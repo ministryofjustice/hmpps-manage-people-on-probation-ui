@@ -12,6 +12,7 @@ const stubEmptyHomepage = (): SuperAgentRequest =>
         upcomingAppointments: [],
         appointmentsRequiringOutcomeCount: 0,
         appointmentsRequiringOutcome: [],
+        enforcementActions: [],
       },
       headers: {
         'Content-Type': 'application/json',

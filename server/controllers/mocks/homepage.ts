@@ -25,4 +25,19 @@ export const mockHomepage = {
       startDateTime: '2025-03-04T11:30:00Z',
     },
   ],
+  enforcementActions: [
+    {
+      id: 0,
+      name: {
+        surname: 'Morrison',
+        forename: 'Stuart',
+      },
+      crn: 'X000001',
+      type: 'Planned telephone contact',
+      location: 'HMP Wakefield',
+      startDateTime: '2025-03-17T09:00:00Z',
+      endDateTime: '2025-03-17T09:30:00Z',
+      outcome: 'Did not comply'
+    }
+  ],
 } as Homepage

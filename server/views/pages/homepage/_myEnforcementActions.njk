@@ -1,0 +1,54 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set tableData = {
+  firstCellIsHeader: true,
+  classes: 'govuk-!-margin-bottom-0',
+  head: [
+    {
+      text: "Person on probation"
+    },
+    {
+      text: "Appointment details"
+    },
+    {
+      text: "Appointment outcome"
+    },
+    {
+        text: "Enforcement action"
+    },
+    {
+        text: "Action"
+    }
+  ],
+  rows: []
+} %}
+
+{% if enforcementActions.length > 0 %}
+  {% for enforcementAction in enforcementActions %}
+      {% set dateAndTime %}
+      {% endset %}
+      {% set row = tableData.rows.push([
+          {
+              html: '<a class="govuk-!-font-weight-regular" href="/case/' + enforcementAction.crn + '">' + enforcementAction.name.surname + ', ' + enforcementAction.name.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + enforcementAction.crn + '</span>'
+          },
+          {
+              html: '<a class="govuk-link" href="/case/' + enforcementAction.crn + '/appointments/appointment/' + enforcementAction.id + '/manage?back=' + url + '">' + enforcementAction.type + '</a>'
+          },
+          {
+              text: enforcementAction.outcome if enforcementAction.outcome else 'Not Provided'
+          },
+          {
+              text: enforcementAction.enforcementAction if enforcementAction.enforcementAction else 'Not Provided'
+          },
+          {
+              classes: 'govuk-!-text-align-right',
+              html: '<a class="govuk-link" href="/case/' + enforcementAction.crn + '/appointments/appointment/' + enforcementAction.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Manage</a>'
+          }
+      ]) %}
+  {% endfor %}
+  <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+    {{ govukTable(tableData) }}
+  </div>
+{% else %}
+  <p class="govuk-body govuk-!-padding-3">There are no upcoming enforcement actions.</p>
+{% endif %}

@@ -20,6 +20,7 @@ import rescheduleAppointmentController from './rescheduleAppointments'
 import whatsNewController from './whatsNewController'
 import appointmentOutcomesController from './appointmentOutcomes'
 import footerController from './footerController'
+import enforcementActionController from './enforcementAction'
 
 export default {
   caseload: caseloadController,
@@ -44,4 +45,5 @@ export default {
   alerts: alertsController,
   checkIns: checkInsController,
   appointmentOutcomes: appointmentOutcomesController,
+  enforcementActions: enforcementActionController,
 }

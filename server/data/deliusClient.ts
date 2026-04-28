@@ -21,6 +21,19 @@ export interface Homepage {
   upcomingAppointments: AppointmentSummary[]
   appointmentsRequiringOutcome: AppointmentSummary[]
   appointmentsRequiringOutcomeCount: number
+  enforcementActions: EnforcementSummary[]
+}
+
+export interface EnforcementSummary {
+  crn: string
+  name: Name
+  id: number
+  type: string
+  startDateTime: string
+  endDateTime?: string
+  location?: string
+  deliusManaged?: boolean
+  outcome?: string
 }
 
 export interface AppointmentSummary {

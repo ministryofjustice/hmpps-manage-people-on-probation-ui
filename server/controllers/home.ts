@@ -18,7 +18,7 @@ const homeController: Controller<typeof routes, void> = {
       const homePage: Homepage = await deliusClient.getHomepage(res.locals.user.username)
       appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
       appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
-      const { upcomingAppointments } = homePage
+      const { upcomingAppointments, enforcementActions } = homePage
       let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
       if (res.locals.flags.enableHomePageOutcomesWithFilter) {
         lastTwoYearsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
@@ -35,6 +35,7 @@ const homeController: Controller<typeof routes, void> = {
         upcomingAppointments,
         appointmentsRequiringOutcome,
         appointmentsRequiringOutcomeCount,
+        enforcementActions,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
