@@ -1,3 +1,17 @@
 {% extends "../_form.njk" %}
-{# placeholder title below - will be removed #}
-{% set title = "Enforcement action for Alton’s unacceptable absence" %}
+{% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s unacceptable absence' %}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+    {{ govukRadios({
+    name: "enforcementAction",
+    fieldset: {
+      legend: {
+        text: "Select an action for " + appointmentOutcome.forename + "’s unacceptable absence",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: appointmentOutcome.options
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+{% endblock %}

@@ -9,7 +9,11 @@ interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
-  const enforcementActionRoutes = ['outcome/attended-failed-to-comply', 'outcome/acceptable-absence']
+  const enforcementActionRoutes = [
+    'outcome/attended-failed-to-comply',
+    'outcome/acceptable-absence',
+    'outcome/unacceptable-absence',
+  ]
   const { crn, id, page, isInPast, msg, log } = args
   return {
     [`[appointments][${crn}][${id}][outcome][type]`]: {
