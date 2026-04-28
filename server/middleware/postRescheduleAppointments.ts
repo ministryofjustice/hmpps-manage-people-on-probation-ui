@@ -10,7 +10,7 @@ import {
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
+import { EventResponse, RescheduleEventRequest, SmsPreviewRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { PersonAppointment } from '../data/model/schedule'
 import { buildCaseLink } from './postAppointments'
@@ -28,8 +28,18 @@ export const postRescheduleAppointments = (
     const { externalReference: oldSupervisionAppointmentUrn } = res.locals.personAppointment.appointment
 
     const { data } = req.session
-    const { date, start, end, type, notes, sensitivity, visorReport, rescheduleAppointment, outcomeRecorded } =
-      getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    const {
+      date,
+      start,
+      end,
+      type,
+      notes,
+      sensitivity,
+      visorReport,
+      rescheduleAppointment,
+      outcomeRecorded,
+      smsOptIn,
+    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const selectedTeam = getDataValue(data, ['appointments', crn, uuid, 'user', 'teamCode'])
     const selectedLocation = getDataValue(data, ['appointments', crn, uuid, 'user', 'locationCode'])
     const staffCode = getDataValue(data, ['appointments', crn, uuid, 'user', 'staffCode'])
@@ -56,6 +66,7 @@ export const postRescheduleAppointments = (
     const response = await masClient.putRescheduleAppointment(contactId, body)
     const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
+    let isWelshTranslation: boolean = false
     if (email && res.locals.flags.enableCalendarEvents) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
@@ -82,11 +93,38 @@ export const postRescheduleAppointments = (
         },
         oldSupervisionAppointmentUrn,
       }
+      const { mobileNumber } = res.locals.case
+
+      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
+        const {
+          includeWelshPreview,
+          appointmentLocation = null,
+          appointmentTypeCode = null,
+        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
+        isWelshTranslation = includeWelshPreview
+        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
+          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
+          mobileNumber,
+          crn,
+          smsOptIn: true,
+          includeWelshTranslation: includeWelshPreview,
+        }
+        if (appointmentLocation)
+          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
+        if (appointmentTypeCode)
+          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentTypeCode = appointmentTypeCode
+      }
+
       eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
+    if (smsOptIn?.includes('YES') && !eventResponse?.smsResponse?.englishNotificationId)
+      data.isEnglishNotificationFailed = true
+
+    if (smsOptIn?.includes('YES') && isWelshTranslation && !eventResponse?.smsResponse?.welshNotificationId)
+      data.isWelshNotificationFailed = true
 
     return response
   }

@@ -5,7 +5,7 @@
 
 {% set titleHtml %}
 <span class="govuk-heading-s govuk-!-margin-bottom-0">
-  <a href="{{ link }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
+  <a href="{{ link }}" class="app-!-inherit-colour">{{ (entry.displayName or entry.type) | toSentenceCase }}
     <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 </span>
 {% endset %}

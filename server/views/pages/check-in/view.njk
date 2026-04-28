@@ -50,6 +50,10 @@
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Reviewed on</dt>
+                <dd class="govuk-summary-list__value">{{checkIn.reviewedAt | dateWithYear(true) }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Is the person in the image from the check in {{ checkIn.personalDetails.name.forename }}?</dt>
                 <dd class="govuk-summary-list__value">{{"Yes" if checkIn.manualIdCheck == "MATCH" else "No"}}</dd>
                 <dd class="govuk-summary-list__actions">
@@ -78,9 +82,6 @@
         <h2 class="govuk-heading-m">Add further information</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
-                hint: {
-                    text: "This information will be added to contact notes."
-                },
                 rows: '10',
                 maxlength: maxCharCount,
                 formGroup: {
@@ -134,6 +135,10 @@
         <h2 class="govuk-heading-m govuk-!-margin-top-5">{{ checkIn.personalDetails.name.forename }}'s check in</h2>
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Checked in on</dt>
+                <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYear(true) }}</dd>
+            </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{"System ID and liveness check result" if checkIn.livenessEnabled else "System ID check result"}}</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>

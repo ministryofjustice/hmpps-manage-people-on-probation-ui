@@ -37,7 +37,7 @@ const loadPage = ({ manageJourney = true, sentenceType = 'community', isProbatio
     completeLocationDateTimePage({ dateInPast: true })
   }
   outcomePage = new OutcomePage()
-  cy.get(`.govuk-radios__input[value=ATTENDED_SENT_HOME_BEHAVIOUR]`).click()
+  cy.get(`.govuk-radios__input[value=UNACCEPTABLE_ABSENCE]`).click()
   outcomePage.getSubmitBtn().click()
 }
 
@@ -96,9 +96,9 @@ const checkPage = ({ manageJourney = true } = {}) => {
   it('should render the page if sentence type is community and user is not probation practitioner', () => {
     loadPage({ manageJourney })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-    attendedFailedToComplyPage.checkPageTitle('Enforcement action for Alton’s failure to comply')
+    attendedFailedToComplyPage.checkPageTitle('Enforcement action for Alton’s unacceptable absence')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
+    cy.get('legend').should('contain.text', 'Select an action for Alton’s unacceptable absence')
     const options = getExpectedOptions()
     checkOptions(options)
   })
@@ -115,7 +115,7 @@ const checkPage = ({ manageJourney = true } = {}) => {
     attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
   })
   it('should show validation error when no option is selected', () => {
-    const msg = 'Select an action for this failure to comply'
+    const msg = 'Select an action for their unacceptable absence'
     loadPage({ manageJourney })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
     attendedFailedToComplyPage.getSubmitBtn().click()
@@ -129,7 +129,7 @@ const checkPage = ({ manageJourney = true } = {}) => {
   })
 }
 
-describe('Attended but failed to comply', () => {
+describe('Unacceptable absence', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })

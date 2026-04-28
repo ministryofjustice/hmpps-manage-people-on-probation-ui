@@ -1,5 +1,37 @@
 [
   {
+    "heading": "Probation-wide launch of this service",
+    "summary": "27 April 2026",
+    "whatsNew": [
+      "Probation-wide launch of this service",
+      [
+        "Manage people on probation (MPOP) is now live for anyone working in the Probation Service with an NDelius username and password.\n\nTo support you with using this new service, we’re running webinars in every region during May and June including the National Security Division.\n\nAt the regional webinars you'll: \nlisten to colleagues who have already started using the service  \nwatch demos \nfind out how to get started \nfind out what training and support is available \nhave an opportunity to ask questions and have a go! \u2028\nYour Regional Change Lead will invite you to a webinar. You should prioritise attending it if you manage a caseload."
+      ],
+      "Add frequently used contacts in this service",
+      [
+        "You can now add the 10 contacts most frequently used by probation practitioners in this service, as well as appointments.\n\nThe contacts cover common communication contacts such as emails, texts, telephone calls and police liaisons.\n\nWe’ll be adding more contacts over the next few months."
+      ],
+      "Character limit increased for notes",
+      ["To make it easier for you to add complete notes to a case, we’ve increased the character limit to 12,000."],
+      "Risk to Probation Staff flag",
+      [
+        "The new Risk to Probation Staff flag highlights when a person on probation poses a risk to probation staff.\n\nThis is a new registration type that is manually added and maintained within NDelius."
+      ],
+      "'Is this page useful?’ survey",
+      [
+        "We have added a ‘Is this page useful?’ survey at the bottom of every page (footer) to help you more readily indicate satisfaction or frustration with a particular page in the service.\n\nIf you click ‘yes’, you can add optional comments, then submit.\n\nIf you click ‘no’, you’re asked to give details and then submit.\n\nThis will help us to identify what’s working well and prioritise improvements."
+      ],
+      "Feedback banner",
+      [
+        "A ‘beta’ banner now appears at the top of every page to give you a quick and easy way to give us feedback. Click the link in the banner and an automatic email will open, addressed to our mpop-digital-team@justice.gov.uk inbox."
+      ],
+      "Calendar invitation bug fix",
+      [
+        "We’ve fixed a bug related to daylight savings, where the appointment time was correct on this service but displayed an hour early on the calendar invitation. Thanks to our users who reported this."
+      ]
+    ]
+  },
+  {
     "heading": "Search and filter contacts more easily",
     "summary": "13 March 2026",
     "whatsNew": [

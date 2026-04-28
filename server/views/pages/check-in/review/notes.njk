@@ -30,8 +30,6 @@
             </h2>
           {% endif %}
         {% endblock %}
-        
-        <p class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the video is the person who should be checking in.</p>
 
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
@@ -171,13 +169,6 @@
    <div class="govuk-grid-column-two-thirds">
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
-                hint: {
-                    text: "This information will be added to the contact"
-                },
-                label: {
-                    text: "What action are you taking after reviewing this check in? (optional)",
-                    classes: "govuk-label--m"
-                },
                 rows: '10',
                 maxlength: maxCharCount,
                 formGroup: {
@@ -215,9 +206,9 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
-                        text: 'Did the check in help you with risk management? (optional)',
+                        text: 'Did this information help you to manage their risk? (optional)',
                         classes: "govuk-fieldset__legend govuk-fieldset__legend--m",
-                        hint: 'This information is only used to help us learn about how you use this system.'
+                        hint: 'We only use this to understand more about the value of online check ins.'
                     }
                 },
                 formGroup: {
@@ -239,7 +230,7 @@
 
             <div class="govuk-button-group">
                 {{ govukButton({
-                html: "Confirm review",
+                html: "Complete review",
                 attributes: {
                     'data-qa': 'submit-btn'
                 }

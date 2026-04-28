@@ -14,7 +14,6 @@ const crn = 'X000001'
 const id = '1234'
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const contactId = '1234'
-const change = '/change/url'
 
 const mockFile = {
   fieldname: 'fileUpload',
@@ -29,9 +28,7 @@ jest.mock('../data/masApiClient')
 
 jest.mock('../data/masApiClient')
 
-const mockHmppsAuthClient = {
-  getSystemClientToken: jest.fn().mockResolvedValue('token'),
-} as any
+jest.mock('../data/masApiClient')
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -144,6 +141,15 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
     ...(request ?? {}),
   }
   return httpMocks.createRequest(req)
+}
+
+const sharedRedirectChecks = {
+  SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
+  INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
+  NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
+  DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
 }
 
 describe('controllers/appointmentOutcomes', () => {
@@ -338,6 +344,68 @@ describe('controllers/appointmentOutcomes', () => {
         const spy = jest.spyOn(res, 'redirect')
         mockGetDataValue.mockReturnValueOnce(enforcementAction)
         controllers.appointmentOutcomes.postAttendedFailedToComply()(req, res)
+        expect(spy).toHaveBeenCalledWith(redirectUrl)
+      })
+    })
+  })
+
+  describe('getAttendedFailedToComply', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAttendedFailedToComply()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply')
+    })
+  })
+
+  describe('postAttendedFailedToComply', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      Object.entries(sharedRedirectChecks).forEach(([enforcementAction, redirectUrl]) => {
+        const req = mockReq()
+        const res = mockRes()
+        const spy = jest.spyOn(res, 'redirect')
+        mockGetDataValue.mockReturnValueOnce(enforcementAction)
+        controllers.appointmentOutcomes.postAttendedFailedToComply()(req, res)
+        expect(spy).toHaveBeenCalledWith(redirectUrl)
+      })
+    })
+  })
+  describe('getAcceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
+    })
+  })
+  describe('postAcceptableAbsence', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUnacceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUnacceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
+    })
+  })
+  describe('postUnacceptableAbsence', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      Object.entries(sharedRedirectChecks).forEach(([enforcementAction, redirectUrl]) => {
+        const req = mockReq()
+        const res = mockRes()
+        const spy = jest.spyOn(res, 'redirect')
+        mockGetDataValue.mockReturnValueOnce(enforcementAction)
+        controllers.appointmentOutcomes.postUnacceptableAbsence()(req, res)
         expect(spy).toHaveBeenCalledWith(redirectUrl)
       })
     })
