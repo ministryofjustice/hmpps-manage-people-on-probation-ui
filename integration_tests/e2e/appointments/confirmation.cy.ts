@@ -188,7 +188,7 @@ describe('Confirmation page', () => {
       loadPage('X000001')
       confirmPage
         .getlogOutcomeLink()
-        .should('contain.text', 'log appointment outcome for Thursday 21 March 2024')
+        .should('contain.text', 'log appointment outcome for Saturday 21 March 2026')
         .should('have.attr', 'href', `/case/X000001/appointments/appointment/5/manage`)
     })
 
