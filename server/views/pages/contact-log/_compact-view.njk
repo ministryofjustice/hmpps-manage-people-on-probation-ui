@@ -14,7 +14,7 @@
 
 {% macro rendersummaryText(activity) %}
   <span>
-    {{ (activity.description or activity.type) | toSentenceCase }}
+    {{ (activity.displayName or activity.type) | toSentenceCase }}
   </span>
 {% endmacro %}
 
@@ -67,7 +67,7 @@
                 }) }}
               {% else %}
                 <div class="govuk-!-margin-bottom-6 contact-activity--noNotes">
-                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ (activity.description or activity.type) | toSentenceCase }}</a>
+                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ (activity.displayName or activity.type) | toSentenceCase }}</a>
                 </div>
               {% endif %}
             </div>

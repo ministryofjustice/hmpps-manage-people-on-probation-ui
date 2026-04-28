@@ -31,6 +31,7 @@ export interface Activity {
   id: string
   eventNumber?: string
   type: string
+  displayName?: string
   startDateTime: string
   endDateTime?: string
   rarToolKit?: string
