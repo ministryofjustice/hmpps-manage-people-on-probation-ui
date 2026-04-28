@@ -188,7 +188,7 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
-                        text: 'Does this contact include sensitive information?',
+                        text: 'Does this online check in include sensitive information?',
                         classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
                     }
                 },
@@ -202,11 +202,11 @@
                 },
                 items: [
                     {
-                        value: "yes",
+                        value: true,
                         text: "Yes, it includes sensitive information"
                     },
                     {
-                        value: "no",
+                        value: false,
                         text: "No, it is not sensitive"
                     }
                 ]

@@ -5,8 +5,17 @@
 {% macro renderComplianceTag(activity) %}
   {% if activity.isAppointment === true %}
     {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
-    {% elif activity.isCommunication %}
+  {% elif activity.isCommunication %}
     {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
+  {% elif activity.esupervisionId %}
+    {% if activity.isSensitive %}
+      <span class="app-compliance-tag--compact">
+        {{ govukTag({
+          html: '<span class="app-compliance-tag-icon"><b>!</b></span>',
+          classes: "app-compliance-tag govuk-tag--yellow govuk-!-margin-left-2 contact-activity__tag app-compliance-tag--compact"
+        }) }}
+      </span>
+    {% endif %}
   {% else %}
     {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
   {% endif %}

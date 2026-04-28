@@ -12,9 +12,11 @@ export interface CheckInReviewValidationArgs {
 
 export const checkInReviewValidation = (args: CheckInReviewValidationArgs): ValidationSpec => {
   const { crn, id, page } = args
+  const sensitiveContactPages = ['notes', 'view', 'view-expired', 'expired']
+  const noteRequiredPages = ['view', 'view-expired']
   return {
     [`[esupervision][${crn}][${id}][checkins][note]`]: {
-      optional: page !== 'view',
+      optional: !noteRequiredPages.includes(page),
       checks: [
         {
           validator: isNotEmpty,
@@ -44,7 +46,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
       ],
     },
     [`[esupervision][${crn}][${id}][checkins][sensitiveContact]`]: {
-      optional: page !== 'notes',
+      optional: !sensitiveContactPages.includes(page),
       checks: [
         {
           validator: isNotEmpty,

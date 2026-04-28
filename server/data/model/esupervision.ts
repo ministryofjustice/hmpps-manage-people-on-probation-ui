@@ -57,12 +57,13 @@ export interface ESupervisionReview {
   notes?: string
   missedCheckinComment?: string
   riskManagementFeedback?: boolean
-  sensitiveContact?: boolean
+  sensitive?: boolean
 }
 
 export interface ESupervisionNote {
   updatedBy: string
   notes: string
+  sensitive?: boolean
 }
 
 export type ExternalUserId = string

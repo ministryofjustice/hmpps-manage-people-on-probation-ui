@@ -80,6 +80,36 @@
                 }
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
 
+            {% if checkIn.sensitive !== 'true' and checkIn.sensitive !== true %}
+                {{ govukRadios({
+                    fieldset: {
+                        legend: {
+                            text: 'Does this online check in include sensitive information?',
+                            classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
+                        }
+                    },
+                    hint: {
+                        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+                    },
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'sensitiveContact'
+                        }
+                    },
+                    items: [
+                        {
+                            value: true,
+                            text: "Yes, it includes sensitive information"
+                        },
+                        {
+                            value: false,
+                            text: "No, it is not sensitive"
+                        }
+                    ]
+                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'sensitiveContact'])) }}
+            {% else %}
+                <input type="hidden" name="esupervision[{{ crn }}][{{ id }}][checkins][sensitiveContact]" value="true">
+            {% endif %}
             <div class="govuk-button-group">
                 {{ govukButton({
                 html: "Add update",
