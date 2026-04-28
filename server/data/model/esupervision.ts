@@ -28,6 +28,7 @@ export interface ESupervisionCheckIn {
   notes?: Note[]
   checkinLogs: ESupervisionCheckInLogs
   reviewDueDate?: string
+  sensitive?: boolean
 }
 
 export interface ESupervisionLog {

@@ -31,10 +31,18 @@
         {% endif %}
         {% block heading %}
           {% if title %}
-            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">
               {{ title }}
             </h2>
           {% endif %}
+            {% if checkIn.sensitive %}
+                <div class="govuk-!-margin-bottom-7">
+                    {{ govukTag({
+                    html: 'Sensitive',
+                    classes: "govuk-tag--yellow"
+                    }) }}
+                </div>
+            {% endif %}
         {% endblock %}
 
         <h2 class="govuk-heading-m">Practitioner review</h2>
