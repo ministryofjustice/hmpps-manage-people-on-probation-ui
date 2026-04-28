@@ -1,17 +1,15 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { v4 as uuidv4, v4 } from 'uuid'
-import { DateTime } from 'luxon'
+import { v4 } from 'uuid'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
-import { checkRecentlyViewedAccess, getSearchParamsString, isValidCrn } from '../utils'
+import { checkRecentlyViewedAccess } from '../utils'
 import { Controller } from '../@types'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
-import { renderError } from '../middleware'
 import { getDateRange, RangeType } from '../utils/getDateRange'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
@@ -130,7 +128,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
       const [name, dir] = sortByQuery.split('.') as [ColName, SortDir]
       let cols = colNames
-      const outcomeFilter = req.query?.outcomeFilter
+      const outcomeFilter = req.query?.outcomeFilter ?? 'PAST_TWO_YEARS'
       let fromDate
       let toDate
       if (type === 'no-outcome') {
