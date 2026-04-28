@@ -119,6 +119,7 @@ const mockAppointment: AppointmentSession = {
 const mockFlags = {
   enableOutlookEvent: true,
   enableCalendarEvents: true,
+  enableSmsReminders: true,
 }
 
 const mockAppointmentTypes: AppointmentType[] = [
@@ -432,6 +433,77 @@ describe('middleware/postRescheduleAppointments', () => {
           }),
         }),
       )
+    })
+
+    it('should set isEnglishNotificationFailed when sms response is missing', async () => {
+      const [req] = buildRequest({
+        smsOptIn: 'YES', // ✅ REQUIRED
+      } as any)
+
+      jest.spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent').mockResolvedValue({
+        ...mockEventResponse,
+        smsResponse: null,
+      })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(req.session.data.isEnglishNotificationFailed).toBe(true)
+    })
+
+    it('should include smsEventRequest when smsOptIn is YES and mobile number exists', async () => {
+      const [req] = buildRequest({
+        smsOptIn: 'YES', // ✅ REQUIRED
+      } as any)
+
+      const mockRes = mockAppResponse({
+        ...mockLocals,
+        flags: {
+          ...mockLocals.flags,
+          enableSmsReminders: true, // ✅ REQUIRED
+        },
+      })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
+
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.objectContaining({
+            smsEventRequest: expect.objectContaining({
+              firstName: 'James',
+              mobileNumber: '07822567890',
+              crn,
+              smsOptIn: true,
+              includeWelshTranslation: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+            }),
+          }),
+        }),
+      )
+    })
+    it('should set isWelshNotificationFailed when welsh sms is missing', async () => {
+      const [req] = buildRequest({
+        smsOptIn: 'YES', // ✅ REQUIRED
+        smsPreview: {
+          request: {
+            includeWelshPreview: true,
+            appointmentLocation: 'Mock Location',
+            appointmentTypeCode: 'COAP',
+          },
+        },
+      } as any)
+
+      jest.spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent').mockResolvedValue({
+        ...mockEventResponse,
+        smsResponse: {
+          englishNotificationId: 'id-1',
+          welshNotificationId: null,
+        },
+      })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(req.session.data.isWelshNotificationFailed).toBe(true)
     })
   })
 })
