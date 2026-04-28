@@ -75,7 +75,7 @@ describe('Change appointment details and reschedule', () => {
         completeRescheduling(uuid)
         cy.get('[data-qa="previousDateTime"]').should(
           'contain.text',
-          `Wednesday 21 February 2024 at 12:15am to 12:30am`,
+          `Wednesday 21 February 2024 at 10:15am to 10:30am`,
         )
         checkYourAnswerPage
           .getSummaryListRow(5)
