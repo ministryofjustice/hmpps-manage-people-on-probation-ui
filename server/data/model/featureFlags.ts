@@ -23,4 +23,5 @@ export class FeatureFlags {
   enablePoPSearchExtraColumns?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
+  enableHomePageOutcomesWithFilter?: boolean = undefined
 }

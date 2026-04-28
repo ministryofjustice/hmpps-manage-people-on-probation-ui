@@ -1,6 +1,7 @@
+import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import config from '../config'
-import DeliusClient from '../data/deliusClient'
+import DeliusClient, { AppointmentSummary, Homepage } from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
@@ -12,8 +13,22 @@ const homeController: Controller<typeof routes, void> = {
       if (!res.locals.flags?.enableDeliusClient) return homeController.getHomeOld(hmppsAuthClient)(req, res)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const deliusClient = new DeliusClient(token)
-      const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } =
-        await deliusClient.getHomepage(res.locals.user.username)
+      let appointmentsRequiringOutcome
+      let appointmentsRequiringOutcomeCount
+      const homePage: Homepage = await deliusClient.getHomepage(res.locals.user.username)
+      appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
+      appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
+      const { upcomingAppointments } = homePage
+      let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
+      if (res.locals.flags.enableHomePageOutcomesWithFilter) {
+        lastTwoYearsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.startDateTime)
+          const twoYearsAgo = DateTime.now().minus({ years: 2 })
+          return contactDate >= twoYearsAgo
+        })
+        appointmentsRequiringOutcome = lastTwoYearsAppointmentsRequiringOutcome
+        appointmentsRequiringOutcomeCount = lastTwoYearsAppointmentsRequiringOutcome.length
+      }
       const url = encodeURIComponent(req.url)
       await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
       return res.render('pages/homepage/homepage', {

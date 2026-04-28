@@ -12,7 +12,11 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
 
   get('/case', controllers.caseload.getCase(hmppsAuthClient))
 
-  get('/caseload/appointments/*path', controllers.caseload.userSchedule(hmppsAuthClient))
+  get('/caseload/appointments/upcoming', controllers.caseload.userSchedule(hmppsAuthClient))
+
+  get('/caseload/appointments/no-outcome', controllers.caseload.userSchedule(hmppsAuthClient))
+
+  post('/caseload/appointments/no-outcome', controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient))
 
   get('/teams', controllers.caseload.getTeams(hmppsAuthClient))
 

@@ -203,13 +203,13 @@ const appointmentsController: Controller<typeof routes, void> = {
         const twoYearsAgo = DateTime.now().minus({ years: 2 })
         return contactDate >= twoYearsAgo
       })
-      if (req.session.outcomesFilter === 'Older') {
+      if (req.session.outcomesFilter === 'OLDER_THAN_TWO_YEARS') {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
           const twoYearsAgo = DateTime.now().minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
-      } else if (req.session.outcomesFilter === 'All') {
+      } else if (req.session.outcomesFilter === 'ALL') {
         outcomes = content
       }
       return res.render('pages/appointments/record-an-outcome', {
@@ -219,7 +219,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
         outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
-        outcomesFilter: req.session.outcomesFilter ?? '2Years',
+        outcomesFilter: req.session.outcomesFilter ?? 'PAST_TWO_YEARS',
       })
     }
   },

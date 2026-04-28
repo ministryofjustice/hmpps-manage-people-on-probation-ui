@@ -13,6 +13,7 @@ import { CaseSearchFilter, TeamCaseload, UserCaseload, UserTeam } from '../data/
 import caseloadController from './caseload'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import * as utils from '../utils'
+import * as dateRangeUtils from '../utils/getDateRange'
 import { checkAuditMessage } from './testutils'
 
 jest.mock('../data/masApiClient')
@@ -358,6 +359,7 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?page=1',
       })
+      res.locals.flags = { enableHomePageOutcomesWithFilter: false }
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
@@ -380,6 +382,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
+        outcomesFilter: undefined,
       })
     })
     it('renders the outcomes to log page with the sortBy search param included in the url', async () => {
@@ -395,6 +398,7 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?sortBy=sentence.desc',
       })
+      res.locals.flags = { enableHomePageOutcomesWithFilter: false }
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
@@ -417,9 +421,91 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
+        outcomesFilter: undefined,
+      })
+    })
+
+    it('passes date range to schedule API and preserves outcomeFilter in sort URL when filter feature flag is enabled', async () => {
+      const req = httpMocks.createRequest({
+        query: {
+          page: '1',
+          outcomeFilter: 'PAST_TWO_YEARS',
+        },
+        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      })
+      const getDateRangeSpy = jest
+        .spyOn(dateRangeUtils, 'getDateRange')
+        .mockReturnValue({ fromDate: '2024-01-01', toDate: '2026-01-01' })
+      res.locals.flags = { enableHomePageOutcomesWithFilter: true }
+
+      await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
+
+      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_TWO_YEARS')
+      expect(getUserScheduleSpy).toHaveBeenCalledWith({
+        username: res.locals.user.username,
+        page: '0',
+        size: '',
+        sortBy: '',
+        ascending: '',
+        type: 'no-outcome',
+        fromDate: '2024-01-01',
+        toDate: '2026-01-01',
+      })
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        userSchedule: expectedUserSchedule,
+        type: 'no-outcome',
+        sortBy: {
+          name: 'none',
+          dob: 'none',
+          sentence: 'none',
+          date: 'ascending',
+        },
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
+        sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+        url: req.url,
+        outcomesFilter: 'PAST_TWO_YEARS',
       })
     })
   })
+
+  describe('postOutcomesAppointmentsFilter', () => {
+    const redirectSpy = jest.spyOn(res, 'redirect')
+
+    it('redirects to the same path with outcomeFilter query parameter', async () => {
+      const req = httpMocks.createRequest({
+        body: {
+          outcomesFilter: 'PAST_TWO_YEARS',
+        },
+        url: '/caseload/appointments/no-outcome',
+      })
+
+      await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith('/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+    })
+
+    it('preserves existing query parameters when adding outcomeFilter', async () => {
+      const req = httpMocks.createRequest({
+        body: {
+          outcomesFilter: 'OLDER_THAN_TWO_YEARS',
+        },
+        url: '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc',
+      })
+
+      await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc&outcomeFilter=OLDER_THAN_TWO_YEARS',
+      )
+    })
+  })
+
   describe('Teams', () => {
     const redirectSpy = jest.spyOn(res, 'redirect')
 
