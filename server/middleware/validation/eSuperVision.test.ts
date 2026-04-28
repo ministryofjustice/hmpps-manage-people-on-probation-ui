@@ -23,6 +23,7 @@ const restartContactUrl = `/case/${crn}/appointments/check-in/manage/${id}/resta
 const restartEditContactUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`
 const eligibilityCheckUrl = `${checkInUrl}/eligibility-check`
 const fullEligibilityUrl = `${checkInUrl}/full-eligibility`
+const spoApprovalUrl = `${checkInUrl}/spo-approval`
 const reqBase = {
   method: 'POST',
   params: { crn, id },
@@ -120,6 +121,35 @@ describe('Test eSuperVision validation', () => {
       validation.eSuperVision(req, res, next)
 
       expect(res.render).toHaveBeenCalledWith('pages/check-in/eligibility-full', expect.any(Object))
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Test spo-approval (checkbox)', () => {
+    it('passes when the checkbox is checked', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            checkins: {
+              eligibilitySPOApproval: 'spo-approval',
+            },
+          },
+        },
+      }
+      const req = makeReq({ url: spoApprovalUrl, body: { esupervision } })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails when the checkbox is not checked', () => {
+      const req = makeReq({
+        url: spoApprovalUrl,
+      })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/check-in/spo-approval', expect.any(Object))
       expect(next).not.toHaveBeenCalled()
     })
   })
@@ -586,6 +616,64 @@ describe('Test eSuperVision validation', () => {
         validation.eSuperVision(req, res, next)
         expect(next).not.toHaveBeenCalled()
       })
+    })
+  })
+  describe('Test edit question', () => {
+    const editQuestionUrl = `/case/${crn}/appointments/check-in/manage/${id}/questions/1-f47ac10b-58cc-4372-a567-0e02b2c3d479/edit`
+
+    it('passes when draftQuestionInput is provided', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            manageQuestions: {
+              draftQuestionInput: 'the housing service',
+            },
+          },
+        },
+      }
+      const req = makeReq({
+        url: editQuestionUrl,
+        body: { esupervision },
+        session: { data: { esupervision } },
+      })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails when draftQuestionInput is empty', () => {
+      const bodyEsupervision = {
+        [crn]: {
+          [id]: {
+            manageQuestions: {
+              draftQuestionInput: '',
+            },
+          },
+        },
+      }
+
+      const sessionEsupervision = {
+        [crn]: {
+          [id]: {
+            manageQuestions: {
+              availableTemplates: [{ id: '1', template: 'Have you heard back from {{thing}}?' }],
+            },
+          },
+        },
+      }
+
+      const req = makeReq({
+        url: editQuestionUrl,
+        body: { esupervision: bodyEsupervision },
+        session: { data: { esupervision: sessionEsupervision } },
+      })
+      const res = makeRes()
+
+      validation.eSuperVision(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/check-in/questions/edit-question', expect.any(Object))
+      expect(next).not.toHaveBeenCalled()
     })
   })
 })

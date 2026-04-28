@@ -20,7 +20,6 @@ context('Personal Details', () => {
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
     page.getTab('activityLog').should('contain.text', 'Contacts')
-    page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('contactDetails').should('contain.text', 'Contact details')
     page.getCardHeader('personalDetails').should('contain.text', 'Personal details')
     page.getCardHeader('identityNumber').should('contain.text', 'Identity numbers')

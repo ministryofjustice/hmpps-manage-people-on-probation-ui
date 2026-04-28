@@ -1,4 +1,4 @@
-export type StatusErrorCode = 404 | 409 | 500
+export type StatusErrorCode = 403 | 404 | 409 | 500
 
 type StatusError = { title: string; message: string }
 type StatusErrorsType = {
@@ -6,6 +6,10 @@ type StatusErrorsType = {
 }
 
 export const statusErrors: StatusErrorsType = {
+  403: {
+    title: 'Forbidden',
+    message: '<p>You do not have permission to access this page.</p>',
+  },
   404: {
     title: 'Page not found',
     message: `<p>Check you used the right web address. For example, if you copied and pasted it from an email or used a bookmark.</p>

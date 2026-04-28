@@ -35,6 +35,22 @@ describe('utils/deliusDeepLinkUrl', () => {
       'component-id',
       'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&contactID=contact-id&componentId=component-id',
     ],
+    [
+      'DrugHistory',
+      'DrugHistory',
+      '1234',
+      '1',
+      undefined,
+      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=DrugHistory&CRN=1234&EventNumber=1',
+    ],
+    [
+      'UPWWorksheet',
+      'UPWWorksheet',
+      '1234',
+      '1',
+      undefined,
+      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UPWWorksheet&CRN=1234&EventNumber=1',
+    ],
   ])(
     '%s deliusDeepLinkUrl(%s, %s)',
     (_: string, a: string, b: string, c: string | undefined, d: string | undefined, expected: string) => {

@@ -64,13 +64,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAppointmentAttendedFailedToComplyOptions,
   )
 
-  router.post(
-    `${manageBasePath}/add-note`,
-    multerErrorHandler('fileUpload'),
-    parseMultipartBody,
-    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
-  )
-
   router.all(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     getAppointmentAcceptableAbsenceOptions,
@@ -80,6 +73,14 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
     getAppointmentFailedToAttendOptions,
     getAppointmentOutcomeEvidenceBy,
+  )
+  /* run multer file upload error handler before validation */
+
+  router.post(
+    `${manageBasePath}/add-note`,
+    multerErrorHandler('fileUpload'),
+    parseMultipartBody,
+    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 
   /* validate outcome options and store session data on all outcome post routes */

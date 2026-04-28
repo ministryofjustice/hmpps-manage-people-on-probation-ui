@@ -24,7 +24,11 @@ export default function populateCurrentUser(
           logger.info('No user available')
         }
         if (userDetails) {
-          localsUser = { ...userDetails, ...localsUser, userId: userDetails?.userId?.toString() }
+          const { staff, ...userDetailsRest } = userDetails
+          localsUser = { ...userDetailsRest, ...localsUser, userId: userDetails.userId?.toString() }
+          if (staff?.probationDeliveryUnits) {
+            localsUser.probationDeliveryUnits = staff.probationDeliveryUnits
+          }
         } else {
           logger.info('No user details available')
         }

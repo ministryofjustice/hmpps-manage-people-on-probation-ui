@@ -41,6 +41,16 @@
     </div>
   </div>
   
+  {% if flags.enableDeepLinks and isOutcomeRecorded and appointment.deliusManaged %}
+    <p class="govuk-body">
+      {% if flags.enableDeepLinks and appointment.type in drugHistoryContactTypes and appointment.eventNumber %}
+        You can manage this contact through the <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">person's drug history in NDelius (opens in a new tab)</a>.
+      {% else %}
+        <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.
+      {% endif %}
+    </p>
+  {% endif %}
+
   {% set appointmentDetails %}
   {% set showAction = false %}
   {% set noMargin = true %}
