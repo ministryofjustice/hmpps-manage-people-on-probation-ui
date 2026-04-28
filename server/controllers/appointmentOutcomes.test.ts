@@ -16,7 +16,6 @@ const crn = 'X000001'
 const id = '1234'
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const contactId = '1234'
-const change = '/change/url'
 
 const mockFile = {
   fieldname: 'fileUpload',
