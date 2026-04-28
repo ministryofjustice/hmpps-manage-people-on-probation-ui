@@ -44,6 +44,16 @@ context('check in reviews', () => {
     Page.verifyOnPage(ActivityLogPage)
   })
 
+  it('Completes an expired check in review and marks it as sensitive', () => {
+    cy.visit(`/case/${crn}/appointments/${expiredId}/check-in/update`)
+    const page = Page.verifyOnPage(CheckInReviewExpiredPage)
+    page.checkinNotes().type('They lost their phone.')
+    page.sensitiveContactGroup().should('exist')
+    page.radioSensitiveYes().click({ force: true })
+    page.completeReviewButton().click()
+    Page.verifyOnPage(ActivityLogPage)
+  })
+
   it('View page for expired check in that has been reviewed', () => {
     cy.visit(`/case/${crn}/appointments/${expiredSubmittedId}/check-in/update`)
     const page = Page.verifyOnPage(ViewExpiredCheckInPage)
@@ -64,6 +74,36 @@ context('check in reviews', () => {
     page.checkOnPage()
     page.getSubmitBtn().click()
     page2.checkOnPage()
+  })
+
+  it('Completes a submitted check in review and marks it as NOT sensitive', () => {
+    cy.visit(`/case/${crn}/appointments/${submittedId}/check-in/update`)
+    const identityPage = Page.verifyOnPage(CheckInReviewIdentityPage)
+    identityPage.getRadio('confirmIdentity', 1).click()
+    identityPage.getSubmitBtn().click()
+    const notesPage = Page.verifyOnPage(CheckInReviewNotesPage)
+    notesPage.sensitiveContactGroup().should('exist')
+    notesPage.radioSensitiveNo().click({ force: true })
+    notesPage.completeReviewButton().click()
+    Page.verifyOnPage(ActivityLogPage)
+  })
+
+  it('Adds an update to a reviewed check in', () => {
+    cy.visit(`/case/${crn}/appointments/${reviewedId}/check-in/update`)
+    const viewPage = Page.verifyOnPage(ViewCheckInPage)
+    viewPage.sensitiveContactGroup().should('exist')
+    viewPage.radioSensitiveYes().click({ force: true })
+    viewPage.checkinNotes().type('This contains sensitive information.')
+    viewPage.completeReviewButton().click()
+  })
+
+  it('Adds an update to an expired check in', () => {
+    cy.visit(`/case/${crn}/appointments/${expiredSubmittedId}/check-in/update`)
+    const viewExpiredPage = Page.verifyOnPage(ViewExpiredCheckInPage)
+    viewExpiredPage.sensitiveContactGroup().should('exist')
+    viewExpiredPage.checkinNotes().type('They were in hospital. Now marking this contact as sensitive.')
+    viewExpiredPage.radioSensitiveYes().click({ force: true })
+    viewExpiredPage.completeReviewButton().click()
   })
 
   it('System ID check shows Pass when liveness enabled with LIVE result and face MATCH', () => {
