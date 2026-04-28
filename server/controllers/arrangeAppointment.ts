@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
+import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
@@ -599,6 +600,17 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         appointmentType = 'RESCHEDULE'
       }
 
+      if (res.locals.contactResponse) {
+        let outcomes = res.locals.contactResponse.content
+        if (res.locals.flags?.enableOutcomesV1) {
+          outcomes = outcomes?.filter(contact => {
+            const contactDate = DateTime.fromISO(contact.date)
+            const twoYearsAgo = DateTime.now().minus({ years: 2 })
+            return contactDate >= twoYearsAgo
+          })
+        }
+        res.locals.contactResponse.content = outcomes
+      }
       return res.render(`pages/arrange-appointment/confirmation`, {
         crn,
         backendId,

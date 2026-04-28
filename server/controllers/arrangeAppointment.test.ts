@@ -1056,8 +1056,14 @@ describe('controllers/arrangeAppointment', () => {
         appointmentSession: { backendId: 1234, user: { username: '' }, smsOptIn: 'YES' },
         dataSession: { isOutLookEventFailed: false },
       })
-      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
-      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
+      const mockRes = createMockResponse({
+        contactResponse: {
+          content: [],
+        },
+      })
+      const mockRenderSpy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
         backendId: 1234,
