@@ -44,7 +44,7 @@ generic-service:
         "id:100105,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
         ctl:ruleRemoveTargetById=942430;ARGS,\
-        ctl:ruleRemoveTargetById=942200;ARGS"    
+        ctl:ruleRemoveTargetById=942200;ARGS"
 
   env:
     INGRESS_URL: 'https://manage-people-on-probation.hmpps.service.justice.gov.uk'
