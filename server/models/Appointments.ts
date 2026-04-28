@@ -96,6 +96,7 @@ export interface AppointmentSession {
   start?: string
   end?: string
   eventId?: string
+  eventNumber?: string
   username?: string
   uuid?: string
   requirementId?: string

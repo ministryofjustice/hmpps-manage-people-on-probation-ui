@@ -1,0 +1,27 @@
+{% extends "./_form.njk" %}
+{% block afterHeading %}
+  {# {% if appointmentOutcome.breach %} #}
+  {{ mojAlert({
+      variant: "warning",
+      title: "There is a live breach for this sentence",
+      showTitleAsHeading: true,
+      dismissible: false,
+      text: 'The breach for ' + appointmentOutcome.breach.order + ' was initiated on ' + appointmentOutcome.breach.date + '.'
+    }) }}
+  {# {% endif %} #}
+  {# {% if appointmentOutcome.ticket %} #}
+  {{ mojTicketPanel({
+    classes: 'govuk-!-margin-bottom-6',
+  attributes: {
+    "aria-label": "Sub navigation 1"
+  },
+  items: [{
+    html: '<h3 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.ticket.title + '</h3>' + appointmentOutcome.ticket.html,
+    attributes: {
+      "aria-label": "Section 1"
+    },
+    classes: "moj-ticket-panel__content--red"
+  }]
+}) }}
+  {# {% endif %} #}
+{% endblock %}

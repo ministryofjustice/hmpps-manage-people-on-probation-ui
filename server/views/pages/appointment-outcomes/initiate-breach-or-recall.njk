@@ -1,4 +1,4 @@
-{% extends "../_form.njk" %}
+{% extends "../_form-compliance.njk" %}
 {% set sendLetter = true if appointmentOutcome.appointmentSession.outcome.enforcementAction == 'INITIATE_BREACH_RECALL_AND_SEND_LETTER' else 
   false %}
 {% set title = 'Initiate a ' + (

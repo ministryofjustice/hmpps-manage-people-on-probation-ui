@@ -84,6 +84,7 @@ export interface Provision {
 }
 
 export interface ActivityCount {
+  acceptableAbsenceCount: number
   unacceptableAbsenceCount: number
   attendedButDidNotComplyCount: number
   outcomeNotRecordedCount: number

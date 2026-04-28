@@ -24,10 +24,11 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     const { appointmentTypes } = res.locals
     let eventId = appointment?.eventId || ''
+    const eventNumber = appointment?.eventNumber
     const sentences = req?.session?.data?.sentences?.[crn]
-    if (!eventId && appointment?.eventNumber) {
+    if (!eventId && eventNumber) {
       if (sentences) {
-        eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
+        eventId = sentences.find(sentence => sentence?.eventNumber === eventNumber)?.id || ''
       }
     }
     if (eventId && !sentences.some(sentence => sentence.id.toString() === eventId.toString())) {
@@ -83,6 +84,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       start,
       end,
       eventId: eventId?.toString(),
+      eventNumber,
       username: res.locals.user.username,
       uuid: '',
       externalReference,

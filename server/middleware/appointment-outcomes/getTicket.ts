@@ -5,6 +5,7 @@ import MasApiClient from '../../data/masApiClient'
 import { Activity } from '../../data/model/schedule'
 import { AppointmentOutcomeProps, AppointmentOutcomeTicket } from '../../models/Locals'
 import { dateWithYear } from '../../utils'
+import { ActivityCount } from '../../data/model/overview'
 
 export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (_req, res, next) => {
@@ -14,7 +15,6 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
         outcome: { type, enforcementAction },
       },
       appointment,
-      breach,
       forename,
       crn,
     } = appointmentOutcome as AppointmentOutcomeProps<Activity>
@@ -32,7 +32,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       return matchEventId
     }
 
-    const activityWithinLast12Months = (startDateTime: string) => {
+    const activityIsWithinLast12Months = (startDateTime: string) => {
       const now = DateTime.now()
       const monthsDiff = DateTime.fromISO(startDateTime).diff(now, 'months').months
       return (monthsDiff < 0 && monthsDiff >= -12) || monthsDiff >= 0
@@ -40,27 +40,58 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
 
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    const { activities } = await masClient.getPersonActivity(crn)
 
-    const getActivities = (filter = 'didTheyComply'): Activity[] =>
-      activities.filter(activity => {
-        const id = getIdToMatch(activity)
-        if (id) {
+    const [personActivity, personCompliance] = await Promise.all([
+      masClient.getPersonActivity(crn),
+      masClient.getPersonCompliance(crn),
+    ])
+
+    const personActivityInLast12Months = personActivity.activities.filter(activity => {
+      const id = getIdToMatch(activity)
+      return activity[id] !== appointment[id] && activityIsWithinLast12Months(activity.startDateTime)
+    })
+
+    const getActivities = ({
+      activityCountType = 'attendedButDidNotComplyCount',
+      previousBreach = false,
+    }: {
+      activityCountType?: keyof ActivityCount
+      previousBreach?: boolean
+    } = {}): Activity[] => {
+      const activities = personActivityInLast12Months.filter(activity => {
+        return personCompliance.currentSentences.some(currentSentence => {
+          let previousBreachMatches = true
+          if (activityCountType === 'attendedButDidNotComplyCount') {
+            previousBreachMatches = previousBreach
+              ? currentSentence.order.breaches > 0
+              : currentSentence.order.breaches === 0
+          }
           return (
-            activity[id] !== appointment[id] &&
-            activity?.didTheyComply === false &&
-            activityWithinLast12Months(activity.startDateTime)
+            currentSentence.eventNumber === activity.eventNumber &&
+            currentSentence.activity[activityCountType] > 0 &&
+            previousBreachMatches
           )
-        }
-        return false
+        })
       })
+      return activities
+    }
+
+    const getPreviousWarningLetters = () => {
+      const letters = personCompliance.currentSentences.filter(currentSentence => {
+        return (
+          personActivityInLast12Months.some(activity => activity.eventNumber === currentSentence.eventNumber) &&
+          currentSentence.activity.lettersCount > 0
+        )
+      })
+      //  .map(item => )
+    }
 
     let ticket: AppointmentOutcomeTicket = null
     if (['UNACCEPTABLE_ABSENCE', 'ATTENDED_FAILED_TO_COMPLY'].includes(type)) {
-      const failureToComplyActivities = getActivities()
-      const failureToComplyCount = failureToComplyActivities ? failureToComplyActivities.length : 0
-      if (!breach && failureToComplyCount === 1) {
-        const { id, type: activityType, startDateTime } = failureToComplyActivities[0]
+      const activitiesWithNoPreviousBreach = getActivities()
+      const activitiesWithPreviousBreach = getActivities({ previousBreach: true })
+      if (activitiesWithNoPreviousBreach.length === 1) {
+        const { id, type: activityType, startDateTime } = activitiesWithNoPreviousBreach[0]
         ticket = {
           title: `This is ${forename}’s second count of non-compliance in the past 12 months`,
           html: `
@@ -71,13 +102,13 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
                   </ul>`,
         }
       }
-      if (!breach && failureToComplyCount > 1) {
+      if (activitiesWithNoPreviousBreach.length > 1) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months.`,
           html: `<p class="govuk-body">You should consider initiating a breach. <a href="/case/${crn}/activity-log?&compliance=not%20complied" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>`,
         }
       }
-      if (breach && failureToComplyCount > 1) {
+      if (activitiesWithPreviousBreach.length > 1) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months.`,
           html: `<p class="govuk-body govuk-!-margin-bottom-2">${forename} has breached this sentence before. You can:</p>
@@ -90,9 +121,8 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       }
     }
     if (type === 'ACCEPTABLE_ABSENCE') {
-      const acceptableAbsenceActivities = getActivities('acceptableAbsence')
-      const acceptableAbsenceCount = acceptableAbsenceActivities ? acceptableAbsenceActivities.length : 0
-      if (!breach && acceptableAbsenceCount > 1) {
+      const activities = getActivities({ activityCountType: 'acceptableAbsenceCount' })
+      if (activities.length > 1) {
         ticket = {
           title: `${forename} has had multiple acceptable absences in the past 12 months.`,
           html: `<p class="govuk-body">You can view a <a href="/case/${crn}/activity-log?&keywords=acceptable%20absence" target="_blank" rel="noopener noreferrer">list of ${forename}’s acceptable absences (opens in a new tab)</a>.</p>`,
@@ -106,6 +136,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
             Licence compliance letter: sent on Tuesday 3 January 2026</p>`,
       }
     }
+    res.locals.appointmentOutcome.ticket = ticket
     return next()
   }
 }

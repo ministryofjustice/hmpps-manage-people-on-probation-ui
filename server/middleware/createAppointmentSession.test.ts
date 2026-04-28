@@ -153,7 +153,7 @@ const expectedSession = (
 ): AppointmentSession => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
-  const { eventId, isVisor } = mockAppointment
+  const { eventId, eventNumber, isVisor } = mockAppointment
   const { date, time: start } = isoToDateTime(mockAppointment.startDateTime)
   const { time: end } = isoToDateTime(mockAppointment.endDateTime)
   return {
@@ -171,6 +171,7 @@ const expectedSession = (
     start,
     end,
     eventId: eventId.toString(),
+    eventNumber,
     enforcementAction: null,
     username,
     uuid: '',
@@ -226,6 +227,7 @@ describe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         eventId: '49',
+        eventNumber: '1234567',
       }),
     )
     expect(nextSpy).toHaveBeenCalled()
@@ -246,6 +248,7 @@ describe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         eventId: '49',
+        eventNumber: '1234567',
         enforcementAction: { responseByDate: '2026-04-20' },
       }),
     )
@@ -426,7 +429,7 @@ describe('/middleware/createAppointmentSession', () => {
     })
     createAppointmentSession(req, res, nextSpy)
     expect(res.locals.appointmentSession).toStrictEqual(
-      expectedSession({ eventId: 'PERSON_LEVEL_CONTACT', type: 'CODC' }),
+      expectedSession({ eventId: 'PERSON_LEVEL_CONTACT', type: 'CODC', eventNumber: undefined }),
     )
   })
 
@@ -444,6 +447,7 @@ describe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         eventId: '',
+        eventNumber: '12345',
         type: '',
         user: {
           locationCode: '',
@@ -470,6 +474,7 @@ describe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         type: '',
+        eventNumber: '12345',
         user: {
           username: 'tony-pan',
           teamCode: 'N07CHT',
