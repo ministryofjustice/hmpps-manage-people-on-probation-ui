@@ -254,6 +254,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        outcomesFilter: 'PAST_TWO_YEARS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -293,6 +294,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        outcomesFilter: 'PAST_TWO_YEARS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -332,6 +334,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        outcomesFilter: 'PAST_TWO_YEARS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -382,7 +385,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
-        outcomesFilter: undefined,
+        outcomesFilter: 'PAST_TWO_YEARS',
       })
     })
     it('renders the outcomes to log page with the sortBy search param included in the url', async () => {
@@ -421,7 +424,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
-        outcomesFilter: undefined,
+        outcomesFilter: 'PAST_TWO_YEARS',
       })
     })
 
