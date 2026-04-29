@@ -1,17 +1,14 @@
-import { DateTime } from 'luxon'
 import { Contact } from '../data/model/overdueOutcomes'
 import { filterContacts } from './filterContacts'
 
-
 describe('filterContacts', () => {
   const outcomes: Contact[] = [
-    { id: 1, date: '2025-01-01', start: '10:00', type: { code: 'A', description: 'A' } },
-    { id: 2, date: '2023-04-30', start: '10:00', type: { code: 'B', description: 'B' } },
-    { id: 3, date: '2023-04-28', start: '10:00', type: { code: 'C', description: 'C' } },
+    { id: 1, date: '2025-01-01', start: '10:00', type: { code: 'CODE1', description: 'Description 1' } },
+    { id: 2, date: '2023-04-30', start: '10:00', type: { code: 'CODE2', description: 'Description 2' } },
+    { id: 3, date: '2023-04-28', start: '10:00', type: { code: 'CODE3', description: 'Description 3' } },
   ]
 
   beforeAll(() => {
-    // Freeze time to 2025-04-29
     jest.useFakeTimers().setSystemTime(new Date('2025-04-29T00:00:00Z'))
   })
 

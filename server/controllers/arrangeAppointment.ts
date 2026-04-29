@@ -34,6 +34,7 @@ import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
+import { filterContacts } from '../middleware/filterContacts'
 
 const routes = [
   'redirectToSentence',
@@ -603,11 +604,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (res.locals.contactResponse) {
         let outcomes = res.locals.contactResponse.content
         if (res.locals.flags?.enableOutcomesV1) {
-          outcomes = outcomes?.filter(contact => {
-            const contactDate = DateTime.fromISO(contact.date)
-            const twoYearsAgo = DateTime.now().minus({ years: 2 })
-            return contactDate >= twoYearsAgo
-          })
+          outcomes = filterContacts(outcomes)
         }
         res.locals.contactResponse.content = outcomes
       }
