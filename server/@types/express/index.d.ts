@@ -28,7 +28,9 @@ declare module 'express-session' {
     activityLogFilters?: ActivityLogFilters
     documentFilters?: DocumentFilters
     documentLevels?: DocumentLevel[]
-    outcomesFilter?: '2Years' | 'Older' | 'All'
+    outcomesFilter?: {
+      [crn: string]: '2Years' | 'Older' | 'All'
+    }
     data?: Data
     errors?: Errors
     errorMessages?: Record<string, string>

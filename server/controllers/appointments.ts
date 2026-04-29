@@ -196,20 +196,21 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      req.session.outcomesFilter = req?.body?.outcomesFilter ?? req.session.outcomesFilter
+      req.session.outcomesFilter = req.session.outcomesFilter ?? {}
+      req.session.outcomesFilter[crn] = req?.body?.outcomesFilter ?? req?.session?.outcomesFilter[crn]
       const content = res.locals.contactResponse?.content
       let outcomes = content?.filter(contact => {
         const contactDate = DateTime.fromISO(contact.date)
         const twoYearsAgo = DateTime.now().minus({ years: 2 })
         return contactDate >= twoYearsAgo
       })
-      if (req.session.outcomesFilter === 'Older') {
+      if (req.session.outcomesFilter[crn] === 'Older') {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
           const twoYearsAgo = DateTime.now().minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
-      } else if (req.session.outcomesFilter === 'All') {
+      } else if (req.session.outcomesFilter[crn] === 'All') {
         outcomes = content
       }
       return res.render('pages/appointments/record-an-outcome', {
@@ -219,7 +220,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
         outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
-        outcomesFilter: req.session.outcomesFilter ?? '2Years',
+        outcomesFilter: req.session.outcomesFilter[crn] ?? '2Years',
       })
     }
   },
