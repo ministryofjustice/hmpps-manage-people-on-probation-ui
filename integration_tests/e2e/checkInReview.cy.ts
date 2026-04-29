@@ -23,12 +23,12 @@ context('check in reviews', () => {
     const page = Page.verifyOnPage(ViewCheckInPage)
 
     page
-      .getSummaryListRow(1, 'reviewSummary')
+      .getSummaryListRow(2, 'reviewSummary')
       .find('.govuk-summary-list__key')
       .should('contain.text', 'Is the person in the image from the check in John?')
-    page.getSummaryListRow(1, 'reviewSummary').find('.govuk-summary-list__value').should('contain.text', 'Yes')
+    page.getSummaryListRow(2, 'reviewSummary').find('.govuk-summary-list__value').should('contain.text', 'Yes')
     page
-      .getSummaryListRow(1, 'reviewSummary')
+      .getSummaryListRow(2, 'reviewSummary')
       .find('.govuk-summary-list__actions .govuk-tag')
       .should('contain.text', 'Identity confirmed')
 
@@ -112,9 +112,9 @@ context('check in reviews', () => {
     const page = Page.verifyOnPage(ViewCheckInPage)
 
     page
-      .getSummaryListRow(1, 'checkInSummary')
+      .getSummaryListRow(2, 'checkInSummary')
       .find('.govuk-summary-list__key')
       .should('contain.text', 'System ID and liveness check result')
-    page.getSummaryListRow(1, 'checkInSummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
+    page.getSummaryListRow(2, 'checkInSummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
   })
 })

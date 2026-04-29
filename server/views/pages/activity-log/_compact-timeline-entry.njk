@@ -15,13 +15,13 @@
       <a href="{{ link }}">
             {% if entry.isAppointment === true %}
                   {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-                  {{ entry.type | toSentenceCase }} at&nbsp;{{ entry.startDateTime | govukTime }}
+                  {{ (entry.displayName or entry.type) | toSentenceCase }} at&nbsp;{{ entry.startDateTime | govukTime }}
             {% elif entry.isCommunication %}
                   {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
                   {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
             {% else %}
                   {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-                  {{ entry.type | toSentenceCase }}
+                  {{ (entry.displayName or entry.type) | toSentenceCase }}
             {% endif %}
             <span class="govuk-visually-hidden"> on {{ thisDate }}
             </a>

@@ -54,6 +54,8 @@ export interface EventResponse {
   subject: string
   startDate: string
   endDate: string
+  attendees: string[]
+  smsResponse?: SmsResponse
 }
 
 export interface SmsResponse {

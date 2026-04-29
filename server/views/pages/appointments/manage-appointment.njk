@@ -2,6 +2,7 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
+{% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set notes = '' %}
 {% set alert = '' %}
 {% set documents = [] %}
@@ -17,7 +18,7 @@
 {% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
-  {% set nextAppointmentHint = nextAppointment.appointment.type | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
+  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
   'their home' if nextAppointmentIsAtHome else 
     addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithYear + "." %}
 {% endif %}
@@ -34,7 +35,7 @@
         text: document.level if document.level else "Contact"
       },
       {
-        text: document.type if document.type else appointment.type
+        text: document.type if document.type else appointmentDisplayName
       },
       {
         text: document.createdAt | dateWithYear if document.createdAt else "",
@@ -119,7 +120,7 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointment.type) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "information",

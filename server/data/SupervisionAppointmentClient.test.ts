@@ -124,6 +124,8 @@ describe('MasOutlookClient', () => {
       subject: 'Rescheduled event',
       startDate: '2025-02-01T10:00:00Z',
       endDate: '2025-02-01T11:00:00Z',
+      attendees: [],
+      smsResponse: null,
     }
 
     fakeApi
