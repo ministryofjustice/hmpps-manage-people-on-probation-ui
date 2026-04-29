@@ -173,13 +173,10 @@
                 }
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'furtherActions'])) }}
 
+            <h2 class="govuk-heading-m">Did this information help you to manage their risk? (optional)</h2>
             {{ govukRadios({
-                fieldset: {
-                    legend: {
-                        text: 'Did this information help you to manage their risk? (optional)',
-                        classes: "govuk-label--m govuk-!-font-weight-bold",
-                        hint: 'We only use this to understand more about the value of online check ins.'
-                    }
+                hint: {
+                    text: 'We only use this to understand more about the value of online check ins.'
                 },
                 formGroup: {
                     attributes: {
