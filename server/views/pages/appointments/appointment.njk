@@ -6,9 +6,28 @@
   pageHeading: [appointmentDisplayName, 'note']}) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
   '' %}
+{% set excludedTypes = ['critical communications', 'alcohol consumption', 'unplanned contact'] %}
 {% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set shouldShowManageButton =
+  flags.enableManageContacts
+  and (appointment.type | lower) not in excludedTypes
+%}
+{% set actions = { items: [] } %}
+
+{% if shouldShowManageButton %}
+  {% set actions = {
+    items: [{
+      href: supervisionContactsUpdateLink(crn, appointment.id),
+      text: 'Update Contact',
+      classes: 'contact-activity__manage-link',
+      attributes: {
+        'data-qa': 'manage-on-delius-link'
+      }
+    }]
+  } %}
+{% endif %}
 {% block beforeContent %}
   {% if backLink %}
     {{ govukBackLink({
@@ -59,11 +78,13 @@
   {% include './_appointment-details.njk' %}
   {% endset %}
 
+
   {{ appSummaryCard({
   attributes: {'data-qa': 'appointmentDetailsCard'},
   titleText: 'Appointment details' if appointment.isAppointment else 'Details',
   headingLevel: '3',
   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+  actions: actions,
   html: appointmentDetails
 }) }}
 
