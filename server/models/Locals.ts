@@ -158,6 +158,11 @@ export interface AppointmentOutcomeSentence {
   length: number | null
 }
 
+export interface AppointmentOutcomeEnforcementAction {
+  responseByDate?: string
+  responseByDays?: number
+}
+
 export interface AppointmentOutcomeProps {
   forename: string
   surname: string
@@ -176,6 +181,7 @@ export interface AppointmentOutcomeProps {
   backLink?: string
   options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
   sentence?: AppointmentOutcomeSentence
+  enforcementAction?: AppointmentOutcomeEnforcementAction
   sentenceType?: SentenceType
   isProbationPractitioner?: boolean
   appointmentHintText?: string

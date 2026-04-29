@@ -33,9 +33,7 @@
           "email": "user@email.com",
           "enabled": true,
           "staff": {
-            "probationDeliveryUnits": [
-              { "code": "N03CTM", "description": "Test PDU" }
-            ]
+            "probationDeliveryUnits": [{ "code": "N03CTM", "description": "Test PDU" }]
           }
         },
         "headers": {

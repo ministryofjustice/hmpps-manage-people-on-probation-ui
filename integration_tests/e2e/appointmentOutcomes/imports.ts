@@ -9,6 +9,8 @@ export interface ExpectedOption<TPage extends Page> {
   redirectPageTitle?: string
 }
 
+export type Journey = 'MANAGE' | 'RESCHEDULE' | 'ARRANGE'
+
 type Constructor<T = any> = new (...args: any[]) => T
 
 export const checkOptions = <TPage extends Page>(options: ExpectedOption<TPage>[]): void => {

@@ -1,5 +1,5 @@
 import { type Name } from '../data/model/personalDetails'
-import { type Activity } from '../data/model/schedule'
+import { type EnforcementAction, type Activity } from '../data/model/schedule'
 import { type Errors } from './Errors'
 import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
 import { Option } from './Option'
@@ -36,6 +36,7 @@ export type AppointmentEnforcementAction =
   | 'RIC'
   | 'PROFESSIONAL_JUDGEMENT_DECISION'
   | 'ACCEPTABLE_FAILURE'
+  | 'DECISION_PENDING'
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
@@ -76,6 +77,7 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
+  enforcementAction?: EnforcementAction
   outcomeRecorded?: YesNo
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
