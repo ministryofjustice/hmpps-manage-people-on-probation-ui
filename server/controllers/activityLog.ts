@@ -50,7 +50,7 @@ const activityLogController: Controller<typeof routes, void> = {
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
       const currentPage = parseInt(page as string, 10)
-      const pageSize = res.locals?.flags?.enableContactLog === true ? 25 : 10
+      const pageSize = 25
       const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1
       let resultsEnd = currentPage > 0 ? (currentPage + 1) * pageSize : pageSize
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
@@ -67,7 +67,7 @@ const activityLogController: Controller<typeof routes, void> = {
       })
 
       const baseUrl = req.url.split('?')[0]
-      const template = res.locals?.flags?.enableContactLog === true ? 'pages/contact-log' : 'pages/activity-log'
+      const template = 'pages/contact-log'
       return res.render(template, {
         personActivity,
         crn,

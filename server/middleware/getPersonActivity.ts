@@ -37,7 +37,7 @@ export const getPersonActivity = async (
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
-  const size = res.locals.flags.enableContactLog ? '25' : '10'
+  const size = '25'
   const [personActivity, tierCalculation] = await Promise.all([
     masClient.postPersonActivityLog(crn, body, page as string, size),
     tierClient.getCalculationDetails(crn),

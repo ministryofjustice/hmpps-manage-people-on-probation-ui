@@ -13,7 +13,6 @@ const mockFlags = {
   enableNavActivityLog: true,
   enableNavCompliance: true,
   enableNavInterventions: true,
-  enableContactLog: true,
 }
 jest.mock('../services/flagService')
 
