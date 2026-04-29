@@ -17,6 +17,7 @@ import {
 import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
+import { filterContacts } from '../middleware/filterContacts'
 
 const routes = [
   'getAppointments',
@@ -198,18 +199,14 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       req.session.outcomesFilter = req?.body?.outcomesFilter ?? req.session.outcomesFilter
       const content = res.locals.contactResponse?.content
-      let outcomes = content?.filter(contact => {
-        const contactDate = DateTime.fromISO(contact.date)
-        const twoYearsAgo = DateTime.now().minus({ years: 2 })
-        return contactDate >= twoYearsAgo
-      })
-      if (req.session.outcomesFilter === 'Older') {
+      let outcomes = filterContacts(content)
+      if (req.session.outcomesFilter === 'OLDER_THAN_TWO_YEARS') {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
           const twoYearsAgo = DateTime.now().minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
-      } else if (req.session.outcomesFilter === 'All') {
+      } else if (req.session.outcomesFilter === 'ALL') {
         outcomes = content
       }
       return res.render('pages/appointments/record-an-outcome', {
@@ -219,7 +216,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
         outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
-        outcomesFilter: req.session.outcomesFilter ?? '2Years',
+        outcomesFilter: req.session.outcomesFilter ?? 'PAST_TWO_YEARS',
       })
     }
   },
