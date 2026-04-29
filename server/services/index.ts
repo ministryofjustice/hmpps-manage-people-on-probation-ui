@@ -22,9 +22,9 @@ export const getManagedBy = (result: any): string => {
   if (activeManager?.staff?.unallocated || !activeManager) {
     return UNALLOCATED
   }
-  const { surname, forenames } = activeManager.staff || {}
+  const { forenames, surname } = activeManager.staff || {}
 
-  return [surname, forenames]
+  return [forenames, surname]
     .filter(Boolean)
     .map(s => convertToTitleCase(s))
     .join(' ')
@@ -46,7 +46,7 @@ export const services = () => {
     environment: config.env,
     extraColumns: [
       {
-        header: 'Managed By',
+        header: 'Managed by',
         value: result => getManagedBy(result),
       },
       {
