@@ -112,7 +112,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
           },
         ],
       }
-      expect(getManagedBy(result)).toBe('Leigh Pacocha')
+      expect(getManagedBy(result)).toBe('Pacocha Leigh')
     })
 
     it('should return only the staff name if borough description is missing', () => {
@@ -130,7 +130,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
           },
         ],
       }
-      expect(getManagedBy(result)).toBe('Smith John')
+      expect(getManagedBy(result)).toBe('John Smith')
     })
 
     it('should return "Unallocated" if no active manager is found', () => {
@@ -201,7 +201,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
         environment: config.env,
         extraColumns: [
           {
-            header: 'Managed By',
+            header: 'Managed by',
             value: expect.any(Function),
           },
           {
@@ -232,11 +232,11 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
       services()
 
       const { extraColumns } = CaseSearchServiceMock.mock.calls[0][0]
-      const managedByColumn = extraColumns.find((c: any) => c.header === 'Managed By')
+      const managedByColumn = extraColumns.find((c: any) => c.header === 'Managed by')
       const pduColumn = extraColumns.find((c: any) => c.header === 'PDU')
 
       const record = { offenderManagers: [{ active: true, staff: { forenames: 'John', surname: 'Smith' } }] }
-      expect(managedByColumn.value(record)).toBe('Smith John')
+      expect(managedByColumn.value(record)).toBe('John Smith')
 
       const pduRecord = {
         offenderManagers: [{ active: true, team: { borough: { description: 'test borough' } } }],
