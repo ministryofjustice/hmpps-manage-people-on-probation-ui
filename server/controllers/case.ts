@@ -1,10 +1,10 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
-import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
+import { filterContacts } from '../middleware/filterContacts'
+import { getCheckinOffenderDetails } from '../middleware'
 
 const routes = ['getCase'] as const
 
@@ -34,11 +34,7 @@ const caseController: Controller<typeof routes, void> = {
       ])
       let outcomes = contactResponse?.content
       if (res.locals.flags.enableOutcomesV1) {
-        outcomes = outcomes?.filter(contact => {
-          const contactDate = DateTime.fromISO(contact.date)
-          const twoYearsAgo = DateTime.now().minus({ years: 2 })
-          return contactDate >= twoYearsAgo
-        })
+        outcomes = filterContacts(outcomes)
       }
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false

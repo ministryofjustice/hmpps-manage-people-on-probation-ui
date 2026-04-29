@@ -61,6 +61,8 @@ interface GetUserScheduleProps {
   ascending: string
   size: string
   type: string
+  fromDate?: string
+  toDate?: string
 }
 
 export default class MasApiClient extends RestClient {
@@ -422,9 +424,11 @@ export default class MasApiClient extends RestClient {
     ascending,
     size,
     type = 'upcoming',
+    fromDate,
+    toDate,
   }: GetUserScheduleProps): Promise<UserSchedule> {
     const searchParams = Object.fromEntries(
-      Object.entries({ size, page, sortBy, ascending }).filter(([_k, v]) => v),
+      Object.entries({ size, page, sortBy, ascending, fromDate, toDate }).filter(([_k, v]) => v),
     ) as Record<string, string>
     const pageQuery = `${new URLSearchParams(searchParams).toString()}`
     return this.get({
