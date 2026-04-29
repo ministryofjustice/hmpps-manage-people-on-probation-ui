@@ -17,6 +17,7 @@ import {
 import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
+import { filterContacts } from '../middleware/filterContacts'
 
 const routes = [
   'getAppointments',
@@ -198,11 +199,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       req.session.outcomesFilter = req?.body?.outcomesFilter ?? req.session.outcomesFilter
       const content = res.locals.contactResponse?.content
-      let outcomes = content?.filter(contact => {
-        const contactDate = DateTime.fromISO(contact.date)
-        const twoYearsAgo = DateTime.now().minus({ years: 2 })
-        return contactDate >= twoYearsAgo
-      })
+      let outcomes = filterContacts(content)
       if (req.session.outcomesFilter === 'OLDER_THAN_TWO_YEARS') {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
