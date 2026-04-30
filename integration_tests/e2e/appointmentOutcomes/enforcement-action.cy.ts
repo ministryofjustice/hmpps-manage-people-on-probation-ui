@@ -10,11 +10,9 @@ import {
   completeRescheduleAppointmentPage,
   getUuid,
 } from '../appointments/utils'
-import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
-import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import { ExpectedOption, Journey } from './imports'
+import { Journey } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -61,57 +59,6 @@ const loadPage = ({
   attendedFailedToComplyPage.getSubmitBtn().click()
 }
 
-type RedirectPages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
-
-const getExpectedOptions = ({
-  isProbationPractitioner = false,
-  sentenceType = 'COMMUNITY',
-}: { isProbationPractitioner?: boolean; sentenceType?: SentenceType } = {}): ExpectedOption<RedirectPages>[] => {
-  const text = sentenceType === 'COMMUNITY' ? 'breach' : 'recall'
-  const expectedOptions: ExpectedOption<RedirectPages>[] = [
-    { value: 'SEND_LETTER', text: 'Send a letter', RedirectPage: SendLetterPage, redirectPageName: 'Send a letter' },
-    {
-      value: 'INITIATE_BREACH_RECALL',
-      text: `Initiate a ${text}`,
-      RedirectPage: InitiateBreachOrRecallPage,
-      redirectPageName: `Initiate a ${text}`,
-      redirectPageTitle: `Initiate a ${text}`,
-    },
-    {
-      value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
-      text: `Initiate a ${text} and send a letter`,
-      RedirectPage: InitiateBreachOrRecallPage,
-      redirectPageName: `Initiate a ${text}`,
-      redirectPageTitle: `Initiate a ${text}`,
-    },
-  ]
-  if (!isProbationPractitioner) {
-    expectedOptions.push({
-      value: 'REFER_TO_OFFENDER_MANAGER',
-      text: 'Refer to offender manager',
-      hint: 'Notify the allocated probation practitioner so they can take action.',
-      redirectPageName: 'Add a note',
-      RedirectPage: AddNotePage,
-    })
-  }
-  expectedOptions.push(
-    {
-      value: 'NO_FURTHER_ACTION',
-      text: 'No further action',
-      RedirectPage: AddNotePage,
-      redirectPageName: 'Add a note',
-    },
-    {
-      value: 'DIFFERENT_ACTION',
-      text: 'I want to add a different action',
-      RedirectPage: EnforcementActionPage,
-      redirectPageName: 'Enforcement action',
-      redirectPageTitle: 'Select an enforcement action for Alton’s failure to comply',
-    },
-  )
-  return expectedOptions
-}
-
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it('should render the page', () => {
     loadPage({ journey })
@@ -141,13 +88,12 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     enforcementActionPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
+      cy.get(`#appointments-${crn}-${id}-outcome-otherEnforcementAction-error`).should('contain.text', msg)
     })
-    cy.pause()
   })
   it('should redirect to the correct page when an option is selected', () => {
     loadPage({ journey })
-    cy.get('select').select('DECISION_PENDING_RESPONSE')
+    cy.get('select').select('DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION')
     enforcementActionPage.getSubmitBtn().click()
     addNotePage = new AddNotePage()
     addNotePage.checkOnPage()

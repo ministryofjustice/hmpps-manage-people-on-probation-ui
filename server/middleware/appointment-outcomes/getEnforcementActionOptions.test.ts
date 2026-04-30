@@ -35,7 +35,10 @@ describe('/middleware/appointment-outcomes/getEnforcementActionOptions', () => {
         expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT' }),
         expect.objectContaining({ value: 'ENFORCEMENT_LETTER_REQUESTED' }),
         expect.objectContaining({ value: 'WITHDRAW_WARNING_LETTER' }),
-        expect.objectContaining({ text: 'Decision pending Alton’s response', value: 'DECISION_PENDING_RESPONSE' }),
+        expect.objectContaining({
+          text: 'Decision pending Alton’s response',
+          value: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+        }),
         expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' }),
         expect.objectContaining({ value: 'YOT_OM_NOTIFIED' }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),

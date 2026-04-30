@@ -25,6 +25,8 @@ import {
   getOutcomeOptions,
   getOutcomeProps,
   getFailedToAttendOptions,
+  saveMappedCode,
+  getUpdateEnforcementActionOptions,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -46,7 +48,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* create appointment session in manage journey */
 
-  router.get(manageBasePath, createAppointmentSession)
+  router.get([manageBasePath, `${manageBasePath}/update-enforcement-action`], createAppointmentSession)
 
   /* redirect page if required session data is not present */
 
@@ -95,6 +97,8 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getBreachNSICreatedByOptions,
   )
 
+  router.all(`${manageBasePath}/update-enforcement-action`, getUpdateEnforcementActionOptions)
+
   router.all(
     [
       `${arrangeBasePath}/initiate-breach-or-recall`,
@@ -121,6 +125,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     validate.appointmentOutcomes,
     autoStoreSessionData(hmppsAuthClient),
   )
+
+  /* save the mapped outcome and action code */
+
+  router.post([arrangeBasePath, manageBasePath], saveMappedCode('OUTCOME'))
+  router.post([`${arrangeBasePath}/*path`, `${manageBasePath}/*path`], saveMappedCode('ACTION'))
 
   /* Outcome index  */
 

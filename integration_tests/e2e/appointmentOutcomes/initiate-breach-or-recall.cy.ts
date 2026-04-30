@@ -61,7 +61,7 @@ const loadPage = ({
   cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
   outcomePage.getSubmitBtn().click()
   attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  const action = sendLetter ? 'INITIATE_BREACH_RECALL_AND_SEND_LETTER' : 'INITIATE_BREACH_RECALL'
+  const action = sendLetter ? 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' : 'BREACH_RECALL_INITIATED'
   cy.get(`.govuk-radios__input[value=${action}]`).click()
   attendedFailedToComplyPage.getSubmitBtn().click()
 }
@@ -99,8 +99,8 @@ const getExpectedOptions = ({
   }
   if (optionsFor === 'LETTER_TYPE') {
     expectedOptions = [
-      { value: 'LICENCE_COMPLIANCE_LETTER', text: 'Licence compliance letter' },
-      { value: 'DIFFERENT_ENFORCEMENT_LETTER', text: 'A different enforcement letter' },
+      { value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' },
+      { value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' },
     ]
   }
   return expectedOptions
@@ -169,7 +169,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', msgs[0])
       cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
-      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
+      cy.get(`#appointments-${crn}-${id}-outcome-initiateBreachOrRecall-error`).should('contain.text', msgs[2])
     })
   })
   it('should show validation errors when only the first option is selected for send letter enforcement action', () => {
@@ -182,7 +182,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('not.exist')
       cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
-      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
+      cy.get(`#appointments-${crn}-${id}-outcome-initiateBreachOrRecall-error`).should('contain.text', msgs[2])
     })
   })
   it('should redirect to the correct page when an option is selected', () => {

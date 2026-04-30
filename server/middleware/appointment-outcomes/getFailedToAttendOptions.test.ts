@@ -25,7 +25,10 @@ describe('/middleware/appointment-outcomes/getFailedToAttendOptions', () => {
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),
-        expect.objectContaining({ value: 'DECISION_PENDING', text: 'Decision pending Anton’s response' }),
+        expect.objectContaining({
+          value: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+          text: 'Decision pending Anton’s response',
+        }),
         expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' }),
         expect.objectContaining({ divider: 'or' }),
         expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
@@ -40,7 +43,10 @@ describe('/middleware/appointment-outcomes/getFailedToAttendOptions', () => {
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),
-        expect.objectContaining({ value: 'DECISION_PENDING', text: 'Decision pending Anton’s response' }),
+        expect.objectContaining({
+          value: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+          text: 'Decision pending Anton’s response',
+        }),
         expect.objectContaining({ divider: 'or' }),
         expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
       ]),

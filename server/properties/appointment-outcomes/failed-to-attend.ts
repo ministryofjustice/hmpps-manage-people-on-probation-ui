@@ -6,7 +6,7 @@ export const failedToAttendOptions = (name: string): AppointmentEnforcementActio
     text: 'Send a letter',
   },
   {
-    value: 'DECISION_PENDING',
+    value: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
     text: `Decision pending ${name}’s response`,
   },
   {

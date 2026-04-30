@@ -88,22 +88,22 @@ const getExpectedOptions = ({
   }
   if (optionsFor === 'LETTER_TYPE') {
     if (sentenceType === 'CUSTODY') {
-      expectedOptions.push({ value: 'LICENCE_COMPLIANCE_LETTER', text: 'Licence compliance letter' })
+      expectedOptions.push({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' })
     }
     if (sentenceType === 'COMMUNITY') {
       expectedOptions.push(
-        { value: 'FIRST_WARNING_LETTER', text: 'First warning letter' },
-        { value: 'BREACH_WARNING_LETTER', text: 'Breach warning letter' },
+        { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
+        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
       )
     }
     if (['PSS', 'YOUTH_CUSTODY'].includes(sentenceType)) {
       expectedOptions.push(
-        { value: 'FIRST_WARNING_LETTER', text: 'First warning letter' },
-        { value: 'SECOND_WARNING_LETTER', text: 'Second warning letter' },
-        { value: 'BREACH_WARNING_LETTER', text: 'Breach warning letter' },
+        { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
+        { value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' },
+        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
       )
     }
-    expectedOptions.push({ value: 'DIFFERENT_ENFORCEMENT_LETTER', text: 'A different enforcement letter' })
+    expectedOptions.push({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' })
   }
   return expectedOptions
 }
@@ -167,7 +167,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     getUuid(3).then(uuid => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[0])
-      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[1])
+      cy.get(`#appointments-${crn}-${id}-outcome-sendLetter-error`).should('contain.text', msgs[1])
     })
   })
   it('should redirect to the add note page when all options are selected', () => {

@@ -23,14 +23,14 @@ describe('/middleware/appointment-outcomes/getAcceptableAbsenceOptions', () => {
     getAcceptableAbsenceOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'COURT_LEGAL' }),
-        expect.objectContaining({ value: 'EMPLOYMENT' }),
-        expect.objectContaining({ value: 'FAMILY_CHILDCARE' }),
-        expect.objectContaining({ value: 'HOLIDAY' }),
-        expect.objectContaining({ value: 'MEDICAL' }),
-        expect.objectContaining({ value: 'RELIGIOUS' }),
-        expect.objectContaining({ value: 'RIC' }),
-        expect.objectContaining({ value: 'PROFESSIONAL_JUDGEMENT_DECISION' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_COURT_LEGAL' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_EMPLOYMENT' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_HOLIDAY' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_MEDICAL' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_RELIGIOUS' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_RIC' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION' }),
         expect.objectContaining({ value: 'ACCEPTABLE_FAILURE' }),
       ]),
     )
@@ -42,14 +42,14 @@ describe('/middleware/appointment-outcomes/getAcceptableAbsenceOptions', () => {
     getAcceptableAbsenceOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'COURT_LEGAL' }),
-        expect.objectContaining({ value: 'EMPLOYMENT' }),
-        expect.objectContaining({ value: 'FAMILY_CHILDCARE' }),
-        expect.objectContaining({ value: 'HOLIDAY' }),
-        expect.objectContaining({ value: 'MEDICAL' }),
-        expect.objectContaining({ value: 'RELIGIOUS' }),
-        expect.objectContaining({ value: 'RIC' }),
-        expect.objectContaining({ value: 'PROFESSIONAL_JUDGEMENT_DECISION' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_COURT_LEGAL' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_EMPLOYMENT' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_HOLIDAY' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_MEDICAL' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_RELIGIOUS' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_RIC' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION' }),
       ]),
     )
     expect(res.locals.appointmentOutcome.options).toHaveLength(8)

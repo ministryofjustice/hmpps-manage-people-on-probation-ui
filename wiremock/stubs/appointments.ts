@@ -26,6 +26,7 @@ interface Args {
   inOffice?: boolean
   contactId?: string
   enforcementActionResponseByDate?: string
+  action?: string
 }
 
 const getAppointmentStub = (
@@ -53,6 +54,7 @@ const getAppointmentStub = (
     inOffice = true,
     contactId = '6',
     enforcementActionResponseByDate = '2024-04-21',
+    action = '',
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -131,7 +133,7 @@ const getAppointmentStub = (
           acceptableAbsenceReason: '',
           isAppointment: true,
           isCommunication: true,
-          action: '',
+          action,
           isSystemContact: true,
           isEmailOrTextFromPop: true,
           isPhoneCallFromPop: true,

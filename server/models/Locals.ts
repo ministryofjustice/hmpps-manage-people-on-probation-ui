@@ -16,6 +16,9 @@ import {
   AppointmentEnforcementActionOption,
   EnforcementActionCreatedByOption,
   EnforcementActionLetterTypeOption,
+  AppointmentEnforcementActionSelectOption,
+  AppointmentOutcomeType,
+  AppointmentEnforcementAction,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -150,7 +153,8 @@ interface Locals {
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
   feedbackEmail?: string
-  appointmentOutcome?: AppointmentOutcomeProps
+  appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
+  action?: string
 }
 
 export interface AppointmentOutcomeSentence {
@@ -163,10 +167,10 @@ export interface AppointmentOutcomeEnforcementAction {
   responseByDays?: number
 }
 
-export interface AppointmentOutcomeProps {
+export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
-  appointment: AttendedCompliedAppointment | Activity
+  appointment: TAppointment
   crn: string
   uuid: string | undefined
   contactId: string | undefined
@@ -179,13 +183,21 @@ export interface AppointmentOutcomeProps {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[] | EnforcementActionCreatedByOption[]
+  options?:
+    | AppointmentOutcomeOption[]
+    | AppointmentEnforcementActionOption[]
+    | AppointmentEnforcementActionSelectOption[]
+    | EnforcementActionCreatedByOption[]
   letterSentByOptions?: EnforcementActionCreatedByOption[]
   letterTypeOptions?: EnforcementActionLetterTypeOption[]
   sentence?: AppointmentOutcomeSentence
   enforcementAction?: AppointmentOutcomeEnforcementAction
   isProbationPractitioner?: boolean
   appointmentHintText?: string
+  sendLetter?: boolean
+  sendBreachOrRecallLetter?: boolean
+  currentOutcome?: AppointmentOutcomeType
+  currentEnforcementAction?: AppointmentEnforcementAction
 }
 
 export interface AppResponse extends Response {

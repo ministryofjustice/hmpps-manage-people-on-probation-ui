@@ -8,7 +8,7 @@ import config from '../../config'
 const appointmentOutcomes: Route<void> = (req, res, next) => {
   let errorMessages = res?.locals?.errorMessages || {}
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
-  const { crn, id, isInPast, baseOutcomeUrl, reqUrl, appointmentSession } = res.locals.appointmentOutcome
+  const { crn, id, isInPast, baseOutcomeUrl, reqUrl, sendBreachOrRecallLetter } = res.locals.appointmentOutcome
   const { maxCharCount } = config
   const localParams: LocalParams = null
 
@@ -75,7 +75,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
         appointmentOutcomesValidation({
           crn,
           id,
-          page: `outcome/acceptable-absence`,
+          page: `outcome/unacceptable-absence`,
           msg: 'Select an action for their unacceptable absence',
           log: 'Unacceptable absence enforcement action not selected',
         }),
@@ -136,7 +136,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
             'Select the type of letter',
           ],
           log: ['breach NSI created by not selected', 'letter sent by no selected', 'letter type not selected'],
-          sendLetter: appointmentSession.outcome.enforcementAction === 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+          sendBreachOrRecallLetter,
         }),
       ),
     }
@@ -155,6 +155,24 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/send-letter`,
           msg: ['Select who will send the letter', 'Select the type of letter'],
           log: ['letter sent by no selected', 'letter type not selected'],
+        }),
+      ),
+    }
+  }
+
+  const validateUpdateEnforcementAction = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/update-enforcement-action`)) return
+    render = 'pages/appointment-outcomes/update-enforcement-action'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/update-enforcement-action`,
+          msg: 'Select another enforcement action',
+          log: 'Another enforcement action not selected',
         }),
       ),
     }
@@ -183,6 +201,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateEnforcementAction()
   validateInitiateBreachRecall()
   validateSendLetter()
+  validateUpdateEnforcementAction()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {

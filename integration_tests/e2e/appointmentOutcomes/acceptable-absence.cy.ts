@@ -63,51 +63,56 @@ const getExpectedOptions = ({
   sentenceLength = 25,
 }: { sentenceLength?: number } = {}): ExpectedOption<RedirectPages>[] => {
   const expectedOptions: ExpectedOption<RedirectPages>[] = [
-    { value: 'COURT_LEGAL', text: 'Court / legal', RedirectPage: AddNotePage, redirectPageName: 'Add a note' },
     {
-      value: 'EMPLOYMENT',
+      value: 'ACCEPTABLE_ABSENCE_COURT_LEGAL',
+      text: 'Court / legal',
+      RedirectPage: AddNotePage,
+      redirectPageName: 'Add a note',
+    },
+    {
+      value: 'ACCEPTABLE_ABSENCE_EMPLOYMENT',
       text: 'Employment',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
     {
-      value: 'FAMILY_CHILDCARE',
+      value: 'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE',
       text: 'Family / childcare',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
     {
-      value: 'HOLIDAY',
+      value: 'ACCEPTABLE_ABSENCE_HOLIDAY',
       text: 'Holiday',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
     {
-      value: 'MEDICAL',
+      value: 'ACCEPTABLE_ABSENCE_MEDICAL',
       text: 'Medical',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
     {
-      value: 'RELIGIOUS',
+      value: 'ACCEPTABLE_ABSENCE_RELIGIOUS',
       text: 'Religious',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
     {
-      value: 'RIC',
+      value: 'ACCEPTABLE_ABSENCE_RIC',
       text: 'RIC (remanded in custody)',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
     {
-      value: 'PROFESSIONAL_JUDGEMENT_DECISION',
+      value: 'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION',
       text: 'Professional judgement decision',
       RedirectPage: AddNotePage,
       redirectPageName: 'Add a note',
@@ -161,7 +166,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     acceptableAbsencePage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
+      cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
     })
   })
   it('should redirect to the correct page when an option is selected', () => {

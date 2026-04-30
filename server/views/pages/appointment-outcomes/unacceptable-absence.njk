@@ -3,7 +3,7 @@
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
-    {{ govukRadios({
+  {{ govukRadios({
     name: "enforcementAction",
     fieldset: {
       legend: {
@@ -13,5 +13,5 @@
       }
     },
     items: appointmentOutcome.options
-  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'unacceptableAbsence'])) }}
 {% endblock %}

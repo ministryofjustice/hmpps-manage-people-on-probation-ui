@@ -7,11 +7,11 @@ export const attendedFailedToComplyOptions = (sentenceType: SentenceType): Appoi
     text: 'Send a letter',
   },
   {
-    value: 'INITIATE_BREACH_RECALL',
+    value: 'BREACH_RECALL_INITIATED',
     text: `Initiate a ${sentenceType === 'COMMUNITY' ? 'breach' : 'recall'}`,
   },
   {
-    value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+    value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
     text: `Initiate a ${sentenceType === 'COMMUNITY' ? 'breach' : 'recall'} and send a letter`,
   },
   {

@@ -157,7 +157,7 @@ const checkValidationErrors = ({
   outcomePage.checkErrorSummaryBox([msg])
   getUuid(2).then(pageUuid => {
     const id = journey === 'MANAGE' ? appointmentId : pageUuid
-    cy.get(`#appointments-${crn}-${id}-outcome-type-error`).should('contain.text', msg)
+    cy.get(`#appointments-${crn}-${id}-outcome-outcomeType-error`).should('contain.text', msg)
   })
 }
 
@@ -186,7 +186,7 @@ const checkPageTitle = ({
     outcomePage = new OutcomePage()
     outcomePage.checkPageTitle(h2Title)
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    cy.get(`#appointments-${crn}-${id}-outcome-type-hint`).should(
+    cy.get(`#appointments-${crn}-${id}-outcome-outcomeType-hint`).should(
       'contain.text',
       `Appointment: ${meetingType} with ${officer} on ${appointmentDate}.`,
     )

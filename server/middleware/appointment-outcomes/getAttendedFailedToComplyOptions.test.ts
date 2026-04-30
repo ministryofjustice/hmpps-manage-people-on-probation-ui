@@ -28,9 +28,9 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),
-        expect.objectContaining({ value: 'INITIATE_BREACH_RECALL', text: 'Initiate a breach' }),
+        expect.objectContaining({ value: 'BREACH_RECALL_INITIATED', text: 'Initiate a breach' }),
         expect.objectContaining({
-          value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+          value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
           text: 'Initiate a breach and send a letter',
         }),
         expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' }),
@@ -48,9 +48,9 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),
-        expect.objectContaining({ value: 'INITIATE_BREACH_RECALL', text: 'Initiate a recall' }),
+        expect.objectContaining({ value: 'BREACH_RECALL_INITIATED', text: 'Initiate a recall' }),
         expect.objectContaining({
-          value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+          value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
           text: 'Initiate a recall and send a letter',
         }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),

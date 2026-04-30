@@ -73,14 +73,14 @@ const getExpectedOptions = ({
   const expectedOptions: ExpectedOption<RedirectPages>[] = [
     { value: 'SEND_LETTER', text: 'Send a letter', RedirectPage: SendLetterPage, redirectPageName: 'Send a letter' },
     {
-      value: 'INITIATE_BREACH_RECALL',
+      value: 'BREACH_RECALL_INITIATED',
       text: `Initiate a ${text}`,
       RedirectPage: InitiateBreachOrRecallPage,
       redirectPageName: `Initiate a ${text}`,
       redirectPageTitle: `Initiate a ${text}`,
     },
     {
-      value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+      value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       text: `Initiate a ${text} and send a letter`,
       RedirectPage: InitiateBreachOrRecallPage,
       redirectPageName: `Initiate a ${text}`,
@@ -149,7 +149,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     attendedFailedToComplyPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
+      cy.get(`#appointments-${crn}-${id}-outcome-attendedFailedToComply-error`).should('contain.text', msg)
     })
   })
   it('should redirect to the correct page when an option is selected', () => {

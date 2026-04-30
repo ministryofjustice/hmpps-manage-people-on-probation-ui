@@ -3,7 +3,7 @@
   false %}
 {% set title = 'Initiate a ' + (
 'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
-  'recall') + (' and send a letter' if sendLetter) %}
+  'recall') + (' and send a letter' if appointmentOutcome.sendBreachOrRecallLetter) %}
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
@@ -17,7 +17,7 @@
     },
     items: appointmentOutcome.options
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'breachNSICreatedBy'])) }}
-  {% if sendLetter %}
+  {% if appointmentOutcome.sendBreachOrRecallLetter %}
     {% include './_send-letter-radios.njk' %}
   {% endif %}
 {% endblock %}

@@ -1,3 +1,6 @@
+{% set page = 'initiateBreachOrRecall' if appointmentOutcome.sendBreachOrRecallLetter else 
+  'sendLetter' %}
+
 {{ govukRadios({
     fieldset: {
       legend: {
@@ -18,4 +21,4 @@
       }
     },
     items: appointmentOutcome.letterTypeOptions
-  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'letterType'])) }}
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', page])) }}

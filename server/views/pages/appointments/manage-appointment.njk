@@ -19,7 +19,7 @@
 {% endif %}
 {% if flags.enableNonCompliance and appointment.hasOutcome %}
   {% set outcomeLabel = 'Change appointment outcome' %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/update-enforcement-action' %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action' %}
 {% endif %}
 
 {% if appointment.location.officeName %}
