@@ -1015,21 +1015,13 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('stop-checkin-btn').click()
     const stopCheckIn = new StopCheckins()
-    stopCheckIn
-      .getHeader()
-      .find('h1.govuk-fieldset__heading')
-      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
     stopCheckIn.getSubmitBtn().click()
-    stopCheckIn.checkErrorSummaryBox(['Select yes if you want to stop check ins for the person'])
-    stopCheckIn.getElementData('stopCheckIn').find('input[type="radio"][value="YES"]').click()
-    stopCheckIn.getSubmitBtn().click()
-    stopCheckIn
-      .getHeader()
-      .find('h1.govuk-fieldset__heading')
-      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
-    stopCheckIn.getSubmitBtn().click()
-    stopCheckIn.checkErrorSummaryBox(['Enter the reason for stopping'])
+    stopCheckIn.checkErrorSummaryBox([
+      'Enter the reason for stopping',
+      'Select yes if the reason for stopping includes sensitive information',
+    ])
     stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
+    stopCheckIn.getElementData('sensitiveContact').find('input[type="radio"][value="false"]').click({ force: true })
     stopCheckIn.getSubmitBtn().click()
     manageCheckins.checkOnPage()
   })

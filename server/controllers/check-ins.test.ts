@@ -2627,8 +2627,8 @@ describe('checkInsController', () => {
           [crn]: {
             [uuid]: {
               manageCheckin: {
-                stopCheckin: 'YES',
-                reason: 'Reason for stopping check in',
+                stopCheckinReason: 'Reason for stopping check in',
+                stopCheckinSensitive: 'true',
               },
             },
           },
@@ -2641,6 +2641,7 @@ describe('checkInsController', () => {
       expect(postDeactivateOffender).toHaveBeenCalledWith(uuid, {
         requestedBy: 'testuser',
         reason: 'Reason for stopping check in',
+        sensitive: true,
       })
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
     })

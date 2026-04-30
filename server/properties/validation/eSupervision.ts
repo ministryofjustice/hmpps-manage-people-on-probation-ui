@@ -224,23 +224,23 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckin]`]: {
+    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckinReason]`]: {
       optional: page !== 'stop-checkin',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select yes if you want to stop check ins for the person',
-          log: 'Stop checkin, not selected',
-        },
-      ],
-    },
-    [`[esupervision][${crn}][${id}][manageCheckin][reason]`]: {
-      optional: page !== `stop-checkin` || (page === 'stop-checkin' && stopCheckIn !== 'YES'),
       checks: [
         {
           validator: isNotEmpty,
           msg: 'Enter the reason for stopping',
           log: 'Stop checkin, reason not provided',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckinSensitive]`]: {
+      optional: page !== 'stop-checkin',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select yes if the reason for stopping includes sensitive information',
+          log: 'Stop checkin sensitive selection not completed',
         },
       ],
     },

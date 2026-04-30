@@ -205,14 +205,12 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`case/${crn}/appointments/check-in/manage/${id}/stop-checkin`)) {
       render = `pages/check-in/manage/stop-checkin`
       localParams.id = id
-      const stopCheckIn = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
       errorMessages = validateWithSpec(
         req,
         eSuperVisionValidation({
           crn,
           id,
           page: 'stop-checkin',
-          stopCheckIn,
         }),
       )
     }

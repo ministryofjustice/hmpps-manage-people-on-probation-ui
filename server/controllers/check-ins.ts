@@ -1353,16 +1353,23 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const stopCheckinVal = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
-      if (stopCheckinVal === 'YES') {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const eSupervisionClient = new ESupervisionClient(token)
-        const body: DeactivateOffenderRequest = {
-          requestedBy: res.locals.user.username,
-          reason: handleQuotes(getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'reason'])),
-        }
-        res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
+      const reasonData = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])
+      const sensitiveData = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'manageCheckin',
+        'stopCheckinSensitive',
+      ])
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      const body: DeactivateOffenderRequest = {
+        requestedBy: res.locals.user.username,
+        reason: handleQuotes(reasonData),
+        sensitive: sensitiveData === 'true',
       }
+      res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin'], null)
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
   },
