@@ -5,16 +5,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
-import {
-  mockTierCalculation,
-  mockActivities,
-  mockAppResponse,
-  mockRisks,
-  mockPredictors,
-  mockPersonAppointment,
-} from './mocks'
+import { mockTierCalculation, mockActivities, mockAppResponse, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
 import { getPersonAppointment } from '../middleware'
 
@@ -33,13 +24,6 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
-jest.mock('../data/arnsApiClient')
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  toRoshWidget: jest.fn(),
-  toPredictors: jest.fn(),
-}))
-
 jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
@@ -55,12 +39,6 @@ const getPersonActivitySpy = jest
 const getCalculationDetailsSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
-
-const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-
-const getPredictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 
 const getPersonAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointment')
@@ -156,8 +134,6 @@ describe('/controllers/activityLogController', () => {
         page: req.query.page,
         view: req.query.view,
         tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         url: req.url,
         resultsStart: 1,
         resultsEnd: 1,

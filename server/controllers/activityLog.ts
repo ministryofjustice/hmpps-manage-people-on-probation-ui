@@ -4,6 +4,7 @@ import type { Controller } from '../@types'
 import { groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
+import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 const routes = ['getOrPostActivityLog', 'getActivity'] as const
 
@@ -50,7 +51,7 @@ const activityLogController: Controller<typeof routes, void> = {
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
       const currentPage = parseInt(page as string, 10)
-      const pageSize = 25
+      const pageSize = ACTIVITY_LOG_PAGE_SIZE
       const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1
       let resultsEnd = currentPage > 0 ? (currentPage + 1) * pageSize : pageSize
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
@@ -67,8 +68,7 @@ const activityLogController: Controller<typeof routes, void> = {
       })
 
       const baseUrl = req.url.split('?')[0]
-      const template = 'pages/contact-log'
-      return res.render(template, {
+      return res.render('pages/contact-log', {
         personActivity,
         crn,
         query: req.session.activityLogFilters,

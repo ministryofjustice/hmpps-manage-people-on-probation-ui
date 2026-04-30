@@ -6,7 +6,7 @@ import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
 import { AppResponse } from '../models/Locals'
 import { ActivityLogRequestBody, SelectedFilterItem } from '../models/ActivityLog'
-import { categoryFilterOptions } from '../properties'
+import { categoryFilterOptions, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 export const getPersonActivity = async (
   req: Request,
@@ -37,7 +37,7 @@ export const getPersonActivity = async (
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
-  const size = '25'
+  const size = String(ACTIVITY_LOG_PAGE_SIZE)
   const [personActivity, tierCalculation] = await Promise.all([
     masClient.postPersonActivityLog(crn, body, page as string, size),
     tierClient.getCalculationDetails(crn),
