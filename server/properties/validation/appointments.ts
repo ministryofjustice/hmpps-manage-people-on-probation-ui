@@ -21,10 +21,11 @@ export interface AppointmentsValidationArgs {
   maxCharCount?: number
   previousStart?: string
   fileOrNote?: boolean
+  isSensitive?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, contactId, page, visor, notes, maxCharCount, previousStart } = args
+  const { crn, id, contactId, page, visor, notes, maxCharCount, previousStart, isSensitive } = args
   const appointmentStartDate = previousStart ? dateWithDayAndWithoutYear(previousStart) : ''
   const appointmentStartTime = previousStart ? shortTime(previousStart) : ''
   return {
@@ -212,7 +213,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     sensitivity: {
-      optional: page !== `appointment/${contactId}/add-note`,
+      optional:
+        page !== `appointment/${contactId}/add-note` ||
+        (page === `appointment/${contactId}/add-note` && isSensitive === true),
       checks: [
         {
           validator: isNotEmpty,
@@ -252,7 +255,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
-      optional: page !== 'reschedule-appointment',
+      optional: page !== 'reschedule-appointment' || (page === 'reschedule-appointment' && isSensitive === true),
       checks: [
         {
           validator: isNotEmpty,

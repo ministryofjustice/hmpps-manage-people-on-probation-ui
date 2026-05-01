@@ -95,6 +95,7 @@ export interface AppointmentSession {
     type: AppointmentOutcomeType
     enforcementAction: AppointmentEnforcementAction
   }
+  sensitivityLocked?: boolean
 }
 
 export interface AppointmentType {
@@ -249,6 +250,7 @@ export interface LocalParams {
   useDecorator?: boolean
   isReschedule?: boolean
   options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  isSensitive?: boolean
 }
 
 export interface ProbationDeliveryUnit {

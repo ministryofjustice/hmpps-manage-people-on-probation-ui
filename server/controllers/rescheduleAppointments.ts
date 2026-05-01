@@ -57,6 +57,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
             'Select who is rescheduling this appointment',
         }
       }
+      const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
 
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       res.render('pages/reschedule/appointment', {
@@ -71,6 +72,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         id,
         showValidation,
         errorMessages,
+        isSensitive,
       })
     }
   },

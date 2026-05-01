@@ -22,7 +22,7 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       start: '',
       end: '',
       notes: null,
-      sensitivity: null,
+      // sensitivityLocked: appointmentToClone.sensitivity === 'Yes',
     }
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)

@@ -69,7 +69,7 @@
             checked: body.sensitivity == 'No'
         }
     ]
-} %}
+} if not isSensitive or not flags.enableSensitivityRemoved %}
     {% if errorMessages.sensitivity %}
         {% set errorMsgSensitivity = {
             text: errorMessages.sensitivity
@@ -98,6 +98,9 @@
                 html: notes
             }) }}
         </section>
+    {% endif %}
+    {% if isSensitive and flags.enableSensitivityRemoved %}
+        <p>You already told us that this contact includes sensitive information.</p>
     {% endif %}
     {{ govukButton({
         text: "Show CRISS headers",

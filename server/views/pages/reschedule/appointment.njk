@@ -61,31 +61,35 @@
         value: body.reason
     } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'reason' ])      ) }}
 
-    {{ govukRadios({
-        fieldset: {
-            legend: {
-                text: 'Does this contact include sensitive information?',
-                classes: "govuk-fieldset__legend--m",
-                isPageHeading: false
-            }
-        },
-        formGroup: {
-            attributes: {
-                'data-qa': 'sensitiveInformation'
-            }
-        },
-        hint: {
-            text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
-        },
-        items: [
-            {
-                value: 'Yes',
-                text: "Yes, it includes sensitive information"
+    {% if not isSensitive or not flags.enableSensitivityRemoved %}
+        {{ govukRadios({
+            fieldset: {
+                legend: {
+                    text: 'Does this contact include sensitive information?',
+                    classes: "govuk-fieldset__legend--m",
+                    isPageHeading: false
+                }
             },
-            {
-                value: 'No',
-                text: "No, it is not sensitive"
-            }
-        ]
-    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }}
+            formGroup: {
+                attributes: {
+                    'data-qa': 'sensitiveInformation'
+                }
+            },
+            hint: {
+                text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+            },
+            items: [
+                {
+                    value: 'Yes',
+                    text: "Yes, it includes sensitive information"
+                },
+                {
+                    value: 'No',
+                    text: "No, it is not sensitive"
+                }
+            ]
+        } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }}
+    {% else %}
+        <p>You already told us that this contact includes sensitive information.</p>    
+    {% endif %}
 {% endblock %}

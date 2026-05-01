@@ -1,6 +1,6 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
-import { isoToDateTime, setDataValue } from '../utils'
+import { getDataValue, isoToDateTime, setDataValue } from '../utils'
 import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
@@ -50,6 +50,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     let date = ''
     let start = ''
     let end = ''
+    let sensitivity: YesNo | undefined
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -69,6 +70,10 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     if (!eventId || !type || !providerCode || !teamCode || !username) {
       locationCode = ''
     }
+    if (selection === 'RESCHEDULE') {
+      sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
+      console.log(sensitivity)
+    }
     appointmentSession = {
       ...appointmentSession,
       user: {
@@ -87,6 +92,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       uuid: '',
       externalReference,
       enforcementAction,
+      // sensitivity,
     }
     if (visorReport) {
       appointmentSession.visorReport = visorReport
