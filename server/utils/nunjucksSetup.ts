@@ -77,6 +77,7 @@ import {
   handleQuotes,
   dateToLongDate,
   merge,
+  dateWithYearTimeFirst,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -165,6 +166,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
+  njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
