@@ -6,12 +6,7 @@
 {% set hideSurveyUsefulSections = true %}
 
 {% block beforeContent %}
-    {{ govukBackLink({
-        href: backLink,
-        attributes: {
-            "data-qa": "back-link"
-        }
-    }) }}
+    <nav id="js-back-wrapper" class="govuk-width-container" data-qa= "back-link"></nav>
 {% endblock %}
 
 {% block content %}

@@ -178,4 +178,56 @@ const stubAppointmentOutcomeWithNoNotes = (): SuperAgentRequest =>
     },
   })
 
-export default { stubAppointmentNoOutcomeWithNote, stubAppointmentOutcomeWithNote, stubAppointmentOutcomeWithNoNotes }
+const stubAppointmentDeepLinkWithOutcome = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/schedule/X000001/appointment/12',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        personSummary: {
+          name: {
+            forename: 'Eula',
+            surname: 'Schmeler',
+          },
+          crn: 'X000001',
+          dateOfBirth: '1979-08-18',
+        },
+        appointment: {
+          id: 12,
+          type: 'Drug Test Details',
+          startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
+          endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
+          isSensitive: false,
+          hasOutcome: true,
+          deliusManaged: true,
+          eventNumber: '7654321',
+          isAppointment: false,
+          appointmentNotes: [],
+          lastUpdated: '2023-03-20',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
+          },
+          lastUpdatedBy: {
+            forename: 'Paul',
+            surname: 'Smith',
+          },
+        },
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default {
+  stubAppointmentNoOutcomeWithNote,
+  stubAppointmentOutcomeWithNote,
+  stubAppointmentOutcomeWithNoNotes,
+  stubAppointmentDeepLinkWithOutcome,
+}

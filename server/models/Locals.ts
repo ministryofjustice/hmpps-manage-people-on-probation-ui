@@ -16,6 +16,7 @@ import {
   AppointmentEnforcementActionOption,
   EnforcementActionCreatedByOption,
   EnforcementActionLetterTypeOption,
+  ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -79,6 +80,7 @@ export interface LocalsUser {
   uuid?: string
   displayName?: string
   token: string
+  probationDeliveryUnits?: ProbationDeliveryUnit[]
 }
 
 interface Locals {
@@ -184,6 +186,7 @@ export interface AppointmentOutcomeProps {
   letterTypeOptions?: EnforcementActionLetterTypeOption[]
   sentence?: AppointmentOutcomeSentence
   enforcementAction?: AppointmentOutcomeEnforcementAction
+  sentenceType?: SentenceType
   isProbationPractitioner?: boolean
   appointmentHintText?: string
 }

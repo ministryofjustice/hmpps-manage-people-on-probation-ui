@@ -32,7 +32,6 @@
     {% else %}
         {% set errorMsgNotes = null %}
     {% endif %}
-
     {% set notesConfig = notesConfig | merge({value: 'arse'}) | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id, 'notes']) %}
 
     {% set sensitivityConfig = {
@@ -137,7 +136,6 @@
         {% if appointmentOutcome.contactId %}
             {% set uploadHtml %}
             <div class="govuk-grid-row govuk-body">
-
                 <div class="govuk-grid-column-full" data-qa="fileUpload">
 
                     {{ govukFileUpload({

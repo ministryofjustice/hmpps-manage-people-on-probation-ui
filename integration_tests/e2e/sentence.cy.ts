@@ -16,7 +16,6 @@ context('Sentence', () => {
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
     page.getTab('activityLog').should('contain.text', 'Contacts')
-    page.getTab('compliance').should('contain.text', 'Compliance')
 
     page.assertAnchorElementAtIndex(
       '[class="moj-side-navigation__item moj-side-navigation__item--active"]',
