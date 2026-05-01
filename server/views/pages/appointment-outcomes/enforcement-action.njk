@@ -1,3 +1,13 @@
 {% extends "../_form.njk" %}
-{# placeholder title below - will be removed #}
-{% set title = "Select an enforcement action for Alton’s failure to comply" %}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+  {{ govukSelect({
+  label: {
+    text: "Select an enforcement action for " + appointmentOutcome.forename + "’s failure to comply",
+    classes: "govuk-label--l",
+    attributes: { 'data-qa': 'pageHeading' }
+  },
+  items: appointmentOutcome.options
+ } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+{% endblock %}

@@ -14,6 +14,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     'outcome/acceptable-absence',
     'outcome/unacceptable-absence',
     'outcome/failed-to-attend',
+    'outcome/enforcement-action',
   ]
   const { crn, id, page, isInPast, msg, log } = args
   return {

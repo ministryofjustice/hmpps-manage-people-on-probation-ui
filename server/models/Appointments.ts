@@ -37,6 +37,25 @@ export type AppointmentEnforcementAction =
   | 'PROFESSIONAL_JUDGEMENT_DECISION'
   | 'ACCEPTABLE_FAILURE'
   | 'DECISION_PENDING'
+  | 'BREACH_REQUESTED'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_CONFIRMATION_SENT'
+  | 'BREACH_CONFIRMATION_SENT'
+  | 'BREACH_LETTER_SENT'
+  | 'BREACH_REQUEST_ACTIONED'
+  | 'SEND_CONFIRMATION_OF_BREACH'
+  | 'RECALL_REQUESTED'
+  | 'IMMEDIATE_BREACH_OR_RECALL'
+  | 'FIRST_WARNING_LETTER_SENT'
+  | 'SECOND_WARNING_LETTER_SENT'
+  | 'OTHER_ENFORCEMENT_LETTER_SENT'
+  | 'LICENCE_COMPLIANCE_LETTER_SENT'
+  | 'ENFORCEMENT_LETTER_REQUESTED'
+  | 'WITHDRAW_WARNING_LETTER'
+  | 'DECISION_PENDING_RESPONSE'
+  | 'YOT_OM_NOTIFIED'
+  | 'WITHDRAWAL_OF_WARNING'
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
@@ -48,7 +67,7 @@ export interface AppointmentOutcomeOption extends Option {
 }
 
 export interface AppointmentEnforcementActionOption extends Option {
-  value?: AppointmentEnforcementAction
+  value?: AppointmentEnforcementAction | ''
 }
 
 export interface AppointmentSessionUser {

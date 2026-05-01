@@ -16,6 +16,7 @@ import {
   getAppointmentAttendedFailedToComplyOptions,
   getAppointmentOutcomeBackLink,
   getAppointmentAcceptableAbsenceOptions,
+  getAppointmentEnforcementActionOptions,
   getAppointmentOutcomeEvidenceBy,
   parseMultipartBody,
 } from '../middleware'
@@ -35,8 +36,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getPersonAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    createAppointmentSession,
   )
+
+  /* create appointment session in manage journey */
+
+  router.get(manageBasePath, createAppointmentSession)
 
   /* redirect page if required session data is not present */
 
@@ -74,7 +78,13 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAppointmentFailedToAttendOptions,
     getAppointmentOutcomeEvidenceBy,
   )
-  /* run multer file upload error handler before validation */
+
+  router.all(
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
+    getAppointmentEnforcementActionOptions,
+  )
+
+  /* run file upload middleware and multipart parser before validation */
 
   router.post(
     `${manageBasePath}/add-note`,
