@@ -36,11 +36,16 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
-  async getProfilePhotoUploadLocation(offenderSetup: OffenderSetup, photoContentType: string): Promise<LocationInfo> {
+  async getProfilePhotoUploadLocation(
+    offenderSetup: OffenderSetup,
+    photoContentType: string,
+    contentSha256Hex?: string,
+  ): Promise<LocationInfo> {
     return this.post({
       path: `/v2/offender_setup/${offenderSetup.uuid}/upload_location`,
       query: { 'content-type': photoContentType },
       headers: { 'Content-Type': 'application/json' },
+      data: contentSha256Hex ? { sha256: contentSha256Hex } : undefined,
       errorMessage: 'Failed to fetch check-in upload location',
     })
   }

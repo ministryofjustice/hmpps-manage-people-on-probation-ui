@@ -33,10 +33,15 @@ export const postCheckInDetails = (
       startedAt: new Date().toISOString(),
       contactPreference: savedUserDetails.preferredComs,
     }
+    const contentSha256 = typeof req.body?.contentSha256 === 'string' ? req.body.contentSha256 : undefined
     logger.info('Checkin Registration started')
     try {
       const setup: OffenderSetup = await eSupervisionClient.postOffenderSetup(data)
-      const uploadLocation: LocationInfo = await eSupervisionClient.getProfilePhotoUploadLocation(setup, 'image/jpeg')
+      const uploadLocation: LocationInfo = await eSupervisionClient.getProfilePhotoUploadLocation(
+        setup,
+        'image/jpeg',
+        contentSha256,
+      )
       return { setup, uploadLocation }
     } catch (error) {
       const statusCode = error?.data?.status || 500

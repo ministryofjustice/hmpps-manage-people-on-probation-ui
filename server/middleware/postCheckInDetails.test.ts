@@ -102,8 +102,25 @@ describe('postCheckInDetails', () => {
     expect(typeof calledWith.startedAt).toBe('string')
     expect(calledWith.contactPreference).toBe('EMAIL')
 
-    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg')
+    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', undefined)
     expect(result).toEqual({ setup, uploadLocation })
+  })
+
+  it('forwards req.body.contentSha256 to getProfilePhotoUploadLocation', async () => {
+    const { req, res } = buildReqRes()
+    req.body = { contentSha256: 'a'.repeat(64) }
+
+    jest.spyOn(MasApiClient.prototype, 'getProbationPractitioner').mockResolvedValue({ username: 'pp-user' } as any)
+
+    const setup = { uuid: setupUuid }
+    jest.spyOn(ESupervisionClient.prototype, 'postOffenderSetup').mockResolvedValue(setup as any)
+    const getProfilePhotoUploadLocation = jest
+      .spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation')
+      .mockResolvedValue({ url: 'http://upload', contentType: 'image/jpeg', duration: 'PT5M' } as any)
+
+    await postCheckInDetails(hmppsAuthClient)(req, res)
+
+    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', 'a'.repeat(64))
   })
 
   it('falls back to res.locals.user.username when MAS practitioner username missing', async () => {
