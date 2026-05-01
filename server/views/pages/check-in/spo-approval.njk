@@ -1,0 +1,41 @@
+{% extends "../_form.njk" %}
+
+{% set title = "Check you've got approval before you sign " + case.name.forename + " up"  %}
+{% set showAnchorLink = true %}
+{% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/full-eligibility' %}
+
+{% set checkboxTitle = "Confirm approval" %}
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            <p class="govuk-body">You must have approval from your Senior Probation Officer (SPO) to sign someone up to reduce some face-to-face contact. You must only replace some face-to-face meetings. You cannot use online check ins to replace all face-to-face contact with a person.  </p>
+
+
+            {{ govukCheckboxes({
+                name: "esupervision[" + crn + "][" + id + "][checkins][eligibilitySPOApproval]",
+                idPrefix: "esupervision-" + crn + "-" + id + "-checkins-eligibilitySPOApproval",
+                fieldset: {
+                    legend: {
+                        text: checkboxTitle,
+                        isPageHeading: false,
+                        classes: "govuk-fieldset__legend--m"
+                    }
+                },
+                errorMessage: {
+                  text: errorMessages["esupervision-" + crn + "-" + id + "-checkins-eligibilitySPOApproval"]
+                } if errorMessages["esupervision-" + crn + "-" + id + "-checkins-eligibilitySPOApproval"],
+                items: [
+                {
+                  value: "spo-approval",
+                  text: "I can confirm that my SPO has approved the use of online check ins to replace some face-to-face contact with this person",
+                  label: {
+                    classes: "govuk-!-width-three-quarters"
+                  },
+                  checked: isApproved
+                }  
+            ]
+            }) | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibilitySPOApproval']) }}
+        </div>
+    </div>
+{% endblock %}

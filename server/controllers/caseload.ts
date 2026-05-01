@@ -5,11 +5,12 @@ import { v4 } from 'uuid'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
-import { checkRecentlyViewedAccess, getSearchParamsString } from '../utils'
+import { checkRecentlyViewedAccess } from '../utils'
 import { Controller } from '../@types'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
+import { getDateRange, RangeType } from '../utils/getDateRange'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
@@ -32,6 +33,7 @@ const routes = [
   'postTeamCase',
   'getRecentCases',
   'checkAccess',
+  'postOutcomesAppointmentsFilter',
 ] as const
 
 interface Args {
@@ -126,8 +128,16 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
       const [name, dir] = sortByQuery.split('.') as [ColName, SortDir]
       let cols = colNames
+      const outcomeFilter = req.query?.outcomeFilter ?? 'PAST_TWO_YEARS'
+      let fromDate
+      let toDate
       if (type === 'no-outcome') {
         cols = cols.filter(col => col !== 'appointment')
+        if (outcomeFilter && res.locals.flags.enableHomePageOutcomesWithFilter) {
+          const result = getDateRange(outcomeFilter as RangeType)
+          fromDate = result.fromDate
+          toDate = result.toDate
+        }
       }
       const sortBy = cols.reduce((acc, colName) => {
         const defaultSort = !dir && colName === 'date' ? 'ascending' : 'none'
@@ -143,15 +153,20 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sortBy: name,
         ascending,
         size: '',
+        fromDate,
+        toDate,
       })
       const appointments: UserActivity[] = userSchedule.appointments.map((appointment: UserActivity) => {
         const [year, month, day] = appointment.dob.split('-')
         return { ...appointment, birthdate: { day, month, year } }
       })
-      const baseUrl = req.url.split('?')[0]
+      let baseUrl = req.url.split('?')[0]
       userSchedule = {
         ...userSchedule,
         appointments,
+      }
+      if (type === 'no-outcome' && res.locals.flags.enableHomePageOutcomesWithFilter) {
+        baseUrl = `${baseUrl}?outcomeFilter=${outcomeFilter}`
       }
 
       const pagination: Pagination = getPaginationLinks(
@@ -169,7 +184,19 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         pagination,
         sortUrl: baseUrl,
         url,
+        outcomesFilter: outcomeFilter,
       })
+    }
+  },
+  postOutcomesAppointmentsFilter: hmppsAuthClient => {
+    return async (req, res) => {
+      const { outcomesFilter } = req.body
+      const [path, queryString = ''] = req.url.split('?')
+      const query = new URLSearchParams(queryString)
+
+      query.set('outcomeFilter', outcomesFilter)
+
+      return res.redirect(`${path}?${query.toString()}`)
     }
   },
   getTeams: hmppsAuthClient => {

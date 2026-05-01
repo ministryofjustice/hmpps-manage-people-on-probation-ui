@@ -14,6 +14,7 @@ import {
   AttendedCompliedAppointment,
   AppointmentOutcomeOption,
   AppointmentEnforcementActionOption,
+  ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -77,6 +78,7 @@ export interface LocalsUser {
   uuid?: string
   displayName?: string
   token: string
+  probationDeliveryUnits?: ProbationDeliveryUnit[]
 }
 
 interface Locals {

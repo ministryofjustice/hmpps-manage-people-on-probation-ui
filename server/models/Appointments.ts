@@ -270,6 +270,11 @@ export interface LocalParams {
   options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
 }
 
+export interface ProbationDeliveryUnit {
+  code: string
+  description: string
+}
+
 export interface MasUserDetails {
   userId: number
   username: string
@@ -278,6 +283,9 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+  staff?: {
+    probationDeliveryUnits?: ProbationDeliveryUnit[]
+  }
 }
 
 export interface AttendedCompliedAppointment {

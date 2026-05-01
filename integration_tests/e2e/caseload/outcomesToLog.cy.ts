@@ -36,7 +36,11 @@ const checkColumnSorting = (page: UserAppointments, index: number) => {
   page.getTableCell(1, 1).find('a').should('contain.text', 'Berge, Alton').should('have.attr', 'href', '/case/X778160')
   page.getTableColumnHeading(index).find('button').click()
   page.getTableColumnHeading(index).should('have.attr', 'aria-sort', secondSort)
-  page.getTableCell(1, 1).find('a').should('contain.text', 'Berge, Alton').should('have.attr', 'href', '/case/X778160')
+  page
+    .getTableCell(1, 1)
+    .find('a')
+    .should('contain.text', 'Berge, Alton')
+    .should('have.attr', 'href', '/case/X778160') /* */
 }
 
 context('Outcomes to log', () => {
@@ -47,10 +51,23 @@ context('Outcomes to log', () => {
     cy.visit('/caseload/appointments/no-outcome')
     const page = new UserAppointments()
     page.checkPageTitle('Outcomes to log')
-    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome')
-    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome')
-    checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/no-outcome')
-    checkColumnHeading(page, 3, 'Date and time', 'date', '/caseload/appointments/no-outcome', 'ascending')
+    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+    checkColumnHeading(
+      page,
+      2,
+      'Sentence',
+      'sentence',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+    )
+    checkColumnHeading(
+      page,
+      3,
+      'Date and time',
+      'date',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      'ascending',
+    )
     page.getTableColumnHeading(4).should('contain.text', 'Action')
     page.getTableColumnHeading(4).find('button').should('not.exist')
     page

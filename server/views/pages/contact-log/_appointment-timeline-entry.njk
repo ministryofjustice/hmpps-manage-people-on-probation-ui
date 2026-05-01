@@ -6,7 +6,7 @@
 
 {% set titleHtml %}
 <span class="govuk-heading-s govuk-!-margin-bottom-0">
-  <a href="{{link}}">{{ entry.type | toSentenceCase }} at {{ entry.startDateTime | govukTime }}
+  <a href="{{link}}">{{ (entry.displayName or entry.type) | toSentenceCase }} at {{ entry.startDateTime | govukTime }}
     <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 </span>
 {% endset %}

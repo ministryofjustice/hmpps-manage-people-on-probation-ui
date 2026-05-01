@@ -1,8 +1,9 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
+{% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set pageTitle = makePageTitle({
-  pageHeading: [appointment.type, 'note']}) %}
+  pageHeading: [appointmentDisplayName, 'note']}) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
   '' %}
 {% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
@@ -18,7 +19,7 @@
 
 {% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else 
   'Upcoming' %}
-{% set title = appointment.type + ' with ' + appointment.officer.name | fullName %}
+{% set title = appointmentDisplayName + ' with ' + appointment.officer.name | fullName %}
 {% set isOutcomeRecorded = appointment.hasOutcome %}
 
 {% block content %}
@@ -41,6 +42,16 @@
     </div>
   </div>
   
+  {% if flags.enableDeepLinks and isOutcomeRecorded and appointment.deliusManaged %}
+    <p class="govuk-body">
+      {% if flags.enableDeepLinks and appointment.type in drugHistoryContactTypes and appointment.eventNumber %}
+        You can manage this contact through the <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">person's drug history in NDelius (opens in a new tab)</a>.
+      {% else %}
+        <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.
+      {% endif %}
+    </p>
+  {% endif %}
+
   {% set appointmentDetails %}
   {% set showAction = false %}
   {% set noMargin = true %}

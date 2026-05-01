@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import express from 'express'
 import request from 'supertest'
+import { DateTime } from 'luxon'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -127,6 +128,54 @@ describe('homeController', () => {
 
         expect(getHomeOldSpy).toHaveBeenCalledWith(hmppsAuthClient)
         expect(legacyHandler).toHaveBeenCalledWith(req, resWithLegacyFlag)
+      })
+    })
+
+    describe('outcomes filter with feature flag enabled', () => {
+      it('should filter appointments requiring outcomes to only include the last 2 years and update count', async () => {
+        const recentAppointment = {
+          id: 1,
+          name: { surname: 'Recent', forename: 'Person' },
+          crn: 'X000002',
+          type: 'Office appointment',
+          startDateTime: DateTime.now().minus({ years: 1 }).toISO() as string,
+        }
+        const oldAppointment = {
+          id: 2,
+          name: { surname: 'Old', forename: 'Person' },
+          crn: 'X000003',
+          type: 'Office appointment',
+          startDateTime: DateTime.now().minus({ years: 3 }).toISO() as string,
+        }
+        const homepageWithMixedOutcomeDates = {
+          ...mockHomepage,
+          appointmentsRequiringOutcome: [recentAppointment, oldAppointment],
+          appointmentsRequiringOutcomeCount: 2,
+        }
+        const resWithFilterFlag = mockAppResponse({
+          flags: { enableDeliusClient: true, enableHomePageOutcomesWithFilter: true },
+        })
+        const renderSpyWithFilter = jest.spyOn(resWithFilterFlag, 'render')
+        jest
+          .spyOn(DeliusClient.prototype, 'getHomepage')
+          .mockImplementation(() => Promise.resolve(homepageWithMixedOutcomeDates))
+
+        await controllers.home.getHome(hmppsAuthClient)(req, resWithFilterFlag)
+
+        expect(renderSpyWithFilter).toHaveBeenCalledWith('pages/homepage/homepage', {
+          upcomingAppointments: mockHomepage.upcomingAppointments,
+          appointmentsRequiringOutcome: [recentAppointment],
+          appointmentsRequiringOutcomeCount: 1,
+          url,
+          delius_link: config.delius.link,
+          oasys_link: config.oaSys.link,
+          interventions_link: config.interventions.link,
+          recall_link: config.recall.link,
+          cas1_link: config.cas1.link,
+          cas3_link: config.cas3.link,
+          caval_link: config.caval.link,
+          epf2_link: config.epf2.link,
+        })
       })
     })
 
