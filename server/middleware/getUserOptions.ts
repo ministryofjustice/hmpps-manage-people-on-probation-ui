@@ -7,7 +7,7 @@ import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
     const { username } = res.locals.user
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { providerCode: providerCodeQuery, teamCode: teamCodeQuery, back } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
@@ -90,6 +90,20 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     )
 
     let userOptions = users.map(user => {
+      if (res.locals.flags.enableMAN2344) {
+        const { username: staffUsername, nameAndRole, staffCode, email, name } = user
+        const option: User = {
+          username: staffUsername,
+          nameAndRole: convertToTitleCase(nameAndRole, [], regexIgnoreValuesInParentheses),
+          staffCode,
+          email,
+          name,
+        }
+        if (staffUsername.toLowerCase() === selectedUser.toLowerCase()) {
+          option.selected = 'selected'
+        }
+        return option
+      }
       const { username: staffUsername, nameAndRole, staffCode } = user
       const option: User = {
         username: staffUsername,

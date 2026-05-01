@@ -1,7 +1,4 @@
-/* eslint-disable import/no-cycle */
 import { Note } from './note'
-import { Validateable } from '../../models/Errors'
-import { Contact } from './professionalContact'
 
 export interface Name {
   forename: string
@@ -94,7 +91,9 @@ export interface PersonalDetailsMainAddress {
   contacts: PersonalContact[]
   mainAddress?: PersonAddress
 }
-export interface PersonalDetailsUpdateRequest extends Validateable {
+
+export interface PersonalDetailsUpdateRequest {
+  [index: string]: string | boolean
   phoneNumber?: string
   mobileNumber?: string
   emailAddress?: string
@@ -217,3 +216,24 @@ export interface Disability {
   lastUpdated: string
   lastUpdatedBy: Name
 }
+
+export interface ProfessionalContact {
+  name: Name
+  currentContacts: Contact[]
+  previousContacts: Contact[]
+}
+
+export interface Contact {
+  name: string
+  telephoneNumber: string
+  email: string
+  provider: string
+  probationDeliveryUnit: string
+  team: string
+  allocationDate: string
+  allocatedUntil?: string
+  responsibleOfficer: boolean
+  prisonOffenderManager: boolean
+}
+
+export type Origin = 'appointments' | undefined

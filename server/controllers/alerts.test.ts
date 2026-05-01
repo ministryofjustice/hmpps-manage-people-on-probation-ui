@@ -11,9 +11,12 @@ import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 import { apiErrors } from '../properties'
 import { UserAlerts } from '../models/Alerts'
 import logger from '../../logger'
+import { checkSendAuditMessage } from './testutils'
+import { SubjectType } from '../middleware/sendAuditMessage'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 
 let toRoshWidgetSpy: jest.Mock
 
@@ -161,6 +164,7 @@ describe('alertsController', () => {
           risksErrors: [],
           note: false,
         })
+        checkSendAuditMessage(res, 'VIEW_MAS_ALERT', res.locals.user.username, SubjectType.USER)
       })
 
       it('should call getUserAlerts with custom page number and sort params, and build query string (Risk Enabled)', async () => {
@@ -319,6 +323,7 @@ describe('alertsController', () => {
           risksErrors: [],
           note: true,
         })
+        checkSendAuditMessage(res, 'VIEW_MAS_ALERT_NOTE', res.locals.user.username, SubjectType.USER)
       })
     })
   })
@@ -336,6 +341,7 @@ describe('alertsController', () => {
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 1 alert.` })
       expect(nextSpy).toHaveBeenCalled()
+      checkSendAuditMessage(res, 'EDIT_MAS_CLEAR_ALERT', res.locals.user.username, SubjectType.USER)
     })
 
     it('should call clearAlerts with multiple selected alerts and return success', async () => {

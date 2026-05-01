@@ -1,0 +1,19 @@
+{% extends "../_form.njk" %}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+  {{ govukRadios({
+    name: "enforcementAction",
+    fieldset: {
+      legend: {
+        html: '<span data-qa="pageHeading">Why was ' + appointmentOutcome.forename + '’s absence acceptable?</span>',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--l"
+      }
+    },
+     hint: {
+        text: appointmentOutcome.appointmentHintText
+    },
+    items: appointmentOutcome.options
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+{% endblock %}

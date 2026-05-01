@@ -7,8 +7,6 @@ import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import SupportingInformationPage from '../../pages/appointments/note.page'
 import {
   checkAppointmentSummary,
-  getUuid,
-  crn,
   checkUpdateType,
   checkUpdateSentence,
   checkUpdateLocation,
@@ -17,6 +15,9 @@ import {
   checkUpdateSensitivity,
   checkUpdateBackLinkRefresh,
 } from './imports'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn } from './imports/common'
+import { getUuid } from './utils'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
@@ -34,13 +35,18 @@ describe('Arrange another appointment', () => {
     loadPage()
     cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    checkAppointmentSummary(arrangeAnotherAppointmentPage)
+    checkAppointmentSummary({
+      page: arrangeAnotherAppointmentPage,
+      sendTextMessage: false,
+      summaryHasDate: false,
+    })
     arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
   })
   describe('User clicks submit without selecting a date and time', () => {
     let dateTimePage: AppointmentdateTimePage
     let supportingInformationPage: SupportingInformationPage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    let textMessageConfirmPage: TextMessageConfirmationPage
     beforeEach(() => {
       cy.task('stubNextAppointment')
       loadPage()
@@ -71,18 +77,21 @@ describe('Arrange another appointment', () => {
     it('should display the outlook invite inset text', () => {
       getUuid().then(uuid => {
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-        const tomorrow = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
-        dateTimePage.getDatePickerInput().clear().type(tomorrow)
-        dateTimePage.getElementInput(`startTime`).type('09:10')
-        dateTimePage.getElementInput(`endTime`).focus().type('10:30')
+        const future = DateTime.now().plus({ days: 2 }).toFormat('d/M/yyyy')
+        dateTimePage.getDatePickerInput().clear().type(future)
+        dateTimePage.getElementInput(`startTime`).clear().type('09:10')
+        dateTimePage.getElementInput(`endTime`).focus().clear().type('10:30')
         dateTimePage.getSubmitBtn().click()
         dateTimePage.getSubmitBtn().click()
+        textMessageConfirmPage = new TextMessageConfirmationPage()
+        textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
+        textMessageConfirmPage.getSubmitBtn().click()
         supportingInformationPage = new SupportingInformationPage()
         cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
         supportingInformationPage.getSubmitBtn().click()
         cy.get('[data-qa="calendarInviteInset"]').should(
           'contain.text',
-          `You'll receive a calendar invite for the appointment`,
+          `You'll receive a calendar invite for the appointment.`,
         )
       })
     })

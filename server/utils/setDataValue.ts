@@ -1,4 +1,8 @@
-export const setDataValue = <T extends Record<string, any>>(data: T, sections: string | string[], value: any): T => {
+export const setDataValue = <TData extends Record<string, any>, TValue = any>(
+  data: TData,
+  sections: string | string[],
+  value: TValue,
+): TData => {
   const path = Array.isArray(sections) ? sections : [sections]
   let target: Record<string, any> = data
   for (let i = 0; i < path.length - 1; i += 1) {

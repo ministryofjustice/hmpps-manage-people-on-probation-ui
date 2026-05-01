@@ -1,0 +1,22 @@
+{% if entry.esupervisionId %}
+  <li><a href="/case/{{ crn }}/appointments/{{ entry.esupervisionId }}/check-in/update?back={{ url }}" data-qa="update-link">Update</a></li>
+  {% elif entry.deliusManaged %}
+  <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-link govuk-!-margin-right-6" data-qa="view-link">View</a></li>
+  {% if flags.enableDeepLinks and entry.type in deepLinkContactTypes and entry.eventNumber %}
+    {% if entry.type === 'CP/UPW - Appointment/Attendance (NS)' %}
+      <li><a href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, entry.eventNumber) }}" target="_blank"
+             rel="external noopener noreferrer" class="contact-activity__manage-link" data-qa="manage-on-delius-link">Manage on NDelius<span
+              class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+    {% else %}
+      <li><a href="{{ deliusDeepLinkUrl('DrugHistory', crn, entry.eventNumber) }}" target="_blank"
+             rel="external noopener noreferrer" class="contact-activity__manage-link" data-qa="manage-on-delius-link">Manage on NDelius<span
+              class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+    {% endif %}
+  {% else %}
+    <li><a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank"
+           rel="external noopener noreferrer" class="contact-activity__manage-link" data-qa="manage-on-delius-link">Manage on NDelius<span
+            class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+  {% endif %}
+{% else %}
+  <li><a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?back={{ url }}" data-qa="manage-link">Manage</a></li>
+{% endif %}

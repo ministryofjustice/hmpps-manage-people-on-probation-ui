@@ -1,11 +1,19 @@
+/* eslint-disable no-new */
 /* eslint-disable no-console */
 import * as govukFrontend from 'govuk-frontend'
-import * as mojFrontend from '@ministryofjustice/frontend'
+import { DatePicker, Alert } from '@ministryofjustice/frontend'
 import { forEach } from 'lodash'
 
 govukFrontend.initAll()
-mojFrontend.initAll()
 
+const $datePickers = document.querySelectorAll('[data-module="moj-date-picker"]')
+const $alerts = document.querySelectorAll('[data-module="moj-alert"]')
+$datePickers.forEach($datePicker => {
+  new DatePicker($datePicker)
+})
+$alerts.forEach($alert => {
+  new Alert($alert)
+})
 // Accessibility
 const { hash } = window.location
 if (hash === '#main-content') {

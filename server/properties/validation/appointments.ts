@@ -2,44 +2,32 @@ import {
   isNotEmpty,
   isValidDate,
   isValidDateFormat,
-  isStringNumber,
   timeIsNotLaterThan,
   isNotEarlierThan,
   isValidCharCount,
   timeIsValid24HourFormat,
-  isTodayOrLater,
-  timeIsNowOrInFuture,
+  isValidRescheduledDateTime,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
+import { dateWithDayAndWithoutYear, shortTime } from '../../utils'
 
 export interface AppointmentsValidationArgs {
   crn: string
   id: string
   page: string
-  repeatingValue?: 'Yes' | 'No'
   visor?: boolean
   contactId?: string
   notes?: string
   maxCharCount?: number
-  enablePastAppointments?: boolean
+  previousStart?: string
   fileOrNote?: boolean
   isSensitive?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const {
-    crn,
-    id,
-    contactId,
-    page,
-    visor,
-    repeatingValue,
-    notes,
-    maxCharCount,
-    enablePastAppointments,
-    fileOrNote,
-    isSensitive,
-  } = args
+  const { crn, id, contactId, page, visor, notes, maxCharCount, previousStart, isSensitive } = args
+  const appointmentStartDate = previousStart ? dateWithDayAndWithoutYear(previousStart) : ''
+  const appointmentStartTime = previousStart ? shortTime(previousStart) : ''
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -95,15 +83,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'The date must not be later than 31/12/2199',
           crossField: `_maxDate`,
         },
-        ...(!enablePastAppointments
-          ? [
-              {
-                validator: isTodayOrLater,
-                msg: 'Date must be today or in the future',
-                log: 'Date must be today or in the future',
-              },
-            ]
-          : []),
+        {
+          validator: isValidRescheduledDateTime,
+          msg: `The original appointment was also arranged for ${appointmentStartTime} on ${appointmentStartDate}. If the original date is incorrect, select a new date.`,
+          log: 'Rescheduled appointment date and time is not valid',
+        },
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
@@ -120,16 +104,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Enter a time in the 24-hour format, for example 16:30',
           crossField: `[appointments][${crn}][${id}][date]`,
         },
-        ...(!enablePastAppointments
-          ? [
-              {
-                validator: timeIsNowOrInFuture,
-                msg: 'The start time must be now or in the future',
-                log: 'The start time must be now or in the future',
-                crossField: `[appointments][${crn}][${id}][date]`,
-              },
-            ]
-          : []),
+        {
+          validator: isValidRescheduledDateTime,
+          msg: `The original appointment was also arranged for ${appointmentStartTime} on ${appointmentStartDate}. If the original date is correct, select a new start time.`,
+          log: 'Rescheduled appointment date and time is not valid',
+        },
       ],
     },
     [`[appointments][${crn}][${id}][end]`]: {
@@ -152,6 +131,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'The end time must be after the start time',
           crossField: `[appointments][${crn}][${id}][start]`,
         },
+        {
+          validator: isValidRescheduledDateTime,
+          msg: `The original appointment was also arranged for ${appointmentStartTime} on ${appointmentStartDate}. If the original date is correct, select a new end time.`,
+          log: 'Rescheduled appointment date and time is not valid',
+        },
       ],
     },
     [`[appointments][${crn}][${id}][user][locationCode]`]: {
@@ -161,41 +145,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select an appointment location',
           log: 'Location not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][repeating]`]: {
-      optional: page !== 'repeating',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select if the appointment will repeat',
-          log: 'Appointment repeat not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][interval]`]: {
-      optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select the frequency the appointment will repeat',
-          log: 'Appointment repeat frequency not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][numberOfRepeatAppointments]`]: {
-      optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Enter the number of times the appointment will repeat',
-          log: 'Appointment repeat count not entered',
-        },
-        {
-          validator: isStringNumber,
-          msg: 'Enter a number',
-          log: 'Appointment repeat count not entered in correct format',
         },
       ],
     },
@@ -294,13 +243,33 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][reason]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Explain why this appointment is being rescheduled',
+          log: 'Explain why this appointment is being rescheduled not provided',
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
       optional: page !== 'reschedule-appointment',
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select if contact includes sensitive information',
+          msg: 'Explain if appointment includes sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][smsOptIn]`]: {
+      optional: page !== 'text-message-confirmation',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if you want to send a text message confirmation',
+          log: 'Send text message confirmation not selected',
         },
       ],
     },
@@ -311,6 +280,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select if they attended and complied',
           log: 'Attended and complied not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][enforcementAction]`]: {
+      optional: page !== 'attended-failed-to-comply',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an action for their failure to comply',
+          log: 'Enforcement action not selected',
         },
       ],
     },

@@ -7,7 +7,7 @@ context('Contact', () => {
     const page = Page.verifyOnPage(DisabilitiesPage)
     page.assertAnchorElementAtIndexWithin(
       'p',
-      0,
+      1,
       0,
       'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=EqualityMonitoring&CRN=X000001',
     )
@@ -26,7 +26,7 @@ context('Contact', () => {
     const page = Page.verifyOnPage(DisabilitiesPage)
     page.assertAnchorElementAtIndexWithin(
       'p',
-      0,
+      1,
       0,
       'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=EqualityMonitoring&CRN=X000001',
     )

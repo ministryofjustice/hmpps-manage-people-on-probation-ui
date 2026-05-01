@@ -5,10 +5,6 @@ export interface Errors {
   }
 }
 
-export interface Validateable {
-  [index: string]: string | boolean
-}
-
 export interface ErrorCheck {
   validator: (...args: any[]) => boolean
   msg: string

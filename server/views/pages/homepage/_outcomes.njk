@@ -22,12 +22,12 @@
   rows: []
 } %}
 
-{% if outcomes.length > 0 %}
-  {% for outcome in outcomes %}
+{% if appointmentsRequiringOutcome.length > 0 %}
+  {% for outcome in appointmentsRequiringOutcome %}
       {% if outcome.deliusManaged %}
         {% set row = tableData.rows.push([
             {
-                html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
+                html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.name.surname + ', ' + outcome.name.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
             },
             {
                 html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type + '</a>'
@@ -44,7 +44,7 @@
       {% else %}
         {% set row = tableData.rows.push([
             {
-                html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
+                html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.name.surname + ', ' + outcome.name.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
             },
             {
                 html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type + '</a>'

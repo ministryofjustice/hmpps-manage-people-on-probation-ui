@@ -1,0 +1,5 @@
+{% extends "../_form.njk" %}
+{% set initiateText = 'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
+    'recall' %}
+{% set title = 'Initiate a ' + initiateText %}
+{% set backLink = appointmentOutcome.backLink %}

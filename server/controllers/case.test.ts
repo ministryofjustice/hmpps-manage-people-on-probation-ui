@@ -5,10 +5,16 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks, mockSanIndicatorResponse } from './mocks'
+import {
+  mockAppResponse,
+  mockTierCalculation,
+  mockPredictors,
+  mockRisks,
+  mockSanIndicatorResponse,
+  mockRiskData,
+} from './mocks'
 import { Overview } from '../data/model/overview'
-import { Needs, PersonRiskFlags } from '../data/model/risk'
-import { toPredictors, toRoshWidget } from '../utils'
+import { Needs } from '../data/model/risk'
 import { checkAuditMessage } from './testutils'
 import {
   AddressType,
@@ -19,9 +25,9 @@ import {
   PersonalDetails,
   Provisions,
   Document,
+  Contact,
 } from '../data/model/personalDetails'
 import { PersonalDetailsSession } from '../models/Data'
-import { Contact } from '../data/model/professionalContact'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
 jest.mock('../data/masApiClient')
@@ -38,13 +44,13 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+jest.mock('../data/eSupervisionClient')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const mockOverview = {} as Overview
 const mockNeeds = {} as Needs
-const mockRiskFlags = {} as PersonRiskFlags
 
 const overview: PersonalDetails = {
   name: {
@@ -81,13 +87,15 @@ const mockPersonalDetails: PersonalDetailsSession = {
   sentencePlan: {
     lastUpdatedDate: '',
     showLink: false,
+    showText: false,
   },
   risks: mockRisks,
   tierCalculation: mockTierCalculation,
   predictors: mockPredictors,
+  riskData: mockRiskData,
 }
 const mockOverdueOutcomesResponse = {
-  content: [{}, {}, {}],
+  content: [{ date: '2021-01-01' }, { date: '2025-01-02' }, { date: '2025-01-03' }],
 }
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
@@ -105,7 +113,11 @@ const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
 
-const res = mockAppResponse()
+const res = mockAppResponse({
+  flags: {
+    enableOutcomesV1: true,
+  },
+})
 const renderSpy = jest.spyOn(res, 'render')
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -146,19 +158,17 @@ describe('caseController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
         overview: mockOverview,
         needs: mockNeeds,
-        risks: mockRisks,
         crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: 3,
+        appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
     })
   })
+
   describe('getCaseNoSentenceNumber', () => {
     const req = httpMocks.createRequest({
       params: {
@@ -187,17 +197,45 @@ describe('caseController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
         overview: mockOverview,
         needs: mockNeeds,
-        risks: mockRisks,
         crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: 3,
+        appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
+    })
+  })
+  describe('getCase - checkins flag enabled and practitioner allocated', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
+      res.locals.flags = { enableESupervisionCheckins: true, enableOutcomesV1: true }
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = { enableOutcomesV1: true }
+    })
+
+    it('should render the overview page with canAccessCheckins true', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          hasPractitioner: true,
+          canAccessCheckins: true,
+        }),
+      )
     })
   })
   it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {

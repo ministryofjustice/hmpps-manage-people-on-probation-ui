@@ -6,17 +6,17 @@ import 'cypress-plugin-tab'
 import mockResponse from '../../../wiremock/mappings/appointment-types.json'
 import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
-import {
-  checkPopHeader,
-  checkRiskToStaffAlert,
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeSupportingInformationPage,
-  completeTypePage,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import { toSentenceCase } from '../../../server/utils'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+  completeSupportingInformationPage,
+} from './utils'
 
 const mockData = mockResponse as Wiremock
 
@@ -24,9 +24,9 @@ const mockAppointmentTypes = getWiremockData<AppointmentType[]>(mockData, '/mas/
 const crn = 'X778160'
 const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 
-const loadPage = () => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage()
+const loadPage = (_crn = crn) => {
+  cy.visit(`/case/${_crn}/arrange-appointment/${uuid}/sentence`)
+  completeSentencePage(1, '', _crn)
 }
 
 describe('Arrange an appointment', () => {
@@ -40,8 +40,7 @@ describe('Arrange an appointment', () => {
     describe('No VISOR registration', () => {
       it('should render the page', () => {
         loadPage()
-        checkPopHeader('Alton Berge', true)
-        checkRiskToStaffAlert()
+        checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')
@@ -65,6 +64,15 @@ describe('Arrange an appointment', () => {
         )
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
+      })
+
+      describe('Page is rendered with risk to staff alert', () => {
+        beforeEach(() => {
+          loadPage('X000001')
+        })
+        it('should render the alert with correct details', () => {
+          checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+        })
       })
 
       describe('Continue is clicked without first selecting a type', () => {
@@ -248,6 +256,7 @@ describe('Arrange an appointment', () => {
       cy.get('[data-qa="attendeeDetails"]').should('contain.text', changedUser)
       completeTypePage()
       completeLocationDateTimePage()
+      completeTextMessageConfirmationPage({ index: 1 })
       completeSupportingInformationPage()
       const cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', changedUser)

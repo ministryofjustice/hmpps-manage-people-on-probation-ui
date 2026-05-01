@@ -1,6 +1,15 @@
 import { PersonSummary } from './personalDetails'
 import { Activity } from './schedule'
 
+export interface SmsEventRequest {
+  firstName: string
+  mobileNumber?: string
+  crn: string
+  smsOptIn: boolean
+  includeWelshTranslation: boolean
+  appointmentLocation?: string
+  appointmentTypeCode?: string
+}
 export interface OutlookEventRequestBody {
   recipients: Recipient[]
   message: string
@@ -8,6 +17,7 @@ export interface OutlookEventRequestBody {
   start: string
   durationInMinutes: number
   supervisionAppointmentUrn: string
+  smsEventRequest?: SmsEventRequest
 }
 
 export interface Recipient {
@@ -21,18 +31,12 @@ export interface OutlookEventResponse {
   startDate: string
   endDate: string
   attendees: string[]
+  smsResponse?: SmsResponse
 }
 
 export interface RescheduleEventRequest {
   rescheduledEventRequest: EventRequest
   oldSupervisionAppointmentUrn: string
-}
-
-export interface SmsEventRequest {
-  firstName: string
-  crn: string
-  smsOptIn: boolean
-  mobileNumber?: string
 }
 
 export interface EventRequest {
@@ -50,4 +54,30 @@ export interface EventResponse {
   subject: string
   startDate: string
   endDate: string
+  attendees: string[]
+  smsResponse?: SmsResponse
+}
+
+export interface SmsResponse {
+  englishNotificationId?: string
+  welshNotificationId?: string
+}
+export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
+
+export interface SmsPreviewRequest {
+  firstName: string
+  dateAndTimeOfAppointment: string
+  appointmentLocation?: string
+  appointmentTypeCode?: string
+  includeWelshPreview: boolean
+}
+
+export interface SmsPreviewResponse {
+  englishSmsPreview: string
+  welshSmsPreview?: string
+}
+
+export interface SmsPreviewSession {
+  request: SmsPreviewRequest
+  preview: SmsPreviewResponse
 }

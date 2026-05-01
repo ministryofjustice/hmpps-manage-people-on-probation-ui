@@ -1,4 +1,6 @@
-{% if entry.action %}
+{% if entry.displayName %}
+   {{ entry.displayName }}
+{% elif entry.action %}
    {{ entry.action }}
 {% elif entry.isEmailOrTextToPop === true %}
     Email/Text to {{ personSummary.name | fullName }}

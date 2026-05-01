@@ -1,18 +1,19 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
-import { getUuid } from './imports'
+import { getUuid } from './utils'
 
 describe('Reschedule Appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let rescheduleAppointmentPage: RescheduleAppointmentPage
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
 
-  const loadPage = () => {
+  const loadPage = (enableNonCompliance = false) => {
     cy.visit('/case/X000001/appointments/appointment/6/manage')
+    const index = enableNonCompliance ? 2 : 1
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage
-      .getAppointmentDetailsListItem(1, 'actions')
+      .getAppointmentDetailsListItem(index, 'actions')
       .find('a')
       .should('contain.text', 'Reschedule')
       .should('have.attr', 'href', `/case/X000001/appointment/6/reschedule`)
@@ -30,16 +31,15 @@ describe('Reschedule Appointment', () => {
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Reschedule an appointment')
     cy.get('div[data-qa="whoNeedsToReschedule"] legend').should(
       'contain.text',
-      'Who needs to reschedule this appointment',
+      'Who needs to reschedule this appointment?',
     )
 
     cy.get('.govuk-form-group .govuk-hint')
       .eq(0)
       .should(
         'include.text',
-        'Appointment: Planned Office Visit (NS) with Terry Jones on 21 February 2024 at 10:15am to 10:30am',
+        'Appointment: Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024 at 10:15am to 10:30am.',
       )
-
     cy.get('.govuk-form-group .govuk-hint')
       .eq(1)
       .should('contain.text', 'They should give 48 hours notice and provide evidence.')
@@ -74,14 +74,18 @@ describe('Reschedule Appointment', () => {
       rescheduleAppointmentPage.getSubmitBtn().click()
       rescheduleAppointmentPage.checkErrorSummaryBox([
         'Select who is rescheduling this appointment',
-        'Select if contact includes sensitive information',
+        'Explain why this appointment is being rescheduled',
+        'Explain if appointment includes sensitive information',
       ])
       rescheduleAppointmentPage
         .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-whoNeedsToReschedule-error`)
         .should('contain.text', 'Select who is rescheduling this appointment')
       rescheduleAppointmentPage
+        .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-reason-error`)
+        .should('contain.text', 'Explain why this appointment is being rescheduled')
+      rescheduleAppointmentPage
         .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-sensitivity-error`)
-        .should('contain.text', 'Select if contact includes sensitive information')
+        .should('contain.text', 'Explain if appointment includes sensitive information')
     })
   })
 
@@ -93,6 +97,10 @@ describe('Reschedule Appointment', () => {
       .eq(0)
       .find('.govuk-radios__input')
       .click()
+    rescheduleAppointmentPage
+      .getReason()
+      .type('This appointment is being rescheduled because of a change in availability.')
+
     cy.get('[data-qa=sensitiveInformation]').find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     rescheduleAppointmentPage.getSubmitBtn().click()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()

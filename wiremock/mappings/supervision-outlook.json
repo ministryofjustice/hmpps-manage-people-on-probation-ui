@@ -30,7 +30,57 @@
           "id": "id-1",
           "subject": "subject",
           "startDate": "2025-10-16T14:55:23.537Z",
-          "endDate": "2025-10-16T15:55:23.537Z"
+          "endDate": "2025-10-16T15:55:23.537Z",
+          "attendees": ["attendees-1", "attendees-2"],
+          "smsResponse": {
+            "englishNotificationId": "english-sms-1"
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/supervision/sms/preview",
+        "method": "POST",
+        "bodyPatterns": [
+          {
+            "equalToJson": { "includeWelshPreview": false },
+            "ignoreArrayOrder": true,
+            "ignoreExtraElements": true
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "englishSmsPreview": "Dear Stuart,\n\nYou have an appointment at Leamington Probation Office on Monday 11 August at 2pm.\n\nThis is an automated message. Do not reply.",
+          "welshSmsPreview": null
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/supervision/sms/preview",
+        "method": "POST",
+        "bodyPatterns": [
+          {
+            "equalToJson": { "includeWelshPreview": true },
+            "ignoreArrayOrder": true,
+            "ignoreExtraElements": true
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "englishSmsPreview": "Dear Stuart,\n\nYou have an appointment at Cardiff Probation Office on Monday 11 August at 2pm.\n\nThis is an automated message. Do not reply.",
+          "welshSmsPreview": "Annwyl Stuart,\n\nMae gennych apwyntiad yn Cardiff Probation Office ar Dydd Llun 11 Awst am 2pm.\n\nNeges awtomataidd yw hon. Peidiwch ag ymateb."
         },
         "headers": {
           "Content-Type": "application/json"

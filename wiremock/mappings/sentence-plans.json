@@ -2,135 +2,57 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/sentence-plan/plans/crn/.*",
-        "method": "GET"
+        "urlPattern": "/assessment-platform/query",
+        "method": "POST"
       },
       "response": {
         "status": 200,
-        "jsonBody": [
-          {
-            "publishedState": "UNPUBLISHED",
-            "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "createdDate": "2025-09-29T10:54:36.782Z",
-            "createdBy": {
-              "externalId": "string",
-              "username": "string"
-            },
-            "lastUpdatedDate": "2025-09-29T10:54:36.782Z",
-            "lastUpdatedBy": {
-              "externalId": "string",
-              "username": "string"
-            },
-            "currentVersion": {
-              "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "version": 0,
-              "planId": 0,
-              "planType": "INITIAL",
-              "status": "AWAITING_COUNTERSIGN",
-              "agreementStatus": "DRAFT",
-              "createdDate": "2025-09-29T10:54:36.782Z",
-              "createdBy": {
-                "externalId": "string",
-                "username": "string"
-              },
-              "updatedDate": "2025-09-29T10:54:36.782Z",
-              "updatedBy": {
-                "externalId": "string",
-                "username": "string"
-              },
-              "agreementDate": "2025-09-29T10:54:36.782Z",
-              "readOnly": true,
-              "checksum": "string",
-              "agreementNotes": [
-                {
-                  "optionalNote": "string",
-                  "agreementStatus": "DRAFT",
-                  "agreementStatusNote": "string",
-                  "practitionerName": "string",
-                  "personName": "string",
-                  "createdDate": "2025-09-29T10:54:36.782Z",
-                  "createdBy": {
-                    "externalId": "string",
-                    "username": "string"
+        "jsonBody": {
+          "queries": [
+            {
+              "result": {
+                "type": "AssessmentVersionQueryResult",
+                "assessmentUuid": "2a836246-0b6a-44bb-aa24-7af9e9341162",
+                "updatedAt": "2025-10-10T16:08:54Z",
+                "collections": [
+                  {
+                    "uuid": "c1234567-0000-0000-0000-000000000001",
+                    "createdAt": "2025-10-10T16:08:48Z",
+                    "updatedAt": "2025-12-09T08:58:36Z",
+                    "name": "PLAN_AGREEMENTS",
+                    "items": [
+                      {
+                        "uuid": "d1234567-0000-0000-0000-000000000001",
+                        "createdAt": "2025-12-09T08:58:36Z",
+                        "updatedAt": "2025-12-09T08:58:36Z",
+                        "answers": {
+                          "agreement_question": {
+                            "type": "Single",
+                            "value": "yes"
+                          },
+                          "created_by": {
+                            "type": "Single",
+                            "value": "Automated ARNS"
+                          }
+                        },
+                        "properties": {
+                          "status": {
+                            "type": "Single",
+                            "value": "AGREED"
+                          },
+                          "status_date": {
+                            "type": "Single",
+                            "value": "2025-12-09T08:58:36Z"
+                          }
+                        }
+                      }
+                    ]
                   }
-                }
-              ],
-              "planProgressNotes": [
-                {
-                  "note": "string",
-                  "isSupportNeeded": "YES",
-                  "isSupportNeededNote": "string",
-                  "isInvolved": true,
-                  "isInvolvedNote": "string",
-                  "personName": "string",
-                  "practitionerName": "string",
-                  "createdDate": "2025-09-29T10:54:36.782Z",
-                  "createdBy": {
-                    "externalId": "string",
-                    "username": "string"
-                  }
-                }
-              ],
-              "goals": [
-                {
-                  "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                  "title": "string",
-                  "areaOfNeed": {
-                    "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                    "name": "string"
-                  },
-                  "targetDate": "2025-09-29",
-                  "reminderDate": "2025-09-29",
-                  "createdDate": "2025-09-29T10:54:36.782Z",
-                  "createdBy": {
-                    "externalId": "string",
-                    "username": "string"
-                  },
-                  "updatedDate": "2025-09-29T10:54:36.782Z",
-                  "updatedBy": {
-                    "externalId": "string",
-                    "username": "string"
-                  },
-                  "status": "ACTIVE",
-                  "statusDate": "2025-09-29T10:54:36.782Z",
-                  "goalOrder": 0,
-                  "steps": [
-                    {
-                      "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                      "description": "string",
-                      "status": "NOT_STARTED",
-                      "createdDate": "2025-09-29T10:54:36.782Z",
-                      "createdBy": {
-                        "externalId": "string",
-                        "username": "string"
-                      },
-                      "actor": "string"
-                    }
-                  ],
-                  "notes": [
-                    {
-                      "note": "string",
-                      "type": "PROGRESS",
-                      "createdDate": "2025-09-29T10:54:36.782Z",
-                      "practitionerName": "string"
-                    }
-                  ],
-                  "relatedAreasOfNeed": [
-                    {
-                      "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                      "name": "string"
-                    }
-                  ]
-                }
-              ],
-              "softDeleted": true,
-              "mostRecentUpdateDate": "2025-09-29T10:54:36.782Z",
-              "mostRecentUpdateByName": "string",
-              "crn": "string"
-            },
-            "crn": "string"
-          }
-        ],
+                ]
+              }
+            }
+          ]
+        },
         "headers": {
           "Content-Type": "application/json"
         }

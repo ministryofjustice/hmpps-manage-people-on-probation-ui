@@ -43,6 +43,7 @@ export interface SentryConfig {
 }
 
 export default {
+  feedbackEmail: get('FEEDBACK_EMAIL', 'email', requiredInProduction),
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
@@ -81,9 +82,17 @@ export default {
   },
   sentencePlan: {
     link: get('SENTENCE_PLAN_LINK', 'https://sentence-plan-dummy-url', requiredInProduction),
+    linkV2: get('SENTENCE_PLAN_LINK_V2', 'https://sentence-plan-dummy-url-v2/crn', requiredInProduction),
   },
   interventions: {
     link: get('INTERVENTIONS_LINK', 'https://interventions-dummy-url', requiredInProduction),
+  },
+  supervisionContacts: {
+    link: get(
+      'SUPERVISION_CONTACTS_LINK',
+      'https://probation-supervision-contacts-ui-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
   },
   recall: {
     link: get('RECALL_LINK', 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/', requiredInProduction),
@@ -170,6 +179,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('MAS_API_TIMEOUT_RESPONSE', 10000))),
     },
+    deliusApi: {
+      url: get('DELIUS_API_URL', 'http://localhost:8100', requiredInProduction),
+      pageSize: 10,
+      timeout: {
+        response: Number(get('DELIUS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('DELIUS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('DELIUS_API_TIMEOUT_RESPONSE', 10000))),
+    },
     arnsApi: {
       url: get('ARNS_API_URL', 'http://localhost:8100', requiredInProduction),
       timeout: {
@@ -202,13 +220,13 @@ export default {
       },
       agent: new AgentConfig(Number(get('SVA_CLIENT_API_TIMEOUT_RESPONSE', 10000))),
     },
-    sentencePlanApi: {
-      url: get('SENTENCE_PLAN_API_URL', 'http://localhost:8100', requiredInProduction),
+    arnsAssessmentPlatformApi: {
+      url: get('ARNS_ASSESSMENT_PLATFORM_API_URL', 'http://localhost:8080', requiredInProduction),
       timeout: {
-        response: Number(get('SENTENCE_PLAN_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('SENTENCE_PLAN_API_TIMEOUT_RESPONSE', 10000)),
+        response: Number(get('ARNS_ASSESSMENT_PLATFORM_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('ARNS_ASSESSMENT_PLATFORM_API_TIMEOUT_RESPONSE', 10000)),
       },
-      agent: new AgentConfig(Number(get('INTERVENTIONS_API_TIMEOUT_RESPONSE', 10000))),
+      agent: new AgentConfig(Number(get('ARNS_ASSESSMENT_PLATFORM_API_TIMEOUT_RESPONSE', 10000))),
     },
     probationFrontendComponentsApi: {
       url: get('PROBATION_FRONTEND_COMPONENTS_API_URL', 'http://localhost:8100', requiredInProduction),

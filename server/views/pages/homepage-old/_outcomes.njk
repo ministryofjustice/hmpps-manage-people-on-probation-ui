@@ -1,0 +1,68 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set tableData = {
+    firstCellIsHeader: true,
+    classes: 'govuk-!-margin-bottom-0',
+    head: [
+        {
+            text: "Person on probation"
+        },
+        {
+            text: "Outcome type"
+        },
+        {
+            classes: 'govuk-!-text-align-right',
+            text: "Date and time"
+        },
+        {
+            classes: 'govuk-!-text-align-right',
+            text: "Action"
+        }
+    ],
+    rows: []
+} %}
+
+{% if outcomes.length > 0 %}
+    {% for outcome in outcomes %}
+        {% if outcome.deliusManaged %}
+            {% set row = tableData.rows.push([
+                {
+                    html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
+                },
+                {
+                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type + '</a>'
+                },
+                {
+                    classes: 'govuk-!-text-align-right',
+                    html: outcome.startDateTime | dateWithYear + '<br /><span class="secondary-text">' + outcome.startDateTime | shortTime + (' to ' + outcome.endDateTime | shortTime if outcome.endDateTime else '') + '</span>'
+                },
+                {
+                    classes: 'govuk-!-text-align-right',
+                    html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', outcome.crn, outcome.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius</a>'
+                }
+            ]) %}
+        {% else %}
+            {% set row = tableData.rows.push([
+                {
+                    html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
+                },
+                {
+                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type + '</a>'
+                },
+                {
+                    classes: 'govuk-!-text-align-right',
+                    html: outcome.startDateTime | dateWithYear + '<br /><span class="secondary-text">' + outcome.startDateTime | shortTime + (' to ' + outcome.endDateTime | shortTime if outcome.endDateTime else '') + '</span>'
+                },
+                {
+                    classes: 'govuk-!-text-align-right',
+                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Manage</a>'
+                }
+            ]) %}
+        {% endif %}
+    {% endfor %}
+    <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+        {{ govukTable(tableData) }}
+    </div>
+{% else %}
+    <p class="govuk-body govuk-!-padding-3">There are no outcomes to log.</p>
+{% endif %}

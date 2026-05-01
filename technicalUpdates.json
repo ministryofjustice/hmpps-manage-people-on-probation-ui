@@ -1,5 +1,86 @@
 [
   {
+    "heading": "Probation-wide launch of this service",
+    "summary": "27 April 2026",
+    "whatsNew": [
+      "Probation-wide launch of this service",
+      [
+        "Manage people on probation (MPOP) is now live for anyone working in the Probation Service with an NDelius username and password.\n\nTo support you with using this new service, we’re running webinars in every region during May and June including the National Security Division.\n\nAt the regional webinars you'll: \nlisten to colleagues who have already started using the service  \nwatch demos \nfind out how to get started \nfind out what training and support is available \nhave an opportunity to ask questions and have a go! \u2028\nYour Regional Change Lead will invite you to a webinar. You should prioritise attending it if you manage a caseload."
+      ],
+      "Add frequently used contacts in this service",
+      [
+        "You can now add the 10 contacts most frequently used by probation practitioners in this service, as well as appointments.\n\nThe contacts cover common communication contacts such as emails, texts, telephone calls and police liaisons.\n\nWe’ll be adding more contacts over the next few months."
+      ],
+      "Character limit increased for notes",
+      ["To make it easier for you to add complete notes to a case, we’ve increased the character limit to 12,000."],
+      "Risk to Probation Staff flag",
+      [
+        "The new Risk to Probation Staff flag highlights when a person on probation poses a risk to probation staff.\n\nThis is a new registration type that is manually added and maintained within NDelius."
+      ],
+      "'Is this page useful?’ survey",
+      [
+        "We have added a ‘Is this page useful?’ survey at the bottom of every page (footer) to help you more readily indicate satisfaction or frustration with a particular page in the service.\n\nIf you click ‘yes’, you can add optional comments, then submit.\n\nIf you click ‘no’, you’re asked to give details and then submit.\n\nThis will help us to identify what’s working well and prioritise improvements."
+      ],
+      "Feedback banner",
+      [
+        "A ‘beta’ banner now appears at the top of every page to give you a quick and easy way to give us feedback. Click the link in the banner and an automatic email will open, addressed to our mpop-digital-team@justice.gov.uk inbox."
+      ],
+      "Calendar invitation bug fix",
+      [
+        "We’ve fixed a bug related to daylight savings, where the appointment time was correct on this service but displayed an hour early on the calendar invitation. Thanks to our users who reported this."
+      ]
+    ]
+  },
+  {
+    "heading": "Search and filter contacts more easily",
+    "summary": "13 March 2026",
+    "whatsNew": [
+      "Search and filter contacts more easily",
+      [
+        "To make it easier for you to see contacts on a case, there is now only one view of contacts. This view includes more contacts so that you quickly scan through what’s been happening on a case.\n\nYou can click on a contact name to read more about it without having to open the contact on a new page.\n\nWe’ve also added new categories to the filters to help you find previously added contacts, and you can toggle system-generated contacts on or off."
+      ],
+      "Tier explanation",
+      [
+        "To help you understand someone’s tier score, we’ve added a link in the header to an explanation of their tier calculation (for example, ‘B2’). This also explains tier history, protect and change factors."
+      ],
+      "New Probation Digital Services header",
+      [
+        "To make your experience of digital probation services more consistent, the title (known as the header) at the top of the Manage people on probation pages now says Probation Digital Services. Some other digital services already use this header."
+      ]
+    ]
+  },
+  {
+    "heading": "Reschedule appointments created on this service",
+    "summary": "10 February 2026",
+    "whatsNew": [
+      "Reschedule appointments",
+      [
+        "To help you keep your appointment schedule up to date, you can now reschedule appointments created on this service if they do not have outcomes.\u2028\nWhen you reschedule a future appointment, your calendar invite will automatically be updated with the new time and date. If the new date changes from the future to the past, you’ll get an email deleting the original calendar invitation."
+      ],
+      "Access to sentence plan",
+      [
+        "If a person on probation has a sentence plan using the new service, you can now access it via a link from the Risk page. This saves you from needing to sign in separately.\n\nThe Risk page has also been renamed to Risk and plan for people with sentence plans.\n\nIf they also have a new strength and needs assessment, you will not see their: \nOASys score history \ncriminogenic needs, because they’re different from the ones in OASys \u2028\n"
+      ],
+      "‘Risk to staff’ flag more visible",
+      [
+        "The ‘Risk to staff flag’ now shows during the appointment-booking process and on the appointment details page, as a more visual reminder of the person’s risk level."
+      ],
+      "Bug fixes and feedback",
+      [
+        "Thanks for continuing to share your feedback about the service. We’ve made some recent improvements based on what you told us:\n\nThe My cases page now displays a person on probation’s next contact with any part of the Probation Service. This resolves an issue where you could only see their next appointment if you were their probation practitioner.\n\nThe contacts count in the Activity and compliance section of the Overview page now states that any data is from all orders, including previous ones. Thanks for letting us know that this needed more clarity.\n\nIf you have outstanding issues to log, you can now access them from the appointment confirmation screen. This fixes a bug where the link was missing."
+      ]
+    ]
+  },
+  {
+    "heading": "Compliance page temporarily unavailable",
+    "summary": "29 January 2026",
+    "whatsNew": [
+      [
+        "The Compliance page is temporarily unavailable while we make some improvements. We’ll let you know as soon as it’s available again."
+      ]
+    ]
+  },
+  {
     "heading": "Learn about online check ins for people on probation",
     "summary": "15 January 2026",
     "whatsNew": [
@@ -37,7 +118,6 @@
     "heading": "View all outcomes to log on one page and other service improvements",
     "summary": "11 December 2025",
     "whatsNew": [
-      "View all outcomes to log on one page",
       [
         "The ‘You need to record an outcome for xx appointments’ link now goes to a page that lists every appointment without an outcome, so you can view them quicker."
       ],

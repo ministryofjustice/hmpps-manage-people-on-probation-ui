@@ -27,10 +27,15 @@ export interface PersonSchedule {
   totalPages: number
   appointments: Activity[]
 }
+export interface EnforcementAction {
+  responseByDate: string
+}
+
 export interface Activity {
   id: string
   eventNumber?: string
   type: string
+  displayName?: string
   startDateTime: string
   endDateTime?: string
   rarToolKit?: string
@@ -48,6 +53,7 @@ export interface Activity {
   rescheduledPop?: boolean
   didTheyComply?: boolean
   absentWaitingEvidence?: boolean
+  enforcementAction?: EnforcementAction
   rearrangeOrCancelReason?: string
   rescheduledBy?: Name
   repeating?: boolean

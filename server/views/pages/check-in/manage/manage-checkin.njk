@@ -1,9 +1,11 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Online check ins" %}
-{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check' %}
 {% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
+{% set changeQuestionsLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/questions/start' %}
 {% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/contact' %}
 {% set stopCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/stop-checkin' %}
+{% set restartCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/restart-checkin' %}
 {% set photoLabel = "Photo of " + case.name.forename %}
 {% set photoUrl = offenderCheckinsByCRNResponse.photoUrl %}
 {% set backLink = '/case/' + crn %}
@@ -28,7 +30,7 @@
 
     {{ mojBanner({
         type: 'success',
-        text: 'Check in settings saved',
+        html: successMessageHtml if successMessageHtml else 'Check in settings saved',
         classes: 'govuk-!-margin-bottom-2',
         attributes: { "data-qa": "updateBanner"},
         iconFallbackText: 'Success'
@@ -37,8 +39,18 @@
 
 {% block pageContent %}
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
-      {% set checkinLabel = 'First check in' %}
-      {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+      {% if flags.enableESupervisionCustomQuestions === true %}
+          {% set checkinLabel = 'Next check in' %}
+          {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
+              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
+          {% else %}
+              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+          {% endif %}
+          
+      {% else %}
+          {% set checkinLabel = 'First check in' %}
+          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+      {% endif %}
         {% if flags.enableManageCheckins === true %}
             <div class="moj-button-group__item">
                 <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
@@ -50,9 +62,47 @@
         {% set checkinText = 'Check ins stopped' %}
         {% if flags.enableManageCheckins === true %}
             <div class="moj-button-group__item">
-                <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
+                <a href="{{ restartCheckinLink }}" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
             </div>
-       {% endif %}
+        {% endif %}
+    {% endif %}
+    {% if flags.enableESupervisionCustomQuestions === true %}
+        {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
+        {% set rows = [
+            {
+                key: { html: '<span data-qa="nextCheckInDueLabel">Next check in</span>' },
+                value: { html: '<span data-qa="nextCheckInValue">' + nextCheckinText + '</span>' }
+            }
+        ] %}
+        {% if upcomingCheckin %}
+            {% for item in upcomingCheckin.questions %}
+                    {% set questionNumber = loop.index %}
+                    {% set rows = (rows.push({
+                        key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
+                        value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
+                    }), rows) %}
+            {% endfor %}
+            {% set nextCheckinQuestionsText %}
+                {{ govukSummaryList({
+                    rows: rows
+                }) }}
+            {% endset %}
+            {{ appSummaryCard({
+                titleText: 'Upcoming online check in',
+                headingLevel: 3,
+                classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+                attributes: {'data-qa': 'checkinQuestionsCard'},
+                html: nextCheckinQuestionsText,
+                actions: {
+                    items: [
+                        {
+                            text: 'Change questions',
+                            href: changeQuestionsLink
+                        }
+                    ]
+                } if showChange and canEditQuestions
+            }) }}
+        {% endif %}
     {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}

@@ -9,6 +9,7 @@ import {
   OutlookEventResponse,
   RescheduleEventRequest,
   EventResponse,
+  SmsPreviewRequest,
 } from './model/OutlookEvent'
 
 jest.mock('../utils', () => {
@@ -40,7 +41,9 @@ describe('MasOutlookClient', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-    nock.cleanAll()
+    nock.cleanAll() // Removes all interceptors
+    nock.restore() // Restores http/https modules
+    nock.activate() // Re-activate for the next test
   })
 
   it('should post calendar event and return response body', async () => {
@@ -121,6 +124,8 @@ describe('MasOutlookClient', () => {
       subject: 'Rescheduled event',
       startDate: '2025-02-01T10:00:00Z',
       endDate: '2025-02-01T11:00:00Z',
+      attendees: [],
+      smsResponse: null,
     }
 
     fakeApi
@@ -163,5 +168,19 @@ describe('MasOutlookClient', () => {
     expect(result.status).toBe(500)
     expect(result.errors?.[0]?.text).toBe('Rescheduling appointment not successful')
     expect(result.text).toContain('Internal Server Error')
+  })
+
+  describe('postSmsPreview', () => {
+    it('should POST sms preview', async () => {
+      const body: SmsPreviewRequest = {
+        firstName: 'John',
+        dateAndTimeOfAppointment: '2026-01-22T17:05:53.994Z',
+        includeWelshPreview: false,
+      }
+      const response = {}
+      fakeApi.post(`/sms/preview`).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+      const output = await client.postSmsPreview(body)
+      expect(output).toEqual(response)
+    })
   })
 })

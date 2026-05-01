@@ -11,8 +11,13 @@ const stubNoAllocatedProbationPractitionerProviderAccess = (): SuperAgentRequest
       jsonBody: {
         defaultUserDetails: {
           username: 'PETER-PARKER',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
           homeArea: 'London',
           team: 'Automated Allocation Team',
+          email: 'peter.parker@testemail.com',
         },
         providers: [
           {
@@ -41,19 +46,39 @@ const stubNoAllocatedProbationPractitionerProviderAccess = (): SuperAgentRequest
         users: [
           {
             username: 'andy-best',
+            name: {
+              forename: 'Andy',
+              surname: 'Best',
+            },
             nameAndRole: 'andy best (PS-PSO)',
+            email: 'andy.best@testemail.com',
           },
           {
             username: 'peter-parker',
+            name: {
+              forename: 'Peter',
+              surname: 'Parker',
+            },
             nameAndRole: 'peter parker (PS-PSO)',
+            email: 'peter.parker@testemail.com',
           },
           {
             username: 'tony-pan',
+            name: {
+              forename: 'Tony',
+              surname: 'Pan',
+            },
             nameAndRole: 'tony pan (PS-PSO)',
+            email: 'tony.pan@testemail.com',
           },
           {
             username: 'terry-jones',
+            name: {
+              forename: 'Terry',
+              surname: 'Jones',
+            },
             nameAndRole: 'terry jones (PS-PSO)',
+            email: 'terry.jones@testemail.com',
           },
         ],
       },
@@ -63,4 +88,72 @@ const stubNoAllocatedProbationPractitionerProviderAccess = (): SuperAgentRequest
     },
   })
 
-export default { stubNoAllocatedProbationPractitionerProviderAccess }
+const stubProbationPractitionerNoEmail = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/case/.*/probation-practitioner',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        code: 'N07B795',
+        name: {
+          forename: 'Deborah',
+          surname: 'Fern',
+        },
+        provider: {
+          code: 'N07',
+          name: 'London',
+        },
+        team: {
+          code: 'N07AAT',
+          description: 'Automated Allocation Team',
+        },
+        unallocated: false,
+        username: 'DeborahFern',
+        email: null,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubProbationPractitioner = ({ username = 'DeborahFern' } = {}): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/case/.*/probation-practitioner',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        code: 'N07B795',
+        name: {
+          forename: 'Deborah',
+          surname: 'Fern',
+        },
+        provider: {
+          code: 'N07',
+          name: 'London',
+        },
+        team: {
+          code: 'N07AAT',
+          description: 'Automated Allocation Team',
+        },
+        unallocated: false,
+        username,
+        email: null,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default {
+  stubNoAllocatedProbationPractitionerProviderAccess,
+  stubProbationPractitionerNoEmail,
+  stubProbationPractitioner,
+}

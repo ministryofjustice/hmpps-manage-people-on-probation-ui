@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
 import nunjucks from 'nunjucks'
+
+import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import express, { Request, NextFunction } from 'express'
 import type { Services } from '../services'
 
@@ -19,6 +21,8 @@ import {
   dateWithYearShortMonthAndTime,
   deliusDateFormat,
   deliusDeepLinkUrl,
+  deepLinkContactTypes,
+  drugHistoryContactTypes,
   fromIsoDateToPicker,
   fullName,
   getCurrentRisksToThemselves,
@@ -41,6 +45,7 @@ import {
   getDistinctRequirements,
   getRisksWithScore,
   interventionsLink,
+  supervisionContactsAddLink,
   isInThePast,
   isToday,
   oaSysUrl,
@@ -79,7 +84,7 @@ import config from '../config'
 import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
-import { to12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
+import { to12HourTimeWithMinutes, toIso12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
 import { to12HourTimeCompact } from './to12HourTimeCompact'
 
 export default function nunjucksSetup(
@@ -116,6 +121,7 @@ export default function nunjucksSetup(
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
       'node_modules/@ministryofjustice/probation-search-frontend/components',
+      'node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/',
     ],
     {
       autoescape: true,
@@ -162,7 +168,6 @@ export default function nunjucksSetup(
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
-
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
     return next()
@@ -182,6 +187,8 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('addressToList', addressToList)
   njkEnv.addGlobal('lastUpdatedBy', lastUpdatedBy)
   njkEnv.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
+  njkEnv.addGlobal('deepLinkContactTypes', deepLinkContactTypes)
+  njkEnv.addGlobal('drugHistoryContactTypes', drugHistoryContactTypes)
   njkEnv.addGlobal('oaSysUrl', oaSysUrl)
   njkEnv.addGlobal('deliusHomepageUrl', deliusHomepageUrl)
   njkEnv.addGlobal('scheduledAppointments', scheduledAppointments)
@@ -192,6 +199,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('tierLink', tierLink)
   njkEnv.addGlobal('sentencePlanLink', sentencePlanLink)
   njkEnv.addGlobal('interventionsLink', interventionsLink)
+  njkEnv.addGlobal('supervisionContactsAddLink', supervisionContactsAddLink)
   njkEnv.addGlobal('setSortOrder', setSortOrder)
   njkEnv.addGlobal('sortAppointmentsDescending', sortAppointmentsDescending)
   njkEnv.addGlobal('isNotNull', isNotNull)
@@ -203,4 +211,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
   njkEnv.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
   njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
+  njkEnv.addFilter('toIso12HourTimeWithMinutes', toIso12HourTimeWithMinutes)
+
+  arnsNunjucksSetup(njkEnv)
 }

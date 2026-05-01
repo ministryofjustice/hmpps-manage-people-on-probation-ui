@@ -118,6 +118,7 @@
     }
 }), locationItems) %}
 {% endfor %}
+
 {% if userLocations.length > 0 %}
     {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
 {% endif %}
@@ -179,15 +180,15 @@
         text: "Use the 24-hour format, for example 09:30 or 16:30."
     },
     attributes: {
-        size: 5,
-        maxlength: 5
+        size: 7,
+        maxlength: 7
     },
     formGroup: {
     attributes: {
         'data-qa': 'startTime'
     }
     },
-    classes: "govuk-input--width-3"
+    classes: "govuk-input--width-4"
    } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
 
     {{ govukInput({
@@ -199,26 +200,22 @@
             text: "Use the 24-hour format, for example 09:30 or 16:30."
         },
         attributes: {
-            maxlength: 5,
-            size: 5
+            maxlength: 7,
+            size: 7
         },
         formGroup: {
         attributes: {
             'data-qa': 'endTime'
         }
         },
-        classes: "govuk-input--width-3"
+        classes: "govuk-input--width-4"
      } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
 
-    <input type="hidden" name="_minDate" value="{{_minDate}}">
-    <input type="hidden" name="_maxDate" value="{{_maxDate}}">
-
-    <h3 class="govuk-heading-m govuk-!-margin-bottom-0">Pick a location for this appointment</h3>
     {{ govukRadios({
     fieldset: {
       legend: {
-        html: '<span data-qa="pageHeading">' + title | safe + '</span>',
-        classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6",
+        html: 'Pick a location for this appointment',
+        classes: "govuk-fieldset__legend--m govuk-!-margin-bottom-2",
         isPageHeading: false
       },
       attributes: {
@@ -227,4 +224,7 @@
     },
     items: locationItems
    } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
+
+    <input type="hidden" name="_minDate" value="{{ _minDate }}">
+    <input type="hidden" name="_maxDate" value="{{ _maxDate }}">
 {% endblock %}

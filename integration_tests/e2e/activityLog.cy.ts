@@ -1,8 +1,6 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
-import { activityLogValidation } from '../../server/properties/validation/activityLog'
-import { getErrorMessage } from '../utils/index'
 import ManageAppointmentPage from '../pages/appointments/manage-appointment.page'
 
 const keywords = 'Phone call'
@@ -27,14 +25,6 @@ const filtersAreFilled = (page: ActivityLogPage) => {
   page.getComplianceFilter(3).should('be.checked')
 }
 
-const checkCompactViewPersists = () => {
-  cy.get('.toggle-menu__list-item:nth-of-type(2) span').should('contain.text', 'Compact view')
-}
-
-const checkDefaultViewPersists = () => {
-  cy.get('.toggle-menu__list-item:nth-of-type(1) span').should('contain.text', 'Default view')
-}
-
 context('Contacts', () => {
   const today = new Date()
   const day = today.getDate()
@@ -51,32 +41,27 @@ context('Contacts', () => {
     const page = new ErrorPage()
     page.checkPageTitle('Page not found')
   })
+
   it('should render the contacts results', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    page.getTimelineCardValue(1, 'enforcement', 'Label').should('contain.text', 'Enforcement')
-    page.getTimelineCardValue(1, 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
-    page.getTimelineCard(1).should('contain.text', 'No notes')
-    page.getTimelineCardValue(2, 'rarActivity', 'Label').should('contain.text', 'RAR activity')
-    page.getTimelineCardValue(2, 'rarActivity', 'Value').should('contain.text', 'Stepping Stones')
-    page.getTimelineCard(3).should('contain.text', 'No notes')
-    page.getTimelineCardValue(4, 'reschedule', 'Label').should('contain.text', 'Reschedule')
-    page.getTimelineCardValue(4, 'reschedule', 'Value').should('contain.text', 'Requested by Terry Jones')
-    page.getTimelineCardValue(4, 'outcome', 'Label').should('contain.text', 'Outcome')
-    page.getTimelineCardValue(4, 'outcome', 'Value').should('contain.text', 'User-generated free text content')
-    page.getTimelineCardValue(4, 'documents', 'Label').should('contain.text', 'Documents')
-    page.getTimelineCardValue(4, 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
+    cy.get('.govuk-table').should('exist')
+    cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
+    cy.get('.govuk-table__header').eq(1).should('contain.text', 'Contact')
+    cy.get('.govuk-table__header').eq(2).should('contain.text', 'Actions')
+    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityTitle(2).should('contain.text', 'Phone call')
+    page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/case/X000001/')
   })
   it('should render the page with date of death recorded warning', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001/activity-log')
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
+
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    cy.get('.toggle-menu .toggle-menu__list-item:nth-of-type(1)').should('contain.text', 'Default view')
-    cy.get('.toggle-menu .toggle-menu__list-item:nth-of-type(2) a').should('contain.text', 'Compact view')
     cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Filter contacts'))
     page.getApplyFiltersButton().should('contain.text', 'Apply filters')
     page.getSelectedFiltersBox().should('not.exist')
@@ -94,38 +79,28 @@ context('Contacts', () => {
       cy.wrap($el).find('input').should('not.be.checked')
       cy.wrap($el).find('label').should('contain.text', filters[i])
     })
-
-    const cardBody = '[class=app-summary-card__body]'
-    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 0, 'Enforcement')
-    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 0, 'Warning letter sent')
-    page.assertPageElementAtIndexWithin(cardBody, 0, 'p', 0, 'No notes')
-
-    page.assertAnchorElementAtIndexWithin(
-      cardBody,
-      1,
-      0,
-      `/case/X000001/appointments/appointment/11/manage/note/1?back=${encodeURIComponent(
-        '/case/X000001/activity-log',
-      )}`,
-    )
+    page.getActivityViewLink(0).should('exist')
   })
+
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
+
     page.getDateToToggle().click()
     page.getDateToDialog().should('be.visible').find(`button[data-testid="${date}"]`).click()
+
     page.getDateToInput().should('have.value', date)
     page.getDateToDialog().should('not.be.visible')
+
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
     page.getErrorSummaryLink(0).click()
     page.getDateFromInput().should('be.focused')
   })
+
   it('should show the correct validation if date from is selected, but no date to is selected', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -137,10 +112,11 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date to')
     page.getErrorSummaryLink(0).click()
     page.getDateToInput().should('be.focused')
   })
+
   it('should show the correct validation if an invalid date from is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -149,11 +125,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if an invalid date to is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -162,13 +137,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
   })
+
   it('should show the correct validation if date from doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -177,11 +149,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if date to doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -190,13 +161,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
   })
+
   it('should show the correct validation if date to is before date from', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -206,9 +174,7 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThan'))
+    page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
   it('should show the correct validation if date from is in the future', () => {
@@ -218,11 +184,10 @@ context('Contacts', () => {
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotLaterThanToday'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'The date from must be today or in the past')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if date to is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -230,13 +195,10 @@ context('Contacts', () => {
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThanToday'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'The date to must be today or in the past')
   })
+
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {
     cy.visit('/case/X000001/activity-log')
     const value = 'Phone call'
@@ -247,7 +209,7 @@ context('Contacts', () => {
     page.getSelectedFiltersBox().find('h3:nth-of-type(1)').should('contain.text', 'Search term')
     page.getSelectedFilterTags().should('have.length', 1)
     page.getSelectedFilterTag(1).should('contain.text', value)
-    page.getCardHeader('timeline1').should('contain.text', 'Phone call from Eula Schmeler')
+    page.getActivityTitle(1).should('contain.text', 'Phone call')
     page.getKeywordsInput().should('have.value', value)
   })
   it('should remove the tag, clear the keyword field and reset the list if the keyword tag is clicked', () => {
@@ -260,7 +222,7 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getSelectedFiltersBox().should('not.exist')
     page.getKeywordsInput().should('have.value', '')
-    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
   })
   it('should display the filter tag and filter the list if a date from and date to are submitted', () => {
     cy.visit('/case/X000001/activity-log')
@@ -275,7 +237,7 @@ context('Contacts', () => {
     page.getDateToInput().should('have.value', toDate)
     page.getSelectedFilterTags().should('have.length', 1)
     page.getSelectedFilterTag(1).should('contain.text', `${fromDate} - ${toDate}`)
-    page.getCardHeader('timeline1').should('contain.text', 'Phone call from Eula Schmeler')
+    cy.get('.contact-activity__actions-cell').should('have.length', 1)
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '1')
@@ -293,9 +255,9 @@ context('Contacts', () => {
     page.getSelectedFiltersBox().should('not.exist')
     page.getDateFromInput().should('have.value', '')
     page.getDateToInput().should('have.value', '')
-    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
-    cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
+    cy.get('[data-qa="results-count-end"]').should('contain.text', '25')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
   })
   it('should display the 3 filter tags and filter the list if all compliance filters as clicked and submitted', () => {
@@ -314,9 +276,9 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('contain.text', 'Without an outcome')
     page.getSelectedFilterTag(2).should('contain.text', 'Complied')
     page.getSelectedFilterTag(3).should('contain.text', 'Not complied')
-    page.getCardHeader('timeline1').should('contain.text', 'AP PA - attitudes, thinking & behaviours at 9:15am')
-    page.getCardHeader('timeline2').should('contain.text', 'Pre-intervention session 1 at 9:15am')
-    page.getCardHeader('timeline3').should('contain.text', 'Initial appointment - home visit (NS) at 9:15am')
+    page.getActivityTitle(1).should('contain.text', 'AP PA - attitudes, thinking & behaviours')
+    page.getActivityTitle(2).should('contain.text', 'Pre-intervention session 1')
+    page.getActivityTitle(3).should('contain.text', 'Initial appointment - home visit (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '3')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '3')
@@ -336,8 +298,8 @@ context('Contacts', () => {
     page.getComplianceFilter(1).should('be.checked')
     page.getComplianceFilter(2).should('be.checked')
     page.getComplianceFilter(3).should('not.be.checked')
-    page.getCardHeader('timeline1').should('contain.text', 'AP PA - attitudes, thinking & behaviours at 9:15am')
-    page.getCardHeader('timeline2').should('contain.text', 'Pre-intervention session 1 at 9:15am')
+    page.getActivityTitle(1).should('contain.text', 'AP PA - attitudes, thinking & behaviours')
+    page.getActivityTitle(2).should('contain.text', 'Pre-intervention session 1')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '2')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '2')
@@ -373,7 +335,7 @@ context('Contacts', () => {
     page.getSelectedFiltersBox().find('h3:nth-of-type(2)').should('contain.text', 'Date range')
     page.getSelectedFiltersBox().find('h3:nth-of-type(3)').should('contain.text', 'Compliance filters')
     page.getSelectedFilterTags().should('have.length', 5)
-    page.getCardHeader('timeline1').should('contain.text', 'Phone call from Eula Schmeler')
+    page.getActivityTitle(1).should('contain.text', 'Phone call')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '1')
@@ -387,59 +349,60 @@ context('Contacts', () => {
     page.getComplianceFilter(1).should('not.be.checked')
     page.getComplianceFilter(2).should('not.be.checked')
     page.getComplianceFilter(3).should('not.be.checked')
-    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
-    cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
+    cy.get('[data-qa="results-count-end"]').should('contain.text', '25')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
     cy.get('.govuk-pagination').should('exist')
   })
-  it('Contacts page is rendered in default view', () => {
+  it('should display the outcome field above the note in the contact log compact view details panel', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Outcome:')
+    cy.get('.govuk-table')
+      .find('tr')
+      .eq(5)
+      .find('.govuk-details__text')
+      .should('contain.text', 'User-generated free text content')
+    cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Turned up')
+
+    cy.get('.govuk-table').find('tr').eq(10).click()
+    cy.get('.govuk-details__text')
+      .find('[class*="govuk-!-font-weight-bold"]')
+      .should('contain.text', 'Enforcement Action:')
+  })
+
+  it('should not display the outcome field when the activity has no outcome', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').find('tr').eq(6).find('.govuk-details__text').should('not.contain.text', 'Outcome:')
+    cy.get('.govuk-table').find('tr').eq(6).find('.govuk-details__text').should('contain.text', 'Some notes')
+  })
+
+  it('Contacts page renders activities with View and Manage links', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
-    page.getRowData('timeline1', 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
-    page.getCardHeader('timeline2').should('contain.text', 'Phone call from Eula Schmeler')
-    page.getRowData('timeline2', 'rarActivity', 'Value').should('contain.text', 'Stepping Stones')
-    page.getCardHeader('timeline3').should('contain.text', 'Planned appointment')
-    page.getCardHeader('timeline3').get('.app-summary-card__actions').should('contain.text', 'Waiting for evidence')
-    page.getCardHeader('timeline4').should('contain.text', 'Initial appointment')
-    page.getCardHeader('timeline4').get('.app-summary-card__actions').should('contain.text', 'Rescheduled')
-    page.getRowData('timeline4', 'reschedule', 'Value').should('contain.text', 'Requested by Terry Jones')
-    page.getRowData('timeline4', 'reschedule', 'Value').should('contain.text', 'Requested by Terry Jones')
-    page.getCardHeader('timeline5').should('contain.text', 'Office appointment at 10:15am')
-    page.getCardHeader('timeline5').get('.app-summary-card__actions').should('contain.text', 'Rescheduled')
-    page.getCardHeader('timeline6').should('contain.text', 'Phone call at 8:15am')
+    cy.get('.govuk-table').should('exist')
+    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityTitle(2).should('contain.text', 'Phone call')
+    page.getActivityViewNoNotes(3).should('contain.text', 'Planned appointment')
+    page.getActivityViewNotes(4).should('contain.text', 'Some notes')
+    page.getActivityViewNotes(5).should('contain.text', 'Turned up')
+    page.getActivityTitle(6).should('contain.text', 'Phone call')
+    page.getActivityTitle(7).should('contain.text', 'Office appointment')
+    page.getActivityViewLink(0).should('contain.text', 'View')
     page
-      .getCardHeader('timeline6')
-      .get('.app-summary-card__actions a')
-      .should('contain.text', 'Manage on NDelius')
-      .should('contain.html', '<span class="govuk-visually-hidden"> (opens in new tab)</span>')
-      .should('have.attr', 'target', '_blank')
-      .should(
-        'have.attr',
-        'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
-      )
-    page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
-    page.getCardHeader('timeline7').get('.app-summary-card__actions a').should('contain.text', 'Manage on NDelius')
-
-    page
-      .getCardHeader('timeline7')
-      .find('.app-summary-card__actions a')
+      .getActivityViewLink(6)
       .should(
         'have.attr',
         'href',
         `/case/X000001/appointments/appointment/16/manage?back=${encodeURIComponent('/case/X000001/activity-log')}`,
       )
-
-    page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
-    page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
-    page.getCardHeader('timeline10').should('contain.text', 'Planned video contact (NS) at 10:15am')
   })
   it('should link to the manage appointment page', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    page.getCardHeader('timeline7').find('.app-summary-card__actions a').click()
+    page.getActivityViewLink(6).click()
     Page.verifyOnPage(ManageAppointmentPage)
   })
   it('should display the pagination navigation', () => {
@@ -557,27 +520,26 @@ context('Contacts', () => {
     page.getPaginationLink(4).should('contain.text', '5')
     page.getPaginationLink(5).should('contain.text', '6')
   })
-  it('Contacts page is rendered in compact view', () => {
+  it('Contacts page renders activities in compact view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
-    page.getActivity('1').should('contain.text', 'Planned video contact (NS)')
-    page.getActivity('2').should('contain.text', 'Phone call from Eula Schmeler')
-    page.getActivity('3').should('contain.text', 'Planned appointment')
-    page.getActivity('4').should('contain.text', 'Initial appointment')
-    page.getActivity('5').should('contain.text', 'Office appointment')
-    page.getActivity('6').should('contain.text', 'Phone call')
-    page.getActivity('7').should('contain.text', 'Office appointment')
-    page.getActivity('8').should('contain.text', 'Initial appointment')
-    page.getActivity('9').should('contain.text', 'Initial appointment')
-    page.getActivity('10').should('contain.text', 'Planned video contact (NS)')
+    cy.get('.govuk-table').should('exist')
+    page.getActivity(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivity(2).should('contain.text', 'Phone call')
+    page.getActivity(3).should('contain.text', 'Planned appointment')
+    page.getActivity(4).should('contain.text', 'Initial appointment')
+    page.getActivity(5).should('contain.text', 'Office appointment')
+    page.getActivity(6).should('contain.text', 'Phone call')
+    page.getActivity(7).should('contain.text', 'Office appointment')
+    page.getActivity(8).should('contain.text', 'Initial appointment')
+    page.getActivity(9).should('contain.text', 'Initial appointment')
+    page.getActivity(10).should('contain.text', 'Planned video contact (NS)')
   })
   it('should display the no results message when no results are returned', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getKeywordsInput().type('No results')
     page.getApplyFiltersButton().click()
-    cy.get('.toggle-menu').should('not.exist')
     cy.get('[data-qa="results-count"]').should('not.exist')
     cy.get('.govuk-pagination').should('not.exist')
     page.getNoResults().find('h3').should('contain.text', '0 search results found')
@@ -601,58 +563,43 @@ context('Contacts', () => {
     page.getPaginationItem(2).click()
     filtersAreFilled(page)
   })
-  it('should persist the selected filters when a view link is clicked', () => {
-    cy.visit('/case/X000001/activity-log')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    fillFilters(page)
-    page.getApplyFiltersButton().click()
-    cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
-    filtersAreFilled(page)
-  })
   it('should persist the selected filters when user clicks on record detail link, then returns to the page via the breadcrumb', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     fillFilters(page)
     page.getApplyFiltersButton().click()
-    page.getActivity('1').find('h2 a').click()
+    page.getActivityViewLink(0).click()
     page.getBackLink().click()
     filtersAreFilled(page)
   })
-  it('should persist the selected compact view', () => {
+  it('should render show Manage link for e supervision checkin contacts', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
-    page.getDateToInput().type('11/1/2025')
-    page.getApplyFiltersButton().click()
-    checkCompactViewPersists()
-    page.getDateFromInput().type('5/1/2025')
-    page.getApplyFiltersButton().click()
-    checkCompactViewPersists()
-    page.getSelectedFilterTag(1).click()
-    checkCompactViewPersists()
-    page.getPaginationLink(2).click()
-    checkCompactViewPersists()
+    cy.get('.govuk-table').should('exist')
+    cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
+    cy.get('.govuk-table__header').eq(1).should('contain.text', 'Contact')
+    cy.get('.govuk-table__header').eq(2).should('contain.text', 'Actions')
+    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityTitle(2).should('contain.text', 'Phone call')
+    page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/case/X000001/')
+    page.getElementByDataQA('esup-manage-link').should('be.visible')
+    page.getElementByDataQA('esup-manage-link').should('contain.text', 'Manage')
   })
-  it('should persist the selected default view', () => {
+
+  it('should render contacts when hide contact NDelius system generated contacts is checked', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    page.getDateToInput().type('11/1/2025')
-    cy.get('[data-qa="timeline1Card"] a').click()
-    page.getBackLink().click()
-    checkDefaultViewPersists()
-  })
-  it('link to checkin page should be correct', () => {
-    cy.visit('/case/X000001/activity-log')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    page.getDateFromInput().type('11/2/2023')
-    page.getDateToInput().type('11/2/2023')
-    page.getApplyFiltersButton().click()
-    cy.get('[data-qa="timeline11Card"] a').should(
-      'have.attr',
-      'href',
-      `/case/X000001/appointments/6fa85f64-5717-4562-b3fc-2c963f66afa6/check-in/update?back=${encodeURIComponent(
-        '/case/X000001/activity-log',
-      )}`,
-    )
+    cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Filter contacts'))
+    page.getApplyFiltersButton().should('contain.text', 'Apply filters')
+    page.getSelectedFiltersBox().should('not.exist')
+    page.getElementByDataQA('submit-apply-button').should('contain.text', 'Apply')
+    cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Hide contacts'))
+    page.getElementByDataQA('hideContact').find('input[type="checkbox"]').should('not.be.checked')
+    page.getElementByDataQA('hideContact').find('input[type="checkbox"]').click()
+    page.getElementByDataQA('submit-apply-button').click()
+
+    cy.get('.govuk-table').should('exist')
+    page.getActivity(1).should('contain.text', 'AP PA - attitudes, thinking & behaviours')
+    page.getActivity(2).should('contain.text', 'Pre-intervention session 1')
   })
 })

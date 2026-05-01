@@ -1,5 +1,6 @@
 import caseloadController from './caseload'
 import activityLogController from './activityLog'
+import addContactController from './addContact'
 import personalDetailsController from './personalDetails'
 import appointmentsController from './appointments'
 import caseController from './case'
@@ -17,16 +18,20 @@ import alertsController from './alerts'
 import checkInsController from './check-ins'
 import rescheduleAppointmentController from './rescheduleAppointments'
 import whatsNewController from './whatsNewController'
+import appointmentOutcomesController from './appointmentOutcomes'
+import footerController from './footerController'
 
 export default {
   caseload: caseloadController,
   activityLog: activityLogController,
+  addContact: addContactController,
   personalDetails: personalDetailsController,
   appointments: appointmentsController,
   case: caseController,
   compliance: complianceController,
   home: homeController,
   whatsNew: whatsNewController,
+  footer: footerController,
   interventions: interventionsController,
   risk: riskController,
   sentence: sentenceController,
@@ -38,4 +43,5 @@ export default {
   fileUpload: fileUploadController,
   alerts: alertsController,
   checkIns: checkInsController,
+  appointmentOutcomes: appointmentOutcomesController,
 }

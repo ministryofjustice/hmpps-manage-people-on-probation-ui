@@ -26,6 +26,8 @@ describe('toSentenceCase()', () => {
     expect(toSentenceCase(str)).toEqual('Initial appointment - planned office visit (NS)')
     const strNonNS = 'Initial Appointment - In office (Non NS)'
     expect(toSentenceCase(strNonNS)).toEqual('Initial appointment - in office (Non NS)')
+    const strIgnoreCaps = 'Planned office visit (NS)'
+    expect(toSentenceCase(strIgnoreCaps, [], null, false, true)).toEqual('planned office visit (NS)')
   })
   it('should not remove hyphens from the string if they are preserved', () => {
     const str = 'A-Title-Cased-Value'

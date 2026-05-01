@@ -1,8 +1,9 @@
+import { Request } from 'express'
 import { postcodeValidator } from 'postcode-validator'
 import { DateTime } from 'luxon'
 import logger from '../../logger'
 import { dateTime } from './dateTime'
-import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
+import { ErrorCheck, ValidationSpec } from '../models/Errors'
 import config from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
@@ -149,6 +150,25 @@ export const timeIsNotLaterThan = (args: any[]) => {
   return notLaterThanDate < date
 }
 
+export const isValidRescheduledDateTime = (_args: any[], _now: DateTime, request: Request) => {
+  const { crn, id } = request.params as Record<string, string>
+  const date = request.body?.appointments?.[crn]?.[id]?.date
+  const start = request.body?.appointments?.[crn]?.[id]?.start
+  const end = request.body?.appointments?.[crn]?.[id]?.end
+  const previousStart = request?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment?.previousStart
+  const previousEnd = request?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment?.previousEnd
+  if (date && start && end && previousStart && previousEnd) {
+    const startDT = DateTime.fromFormat(`${date} ${start}`, 'd/M/yyyy HH:mm', { zone: 'Europe/London' })
+    const endDT = DateTime.fromFormat(`${date} ${end}`, 'd/M/yyyy HH:mm', { zone: 'Europe/London' })
+    const prevStartDT = DateTime.fromISO(previousStart).set({ millisecond: 0 })
+    const prevEndDT = DateTime.fromISO(previousEnd).set({ millisecond: 0 })
+    if (startDT.toMillis() === prevStartDT.toMillis() && endDT.toMillis() === prevEndDT.toMillis()) {
+      return false
+    }
+  }
+  return true
+}
+
 export const isValidCharCount = (args: any[]) => {
   const value = args?.[0]
   const { maxCharCount } = config
@@ -165,27 +185,23 @@ export const isValidMobileNumber = (input: string) => {
   return /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(value.trim())
 }
 
-export function validateWithSpec<R extends Validateable>(
-  request: R,
-  validationSpec: ValidationSpec,
-  mocks: { now?: DateTime } = {},
-) {
+export function validateWithSpec(request: Request, validationSpec: ValidationSpec, mocks: { now?: DateTime } = {}) {
   const errors: Record<string, string> = {}
   Object.entries(validationSpec).forEach(([fieldName, checks]) => {
     const formattedFieldName = fieldName.split('][').join('-').replace('[', '').replace(']', '')
-    if (checks.mandatoryWhenFieldSet && !request?.[fieldName] && request?.[checks.mandatoryWhenFieldSet]) {
+    if (checks.mandatoryWhenFieldSet && !request?.body?.[fieldName] && request?.body?.[checks.mandatoryWhenFieldSet]) {
       errors[fieldName] = checks.mandatoryMsg
       return
     }
-    if (!request?.[fieldName] && checks.optional === true) {
+    if (!request?.body?.[fieldName] && checks.optional === true) {
       return
     }
     let hasProperty: boolean
     if (isObjectFieldName(fieldName)) {
       const keys = fieldName.slice(1, -1).split('][')
-      hasProperty = hasNestedKeys(request, keys)
+      hasProperty = hasNestedKeys(request.body, keys)
     } else {
-      hasProperty = Object.keys(request).includes(fieldName)
+      hasProperty = Object.keys(request.body).includes(fieldName)
     }
     if (hasProperty) {
       const error = executeValidator(checks.checks, fieldName, request, mocks)
@@ -202,11 +218,11 @@ export function validateWithSpec<R extends Validateable>(
   return errors
 }
 
-function executeValidator(checks: ErrorCheck[], fieldName: string, request: Validateable, mocks: { now?: DateTime }) {
+function executeValidator(checks: ErrorCheck[], fieldName: string, request: Request, mocks: { now?: DateTime }) {
   for (const check of checks) {
     const { log = '' } = check
     const args: any[] = setArgs(fieldName, check, request)
-    if (!check.validator(args, mocks.now)) {
+    if (!check.validator(args, mocks.now, request)) {
       if (log) {
         logger.info(check.log)
       }
@@ -216,19 +232,21 @@ function executeValidator(checks: ErrorCheck[], fieldName: string, request: Vali
   return null
 }
 
-function setArgs(fieldName: string, check: ErrorCheck, request: Validateable) {
-  let value = request[fieldName]
+function setArgs(fieldName: string, check: ErrorCheck, request: Request) {
+  let value = request?.body?.[fieldName]
   if (isObjectFieldName(fieldName)) {
     const path = fieldName.slice(1, -1).split('][')
-    value = getNestedValue(request, path)
+    value = getNestedValue(request.body, path)
   }
   let args: any[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
     args = [
       isObjectFieldName(check?.crossField)
-        ? getNestedValue(request, check?.crossField.slice(1, -1).split(']['))
-        : request[check.crossField],
-      isObjectFieldName(fieldName) ? getNestedValue(request, fieldName.slice(1, -1).split('][')) : request[fieldName],
+        ? getNestedValue(request.body, check?.crossField.slice(1, -1).split(']['))
+        : request?.body?.[check.crossField],
+      isObjectFieldName(fieldName)
+        ? getNestedValue(request.body, fieldName.slice(1, -1).split(']['))
+        : request?.body?.[fieldName],
     ]
   }
   return args

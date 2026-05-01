@@ -30,8 +30,6 @@
             </h2>
           {% endif %}
         {% endblock %}
-        
-        <p class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the video is the person who should be checking in.</p>
 
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
@@ -115,9 +113,16 @@
                 <dd class="govuk-summary-list__actions"></dd>
                 </div>
             {% endif %}
+            {% if checkIn.surveyResponse.employmentEduSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about employment and education</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.employmentEduSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
             {% if checkIn.surveyResponse.supportSystemSupport %}
                 <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">What they want us to know about their support system</dt>
+                <dt class="govuk-summary-list__key">What they want us to know about their relationships</dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.supportSystemSupport }}</dd>
                 <dd class="govuk-summary-list__actions"></dd>
                 </div>
@@ -130,20 +135,30 @@
                 </div>
             {% endif %}
 
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
-                <dd class="govuk-summary-list__actions">
-                    {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
-                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
-                    {% endif %}
-                </dd>
-            </div>
+            {% if checkIn.surveyResponse.customQuestions %}
+                {% for cq in checkIn.surveyResponse.customQuestions | split %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">{{ cq.question }}</dt>
+                        <dd class="govuk-summary-list__value">{{ cq.response }}</dd>
+                        <dd class="govuk-summary-list__actions"></dd>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             {% if checkIn.surveyResponse.callbackDetails %}
                 <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">What they want to talk about</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callbackDetails }}</dd>
-                <dd class="govuk-summary-list__actions"></dd>
+                    <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
+                    <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
+                    <dd class="govuk-summary-list__actions">
+                        {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
+                            {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">What they want to talk about</dt>
+                    <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callbackDetails }}</dd>
+                    <dd class="govuk-summary-list__actions"></dd>
                 </div>
             {% endif %}
         </dl>
@@ -151,9 +166,6 @@
         <h2 class="govuk-heading-m">What action are you taking after reviewing this check in? (optional)</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
-                hint: {
-                    text: "This information will be added to the contact"
-                },
                 rows: '10',
                 maxlength: maxCharCount,
                 formGroup: {
@@ -164,9 +176,9 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
-                        text: 'Did the check in help you with risk management? (optional)',
+                        text: 'Did this information help you to manage their risk? (optional)',
                         classes: "govuk-label--m govuk-!-font-weight-bold",
-                        hint: 'This information is only used to help us learn about how you use this system.'
+                        hint: 'We only use this to understand more about the value of online check ins.'
                     }
                 },
                 formGroup: {
@@ -188,7 +200,7 @@
 
             <div class="govuk-button-group">
                 {{ govukButton({
-                html: "Confirm review",
+                html: "Complete review",
                 attributes: {
                     'data-qa': 'submit-btn'
                 }

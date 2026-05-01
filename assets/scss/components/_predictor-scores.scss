@@ -40,14 +40,14 @@ $predictor-score-background-colour: #f3f2f1;
   position: relative;
   text-align: center;
   display: block;
-  color: govuk-colour("black");
+  color: govuk-colour('black');
 }
 
 @mixin score-bar-base {
   width: 100%;
 
   &::after {
-    content: "" "";
+    content: '' '';
     display: block;
     visibility: hidden;
     clear: both;
@@ -59,13 +59,13 @@ $predictor-score-background-colour: #f3f2f1;
   }
 }
 
-@mixin predictor-timeline-item-base($primary-colour, $secondary-colour, $text-colour) {
+@mixin predictor-timeline-item-v1-base($primary-colour, $secondary-colour, $text-colour) {
   outline: 2px solid $primary-colour;
   padding: 0;
   display: inline-block;
 
   &::after {
-    content: "" "";
+    content: '' '';
     display: block;
     visibility: hidden;
     clear: both;
@@ -75,48 +75,56 @@ $predictor-score-background-colour: #f3f2f1;
     padding: 3px 6px;
   }
 
-  & .predictor-timeline-item__level {
-    @include govuk-font(14, "regular");
+  & .predictor-timeline-item-v1__level {
+    @include govuk-font(16, 'regular');
 
     float: left;
     color: $text-colour;
   }
 
-  & .predictor-timeline-item__score {
-    @include govuk-font(14, "bold");
+  & .predictor-timeline-item-v1__score {
+    @include govuk-font(16, 'bold');
 
     float: right;
-    color: govuk-colour("black");
+    color: govuk-colour('black');
     background-color: $secondary-colour;
   }
 }
 
-.predictor-timeline-item {
-  @include predictor-timeline-item-base($govuk-secondary-text-colour, govuk-colour("light-grey"), $govuk-secondary-text-colour);
-}
-
-.predictor-timeline-item--unknown {
-  @include predictor-timeline-item-base(govuk-colour("yellow"), govuk-colour("yellow"), govuk-colour("black"));
-}
-
-.predictor-timeline-item--very-high {
-  @include predictor-timeline-item-base(
-                  $very-high-score-colour,
-                  $very-high-score-colour--light,
-                  $very-high-score-colour__text
+.predictor-timeline-item-v1 {
+  @include predictor-timeline-item-v1-base(
+    $govuk-secondary-text-colour,
+    govuk-colour('light-grey'),
+    $govuk-secondary-text-colour
   );
 }
 
-.predictor-timeline-item--high {
-  @include predictor-timeline-item-base($high-score-colour, $high-score-colour--light, $high-score-colour__text);
+.predictor-timeline-item-v1--unknown {
+  @include predictor-timeline-item-v1-base(govuk-colour('yellow'), govuk-colour('yellow'), govuk-colour('black'));
 }
 
-.predictor-timeline-item--medium {
-  @include predictor-timeline-item-base($medium-score-colour, $medium-score-colour--light, $medium-score-colour__text);
+.predictor-timeline-item-v1--very-high {
+  @include predictor-timeline-item-v1-base(
+    $very-high-score-colour,
+    $very-high-score-colour--light,
+    $very-high-score-colour__text
+  );
 }
 
-.predictor-timeline-item--low {
-  @include predictor-timeline-item-base($low-score-colour, $low-score-colour--light, $low-score-colour__text);
+.predictor-timeline-item-v1--high {
+  @include predictor-timeline-item-v1-base($high-score-colour, $high-score-colour--light, $high-score-colour__text);
+}
+
+.predictor-timeline-item-v1--medium {
+  @include predictor-timeline-item-v1-base(
+    $medium-score-colour,
+    $medium-score-colour--light,
+    $medium-score-colour__text
+  );
+}
+
+.predictor-timeline-item-v1--low {
+  @include predictor-timeline-item-v1-base($low-score-colour, $low-score-colour--light, $low-score-colour__text);
 }
 
 .js-enabled .predictor-timeline-section--hidden {
@@ -135,7 +143,7 @@ $predictor-score-background-colour: #f3f2f1;
   height: 0;
   border-right: 16px solid transparent;
   border-left: 16px solid transparent;
-  border-top: 16px solid govuk-colour("black");
+  border-top: 16px solid govuk-colour('black');
   position: relative;
   top: 0;
   left: 23px;
@@ -143,7 +151,7 @@ $predictor-score-background-colour: #f3f2f1;
 }
 
 .score-label__card-pointer--white::after {
-  border-top: 14px solid govuk-colour("white") !important;
+  border-top: 14px solid govuk-colour('white') !important;
 }
 
 .score-label__card-pointer::after {
@@ -151,11 +159,11 @@ $predictor-score-background-colour: #f3f2f1;
   height: 0;
   border-right: 14px solid transparent;
   border-left: 14px solid transparent;
-  border-top: 14px solid govuk-colour("white");
+  border-top: 14px solid govuk-colour('white');
   position: absolute;
   top: -17px;
   left: -14px;
-  content: "";
+  content: '';
 }
 
 .score-label {
@@ -206,9 +214,9 @@ $predictor-score-background-colour: #f3f2f1;
 
 .score-label-wrapper--very-high {
   @include score-label-card-colour(
-                  $very-high-score-colour,
-                  $very-high-score-colour--light,
-                  $very-high-score-colour__text
+    $very-high-score-colour,
+    $very-high-score-colour--light,
+    $very-high-score-colour__text
   );
 }
 
@@ -228,8 +236,8 @@ $predictor-score-background-colour: #f3f2f1;
   width: 78px;
   bottom: 30px;
   margin: 0 auto;
-  background-color: govuk-colour("white");
-  border: 2px solid govuk-colour("black");
+  background-color: govuk-colour('white');
+  border: 2px solid govuk-colour('black');
 }
 
 .score-label__card-top {
@@ -243,16 +251,16 @@ $predictor-score-background-colour: #f3f2f1;
   }
 
   & h3 {
-    @include govuk-font(14, "bold");
+    @include govuk-font(16, 'bold');
   }
 
   & p {
-    @include govuk-font(14, "regular");
+    @include govuk-font(16, 'regular');
   }
 }
 
 .score-label__card-bottom p {
-  @include govuk-font(14, "bold");
+  @include govuk-font(16, 'bold');
 
   margin: 0;
 }
@@ -310,31 +318,31 @@ $predictor-score-background-colour: #f3f2f1;
     height: 30px;
     display: inline;
     float: left;
-    border-right: 1px solid govuk-colour("black");
+    border-right: 1px solid govuk-colour('black');
     box-sizing: border-box;
   }
 
   & > div:first-child {
-    border-left: 1px solid govuk-colour("black");
+    border-left: 1px solid govuk-colour('black');
   }
 
   & > div:nth-child(4n + 1) {
     &::before {
-      @include govuk-font(16, "bold");
+      @include govuk-font(16, 'bold');
       @include score-bar-label;
 
       float: left;
-      content: "0%";
+      content: '0%';
       left: -5%;
       bottom: -35px;
     }
 
     &::after {
-      @include govuk-font(16, "bold");
+      @include govuk-font(16, 'bold');
       @include score-bar-label;
 
       float: right;
-      content: "3%";
+      content: '3%';
       right: -5%;
       bottom: -20px;
     }
@@ -346,10 +354,10 @@ $predictor-score-background-colour: #f3f2f1;
 
   & > div:nth-child(4n + 2) {
     &::after {
-      @include govuk-font(16, "bold");
+      @include govuk-font(16, 'bold');
       @include score-bar-label;
 
-      content: "6.9%";
+      content: '6.9%';
       float: right;
       right: -11%;
       bottom: -20px;
@@ -362,11 +370,11 @@ $predictor-score-background-colour: #f3f2f1;
 
   & > div:nth-child(4n + 3) {
     &::after {
-      @include govuk-font(16, "bold");
+      @include govuk-font(16, 'bold');
       @include score-bar-label;
 
       float: right;
-      content: "25%+";
+      content: '25%+';
       right: -12%;
       bottom: -20px;
     }

@@ -4,28 +4,24 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import SentencePlanApiClient from '../data/sentencePlanApiClient'
 import { checkAuditMessage } from './testutils'
-import { toPredictors, toRoshWidget } from '../utils'
+import { findReplace, toPredictors, toRoshWidget } from '../utils'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import {
   mockAppResponse,
   mockTierCalculation,
   mockRisks,
-  mockPersonRiskFlags,
   mockPersonRiskFlag,
   mockPredictors,
   mockNeeds,
   mockSanIndicatorResponse,
-  mockSentencePlans,
   mockUserCaseload,
 } from './mocks'
 import config from '../config'
 import { UserCaseload } from '../data/model/caseload'
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/sentencePlanApiClient')
 jest.mock('../data/interventionsApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
@@ -38,6 +34,14 @@ jest.mock('../data/hmppsAuthClient', () => {
       getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
     }
   })
+})
+
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    findReplace: jest.fn(),
+  }
 })
 
 const username = 'user-1'
@@ -65,6 +69,15 @@ const sanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
 
+const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
+
+const mockFormattedRiskFlag = {
+  ...mockPersonRiskFlag,
+  riskFlag: { description: 'ROSH flag' },
+}
+
+mockFindReplace.mockImplementation(() => mockFormattedRiskFlag)
+
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 
 const req = httpMocks.createRequest({
@@ -79,31 +92,20 @@ describe('riskController', () => {
   })
   describe('getRisk', () => {
     describe('CRN has sentence plan, user does not have SENTENCE_PLAN role, pop in users caseload', () => {
-      let getPlanByCrnSpy: jest.SpyInstance
       const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        getPlanByCrnSpy = jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       checkAuditMessage(mockRes, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
-        expect(getRisksSpy).toHaveBeenCalledWith(crn)
-        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-        expect(predictorsSpy).toHaveBeenCalledWith(crn)
         expect(needsSpy).toHaveBeenCalledWith(crn)
         expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
       })
 
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -119,18 +121,11 @@ describe('riskController', () => {
       })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -143,16 +138,11 @@ describe('riskController', () => {
       const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -165,16 +155,11 @@ describe('riskController', () => {
       const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -191,18 +176,11 @@ describe('riskController', () => {
         jest
           .spyOn(MasApiClient.prototype, 'searchUserCaseload')
           .mockImplementationOnce(() => Promise.resolve(mockNoUserCaseload))
-        jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -211,20 +189,13 @@ describe('riskController', () => {
       })
     })
 
-    describe('Sentence plan api returns an error', () => {
+    describe('Assessment Platform API returns an error', () => {
       beforeEach(async () => {
-        jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.reject(new Error()))
         await controllers.risk.getRisk(hmppsAuthClient)(req, res)
       })
       it('should render the risk page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -241,9 +212,102 @@ describe('riskController', () => {
     it('should request the person risk flag from the api', () => {
       expect(getPersonRiskFlagSpy).toHaveBeenCalledWith(crn, id)
     })
-    it('should render the person risk flag page', () => {
+    it(`should find and replace RoSH with ROSH in the api response`, () => {
+      expect(mockFindReplace).toHaveBeenCalledTimes(1)
+      expect(mockFindReplace).toHaveBeenCalledWith({
+        data: mockPersonRiskFlag,
+        path: ['riskFlag', 'description'],
+        find: 'RoSH',
+        replace: 'ROSH',
+      })
       expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
-        personRiskFlag: mockPersonRiskFlag,
+        personRiskFlag: mockFormattedRiskFlag,
+        showRiskLevel: false,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Staff', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Staff' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Children', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Children' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Known Adult', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Known Adult' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Prisoner', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Prisoner' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Public', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Public' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
         crn,
       })
     })
@@ -255,6 +319,17 @@ describe('riskController', () => {
     checkAuditMessage(res, 'VIEW_MAS_REMOVED_RISKS', uuidv4(), crn, 'CRN')
     it('should render the removed risk flags page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/risk/removed-risk-flags', {
+        crn,
+      })
+    })
+  })
+  describe('getRiskPredictorScoresDetail', () => {
+    beforeEach(async () => {
+      await controllers.risk.getRiskPredictorScoresDetail(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_RISKS_DETAIL', uuidv4(), crn, 'CRN')
+    it('should render the risk predictor scores detail page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/risk-predictor-scores-detail', {
         crn,
       })
     })

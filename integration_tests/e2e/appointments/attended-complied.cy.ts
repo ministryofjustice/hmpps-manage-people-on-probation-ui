@@ -2,18 +2,10 @@ import { DateTime } from 'luxon'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
-import {
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeTypePage,
-  checkLogOutcomesAlert,
-  checkPopHeader,
-  crn,
-  uuid,
-} from './imports'
+import { checkLogOutcomesAlert, checkPopHeader } from './imports'
 import { dateWithYear } from '../../../server/utils'
-
-const appointmentId = '6'
+import { crn, uuid, appointmentId } from './imports/common'
+import { completeSentencePage, completeTypePage, completeLocationDateTimePage } from './utils'
 
 const loadManagePage = () => {
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
@@ -37,16 +29,18 @@ describe('Log attended and complied appointment', () => {
 
   const checkContent = (manageJourney = false) => {
     const name = 'Alton Berge'
+    const headerCrn = 'X778160'
     const now = DateTime.now()
     const yesterday = now.minus({ days: 1 })
     const date = dateWithYear(yesterday.toISODate())
+    const dayName = yesterday.toFormat('cccc')
     const appointmentText = manageJourney
-      ? '3 Way Meeting (NS) with Terry Jones on 21 February 2024'
-      : `Planned Office Visit (NS) with Deborah Fern on ${date}`
+      ? '3 Way Meeting (NS) with Terry Jones on Wednesday 21 February 2024'
+      : `Planned Office Visit (NS) with Deborah Fern on ${dayName} ${date}`
     const id = getId(manageJourney)
     cy.get(`#${id}-hint`).should('contain.text', `Appointment: ${appointmentText}.`)
     cy.get(`label[for="${id}"]`).should('contain.text', `Yes, ${name.split(' ')[0]} attended and complied`)
-    checkPopHeader(name, true)
+    checkPopHeader({ name, appointments: true, headerCrn })
   }
 
   const checkValidation = (manageJourney = false) => {
@@ -71,7 +65,7 @@ describe('Log attended and complied appointment', () => {
     const manageJourney = true
 
     beforeEach(() => {
-      cy.task('stubPastAppointmentNoOutcomeNoNotes')
+      cy.task('stubAppointment', { isFuture: false, hasOutcome: false, notes: false })
       loadManagePage()
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.getTaskLink(1).click()

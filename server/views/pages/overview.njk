@@ -6,16 +6,18 @@
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set headerCRN = crn %}
-{% set headerDob = overview.personalDetails.dateOfBirth %}
+{% set headerDob = personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
+{% set veryHighRiskLevel = groupByLevel("VERY HIGH", personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
-{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set noRiskLevel = groupByLevel(undefined, personRisks.riskFlags) %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 {% set personForename = overview.personalDetails.name.forename %}
 
@@ -61,6 +63,25 @@
 {% set riskFlagsHtml %}
 {% if personRisks.riskFlags.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+    {% if noRiskLevel.length %}
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in noRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
+    {% if veryHighRiskLevel.length %}
+      <dt class="govuk-!-font-weight-bold rosh--very-high">Very High</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in veryHighRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
     {% if highRiskLevel.length %}
       <dt class="govuk-!-font-weight-bold rosh--high">High</dt>
       <dd class="govuk-!-margin-left-0">
@@ -222,7 +243,6 @@
   {% endif %}
   {% endset %}
   {% endset %}
-  {% if flags.enableESuperVision === true %}
     {{ appSummaryCard({
         titleText: 'Online check ins',
         headingLevel: 3,
@@ -236,9 +256,8 @@
                     href: checkinHrefLink
                 }
             ]
-        } if hasPractitioner
+        } if canAccessCheckins
     }) }}
-  {% endif %}
 
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}
@@ -589,8 +608,9 @@
           {%- case 0 -%}
                         No breaches on previous orders
                     {%- default -%}
-            {{ overview.previousOrders.breaches }} breaches on previous orders
-                {%- endswitch -%}
+            {% set breachCount = overview.previousOrders.breaches %}
+            {{ breachCount }} breach{% if breachCount > 1 %}es{% endif %} on previous orders
+          {%- endswitch -%}
             {% endset %}
             {{ total}} ({{ breaches }})
             {% endif %}
@@ -615,9 +635,6 @@
                     {{ overview.compliance.breachesOnCurrentOrderCount }} breaches on current order
               {%- endswitch -%}
                   {% endif %}
-                  <p>
-                    <a href={{crn}}/compliance>View all compliance details</a>
-                  </p>
                   {% endset %}
                   {% set activity %}
                   {% if overview.activity %}
@@ -644,7 +661,7 @@
             value: { html: '<span data-qa="complianceValue">' + compliance + '</span>'}
           },
           {
-            key: { html: '<span data-qa="activityLogLabel">Contacts</span>'},
+            key: { html: '<span data-qa="activityLogLabel">Contacts across all orders</span><span class="govuk-!-font-weight-regular secondary-text secondary-text--with-break">Includes all previous orders</span>'},
             value: { html: '<span data-qa="activityLogValue">' + activity + '</span>'}
           }
         ]

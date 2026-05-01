@@ -1,5 +1,5 @@
+import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Location, Provider, Team, User } from '../data/model/caseload'
-import { ErrorSummary } from '../data/model/common'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
@@ -8,17 +8,23 @@ import { AppointmentSession, AppointmentType } from './Appointments'
 import { Errors } from './Errors'
 import { ESupervisionSession } from './ESupervision'
 import { SentencePlan } from './Risk'
+import { ErrorSummary } from '../data/model/common'
+import { ProbationPractitioner } from './CaseDetail'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
   sentencePlan: SentencePlan
   risks: RiskSummary
   tierCalculation: TierCalculation
-  predictors: ErrorSummary | RiskScoresDto[]
+  riskData?: RiskData
+  predictors?: RiskScoresDto[] | ErrorSummary
+  probationPractitioner?: ProbationPractitioner
 }
 
 export interface Data {
   isOutLookEventFailed?: any
+  isEnglishNotificationFailed?: boolean
+  isWelshNotificationFailed?: boolean
   appointments?: {
     [crn: string]: {
       [id: string]: AppointmentSession

@@ -1,0 +1,17 @@
+{% extends "../_form.njk" %}
+{% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s failure to comply' %}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+  {{ govukRadios({
+    name: "enforcementAction",
+    fieldset: {
+      legend: {
+        text: "Select an action for " + appointmentOutcome.forename + "’s failure to comply",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: appointmentOutcome.options
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+{% endblock %}

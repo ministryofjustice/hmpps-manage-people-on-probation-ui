@@ -5,6 +5,7 @@ import {
   isEmail,
   isFutureDate,
   isNotEmpty,
+  isTodayOrLater,
   isValidDate,
   isValidDateFormat,
   isValidMobileNumber,
@@ -26,6 +27,36 @@ export interface ESupervisionValidationArgs {
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
   const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change, stopCheckIn } = args
   return {
+    [`[esupervision][${crn}][${id}][checkins][eligibility]`]: {
+      optional: page !== 'eligibility-check',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if any of these apply to the person',
+          log: 'Eligibility criteria not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][eligibilityChoice]`]: {
+      optional: page !== 'full-eligibility',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how you will use online check ins',
+          log: 'Check in option not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][eligibilitySPOApproval]`]: {
+      optional: page !== 'spo-approval',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select to confirm SPO approval',
+          log: 'SPO approval not confirmed',
+        },
+      ],
+    },
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
       checks: [
@@ -45,9 +76,9 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           log: 'Checkin date is not valid',
         },
         {
-          validator: isFutureDate,
-          msg: 'The first online check in date must be in the future',
-          log: 'First checkin date must be in the future',
+          validator: isTodayOrLater,
+          msg: 'The first online check in date must be today or in the future',
+          log: 'First checkin date must be today or in the future',
         },
       ],
     },
@@ -233,6 +264,115 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           msg: 'Enter a mobile number',
           log: 'Mobile number not entered in manage check in process',
           crossField: `[esupervision][${crn}][${id}][manageCheckin][preferredComs]`,
+        },
+      ],
+    },
+
+    // Restart Date and Frequency
+    [`[esupervision][${crn}][${id}][restartCheckin][date]`]: {
+      optional: page !== 'restart-date-frequency',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter the date you would like the person to complete their next online check in',
+          log: 'Restart checkin date not entered',
+        },
+        {
+          validator: isValidDateFormat,
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
+          log: 'Restart checkin date not entered in correct format',
+        },
+        {
+          validator: isValidDate,
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
+          log: 'Restart checkin date is not valid',
+        },
+        {
+          validator: isTodayOrLater,
+          msg: 'The next online check in date must be today or in the future',
+          log: 'Restart checkin date must be today or in the future',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][interval]`]: {
+      optional: page !== 'restart-date-frequency',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how often you would like the person to check in',
+          log: 'Restart checkin frequency not selected',
+        },
+      ],
+    },
+
+    // Restart Contact Preferences
+    [`[esupervision][${crn}][${id}][restartCheckin][preferredComs]`]: {
+      optional: page !== 'restart-contact' || change !== 'main',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how the person wants us to send a link to the service',
+          log: 'Select how to send service link, not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][checkInEmail]`]: {
+      optional:
+        (page === 'restart-contact' && checkInEmail?.trim() !== '') || page !== 'restart-contact' || change !== 'main',
+      checks: [
+        {
+          validator: contactPrefEmailCheck,
+          msg: 'Enter an email address',
+          log: 'Email not entered in restart check in process',
+          crossField: `[esupervision][${crn}][${id}][restartCheckin][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][checkInMobile]`]: {
+      optional:
+        (page === 'restart-contact' && checkInMobile?.trim() !== '') || page !== 'restart-contact' || change !== 'main',
+      checks: [
+        {
+          validator: contactPrefMobileCheck,
+          msg: 'Enter a mobile number',
+          log: 'Mobile number not entered in manage check in processs',
+          crossField: `[esupervision][${crn}][${id}][restartCheckin][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][editCheckInMobile]`]: {
+      optional: (page === 'restart-edit-contact' && !editCheckInMobile) || page !== 'restart-edit-contact',
+      checks: [
+        {
+          validator: isValidMobileNumber,
+          msg: 'Enter a mobile number in the correct format.',
+          log: 'Mobile number not in correct format in restart process',
+        },
+        {
+          validator: charsOrLess,
+          length: 35,
+          msg: `Mobile number must be 35 characters or less.`,
+          log: 'Mobile number must be less than 35 chars, in check in process',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][editCheckInEmail]`]: {
+      optional: (page === 'restart-edit-contact' && !editCheckInEmail) || page !== 'restart-edit-contact',
+      checks: [
+        {
+          validator: isEmail,
+          msg: 'Enter an email address in the correct format.',
+          log: 'Email address not in correct format in restart process',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][manageQuestions][draftQuestionInput]`]: {
+      optional: page !== 'edit-question',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter what you want to ask',
+          log: 'Question text not entered',
         },
       ],
     },

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
 import logger from '../../logger'
@@ -6,7 +5,9 @@ import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
-import { escapeForLog, isValidHost, isValidPath } from '../utils'
+import { escapeForLog } from '../utils/escapeForLog'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 import 'multer'
 
 interface Request {
@@ -89,7 +90,6 @@ export default class RestClient {
         warnings.push({ text: errorMessage })
         error.response.errors = warnings
         logger.info('Handling 500')
-        JSON.stringify(error.response)
         return error.response
       }
       if (handle404 && error?.response?.status === 404) {
@@ -169,24 +169,28 @@ export default class RestClient {
       const result = await request
       return raw ? (result as Response) : result.body
     } catch (error) {
-      if (handle404 && error.response?.status === 404) return null
-      if (handle415 && error?.response?.status === 415) {
+      const sanitisedError = sanitiseError(error)
+      const sanitisedErrorMessage = sanitisedError.message
+
+      if (sanitisedError.status === 400) {
+        throw new Error(`http 400: ${sanitisedErrorMessage}`)
+      }
+      if (handle404 && sanitisedError.status === 404) return null
+      if (handle415 && sanitisedError.status === 415) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })
         error.response.errors = warnings
-        JSON.stringify(error.response)
-        logger.info('Handling 415 : ', error.response)
+        logger.info('Handling 415 : ', sanitisedErrorMessage)
         return error.response
       }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })
         error.response.errors = warnings
-        JSON.stringify(error.response)
-        logger.info('Handling 500 : ', error.response)
+        logger.info('Handling 500 : ', sanitisedErrorMessage)
         return error.response
       }
-      const sanitisedError = sanitiseError(error)
+
       logger.warn(
         { ...sanitisedError },
         escapeForLog(`Error calling ${this.name}, path: '${path}', verb: '${method.toUpperCase()}'`),

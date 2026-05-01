@@ -21,13 +21,13 @@
   rows: []
 } %}
 
-{% if appointments.length > 0 %}
-  {% for appointment in appointments %}
+{% if upcomingAppointments.length > 0 %}
+  {% for appointment in upcomingAppointments %}
       {% set dateAndTime %}
       {% endset %}
       {% set row = tableData.rows.push([
           {
-              html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.caseName.surname + ', ' + appointment.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
+              html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.name.surname + ', ' + appointment.name.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
           },
           {
               html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>'

@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
+import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -9,16 +9,14 @@ import {
   AppointmentType,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
+import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from '../data/model/OutlookEvent'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
-import FlagService from '../services/flagService'
-import { FeatureFlags } from '../data/model/featureFlags'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
-    const { crn, id: uuid } = req.params
+    const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
@@ -29,18 +27,17 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       date,
       start,
       end,
-      interval,
-      numberOfAppointments,
       eventId,
       requirementId = '',
       licenceConditionId = '',
       nsiId = '',
       notes,
       sensitivity,
-      until: untilDate,
       visorReport,
       outcomeRecorded,
+      smsOptIn,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+
     const body: AppointmentRequestBody = {
       user: {
         username,
@@ -50,11 +47,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       type,
       start: dateTime(date, start),
       end: dateTime(date, end),
-      interval,
-      numberOfAppointments: parseInt(numberOfAppointments, 10),
       uuid,
-      createOverlappingAppointment: true,
-      until: dateTime(untilDate, end),
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
@@ -76,36 +69,72 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
 
     const response = await masClient.postAppointments(crn, body)
-    const userDetails = await masClient.getUserDetails(username)
+    let email: string | undefined
+    let name: Name
+    let firstName: string
+    let surname: string
+    if (res.locals.flags.enableMAN2344) {
+      ;({
+        user: { name, email },
+      } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid]))
+      ;({ forename: firstName, surname } = name)
+    } else {
+      ;({ email, firstName, surname } = res.locals.user)
+    }
     let outlookEventResponse: OutlookEventResponse
-
-    if (userDetails?.email) {
+    let isWelshTranslation: boolean = false
+    if (email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
-      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
+      const subject: string = `${firstInitialLastName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}: ${toSentenceCase(apptDescription, [], null, false, true)}`
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {
-            emailAddress: userDetails.email,
-            name: `${userDetails.firstName} ${userDetails.surname}`,
+            emailAddress: email,
+            name: `${firstName} ${surname}`,
           },
         ],
         message,
         subject,
-        start: dateTime(date, start).toISOString(),
+        start: isoFromDateTime(date, start),
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
+      }
+      const { mobileNumber } = res.locals.case
+
+      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
+        const {
+          includeWelshPreview,
+          appointmentLocation = null,
+          appointmentTypeCode = null,
+        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
+        isWelshTranslation = includeWelshPreview
+        outlookEventRequestBody.smsEventRequest = {
+          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
+          mobileNumber,
+          crn,
+          smsOptIn: true,
+          includeWelshTranslation: includeWelshPreview,
+        }
+        if (appointmentLocation) outlookEventRequestBody.smsEventRequest.appointmentLocation = appointmentLocation
+        if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
+    if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
+
+    if (smsOptIn?.includes('YES') && !outlookEventResponse?.smsResponse?.englishNotificationId)
+      data.isEnglishNotificationFailed = true
+
+    if (smsOptIn?.includes('YES') && isWelshTranslation && !outlookEventResponse?.smsResponse?.welshNotificationId)
+      data.isWelshNotificationFailed = true
 
     return response
   }
 }
 
 export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>
-  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`
+  `<a href="${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments" target="_blank" rel="external noopener noreferrer">View the appointment on Manage people on probation (opens in new tab).</a>`

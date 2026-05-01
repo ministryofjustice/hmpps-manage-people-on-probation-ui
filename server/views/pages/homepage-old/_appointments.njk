@@ -1,0 +1,49 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set tableData = {
+    firstCellIsHeader: true,
+    classes: 'govuk-!-margin-bottom-0',
+    head: [
+        {
+            text: "Person on probation"
+        },
+        {
+            text: "Appointment type"
+        },
+        {
+            text: "Appointment location"
+        },
+        {
+            classes: 'govuk-!-text-align-right',
+            text: "Date and time"
+        }
+    ],
+    rows: []
+} %}
+
+{% if appointments.length > 0 %}
+    {% for appointment in appointments %}
+        {% set dateAndTime %}
+        {% endset %}
+        {% set row = tableData.rows.push([
+            {
+                html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.caseName.surname + ', ' + appointment.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
+            },
+            {
+                html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>'
+            },
+            {
+                text: appointment.location if appointment.location else 'Not Provided'
+            },
+            {
+                classes: 'govuk-!-text-align-right',
+                html: appointment.startDateTime | dateWithYear + '<br /><span class="secondary-text">' + appointment.startDateTime | shortTime + (' to ' + appointment.endDateTime | shortTime if appointment.endDateTime else '') + '</span>'
+            }
+        ]) %}
+    {% endfor %}
+    <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+        {{ govukTable(tableData) }}
+    </div>
+{% else %}
+    <p class="govuk-body govuk-!-padding-3">There are no upcoming appointments.</p>
+{% endif %}

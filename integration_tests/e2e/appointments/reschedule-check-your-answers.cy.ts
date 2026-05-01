@@ -1,33 +1,43 @@
 import { DateTime } from 'luxon'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import {
-  checkAppointmentSummary,
-  checkPopHeader,
-  getUuid,
-  to24HourTimeWithMinutes,
-  completeRescheduling,
-  completeRescheduleAppointmentPage,
-} from './imports'
+import { checkAppointmentSummary, checkPopHeader } from './imports'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import { completeRescheduleAppointmentPage, getUuid, completeRescheduling, to24HourTimeWithMinutes } from './utils'
 
 describe('Change appointment details and reschedule', () => {
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
   let dateTimePage: AppointmentLocationDateTimePage
   const crn = 'X000001'
-  const tomorrow = DateTime.now().plus({ days: 1 })
+  const future = DateTime.now().plus({ days: 2 })
   const startTime = '09:10'
   const endTime = '10:30'
+
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
 
   it('should render the page', () => {
     completeRescheduleAppointmentPage()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
     checkPopHeader()
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Change appointment details and reschedule')
-    checkAppointmentSummary(checkYourAnswerPage)
+    checkAppointmentSummary({
+      page: checkYourAnswerPage,
+      probationPractitioner: false,
+      sendTextMessage: false,
+      summaryHasDate: false,
+    })
+
+    cy.get('p')
+      .eq(1)
+      .should(
+        'contain.text',
+        'Use the saved details of the previously created appointment to reschedule it. You can amend any of the details.',
+      )
     cy.get('[data-qa="calendarInviteInset"]').should(
       'contain.text',
-      `You'll receive an updated calendar invite for the appointment`,
+      `You'll receive a calendar invite for the appointment.`,
     )
     cy.get('[data-qa="previousDateTime"]').should('not.exist')
   })
@@ -65,7 +75,7 @@ describe('Change appointment details and reschedule', () => {
         completeRescheduling(uuid)
         cy.get('[data-qa="previousDateTime"]').should(
           'contain.text',
-          `Wednesday 21 February 2024 at 12:15am to 12:30am`,
+          `Wednesday 21 February 2024 at 10:15am to 10:30am`,
         )
         checkYourAnswerPage
           .getSummaryListRow(5)
@@ -74,10 +84,14 @@ describe('Change appointment details and reschedule', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `${dayOfWeek(tomorrow.toISODate())} ${dateWithYear(tomorrow.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+              `${dayOfWeek(future.toISODate())} ${dateWithYear(future.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
             )
           })
         cy.get('[data-qa="calendarInviteInset"]').should('be.visible')
+        cy.get('[data-qa="calendarInviteInset"]').should(
+          'contain.text',
+          `You'll receive an updated calendar invite for the appointment.`,
+        )
       })
     })
   })

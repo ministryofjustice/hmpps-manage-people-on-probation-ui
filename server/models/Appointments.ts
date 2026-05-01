@@ -1,19 +1,64 @@
-import { type AttendedCompliedAppointment } from '../middleware'
-import { Name } from '../data/model/personalDetails'
-import { Activity } from '../data/model/schedule'
-import { Errors } from './Errors'
+import { type Name } from '../data/model/personalDetails'
+import { type EnforcementAction, type Activity } from '../data/model/schedule'
+import { type Errors } from './Errors'
+import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
+import { Option } from './Option'
 
 export type YesNo = '' | 'Yes' | 'No'
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
+export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
+
+export type AppointmentOutcomeType =
+  | 'ATTENDED_COMPLIED'
+  | 'ATTENDED_FAILED_TO_COMPLY'
+  | 'ATTENDED_SENT_HOME_BEHAVIOUR'
+  | 'ATTENDED_SENT_HOME_SERVICE_ISSUES'
+  | 'ACCEPTABLE_ABSENCE'
+  | 'UNACCEPTABLE_ABSENCE'
+  | 'FAILED_TO_ATTEND'
+  | 'WILL_BE_RESCHEDULED'
+
+export type AppointmentEnforcementAction =
+  | 'SEND_LETTER'
+  | 'INITIATE_BREACH_RECALL'
+  | 'INITIATE_BREACH_RECALL_AND_SEND_LETTER'
+  | 'REFER_TO_OFFENDER_MANAGER'
+  | 'NO_FURTHER_ACTION'
+  | 'DIFFERENT_ACTION'
+  | 'COURT_LEGAL'
+  | 'EMPLOYMENT'
+  | 'FAMILY_CHILDCARE'
+  | 'HOLIDAY'
+  | 'MEDICAL'
+  | 'RELIGIOUS'
+  | 'RIC'
+  | 'PROFESSIONAL_JUDGEMENT_DECISION'
+  | 'ACCEPTABLE_FAILURE'
+  | 'DECISION_PENDING'
+
+export interface AppointmentOutcome {
+  type: AppointmentOutcomeType
+  complied: 'YES' | 'NO'
+}
+
+export interface AppointmentOutcomeOption extends Option {
+  value?: AppointmentOutcomeType
+}
+
+export interface AppointmentEnforcementActionOption extends Option {
+  value?: AppointmentEnforcementAction
+}
+
 export interface AppointmentSessionUser {
   providerCode?: string
   teamCode?: string
   username?: string
-  name?: Name
   locationCode?: string
   staffCode?: string
+  name?: Name
+  email?: string
 }
 
 export interface AppointmentSession {
@@ -23,31 +68,32 @@ export interface AppointmentSession {
   date?: string
   start?: string
   end?: string
-  until?: string
-  interval?: AppointmentInterval
-  numberOfAppointments?: string
-  numberOfRepeatAppointments?: string
   eventId?: string
   username?: string
   uuid?: string
   requirementId?: string
   licenceConditionId?: string
   nsiId?: string
-  repeating?: YesNo
-  repeatingDates?: string[]
   notes?: string
   sensitivity?: YesNo
   backendId?: number
+  enforcementAction?: EnforcementAction
   outcomeRecorded?: YesNo
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
+  smsOptIn?: SmsOptInOptions
+  smsPreview?: SmsPreviewSession
   temp?: {
     providerCode?: string
     teamCode?: string
     username?: string
     isInPast?: boolean
     date?: string
+  }
+  outcome?: {
+    type: AppointmentOutcomeType
+    enforcementAction: AppointmentEnforcementAction
   }
 }
 
@@ -98,15 +144,11 @@ export interface AppointmentRequestBody {
   type: string
   start: Date
   end: Date
-  interval: AppointmentInterval
-  numberOfAppointments: number
   eventId?: number
   uuid: string
-  createOverlappingAppointment: true
   requirementId?: number
   licenceConditionId?: number
   nsiId?: number
-  until?: Date
   notes?: string
   sensitive?: boolean
   visorReport?: boolean
@@ -188,11 +230,12 @@ export interface AppointmentsPostResponse {
 export interface LocalParams {
   crn: string
   id: string
+  contactId?: string
+  uuid?: string
   errors?: Errors
   body?: Record<string, string | string[]>
   _minDate?: string
   _maxDate?: string
-  contactId?: string
   uploadedFiles?: any
   personLevel?: boolean
   maxCharCount?: number
@@ -205,6 +248,12 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+}
+
+export interface ProbationDeliveryUnit {
+  code: string
+  description: string
 }
 
 export interface MasUserDetails {
@@ -215,4 +264,15 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+  staff?: {
+    probationDeliveryUnits?: ProbationDeliveryUnit[]
+  }
+}
+
+export interface AttendedCompliedAppointment {
+  type: string
+  officer: {
+    name: Name
+  }
+  startDateTime: string
 }

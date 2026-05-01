@@ -4,24 +4,24 @@
 
 {% switch params.level %}
 {% case 'VERY_HIGH' %}
-    {% set timelineItemClass = 'predictor-timeline-item--very-high'%}
+    {% set timelineItemClass = 'predictor-timeline-item-v1--very-high'%}
     {% set level = 'VERY HIGH'%}
     {% case 'HIGH' %}
-        {% set timelineItemClass = 'predictor-timeline-item--high'%}
+        {% set timelineItemClass = 'predictor-timeline-item-v1--high'%}
         {% case 'MEDIUM' %}
-            {% set timelineItemClass = 'predictor-timeline-item--medium' %}
+            {% set timelineItemClass = 'predictor-timeline-item-v1--medium' %}
             {% case 'LOW' %}
-                {% set timelineItemClass = 'predictor-timeline-item--low' %}
-                     {% default %}
-                {% set timelineItemClass = 'predictor-timeline-item--unknown' %}
+                {% set timelineItemClass = 'predictor-timeline-item-v1--low' %}
+                {% default %}
+                {% set timelineItemClass = 'predictor-timeline-item-v1--unknown' %}
                 {% set default_level = 'UNKNOWN' %}
                 {% endswitch %}
 
-                <div data-qa="" class="predictor-timeline-item {{ timelineItemClass }}">
-                    <span class="predictor-timeline-item__level">
+                <div data-qa="" class="predictor-timeline-item-v1 {{ timelineItemClass }}">
+                    <span class="predictor-timeline-item-v1__level">
                         <strong>{{ params.type }}</strong>
                         {{ default_level if default_level else level }}</span>
                     {% if params.score %}
-                        <span class="predictor-timeline-item__score">{{ params.score }}</span>
+                        <span class="predictor-timeline-item-v1__score">{{ params.score }}</span>
                     {% endif %}
                 </div>

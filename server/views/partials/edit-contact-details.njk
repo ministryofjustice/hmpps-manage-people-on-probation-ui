@@ -6,12 +6,17 @@
 {% set dateWarning = 'An end date will change this to a previous address and you will need to add a new main address.' %}
 
 {% block beforeContent %}
-
     {% set bannerHtml %}
     <h2 class="govuk-heading-m govuk-!-font-weight-regular">{{ dateWarning }}</h2>
     {% endset %}
-
-    {{ govukBreadcrumbs({
+    {% if origin === 'appointments' %}
+        {% if backLink %}
+            {{ govukBackLink({
+    href: backLink
+  }) }}
+        {% endif %}
+    {% else %}
+        {{ govukBreadcrumbs({
         items: [
             {
                 text: "Cases",
@@ -28,7 +33,7 @@
             }
         ]
     }) }}
-
+    {% endif %}
     {{ mojBanner({
         type: 'information',
         html: bannerHtml,
@@ -53,6 +58,20 @@
     {% include "../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
     <h2 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7" data-qa="pageHeading">{{title}}</h2>
+    {% if showContactAlert %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full govuk-!-margin-bottom-6">
+                {{ mojAlert({
+                    variant: "warning",
+                    title: "",
+                    showTitleAsHeading: false,
+                    dismissible: false,
+                    attributes: { "data-qa": "updateBanner" },
+                    html: 'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.'
+                }) }}
+            </div>
+        </div>
+    {% endif %}
     <div class="govuk-!-width-one-half">
         <form method="post" autocomplete="off" action="{{ paths.current }}">
 

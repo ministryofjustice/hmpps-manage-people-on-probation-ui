@@ -43,6 +43,7 @@ context('Interventions', () => {
     cy.get('h2').should('contain.text', 'Interventions')
     cy.get('p').should('contain.text', 'There may be interventions in place but we cannot yet display them.')
     cy.get('p')
+      .eq(1)
       .find('a')
       .should('contain.text', 'Search the contact log on NDelius (opens in new tab)')
       .should(
@@ -58,6 +59,7 @@ context('Interventions', () => {
     cy.get('h2').should('contain.text', 'Interventions')
     cy.get('p').should('contain.text', 'There may be interventions in place but we cannot yet display them.')
     cy.get('p')
+      .eq(1)
       .find('a')
       .should('contain.text', 'Search the contact log on NDelius (opens in new tab)')
       .should(

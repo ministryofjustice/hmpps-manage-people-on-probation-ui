@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
-import { getDataValue, isValidCrn, isValidUUID } from '../utils'
+import { isValidCrn, isValidUUID } from '../utils'
 
 import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = [
   'redirectToRescheduleAppointment',
@@ -15,7 +16,7 @@ const routes = [
 const rescheduleAppointmentController: Controller<typeof routes, void> = {
   redirectToRescheduleAppointment: () => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn, contactId } = req.params as Record<string, string>
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
@@ -46,6 +47,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       const { validation } = req.query
       const showValidation = validation === 'true'
       const { crn, id, contactId } = req.params as Record<string, string>
+      await sendAuditMessage(res, 'ADD_MAS_RESCHEDULE_APPOINTMENT', crn, SubjectType.CRN)
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-sensitivity`]: 'Select if appointment includes sensitive information',
@@ -72,20 +74,21 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       })
     }
   },
-  postRescheduleAppointment: hmppsAuthClient => {
+  postRescheduleAppointment: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const { nextAppointmentSession } = res.locals
-      return cloneAppointmentAndRedirect(nextAppointmentSession, 'RESCHEDULE')(req, res)
+      const { appointmentSession } = res.locals
+      return cloneAppointmentAndRedirect(appointmentSession, 'RESCHEDULE')(req, res)
     }
   },
   getRescheduleCheckYourAnswer: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, contactId } = req.params
+      const { crn, id, contactId } = req.params as Record<string, string>
       const isInPast = appointmentDateIsInPast(req)
+      await sendAuditMessage(res, 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE', crn, SubjectType.CRN)
       const { url } = req
       res.render('pages/reschedule/check-your-answers', {
         crn,

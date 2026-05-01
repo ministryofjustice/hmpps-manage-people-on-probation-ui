@@ -2,34 +2,40 @@ import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
 import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
-import { isValidHost, isValidPath } from '../utils'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 import logger from '../../logger'
 import { ErrorSummary } from './model/common'
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
+jest.mock('../utils/isValidHost', () => {
   return {
-    ...actualUtils,
-    isValidPath: jest.fn(),
     isValidHost: jest.fn(),
+  }
+})
+jest.mock('../utils/isValidPath', () => {
+  return {
+    isValidPath: jest.fn(),
   }
 })
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
+let restClient: RestClient
 
-const restClient = new RestClient(
-  'api-name',
-  {
-    url: 'http://localhost:8080/api',
-    timeout: {
-      response: 1000,
-      deadline: 1000,
+beforeEach(() => {
+  restClient = new RestClient(
+    'api-name',
+    {
+      url: 'http://localhost:8080/api',
+      timeout: {
+        response: 1000,
+        deadline: 1000,
+      },
+      agent: new AgentConfig(1000),
     },
-    agent: new AgentConfig(1000),
-  },
-  'token-1',
-)
+    'token-1',
+  )
+})
 
 describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method => {
   beforeEach(() => {
@@ -134,11 +140,15 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     it('should log any errors if found', async () => {
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
-        .reply(500, (_, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
+        .reply(500, { message: 'This is a test error' })
+        .persist()
 
-      await expect(restClient[method]<ErrorSummary>({ path: `/test`, handle500: true })).rejects.toThrow(
-        'This is a test error',
-      )
+      await expect(
+        restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle500: false,
+        }),
+      ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
     })
   } else {
@@ -181,13 +191,12 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     it('should log any errors if found', async () => {
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
-        .reply(500, (_uri, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
+        .reply(500, { message: 'This is a test error' })
 
       await expect(
         restClient[method]<ErrorSummary>({
           path: `/test`,
-          retry: true,
-          handle500: true,
+          handle500: false,
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
@@ -321,5 +330,33 @@ describe('RestClient.construct', () => {
     }
     const client = new RestClient('test', config, 'token')
     expect(client.agent).toBeInstanceOf(HttpsAgent)
+  })
+})
+
+describe('RestClient requestWithBody - 400 handling', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedIsValidHost.mockReturnValue(true)
+    mockedIsValidPath.mockReturnValue(true)
+    nock.cleanAll()
+  })
+
+  it('throws custom error message when API returns 400', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .post('/api/test')
+      .reply(400, { message: 'Bad request from API' })
+
+    const requestData = { foo: 'bar' }
+
+    await expect(
+      restClient.post({
+        path: '/test',
+        data: requestData,
+      }),
+    ).rejects.toThrow('http 400: Bad request from API')
+
+    expect(nock.isDone()).toBe(true)
   })
 })

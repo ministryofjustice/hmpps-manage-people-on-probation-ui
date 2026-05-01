@@ -1,8 +1,7 @@
+import { DateTime } from 'luxon'
 import Page from '../../pages/page'
 import AppointmentsPage from '../../pages/appointments'
-import InstructionsPage from '../../pages/check-ins/instructions'
 import DateFrequencyPage from '../../pages/check-ins/date-frequencey'
-import { getCheckinUuid, getUuid } from './imports'
 import ContactPreferencePage from '../../pages/check-ins/contact-preference'
 import PhotoOptionsPage from '../../pages/check-ins/photo-options'
 import EditContactPreferencePage from '../../pages/check-ins/edit-contact-preference'
@@ -13,19 +12,46 @@ import PhotoRulesPage from '../../pages/check-ins/photo-rules'
 import CheckYourAnswersPage from '../../pages/check-ins/check-your-answers'
 import CheckinConfirmationPage from '../../pages/check-ins/confirmation.page'
 import TakeAPhotoPage from '../../pages/check-ins/take-a-photo'
-import { statusErrors } from '../../../server/properties'
 import OverviewPage from '../../pages/overview'
 import ManageCheckins from '../../pages/check-ins/manage-checkins'
 import ManageContactPage from '../../pages/check-ins/manage-contact'
 import ManageEditContactPage from '../../pages/check-ins/manage-edit-contact'
 import ChangeSettingsPage from '../../pages/check-ins/change-settings'
 import StopCheckins from '../../pages/check-ins/stop-checkins'
+import RestartConfirmationPage from '../../pages/check-ins/restart/restart-confirmation.page'
+import RestartContactPreferencePage from '../../pages/check-ins/restart/restart-contact-preference.page'
+import RestartDateFrequencyPage from '../../pages/check-ins/restart/restart-date-frequency.page'
+import RestartCheckYourAnswersPage from '../../pages/check-ins/restart/restart-check-your-answers.page'
+import RestartEditContactPreferencePage from '../../pages/check-ins/restart/restart-edit-contact-preference.page'
+import EligibilityCheckPage from '../../pages/check-ins/eligibility-check'
+import EligibilityFullPage from '../../pages/check-ins/eligibility-full'
+import EligibilitySupplementaryPage from '../../pages/check-ins/eligibility-supplementary'
+import EligibilityDeniedPage from '../../pages/check-ins/eligibility-denied'
+import { getCheckinUuid } from './utils'
+import AddQuestionsPage from '../../pages/check-ins/questions/add-questions'
+import InstructionsPage from '../../pages/check-ins/questions/instructions'
+import PreviewFeelingPage from '../../pages/check-ins/questions/preview/feeling'
+import PreviewSupportPage from '../../pages/check-ins/questions/preview/support'
+import EditQuestionPage from '../../pages/check-ins/questions/edit-question'
+import ListQuestionsPage from '../../pages/check-ins/questions/list-questions'
+import EligibilitySPOApprovalPage from '../../pages/check-ins/eligibility-spo-approval'
 
 const loadPage = () => {
   cy.task('resetMocks')
-  cy.task('stubEnableESuperVision')
   cy.visit(`/case/X000001/appointments`)
+  cy.task('stubGetQuestionsTemplates')
+  cy.task('stubEnableESupervisionCustomQuestions')
 }
+
+const clickNextDayButton = () => {
+  const now = DateTime.now()
+  const tomorrow = now.plus({ days: 1 })
+  if (tomorrow.month !== now.month) {
+    cy.get('.moj-js-datepicker-next-month').click()
+  }
+  cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+}
+
 context('Appointment check-ins', () => {
   it('Appointments page with online check-ins', () => {
     loadPage()
@@ -40,19 +66,140 @@ context('Appointment check-ins', () => {
       .and('contain.text', 'Set up online check ins')
     page.getElement('[data-qa="online-checkin-btn"]').click()
     getCheckinUuid().then(uuid => {
-      cy.url().should('contain', `/case/X000001/appointments/${uuid}/check-in/instructions`)
+      cy.url().should('contain', `/case/X000001/appointments/${uuid}/check-in/eligibility-check`)
     })
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.checkOnPage()
-    instructionsPage.getElement('[data-qa="formAnchorLink"]').click()
-    Page.verifyOnPage(AppointmentsPage)
+  })
+  it('should navigate to supplementary eligibility page when option one is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const checkPage = new EligibilityCheckPage()
+
+    checkPage.getOptionOne().check()
+    checkPage.getSubmitBtn().click()
+
+    const supplementaryPage = new EligibilitySupplementaryPage()
+    supplementaryPage.getSubmitBtn().click()
+
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.checkOnPage()
+  })
+
+  it('should navigate to supplementary eligibility page when more than one eligible option is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const checkPage = new EligibilityCheckPage()
+
+    checkPage.getOptionOne().check()
+    checkPage.getOptionTwo().check()
+
+    checkPage.getSubmitBtn().click()
+
+    const supplementaryPage = new EligibilitySupplementaryPage()
+    supplementaryPage.getSubmitBtn().click()
+
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.checkOnPage()
+  })
+
+  it('should navigate to full eligibility choice when "None of these apply" is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const checkPage = new EligibilityCheckPage()
+
+    checkPage.getNoneOption().check()
+    checkPage.getSubmitBtn().click()
+
+    const fullPage = new EligibilityFullPage()
+  })
+  it('should navigate to SPO approval when "To replace some face-to-face contact" radio is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getNoneOption().check()
+    checkPage.getSubmitBtn().click()
+
+    const fullPage = new EligibilityFullPage()
+    fullPage.getReplacementRadio().check()
+    fullPage.getSubmitBtn().click()
+
+    const spoApprovalPage = new EligibilitySPOApprovalPage()
+    spoApprovalPage.checkOnPage()
+  })
+
+  it('should navigate to date frequency when SPO approval checkbox is checked', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getNoneOption().check()
+    checkPage.getSubmitBtn().click()
+
+    const fullPage = new EligibilityFullPage()
+    fullPage.getReplacementRadio().check()
+    fullPage.getSubmitBtn().click()
+
+    const spoApprovalPage = new EligibilitySPOApprovalPage()
+    spoApprovalPage.checkOnPage()
+    spoApprovalPage.getCheckbox()
+    spoApprovalPage.getSubmitBtn()
+  })
+
+  it('should navigate to date frequency when "As well as existing face-to-face contact" radio is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getNoneOption().check()
+    checkPage.getSubmitBtn().click()
+
+    const fullPage = new EligibilityFullPage()
+    fullPage.getSupplementaryRadio().check()
+    fullPage.getSubmitBtn().click()
+
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.checkOnPage()
+  })
+
+  it('should navigate to denied page when option 10 (Intensive Supervision Court pilot case) is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getOptionNine().check()
+    checkPage.getSubmitBtn().click()
+    const deniedPage = new EligibilityDeniedPage()
+    deniedPage.checkOnPage()
+  })
+
+  it('should navigate to denied page when option 10 (Intensive Supervision Court pilot case) is selected alongside other eligible choices', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getOptionOne().check()
+    checkPage.getOptionNine().check()
+    checkPage.getSubmitBtn().click()
+    const deniedPage = new EligibilityDeniedPage()
+    deniedPage.checkOnPage()
+  })
+
+  it('should show validation errors when no option is selected', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getSubmitBtn().click()
+    cy.get('.govuk-error-summary').should('be.visible')
+    cy.get('.govuk-error-message').should('contain', 'Select if any of these apply')
   })
 
   it('check-in frequency page should fail with validation errors', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getSubmitBtn().click()
@@ -76,13 +223,20 @@ context('Appointment check-ins', () => {
   it('should able to submit check-in frequency details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -92,11 +246,20 @@ context('Appointment check-ins', () => {
   it('contact preference page should fail with validation errors', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -112,11 +275,20 @@ context('Appointment check-ins', () => {
   it('should able to submit contact preference details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -136,11 +308,20 @@ context('Appointment check-ins', () => {
   it('should able to edit contact preference details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -155,11 +336,20 @@ context('Appointment check-ins', () => {
   it('Should able to choose photo options', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -188,11 +378,20 @@ context('Appointment check-ins', () => {
   it('Should able to upload a pic and show rules page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -225,11 +424,20 @@ context('Appointment check-ins', () => {
   it('Should able to show cya and confirm page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -266,11 +474,20 @@ context('Appointment check-ins', () => {
   it('Should able to take a photo and show cya and confirm page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -306,11 +523,20 @@ context('Appointment check-ins', () => {
   it('Should able to change options from cya', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -372,6 +598,13 @@ context('Appointment check-ins', () => {
     contactPreferencePage.getChangeLink().click()
     const editContactPreferencePage = new EditContactPreferencePage()
     editContactPreferencePage.checkOnPage()
+    editContactPreferencePage
+      .getAlert()
+      .should('be.visible')
+      .and(
+        'contain',
+        'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.',
+      )
     editContactPreferencePage.getSubmitBtn().click()
     contactPreferencePage.checkOnPage()
     contactPreferencePage.getSubmitBtn().click()
@@ -406,11 +639,20 @@ context('check-ins error scenario ', () => {
     loadPage()
     cy.task('stubUpdatePersonalContact404Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -427,11 +669,20 @@ context('check-ins error scenario ', () => {
     loadPage()
     cy.task('stubUpdatePersonalContact500Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -448,11 +699,20 @@ context('check-ins error scenario ', () => {
     loadPage()
     cy.task('stubOffenderSetup422Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -494,11 +754,20 @@ context('check-ins error scenario ', () => {
     loadPage()
     cy.task('stubOffenderSetup500Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
@@ -533,17 +802,31 @@ context('check-ins error scenario ', () => {
 
   it('Should able to show error page, when checkin registration fails', () => {
     loadPage()
+
     cy.task('stubOffenderSetupComplete500Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.getSubmitBtn().click()
+
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.getDatePickerToggle().click()
-    dateFrequencyPage.getNextDayButton().click()
+
+    dateFrequencyPage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    dateFrequencyPage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
+
     const contactPreferencePage = new ContactPreferencePage()
     contactPreferencePage.checkOnPage()
+
     contactPreferencePage
       .getCheckInPreferredComs()
       .find('.govuk-radios__item')
@@ -557,6 +840,7 @@ context('check-ins error scenario ', () => {
     takeAPhotoOptionsPage.getSubmitBtn().click()
     takeAPhotoOptionsPage.getBackLink().click()
     takeAPhotoOptionsPage.checkOnPage()
+
     takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
     takeAPhotoOptionsPage.getSubmitBtn().click()
     const uploadAPhoto = new UploadAPhotoPage()
@@ -565,19 +849,23 @@ context('check-ins error scenario ', () => {
     uploadAPhoto.continueButton().click()
     const photoRules = new PhotoRulesPage()
     photoRules.checkOnPage()
+
     photoRules.getSubmitBtn().click()
     const checkYourAnswersPage = new CheckYourAnswersPage()
     checkYourAnswersPage.checkOnPage()
     checkYourAnswersPage.getSubmitBtn().click()
-    cy.get('h1').should('contain.text', statusErrors[500].title)
-    cy.get('[data-qa="errorMessage"]').should('contain.html', statusErrors[500].message)
+    cy.get('h1').should('contain.text', 'Sorry, there is a problem with the service')
+    cy.get('[data-qa="errorMessage"]').should(
+      'contain.html',
+      '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p>',
+    )
   })
 })
 
 context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -598,7 +886,7 @@ context('check-ins overview and manage pages', () => {
 
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -609,16 +897,15 @@ context('check-ins overview and manage pages', () => {
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Set up online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
-    const instructionsPage = new InstructionsPage()
-    instructionsPage.checkOnPage()
-    instructionsPage.getBackLink().click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.checkOnPage()
+    eligibilityCheckPage.getBackLink().click()
     overviewPage.checkOnPage()
   })
 
   it('should show checkin details', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
-
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
     appointmentsPage.checkOnPage()
@@ -641,8 +928,8 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
-    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
-    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'Next check in')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', '20 April 2026')
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
     manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
@@ -660,7 +947,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to visit contact details page', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -686,13 +972,19 @@ context('check-ins overview and manage pages', () => {
 
     manageContact.getElement('button[name="change"][value="emailAddress"]').click()
     manageEditContactPage.checkOnPage()
+    manageEditContactPage
+      .getAlert()
+      .should('be.visible')
+      .and(
+        'contain',
+        'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.',
+      )
     manageEditContactPage.getBackLink().click()
     manageContact.checkOnPage()
   })
 
   it('should able to vist change settings page', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
@@ -718,7 +1010,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to stop check in', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
@@ -741,5 +1032,257 @@ context('check-ins overview and manage pages', () => {
     stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
     stopCheckIn.getSubmitBtn().click()
     manageCheckins.checkOnPage()
+  })
+
+  it('should able to stop and restart online check ins', () => {
+    cy.task('resetMocks')
+    cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
+
+    const restartDatePage = new RestartDateFrequencyPage()
+    restartDatePage.checkOnPage()
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    restartDatePage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
+    restartDatePage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    restartDatePage.getSubmitBtn().click()
+
+    const restartContactPage = new RestartContactPreferencePage()
+    restartContactPage.checkOnPage()
+    restartContactPage.getCheckInPreferredComs().find('input[value="PHONE"]').should('be.checked')
+    restartContactPage.getMobileNumberChangeLink().click()
+    const restartEditPage = new RestartEditContactPreferencePage()
+    restartEditPage.checkOnPage()
+    restartEditPage.getAlert().should('be.visible').and('contain.text', 'update the record in NDelius')
+    restartEditPage.getMobileInput().clear().type('07700900123')
+    restartEditPage.getSubmitBtn().click()
+    restartContactPage.checkOnPage()
+    restartContactPage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
+    restartContactPage.getSubmitBtn().click()
+    const restartSummaryPage = new RestartCheckYourAnswersPage()
+    restartSummaryPage.checkOnPage()
+    restartSummaryPage.getSummaryValue(2).should('contain.text', 'Every week')
+    restartSummaryPage.getSubmitBtn().click()
+    const restartConfirmPage = new RestartConfirmationPage()
+    restartConfirmPage.checkOnPage()
+    restartConfirmPage.getPanel().should('contain.text', 'Online check ins restarted')
+  })
+})
+
+context('check-ins add questions pages', () => {
+  it('should allow a user to start the add questions to online check ins journey', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.checkOnPage()
+  })
+
+  it('should allow a user to view the default questions preview pages', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.getElement('.govuk-table').should('contain.text', 'How have you been feeling')
+    addQuestionsPage.getElement('.govuk-table').should('contain.text', 'Is there anything you need support with')
+    addQuestionsPage.clickPreviewFeeling()
+    const feelingPreview = new PreviewFeelingPage()
+    feelingPreview.checkOnPage()
+    feelingPreview.getElement('.govuk-textarea').first().should('have.attr', 'readonly')
+    feelingPreview.clickBackToQuestions()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickPreviewSupport()
+    const supportPreview = new PreviewSupportPage()
+    supportPreview.checkOnPage()
+    supportPreview.clickBackToQuestions()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickCancel()
+    instructionsPage.checkOnPage()
+  })
+
+  it('should show the "Add question" button for additional custom questions', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.getElement('[data-qa="add-question-btn"]').should('be.visible')
+  })
+
+  it('should show the "Save questions" button', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.getElement('[data-qa="save-questions-btn"]').should('be.visible')
+  })
+
+  it('should show the "cancel and go back" button ', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.getElement('[data-qa="cancel-link"]').should('be.visible')
+  })
+
+  it('should trigger validation errors when trying to save a blank custom question', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.clickAddQuestion()
+
+    const listQuestionsPage = new ListQuestionsPage()
+    listQuestionsPage.clickAddTemplateByIndex(0)
+
+    const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.clickContinue()
+
+    editQuestionPage.checkValidationError('Enter what you want to ask')
+  })
+
+  it('should allow a user to add, edit, and delete a custom question', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+
+    const addQuestionsPage = new AddQuestionsPage()
+
+    // Add "How has [your unpaid work] been going recently?"
+    addQuestionsPage.clickAddQuestion()
+    const listQuestionsPage = new ListQuestionsPage()
+    listQuestionsPage.clickAddTemplateByIndex(0)
+
+    const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.enterDraftQuestionInput('your unpaid work')
+    editQuestionPage.clickContinue()
+
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionInList('your unpaid work')
+
+    // Edit "How has [your college course] been going recently?"
+    addQuestionsPage.clickEditForQuestion(0)
+
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('your college course')
+    editQuestionPage.clickContinue()
+
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionInList('your college course')
+    addQuestionsPage.verifyQuestionNotInList('your unpaid work')
+
+    // Delete
+    addQuestionsPage.clickDeleteForQuestion(0)
+
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionNotInList('your college course')
+  })
+
+  it('should enforce the maximum limit of 3 custom questions', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+
+    const addQuestionsPage = new AddQuestionsPage()
+
+    // Add "How has [your apprenticeship] been going recently?"
+    addQuestionsPage.clickAddQuestion()
+    const listQuestionsPage = new ListQuestionsPage()
+    listQuestionsPage.clickAddTemplateByIndex(0)
+    const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('your apprenticeship')
+    editQuestionPage.clickContinue()
+
+    // Add "How have things been feeling [at home] recently?"
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickAddQuestion()
+    listQuestionsPage.checkOnPage()
+    listQuestionsPage.clickAddTemplateByIndex(1)
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('at home')
+    editQuestionPage.clickContinue()
+
+    // Add "How is [your physical health]?"
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickAddQuestion()
+    listQuestionsPage.checkOnPage()
+    listQuestionsPage.clickAddTemplateByIndex(1)
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('your physical health')
+    editQuestionPage.clickContinue()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionInList('your apprenticeship')
+    addQuestionsPage.verifyQuestionInList('at home')
+    addQuestionsPage.verifyQuestionInList('your physical health')
+    addQuestionsPage.verifyAddQuestionButtonHidden()
+  })
+})
+
+context('check-ins flag guard', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+    cy.task('stubDisableESupervisionCheckins')
+  })
+
+  it('returns 403 for a /check-in/manage subpath when the flag is disabled', () => {
+    cy.request({
+      url: '/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start',
+      failOnStatusCode: false,
+    }).then(response => {
+      expect(response.status).to.eq(403)
+    })
+  })
+
+  it('returns 403 for an /:id/check-in subpath when the flag is disabled', () => {
+    cy.request({
+      url: '/case/X000001/appointments/3fa85f64-5717-4562-b3fc-2c963f66afa7/check-in/eligibility-check',
+      failOnStatusCode: false,
+    }).then(response => {
+      expect(response.status).to.eq(403)
+    })
   })
 })

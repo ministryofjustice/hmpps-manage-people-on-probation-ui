@@ -15,8 +15,10 @@ export default abstract class Page {
     cy.get('[data-qa=pageHeading]').contains(this.title)
   }
 
-  checkPageTitle = (title: string) => {
-    this.title = title
+  checkPageTitle = (title?: string) => {
+    if (title) {
+      this.title = title
+    }
     this.checkOnPage()
   }
 
@@ -186,14 +188,40 @@ export default abstract class Page {
     return cy.get(`.govuk-summary-list__row:nth-child(${index})`)
   }
 
-  assertRiskTags() {
-    cy.get(`[class=predictor-timeline-item__level]`)
-      .eq(0)
-      .within(() => cy.get('strong').should('contain.text', 'ROSH'))
+  assertRiskTags(ogrs4 = false) {
+    if (ogrs4) {
+      cy.get(`[data-predictor-badge]`)
+        .eq(0)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'Combined serious reoffending predictor')
+        .should('contain.text', 'LOW')
+        .get('[data-test-id=score')
+        .should('contain.text', '0.28%')
+        .get('[data-test-id=staticOrDynamic')
+        .should('contain.text', 'Dynamic')
 
-    cy.get(`[class=predictor-timeline-item__level]`)
-      .eq(1)
-      .within(() => cy.get('strong').should('contain.text', 'RSR'))
+      cy.get(`[data-predictor-badge]`)
+        .eq(1)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'RISK OF SERIOUS HARM')
+        .should('contain.text', 'VERY HIGH')
+    } else {
+      cy.get(`[data-predictor-badge]`)
+        .eq(0)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'RSR')
+        .should('contain.text', 'LOW')
+        .get('[data-test-id=score')
+        .should('contain.text', '0.05%')
+        .get('[data-test-id=staticOrDynamic')
+        .should('contain.text', 'Dynamic')
+
+      cy.get(`[data-predictor-badge]`)
+        .eq(1)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'ROSH')
+        .should('contain.text', 'VERY HIGH')
+    }
   }
 
   getElementByDataQA = (name: string): PageElement => cy.get(`[data-qa="${name}"]`)
@@ -201,4 +229,12 @@ export default abstract class Page {
   hideMessageLink = (): PageElement => cy.get('#hide-message')
 
   getLogOutcomesAlertBanner = (): PageElement => cy.get('[data-module="serviceAlert"]')
+
+  getDatePickerToggle = () => {
+    return cy.get('.moj-datepicker__toggle')
+  }
+
+  getDatePickerInput = () => {
+    return cy.get('.moj-js-datepicker-input')
+  }
 }

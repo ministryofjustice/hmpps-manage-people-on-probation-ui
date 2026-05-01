@@ -4,10 +4,11 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { eSuperVisionValidation } from '../../properties/validation/eSupervision'
 import { LocalParams } from '../../models/ESupervision'
 import { getDataValue } from '../../utils'
+import { parseQuestionTemplate } from '../../utils/esupervisionParseTemplate'
 
 const eSuperVision: Route<void> = (req, res, next) => {
   const { url, params, body } = req
-  const { crn, id } = params
+  const { crn, id } = params as Record<string, string>
   const { checkInMinDate, checkInMobile, checkInEmail } = body
   const editCheckInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
   const editCheckInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInEmail'])
@@ -26,12 +27,13 @@ const eSuperVision: Route<void> = (req, res, next) => {
     'editCheckInEmail',
   ])
 
-  const { back = '' } = req.query as Record<string, string>
+  const { back = '', cya = '' } = req.query as Record<string, string>
   const localParams: LocalParams = {
     crn,
     id,
     body,
     back,
+    cya,
     checkInMinDate,
     checkInEmail,
     checkInMobile,
@@ -48,11 +50,51 @@ const eSuperVision: Route<void> = (req, res, next) => {
       .join('/'),
   ]}`
 
+  const validateEligibilityCheck = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/eligibility-check`)) {
+      render = `pages/check-in/eligibility-check`
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'eligibility-check',
+        }),
+      )
+    }
+  }
+  const validateEligibilityChoice = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)) {
+      render = `pages/check-in/eligibility-full`
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'full-eligibility',
+        }),
+      )
+    }
+  }
+  const validateSPOApproval = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/spo-approval`)) {
+      render = `pages/check-in/spo-approval`
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'spo-approval',
+        }),
+      )
+    }
+  }
+
   const validateDateFrequency = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
       render = `pages/check-in/date-frequency`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -64,9 +106,9 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateContactPreference = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/contact-preference`)) {
       render = `pages/check-in/contact-preference`
-      if (req.body.change === 'main') {
+      if (req.body?.change === 'main') {
         errorMessages = validateWithSpec(
-          req.body,
+          req,
           eSuperVisionValidation({
             crn,
             id,
@@ -84,7 +126,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       const preferredComs = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'preferredComs'])
       render = `pages/check-in/edit-contact-preference`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -103,7 +145,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/photo-options`)) {
       render = `pages/check-in/photo-options`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -116,7 +158,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/upload-a-photo`)) {
       render = `pages/check-in/upload-a-photo`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -130,7 +172,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       render = `pages/check-in/manage/checkin-settings`
       localParams.id = id
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -145,7 +187,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       render = `pages/check-in/manage/manage-edit-contact`
       localParams.id = id
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -165,7 +207,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       localParams.id = id
       const stopCheckIn = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         eSuperVisionValidation({
           crn,
           id,
@@ -178,9 +220,9 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateManageContactPage = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/contact`)) {
       render = `pages/check-in/manage/manage-contact`
-      if (req.body.change === 'main') {
+      if (req.body?.change === 'main') {
         errorMessages = validateWithSpec(
-          req.body,
+          req,
           eSuperVisionValidation({
             crn,
             id,
@@ -193,7 +235,91 @@ const eSuperVision: Route<void> = (req, res, next) => {
       }
     }
   }
+  const validateRestartJourney = () => {
+    if (baseUrl.includes(`/manage/${id}/restart-checkin`)) {
+      render = `pages/check-in/manage/restart-date-frequency`
+      localParams.id = id
+      errorMessages = validateWithSpec(req, eSuperVisionValidation({ crn, id, page: 'restart-date-frequency' }))
+    }
+
+    if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`)) {
+      render = `pages/check-in/manage/restart-edit-contact`
+      localParams.id = id
+      const editMobile = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'restartCheckin',
+        'editCheckInMobile',
+      ])
+      const editEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'])
+
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'restart-edit-contact',
+          editCheckInEmail: editEmail,
+          editCheckInMobile: editMobile,
+        }),
+      )
+    }
+
+    if (baseUrl.includes(`/manage/${id}/restart-contact`)) {
+      render = `pages/check-in/manage/restart-contact-preference`
+      localParams.id = id
+      const restartData = req.body.esupervision?.[crn]?.[id]?.restartCheckin || {}
+      const sessionData = getDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin']) || {}
+      const email = restartData.checkInEmail || sessionData.checkInEmail
+      const mobile = restartData.checkInMobile || sessionData.checkInMobile
+
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'restart-contact',
+          change: req.body.change || 'main',
+          checkInEmail: email,
+          checkInMobile: mobile,
+        }),
+      )
+      localParams.checkInEmail = email
+      localParams.checkInMobile = mobile
+    }
+  }
+  const validateEditQuestion = () => {
+    const questionMatch = baseUrl.match(/\/questions\/([\w-]+)\/edit/)
+
+    if (questionMatch) {
+      const draftId = questionMatch[1]
+      const templateId = draftId.split('-')[0]
+      render = `pages/check-in/questions/edit-question`
+
+      localParams.questionId = draftId
+
+      const availableTemplates =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
+      const questionData = parseQuestionTemplate(availableTemplates, templateId)
+      if (questionData) {
+        localParams.question = questionData
+      }
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'edit-question',
+        }),
+      )
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
+  validateEligibilityCheck()
+  validateEligibilityChoice()
+  validateSPOApproval()
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()
@@ -203,6 +329,8 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateManageEditContactPreference()
   validateStopCheckins()
   validateManageContactPage()
+  validateRestartJourney()
+  validateEditQuestion()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

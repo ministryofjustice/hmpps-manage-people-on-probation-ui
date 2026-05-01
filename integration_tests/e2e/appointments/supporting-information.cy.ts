@@ -1,43 +1,37 @@
-import {
-  crn,
-  uuid,
-  completeTypePage,
-  completeSentencePage,
-  checkPopHeader,
-  completeLocationDateTimePage,
-  checkRiskToStaffAlert,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+} from './utils'
 
-const loadPage = () => {
+const loadPage = (_crn = crn) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage()
+  completeSentencePage(1, '', _crn)
   completeTypePage()
-  completeLocationDateTimePage()
+  completeLocationDateTimePage({ crnOverride: _crn })
+  completeTextMessageConfirmationPage({ _crn, _uuid: uuid, index: 1 })
 }
 
 describe('Add supporting information (optional)', () => {
   let appointmentNotePage: AppointmentNotePage
   beforeEach(() => {
-    cy.task('stubNoRepeats')
+    cy.task('resetMocks')
     loadPage()
     appointmentNotePage = new AppointmentNotePage()
   })
-  afterEach(() => {
-    cy.task('resetMocks')
-  })
+
   it('should be on add supporting information (optional) page', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {
-    checkPopHeader('Alton Berge', true)
-  })
-  it('should render the risk to staff alert', () => {
-    checkRiskToStaffAlert()
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
   })
   it('should display validation errors if note is more than 12000 character', () => {
-    loadPage()
     const note = 'x'.repeat(12001)
     cy.get(`#appointments-${crn}-${uuid}-notes`).invoke('val', note).trigger('input')
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
@@ -50,7 +44,6 @@ describe('Add supporting information (optional)', () => {
   })
 
   it('should count a return as 1 character', () => {
-    loadPage()
     cy.get(`#appointments-${crn}-${uuid}-notes`).then($el => {
       const paragraph = 'x'.repeat(6000)
       const value = `${paragraph}\n\n${paragraph}`
@@ -93,5 +86,11 @@ describe('Add supporting information (optional)', () => {
       'contain.text',
       'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.',
     )
+  })
+})
+describe('Risk to staff alert', () => {
+  it('should display the alert with medium risk to staff details', () => {
+    loadPage('X000001')
+    checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
   })
 })

@@ -8,7 +8,7 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
   return (req: Request, res: AppResponse): void => {
     let uuid = uuidv4()
     const { data } = req.session
-    const { crn, id, contactId } = req.params
+    const { crn, id, contactId } = req.params as Record<string, string>
     // for next-appointment of type: 'KEEP_TYPE'
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
     if (apptType === 'RESCHEDULE') {
@@ -21,11 +21,6 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       date: '',
       start: '',
       end: '',
-      repeatingDates: [] as string[],
-      until: '',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
-      repeating: 'No',
       notes: null,
       sensitivity: null,
     }

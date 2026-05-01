@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { filterActivityLog } from './filterActivityLog'
-import { filterOptions } from '../properties'
+import { categoryFilterOptions, filterOptions, hideContactsFilterOptions } from '../properties'
 import { AppResponse } from '../models/Locals'
 import { ActivityLogFiltersResponse } from '../models/ActivityLog'
 
@@ -14,6 +14,8 @@ interface Args {
   dateFrom?: string
   dateTo?: string
   compliance?: string | string[]
+  category?: string | string[]
+  hideContact?: string | string[]
   clearFilterKey?: string
   clearFilterValue?: string
   submit?: boolean
@@ -21,12 +23,28 @@ interface Args {
   clear?: string
 }
 
+const categeoryList = [
+  'appointments',
+  'Approved Premises',
+  'communication with other organisations',
+  'communications with person on probation',
+  'communications with police',
+  'unpaid work',
+  'Internal communications',
+  'Multi-agency working',
+  'enforcement',
+  'Referrals and assessments',
+  'safeguarding',
+]
+
 const defaultRequest: Args = {
   page: undefined,
   keywords: 'test',
   dateFrom: '21/03/2025',
   dateTo: '22/03/2025',
   compliance: ['no outcome', 'complied', 'not complied'],
+  category: categeoryList,
+  hideContact: ['hide NDelius system generated contacts'],
   clearFilterKey: '',
   clearFilterValue: '',
   submit: true,
@@ -98,16 +116,41 @@ describe('/middleware/filterActivityLog()', () => {
         clearFilterKey: '',
         clearFilterValue: '',
         compliance: ['no outcome', 'complied', 'not complied'],
+        category: categeoryList,
+        hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '21/03/2025',
         dateTo: '22/03/2025',
         errors: false,
         keywords: 'test',
         submit: true,
+        crn: 'X000001',
       })
+    })
+    it('should set the crn in the session', () => {
+      expect(req.session.activityLogFilters.crn).toEqual(crn)
+    })
+  })
+  describe('session is cleared when crn in session does not match crn in params', () => {
+    it('should clear the session activityLogFilters', () => {
+      const req = getRequest({ submit: false })
+      req.session.activityLogFilters = {
+        crn: 'X00001',
+        keywords: 'test message',
+      }
+      filterActivityLog(req, res, nextSpy)
+      expect(req.session.activityLogFilters).toBeUndefined()
     })
   })
   describe('Only one compliance filter is submitted', () => {
-    const req = getRequest({ submit: true, keywords: '', dateFrom: '', dateTo: '', compliance: 'complied' })
+    const req = getRequest({
+      submit: true,
+      keywords: '',
+      dateFrom: '',
+      dateTo: '',
+      compliance: 'complied',
+      category: 'appointments',
+      hideContact: 'hide NDelius system generated contacts',
+    })
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
@@ -121,14 +164,39 @@ describe('/middleware/filterActivityLog()', () => {
               href: `${url}?clearFilterKey=compliance&clearFilterValue=complied`,
             },
           ],
+          category: [
+            {
+              text: 'Appointments',
+              href: `${url}?clearFilterKey=category&clearFilterValue=appointments`,
+            },
+          ],
+          hideContact: [
+            {
+              text: 'Hide NDelius system generated contacts',
+              href: `${url}?clearFilterKey=hideContact&clearFilterValue=hide%20NDelius%20system%20generated%20contacts`,
+            },
+          ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: value === 'complied' })),
+        categoryOptions: categoryFilterOptions.map(({ text, value }) => ({
+          text,
+          value,
+          checked: value === 'appointments',
+        })),
+        hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({
+          text,
+          value,
+          checked: value === 'hide NDelius system generated contacts',
+        })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: [req.query.compliance] as string[],
+        category: [req.query.category] as string[],
+        hideContact: [req.query.hideContact] as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })
@@ -138,9 +206,12 @@ describe('/middleware/filterActivityLog()', () => {
     const req = getRequest()
     req.session.activityLogFilters = {
       compliance: ['not complied'],
+      category: ['appointments'],
+      hideContact: ['hide NDelius system generated contacts'],
       dateFrom: '20/03/2025',
       dateTo: '23/03/2025',
       keywords: 'testing',
+      crn: 'X000001',
     }
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
@@ -159,7 +230,19 @@ describe('/middleware/filterActivityLog()', () => {
           compliance: [
             ...(query.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
-              href: `${url}?clearFilterKey=compliance&clearFilterValue=${item.replace(' ', '%20')}`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=${encodeURIComponent(item)}`,
+            })),
+          ],
+          category: [
+            ...(query.category as string[]).map((item, i) => ({
+              text: categoryFilterOptions[i].text,
+              href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
+            })),
+          ],
+          hideContact: [
+            ...(query.hideContact as string[]).map((item, i) => ({
+              text: hideContactsFilterOptions[i].text,
+              href: `${url}?clearFilterKey=hideContact&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           dateRange: [
@@ -170,12 +253,17 @@ describe('/middleware/filterActivityLog()', () => {
           ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
+        categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
+        hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
+        category: req.query.category as string[],
+        hideContact: req.query.hideContact as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })
@@ -231,17 +319,34 @@ describe('/middleware/filterActivityLog()', () => {
           compliance: [
             ...(query.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
-              href: `${url}?clearFilterKey=compliance&clearFilterValue=${item.replace(' ', '%20')}`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=${encodeURIComponent(item)}`,
+            })),
+          ],
+          category: [
+            ...(query.category as string[]).map((item, i) => ({
+              text: categoryFilterOptions[i].text,
+              href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
+            })),
+          ],
+          hideContact: [
+            ...(query.hideContact as string[]).map((item, i) => ({
+              text: hideContactsFilterOptions[i].text,
+              href: `${url}?clearFilterKey=hideContact&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
+        categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
+        hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
+        category: req.query.category as string[],
+        hideContact: req.query.hideContact as string[],
         dateFrom: '',
         dateTo: '',
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })
@@ -252,9 +357,12 @@ describe('/middleware/filterActivityLog()', () => {
     req.url = `/case/${crn}/activity-log?page=0`
     req.session.activityLogFilters = {
       compliance: ['not complied'],
+      category: ['appointments'],
+      hideContact: ['hide NDelius system generated contacts'],
       dateFrom: '20/03/2025',
       dateTo: '23/03/2025',
       keywords: 'testing',
+      crn: 'X000001',
     }
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
@@ -267,6 +375,18 @@ describe('/middleware/filterActivityLog()', () => {
             {
               text: 'Not complied',
               href: `${url}?clearFilterKey=compliance&clearFilterValue=not%20complied`,
+            },
+          ],
+          category: [
+            {
+              text: 'Appointments',
+              href: `${url}?clearFilterKey=category&clearFilterValue=appointments`,
+            },
+          ],
+          hideContact: [
+            {
+              text: 'Hide NDelius system generated contacts',
+              href: `${url}?clearFilterKey=hideContact&clearFilterValue=hide%20NDelius%20system%20generated%20contacts`,
             },
           ],
           dateRange: [
@@ -283,12 +403,25 @@ describe('/middleware/filterActivityLog()', () => {
           ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: value === 'not complied' })),
+        categoryOptions: categoryFilterOptions.map(({ text, value }) => ({
+          text,
+          value,
+          checked: value === 'appointments',
+        })),
+        hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({
+          text,
+          value,
+          checked: value === 'hide NDelius system generated contacts',
+        })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: 'testing',
         compliance: ['not complied'],
+        category: ['appointments'],
+        hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '20/03/2025',
         dateTo: '23/03/2025',
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })

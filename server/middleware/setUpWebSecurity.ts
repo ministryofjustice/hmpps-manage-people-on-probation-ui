@@ -52,6 +52,7 @@ export default function setUpWebSecurity(): Router {
           connectSrc: (() => {
             const sources = [
               "'self' https://*.sentry.io",
+              "'self' https://*.sentry-cdn.com",
               'js.monitor.azure.com',
               '*.applicationinsights.azure.com/v2/track',
               config.probationFrontendComponents.connectSrc,

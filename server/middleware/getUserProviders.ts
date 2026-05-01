@@ -6,9 +6,7 @@ export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promis
   return async (req, res, next) => {
     const { appointment } = res.locals.personAppointment
     const { username } = res.locals.user
-    const { providerCode, teamCode } = appointment?.officer
-      ? appointment.officer
-      : res.locals.nextAppointmentSession.user
+    const { providerCode, teamCode } = appointment?.officer ? appointment.officer : res.locals.appointmentSession.user
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(
@@ -17,10 +15,20 @@ export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       teamCode,
     )
     const displayedUsers = users.map(u => {
-      if (u.username.toUpperCase() === defaultUserDetails.username) {
-        return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
+      if (res.locals.flags.enableMAN2344) {
+        return {
+          username: u.username,
+          nameAndRole: u.nameAndRole,
+          name: u?.name,
+          email: u?.email,
+          ...(u.username.toUpperCase() === defaultUserDetails.username ? { selected: 'selected' } : {}),
+        }
       }
-      return { username: u.username, nameAndRole: u.nameAndRole }
+      return {
+        username: u.username,
+        nameAndRole: u.nameAndRole,
+        ...(u.username.toUpperCase() === defaultUserDetails.username ? { selected: 'selected' } : {}),
+      }
     })
     req.session.data = {
       ...(req?.session?.data ?? {}),

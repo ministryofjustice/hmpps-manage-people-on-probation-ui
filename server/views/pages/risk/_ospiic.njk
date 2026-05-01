@@ -1,0 +1,46 @@
+{% set band_ogrs4 = riskData
+  .assessments[0]
+  .indirectImageContactSexualReoffendingPredictor
+  .band %}
+{% set band_ogrs3 = riskData
+  .assessments[0]
+  .ospdc
+  .band %}
+{% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" else 
+  false %}
+{% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+  false %}
+
+{% if showOGRS4 %}
+  <section data-qa="indirectImageContactSexualReoffendingPredictor">
+    {% if flags.enableOGRS4SummaryCardDetail %}
+      <div class="arns-summary-card-expanded-badge-spacing">
+        {{ expandedPredictorBadge({
+            data: riskData,
+            predictor: 'indirectImageContactSexualReoffendingPredictor',
+            excludeDate: true,
+            fixedWidth: false
+          }) }}
+      </div>
+    {% else %}
+      {{ predictorScale({
+        data: riskData,
+        predictor: 'indirectImageContactSexualReoffendingPredictor',
+        excludeDate: true,
+        headingLevel: 4,
+        headingClass: "xs"
+      }) }}
+    {% endif %}
+  </section>
+{% endif %}
+{% if showOGRS3 %}
+  <section data-qa="ospiic">
+    {{ predictorScale({
+      data: riskData,
+      predictor: 'ospiic',
+      excludeDate: true,
+      headingLevel: 4,
+      headingClass: "xs"
+    }) }}
+  </section>
+{% endif %}

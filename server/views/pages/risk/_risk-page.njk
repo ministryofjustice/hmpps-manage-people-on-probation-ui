@@ -21,21 +21,14 @@
                 ]
             }) }}
             {% if risks.assessedOn %}
-                <p class="govuk-!-margin-bottom-2">
+                <p class="govuk-!-margin-bottom-6">
                     <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysViewRiskAssessmentLink">
                         View the full risk assessment on OASys (opens in new tab).
                     </a>
                 </p>
             {% endif %}
-
         </div>
-        <div class='govuk-!-margin-bottom-4'>
-            {% include "./_rsr.njk" %}
-            {% include "./_ogrs.njk" %}
-            {% include "./_osp.njk" %}
-            {% include "./_ovp.njk" %}
-            {% include "./_ogp.njk" %}
-        </div>
+      {% include './_risk-scores-card.njk' %}
     {% else %}
         {% set html %}
         <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisks.personSummary.name | fullName }}</h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
@@ -50,26 +43,32 @@
 <div class="govuk-grid-column-one-third">
     {% include './_rosh.njk' %}
     {% include './_mappa.njk' %}
-    <div class="govuk-body predictor-timeline__heading" data-qa="oasysScoreHistory">
-        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
-        {% if predictorScores.error and caseSummary.roshHistory.error %}
-            <p class='govuk-body' data-qa='timeline-missing'>ROSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
-        {% elif predictorScores.error %}
-            <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
-        {% elif roshHistory.error %}
-            <p class='govuk-body' data-qa='rosh-history-missing'>Historical ROSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
-        {% endif %}
-        {% if timeline.length %}
-            <div>
-                <button type='button' data-js="predictor-timeline__toggle-all" class="reset-button link-button govuk-link">Open all<span class='govuk-visually-hidden'> scores in timeline</span>
-                </button>
-            </div>
+    <div data-qa="oasysScoreHistory">
+        {% if flags.enableOGRS4 %}
+            {{ predictorTimeline({ data: riskData }) }}
         {% else %}
-            <p class='govuk-body' data-qa='rosh-history-missing'>No risk scores have been recorded</p>
+            <div class="govuk-body predictor-timeline__heading">
+                <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
+                {% if riskData.httpStatus !== 200 and caseSummary.roshHistory.error %}
+                    <p class='govuk-body' data-qa='timeline-missing'>ROSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
+                {% elif riskData.httpStatus !== 200 %}
+                    <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
+                {% elif caseSummary.roshHistory.error %}
+                    <p class='govuk-body' data-qa='rosh-history-missing'>Historical ROSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
+                {% endif %}
+                {% if timeline.length %}
+                    <div>
+                        <button type='button' data-js="predictor-timeline__toggle-all" class="reset-button link-button govuk-link">Open all<span class='govuk-visually-hidden'> scores in timeline</span>
+                        </button>
+                    </div>
+                {% else %}
+                    <p class='govuk-body' data-qa='rosh-history-missing'>No risk scores have been recorded</p>
+                {% endif %}
+            </div>
+            {% if timeline.length %}
+                {{ predictorTimelineV1(timeline, 'x') }}
+            {% endif %}
         {% endif %}
     </div>
-    {% if timeline.length %}
-        {{ predictorTimeline(timeline, 'x') }}
-    {% endif %}
     {% include './_sentence-plan.njk' %}
 </div>

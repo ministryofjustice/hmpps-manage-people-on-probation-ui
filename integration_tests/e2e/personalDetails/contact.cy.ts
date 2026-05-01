@@ -8,7 +8,7 @@ context('Contact', () => {
     const page = Page.verifyOnPage(ContactPage)
     page.assertAnchorElementAtIndexWithin(
       'p',
-      0,
+      1,
       0,
       'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=PersonalContacts&CRN=X000001',
     )

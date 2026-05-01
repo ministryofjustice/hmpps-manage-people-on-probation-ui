@@ -7,6 +7,8 @@ export interface SentenceDetails {
   sentence: Sentence
 }
 
+export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE'
+
 export interface Sentences {
   personSummary: PersonSummary
   sentences: Sentence[]
@@ -29,6 +31,7 @@ export interface Sentence {
   conviction?: Conviction
   courtDocuments?: CourtDocument[]
   unpaidWorkProgress?: string
+  sentenceType?: SentenceType
 }
 
 export interface OffenceDetails {

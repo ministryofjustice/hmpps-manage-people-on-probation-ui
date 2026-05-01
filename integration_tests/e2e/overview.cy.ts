@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overview'
+import { checkPopHeader, checkRiskToStaffAlert } from './appointments/imports'
 
 context('Overview', () => {
   beforeEach(() => {
@@ -11,15 +12,13 @@ context('Overview', () => {
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Caroline Wolff')
     page.pageHeading().should('contain.text', 'Overview')
-    page.assertRiskTags()
     page.getTab('overview').should('contain.text', 'Overview')
     page.getTab('personalDetails').should('contain.text', 'Personal details')
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
     page.getTab('activityLog').should('contain.text', 'Contacts')
-    page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
-
+    checkPopHeader()
     page
       .getAppointmentsLink('X000001')
       .should('exist')
@@ -138,6 +137,12 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
+  it('Overview page is rendered with OGRS4 risk predictor scores', () => {
+    cy.task('stubPredictorScoresOGRS4')
+    cy.visit('/case/X000001')
+    checkPopHeader({ ogrs4: true })
+  })
+
   it('Overview page is rendered with date of death', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001')
@@ -177,7 +182,6 @@ context('Overview', () => {
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
     page.getTab('activityLog').should('contain.text', 'Contacts')
-    page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
 
     cy.get(`[data-qa=errors]`).should(
@@ -201,9 +205,15 @@ context('Overview', () => {
     page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'No requirements details')
   })
 
-  it('Overview page with very high risk to staff is rendered', () => {
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getAlert().should('contain.text', 'is very high risk to staff')
+  it('Overview page with medium risk to staff is rendered', () => {
+    cy.visit('/case/X000001', { failOnStatusCode: false })
+    Page.verifyOnPage(OverviewPage)
+    checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+  })
+
+  it('Overview page with risk to probation staff is rendered', () => {
+    cy.visit('/case/X777916', { failOnStatusCode: false })
+    Page.verifyOnPage(OverviewPage)
+    checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
   })
 })

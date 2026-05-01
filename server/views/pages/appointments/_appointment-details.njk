@@ -1,4 +1,5 @@
 {% set notes = '' %}
+{% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
 {% if hasNotes %}
@@ -8,7 +9,8 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else ['Type', 'Notes'] %}
+{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else 
+  ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
   rows: [
@@ -23,7 +25,7 @@
         items: [
           {
             classes: "govuk-link--no-visited-state",
-            attributes: { "target": "_blank", "aria-label":"Change '" + appointment.type | lower + " appointment on NDelius" },
+            attributes: { "target": "_blank", "aria-label":"Change '" + appointmentDisplayName | lower + " appointment on NDelius" },
             href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
             text:'Change',
             visuallyHiddenText: '(opens in new tab)'
@@ -33,7 +35,7 @@
     } if appointment.rearrangeOrCancelReason,
     {
       key: { html: '<span data-qa="typeLabel">' + headings[0] + '</span>' },
-      value: { html: '<span data-qa="typeValue">' + appointment.type + '</span>' }
+      value: { html: '<span data-qa="typeValue">' + appointmentDisplayName + '</span>' }
     },
     {
       key: { html: '<span data-qa="descriptionLabel">Description</span>' },
@@ -51,10 +53,6 @@
       key: { html:  '<span data-qa="timeLabel">Time</span>' },
       value: { html: '<span data-qa="timeValue">' + timeFromTo(appointment.startDateTime, appointment.endDateTime) + '</span>'}
     },
-    {
-      key: { html: '<span data-qa="repeatingLabel">Repeating appointment</span>' },
-      value: { html: '<span data-qa="repeatingValue">' + appointment.repeating  | toYesNo + '</span>'}
-    } if appointment.repeating,
     {
       key: { html: '<span data-qa="rarLabel">RAR toolkit</span>' },
       value: { html: '<span data-qa="rarValue">' + appointment.rarCategory + '</span>'}

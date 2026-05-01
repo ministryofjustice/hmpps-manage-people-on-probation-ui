@@ -1,10 +1,12 @@
 import { DateTime } from 'luxon'
 import { Request, Response } from 'express'
-import { dateIsInPast, getDataValue } from '../utils'
+import { dateIsInPast } from '../utils/dateIsInPast'
+import { getDataValue } from '../utils/getDataValue'
 import '../@types/express/index.d'
 
 export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean => {
-  const { crn, id } = req.params
+  const { crn, id: uuid, contactId } = req.params as Record<string, string>
+  const id = uuid || contactId
   let date: string
   let start: string
   let isInPast = false
@@ -15,7 +17,8 @@ export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean 
     format = 'd/M/yyyy'
   }
   if (!date) {
-    ;({ date, start } = getDataValue(data, ['appointments', crn, id]))
+    date = getDataValue(data, ['appointments', crn, id, 'date'])
+    start = getDataValue(data, ['appointments', crn, id, 'start'])
     format = 'yyyy-M-d'
   }
   if (date) {

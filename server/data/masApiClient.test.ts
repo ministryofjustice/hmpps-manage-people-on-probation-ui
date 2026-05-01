@@ -30,7 +30,9 @@ describe('masApiClient', () => {
   })
   afterEach(() => {
     jest.resetAllMocks()
-    nock.cleanAll()
+    nock.cleanAll() // Removes all interceptors
+    nock.restore() // Restores http/https modules
+    nock.activate() // Re-activate for the next test
   })
   describe('getSentenceDetails', () => {
     beforeEach(() => {
@@ -170,7 +172,23 @@ describe('masApiClient', () => {
         'postPersonActivityLog',
         '/activity/X000001?size=10&page=1',
         () =>
-          masApiClient.postPersonActivityLog('X000001', { keywords: '', dateFrom: '', dateTo: '', filters: [] }, '1'),
+          masApiClient.postPersonActivityLog(
+            'X000001',
+            { keywords: '', dateFrom: '', dateTo: '', filters: [], typeCodes: [] },
+            '1',
+          ),
+        'post',
+      ],
+      [
+        'postPersonActivityLog with custom size',
+        '/activity/X000001?size=25&page=1',
+        () =>
+          masApiClient.postPersonActivityLog(
+            'X000001',
+            { keywords: '', dateFrom: '', dateTo: '', filters: [], typeCodes: [] },
+            '1',
+            '25',
+          ),
         'post',
       ],
       ['getPersonRiskFlags', '/risk-flags/X000001', () => masApiClient.getPersonRiskFlags('X000001')],
@@ -216,12 +234,9 @@ describe('masApiClient', () => {
         '/appointment/X000001',
         () =>
           masApiClient.postAppointments('X000001', {
-            createOverlappingAppointment: true,
             end: undefined,
             eventId: 0,
-            interval: undefined,
             licenceConditionId: 0,
-            numberOfAppointments: 0,
             requirementId: 0,
             nsiId: 0,
             start: undefined,
@@ -255,7 +270,6 @@ describe('masApiClient', () => {
         'post',
       ],
 
-      ['getUserAppointments', '/user/USER/appointments', () => masApiClient.getUserAppointments('USER')],
       ['getUserTeams', '/caseload/user/USER/teams', () => masApiClient.getUserTeams('USER')],
       [
         'getOfficeLocationsByTeamAndProvider',

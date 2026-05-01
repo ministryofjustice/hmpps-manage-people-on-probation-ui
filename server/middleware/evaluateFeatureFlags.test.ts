@@ -13,7 +13,7 @@ const mockFlags = {
   enableNavActivityLog: true,
   enableNavCompliance: true,
   enableNavInterventions: true,
-  enableAppointmentCreate: true,
+  enableContactLog: true,
 }
 jest.mock('../services/flagService')
 
@@ -80,6 +80,83 @@ describe('/middleware/evaluateFeatureFlags', () => {
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledWith(mockError)
+    })
+  })
+
+  describe('PDU codes passed as context', () => {
+    it('should pass pduCodes to getFlags when user has probation delivery units', async () => {
+      const resWithPdus = {
+        locals: {
+          user: {
+            username: 'user-1',
+            email: 'test@example.com',
+            probationDeliveryUnits: [
+              { code: 'PDU001', description: 'Test PDU' },
+              { code: 'PDU002', description: 'Another PDU' },
+            ],
+          },
+        },
+        redirect: jest.fn().mockReturnThis(),
+      } as unknown as AppResponse
+      const getFlagsSpy = jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(mockFlags))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(req, resWithPdus, nextSpy)
+
+      expect(getFlagsSpy).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        pduCodes: ['PDU001', 'PDU002'],
+      })
+    })
+
+    it('should pass empty pduCodes array when user has no probation delivery units', async () => {
+      const getFlagsSpy = jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(mockFlags))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(req, res, nextSpy)
+
+      expect(getFlagsSpy).toHaveBeenCalledWith({
+        email: undefined,
+        pduCodes: [],
+      })
+    })
+  })
+
+  describe('enableDeliusClient query parameter', () => {
+    it('should override enableDeliusClient to true when query parameter is "true"', async () => {
+      const reqWithQuery = httpMocks.createRequest({
+        query: { enableDeliusClient: 'true' },
+      })
+      const flagsWithDeliusDisabled = { ...mockFlags, enableDeliusClient: false }
+      jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(flagsWithDeliusDisabled))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(reqWithQuery, res, nextSpy)
+
+      expect(res.locals.flags.enableDeliusClient).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('should override enableDeliusClient to false when query parameter is "false"', async () => {
+      const reqWithQuery = httpMocks.createRequest({
+        query: { enableDeliusClient: 'false' },
+      })
+      const flagsWithDeliusEnabled = { ...mockFlags, enableDeliusClient: true }
+      jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(flagsWithDeliusEnabled))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(reqWithQuery, res, nextSpy)
+
+      expect(res.locals.flags.enableDeliusClient).toBe(false)
+      expect(nextSpy).toHaveBeenCalled()
     })
   })
 })

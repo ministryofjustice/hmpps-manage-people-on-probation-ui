@@ -5,6 +5,8 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
 import { FileUploadResponse } from '../@types'
 import MasApiClient from '../data/masApiClient'
+import { checkAuditMessage, checkSendAuditMessage } from './testutils'
+import { SubjectType } from '../middleware/sendAuditMessage'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -19,6 +21,7 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+jest.mock('@ministryofjustice/hmpps-audit-client')
 
 const patchDocumentsSpy = jest
   .spyOn(MasApiClient.prototype, 'patchDocuments')
@@ -135,6 +138,7 @@ describe('fileUpload controller', () => {
 
       beforeEach(async () => {
         await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
+        checkSendAuditMessage(mockRes, 'ADD_NOTE_MANAGE_APPOINTMENT_FILE_UPLOAD', testCrn, SubjectType.CRN)
       })
 
       it('should upload the document', () => {

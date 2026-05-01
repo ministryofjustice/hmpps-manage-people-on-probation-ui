@@ -16,4 +16,6 @@ export default class EditContactDetails extends Page {
   getDateElementInput = (name: string): PageElement => {
     return cy.get(`[data-qa="${name}"] govuk-input moj-js-datepicker-input`)
   }
+
+  getAlert = (): PageElement => cy.get('[data-qa="updateBanner"]')
 }

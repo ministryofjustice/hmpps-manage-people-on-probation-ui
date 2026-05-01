@@ -23,13 +23,17 @@ const activityLog: Route<void> = (req, res, next): void => {
     clearSession()
     const dateToIsEmpty = isEmpty(req?.body?.dateTo)
     const dateFromIsEmpty = isEmpty(req?.body?.dateFrom)
-    errorMessages = validateWithSpec(req.body, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
+    errorMessages = validateWithSpec(req, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
 
     if (Object.keys(errorMessages).length) {
       req.session.errorMessages = errorMessages
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
+      const categoryFilters: Array<string> = req.body.category ? [req.body.category].flat() : []
+      const hideContactFilters: Array<string> = req.body.category ? [req.body.hideContact].flat() : []
       req.session.activityLogFilters = req.body as ActivityLogFilters
       req.session.activityLogFilters.compliance = complianceFilters
+      req.session.activityLogFilters.category = categoryFilters
+      req.session.activityLogFilters.hideContact = hideContactFilters
       const view = req?.query?.view ?? req?.body?.view
       if (view && view !== 'compact') {
         return renderError(404)(req, res)

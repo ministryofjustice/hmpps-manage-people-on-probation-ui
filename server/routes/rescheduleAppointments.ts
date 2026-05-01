@@ -1,4 +1,4 @@
-import { type RequestHandler, type Router } from 'express'
+import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
@@ -6,10 +6,11 @@ import controllers from '../controllers'
 import {
   autoStoreSessionData,
   cacheUploadedFiles,
-  constructNextAppointmentSession,
+  createAppointmentSession,
   getAppointment,
   getAppointmentTypes,
   getOfficeLocationsByTeamAndProvider,
+  getOverdueOutcomes,
   getPersonalDetails,
   getPersonAppointment,
   getSentences,
@@ -17,7 +18,7 @@ import {
 } from '../middleware'
 import validate from '../middleware/validation'
 
-const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
+const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get(
@@ -41,12 +42,12 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
   router.post(
     '/case/:crn/appointments/reschedule/:contactId/:id',
     getPersonAppointment(hmppsAuthClient),
-    autoStoreSessionData(hmppsAuthClient),
     cacheUploadedFiles,
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    constructNextAppointmentSession,
+    createAppointmentSession,
     getUserProviders(hmppsAuthClient),
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
   )
@@ -59,8 +60,9 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
 
   router.get(
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
+    getOverdueOutcomes(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient),
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
     getPersonAppointment(hmppsAuthClient),
     getUserProviders(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),

@@ -1,0 +1,98 @@
+{% extends "../../../_form.njk" %}
+{% set pageTitle = "How have you been feeling since we last spoke?" %}
+{% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set buttonText = "Back to questions" %}
+{% set notStandardForm = true %}
+{% set hideButton = true %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+
+
+{% block primary %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-hint govuk-body govuk-!-margin-bottom-2">Question preview</p>
+            <h2 class="govuk-heading-l govuk-!-margin-top-0 govuk-!-margin-bottom-2 govuk-!-padding-top-0" data-qa="pageHeading">
+                {{ pageTitle }}
+            </h2>
+
+            <p class="govuk-hint">
+                Think about things like if you have noticed a change in your mood and what may have caused this.
+            </p>
+
+            <div class="govuk-form-group">
+                <div class="govuk-radios">
+                    
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="mentalHealthVeryWell-radio" name="preview-very-well" type="radio" checked="true" readonly>
+                        <label class="govuk-label govuk-radios__label" for="mentalHealthVeryWell-radio">Very well</label>
+                    </div>
+                    <div class="govuk-radios__conditional">
+                        {{ govukTextarea({
+                            name: "mentalHealthVeryWell",
+                            id: "mentalHealthVeryWell-textarea",
+                            label: { text: "Tell us why you are very well (optional)" },
+                            attributes: { "readonly": "readonly" }
+                        }) }}
+                    </div>
+
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="mentalHealthWell-radio" name="preview-well" type="radio" checked="true" readonly>
+                        <label class="govuk-label govuk-radios__label" for="mentalHealthWell-radio">Well</label>
+                    </div>
+                    <div class="govuk-radios__conditional">
+                        {{ govukTextarea({
+                            name: "mentalHealthWell",
+                            id: "mentalHealthWell-textarea",
+                            label: { text: "Tell us why you are well (optional)" },
+                            attributes: { "readonly": "readonly" }
+                        }) }}
+                    </div>
+
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="mentalHealthOk-radio" name="preview-ok" type="radio" checked="true" readonly>
+                        <label class="govuk-label govuk-radios__label" for="mentalHealthOk-radio">OK</label>
+                    </div>
+                    <div class="govuk-radios__conditional">
+                        {{ govukTextarea({
+                            name: "mentalHealthOk",
+                            id: "mentalHealthOk-textarea",
+                            label: { text: "Tell us why you are OK (optional)" },
+                            attributes: { "readonly": "readonly" }
+                        }) }}
+                    </div>
+
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="mentalHealthNotGreat-radio" name="preview-not-great" type="radio" checked="true" readonly>
+                        <label class="govuk-label govuk-radios__label" for="mentalHealthNotGreat-radio">Not great</label>
+                    </div>
+                    <div class="govuk-radios__conditional">
+                        {{ govukTextarea({
+                            name: "mentalHealthNotGreat",
+                            id: "mentalHealthNotGreat-textarea",
+                            label: { text: "Tell us why you are not great (optional)" },
+                            attributes: { "readonly": "readonly" }
+                        }) }}
+                    </div>
+
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="mentalHealthStruggling-radio" name="preview-struggling" type="radio" checked="true" readonly>
+                        <label class="govuk-label govuk-radios__label" for="mentalHealthStruggling-radio">Struggling</label>
+                    </div>
+                    <div class="govuk-radios__conditional">
+                        {{ govukTextarea({
+                            name: "mentalHealthStruggling",
+                            id: "mentalHealthStruggling-textarea",
+                            label: { text: "Tell us why you are struggling (optional)" },
+                            attributes: { "readonly": "readonly" }
+                        }) }}
+                    </div>
+
+                </div>
+            </div>
+            <div class="govuk-button-group">
+                <a href="{{ formAnchorLink }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

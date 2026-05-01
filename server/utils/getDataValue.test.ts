@@ -5,14 +5,10 @@ const mockSession = {
     X000001: {
       1234: {
         type: 'C084',
-        numberOfAppointments: '1',
-        numberOfRepeatAppointments: '2',
         date: '2024-04-10',
       },
       4567: {
         type: 'CHVS',
-        numberOfAppointments: '4',
-        numberOfRepeatAppointments: '3',
         date: '2024-03-11',
       },
     },

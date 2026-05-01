@@ -3,21 +3,15 @@ import superagent, { SuperAgentRequest } from 'superagent'
 const stubEmptyHomepage = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: '/mas/user/USER1/appointments',
+      urlPathPattern: '/delius/user/USER1/homepage',
       method: 'GET',
     },
     response: {
       status: 200,
       jsonBody: {
-        provider: 'London',
-        staff: {
-          forename: 'Paul',
-          surname: 'McPhee',
-        },
-        totalAppointments: 0,
-        totalOutcomes: 0,
-        appointments: [],
-        outcomes: [],
+        upcomingAppointments: [],
+        appointmentsRequiringOutcomeCount: 0,
+        appointmentsRequiringOutcome: [],
       },
       headers: {
         'Content-Type': 'application/json',

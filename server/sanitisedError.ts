@@ -11,9 +11,15 @@ export interface SanitisedError extends Error {
 
 export type UnsanitisedError = ResponseError
 
+type ErrorBody = {
+  message?: string
+  developerMessage?: string
+}
+
 export default function sanitise(error: UnsanitisedError): SanitisedError {
   const e = new Error() as SanitisedError
-  e.message = error.message
+  const body = error.response?.body as ErrorBody | undefined
+  e.message = body?.message ?? body?.developerMessage ?? error.message
   e.stack = error.stack
   if (error.response) {
     e.text = error.response.text

@@ -2,6 +2,8 @@ import httpMocks from 'node-mocks-http'
 import controllers from '.'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
+import { checkSendAuditMessage } from './testutils'
+import { SubjectType } from '../middleware/sendAuditMessage'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -17,6 +19,7 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+jest.mock('@ministryofjustice/hmpps-audit-client')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -36,6 +39,7 @@ describe('searchController', () => {
       expect(req.session.backLink).toEqual('/search')
     })
     it('should render the search page', () => {
+      checkSendAuditMessage(res, 'VIEW_MAS_SEARCH', res.locals.user.username, SubjectType.USER)
       expect(renderSpy).toHaveBeenCalledWith('pages/search')
     })
   })

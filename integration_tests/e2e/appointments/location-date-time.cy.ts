@@ -1,25 +1,27 @@
 import { DateTime } from 'luxon'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import {
-  completeSentencePage,
-  completeTypePage,
-  crn,
-  uuid,
-  checkPopHeader,
-  completeAttendedCompliedPage,
-  completeAddNotePage,
-  completeSupportingInformationPage,
-  checkRiskToStaffAlert,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeAttendedCompliedPage,
+  completeAddNotePage,
+  completeSupportingInformationPage,
+  completeRescheduleAppointmentPage,
+  getUuid,
+} from './utils'
+import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
-const loadPage = (typeOptionIndex = 1) => {
-  completeSentencePage()
+const loadPage = (urlCRN = crn, typeOptionIndex = 1) => {
+  completeSentencePage(1, '', urlCRN)
   completeTypePage(typeOptionIndex)
 }
 
@@ -29,32 +31,35 @@ describe('Pick a date, location and time for this appointment', () => {
   let locationNotInListPage: AppointmentLocationNotInListPage
   let notePage: AppointmentNotePage
   let cyaPage: AppointmentCheckYourAnswersPage
+  let textMessageConfirmPage: TextMessageConfirmationPage
 
   const now = DateTime.now()
   const yesterday = now.minus({ days: 1 })
-  const yesterdayIsInCurrentMonth = yesterday.month === now.month
+
+  const completeDateInFuture = () => {
+    locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+    const future = now.plus({ days: 2 })
+    locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
+    locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+    locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
+    locationDateTimePage.getSubmitBtn().click()
+  }
 
   const selectPastDate = () => {
-    locationDateTimePage.getDatePickerToggle().click()
-    if (!yesterdayIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-prev-month').click()
-    }
-    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
   }
 
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Page is rendered with options for an appointment type which requires a location', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage = new AppointmentLocationDateTimePage()
     })
     it('should render the pop header', () => {
-      checkPopHeader('Alton Berge', true)
-    })
-    it('should render the risk to staff alert', () => {
-      checkRiskToStaffAlert()
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
     })
     it('should display the options', () => {
       locationDateTimePage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')
@@ -104,10 +109,18 @@ describe('Pick a date, location and time for this appointment', () => {
         .should('contain.text', 'Married / Civil partnership')
     })
   })
+  describe('Page is rendered with risk to staff alert', () => {
+    beforeEach(() => {
+      loadPage('X000001')
+    })
+    it('should render the alert with medium risk to staff details', () => {
+      checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+    })
+  })
   describe('Page is rendered with options for an appointment type which does not require a location', () => {
     beforeEach(() => {
       const typeOptionIndex = 2
-      loadPage(typeOptionIndex)
+      loadPage(crn, typeOptionIndex)
       locationDateTimePage = new AppointmentLocationDateTimePage()
     })
     it('should display the non-mandatory location option', () => {
@@ -127,7 +140,7 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should only display the last 2 radio options', () => {
       cy.task('stubNoUserLocationsFound')
       const typeOptionIndex = 2
-      loadPage(typeOptionIndex)
+      loadPage(crn, typeOptionIndex)
       locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage
         .getRadioLabel('locationCode', 1)
@@ -206,24 +219,16 @@ describe('Pick a date, location and time for this appointment', () => {
       cy.clock(DateTime.fromISO(mockedNow).toMillis())
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('9:10')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('08:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:10')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('08:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      locationDateTimePage.checkErrorSummaryBox([
-        'Enter a time in the 24-hour format, for example 16:30',
-        'The end time must be after the start time',
-      ])
+      locationDateTimePage.checkErrorSummaryBox(['The end time must be after the start time'])
 
-      locationDateTimePage.getBackLink().should('be.visible')
-    })
-    it('should display the error messages incorrect 24 hours time format', () => {
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include('Enter a time in the 24-hour format, for example 16:30')
-      })
       locationDateTimePage.getBackLink().should('be.visible')
     })
     it('should display the error messages end time before start time', () => {
@@ -239,8 +244,8 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerInput().clear().type('xxxxxxxx')
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('10:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('10:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -258,10 +263,11 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:30')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:30')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -280,8 +286,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('10:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:00')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:00')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box again', () => {
@@ -301,8 +307,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('11:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('11:15')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('11:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('11:15')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the overlapping appointment warning', () => {
@@ -335,9 +341,10 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   describe('Date is selected', () => {
-    const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
+    const value = DateTime.now().toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
     })
@@ -349,27 +356,15 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Date is selected from the picker which is in the past', () => {
     beforeEach(() => {
       loadPage()
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-prev-month').click()
-      }
-      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
+      locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
     })
     it('should display the log an outcome alert banner', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if date is selected from the picker in the future', () => {
-      const tomorrow = now.plus({ days: 1 })
-      const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      if (!tomorrowIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+      const future = now.plus({ days: 2 })
+      locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
       it('should hide the alert banner', () => {
         locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
       })
@@ -385,8 +380,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if a date is entered in the future', () => {
-      const tomorrow = now.plus({ days: 1 }).toFormat('d/M/yyyy')
-      locationDateTimePage.getDatePickerInput().clear().type(tomorrow)
+      const future = now.plus({ days: 2 }).toFormat('d/M/yyyy')
+      locationDateTimePage.getDatePickerInput().clear().type(future)
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
@@ -407,7 +402,7 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('08:00')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('08:00')
     })
     it('should display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
@@ -431,7 +426,7 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('10:00')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
     })
     it('should not display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
@@ -462,8 +457,8 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should persist the log an outcome alert banner when past date is submitted and cancel and go back link is clicked from log an outcome page', () => {
       selectPastDate()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
@@ -475,8 +470,8 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should persist the log an outcome banner when change link is clicked on check your answers page', () => {
       selectPastDate()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
@@ -507,8 +502,8 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should not re-show the alert banner when the form is submitted, then the back link is clicked on the next page', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
@@ -520,17 +515,8 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      const tomorrow = now.plus({ days: 1 })
-      const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!tomorrowIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
-      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
+      completeDateInFuture()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
         .should(
@@ -546,7 +532,10 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getSubmitBtn().click()
     })
 
-    it('should redirect to the supporting information, then cya page', () => {
+    it('should redirect to the text message confirm, supporting information, then cya page', () => {
+      textMessageConfirmPage = new TextMessageConfirmationPage()
+      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
+      textMessageConfirmPage.getSubmitBtn().click()
       notePage = new AppointmentNotePage()
       notePage.checkOnPage()
       completeSupportingInformationPage()
@@ -555,52 +544,79 @@ describe('Pick a date, location and time for this appointment', () => {
     })
   })
 
-  describe('Past appointments feature flag disabled', () => {
+  describe('Text message confirmation feature flag is disabled', () => {
     beforeEach(() => {
-      cy.task('stubDisablePastAppointments')
+      cy.task('stubDisableSmsReminders')
       loadPage()
-    })
-    it('disable all past dates in the date picker', () => {
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-prev-month').click()
-      }
-      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).should('have.attr', 'aria-disabled', 'true')
-    })
-    it('should display validation error when past date entered', () => {
-      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      completeDateInFuture()
       locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.checkErrorSummaryBox([
-        'Date must be today or in the future',
-        'Enter a start time',
-        'Enter an end time',
-      ])
     })
-    it('should show validation error if today and start time in the past entered', () => {
-      const mockedTime = DateTime.local().set({
-        hour: 9,
-        minute: 1,
-        second: 0,
-        millisecond: 0,
+    it('should redirect to the supporting info page', () => {
+      notePage = new AppointmentNotePage()
+      notePage.checkOnPage()
+    })
+  })
+
+  const completeInvalidRescheduleDateTime = () => {
+    completeRescheduleAppointmentPage()
+    const rescheduleCyaPage = new RescheduleCheckYourAnswerPage()
+    rescheduleCyaPage.getSubmitBtn().click()
+    locationDateTimePage = new AppointmentLocationDateTimePage()
+    locationDateTimePage.getDatePickerInput().clear().type('21/2/2024')
+    locationDateTimePage.getElementInput(`startTime`).clear().type('10:15')
+    locationDateTimePage.getElementInput(`endTime`).focus().clear().type('10:30')
+    locationDateTimePage.getSubmitBtn().click()
+  }
+
+  describe('Rescheduled date', () => {
+    const urlCRN = 'X000001'
+    beforeEach(() => {
+      completeInvalidRescheduleDateTime()
+    })
+    it('should display the correct validation if rescheduled date, start and end time are the same as original appointment', () => {
+      getUuid().then(urlUUID => {
+        locationDateTimePage.checkErrorSummaryBox([
+          'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is incorrect, select a new date.',
+          'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new start time.',
+          'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new end time.',
+        ])
+        locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-date-error`).should($error => {
+          expect($error.text().trim()).to.include(
+            'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is incorrect, select a new date.',
+          )
+        })
+        locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-start-error`).should($error => {
+          expect($error.text().trim()).to.include(
+            'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new start time.',
+          )
+        })
+        locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-end-error`).should($error => {
+          expect($error.text().trim()).to.include(
+            'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new end time.',
+          )
+        })
       })
-      const mockedNow = mockedTime.toUTC().toISO()
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:3007/__test/set-mocked-time',
-        body: { time: mockedNow },
-      })
-      cy.clock(DateTime.fromISO(mockedNow).toMillis())
-      locationDateTimePage.getDatePickerInput().clear().type(now.toFormat('d/M/yyyy'))
-      locationDateTimePage.getElementInput(`startTime`).type('08:10')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('08:30')
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+    })
+    it('should submit the page if date is changed', () => {
+      locationDateTimePage.getDatePickerInput().clear().type('22/2/2024')
       locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
+      locationDateTimePage.getSubmitBtn().click()
+      const attendedCompliedPage = new AttendedCompliedPage()
+      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
     })
-    it('should not display the alert banner when a past appointment is entered', () => {
-      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
+    it('should submit the page if start time is changed', () => {
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:20')
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      const attendedCompliedPage = new AttendedCompliedPage()
+      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
+    })
+    it('should submit the page if end time is changed', () => {
+      locationDateTimePage.getElementInput(`endTime`).clear().type('10:40')
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      const attendedCompliedPage = new AttendedCompliedPage()
+      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
     })
   })
 })

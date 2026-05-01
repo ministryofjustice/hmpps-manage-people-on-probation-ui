@@ -2,6 +2,7 @@
 {% set radioTitle = "Are you sure you want to stop online <br/> check ins for " + case.name.forename + "?" %}
 {% set hintText = case.name.forename + " will no longer receive reminders to use the check in service." %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
+{% set buttonText = "Stop check ins" %}
 {% block form %}
 
     {% set textBoxHtml %}

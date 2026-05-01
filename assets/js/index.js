@@ -1,6 +1,7 @@
 /* eslint-disable no-new */
 /* eslint-disable no-restricted-globals */
 
+import * as arnsFrontend from '@ministryofjustice/hmpps-arns-frontend-components-lib/dist/js/all'
 import { DateTime } from 'luxon'
 import './appInsights'
 import './predictors'
@@ -9,6 +10,9 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
+import initGovUkBackLink from './back-link'
+
+arnsFrontend.initAll()
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
 if ($backendSortableTable) {
@@ -18,40 +22,7 @@ const $mpopSortableTable = document.querySelector('table[data-module="moj-mpop-s
 if ($mpopSortableTable) {
   new MpopSortableTable($mpopSortableTable)
 }
-const lastAppointment = () => {
-  const repeatingFrequency = document.querySelector('div[data-interval]')
-  if (repeatingFrequency) {
-    const repeatingFrequencyRadios = repeatingFrequency.querySelectorAll('input[type="radio"]')
-    const repeatingCount = document.querySelector('div[data-numberOfRepeatAppointments] input')
-    const lastAppointmentElm = document.querySelector('div[data-last-appointment]')
-    const lastAppointmentHandler = async () => {
-      const repeatingFrequencyRadioSelected = repeatingFrequency.querySelector('input:checked')
-      if (parseInt(repeatingCount.value, 10) > 0 && repeatingFrequencyRadioSelected) {
-        const divider = location.href.includes('?') ? '&' : '?'
-        const url = `${location.href}${divider}interval=${encodeURI(repeatingFrequencyRadioSelected.value)}&numberOfRepeatAppointments=${repeatingCount.value}`
-        const headers = {
-          Accept: '*/*',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        }
-        const response = await fetch(url, {
-          method: 'GET',
-          cache: 'no-cache',
-          credentials: 'same-origin',
-          headers,
-        })
-        const html = await response.text()
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(html, 'text/html')
-        const element = doc.querySelector('div[data-last-appointment]').innerHTML
-        document.querySelector('div[data-last-appointment]').innerHTML = element
-      } else {
-        lastAppointmentElm.innerHTML = ''
-      }
-    }
-    repeatingFrequencyRadios.forEach(input => input.addEventListener('click', lastAppointmentHandler))
-    repeatingCount.addEventListener('keyup', lastAppointmentHandler)
-  }
-}
+
 const resetConditionals = () => {
   const handleReset = () => {
     document.querySelectorAll('.govuk-radios__conditional input').forEach(radioBtn => {
@@ -254,15 +225,19 @@ class ServiceAlert {
 
     this.dateInput = document.querySelector('.moj-js-datepicker-input')
     this.startInput = document.querySelector('[data-qa="startTime"] input')
+    this.endInput = document.querySelector('[data-qa="endTime"] input')
     this.status = document.querySelector('[data-qa="serviceAlertStatus"]')
     this.dismissLink = this.alert.querySelector('.moj-alert__dismiss')
     this.dismissed = false
 
     this.handleDismiss = this.handleDismiss.bind(this)
     this.showAlert = this.showAlert.bind(this)
+    this.handleTimeChange = this.handleTimeChange.bind(this)
     this.handleStartTimeChange = this.handleStartTimeChange.bind(this)
+    this.handleEndTimeChange = this.handleEndTimeChange.bind(this)
     this.handleRequest = this.handleRequest.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
+    this.formatDateChange = this.formatDateChange.bind(this)
 
     this.init()
   }
@@ -274,7 +249,15 @@ class ServiceAlert {
 
     if (this.dateInput) {
       this.dateInput.addEventListener('keyup', this.handleDateChange)
-      this.dateInput.addEventListener('change', this.handleDateChange)
+      this.dateInput.addEventListener('change', this.formatDateChange)
+    }
+
+    if (this.startInput) {
+      this.endInput.addEventListener('change', this.handleTimeChange)
+      this.startInput.addEventListener('change', this.handleStartTimeChange)
+    }
+    if (this.endInput) {
+      this.endInput.addEventListener('change', this.handleEndTimeChange)
     }
   }
 
@@ -311,13 +294,21 @@ class ServiceAlert {
     }
   }
 
-  async handleStartTimeChange(event) {
+  async handleTimeChange(event) {
     const time = DateTime.fromFormat(event.target.value, 'H:mm')
     if (time.isValid) {
       await this.handleRequest()
     } else {
       this.showAlert(false)
     }
+  }
+
+  handleStartTimeChange() {
+    this.startInput.value = standardiseTimeValue(this.startInput.value)
+  }
+
+  handleEndTimeChange() {
+    this.endInput.value = standardiseTimeValue(this.endInput.value)
   }
 
   async handleRequest(dateEvent = false) {
@@ -335,13 +326,18 @@ class ServiceAlert {
     this.dismissed = alertDismissed
 
     if (dateEvent) {
-      this.startInput.removeEventListener('keyup', this.handleStartTimeChange)
+      this.startInput.removeEventListener('keyup', this.handleTimeChange)
       if (isToday) {
-        this.startInput.addEventListener('keyup', this.handleStartTimeChange)
+        this.startInput.addEventListener('keyup', this.handleTimeChange)
       }
     }
 
     this.showAlert(isInPast)
+  }
+
+  async formatDateChange() {
+    this.dateInput.value = standardiseDateValue(this.dateInput.value)
+    await this.handleDateChange()
   }
 
   async handleDateChange() {
@@ -355,8 +351,47 @@ class ServiceAlert {
   }
 }
 
+function standardiseDateValue(dateValue) {
+  if (!dateValue) {
+    return dateValue
+  }
+  const separators = ['/', '-', '.', ' ', '_', ':']
+  const formats = []
+  for (const seperator of separators) {
+    formats.push(`d${seperator}M${seperator}yyyy`)
+    formats.push(`d${seperator}M${seperator}yy`)
+  }
+  for (const format of formats) {
+    const date = DateTime.fromFormat(dateValue, format)
+    if (date.isValid) {
+      const newDateValue = date.toFormat('d/M/yyyy')
+      return newDateValue
+    }
+  }
+  return dateValue
+}
+
+function standardiseTimeValue(timeValue) {
+  if (!timeValue) {
+    return timeValue
+  }
+  const separators = [':', '/', '-', '.', ' ', '_']
+  const formats = []
+  for (const seperator of separators) {
+    formats.push(`H${seperator}mm`)
+    formats.push(`h${seperator}mma`)
+  }
+  for (const format of formats) {
+    const time = DateTime.fromFormat(timeValue, format)
+    if (time.isValid) {
+      const newTimeValue = time.toFormat('HH:mm')
+      return newTimeValue
+    }
+  }
+  return timeValue
+}
+
 setNoFixedAddressConditional()
-lastAppointment()
 resetConditionals()
 attendanceSelectors()
 homeSearch()
@@ -364,4 +399,5 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
+initGovUkBackLink()
 new ServiceAlert()

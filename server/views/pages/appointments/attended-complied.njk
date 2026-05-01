@@ -2,6 +2,7 @@
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
 {% set isAttendedComplied = true %}
+{% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set config = {
    classes: "govuk-checkboxes--small",
     fieldset: {
@@ -11,7 +12,7 @@
       }
     },
     hint: {
-        text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName + " on " + appointment.startDateTime | dateWithYear + "."
+        text: "Appointment: " + appointmentDisplayName + " with " + appointment.officer.name | fullName + " on " + appointment.startDateTime | dateWithDayAndWithYear + "."
     },
     formGroup: {
       attributes: {

@@ -13,19 +13,20 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     function getUnderscoredFormValue(name: string) {
       return req.body[`_${name}`]
     }
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { data } = req.session
+    const { back = '', change = '' } = req.query as Record<string, string>
     const { date, start: startTime, end: endTime, previousValues } = getDataValue(data, ['appointments', crn, id])
     const sameValuesHaveBeenSubmitted = JSON.stringify({ date, startTime, endTime }) === JSON.stringify(previousValues)
     setDataValue(data, ['appointments', crn, id, 'previousValues'], { date, startTime, endTime })
     const start = dateTime(date, startTime)
     const end = dateTime(date, endTime)
-    const { enablePastAppointments } = res.locals.flags
-    const { _minDate, _maxDate } = getMinMaxDates()
+    const { _maxDate } = getMinMaxDates()
     const localParams: LocalParams = {
       crn,
       id,
-      ...(!enablePastAppointments ? { _minDate } : {}),
+      back,
+      change,
       _maxDate,
       isInPast: appointmentDateIsInPast(req),
     }

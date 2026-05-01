@@ -151,6 +151,14 @@
       } if flag.riskNote.note,
       {
         key: {
+        html: '<span data-qa="riskFlagLevelLabel">Risk level</span>'
+      },
+        value: {
+        html: '<span data-qa="riskFlagLevel">' + personRiskFlag.riskFlag.levelDescription  + '</span>' if personRiskFlag.riskFlag.levelDescription  else '<span data-qa="riskFlagLevel">N/A</span>'
+      }
+      } if showRiskLevel,
+      {
+        key: {
            html: '<span data-qa="nextReviewDateLabel">Next review</span>'
         },
         value: {

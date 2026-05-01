@@ -7,9 +7,9 @@ on:
 
 jobs:
   trivy:
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@559b0f829c243c1ce5874d0ac3eaa4a8615486b2 # v1
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@v2 # WORKFLOW_VERSION
     with:
-      channel_id: manage-people-on-probation-alerts
+      channel_id: manage-people-on-probation-alerts-security
     secrets:
       HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
 
@@ -26,7 +26,7 @@ jobs:
 
       - name: Setup Firefox
         id: firefox
-        uses: browser-actions/setup-firefox@5914774dda97099441f02628f8d46411fcfbd208 # v1
+        uses: browser-actions/setup-firefox@fcf821c621167805dd63a29662bd7cb5676c81a8 # v1
         with:
           firefox-version: latest-esr
 
@@ -44,7 +44,7 @@ jobs:
         shell: bash
 
       - name: Upload report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: zap-report
           path: ${{ env.REPORT_DIR }}
@@ -62,13 +62,13 @@ jobs:
         shell: bash
 
       - name: Send message to Slack
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         if: steps.json.outputs.high != '0' || steps.json.outputs.medium != '0'
         with:
           method: chat.postMessage
           payload: |
             {
-              "channel": "manage-people-on-probation-alerts",
+              "channel": "manage-people-on-probation-alerts-security",
               "blocks": [
                 {
                   "type": "section",
@@ -112,13 +112,13 @@ jobs:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Send failure message to Slack
-        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         if: failure()
         with:
           method: chat.postMessage
           payload: |
             {
-              "channel": "manage-people-on-probation-alerts",
+              "channel": "manage-people-on-probation-alerts-security",
               "blocks": [
                 {
                   "type": "section",

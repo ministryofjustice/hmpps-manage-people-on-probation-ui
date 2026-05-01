@@ -1,7 +1,8 @@
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
-import { checkPopHeader, completeLocationDateTimePage, completeSentencePage, completeTypePage } from './imports'
+import { checkPopHeader } from './imports'
+import { completeLocationDateTimePage, completeSentencePage, completeTypePage } from './utils'
 
 const loadPage = (locations = true) => {
   completeSentencePage()
@@ -17,7 +18,7 @@ describe('Arrange an appointment in another location', () => {
   it('should render the page', () => {
     loadPage()
     const locationNotInListPage = new AppointmentLocationNotInListPage()
-    checkPopHeader('Alton Berge', true)
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
     locationNotInListPage
       .getElement('p:nth-of-type(1)')
       .should(

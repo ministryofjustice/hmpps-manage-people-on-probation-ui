@@ -25,13 +25,11 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apk update && apk add --no-cache \
-    build-base=0.5-r3 \
-    python3=3.12.12-r0 \
-    python3-dev=3.12.12-r0 \
-    make=4.4.1-r2 \
-    g++=14.2.0-r4 \
-    ca-certificates=20250911-r0
+RUN apk add --no-cache \
+    python3 \
+    python3-dev \
+    build-base \
+    ca-certificates
 
 # Stage: build assets
 FROM base as build
@@ -40,8 +38,8 @@ ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
 
-COPY package*.json ./
-RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
+COPY package*.json .allowed-scripts.mjs ./
+RUN CYPRESS_INSTALL_BINARY=0 NPM_CONFIG_AUDIT=false NPM_CONFIG_FUND=false npm run setup
 
 ENV NODE_ENV='production'
 

@@ -5,15 +5,9 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { checkAuditMessage } from './testutils'
-import { toPredictors, toRoshWidget } from '../utils'
-import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
 import {
   mockAppResponse,
-  mockTierCalculation,
-  mockRisks,
   mockSentenceDetails,
-  mockPredictors,
   mockProbationHistory,
   mockPreviousOrder,
   mockPreviousOrders,
@@ -70,13 +64,6 @@ const getSentenceLicenceConditionNoteSpy = jest
 const getSentenceRequirementNoteSpy = jest
   .spyOn(MasApiClient.prototype, 'getSentenceRequirementNote')
   .mockImplementation(() => Promise.resolve(mockRequirementNote))
-const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 describe('riskController', () => {
   const req = httpMocks.createRequest({
     params: {
@@ -103,17 +90,11 @@ describe('riskController', () => {
       checkAuditMessage(res, 'VIEW_MAS_SENTENCE', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
         expect(getSentenceDetailsSpy).toHaveBeenCalledWith(crn, '?activeSentence=true&number=1')
-        expect(getRisksSpy).toHaveBeenCalledWith(crn)
-        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-        expect(predictorsSpy).toHaveBeenCalledWith(crn)
       })
       it('should render the sentence page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/sentence', {
           sentenceDetails: mockSentenceDetails,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
         })
       })
     })
@@ -124,17 +105,11 @@ describe('riskController', () => {
       checkAuditMessage(res, 'VIEW_MAS_SENTENCE', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
         expect(getProbationHistorySpy).toHaveBeenCalledWith(crn)
-        expect(getRisksSpy).toHaveBeenCalledWith(crn)
-        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-        expect(predictorsSpy).toHaveBeenCalledWith(crn)
       })
       it('should render the probation history page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/probation-history', {
           sentenceDetails: mockProbationHistory,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
         })
       })
     })
@@ -190,17 +165,11 @@ describe('riskController', () => {
       checkAuditMessage(res, 'VIEW_MAS_SENTENCE_LICENCE_CONDITION_NOTE', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
         expect(getSentenceLicenceConditionNoteSpy).toHaveBeenCalledWith(crn, licenceConditionId, noteId)
-        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-        expect(getRisksSpy).toHaveBeenCalledWith(crn)
-        expect(predictorsSpy).toHaveBeenCalledWith(crn)
       })
       it('should render the licence condition note page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/licence-condition-note', {
           licenceNoteDetails: mockLicenceConditionNote,
-          tierCalculation: mockTierCalculation,
           crn,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
         })
       })
     })
@@ -211,17 +180,11 @@ describe('riskController', () => {
       checkAuditMessage(res, 'VIEW_MAS_SENTENCE_REQUIREMENT_NOTE', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
         expect(getSentenceRequirementNoteSpy).toHaveBeenCalledWith(crn, requirementId, noteId)
-        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-        expect(getRisksSpy).toHaveBeenCalledWith(crn)
-        expect(predictorsSpy).toHaveBeenCalledWith(crn)
       })
       it('should render the requirement note page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/requirement-note', {
           requirementNoteDetails: mockRequirementNote,
-          tierCalculation: mockTierCalculation,
           crn,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
         })
       })
     })

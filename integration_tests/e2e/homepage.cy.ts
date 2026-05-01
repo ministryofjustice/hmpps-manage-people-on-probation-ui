@@ -16,7 +16,17 @@ context('Sign In', () => {
     page.getAppointments().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
+  it('Renders the the outcomes to log with 2 years filter', () => {
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+    page.getOutcomesToLog().should('exist')
+    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (')
+    page.getOutcomesToLogRows().should('have.length', 5)
+    page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'false')
+  })
+
   it('Renders the the outcomes to log', () => {
+    cy.task('stubDisableHomePageOutcome')
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
     page.getOutcomesToLog().should('exist')
