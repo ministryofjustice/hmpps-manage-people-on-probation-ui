@@ -72,17 +72,8 @@
     ]
   },
   {
-    "heading": "Compliance page temporarily unavailable",
-    "summary": "29 January 2026",
-    "whatsNew": [
-      [
-        "The Compliance page is temporarily unavailable while we make some improvements. We’ll let you know as soon as it’s available again."
-      ]
-    ]
-  },
-  {
     "heading": "Learn about online check ins for people on probation",
-    "summary": "15 January 2026",
+    "summary": "29 January 2026",
     "whatsNew": [
       "About online check ins",
       [
@@ -93,6 +84,10 @@
       "Bug fixes for Manage people on probation",
       [
         "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome.\n\nYou can now arrange planned telephone contacts (NS) without needing to select a location. This fixes a bug that was causing errors."
+      ],
+      "Compliance page temporarily unavailable",
+      [
+        "The Compliance page is temporarily unavailable while we make some improvements. We’ll let you know as soon as it’s available again."
       ]
     ]
   },
