@@ -2,7 +2,7 @@ import { Response } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
-import { PersonAppointment, Schedule } from './model/schedule'
+import { ContactOutcomesResponse, PersonAppointment, Schedule } from './model/schedule'
 import {
   AddressOverview,
   AddressOverviewSummary,
@@ -135,6 +135,11 @@ export default class MasApiClient extends RestClient {
 
   async getContacts(crn: string): Promise<ProfessionalContact | null> {
     return this.get({ path: `/sentence/${crn}/contacts`, handle404: false })
+  }
+
+  async getContactOutcomes(typeCode: string, outcomeCode?: string): Promise<ContactOutcomesResponse> {
+    const path = `/contact/types/${typeCode}/outcomes${outcomeCode ? `/${outcomeCode}` : ''}`
+    return this.get({ path })
   }
 
   async getPersonalDetails(crn: string): Promise<PersonalDetails | null> {

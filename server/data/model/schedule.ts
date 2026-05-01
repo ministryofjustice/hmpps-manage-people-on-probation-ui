@@ -31,6 +31,20 @@ export interface EnforcementAction {
   responseByDate: string
 }
 
+export interface ContactOutcomes {
+  code: string
+  description: string
+}
+
+export interface ContactEnforcementActions extends ContactOutcomes {
+  defaultResponsePeriodDays?: number
+}
+
+export interface ContactOutcomesResponse {
+  outcomes: ContactOutcomes[]
+  enforcementActions?: ContactEnforcementActions[]
+}
+
 export interface Activity {
   id: string
   eventNumber?: string

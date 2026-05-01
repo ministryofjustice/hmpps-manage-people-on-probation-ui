@@ -63,6 +63,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getBackLink,
   )
 
+  /* get the contacts and actions for the appointment type from the api */
+
+  router.get([arrangeBasePath, manageBasePath], getOutcomeOptions)
+
   /* get readable enforcement action from current appointment */
 
   router.all(`${manageBasePath}/update-enforcement-action`, getCurrentEnforcementAction)

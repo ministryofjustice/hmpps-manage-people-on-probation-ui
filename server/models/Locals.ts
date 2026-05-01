@@ -25,7 +25,13 @@ import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import { Activity, PersonAppointment, PersonSchedule } from '../data/model/schedule'
+import {
+  Activity,
+  ContactEnforcementActions,
+  ContactOutcomes,
+  PersonAppointment,
+  PersonSchedule,
+} from '../data/model/schedule'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
@@ -185,6 +191,8 @@ export interface AppointmentOutcomeProps<TAppointment> {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
+  outcomes?: ContactOutcomes[]
+  enforcementActions?: ContactEnforcementActions[]
   options?:
     | AppointmentOutcomeOption[]
     | AppointmentEnforcementActionOption[]
