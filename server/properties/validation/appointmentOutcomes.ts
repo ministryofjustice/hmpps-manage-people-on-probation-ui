@@ -6,7 +6,6 @@ interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
   isInPast?: boolean
   msg?: string | string[]
   log?: string | string[]
-  sendLetter?: boolean
   sendBreachOrRecallLetter?: boolean
 }
 

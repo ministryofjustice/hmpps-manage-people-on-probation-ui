@@ -1,6 +1,5 @@
 {% extends "../_form.njk" %}
-{% set sendLetter = true if appointmentOutcome.appointmentSession.outcome.enforcementAction == 'INITIATE_BREACH_RECALL_AND_SEND_LETTER' else 
-  false %}
+
 {% set title = 'Initiate a ' + (
 'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
   'recall') + (' and send a letter' if appointmentOutcome.sendBreachOrRecallLetter) %}
