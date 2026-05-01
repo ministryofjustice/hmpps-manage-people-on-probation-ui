@@ -27,6 +27,7 @@ import {
   getFailedToAttendOptions,
   saveMappedCode,
   getUpdateEnforcementActionOptions,
+  getCurrentEnforcementAction,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -61,6 +62,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getOutcomeProps,
     getBackLink,
   )
+
+  /* get readable enforcement action from current appointment */
+
+  router.all(`${manageBasePath}/update-enforcement-action`, getCurrentEnforcementAction)
 
   /* run the outcome page options middleware before validation */
 

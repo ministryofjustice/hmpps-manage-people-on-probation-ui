@@ -2,23 +2,28 @@ import httpMocks from 'node-mocks-http'
 import { mockAppResponse } from '../../controllers/mocks'
 import { getUpdateEnforcementActionOptions } from './getUpdateEnforcementActionOptions'
 import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { SentenceType } from '../../data/model/sentenceDetails'
 
 const buildResponse = ({
-  currentEnforcementAction = 'FIRST_WARNING_LETTER_SENT',
-  acceptableAbsence = true,
+  action = 'FIRST_WARNING_LETTER_SENT',
+  acceptableAbsence = false,
+  sentenceType = 'COMMUNITY',
 }: {
-  currentEnforcementAction?: AppointmentEnforcementAction
+  action?: AppointmentEnforcementAction
   acceptableAbsence?: boolean
+  sentenceType?: SentenceType
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
       forename: 'Alton',
-      currentEnforcementAction,
+      currentEnforcementAction: {
+        action,
+      },
       appointment: {
         acceptableAbsence,
       },
       sentence: {
-        type: 'COMMUNITY',
+        type: sentenceType,
       },
     },
   }
@@ -29,13 +34,13 @@ const nextSpy = jest.fn()
 const req = httpMocks.createRequest()
 
 describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
-  it('should define the correct options if enforcement action is a letter', () => {
-    const res = buildResponse({ acceptableAbsence: false })
+  it('should define the correct options if current enforcement action is LETTER related', () => {
+    const res = buildResponse()
     getUpdateEnforcementActionOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_ANOTHER_LETTER' }),
-        expect.objectContaining({ value: 'BREACH_RECALL_INITIATED' }),
+        expect.objectContaining({ text: 'Initiate a breach', value: 'BREACH_RECALL_INITIATED' }),
         expect.objectContaining({ value: 'WITHDRAW_WARNING_LETTER' }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
         expect.objectContaining({ divider: 'or' }),
@@ -45,7 +50,58 @@ describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', ()
     expect(res.locals.appointmentOutcome.options).toHaveLength(6)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
-  //   it('should define the correct options if enforcement action is a breach', () => {})
-  //   it('should define the correct options if enforcement action is decision pending or refer to pp', () => {})
-  //   it('should define the correct options if outcome is acceptable absence', () => {})
+  it('should define the correct options if current enforcement action is BREACH related', () => {
+    const res = buildResponse({ action: 'BREACH_REQUESTED' })
+    getUpdateEnforcementActionOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.options).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'BREACH_REQUESTED' }),
+        expect.objectContaining({ value: 'BREACH_CONFIRMATION_SENT' }),
+        expect.objectContaining({ value: 'BREACH_LETTER_SENT' }),
+        expect.objectContaining({ value: 'BREACH_REQUEST_ACTIONED' }),
+        expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
+        expect.objectContaining({ divider: 'or' }),
+        expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.options).toHaveLength(7)
+  })
+  const currentActions: AppointmentEnforcementAction[] = [
+    'REFER_TO_OFFENDER_MANAGER',
+    'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+  ]
+  currentActions.forEach(action => {
+    it(`should define the correct options if current enforcement action is ${action} and sentence type is CUSTODY`, () => {
+      const res = buildResponse({ action, sentenceType: 'CUSTODY' })
+      getUpdateEnforcementActionOptions(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.options).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ value: 'SEND_LETTER' }),
+          expect.objectContaining({ text: 'Initiate a recall', value: 'BREACH_RECALL_INITIATED' }),
+          expect.objectContaining({
+            text: 'Initiate a recall and send a letter',
+            value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+          }),
+          expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
+          expect.objectContaining({ divider: 'or' }),
+          expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
+        ]),
+      )
+      expect(res.locals.appointmentOutcome.options).toHaveLength(6)
+    })
+  })
+
+  it('should define the correct options if current outcome is ACCEPTABLE_ABSENCE', () => {
+    const res = buildResponse({ acceptableAbsence: true })
+    getUpdateEnforcementActionOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.options).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'WITHDRAW_WARNING_LETTER' }),
+        expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
+        expect.objectContaining({ divider: 'or' }),
+        expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.options).toHaveLength(4)
+  })
 })

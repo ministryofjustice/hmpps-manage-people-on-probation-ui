@@ -1,12 +1,21 @@
 {% extends "../_form.njk" %}
 {% set outcome = 'acceptable absence' if appointmentOutcome.appointment.acceptableAbsence == true else 
-    'failure to comply' %}
+  'failure to comply' %}
 {% set title = 'Update enforcement action for ' + appointmentOutcome.forename + '’s ' + outcome %}
 {% set backLink = appointmentOutcome.backLink %}
 {% set hideButton = true %}
-
+{% block afterHeading %}
+  {% if appointmentOutcome.currentEnforcementAction %}
+    {{ govukInsetText({
+  html: "The current enforcement status is: " + govukTag({
+          text: appointmentOutcome.currentEnforcementAction.text,
+          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
+        })
+}) }}
+  {% endif %}
+{% endblock %}
 {% block form %}
-    {{ govukRadios({
+  {{ govukRadios({
     fieldset: {
       legend: {
         text: "Select an action for " + appointmentOutcome.forename + "’s " + outcome,
@@ -16,14 +25,14 @@
     },
     items: appointmentOutcome.options
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'updateEnforcementAction'])) }}
-    <div class="govuk-button-group">
-        {{ govukButton({
+  <div class="govuk-button-group">
+    {{ govukButton({
                     text: "Continue",
                     type: "submit",
                     attributes: { "data-qa": "submit-btn" }
                 }) }}
-        <a class="govuk-link" href="{{ backLink }}" data-qa="cancelGoBackLink">
+    <a class="govuk-link" href="{{ backLink }}" data-qa="cancelGoBackLink">
                     Cancel and go back
                 </a>
-    </div>
+  </div>
 {% endblock %}

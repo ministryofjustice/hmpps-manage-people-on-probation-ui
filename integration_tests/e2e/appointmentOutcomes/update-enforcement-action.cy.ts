@@ -160,6 +160,14 @@ const getExpectedOptions = ({
   return expectedOptions
 }
 
+const checkCurrentEnforcementStatus = ({
+  colour = 'yellow',
+  text = 'First Warning Letter Sent',
+}: { colour?: string; text?: string } = {}) => {
+  cy.get('.govuk-inset-text').should('contain.text', 'The current enforcement status is:')
+  cy.get('.govuk-inset-text').find(`.govuk-tag--${colour}`).should('contain.text', text)
+}
+
 const checkPage = () => {
   describe('Current enforcement action is letter and sentence type is COMMUNITY', () => {
     const options = getExpectedOptions()
@@ -175,6 +183,7 @@ const checkPage = () => {
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
+      checkCurrentEnforcementStatus()
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
@@ -192,6 +201,7 @@ const checkPage = () => {
       loadPage({ enforcementAction })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
+      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
@@ -200,6 +210,28 @@ const checkPage = () => {
         Page: UpdateEnforcementActionPage,
         enforcementAction,
       })
+    })
+  })
+
+  describe('Current enforcement action is NO_FURTHER_ACTION', () => {
+    it('should render the page', () => {
+      loadPage({ enforcementAction: 'NO_FURTHER_ACTION' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'No Further Action' })
+    })
+  })
+
+  describe('Current enforcement action is REFER_TO_OFFENDER_MANAGER', () => {
+    it('should render the page', () => {
+      loadPage({ enforcementAction: 'REFER_TO_OFFENDER_MANAGER' })
+      checkCurrentEnforcementStatus({ colour: 'purple', text: 'Refer to Offender Manager' })
+    })
+  })
+
+  describe('Current enforcement action is WITHDRAWAL_OF_WARNING', () => {
+    it('should render the page', () => {
+      loadPage({ enforcementAction: 'WITHDRAWAL_OF_WARNING' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of Warning' })
+      cy.pause()
     })
   })
 

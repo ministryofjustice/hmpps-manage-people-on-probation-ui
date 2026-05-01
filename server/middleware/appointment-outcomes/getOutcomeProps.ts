@@ -1,11 +1,6 @@
 import { DateTime } from 'luxon'
 import { Activity } from '../../data/model/schedule'
-import {
-  AppointmentEnforcementAction,
-  AppointmentOutcomeType,
-  AppointmentSession,
-  AttendedCompliedAppointment,
-} from '../../models/Appointments'
+import { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
 import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
@@ -13,7 +8,6 @@ import { Route } from '../../@types'
 import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../../utils'
 import { Sentence } from '../../data/model/sentenceDetails'
 import { AppointmentOutcomeSentence } from '../../models/Locals'
-import { enforcementActionMap, outcomeMap } from '../../properties/appointment-outcomes'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
@@ -69,18 +63,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     type: appointmentSentence?.sentenceType,
     length: sentenceLength,
   }
-  let currentOutcome: AppointmentOutcomeType
-  let currentEnforcementAction: AppointmentEnforcementAction
-  if ((appointment as Activity)?.outcome) {
-    currentOutcome = Object.entries(outcomeMap).find(
-      ([_key, { description }]) => description.toLowerCase() === (appointment as Activity).outcome.toLowerCase(),
-    )?.[0] as AppointmentOutcomeType
-  }
-  if ((appointment as Activity)?.action) {
-    currentEnforcementAction = Object.entries(enforcementActionMap).find(
-      ([_key, { description }]) => description?.toLowerCase() === (appointment as Activity).action.toLowerCase(),
-    )?.[0] as AppointmentEnforcementAction
-  }
+
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
   const unacceptableAbsence = appointmentSession?.outcome?.acceptableAbsence
   const failedToAttend = appointmentSession?.outcome?.failedToAttend
@@ -113,8 +96,6 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     appointmentHintText,
     sendBreachOrRecallLetter,
     sendLetter,
-    currentOutcome,
-    currentEnforcementAction,
   }
   return next()
 }
