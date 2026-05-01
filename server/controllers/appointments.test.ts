@@ -553,7 +553,7 @@ describe('controllers/appointments', () => {
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',
-              sensitive: 'Yes',
+              sensitivity: 'Yes',
             },
             params: {
               contactId: id,
@@ -591,7 +591,7 @@ describe('controllers/appointments', () => {
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',
-              sensitive: 'Yes',
+              sensitivity: 'Yes',
             },
             params: {
               contactId: id,
@@ -785,7 +785,7 @@ describe('controllers/appointments', () => {
     const mockReq = httpMocks.createRequest({
       body: {
         notes: 'some mock notes',
-        sensitive: 'Yes',
+        sensitivity: 'Yes',
       },
       params: {
         contactId: id,
@@ -804,7 +804,7 @@ describe('controllers/appointments', () => {
     expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
       uploadError: 'File not uploaded. Please try again.',
       patchResponse: expect.any(Object),
-      sensitive: 'Yes',
+      sensitive: true,
       notes: 'some mock notes',
     })
 
