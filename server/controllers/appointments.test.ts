@@ -591,7 +591,7 @@ describe('controllers/appointments', () => {
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',
-              sensitivity: 'Yes',
+              sensitivity: 'No',
             },
             params: {
               contactId: id,
@@ -618,7 +618,7 @@ describe('controllers/appointments', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
             id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
-            sensitive: true,
+            sensitive: false,
             outcomeRecorded: true,
           })
         })
@@ -755,7 +755,7 @@ describe('controllers/appointments', () => {
     const mockReq = httpMocks.createRequest({
       body: {
         notes: 'some mock notes',
-        sensitive: 'Yes',
+        sensitivity: 'Yes',
       },
       params: {
         contactId: id,
@@ -819,7 +819,7 @@ describe('controllers/appointments', () => {
     const mockReq = httpMocks.createRequest({
       body: {
         notes: 'some mock notes',
-        sensitive: 'Yes',
+        sensitivity: 'Yes',
       },
       params: {
         contactId: id,
