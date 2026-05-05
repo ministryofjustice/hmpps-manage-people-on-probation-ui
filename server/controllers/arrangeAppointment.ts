@@ -161,6 +161,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change, validation } = req.query
       const { data } = req.session
       let { back } = req.query
+
+      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
+      }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       if (back) {
         setDataValue(data, ['backLink', 'sentence'], back)
@@ -220,6 +225,16 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-type`]: 'Select a valid appointment type',
         }
+      }
+      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        return res.render(`pages/arrange-appointment/type-attendance`, {
+          crn,
+          id,
+          url,
+          change,
+          errors,
+          allSentences: req?.session?.data?.sentences?.[crn],
+        })
       }
       return res.render(`pages/arrange-appointment/type-attendance`, { crn, id, url, change, errors })
     }

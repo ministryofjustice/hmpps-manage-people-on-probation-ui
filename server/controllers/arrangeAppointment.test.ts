@@ -257,8 +257,34 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
-    it('should render the sentence page', async () => {
-      await controllers.arrangeAppointments.getSentence()(mockReq, res)
+    it('should redirect to the appointments page if POP has one sentence', async () => {
+      const mockRequest = {
+        ...req,
+        query: {},
+        session: {
+          data: {
+            sentences: {
+              X000001: ['sentence'],
+            },
+          },
+        },
+      } as httpMocks.MockRequest<any>
+      await controllers.arrangeAppointments.getSentence()(mockRequest, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`)
+    })
+    it('should render the sentence page if POP has more than one sentence', async () => {
+      const mockRequest = {
+        ...req,
+        query: {},
+        session: {
+          data: {
+            sentences: {
+              X000001: ['sentence1', 'sentence2'],
+            },
+          },
+        },
+      } as httpMocks.MockRequest<any>
+      await controllers.arrangeAppointments.getSentence()(mockRequest, res)
       checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
