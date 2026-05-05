@@ -26,25 +26,37 @@ generic-service:
         "id:100101,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
         ctl:ruleRemoveTargetById=942430;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942200;ARGS:notes"
+        ctl:ruleRemoveTargetById=942200;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942360;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942370;ARGS:notes"
       
       SecRule REQUEST_URI "@rx ^/case/[^/]+/arrange-appointment/[^/]+/supporting-information$" \
         "id:100104,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
         ctl:ruleRemoveTargetById=942430;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942200;ARGS:notes"
+        ctl:ruleRemoveTargetById=942200;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942360;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942370;ARGS:notes"
       
       SecRule REQUEST_URI "@rx ^/case/[^/]+/personal-details/edit-main-address$" \
         "id:100102,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
         ctl:ruleRemoveTargetById=942430;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942200;ARGS:notes"
+        ctl:ruleRemoveTargetById=942200;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942360;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942370;ARGS:notes"
       
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/[^/]+/check-in(?:/.*)?$" \
         "id:100105,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
         ctl:ruleRemoveTargetById=942430;ARGS,\
-        ctl:ruleRemoveTargetById=942200;ARGS"
+        ctl:ruleRemoveTargetById=942200;ARGS,\
+        ctl:ruleRemoveTargetById=942360;ARGS,\
+        ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942370;ARGS"
 
   env:
     INGRESS_URL: 'https://manage-people-on-probation.hmpps.service.justice.gov.uk'
