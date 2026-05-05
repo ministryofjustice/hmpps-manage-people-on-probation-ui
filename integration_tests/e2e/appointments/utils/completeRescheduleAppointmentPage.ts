@@ -5,8 +5,7 @@ import RescheduleAppointmentPage from '../../../pages/appointments/reschedule-ap
 export const completeRescheduleAppointmentPage = (enableNonCompliance = false, crn = 'X000001') => {
   cy.visit(`/case/${crn}/appointments/appointment/6/manage`)
   const manageAppointmentPage = new ManageAppointmentPage()
-  const index = enableNonCompliance ? 2 : 1
-  manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').find('a').click()
+  manageAppointmentPage.getAppointmentDetailsRowActions('dateTimeRow').find('a').click()
   getUuid(1).then(pageUuid => {
     const rescheduleAppointmentPage = new RescheduleAppointmentPage()
     rescheduleAppointmentPage

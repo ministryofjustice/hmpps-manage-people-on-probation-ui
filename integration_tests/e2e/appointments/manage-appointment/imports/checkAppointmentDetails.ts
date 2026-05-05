@@ -57,20 +57,22 @@ export const checkAppointmentDetails = (
   }
   if (deliusManaged && hasOutcome) {
     it('should display the outcome', () => {
-      manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Outcome')
+      manageAppointmentPage.getAppointmentDetailsRowKey('outcomeRow').should('contain.text', 'Outcome')
       manageAppointmentPage
-        .getAppointmentDetailsListItem(1, 'value')
+        .getAppointmentDetailsRowValue('outcomeRow')
         .should('contain.html', `<strong class="govuk-tag govuk-tag--${tagColour}`)
         .should('contain.text', outcomeStatus)
-      manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+      manageAppointmentPage.getAppointmentDetailsRowActions('outcomeRow').should('not.exist')
     })
   }
   if (enableNonCompliance && !deliusManaged) {
     it('should display the sentence', () => {
-      manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Sentence')
-      manageAppointmentPage.getAppointmentDetailsListItem(1, 'value').should('contain.text', '12 month Community order')
+      manageAppointmentPage.getAppointmentDetailsRowKey('sentenceRow').should('contain.text', 'Sentence')
       manageAppointmentPage
-        .getAppointmentDetailsListItem(1, 'actions')
+        .getAppointmentDetailsRowValue('sentenceRow')
+        .should('contain.text', '12 month Community order')
+      manageAppointmentPage
+        .getAppointmentDetailsRowActions('sentenceRow')
         .find('a')
         .should('contain.text', 'View sentence details')
         .should('have.attr', 'href', `/case/${crn}/sentence`)
@@ -90,34 +92,30 @@ export const checkAppointmentDetails = (
       }
       cy.task('stubAppointment', { ...args, isFuture: false })
       loadPage()
-      let index = deliusManaged && hasOutcome ? 2 : 1
-      if (enableNonCompliance && !deliusManaged) index += 1
-      manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
+      manageAppointmentPage.getAppointmentDetailsRowKey('dateTimeRow').should('contain.text', 'Date and time')
       manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'value')
+        .getAppointmentDetailsRowValue('dateTimeRow')
         .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
       if (!deliusManaged) {
         manageAppointmentPage
-          .getAppointmentDetailsListItem(index, 'actions')
+          .getAppointmentDetailsRowActions('dateTimeRow')
           .find('a')
           .should('contain.text', 'Reschedule')
           .should('have.attr', 'href', `/case/${crn}/appointment/6/reschedule`)
       } else {
-        manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+        manageAppointmentPage.getAppointmentDetailsRowActions('dateTimeRow').should('not.exist')
       }
     },
   )
 
   it('should display the full location address', () => {
-    let index = deliusManaged && hasOutcome ? 3 : 2
-    if (enableNonCompliance && !deliusManaged) index += 1
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Location')
+    manageAppointmentPage.getAppointmentDetailsRowKey('locationRow').should('contain.text', 'Location')
     manageAppointmentPage
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentDetailsRowValue('locationRow')
       .should('contain.html', 'The Building<br>77 Some Street<br>Some City Centre<br>London<br>Essex<br>NW10 1EP')
     if (!deliusManaged) {
       manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('locationRow')
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
@@ -127,12 +125,10 @@ export const checkAppointmentDetails = (
           'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
         )
     } else {
-      manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+      manageAppointmentPage.getAppointmentDetailsRowActions('locationRow').should('not.exist')
     }
   })
   it('should display only the office name for the location', () => {
-    let index = deliusManaged && hasOutcome ? 3 : 2
-    if (enableNonCompliance && !deliusManaged) index += 1
     if (enableNonCompliance) {
       cy.task('stubEnableNonCompliance')
     }
@@ -140,7 +136,7 @@ export const checkAppointmentDetails = (
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
     manageAppointmentPage
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentDetailsRowValue('locationRow')
       .should('contain.text', 'Leamington Probation Office')
   })
   it('should display the attending officer', () => {
@@ -148,13 +144,11 @@ export const checkAppointmentDetails = (
       cy.task('stubEnableNonCompliance')
     }
     cy.task('stubAppointment', { ...args })
-    let index = deliusManaged && hasOutcome ? 4 : 3
-    if (enableNonCompliance && !deliusManaged) index += 1
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Attending')
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Terry Jones')
+    manageAppointmentPage.getAppointmentDetailsRowKey('attendingRow').should('contain.text', 'Attending')
+    manageAppointmentPage.getAppointmentDetailsRowValue('attendingRow').should('contain.text', 'Terry Jones')
     if (!deliusManaged) {
       manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('attendingRow')
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
@@ -164,7 +158,7 @@ export const checkAppointmentDetails = (
           'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
         )
     } else {
-      manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+      manageAppointmentPage.getAppointmentDetailsRowActions('attendingRow').should('not.exist')
     }
   })
   it(`should display the RAR activity`, () => {
@@ -177,14 +171,12 @@ export const checkAppointmentDetails = (
       hasRarActivity: true,
     })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
-    let index = deliusManaged && hasOutcome ? 5 : 4
-    if (enableNonCompliance && !deliusManaged) index += 1
     page = new ManageAppointmentPage()
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'RAR activity')
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Stepping Stones')
+    manageAppointmentPage.getAppointmentDetailsRowKey('rarActivityRow').should('contain.text', 'RAR activity')
+    manageAppointmentPage.getAppointmentDetailsRowValue('rarActivityRow').should('contain.text', 'Stepping Stones')
     if (!deliusManaged) {
       manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('rarActivityRow')
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
@@ -194,10 +186,10 @@ export const checkAppointmentDetails = (
           'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
         )
     } else {
-      manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+      manageAppointmentPage.getAppointmentDetailsRowActions('rarActivityRow').should('not.exist')
     }
   })
-  it('should display with no RAR activity', () => {
+  it('should not display RAR activity', () => {
     if (enableNonCompliance) {
       cy.task('stubEnableNonCompliance')
     }
@@ -207,34 +199,19 @@ export const checkAppointmentDetails = (
       hasRarActivity: false,
     })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
-    let index = hasOutcome && deliusManaged ? 5 : 4
-    if (enableNonCompliance && !deliusManaged) index += 1
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'RAR activity')
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Not provided')
-    if (!deliusManaged) {
-      manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'actions')
-        .find('a')
-        .should('contain.text', 'Change on NDelius')
-        .should('have.attr', 'target', '_blank')
-        .should(
-          'have.attr',
-          'href',
-          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
-        )
-    } else {
-      manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
-    }
+    manageAppointmentPage.getAppointmentDetailsRow('rarActivityRow').should('not.exist')
   })
 
   it('should display the VISOR report', () => {
-    let index = deliusManaged && hasOutcome ? 6 : 5
-    if (enableNonCompliance && !deliusManaged) index += 1
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'VISOR report')
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No')
+    cy.task('stubAppointment', {
+      ...args,
+      hasRarActivity: true,
+    })
+    manageAppointmentPage.getAppointmentDetailsRowKey('visorReportRow').should('contain.text', 'VISOR report')
+    manageAppointmentPage.getAppointmentDetailsRowValue('visorReportRow').should('contain.text', 'No')
     if (!deliusManaged) {
       manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('visorReportRow')
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
@@ -244,42 +221,40 @@ export const checkAppointmentDetails = (
           'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
         )
     } else {
-      manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+      manageAppointmentPage.getAppointmentDetailsRowActions('visorReportRow').should('not.exist')
     }
   })
   it('should display the correct values if notes added to appointment', () => {
-    let index = deliusManaged && hasOutcome ? 7 : 6
-    if (enableNonCompliance && !deliusManaged) index += 1
     if (enableNonCompliance) {
       cy.task('stubEnableNonCompliance')
     }
     cy.task('stubAppointment', { ...args, notes: true })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
-    page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Appointment notes')
+    page.getAppointmentDetailsRowKey('appointmentNotesRow').should('contain.text', 'Appointment notes')
     page
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentDetailsRowValue('appointmentNotesRow')
       .find('.app-note')
       .eq(0)
       .find('p')
       .eq(0)
       .should('contain.text', 'Some notes')
     page
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentDetailsRowValue('appointmentNotesRow')
       .find('.app-note')
       .eq(0)
       .find('p')
       .eq(1)
       .should('contain.text', 'Comment added by Terry Jones on 6 April 2023')
     page
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentDetailsRowValue('appointmentNotesRow')
       .find('.app-note')
       .eq(1)
       .find('p')
       .eq(0)
       .should('contain.text', 'Some more notes')
     page
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentDetailsRowValue('appointmentNotesRow')
       .find('.app-note')
       .eq(1)
       .find('p')
@@ -287,7 +262,7 @@ export const checkAppointmentDetails = (
       .should('contain.text', 'Comment added by Terry Jones on 7 April 2023')
     if (!deliusManaged) {
       page
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('appointmentNotesRow')
         .find('a')
         .should('contain.text', 'Add to notes')
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
@@ -295,8 +270,6 @@ export const checkAppointmentDetails = (
   })
 
   it('should display the correct values if no notes added to appointment', () => {
-    let index = deliusManaged && hasOutcome ? 7 : 6
-    if (enableNonCompliance && !deliusManaged) index += 1
     if (enableNonCompliance) {
       cy.task('stubEnableNonCompliance')
     }
@@ -307,10 +280,10 @@ export const checkAppointmentDetails = (
     })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
-    page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No notes')
+    page.getAppointmentDetailsRowValue('appointmentNotesRow').should('contain.text', 'No notes')
     if (!deliusManaged) {
       page
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('appointmentNotesRow')
         .find('a')
         .should('contain.text', 'Change')
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
@@ -319,33 +292,29 @@ export const checkAppointmentDetails = (
 
   if (hasOutcomeText) {
     it('should display the outcome text', () => {
-      const index = deliusManaged && hasOutcome ? 8 : 7
       if (enableNonCompliance) {
         cy.task('stubEnableNonCompliance')
       }
       cy.task('stubAppointmentWithOutcomeText')
       cy.visit('/case/X778160/appointments/appointment/6/manage')
       page = new ManageAppointmentPage()
-      page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Outcome')
-      page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Recalled to custody')
-      page.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+      page.getAppointmentDetailsRowKey('mpopOutcomeRow').should('contain.text', 'Outcome')
+      page.getAppointmentDetailsRowValue('mpopOutcomeRow').should('contain.text', 'Recalled to custody')
+      page.getAppointmentDetailsRowActions('mpopOutcomeRow').should('not.exist')
     })
   }
   it('should display sensitive', () => {
-    const baseIndex = deliusManaged && hasOutcome ? 8 : 7
-    let index = baseIndex + (hasOutcomeText ? 1 : 0)
-    if (enableNonCompliance && !deliusManaged) index += 1
     if (enableNonCompliance) {
       cy.task('stubEnableNonCompliance')
     }
     cy.task('stubAppointment', { ...args })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
-    page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Sensitive')
-    page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No')
+    page.getAppointmentDetailsRowKey('sensitiveRow').should('contain.text', 'Sensitive')
+    page.getAppointmentDetailsRowValue('sensitiveRow').should('contain.text', 'No')
     if (!deliusManaged) {
       page
-        .getAppointmentDetailsListItem(index, 'actions')
+        .getAppointmentDetailsRowActions('sensitiveRow')
         .find('a')
         .should('contain.text', 'Change')
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)

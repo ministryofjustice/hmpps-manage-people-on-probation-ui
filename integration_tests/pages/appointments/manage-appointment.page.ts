@@ -44,10 +44,20 @@ export default class ManageAppointmentPage extends Page {
     return cy.get(`[data-qa="appointmentActions"] li:nth-child(${rowIndex}) .govuk-task-list__status`)
   }
 
-  getAppointmentDetailsListItem = (rowIndex: number, type: string) => {
-    return cy.get(
-      `[data-qa="appointmentDetails"] .govuk-summary-list .govuk-summary-list__row:nth-child(${rowIndex}) .govuk-summary-list__${type}`,
-    )
+  getAppointmentDetailsRow = (dataQa: string) => {
+    return cy.get(`[data-qa="${dataQa}"]`)
+  }
+
+  getAppointmentDetailsRowValue = (dataQa: string) => {
+    return this.getAppointmentDetailsRow(dataQa).find('.govuk-summary-list__value')
+  }
+
+  getAppointmentDetailsRowKey = (dataQa: string) => {
+    return this.getAppointmentDetailsRow(dataQa).find('.govuk-summary-list__key')
+  }
+
+  getAppointmentDetailsRowActions = (dataQa: string) => {
+    return this.getAppointmentDetailsRow(dataQa).find('.govuk-summary-list__actions')
   }
 
   getAssociatedDocumentsTableColumnHeading = (index: number) => {

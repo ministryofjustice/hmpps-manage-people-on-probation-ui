@@ -34,11 +34,11 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
       })
       describe('Appointment in future with outcome recorded', () => {
         it('Should not display Reschedule link', () => {
-          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsRowKey('dateTimeRow').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(index, 'value')
+            .getAppointmentDetailsRowValue('dateTimeRow')
             .should('contain.text', `${futureDate} at ${startTime} to ${endTime}`)
-          manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+          manageAppointmentPage.getAppointmentDetailsRowActions('dateTimeRow').should('not.exist')
         })
       })
     })
@@ -55,12 +55,12 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
       })
       describe('Appointment in future with no outcome recorded', () => {
         it('should display the reschedule link ', () => {
-          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsRowKey('dateTimeRow').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(index, 'value')
+            .getAppointmentDetailsRowValue('dateTimeRow')
             .should('contain.text', `${futureDate} at ${startTime} to ${endTime}`)
           manageAppointmentPage
-            .getAppointmentDetailsListItem(index, 'actions')
+            .getAppointmentDetailsRowActions('dateTimeRow')
             .find('a')
             .should('contain.text', 'Reschedule')
             .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
@@ -83,11 +83,11 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
       })
       describe('Appointment in past with outcome recorded', () => {
         it('Should not display Reschedule link', () => {
-          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsRowKey('dateTimeRow').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(index, 'value')
+            .getAppointmentDetailsRowValue('dateTimeRow')
             .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
-          manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+          manageAppointmentPage.getAppointmentDetailsRowActions('dateTimeRow').should('not.exist')
         })
       })
     })
@@ -103,12 +103,12 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
         manageAppointmentPage = new ManageAppointmentPage()
       })
       it('should display the reschedule link ', () => {
-        manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
+        manageAppointmentPage.getAppointmentDetailsRowKey('dateTimeRow').should('contain.text', 'Date and time')
         manageAppointmentPage
-          .getAppointmentDetailsListItem(index, 'value')
+          .getAppointmentDetailsRowValue('dateTimeRow')
           .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
         manageAppointmentPage
-          .getAppointmentDetailsListItem(index, 'actions')
+          .getAppointmentDetailsRowActions('dateTimeRow')
           .find('a')
           .should('contain.text', 'Reschedule')
           .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)

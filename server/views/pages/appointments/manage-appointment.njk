@@ -243,18 +243,20 @@
         {% endif %}
         {{ govukSummaryList({
   rows: [
-  {
-    key: {
-      text: "Outcome"
-    },
-    value: {
-      html: govukTag({
+    {
+      attributes: { 'data-qa': 'outcomeRow' },
+      key: {
+        text: "Outcome"
+      },
+      value: {
+        html: govukTag({
           text: outcomeStatus,
           classes: "govuk-tag--" + outcomeTagColour
         })
       }
     } if (outcomeStatus and appointment.deliusManaged),
     {
+      attributes: { 'data-qa': 'sentenceRow' },
       key: {
         text: "Sentence"
       },
@@ -272,6 +274,7 @@
       } if sentence
     } if sentence and flags.enableNonCompliance and not appointment.deliusManaged,
     {
+      attributes: { 'data-qa': 'dateTimeRow' },
       key: {
         text: "Date and time"
       },
@@ -289,6 +292,7 @@
     } if canReschedule
     },
     {
+      attributes: { 'data-qa': 'locationRow' },
       key: {
         text: "Location"
       },
@@ -311,6 +315,7 @@
       } if not appointment.deliusManaged
     } if appointment.location,
     {
+      attributes: { 'data-qa': 'attendingRow' },
       key: {
         text: "Attending"
       },
@@ -333,6 +338,7 @@
       } if not appointment.deliusManaged
     },
     {
+      attributes: { 'data-qa': 'rarActivityRow' },
       key: {
         text: "RAR activity"
       },
@@ -353,8 +359,9 @@
           }
         ]
       } if not appointment.deliusManaged
-    },
+    } if(appointment.rarCategory and appointment.rarCategory | length > 0),
     {
+      attributes: { 'data-qa': 'visorReportRow' },
       key: {
         text: "VISOR report"
       },
@@ -377,6 +384,7 @@
       } if not appointment.deliusManaged
     },
     {
+      attributes: { 'data-qa': 'appointmentNotesRow' },
       key: {
         text: "Appointment notes"
       },
@@ -392,6 +400,7 @@
       } if not appointment.deliusManaged
     },
     {
+      attributes: { 'data-qa': 'mpopOutcomeRow' },
       key: {
         text: "Outcome"
       },
@@ -400,6 +409,7 @@
       }
     } if appointment.outcome,
     {
+      attributes: { 'data-qa': 'sensitiveRow' },
       key: {
         text: "Sensitive"
       },
