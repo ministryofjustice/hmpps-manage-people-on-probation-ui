@@ -1,7 +1,12 @@
 import { FliptEvaluationClient } from '@flipt-io/flipt-client'
+import * as Sentry from '@sentry/browser'
 import { FlagService } from '.'
 
 const email = 'test@example.com'
+
+jest.mock('@sentry/browser', () => ({
+  captureException: jest.fn(),
+}))
 
 jest.mock('@flipt-io/flipt-client', () => ({
   FliptEvaluationClient: {
@@ -204,6 +209,29 @@ describe('FlagService', () => {
           context: { email: mixedCaseEmail.toLowerCase() },
         }),
       ]),
+    )
+  })
+
+  it('captures message in Sentry when enableSentencePlan flag has unexpected response count', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
+      ],
+    })
+
+    const result = await service.getFlags({ email })
+
+    expect(result.enableSentencePlan).toBe(false)
+    expect(result.enableSanIndicator).toBe(true)
+    expect(result.enableESupervisionCheckins).toBe(true)
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('Expected exactly 1 response for flag enableSentencePlan, got 2'),
+      }),
     )
   })
 })
