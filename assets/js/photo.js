@@ -216,15 +216,10 @@ const dataUrlToBlob = dataUrl => {
   return new Blob([bytes], { type: mime })
 }
 
-const sha256Hex = async blob => {
+const sha256Base64 = async blob => {
   const buffer = await blob.arrayBuffer()
   const digest = await crypto.subtle.digest('SHA-256', buffer)
-  const bytes = new Uint8Array(digest)
-  let hex = ''
-  for (let i = 0; i < bytes.length; i += 1) {
-    hex += bytes[i].toString(16).padStart(2, '0')
-  }
-  return hex
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
 }
 
 const showValidationMessage = message => {
@@ -267,7 +262,7 @@ if (registerButton) {
       const imageBlob = dataUrlToBlob(image)
       // Hash the image before requesting the upload URL so the API can bind the URL
       // to this exact payload (S3 enforces the matching x-amz-checksum-sha256 on PUT).
-      const contentSha256 = await sha256Hex(imageBlob)
+      const contentSha256 = await sha256Base64(imageBlob)
       const checkinUrl = `/case/${crn}/appointments/${id}/check-in/confirm-start`
       const registerResponse = await fetch(checkinUrl, {
         method: 'POST',
