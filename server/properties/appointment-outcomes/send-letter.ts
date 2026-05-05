@@ -1,6 +1,7 @@
-import { EnforcementActionCreatedByOption, EnforcementActionLetterTypeOption } from '../../models/Appointments'
+import { EnforcementActionCreatedBy, EnforcementActionLetterType } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const letterSentByOptions: EnforcementActionCreatedByOption[] = [
+export const letterSentByOptions: Option<EnforcementActionCreatedBy>[] = [
   {
     text: 'Case administrator',
     value: 'CASE_ADMIN',
@@ -9,7 +10,7 @@ export const letterSentByOptions: EnforcementActionCreatedByOption[] = [
   { text: `I’ll send the letter`, value: 'USER' },
 ]
 
-export const letterTypeOptions: EnforcementActionLetterTypeOption[] = [
+export const letterTypeOptions: Option<EnforcementActionLetterType>[] = [
   { text: 'Licence compliance letter', value: 'LICENCE_COMPLIANCE_LETTER_SENT' },
   { text: 'First warning letter', value: 'FIRST_WARNING_LETTER_SENT' },
   { text: 'Second warning letter', value: 'SECOND_WARNING_LETTER_SENT' },

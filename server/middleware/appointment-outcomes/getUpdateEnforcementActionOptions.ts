@@ -4,40 +4,29 @@ import {
   AppointmentEnforcementAction,
   BreachEnforcementAction,
   LetterEnforcementAction,
+  breachEnforcementActions,
+  letterEnforcementActions,
 } from '../../models/Appointments'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 import { updateEnforcementActionOptions } from '../../properties/appointment-outcomes'
+import { validEnforcementActionOptions } from '../../utils'
 
 export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) => {
-  const breachActions: BreachEnforcementAction[] = [
-    'BREACH_REQUESTED',
-    'BREACH_RECALL_INITIATED',
-    'BREACH_CONFIRMATION_SENT',
-    'BREACH_LETTER_SENT',
-    'BREACH_REQUEST_ACTIONED',
-    'SEND_CONFIRMATION_OF_BREACH',
-    'RECALL_REQUESTED',
-    'IMMEDIATE_BREACH_OR_RECALL',
-    'NO_FURTHER_ACTION',
-  ]
-  const letterActions: LetterEnforcementAction[] = [
-    'FIRST_WARNING_LETTER_SENT',
-    'SECOND_WARNING_LETTER_SENT',
-    'BREACH_LETTER_SENT',
-    'OTHER_ENFORCEMENT_LETTER_SENT',
-    'LICENCE_COMPLIANCE_LETTER_SENT',
-    'ENFORCEMENT_LETTER_REQUESTED',
-    'WITHDRAW_WARNING_LETTER',
-  ]
   const {
     sentence: { type: sentenceType },
     appointment: { acceptableAbsence },
+    appointmentSession,
     currentEnforcementAction,
   } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
-  let options = updateEnforcementActionOptions(sentenceType)
+
+  let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
+    appointmentSession.outcome.contactEnforcementActions,
+    updateEnforcementActionOptions(sentenceType),
+  )
+
   let values: AppointmentEnforcementAction[] = []
 
-  if (letterActions.includes(currentEnforcementAction.action as LetterEnforcementAction)) {
+  if (letterEnforcementActions.includes(currentEnforcementAction.action as LetterEnforcementAction)) {
     values = ['SEND_ANOTHER_LETTER', 'BREACH_RECALL_INITIATED', 'WITHDRAW_WARNING_LETTER']
   }
   if (
@@ -47,7 +36,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   ) {
     values = ['SEND_LETTER', 'BREACH_RECALL_INITIATED', 'BREACH_RECALL_INITIATED_AND_SEND_LETTER']
   }
-  if (breachActions.includes(currentEnforcementAction.action as BreachEnforcementAction)) {
+  if (breachEnforcementActions.includes(currentEnforcementAction.action as BreachEnforcementAction)) {
     values = ['BREACH_REQUESTED', 'BREACH_CONFIRMATION_SENT', 'BREACH_LETTER_SENT', 'BREACH_REQUEST_ACTIONED']
   }
 
@@ -55,7 +44,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
     values = ['WITHDRAW_WARNING_LETTER']
   }
   values = [...values, 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
-  options = options.filter(option => values.includes(option.value) || option?.divider)
+  options = options.filter(option => values.includes(option.value as AppointmentEnforcementAction) || option?.divider)
   res.locals.appointmentOutcome.options = options
   return next()
 }

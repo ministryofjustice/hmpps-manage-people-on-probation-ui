@@ -1,6 +1,7 @@
-import { AppointmentEnforcementActionSelectOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const enforcementActionOptions = (name: string): AppointmentEnforcementActionSelectOption[] => [
+export const enforcementActionOptions = (name: string): Option<AppointmentEnforcementAction | ''>[] => [
   {
     value: '',
     text: 'Select enforcement action',

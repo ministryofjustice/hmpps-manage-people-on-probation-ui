@@ -3,6 +3,9 @@ import { mockAppResponse } from '../../controllers/mocks'
 import { getSendLetterOptions } from './getSendLetterOptions'
 import { SentenceType } from '../../data/model/sentenceDetails'
 import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../../models/Appointments'
+import { ContactEnforcementActions } from '../../data/model/schedule'
+import { letterTypeOptions } from '../../properties/appointment-outcomes'
+import { validEnforcementActionOptions } from '../../utils'
 
 interface Props {
   sentenceType?: SentenceType
@@ -10,6 +13,12 @@ interface Props {
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
 }
+
+const contactEnforcementActions: ContactEnforcementActions[] = [
+  { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+  { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
+  { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
 
 const buildResponse = ({
   sentenceType = 'COMMUNITY',
@@ -25,12 +34,21 @@ const buildResponse = ({
       appointmentSession: {
         outcome: {
           ...enforcementAction,
+          contactEnforcementActions,
         },
       },
     },
   }
   return mockAppResponse(locals)
 }
+
+jest.mock('../../utils', () => ({
+  validEnforcementActionOptions: jest.fn(() => letterTypeOptions),
+}))
+
+const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.MockedFunction<
+  typeof validEnforcementActionOptions
+>
 
 const nextSpy = jest.fn()
 const req = httpMocks.createRequest()
@@ -52,6 +70,7 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
   it('should define the correct options if enforcement action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
     const res = buildResponse({ sendBreachOrRecallLetter: true })
     getSendLetterOptions(req, res, nextSpy)
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactEnforcementActions, letterTypeOptions)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),

@@ -12,13 +12,10 @@ import {
   NextAppointmentResponse,
   YesNo,
   AttendedCompliedAppointment,
-  AppointmentOutcomeOption,
-  AppointmentEnforcementActionOption,
-  EnforcementActionCreatedByOption,
-  EnforcementActionLetterTypeOption,
-  AppointmentEnforcementActionSelectOption,
   AppointmentOutcomeType,
   AppointmentEnforcementAction,
+  EnforcementActionLetterType,
+  EnforcementActionCreatedBy,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -194,12 +191,11 @@ export interface AppointmentOutcomeProps<TAppointment> {
   outcomes?: ContactOutcomes[]
   enforcementActions?: ContactEnforcementActions[]
   options?:
-    | AppointmentOutcomeOption[]
-    | AppointmentEnforcementActionOption[]
-    | AppointmentEnforcementActionSelectOption[]
-    | EnforcementActionCreatedByOption[]
-  letterSentByOptions?: EnforcementActionCreatedByOption[]
-  letterTypeOptions?: EnforcementActionLetterTypeOption[]
+    | Option<AppointmentOutcomeType>[]
+    | Option<AppointmentEnforcementAction | ''>[]
+    | Option<EnforcementActionCreatedBy>[]
+  letterSentByOptions?: Option<EnforcementActionCreatedBy>[]
+  letterTypeOptions?: Option<EnforcementActionLetterType>[]
   sentence?: AppointmentOutcomeSentence
   enforcementAction?: AppointmentOutcomeEnforcementAction
   isProbationPractitioner?: boolean

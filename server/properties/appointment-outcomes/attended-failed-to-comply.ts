@@ -1,7 +1,8 @@
-import { AppointmentEnforcementActionOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 import { SentenceType } from '../../data/model/sentenceDetails'
 
-export const attendedFailedToComplyOptions = (sentenceType: SentenceType): AppointmentEnforcementActionOption[] => [
+export const attendedFailedToComplyOptions = (sentenceType: SentenceType): Option<AppointmentEnforcementAction>[] => [
   {
     value: 'SEND_LETTER',
     text: 'Send a letter',

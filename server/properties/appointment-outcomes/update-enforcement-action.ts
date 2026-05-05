@@ -1,7 +1,8 @@
 import { SentenceType } from '../../data/model/sentenceDetails'
-import { AppointmentEnforcementActionOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const updateEnforcementActionOptions = (sentenceType: SentenceType): AppointmentEnforcementActionOption[] => [
+export const updateEnforcementActionOptions = (sentenceType: SentenceType): Option<AppointmentEnforcementAction>[] => [
   { text: 'Send a letter', value: 'SEND_LETTER' },
   { text: 'Send another letter', value: 'SEND_ANOTHER_LETTER' },
   { text: `Initiate a ${sentenceType === 'COMMUNITY' ? 'breach' : 'recall'}`, value: 'BREACH_RECALL_INITIATED' },

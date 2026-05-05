@@ -1,16 +1,37 @@
 import httpMocks from 'node-mocks-http'
 import { mockAppResponse } from '../../controllers/mocks'
 import { getEnforcementActionOptions } from './getEnforcementActionOptions'
+import { ContactEnforcementActions } from '../../data/model/schedule'
+import { enforcementActionOptions } from '../../properties/appointment-outcomes'
+import { validEnforcementActionOptions } from '../../utils'
+
+const contactEnforcementActions: ContactEnforcementActions[] = [
+  { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+  { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
+  { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
 
 const buildResponse = (): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
       forename: 'Alton',
+      appointmentSession: {
+        outcome: {
+          contactEnforcementActions,
+        },
+      },
     },
   }
   return mockAppResponse(locals)
 }
 
+jest.mock('../../utils', () => ({
+  validEnforcementActionOptions: jest.fn(() => enforcementActionOptions('Alton')),
+}))
+
+const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.MockedFunction<
+  typeof validEnforcementActionOptions
+>
 const nextSpy = jest.fn()
 const req = httpMocks.createRequest()
 
@@ -18,6 +39,10 @@ describe('/middleware/appointment-outcomes/getEnforcementActionOptions', () => {
   it('should define the correct options', () => {
     const res = buildResponse()
     getEnforcementActionOptions(req, res, nextSpy)
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
+      contactEnforcementActions,
+      enforcementActionOptions('Alton'),
+    )
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ text: 'Select enforcement action', value: '' }),

@@ -1,6 +1,7 @@
-import { AppointmentEnforcementActionOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const acceptableAbsenceOptions: AppointmentEnforcementActionOption[] = [
+export const acceptableAbsenceOptions: Option<AppointmentEnforcementAction>[] = [
   {
     value: 'ACCEPTABLE_ABSENCE_COURT_LEGAL',
     text: 'Court / legal',

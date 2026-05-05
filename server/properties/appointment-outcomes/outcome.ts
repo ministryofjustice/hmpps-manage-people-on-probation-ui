@@ -1,6 +1,7 @@
-import { AppointmentOutcomeOption } from '../../models/Appointments'
+import { AppointmentOutcomeType } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const outcomeOptions: AppointmentOutcomeOption[] = [
+export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
   {
     value: 'ATTENDED_COMPLIED',
     text: 'Attended - complied',

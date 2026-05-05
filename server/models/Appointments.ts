@@ -1,6 +1,11 @@
 /* eslint-disable import/no-cycle */
 import { type Name } from '../data/model/personalDetails'
-import { type EnforcementAction, type Activity } from '../data/model/schedule'
+import {
+  type EnforcementAction,
+  type Activity,
+  ContactOutcomes,
+  ContactEnforcementActions,
+} from '../data/model/schedule'
 import { type Errors } from './Errors'
 import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
 import { Option } from './Option'
@@ -12,86 +17,78 @@ export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
 
-export type AppointmentOutcomeType =
-  | 'ATTENDED_COMPLIED'
-  | 'ATTENDED_FAILED_TO_COMPLY'
-  | 'ATTENDED_SENT_HOME_BEHAVIOUR'
-  | 'ATTENDED_SENT_HOME_SERVICE_ISSUES'
-  | 'ACCEPTABLE_ABSENCE'
-  | 'UNACCEPTABLE_ABSENCE'
-  | 'FAILED_TO_ATTEND'
-  | 'WILL_BE_RESCHEDULED'
+export const appointmentOutcomeTypes = [
+  'ATTENDED_COMPLIED',
+  'ATTENDED_FAILED_TO_COMPLY',
+  'ATTENDED_SENT_HOME_BEHAVIOUR',
+  'ATTENDED_SENT_HOME_SERVICE_ISSUES',
+  'ACCEPTABLE_ABSENCE',
+  'UNACCEPTABLE_ABSENCE',
+  'FAILED_TO_ATTEND',
+  'WILL_BE_RESCHEDULED',
+] as const
 
-export type AppointmentEnforcementAction =
-  | 'BREACH_RECALL_INITIATED'
-  | 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
-  | 'REFER_TO_OFFENDER_MANAGER'
-  | 'NO_FURTHER_ACTION'
-  | 'DIFFERENT_ACTION'
-  | 'ACCEPTABLE_ABSENCE_COURT_LEGAL'
-  | 'ACCEPTABLE_ABSENCE_EMPLOYMENT'
-  | 'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE'
-  | 'ACCEPTABLE_ABSENCE_HOLIDAY'
-  | 'ACCEPTABLE_ABSENCE_MEDICAL'
-  | 'ACCEPTABLE_ABSENCE_RELIGIOUS'
-  | 'ACCEPTABLE_ABSENCE_RIC'
-  | 'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION'
-  | 'ACCEPTABLE_FAILURE'
-  | 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION'
-  | 'DECISION_PENDING_RESPONSE'
-  | 'SEND_CONFIRMATION_OF_BREACH'
-  | 'RECALL_REQUESTED'
-  | 'IMMEDIATE_BREACH_OR_RECALL'
-  | 'YOT_OM_NOTIFIED'
-  | 'WITHDRAWAL_OF_WARNING'
-  | 'SEND_LETTER'
-  | 'SEND_ANOTHER_LETTER'
-  | LetterEnforcementAction
-  | BreachEnforcementAction
+export type AppointmentOutcomeType = (typeof appointmentOutcomeTypes)[number]
 
-export type BreachEnforcementAction =
-  | 'BREACH_REQUESTED'
-  | 'BREACH_RECALL_INITIATED'
-  | 'BREACH_CONFIRMATION_SENT'
-  | 'BREACH_LETTER_SENT'
-  | 'BREACH_REQUEST_ACTIONED'
-  | 'SEND_CONFIRMATION_OF_BREACH'
-  | 'RECALL_REQUESTED'
-  | 'IMMEDIATE_BREACH_OR_RECALL'
-  | 'NO_FURTHER_ACTION'
+export const breachEnforcementActions = [
+  'BREACH_REQUESTED',
+  'BREACH_RECALL_INITIATED',
+  'BREACH_CONFIRMATION_SENT',
+  'BREACH_LETTER_SENT',
+  'BREACH_REQUEST_ACTIONED',
+  'SEND_CONFIRMATION_OF_BREACH',
+  'RECALL_REQUESTED',
+  'IMMEDIATE_BREACH_OR_RECALL',
+  'NO_FURTHER_ACTION',
+] as const
 
-export type LetterEnforcementAction =
-  | 'FIRST_WARNING_LETTER_SENT'
-  | 'SECOND_WARNING_LETTER_SENT'
-  | 'BREACH_LETTER_SENT'
-  | 'OTHER_ENFORCEMENT_LETTER_SENT'
-  | 'LICENCE_COMPLIANCE_LETTER_SENT'
-  | 'ENFORCEMENT_LETTER_REQUESTED'
-  | 'WITHDRAW_WARNING_LETTER'
+export type BreachEnforcementAction = (typeof breachEnforcementActions)[number]
+
+export const letterEnforcementActions = [
+  'FIRST_WARNING_LETTER_SENT',
+  'SECOND_WARNING_LETTER_SENT',
+  'BREACH_LETTER_SENT',
+  'OTHER_ENFORCEMENT_LETTER_SENT',
+  'LICENCE_COMPLIANCE_LETTER_SENT',
+  'ENFORCEMENT_LETTER_REQUESTED',
+  'WITHDRAW_WARNING_LETTER',
+] as const
+
+export type LetterEnforcementAction = (typeof letterEnforcementActions)[number]
+
+export const appointmentEnforcementActions = [
+  'BREACH_RECALL_INITIATED',
+  'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+  'REFER_TO_OFFENDER_MANAGER',
+  'NO_FURTHER_ACTION',
+  'DIFFERENT_ACTION',
+  'ACCEPTABLE_ABSENCE_COURT_LEGAL',
+  'ACCEPTABLE_ABSENCE_EMPLOYMENT',
+  'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE',
+  'ACCEPTABLE_ABSENCE_HOLIDAY',
+  'ACCEPTABLE_ABSENCE_MEDICAL',
+  'ACCEPTABLE_ABSENCE_RELIGIOUS',
+  'ACCEPTABLE_ABSENCE_RIC',
+  'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION',
+  'ACCEPTABLE_FAILURE',
+  'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+  'DECISION_PENDING_RESPONSE',
+  'SEND_CONFIRMATION_OF_BREACH',
+  'RECALL_REQUESTED',
+  'IMMEDIATE_BREACH_OR_RECALL',
+  'YOT_OM_NOTIFIED',
+  'WITHDRAWAL_OF_WARNING',
+  'SEND_LETTER',
+  'SEND_ANOTHER_LETTER',
+  ...breachEnforcementActions,
+  ...letterEnforcementActions,
+] as const
+
+export type AppointmentEnforcementAction = (typeof appointmentEnforcementActions)[number]
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
   complied: 'YES' | 'NO'
-}
-
-export interface AppointmentOutcomeOption extends Option {
-  value?: AppointmentOutcomeType
-}
-
-export interface AppointmentEnforcementActionOption extends Option {
-  value?: AppointmentEnforcementAction
-}
-
-export interface AppointmentEnforcementActionSelectOption extends Option {
-  value?: AppointmentEnforcementAction | ''
-}
-
-export interface EnforcementActionCreatedByOption extends Option {
-  value?: EnforcementActionCreatedBy
-}
-
-export interface EnforcementActionLetterTypeOption extends Option {
-  value?: EnforcementActionLetterType
 }
 
 export interface AppointmentSessionOutcome {
@@ -108,6 +105,8 @@ export interface AppointmentSessionOutcome {
   breachNSICreatedBy?: EnforcementActionCreatedBy
   letterSentBy?: EnforcementActionCreatedBy
   updateEnforcementAction?: AppointmentEnforcementAction
+  contactOutcomes?: ContactOutcomes[]
+  contactEnforcementActions?: ContactEnforcementActions[]
 }
 
 export interface AppointmentSessionUser {
@@ -314,10 +313,9 @@ export interface LocalParams {
   useDecorator?: boolean
   isReschedule?: boolean
   options?:
-    | AppointmentOutcomeOption[]
-    | AppointmentEnforcementActionOption[]
-    | AppointmentEnforcementActionSelectOption[]
-    | EnforcementActionCreatedByOption[]
+    | Option<AppointmentOutcomeType>[]
+    | Option<AppointmentEnforcementAction | ''>[]
+    | Option<EnforcementActionCreatedBy>[]
 }
 
 export interface MasUserDetails {

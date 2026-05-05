@@ -1,6 +1,6 @@
-export interface Option {
+export interface Option<TValue = string> {
   text?: string
-  value?: string
+  value?: TValue
   hint?: {
     text: string
   }

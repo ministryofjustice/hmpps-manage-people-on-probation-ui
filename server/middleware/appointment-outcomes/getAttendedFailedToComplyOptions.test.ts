@@ -1,6 +1,15 @@
 import httpMocks from 'node-mocks-http'
 import { getAttendedFailedToComplyOptions } from './getAttendedFailedToComplyOptions'
 import { mockAppResponse } from '../../controllers/mocks'
+import { ContactEnforcementActions } from '../../data/model/schedule'
+import { validEnforcementActionOptions } from '../../utils'
+import { attendedFailedToComplyOptions } from '../../properties/appointment-outcomes'
+
+const contactEnforcementActions: ContactEnforcementActions[] = [
+  { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+  { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
+  { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
 
 const nextSpy = jest.fn()
 
@@ -12,10 +21,23 @@ const buildResponse = ({
     appointmentOutcome: {
       sentence: { type: sentenceType },
       isProbationPractitioner,
+      appointmentSession: {
+        outcome: {
+          contactEnforcementActions,
+        },
+      },
     },
   }
   return mockAppResponse(locals)
 }
+
+jest.mock('../../utils', () => ({
+  validEnforcementActionOptions: jest.fn(),
+}))
+
+const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.MockedFunction<
+  typeof validEnforcementActionOptions
+>
 
 describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', () => {
   const req = httpMocks.createRequest()
@@ -24,7 +46,12 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
   })
   it('should return the correct options for a community sentence and user is not probation practitioner', () => {
     const res = buildResponse()
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('COMMUNITY'))
     getAttendedFailedToComplyOptions(req, res, nextSpy)
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
+      contactEnforcementActions,
+      attendedFailedToComplyOptions('COMMUNITY'),
+    )
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),
@@ -44,7 +71,12 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
   })
   it('should return the correct options for a custody sentence and user is probation practitioner', () => {
     const res = buildResponse({ sentenceType: 'CUSTODY', isProbationPractitioner: true })
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('CUSTODY'))
     getAttendedFailedToComplyOptions(req, res, nextSpy)
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
+      contactEnforcementActions,
+      attendedFailedToComplyOptions('CUSTODY'),
+    )
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),

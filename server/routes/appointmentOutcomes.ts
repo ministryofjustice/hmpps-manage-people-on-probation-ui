@@ -28,6 +28,7 @@ import {
   saveMappedCode,
   getUpdateEnforcementActionOptions,
   getCurrentEnforcementAction,
+  getContactOutcomes,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -54,6 +55,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* redirect page if required session data is not present */
 
   router.get(arrangeBasePath, redirectWizard(['eventId', 'type', 'date']))
+
+  /* get the contact outcomes and enforcement actions from api */
+
+  router.get([manageBasePath, arrangeBasePath], getContactOutcomes(hmppsAuthClient))
 
   /* get outcome props for all outcome routes */
 
