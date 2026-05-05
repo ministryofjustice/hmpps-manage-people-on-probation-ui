@@ -37,7 +37,6 @@ export const breachEnforcementActions = [
   'BREACH_LETTER_SENT',
   'BREACH_REQUEST_ACTIONED',
   'SEND_CONFIRMATION_OF_BREACH',
-  'RECALL_REQUESTED',
   'IMMEDIATE_BREACH_OR_RECALL',
   'NO_FURTHER_ACTION',
 ] as const
@@ -47,7 +46,6 @@ export type BreachEnforcementAction = (typeof breachEnforcementActions)[number]
 export const letterEnforcementActions = [
   'FIRST_WARNING_LETTER_SENT',
   'SECOND_WARNING_LETTER_SENT',
-  'BREACH_LETTER_SENT',
   'OTHER_ENFORCEMENT_LETTER_SENT',
   'LICENCE_COMPLIANCE_LETTER_SENT',
   'ENFORCEMENT_LETTER_REQUESTED',

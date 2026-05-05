@@ -15,6 +15,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   const {
     sentence: { type: sentenceType },
     appointment: { acceptableAbsence },
+    baseOutcomeUrl,
     appointmentSession,
     currentEnforcementAction,
   } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
@@ -26,19 +27,59 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
 
   let values: AppointmentEnforcementAction[] = []
 
+  /* Letter related */
+
   if (letterEnforcementActions.includes(currentEnforcementAction.action as LetterEnforcementAction)) {
-    values = ['SEND_ANOTHER_LETTER', 'BREACH_RECALL_INITIATED', 'WITHDRAW_WARNING_LETTER']
+    values = [
+      'SEND_ANOTHER_LETTER',
+      'BREACH_RECALL_INITIATED',
+      'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      'WITHDRAW_WARNING_LETTER',
+    ]
   }
-  if (
-    ['DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION', 'REFER_TO_OFFENDER_MANAGER'].includes(
-      currentEnforcementAction.action,
-    )
-  ) {
+
+  /* Breach related */
+
+  if (breachEnforcementActions.includes(currentEnforcementAction.action as BreachEnforcementAction)) {
+    values = [
+      'BREACH_REQUESTED',
+      'BREACH_CONFIRMATION_SENT',
+      'BREACH_LETTER_SENT',
+      'BREACH_REQUEST_ACTIONED',
+      'WITHDRAW_WARNING_LETTER',
+    ]
+  }
+
+  /* Decision pending response - specific behaviour */
+
+  const pendingResponseActions: AppointmentEnforcementAction[] = [
+    'DECISION_PENDING_RESPONSE',
+    'REFER_TO_OFFENDER_MANAGER',
+    'YOT_OM_NOTIFIED',
+  ]
+  if (pendingResponseActions.includes(currentEnforcementAction.action)) {
     values = ['SEND_LETTER', 'BREACH_RECALL_INITIATED', 'BREACH_RECALL_INITIATED_AND_SEND_LETTER']
   }
-  if (breachEnforcementActions.includes(currentEnforcementAction.action as BreachEnforcementAction)) {
-    values = ['BREACH_REQUESTED', 'BREACH_CONFIRMATION_SENT', 'BREACH_LETTER_SENT', 'BREACH_REQUEST_ACTIONED']
+
+  /* Recall related */
+
+  const recallActions: AppointmentEnforcementAction[] = [
+    'BREACH_RECALL_INITIATED',
+    'RECALL_REQUESTED',
+    'IMMEDIATE_BREACH_OR_RECALL',
+  ]
+  if (recallActions.includes(currentEnforcementAction.action)) {
+    values = ['RECALL_REQUESTED', 'WITHDRAW_WARNING_LETTER']
   }
+
+  /* Other enforcement action */
+
+  const otherAction: AppointmentEnforcementAction = 'NO_FURTHER_ACTION'
+  if (currentEnforcementAction.action === otherAction) {
+    return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
+  }
+
+  /* Acceptable absence */
 
   if (acceptableAbsence) {
     values = ['WITHDRAW_WARNING_LETTER']

@@ -68,15 +68,17 @@ describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', ()
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_ANOTHER_LETTER' }),
         expect.objectContaining({ text: 'Initiate a breach', value: 'BREACH_RECALL_INITIATED' }),
+        expect.objectContaining({ value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' }),
         expect.objectContaining({ value: 'WITHDRAW_WARNING_LETTER' }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
         expect.objectContaining({ divider: 'or' }),
         expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(6)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(7)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
+
   it('should define the correct options if current enforcement action is BREACH related', () => {
     const res = buildResponse({ action: 'BREACH_REQUESTED' })
     validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
@@ -87,17 +89,20 @@ describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', ()
         expect.objectContaining({ value: 'BREACH_CONFIRMATION_SENT' }),
         expect.objectContaining({ value: 'BREACH_LETTER_SENT' }),
         expect.objectContaining({ value: 'BREACH_REQUEST_ACTIONED' }),
+        expect.objectContaining({ value: 'WITHDRAW_WARNING_LETTER' }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
         expect.objectContaining({ divider: 'or' }),
         expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(7)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(8)
   })
   const currentActions: AppointmentEnforcementAction[] = [
+    'DECISION_PENDING_RESPONSE',
     'REFER_TO_OFFENDER_MANAGER',
-    'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+    'YOT_OM_NOTIFIED',
   ]
+
   currentActions.forEach(action => {
     it(`should define the correct options if current enforcement action is ${action} and sentence type is CUSTODY`, () => {
       const res = buildResponse({ action, sentenceType: 'CUSTODY' })
