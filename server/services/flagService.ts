@@ -1,4 +1,5 @@
 import { EvaluationRequest, EvaluationResponse, FliptEvaluationClient } from '@flipt-io/flipt-client'
+import * as Sentry from '@sentry/browser'
 import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
 import logger from '../../logger'
@@ -57,7 +58,10 @@ export default class FlagService {
         featureFlags[f] = matching[0].booleanEvaluationResponse.enabled === true
       } else {
         // Fail closed: unexpected response shape from Flipt for a non-PDU-gated flag.
-        logger.warn(`Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`)
+        const message = `No flags found. Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`
+        logger.warn(message)
+        const error = new Error(message)
+        Sentry.captureException(error)
         featureFlags[f] = false
       }
     })
