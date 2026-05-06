@@ -77,6 +77,7 @@ import {
   handleQuotes,
   dateToLongDate,
   merge,
+  activityLogEventName,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -200,6 +201,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('sentencePlanLink', sentencePlanLink)
   njkEnv.addGlobal('interventionsLink', interventionsLink)
   njkEnv.addGlobal('supervisionContactsAddLink', supervisionContactsAddLink)
+  njkEnv.addGlobal('activityLogEventName', activityLogEventName)
   njkEnv.addGlobal('setSortOrder', setSortOrder)
   njkEnv.addGlobal('sortAppointmentsDescending', sortAppointmentsDescending)
   njkEnv.addGlobal('isNotNull', isNotNull)

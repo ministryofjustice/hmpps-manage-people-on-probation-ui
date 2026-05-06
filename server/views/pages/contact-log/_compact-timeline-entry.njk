@@ -2,6 +2,7 @@
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+{% set viewAnalyticsEvent = activityLogEventName('view', entry) %}
 {% if entry.isAppointment %}
   {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
   {% elif entry.esupervisionId %}
@@ -15,7 +16,7 @@
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}
       {% else %}
-      <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span></a></li>
+      <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link"{% if viewAnalyticsEvent %} data-analytics-event="{{ viewAnalyticsEvent }}"{% endif %}>View<span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span></a></li>
     {% endif %}
   </ul>
 {% endset %}

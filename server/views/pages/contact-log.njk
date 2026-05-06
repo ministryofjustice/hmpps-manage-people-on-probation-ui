@@ -8,6 +8,9 @@
 {% if flags.enableCreateContact == true %}
   {% set headerActionText = 'Add a contact' %}
   {% set headerActionHref = supervisionContactsAddLink(crn) %}
+  {% set headerActionAttributes = {
+    "data-analytics-event": "add_contact_log"
+  } %}
 {% endif %}
 {% set headerCRN = personActivity.personSummary.crn %}
 {% set headerDob = personActivity.personSummary.dateOfBirth %}

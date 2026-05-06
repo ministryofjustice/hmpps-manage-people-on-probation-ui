@@ -602,4 +602,12 @@ context('Contacts', () => {
     page.getActivity(1).should('contain.text', 'AP PA - attitudes, thinking & behaviours')
     page.getActivity(2).should('contain.text', 'Pre-intervention session 1')
   })
+
+  it('should add analytics event names to contact log actions', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+
+    page.getElementData('headerActionButton').should('have.attr', 'data-analytics-event', 'add_contact_log')
+    page.getApplyFiltersButton().should('have.attr', 'data-analytics-event', 'apply_filter')
+  })
 })
