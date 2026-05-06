@@ -72,7 +72,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     if (selection === 'RESCHEDULE') {
       sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
-      console.log(sensitivity)
     }
     appointmentSession = {
       ...appointmentSession,
