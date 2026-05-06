@@ -66,6 +66,17 @@ describe('utils/validEnforcementActionOptions', () => {
       value: 'LICENCE_COMPLIANCE_LETTER_SENT',
       text: 'Licence compliance letter sent',
     },
+    {
+      value: 'NO_FURTHER_ACTION',
+      text: 'No further action',
+    },
+    {
+      divider: 'or',
+    },
+    {
+      value: 'DIFFERENT_ACTION',
+      text: 'I want to add a different action',
+    },
   ]
 
   it('should return all the enforcement action options', () => {
@@ -75,6 +86,6 @@ describe('utils/validEnforcementActionOptions', () => {
   it('should return only the valid enforcement action options', () => {
     contactEnforcementActions = [...contactEnforcementActions.filter(item => item.code !== 'LCL')]
     const validOptions = validEnforcementActionOptions(contactEnforcementActions, enforcementActionOptions)
-    expect(validOptions).toStrictEqual([enforcementActionOptions[0], enforcementActionOptions[1]])
+    expect(validOptions).toEqual([...enforcementActionOptions.slice(0, 2), ...enforcementActionOptions.slice(3)])
   })
 })

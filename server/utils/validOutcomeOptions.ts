@@ -24,12 +24,15 @@ export const validEnforcementActionOptions = <
   contactEnforcementActions: ContactEnforcementActions[],
   options: Option<TOption | ''>[],
 ): Option<TOption | ''>[] => {
+  const ignore: AppointmentEnforcementAction[] = ['SEND_LETTER', 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
   return options.filter(
-    ({ value }) =>
-      value &&
-      enforcementActionMap?.[value as TOption]?.code &&
-      contactEnforcementActions.some(
-        contactEnforcementAction => contactEnforcementAction.code === enforcementActionMap[value as TOption].code,
-      ),
+    ({ value, divider }) =>
+      (value &&
+        enforcementActionMap?.[value as TOption]?.code &&
+        contactEnforcementActions.some(
+          contactEnforcementAction => contactEnforcementAction.code === enforcementActionMap[value as TOption].code,
+        )) ||
+      divider ||
+      (value && ignore.includes(value)),
   )
 }
