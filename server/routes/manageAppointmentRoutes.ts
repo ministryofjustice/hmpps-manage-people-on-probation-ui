@@ -8,8 +8,11 @@ import {
   redirectWizard,
   getAppointment,
   autoStoreSessionData,
+  getAppointmentTypes,
+  getSentences,
+  parseMultipartBody,
 } from '../middleware'
-import { getOutcomeProps } from '../middleware/appointment-outcomes'
+import { getNotePrepend, getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import config from '../config'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
@@ -39,6 +42,46 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     multerErrorHandler('fileUpload'),
     validate.appointments,
     controllers.appointments.postAddNote(hmppsAuthClient),
+  )
+
+  /* Outcome add notes page */
+
+  router.all(
+    [
+      '/case/:crn/arrange-appointment/:id/outcome/add-note',
+      '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    ],
+    getAppointmentTypes(hmppsAuthClient),
+    getSentences(hmppsAuthClient),
+  )
+
+  router.all('/case/:crn/appointments/appointment/:contactId/outcome/add-note', getPersonAppointment(hmppsAuthClient))
+
+  router.all(
+    [
+      '/case/:crn/arrange-appointment/:id/outcome/add-note',
+      '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    ],
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getOutcomeProps,
+  )
+
+  router.post(
+    '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    multerErrorHandler('fileUpload'),
+    parseMultipartBody,
+    validate.appointmentOutcomes,
+    getNotePrepend,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
+  )
+
+  router.get(
+    [
+      '/case/:crn/arrange-appointment/:id/outcome/add-note',
+      '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    ],
+    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
   )
 
   router.post(

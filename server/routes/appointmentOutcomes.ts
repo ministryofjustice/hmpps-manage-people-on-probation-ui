@@ -11,7 +11,6 @@ import {
   getSentences,
   redirectWizard,
   getPersonalDetails,
-  parseMultipartBody,
 } from '../middleware'
 
 import {
@@ -32,7 +31,6 @@ import {
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
-import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -125,12 +123,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* run file upload middleware and multipart parser before validation */
 
-  router.post(
-    `${manageBasePath}/add-note`,
-    multerErrorHandler('fileUpload'),
-    parseMultipartBody,
-    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
-  )
+  // router.post(`${manageBasePath}/add-note`, multerErrorHandler('fileUpload'), parseMultipartBody)
 
   /* validate outcome options and store session data on all outcome post routes */
 
@@ -150,19 +143,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
   router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
 
-  /* Add note */
-
-  router.all(`${manageBasePath}/add-note`, getPersonAppointment(hmppsAuthClient))
-
-  router.get(
-    [`${arrangeBasePath}/add-note`, `${manageBasePath}/add-note`],
-    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
-  )
-
-  router.post(
-    [`${arrangeBasePath}/add-note`, `${manageBasePath}/add-note`],
-    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
-  )
+  /* Add note routes are initiated before csrf in app file */
 
   /* Attended - failed to comply */
 

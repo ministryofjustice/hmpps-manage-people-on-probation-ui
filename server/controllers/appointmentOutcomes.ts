@@ -114,14 +114,14 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAddNote: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, contactId, uuid } = res.locals.appointmentOutcome
+      const { crn, isValidParams, id, uuid } = res.locals.appointmentOutcome
       const { change } = req.query as Record<string, string>
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
       const redirect = uuid
-        ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
-        : `/case/${crn}/appointments/appointment/${contactId}/manage`
+        ? `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+        : `/case/${crn}/appointments/appointment/${id}/check-your-answers`
       return res.redirect(change ?? redirect)
     }
   },

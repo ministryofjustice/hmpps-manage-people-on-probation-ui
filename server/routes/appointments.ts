@@ -11,6 +11,9 @@ import {
   getNextComAppointment,
   getOverdueOutcomes,
   getPersonRiskFlags,
+  checkAnswers,
+  getAppointment,
+  getOfficeLocationsByTeamAndProvider,
 } from '../middleware'
 import { getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
@@ -37,6 +40,20 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     '/case/:crn/record-an-outcome/:actionType',
     validate.appointments,
     controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
+  )
+
+  /* Manage journey check your answers page */
+
+  router.get(
+    '/case/:crn/appointments/appointment/:contactId/check-your-answers',
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+    checkAnswers,
+    controllers.arrangeAppointments.getCheckYourAnswers(),
+  )
+  router.post(
+    '/case/:crn/appointments/appointment/:contactId/check-your-answers',
+    controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient),
   )
 
   /* Delete these routes after enableNonCompliance feature flag is removed 👇 */

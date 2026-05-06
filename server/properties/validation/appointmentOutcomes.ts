@@ -1,4 +1,4 @@
-import { isNotEmpty } from '../../utils/validationUtils'
+import { isNotEmpty, isValidCharCount } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 import { AppointmentsValidationArgs } from './appointments'
 
@@ -10,7 +10,7 @@ interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
-  const { crn, id, page, isInPast, msg, log, sendBreachOrRecallLetter } = args
+  const { crn, id, page, isInPast, msg, log, sendBreachOrRecallLetter, notes, maxCharCount } = args
   const msgs = Array.isArray(msg) ? msg : [msg]
   const logs = Array.isArray(log) ? log : [log]
   return {
@@ -116,6 +116,26 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
           validator: isNotEmpty,
           msg: msgs[2],
           log: logs[2],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][notes]`]: {
+      optional: page !== `outcome/add-note` || (page === `outcome/add-note` && notes?.trim() === ''),
+      checks: [
+        {
+          validator: isValidCharCount,
+          msg: `Note must be ${maxCharCount} characters or less`,
+          log: `Note exceeds maximum character length`,
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][sensitivity]`]: {
+      optional: page !== `outcome/add-note`,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not the appointment note contains sensitive information',
+          log: 'Sensitivity not selected',
         },
       ],
     },

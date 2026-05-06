@@ -6,11 +6,18 @@ import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
-  let errorMessages = res?.locals?.errorMessages || {}
-  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
   const { crn, id, isInPast, baseOutcomeUrl, reqUrl, sendBreachOrRecallLetter } = res.locals.appointmentOutcome
   const { maxCharCount } = config
-  const localParams: LocalParams = null
+
+  req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
+
+  let localParams: LocalParams = { crn, id }
+  if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
+    localParams = { ...localParams, maxCharCount: maxCharCount as number }
+  }
+
+  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
+  let errorMessages = res?.locals?.errorMessages || {}
 
   const validateOutcome = (): void => {
     if (reqUrl !== baseOutcomeUrl) return
@@ -181,16 +188,19 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
-    errorMessages = validateWithSpec(
-      req,
-      appointmentOutcomesValidation({
-        crn,
-        id,
-        page: `outcome/add-note`,
-        notes: req.body.appointments[crn][id].notes,
-        maxCharCount: maxCharCount as number,
-      }),
-    )
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/add-note`,
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount: maxCharCount as number,
+        }),
+      ),
+    }
   }
 
   validateOutcome()

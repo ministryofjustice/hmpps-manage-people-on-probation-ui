@@ -300,7 +300,7 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const spy = jest.spyOn(res, 'redirect')
       controllers.appointmentOutcomes.postAddNote()(req, res)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage`)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/check-your-answers`)
     })
   })
 
