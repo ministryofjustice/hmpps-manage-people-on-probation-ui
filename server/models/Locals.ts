@@ -203,6 +203,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
   currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
+  notePrepend?: string
 }
 
 export interface AppResponse extends Response {

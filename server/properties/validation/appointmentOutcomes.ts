@@ -107,25 +107,15 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
         },
       ],
     },
-    [`[appointments][${crn}][${id}][outcome][initiateBreachOrRecall]`]: {
+    [`[appointments][${crn}][${id}][outcome][letterType]`]: {
       optional:
-        page !== 'outcome/initiate-breach-or-recall' ||
+        !['outcome/initiate-breach-or-recall', 'outcome/send-letter'].includes(page) ||
         (page === 'outcome/initiate-breach-or-recall' && !sendBreachOrRecallLetter),
       checks: [
         {
           validator: isNotEmpty,
           msg: msgs[2],
           log: logs[2],
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][outcome][sendLetter]`]: {
-      optional: page !== 'outcome/send-letter',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: msgs[1],
-          log: logs[1],
         },
       ],
     },

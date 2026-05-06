@@ -131,7 +131,7 @@ describe('middleware/appointment-outcomes/saveMappedCode', () => {
     })
     it('should append the action code to the array if selected option is map key and action session exists', () => {
       const req = buildRequest({
-        enforcementAction: { initiateBreachOrRecall: 'LICENCE_COMPLIANCE_LETTER_SENT' },
+        enforcementAction: { letterType: 'LICENCE_COMPLIANCE_LETTER_SENT' },
       })
       const res = buildResponse({ enforcementActionCode: ['IBR'], reqUrl: '/outcome/initiate-breach-or-recall' })
       saveMappedCode('ACTION')(req, res, nextSpy)

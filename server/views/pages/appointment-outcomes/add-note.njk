@@ -88,6 +88,12 @@
             }) }}
         </section>
     {% endif %}
+    {% if appointmentOutcome.notePrepend %}
+        {{ govukInsetText({
+        classes: "govuk-!-margin-0 guidance-panel"
+        html: '<p class="govuk-body">Manage people on probation will automatically add this update:<br>' + appointmentOutcome.notePrepend + '</p>'
+            }) }}
+    {% endif %}
     {{ govukButton({
         text: "Show CRISS headers",
         classes: "govuk-button--secondary",

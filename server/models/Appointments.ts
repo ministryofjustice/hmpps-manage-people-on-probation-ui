@@ -98,10 +98,9 @@ export interface AppointmentSessionOutcome {
   unacceptableAbsence?: AppointmentEnforcementAction
   failedToAttend?: AppointmentEnforcementAction
   otherEnforcementAction?: AppointmentEnforcementAction
-  initiateBreachOrRecall?: AppointmentEnforcementAction
-  sendLetter?: AppointmentEnforcementAction
   breachNSICreatedBy?: EnforcementActionCreatedBy
   letterSentBy?: EnforcementActionCreatedBy
+  letterType?: AppointmentEnforcementAction
   updateEnforcementAction?: AppointmentEnforcementAction
   contactOutcomes?: ContactOutcomes[]
   contactEnforcementActions?: ContactEnforcementActions[]
