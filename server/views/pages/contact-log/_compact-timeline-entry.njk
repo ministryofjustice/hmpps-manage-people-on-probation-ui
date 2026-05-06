@@ -15,7 +15,16 @@
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}
       {% else %}
-      <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span></a></li>
+      <li>
+        <a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">
+          {% if flags.enableManageContacts and entry.displayName %}
+            Manage
+          {% else %}
+            View
+          {% endif %}
+          <span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span>
+        </a>
+      </li>
     {% endif %}
   </ul>
 {% endset %}

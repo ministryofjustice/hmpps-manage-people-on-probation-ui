@@ -9,7 +9,7 @@ describe('View appointment note page', () => {
     const page = new AppointmentPage()
     page.appointmentType().should('contain.text', 'Communication')
     page.appointmentTitle().should('contain.text', 'Phone call with Terry Jones')
-    page.getCardHeader('appointmentDetails').should('contain.text', 'Details')
+    page.getCardHeader('appointmentDetails').should('contain.text', 'details')
     page.getRowData('appointmentDetails', 'type', 'Value').should('contain.text', 'Phone call')
     page.getRowData('appointmentDetails', 'date', 'Value').should('contain.text', 'Thursday 22 December')
     page.getRowData('appointmentDetails', 'time', 'Value').should('contain.text', '9:15am to 9:30am')
