@@ -2,7 +2,6 @@ import config from '../config'
 import RestClient from './restClient'
 import { QueriesRequest, QueriesResponse, SentencePlanResult, unwrapSingleValue } from './model/arnsAssessmentPlatform'
 
-
 const DRAFT_STATUS = 'DRAFT'
 
 export default class ArnsAssessmentPlatformApiClient extends RestClient {
