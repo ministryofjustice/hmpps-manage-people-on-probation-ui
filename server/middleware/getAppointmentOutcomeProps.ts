@@ -66,7 +66,8 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
 
   const appointmentHintText = `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
   const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
-  const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
+  const isProbationPractitioner =
+    probationPractitioner?.username?.toLowerCase() === res.locals.user.username.toLowerCase()
   res.locals.appointmentOutcome = {
     forename,
     surname,
