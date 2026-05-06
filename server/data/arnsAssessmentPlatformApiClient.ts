@@ -55,7 +55,7 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
 
       return { hasAgreedPlan, lastUpdatedDate: result.updatedAt }
     } catch (error) {
-      logger.error('Failed to get sentence plan from Assessment Platform API')
+      logger.error(error.name, 'Failed to get sentence plan from Assessment Platform API')
 
       return null
     }
