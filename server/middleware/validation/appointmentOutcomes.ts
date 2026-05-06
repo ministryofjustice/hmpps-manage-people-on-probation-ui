@@ -40,7 +40,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           crn,
           id,
           page: `outcome/attended-failed-to-comply`,
-          msg: 'Select an action for this failure to comply',
+          msg: 'Select an action for their failure to comply',
           log: 'Action for failure to comply not selected',
         }),
       ),
