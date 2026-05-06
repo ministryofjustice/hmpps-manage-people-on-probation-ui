@@ -1,7 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
 import { QueriesRequest, QueriesResponse, SentencePlanResult, unwrapSingleValue } from './model/arnsAssessmentPlatform'
-import logger from '../../logger'
+
 
 const DRAFT_STATUS = 'DRAFT'
 
@@ -30,6 +30,7 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
       const response = await this.post<QueriesResponse>({
         path: '/query',
         data: request as unknown as Record<string, unknown>,
+        handle404: true,
       })
 
       const result = response?.queries?.[0]?.result
@@ -54,8 +55,6 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
 
       return { hasAgreedPlan, lastUpdatedDate: result.updatedAt }
     } catch (error) {
-      logger.error(error, 'Failed to get sentence plan from Assessment Platform API')
-
       return null
     }
   }
