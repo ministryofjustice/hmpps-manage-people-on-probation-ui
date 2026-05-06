@@ -31,14 +31,14 @@ generic-service:
         ctl:ruleRemoveTargetById=942131;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
       
-      SecRule REQUEST_URI "@rx ^/case/[^/]+/arrange-appointment/[^/]+/supporting-information$" \
+      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/arrange-appointment/[^/]+/supporting-information$" \
         "id:100104,phase:1,pass,nolog,\
-        ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942430;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942200;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942360;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942131;ARGS:notes,\
-        ctl:ruleRemoveTargetById=942370;ARGS:notes"
+        ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
+        ctl:ruleRemoveTargetById=942430;ARGS,\
+        ctl:ruleRemoveTargetById=942200;ARGS,\
+        ctl:ruleRemoveTargetById=942360;ARGS,\
+        ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942370;ARGS"
       
       SecRule REQUEST_URI "@rx ^/case/[^/]+/personal-details/edit-main-address$" \
         "id:100102,phase:1,pass,nolog,\
@@ -58,7 +58,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942131;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
       
-      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/[^/]+/check-in/view-expired$" \
+      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/[^/]+/check-in/(?:view|view-expired)$" \
         "id:100106,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
         ctl:ruleRemoveTargetById=942430;ARGS,\
