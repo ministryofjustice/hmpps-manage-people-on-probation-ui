@@ -187,13 +187,19 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
   },
   postEnforcementAction: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
+    return async (_req, res) => {
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    }
   },
   getInitiateBreachOrRecall: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
   },
   postInitiateBreachOrRecall: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
+    return async (_req, res) => {
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    }
   },
   getSendLetter: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/send-letter')

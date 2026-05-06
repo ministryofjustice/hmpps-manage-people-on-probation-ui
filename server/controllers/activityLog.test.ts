@@ -5,16 +5,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
-import {
-  mockTierCalculation,
-  mockActivities,
-  mockAppResponse,
-  mockRisks,
-  mockPredictors,
-  mockPersonAppointment,
-} from './mocks'
+import { mockTierCalculation, mockActivities, mockAppResponse, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
 import { getPersonAppointment } from '../middleware'
 
@@ -33,13 +24,6 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
-jest.mock('../data/arnsApiClient')
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  toRoshWidget: jest.fn(),
-  toPredictors: jest.fn(),
-}))
-
 jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
@@ -55,12 +39,6 @@ const getPersonActivitySpy = jest
 const getCalculationDetailsSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
-
-const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-
-const getPredictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 
 const getPersonAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointment')
@@ -111,24 +89,10 @@ const res = mockAppResponse({
     dateTo: '',
     keywords: '',
   },
-  flags: {
-    enableContactLog: false,
-  },
-})
-
-const resWithContactLogFlag = mockAppResponse({
-  filters: {
-    dateFrom: '',
-    dateTo: '',
-    keywords: '',
-  },
-  flags: {
-    enableContactLog: true,
-  },
+  flags: {},
 })
 
 const renderSpy = jest.spyOn(res, 'render')
-const renderSpyWithFlag = jest.spyOn(resWithContactLogFlag, 'render')
 
 describe('/controllers/activityLogController', () => {
   afterEach(() => {
@@ -147,45 +111,7 @@ describe('/controllers/activityLogController', () => {
       expect(res.locals.defaultView).toEqual(true)
     })
     checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG', uuidv4(), crn, 'CRN')
-    it('should request the person activity from the api with size 10 when enableContactLog is false', () => {
-      const expectedBody = {
-        keywords: '',
-        dateFrom: '',
-        dateTo: '',
-        filters: [] as string[],
-        includeSystemGenerated: false,
-        typeCodes: [] as string[],
-      }
-      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '10')
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-
-    it('should render the activity-log page when enableContactLog flag is false', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
-        personActivity: mockActivities,
-        baseUrl: '',
-        crn,
-        query: req.query,
-        queryParams: [],
-        page: req.query.page,
-        view: req.query.view,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
-        url: req.url,
-        resultsStart: 1,
-        resultsEnd: 1,
-        errorMessages: undefined,
-        groupedActivities: [
-          {
-            date: 'Thu 22 Dec 2044',
-            activities: mockActivities.activities,
-          },
-        ],
-      })
-    })
-    it('should request the person activity from the api with size 25 when enableContactLog is true', async () => {
-      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, resWithContactLogFlag)
+    it('should request the person activity from the api with size 25', () => {
       const expectedBody = {
         keywords: '',
         dateFrom: '',
@@ -195,10 +121,11 @@ describe('/controllers/activityLogController', () => {
         typeCodes: [] as string[],
       }
       expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25')
+      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
     })
-    it('should render the contact-log page when enableContactLog flag is true', async () => {
-      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, resWithContactLogFlag)
-      expect(renderSpyWithFlag).toHaveBeenCalledWith('pages/contact-log', {
+
+    it('should render the contact-log page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/contact-log', {
         personActivity: mockActivities,
         baseUrl: '',
         crn,
@@ -207,8 +134,6 @@ describe('/controllers/activityLogController', () => {
         page: req.query.page,
         view: req.query.view,
         tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         url: req.url,
         resultsStart: 1,
         resultsEnd: 1,
@@ -231,7 +156,7 @@ describe('/controllers/activityLogController', () => {
       reqWithBanner.flash = jest.fn().mockReturnValue([])
       const resWithBanner = mockAppResponse({
         filters: { dateFrom: '', dateTo: '', keywords: '' },
-        flags: { enableContactLog: true },
+        flags: {},
       })
       const redirectSpy = jest.spyOn(resWithBanner, 'redirect')
 
@@ -250,36 +175,13 @@ describe('/controllers/activityLogController', () => {
       reqWithPage.flash = jest.fn().mockReturnValue([])
       const resWithPage = mockAppResponse({
         filters: { dateFrom: '', dateTo: '', keywords: '' },
-        flags: { enableContactLog: false },
+        flags: {},
       })
       const renderSpyWithPage = jest.spyOn(resWithPage, 'render')
 
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithPage, resWithPage)
 
       expect(renderSpyWithPage).toHaveBeenCalledWith(
-        'pages/activity-log',
-        expect.objectContaining({
-          resultsStart: 11,
-          resultsEnd: 20,
-        }),
-      )
-    })
-    it('should calculate correct pagination with pageSize 25 when page is greater than 0 and enableContactLog is true', async () => {
-      const reqWithPage = httpMocks.createRequest({
-        params: { crn },
-        query: { page: '1', view: 'default' },
-        session: { activityLogFilters: {} },
-      })
-      reqWithPage.flash = jest.fn().mockReturnValue([])
-      const resWithPageAndFlag = mockAppResponse({
-        filters: { dateFrom: '', dateTo: '', keywords: '' },
-        flags: { enableContactLog: true },
-      })
-      const renderSpyWithPageAndFlag = jest.spyOn(resWithPageAndFlag, 'render')
-
-      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithPage, resWithPageAndFlag)
-
-      expect(renderSpyWithPageAndFlag).toHaveBeenCalledWith(
         'pages/contact-log',
         expect.objectContaining({
           resultsStart: 26,
@@ -296,7 +198,7 @@ describe('/controllers/activityLogController', () => {
         session: { activityLogFilters: {} },
       })
       reqWithSuccess.flash = jest.fn().mockReturnValue([])
-      const resWithFlag = mockAppResponse({ filters: {}, flags: { enableContactLog: true } })
+      const resWithFlag = mockAppResponse({ filters: {}, flags: {} })
       const redirectSpy = jest.spyOn(resWithFlag, 'redirect')
 
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithSuccess, resWithFlag)
@@ -314,7 +216,7 @@ describe('/controllers/activityLogController', () => {
         session: { activityLogFilters: {} },
       })
       reqWithUploadFailed.flash = jest.fn().mockReturnValue([])
-      const resWithFlag = mockAppResponse({ filters: {}, flags: { enableContactLog: true } })
+      const resWithFlag = mockAppResponse({ filters: {}, flags: {} })
       const redirectSpy = jest.spyOn(resWithFlag, 'redirect')
 
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithUploadFailed, resWithFlag)

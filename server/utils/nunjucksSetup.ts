@@ -46,6 +46,7 @@ import {
   getRisksWithScore,
   interventionsLink,
   supervisionContactsAddLink,
+  supervisionContactsUpdateLink,
   isInThePast,
   isToday,
   oaSysUrl,
@@ -77,6 +78,7 @@ import {
   handleQuotes,
   dateToLongDate,
   merge,
+  dateWithYearTimeFirst,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -165,6 +167,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
+  njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
@@ -200,6 +203,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('sentencePlanLink', sentencePlanLink)
   njkEnv.addGlobal('interventionsLink', interventionsLink)
   njkEnv.addGlobal('supervisionContactsAddLink', supervisionContactsAddLink)
+  njkEnv.addGlobal('supervisionContactsUpdateLink', supervisionContactsUpdateLink)
   njkEnv.addGlobal('setSortOrder', setSortOrder)
   njkEnv.addGlobal('sortAppointmentsDescending', sortAppointmentsDescending)
   njkEnv.addGlobal('isNotNull', isNotNull)

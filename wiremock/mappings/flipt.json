@@ -68,17 +68,6 @@
               "rollouts": []
             },
             {
-              "key": "enableContactLog",
-              "name": "enableContactLog",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-02T12:00:00.000000Z",
-              "updatedAt": "2026-02-02T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableCreateContact",
               "name": "enableCreateContact",
               "description": "",
@@ -86,6 +75,17 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-01-30T15:28:37.920581Z",
               "updatedAt": "2026-01-30T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableManageContacts",
+              "name": "enableManageContacts",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-04-23T12:00:00.000000Z",
+              "updatedAt": "2026-04-23T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             },
@@ -116,17 +116,6 @@
               "name": "enableOGRS4SummaryCardDetail",
               "description": "",
               "enabled": false,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableBreadcrumbs",
-              "name": "enableBreadcrumbs",
-              "description": "",
-              "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-02-26T12:00:00.000000Z",
               "updatedAt": "2026-02-26T12:00:00.000000Z",

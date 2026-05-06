@@ -14,6 +14,8 @@ import {
   AttendedCompliedAppointment,
   AppointmentOutcomeOption,
   AppointmentEnforcementActionOption,
+  EnforcementActionCreatedByOption,
+  EnforcementActionLetterTypeOption,
   ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
@@ -179,7 +181,9 @@ export interface AppointmentOutcomeProps {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[] | EnforcementActionCreatedByOption[]
+  letterSentByOptions?: EnforcementActionCreatedByOption[]
+  letterTypeOptions?: EnforcementActionLetterTypeOption[]
   sentence?: AppointmentOutcomeSentence
   enforcementAction?: AppointmentOutcomeEnforcementAction
   sentenceType?: SentenceType
