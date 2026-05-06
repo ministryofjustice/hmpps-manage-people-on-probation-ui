@@ -1,6 +1,7 @@
 import config from '../config'
 import RestClient from './restClient'
 import { QueriesRequest, QueriesResponse, SentencePlanResult, unwrapSingleValue } from './model/arnsAssessmentPlatform'
+import logger from '../../logger'
 
 const DRAFT_STATUS = 'DRAFT'
 
@@ -54,6 +55,8 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
 
       return { hasAgreedPlan, lastUpdatedDate: result.updatedAt }
     } catch (error) {
+      logger.error('Failed to get sentence plan from Assessment Platform API')
+
       return null
     }
   }
