@@ -1136,13 +1136,13 @@ describe('validates appointment enforcement action page', () => {
     crn,
     id,
     page: `outcome/attended-failed-to-comply`,
-    msg: ['Select an action for this failure to comply'],
+    msg: ['Select an action for their failure to comply'],
     log: ['Action for failure to comply not selected'],
   }
   const spec = appointmentOutcomesValidation(args)
   const expectedResult: Record<string, string> = {
     'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-enforcementAction':
-      'Select an action for this failure to comply',
+      'Select an action for their failure to comply',
   }
   it('should return the correct validation errors if date is in the past', () => {
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
