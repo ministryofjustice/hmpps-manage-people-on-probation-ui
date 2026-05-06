@@ -17,6 +17,7 @@ import {
   getAppointmentOutcomeBackLink,
   getAppointmentAcceptableAbsenceOptions,
   getAppointmentEnforcementActionOptions,
+  getAppointmentInitiateBreachRecallOptions,
   getAppointmentOutcomeEvidenceBy,
   parseMultipartBody,
 } from '../middleware'
@@ -82,6 +83,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.all(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
     getAppointmentEnforcementActionOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
+    getAppointmentInitiateBreachRecallOptions,
   )
 
   /* run file upload middleware and multipart parser before validation */

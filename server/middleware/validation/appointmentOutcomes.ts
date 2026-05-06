@@ -8,7 +8,7 @@ import config from '../../config'
 const appointmentOutcomes: Route<void> = (req, res, next) => {
   let errorMessages = res?.locals?.errorMessages || {}
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
-  const { crn, id, isInPast, baseOutcomeUrl, reqUrl } = res.locals.appointmentOutcome
+  const { crn, id, isInPast, baseOutcomeUrl, reqUrl, appointmentSession } = res.locals.appointmentOutcome
   const { maxCharCount } = config
   const localParams: LocalParams = null
 
@@ -119,6 +119,29 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateInitiateBreachRecall = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/initiate-breach-or-recall`)) return
+    render = 'pages/appointment-outcomes/initiate-breach-or-recall'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/initiate-breach-or-recall`,
+          msg: [
+            'Select who will create the breach NSI',
+            'Select who will send the letter',
+            'Select the type of letter',
+          ],
+          log: ['breach NSI created by not selected', 'letter sent by no selected', 'letter type not selected'],
+          sendLetter: appointmentSession.outcome.enforcementAction === 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        }),
+      ),
+    }
+  }
+
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
@@ -143,6 +166,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateUnacceptableAbsence()
   validateFailedToAttend()
   validateEnforcementAction()
+  validateInitiateBreachRecall()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {
