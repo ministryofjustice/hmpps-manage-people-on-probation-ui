@@ -83,12 +83,6 @@ export function updateLinks(enableMopPrivacyPolicy: boolean, enableMopCookiePoli
       )
     : /$^/
   return input
-    .replace(
-      policyRegex,
-      `<a$1href="/privacy-policy" target="_blank" rel="noopener noreferrer" data-qa="privacyPolicyLink"$2>`,
-    )
-    .replace(
-      cookieRegex,
-      `<a$1href="/cookies-policy" target="_blank" rel="noopener noreferrer" data-qa="cookiesPolicyLink"$2>`,
-    )
+    .replace(policyRegex, `<a$1href="/privacy-policy" data-qa="privacyPolicyLink"$2>`)
+    .replace(cookieRegex, `<a$1href="/cookies-policy" data-qa="cookiesPolicyLink"$2>`)
 }

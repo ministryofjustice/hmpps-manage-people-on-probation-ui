@@ -2,7 +2,7 @@ import { isNotEmpty } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 import { AppointmentsValidationArgs } from './appointments'
 
-interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
+export interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
   isInPast?: boolean
   msg?: string | string[]
   log?: string | string[]

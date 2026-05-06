@@ -1,12 +1,25 @@
 {% extends "../../partials/layout.njk" %}
-{% set title = 'My upcoming appointments' if type == 'upcoming' else 
+{% set title = 'My upcoming appointments' if type == 'upcoming' else
     'Outcomes to log' %}
 {% set pageTitle = makePageTitle({pageHeading: title}) %}
 
 {% block content %}
+    {% if type === 'upcoming'%}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
+    {% elseif flags.enableHomePageOutcomesWithFilter %}
+     <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
+     <div class="govuk-grid-row govuk-!-margin-top-4">
+    <div class="govuk-grid-column-one-quarter govuk-!-margin-left-0">
+        {% include "../../partials/_outcome-filters.njk" %}
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+    {% else %}
+          <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
+            <div>
+    {% endif %}
+
             {% if userSchedule.appointments.length > 0 %}
                 {% set rows = [] %}
                 {% for appointment in userSchedule.appointments %}

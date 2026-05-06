@@ -36,7 +36,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   router.post(
     '/case/:crn/record-an-outcome/:actionType',
     validate.appointments,
-    controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
+    controllers.appointments.getRecordAnOutcome(hmppsAuthClient),
   )
 
   /* Delete these routes after enableNonCompliance feature flag is removed 👇 */

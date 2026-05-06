@@ -128,12 +128,8 @@ describe('updateLinks', () => {
 
     expect(output).toContain(`href="/privacy-policy"`)
     expect(output).toContain(`href="/cookies-policy"`)
-    expect(output).toContain(`target="_blank"`)
-    expect(output).toContain(`rel="noopener noreferrer"`)
     expect(output).toContain(`data-qa="cookiesPolicyLink"`)
     expect(output).toContain(`data-qa="privacyPolicyLink"`)
-    const matches = output.match(/rel="noopener noreferrer"/g) || []
-    expect(matches).toHaveLength(2)
   })
 
   it('should NOT update Privacy policy and Cookies policy links and add target blank', () => {
@@ -166,12 +162,8 @@ describe('updateLinks', () => {
 
     expect(output).not.toContain(`href="/privacy-policy"`)
     expect(output).toContain(`href="/cookies-policy"`)
-    expect(output).toContain(`target="_blank"`)
-    expect(output).toContain(`rel="noopener noreferrer"`)
     expect(output).toContain(`data-qa="cookiesPolicyLink"`)
     expect(output).not.toContain(`data-qa="privacyPolicyLink"`)
-    const matches = output.match(/rel="noopener noreferrer"/g) || []
-    expect(matches).toHaveLength(1)
   })
 
   it('should not have update cookie policy and should have privacy policy link and add target blank', () => {
@@ -186,12 +178,8 @@ describe('updateLinks', () => {
 
     expect(output).toContain(`href="/privacy-policy"`)
     expect(output).not.toContain(`href="/cookies-policy"`)
-    expect(output).toContain(`target="_blank"`)
-    expect(output).toContain(`rel="noopener noreferrer"`)
     expect(output).not.toContain(`data-qa="cookiesPolicyLink"`)
     expect(output).toContain(`data-qa="privacyPolicyLink"`)
-    const matches = output.match(/rel="noopener noreferrer"/g) || []
-    expect(matches).toHaveLength(1)
   })
 
   it('should not modify unrelated links', () => {

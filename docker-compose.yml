@@ -15,9 +15,33 @@ services:
     env_file:
       - .env
 
+  waf:
+    image: owasp/modsecurity-crs:4.25-nginx-lts
+    networks:
+      - hmpps
+    ports:
+      - "8080:8080"
+    environment:
+      BACKEND: "http://app:3000"
+      SERVER_NAME: "localhost"
+      MODSEC_RULE_ENGINE: "On"
+      MODSEC_AUDIT_ENGINE: "On"
+      MODSEC_AUDIT_LOG: "/var/log/modsecurity/audit.log"
+      MODSEC_AUDIT_LOG_TYPE: "Serial"
+      BLOCKING_PARANOIA: "1"
+      DETECTION_PARANOIA: "1"
+    volumes:
+      - ./waf-conf/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
+      - ./waf-logs:/var/log/modsecurity
+    depends_on:
+      - app
+
 networks:
   hmpps:
 
 secrets:
   sentry:
     file: .sentry-token
+
+
+

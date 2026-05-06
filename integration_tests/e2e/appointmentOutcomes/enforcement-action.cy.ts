@@ -133,7 +133,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
-  it('should show validation error when no option is selected for breach created by', () => {
+  it('should show validation error when no option is selected', () => {
     const msg = 'Select an enforcement action for their failure to comply'
     loadPage({ journey })
     enforcementActionPage = new EnforcementActionPage()
@@ -143,7 +143,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
     })
-    cy.pause()
   })
   it('should redirect to the correct page when an option is selected', () => {
     loadPage({ journey })

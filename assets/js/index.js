@@ -10,6 +10,7 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
+import initGovUkBackLink from './back-link'
 
 arnsFrontend.initAll()
 
@@ -236,6 +237,7 @@ class ServiceAlert {
     this.handleEndTimeChange = this.handleEndTimeChange.bind(this)
     this.handleRequest = this.handleRequest.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
+    this.formatDateChange = this.formatDateChange.bind(this)
 
     this.init()
   }
@@ -247,7 +249,7 @@ class ServiceAlert {
 
     if (this.dateInput) {
       this.dateInput.addEventListener('keyup', this.handleDateChange)
-      this.dateInput.addEventListener('change', this.handleDateChange)
+      this.dateInput.addEventListener('change', this.formatDateChange)
     }
 
     if (this.startInput) {
@@ -333,6 +335,11 @@ class ServiceAlert {
     this.showAlert(isInPast)
   }
 
+  async formatDateChange() {
+    this.dateInput.value = standardiseDateValue(this.dateInput.value)
+    await this.handleDateChange()
+  }
+
   async handleDateChange() {
     const { value } = this.dateInput
     const dt = DateTime.fromFormat(value, 'd/M/yyyy')
@@ -344,19 +351,37 @@ class ServiceAlert {
   }
 }
 
+function standardiseDateValue(dateValue) {
+  if (!dateValue) {
+    return dateValue
+  }
+  const separators = ['/', '-', '.', ' ', '_', ':']
+  const formats = []
+  for (const seperator of separators) {
+    formats.push(`d${seperator}M${seperator}yyyy`)
+    formats.push(`d${seperator}M${seperator}yy`)
+  }
+  for (const format of formats) {
+    const date = DateTime.fromFormat(dateValue, format)
+    if (date.isValid) {
+      const newDateValue = date.toFormat('d/M/yyyy')
+      return newDateValue
+    }
+  }
+  return dateValue
+}
+
 function standardiseTimeValue(timeValue) {
   if (!timeValue) {
     return timeValue
   }
   const separators = [':', '/', '-', '.', ' ', '_']
   const formats = []
-  for (let i = 0; i < separators.length; i += 1) {
-    const seperator = separators[i]
+  for (const seperator of separators) {
     formats.push(`H${seperator}mm`)
     formats.push(`h${seperator}mma`)
   }
-  for (let j = 0; j < formats.length; j += 1) {
-    const format = formats[j]
+  for (const format of formats) {
     const time = DateTime.fromFormat(timeValue, format)
     if (time.isValid) {
       const newTimeValue = time.toFormat('HH:mm')
@@ -374,4 +399,5 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
+initGovUkBackLink()
 new ServiceAlert()
