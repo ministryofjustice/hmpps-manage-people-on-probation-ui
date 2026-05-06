@@ -24,7 +24,12 @@ export const validEnforcementActionOptions = <
   contactEnforcementActions: ContactEnforcementActions[],
   options: Option<TOption | ''>[],
 ): Option<TOption | ''>[] => {
-  const ignore: AppointmentEnforcementAction[] = ['SEND_LETTER', 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
+  const ignore: AppointmentEnforcementAction[] = [
+    'SEND_LETTER',
+    'SEND_ANOTHER_LETTER',
+    'NO_FURTHER_ACTION',
+    'DIFFERENT_ACTION',
+  ]
   return options.filter(
     ({ value, divider }) =>
       (value &&
