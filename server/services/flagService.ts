@@ -59,19 +59,21 @@ export default class FlagService {
         const message = `Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`
 
         logger.warn(message)
-        logger.info(`Sentry client exists: ${Boolean(Sentry.getClient())}`)
 
-        const eventId = Sentry.captureException(new Error(message), {
-          tags: {
-            flag: f,
-            service: 'FlagService',
-          },
-          extra: {
-            matchingLength: matching.length,
-          },
-        })
+        const client = Sentry.getClient()
+        if (client) {
+          const eventId = Sentry.captureException(new Error(message), {
+            tags: {
+              flag: f,
+              service: 'FlagService',
+            },
+            extra: {
+              matchingLength: matching.length,
+            },
+          })
 
-        logger.info(`Sentry eventId: ${eventId}`)
+          logger.info(`Sentry eventId: ${eventId}`)
+        }
 
         featureFlags[f] = false
       }
