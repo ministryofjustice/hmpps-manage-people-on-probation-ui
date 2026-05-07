@@ -1,7 +1,7 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
 {% set personForename = headerPersonName.forename %}
-{% set backLink = change if change else '/case/' + crn + '/appointments' %}
+{% set backLink = change | default('/case/' + crn + '/appointments') %}
 
 {% block alertBanner %}
   {% include "../../partials/_risk-to-staff-alert.njk" %}

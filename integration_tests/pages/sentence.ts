@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class SentencePage extends Page {
   constructor() {
-    super('Sentence')
+    super('What is this appointment for?')
   }
 
   activeSideNavItem = (): PageElement => cy.get('.moj-side-navigation__item--active a')

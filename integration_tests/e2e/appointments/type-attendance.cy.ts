@@ -1,4 +1,4 @@
-import Page, { PageElement } from '../../pages/page'
+import Page from '../../pages/page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
@@ -17,6 +17,7 @@ import {
   completeTextMessageConfirmationPage,
   completeSupportingInformationPage,
 } from './utils'
+import SentencePage from '../../pages/sentence'
 
 const mockData = mockResponse as Wiremock
 
@@ -42,8 +43,8 @@ describe('Arrange an appointment', () => {
 
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
 
-      const backButton = (): PageElement => cy.get('.govuk-back-link')
-      backButton().click()
+      const sentencePage = new SentencePage()
+      sentencePage.getBackLink().click()
 
       cy.url().should('contain', `/case/X778160/appointments`)
     })

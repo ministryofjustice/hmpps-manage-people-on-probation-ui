@@ -2,7 +2,7 @@ import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import { crn, uuid } from './imports/common'
-import { PageElement } from '../../pages/page'
+import SentencePage from '../../pages/sentence'
 
 const loadPage = (_crn = crn) => {
   cy.visit(`/case/${_crn}/arrange-appointment/${uuid}/sentence`)
@@ -99,8 +99,8 @@ describe('What is this appointment for?', () => {
       cy.url().should('contain', `/case/X778160/arrange-appointment/${uuid}/type-attendance`)
       cy.get('[data-qa="pageHeading"]').should('have.text', 'Appointment type and attendance')
 
-      const backButton = (): PageElement => cy.get('.govuk-back-link')
-      backButton().click()
+      const sentencePage = new AppointmentTypePage()
+      sentencePage.getBackLink().click()
 
       cy.url().should('contain', `/case/X778160/appointments`)
     })
