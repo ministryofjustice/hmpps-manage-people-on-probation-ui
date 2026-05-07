@@ -8,6 +8,8 @@ import { AppointmentOutcomeProps, AppResponse } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
 import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
 import { appointmentOutcomeRequests } from './appointmentOutcomes'
+import { HmppsAuthClient } from '../data'
+import { isSuccessfulUpload } from './appointments'
 
 const crn = 'X000001'
 const id = '1234'
@@ -22,12 +24,6 @@ const mockFile = {
   buffer: [] as any,
   size: 584020,
 }
-
-const mockHmppsAuthClient = {
-  getSystemClientToken: jest.fn().mockResolvedValue('token'),
-} as any
-
-jest.mock('../data/masApiClient')
 
 const mockHmppsAuthClient = {
   getSystemClientToken: jest.fn().mockResolvedValue('token'),
