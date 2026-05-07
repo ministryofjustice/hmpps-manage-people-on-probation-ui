@@ -5,7 +5,7 @@ import { FlagService } from '.'
 const email = 'test@example.com'
 
 jest.mock('@sentry/node', () => ({
-  getClient: jest.fn(),
+  getClient: jest.fn(() => ({})),
   captureException: jest.fn(),
 }))
 
