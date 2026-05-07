@@ -219,4 +219,8 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
     controllers.appointmentOutcomes.postUpdateEnforcementAction(),
   )
+
+  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+
+  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote())
 }

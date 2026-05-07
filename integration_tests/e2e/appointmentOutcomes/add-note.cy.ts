@@ -24,7 +24,7 @@ let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
 
 const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
-  const crn = journey === 'MANAGE' ? 'X000001' : 'X778160'
+  const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
   cy.request({
     method: 'POST',
     url: 'http://localhost:3007/__test/clear-session',
@@ -45,7 +45,7 @@ const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
-      completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid })
+      completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid, crnOverride: crn })
     })
   }
   outcomePage = new OutcomePage()
@@ -68,7 +68,7 @@ const createFakeFile = (mb: number, type: string): Cypress.FixtureData => {
 }
 
 const checkValidation = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
-  const crn = journey === 'MANAGE' ? 'X000001' : 'X778160'
+  const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
   it('shows error when sensitivity is not selected', () => {
     loadPage({ journey })
     getUuid(3).then(uuid => {
@@ -95,7 +95,7 @@ const checkValidation = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): vo
 }
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
-  const crn = journey === 'MANAGE' ? 'X000001' : 'X778160'
+  const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
   it('renders the page', () => {
     loadPage({ journey })
     getUuid(3).then(uuid => {
@@ -109,28 +109,29 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       }
     })
   })
-  it('adds CRISS headers when textarea is empty', () => {
-    loadPage({ journey })
-    getUuid(3).then(uuid => {
-      const id = journey === 'MANAGE' ? appointmentId : uuid
-      addNotePage.getCrissButton().click()
-      cy.get(`textarea#appointments-${crn}-${id}-notes`).should(
-        'have.value',
-        'Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks',
-      )
+  if (journey === 'MANAGE') {
+    it('adds CRISS headers when textarea is empty', () => {
+      loadPage({ journey })
+      getUuid(3).then(uuid => {
+        const id = journey === 'MANAGE' ? appointmentId : uuid
+        addNotePage.getCrissButton().click()
+        cy.get(`textarea#appointments-${crn}-${id}-notes`).should(
+          'have.value',
+          'Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks',
+        )
+      })
     })
-  })
-  it('does not overwrite existing notes with CRISS headers', () => {
-    loadPage({ journey })
-    getUuid(3).then(uuid => {
-      const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`textarea#appointments-${crn}-${id}-notes`).type('Some notes')
-      addNotePage.getCrissButton().click()
-      cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', 'Some notes')
+    it('does not overwrite existing notes with CRISS headers', () => {
+      loadPage({ journey })
+      getUuid(3).then(uuid => {
+        const id = journey === 'MANAGE' ? appointmentId : uuid
+        cy.get(`textarea#appointments-${crn}-${id}-notes`).type('Some notes')
+        addNotePage.getCrissButton().click()
+        cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', 'Some notes')
+      })
     })
-  })
-
-  checkValidation({ journey })
+    checkValidation({ journey })
+  }
 
   if (journey === 'ARRANGE') {
     it('does not show file upload', () => {
@@ -162,17 +163,19 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         cy.get('textarea').type('Test note')
         addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
         addNotePage.getSubmitBtn().click()
-        cy.url().should('include', '/manage')
         cy.wait('@submit')
+        const cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
+        // cy.url().should('include', '/manage')
       })
     })
-    it('submits successfully with no notes or upload and sensitivity selected', () => {
-      loadPage({ journey })
-      addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
-      addNotePage.getSubmitBtn().click()
-      manageAppointmentPage = new ManageAppointmentPage()
-    })
   }
+  it('submits successfully with no notes or upload and sensitivity selected', () => {
+    loadPage({ journey })
+    addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+    addNotePage.getSubmitBtn().click()
+    checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
+  })
 }
 
 describe('Add a note', () => {

@@ -531,7 +531,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getCheckYourAnswers: () => {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)
-      const { crn, id } = req.params as Record<string, string>
+      const { crn, id: uuid, contactId } = req.params as Record<string, string>
+      const id = uuid ?? contactId
       const { data } = req.session
       let location = null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CHECK_YOUR_ANSWERS', crn, SubjectType.CRN)
