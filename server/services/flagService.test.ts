@@ -244,4 +244,24 @@ describe('FlagService', () => {
       }),
     )
   })
+
+  it('does not capture Sentry exception when no Sentry client exists', async () => {
+    ;(Sentry.getClient as jest.Mock).mockReturnValue(undefined)
+
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+      ],
+    })
+
+    const result = await service.getFlags({ email })
+
+    expect(result.enableSentencePlan).toBe(false)
+
+    expect(Sentry.getClient).toHaveBeenCalled()
+
+    expect(Sentry.captureException).not.toHaveBeenCalled()
+  })
 })
