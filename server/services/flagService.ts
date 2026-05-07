@@ -56,7 +56,7 @@ export default class FlagService {
       } else if (matching.length === 1) {
         featureFlags[f] = matching[0].booleanEvaluationResponse.enabled === true
       } else {
-        const message = `No flags found. Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`
+        const message = `Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`
 
         logger.warn(message)
         logger.info(`Sentry client exists: ${Boolean(Sentry.getClient())}`)
