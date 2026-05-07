@@ -6,7 +6,6 @@ export class FeatureFlags {
   enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
-  enableCreateContact?: boolean = undefined
   enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
   enableOGRS4?: boolean = undefined
