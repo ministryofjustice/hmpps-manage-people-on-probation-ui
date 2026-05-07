@@ -1,10 +1,11 @@
 import { FliptEvaluationClient } from '@flipt-io/flipt-client'
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/node'
 import { FlagService } from '.'
 
 const email = 'test@example.com'
 
-jest.mock('@sentry/browser', () => ({
+jest.mock('@sentry/node', () => ({
+  getClient: jest.fn(),
   captureException: jest.fn(),
 }))
 
@@ -231,6 +232,15 @@ describe('FlagService', () => {
     expect(Sentry.captureException).toHaveBeenCalledWith(
       expect.objectContaining({
         message: expect.stringContaining('Expected exactly 1 response for flag enableSentencePlan, got 2'),
+      }),
+      expect.objectContaining({
+        tags: {
+          flag: 'enableSentencePlan',
+          service: 'FlagService',
+        },
+        extra: {
+          matchingLength: 2,
+        },
       }),
     )
   })
