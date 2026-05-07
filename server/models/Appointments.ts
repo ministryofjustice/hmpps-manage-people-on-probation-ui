@@ -129,7 +129,12 @@ export interface AppointmentSession {
 
 export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'
 
-export type EnforcementActionLetterType = 'LICENCE_COMPLIANCE_LETTER' | 'DIFFERENT_ENFORCEMENT_LETTER'
+export type EnforcementActionLetterType =
+  | 'LICENCE_COMPLIANCE_LETTER'
+  | 'FIRST_WARNING_LETTER'
+  | 'SECOND_WARNING_LETTER'
+  | 'BREACH_WARNING_LETTER'
+  | 'DIFFERENT_ENFORCEMENT_LETTER'
 
 export interface AppointmentType {
   code: string

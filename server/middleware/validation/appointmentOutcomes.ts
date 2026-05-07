@@ -142,6 +142,24 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateSendLetter = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/send-letter`)) return
+    render = 'pages/appointment-outcomes/send-letter'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/send-letter`,
+          msg: ['Select who will send the letter', 'Select the type of letter'],
+          log: ['letter sent by no selected', 'letter type not selected'],
+        }),
+      ),
+    }
+  }
+
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
@@ -167,6 +185,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateFailedToAttend()
   validateEnforcementAction()
   validateInitiateBreachRecall()
+  validateSendLetter()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {

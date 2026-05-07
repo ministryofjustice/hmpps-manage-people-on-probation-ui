@@ -1,8 +1,8 @@
 import httpMocks from 'node-mocks-http'
-import { getAppointmentOutcomeBackLink } from './getAppointmentOutcomeBackLink'
-import { AppointmentOutcomeType } from '../models/Appointments'
-import { AppointmentOutcomeProps } from '../models/Locals'
-import { getDataValue } from '../utils'
+import { getBackLink } from './getBackLink'
+import { AppointmentOutcomeType } from '../../models/Appointments'
+import { AppointmentOutcomeProps } from '../../models/Locals'
+import { getDataValue } from '../../utils'
 
 const nextSpy = jest.fn()
 const crn = 'X000001'
@@ -16,8 +16,8 @@ type SelectedOutcomeTypes = {
   [K in AppointmentOutcomeType]?: string
 }
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
+jest.mock('../../utils', () => {
+  const actualUtils = jest.requireActual('../../utils')
   return {
     ...actualUtils,
     getDataValue: jest.fn(),
@@ -72,7 +72,7 @@ const mockRes = (appointmentOutcome: Partial<AppointmentOutcomeProps> = {}): htt
   return httpMocks.createResponse(res)
 }
 
-describe('/middleware/getAppointmentOutcomeBackLink()', () => {
+describe('/middleware/appointment-outcomes/getBackLink', () => {
   const checkBackLinks = ({
     arrangeAppointmentJourney = true,
     requestMethod,
@@ -85,34 +85,34 @@ describe('/middleware/getAppointmentOutcomeBackLink()', () => {
     const localsVars = arrangeAppointmentJourney ? { uuid, id: uuid } : { id: contactId, contactId }
     it('should return correct link if on outcome page', () => {
       const res = mockRes({ reqUrl: baseOutcomeUrl, ...localsVars })
-      getAppointmentOutcomeBackLink(req, res, nextSpy)
+      getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(
         arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
       )
     })
     it('should return correct link if on attended complied page', () => {
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-complied`, ...localsVars })
-      getAppointmentOutcomeBackLink(req, res, nextSpy)
+      getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on attended failed to comply page', () => {
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-failed-to-comply`, ...localsVars })
-      getAppointmentOutcomeBackLink(req, res, nextSpy)
+      getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on acceptable absence page', () => {
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/acceptable-absence`, ...localsVars })
-      getAppointmentOutcomeBackLink(req, res, nextSpy)
+      getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on unacceptable absence page', () => {
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/unacceptable-absence`, ...localsVars })
-      getAppointmentOutcomeBackLink(req, res, nextSpy)
+      getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on failed to attend page', () => {
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/failed-to-attend`, ...localsVars })
-      getAppointmentOutcomeBackLink(req, res, nextSpy)
+      getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
 
@@ -135,7 +135,7 @@ describe('/middleware/getAppointmentOutcomeBackLink()', () => {
           const mockedReq = mockReq({ id: arrangeAppointmentJourney ? uuid : contactId, outcomeType: type, request })
           const res = mockRes({ reqUrl: `${baseOutcomeUrl}/${pageUrl}`, ...localsVars })
           mockGetDataValue.mockReturnValue(type)
-          getAppointmentOutcomeBackLink(mockedReq, res, nextSpy)
+          getBackLink(mockedReq, res, nextSpy)
           expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/${url}`)
         })
       })
