@@ -514,6 +514,44 @@ describe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession.rescheduleAppointment).toEqual(rescheduleAppointment)
   })
 
+  it('should include rescheduleAppointment and lock sensitivity when previously set to sensitive', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49, isSensitive: true })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'RESCHEDULE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                rescheduleAppointment,
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+      flags: {
+        enableSensitivityRemoved: true,
+      },
+    })
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toBeDefined()
+    expect(res.locals.appointmentSession?.sensitivityLocked).toBe(true)
+    expect(res.locals.appointmentSession?.sensitivity).toBe('Yes')
+  })
+
   it('should not include rescheduleAppointment when selection is RESCHEDULE but no reschedule data in session', () => {
     const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
     const req = httpMocks.createRequest({

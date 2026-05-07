@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import {
@@ -1048,6 +1048,34 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
+    })
+    it('should update sensitivity if locked by previous setting', async () => {
+      const appointmentSession: AppointmentSession = {
+        user: {
+          username: 'X',
+          locationCode: `X`,
+          teamCode: 'X',
+          providerCode: 'X',
+        },
+        eventId: 'X',
+        type: 'X',
+        date: 'X',
+        sensitivity: 'No',
+        sensitivityLocked: true,
+      }
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      mockedPostAppointments.mockReturnValue(() =>
+        Promise.resolve({ appointments: [{ id: 0, externalReference: 'apt-ref-1' }] }),
+      )
+      const mockReq = createMockRequest({ appointmentSession })
+      await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'sensitivity'],
+        'Yes',
+      )
     })
   })
   describe('getConfirmation', () => {
