@@ -39,7 +39,6 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block head %}
-  <a id="top"></a>
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
   {% if feComponents.cssIncludes %}
     {% for css in feComponents.cssIncludes %}
@@ -60,7 +59,7 @@
 
 {% endblock %}
 
-{% block bodyStart %}{% endblock %}
+{% block bodyStart %} <a id="top"></a> {% endblock %}
 
 {% block footer %}
   {% if not hideSurveyUsefulSections %}
