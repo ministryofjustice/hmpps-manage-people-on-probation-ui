@@ -96,7 +96,6 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   const { sensitivityLocked } = getDataValue(data, ['appointments', crn, id])
   if (sensitivityLocked) {
     setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
-    console.log(data.appointments)
   }
   const {
     user: { providerCode, teamCode, username, locationCode },
