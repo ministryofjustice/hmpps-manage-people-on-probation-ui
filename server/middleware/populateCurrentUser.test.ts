@@ -187,6 +187,32 @@ describe('/middleware/populateCurrentUser()', () => {
     })
   })
 
+  describe('If user details with probation delivery units is returned from api', () => {
+    const mockUserDetailsWithPdus: MasUserDetails = {
+      ...mockUserDetails,
+      staff: {
+        probationDeliveryUnits: [
+          { code: 'PDU001', description: 'Test PDU' },
+          { code: 'PDU002', description: 'Another PDU' },
+        ],
+      },
+    }
+    const localsUser: LocalsUser = { username: 'user-1', token: '1234', authSource: 'delius' }
+    const mockRes = mockAppResponse({ user: localsUser })
+
+    beforeEach(async () => {
+      jest.spyOn(userService, 'getUser').mockResolvedValueOnce(mockUser)
+      jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(mockUserDetailsWithPdus)
+      await populateCurrentUser(userService, hmppsAuthClient)(req, mockRes, nextSpy)
+    })
+    it('should assign probationDeliveryUnits to res.locals.user', () => {
+      expect(mockRes.locals.user.probationDeliveryUnits).toEqual([
+        { code: 'PDU001', description: 'Test PDU' },
+        { code: 'PDU002', description: 'Another PDU' },
+      ])
+    })
+  })
+
   describe('If error returned', () => {
     const mockError = new Error('Error fetching user')
     const loggerErrorSpy = jest.spyOn(logger, 'error')

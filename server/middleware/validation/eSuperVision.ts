@@ -4,6 +4,7 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { eSuperVisionValidation } from '../../properties/validation/eSupervision'
 import { LocalParams } from '../../models/ESupervision'
 import { getDataValue } from '../../utils'
+import { parseQuestionTemplate } from '../../utils/esupervisionParseTemplate'
 
 const eSuperVision: Route<void> = (req, res, next) => {
   const { url, params, body } = req
@@ -71,6 +72,19 @@ const eSuperVision: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'full-eligibility',
+        }),
+      )
+    }
+  }
+  const validateSPOApproval = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/spo-approval`)) {
+      render = `pages/check-in/spo-approval`
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'spo-approval',
         }),
       )
     }
@@ -275,10 +289,37 @@ const eSuperVision: Route<void> = (req, res, next) => {
       localParams.checkInMobile = mobile
     }
   }
+  const validateEditQuestion = () => {
+    const questionMatch = baseUrl.match(/\/questions\/([\w-]+)\/edit/)
+
+    if (questionMatch) {
+      const draftId = questionMatch[1]
+      const templateId = draftId.split('-')[0]
+      render = `pages/check-in/questions/edit-question`
+
+      localParams.questionId = draftId
+
+      const availableTemplates =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
+      const questionData = parseQuestionTemplate(availableTemplates, templateId)
+      if (questionData) {
+        localParams.question = questionData
+      }
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'edit-question',
+        }),
+      )
+    }
+  }
 
   let errorMessages: Record<string, string> = {}
   validateEligibilityCheck()
   validateEligibilityChoice()
+  validateSPOApproval()
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()
@@ -289,6 +330,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateStopCheckins()
   validateManageContactPage()
   validateRestartJourney()
+  validateEditQuestion()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

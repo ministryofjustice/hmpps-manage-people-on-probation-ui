@@ -1,13 +1,14 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { dateWithYear, dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
   CheckinScheduleRequest,
   DeactivateOffenderRequest,
+  ESupervisionCheckIn,
   ESupervisionNote,
   ESupervisionReview,
   ReactivateOffenderRequest,
@@ -21,6 +22,14 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import config from '../config'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import { parseQuestionTemplate } from '../utils/esupervisionParseTemplate'
+
+function systemIdCheckPass(checkIn: ESupervisionCheckIn): boolean {
+  if (checkIn.livenessEnabled) {
+    return checkIn.livenessResult === 'LIVE' && checkIn.autoIdCheck === 'MATCH'
+  }
+  return checkIn.autoIdCheck === 'MATCH'
+}
 
 const routes = [
   'getStartSetup',
@@ -32,6 +41,8 @@ const routes = [
   'postFullEligibilityPage',
   'getSupplementaryEligibilityPage',
   'postSupplementaryEligibilityPage',
+  'getSPOApprovalPage',
+  'postSPOApprovalPage',
   'getDateFrequencyPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
@@ -56,7 +67,6 @@ const routes = [
   'getCheckinSummaryPage',
   'postCheckinSummaryPage',
   'getConfirmationPage',
-  'getCheckinVideoPage',
   'postTakeAPhotoPage',
   'postViewCheckIn',
   'getManageCheckinPage',
@@ -80,8 +90,15 @@ const routes = [
   'getStartQuestionsPage',
   'postStartQuestionsPage',
   'getAddQuestionsPage',
+  'postAddQuestionsPage',
   'getPreviewFeelingPage',
   'getPreviewSupportPage',
+  'getQuestionsListPage',
+  'postQuestionsListPage',
+  'getEditQuestionPage',
+  'postEditQuestionPage',
+  'getSelectQuestionPage',
+  'getDeleteQuestion',
 ] as const
 
 interface OptionPair {
@@ -196,6 +213,12 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
+      const eligibilityChoice: string | any[] =
+        req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice || []
+
+      if (eligibilityChoice === 'replacement-contact') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/spo-approval`)
+      }
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
@@ -224,6 +247,41 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  getSPOApprovalPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { back } = req.query
+
+      await sendAuditMessage(res, 'VIEW_MAS_SPO_APPROVAL_TO_USE_CHECK_INS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const answer = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilitySPOApproval
+      const isApproved = answer === 'spo-approval' || (Array.isArray(answer) && answer.includes('spo-approval'))
+
+      return res.render('pages/check-in/spo-approval.njk', {
+        crn,
+        id,
+        back,
+        isApproved,
+      })
+    }
+  },
+
+  postSPOApprovalPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const approval = req.body?.esupervision?.[crn]?.[id]?.checkins?.eligibilitySPOApproval
+      if (approval) {
+        setDataValue(data, ['esupervision', crn, id, 'checkins', 'eligibilitySPOApproval'], approval)
+      }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+    }
+  },
+
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
@@ -234,9 +292,12 @@ const checkInsController: Controller<typeof routes, void> = {
       const cya = req.query.cya === 'true'
       const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
       const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
       let backLink: string
       if (cya) {
         backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityChoice === 'replacement-contact') {
+        backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
       } else if (eligibilityArray.includes('eligibility-none')) {
         backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
       } else {
@@ -469,13 +530,16 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const { checkIn } = res.locals
 
-      const url = encodeURIComponent(req.url)
-      const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
-
       if (checkIn.status !== 'REVIEWED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
-      return res.render('pages/check-in/view.njk', { crn, id, back, checkIn, videoLink })
+      return res.render('pages/check-in/view.njk', {
+        crn,
+        id,
+        back,
+        checkIn,
+        systemIdCheckPass: systemIdCheckPass(checkIn),
+      })
     }
   },
 
@@ -554,13 +618,17 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
-      const url = encodeURIComponent(req.url)
-      const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       await sendAuditMessage(res, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
-      return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn, videoLink })
+      return res.render('pages/check-in/review/identity.njk', {
+        crn,
+        id,
+        back,
+        checkIn,
+        systemIdCheckPass: systemIdCheckPass(checkIn),
+      })
     }
   },
 
@@ -685,23 +753,15 @@ const checkInsController: Controller<typeof routes, void> = {
           savedUserDetails.preferredComs === 'EMAIL' ? savedUserDetails.checkInEmail : savedUserDetails.checkInMobile,
         displayDay: dayOfWeek(DateTime.fromFormat(savedUserDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
       }
+      const today = DateTime.now().startOf('day')
+      const checkInDate = DateTime.fromFormat(userDetails.date, 'd/M/yyyy').startOf('day')
+      const isFutureCheckinDate = checkInDate > today
+
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
-      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
+      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails, isFutureCheckinDate })
     }
   },
 
-  getCheckinVideoPage: HmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params as Record<string, string>
-      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
-      const { checkIn } = res.locals
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      const { back } = req.query
-      return res.render('pages/check-in/video.njk', { crn, id, checkIn, back })
-    }
-  },
   postTakeAPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
@@ -731,6 +791,20 @@ const checkInsController: Controller<typeof routes, void> = {
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
+      const eSupClient = new ESupervisionClient(token)
+      let upcomingCheckin = null
+      try {
+        const response = await eSupClient.getUpcomingCheckinQuestions(crn)
+        upcomingCheckin = response || null
+      } catch (error) {
+        logger.info(`No upcoming check in questions found for CRN ${crn}`)
+      }
+      // questions can be edited until 23:59 the day before a check in is sent out
+      const today = new Date().setHours(0, 0, 0, 0)
+      const checkinDate = upcomingCheckin?.expectedCheckinDate
+        ? new Date(upcomingCheckin.expectedCheckinDate).setHours(0, 0, 0, 0)
+        : null
+      const canEditQuestions = checkinDate ? today < checkinDate : false
       const showChange = checkinRes?.status === 'VERIFIED'
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
       const settingsUpdated = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'])
@@ -738,7 +812,32 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.settingsUpdated
       }
-      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
+      const questionsAdded = getDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'])
+
+      let successMessageHtml: string | undefined
+
+      if (questionsAdded) {
+        res.locals.success = true
+        const forename = personalDetails?.name?.forename || 'the person'
+        const rawCheckinDate = upcomingCheckin?.expectedCheckinDate
+        const nextCheckinDate = dateWithYear(rawCheckinDate)
+        successMessageHtml = `
+          <strong>You have added additional questions to ${forename}’s next online check in</strong>
+          <br>
+          Additional questions will only apply to their next check in${nextCheckinDate ? ` on ${nextCheckinDate}` : ''}
+        `
+        setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], undefined)
+      }
+      return res.render('pages/check-in/manage/manage-checkin.njk', {
+        crn,
+        id,
+        mobile,
+        email,
+        showChange,
+        upcomingCheckin,
+        canEditQuestions,
+        successMessageHtml,
+      })
     }
   },
   getManageCheckinDatePage: hmppsAuthClient => {
@@ -1268,6 +1367,8 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  // manage check in questions
+
   getStartQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
@@ -1298,18 +1399,161 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
-
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG CHECK
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_ADD_QUESTIONS', crn, SubjectType.CRN)
+      // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
       }
 
-      // TODO: call the esup questions endpoint
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+
+      const { data } = req.session
+
+      let availableTemplates =
+        getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
+      if (availableTemplates.length === 0) {
+        const eSupClient = new ESupervisionClient(token)
+        const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
+        const customisableTemplates = templatesList.templates.filter(
+          (t: any) => t.policy$hmpps_esupervision_api === 'CUSTOMISABLE',
+        )
+        availableTemplates = customisableTemplates
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'], availableTemplates)
+      }
+
+      let questionTemplateAndInputs = getDataValue(data, [
+        'esupervision',
+        crn,
+        id,
+        'manageQuestions',
+        'questionTemplateAndInputs',
+      ])
+      let expectedCheckinDate = getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'expectedCheckinDate'])
+      // Fetch current check in questions if they have already been submitted
+      if (!questionTemplateAndInputs) {
+        questionTemplateAndInputs = {}
+        try {
+          const eSupClient = new ESupervisionClient(token)
+          const response = await eSupClient.getUpcomingCheckinQuestionItems(crn, 'en-GB')
+          expectedCheckinDate = response?.upcoming?.expectedCheckinDate
+          const items = response?.upcoming?.items || []
+
+          items.forEach((item: any) => {
+            const isCustomisable = availableTemplates.some((t: any) => String(t.id) === String(item.template.id))
+            if (isCustomisable) {
+              const draftId = `${item.template.id}-${uuidv4()}`
+              const inputValue = Object.values(item.params?.placeholders || {})[0] || ''
+              questionTemplateAndInputs[draftId] = inputValue
+            }
+          })
+        } catch (error: any) {
+          if (error?.status === 404 || error?.response?.status === 404) {
+            logger.info(`No upcoming questions found for CRN ${crn}.`)
+          } else {
+            logger.error(`Failed to fetch upcoming questions for CRN ${crn}:`, error)
+            return renderError(error?.status || 500)(req, res)
+          }
+        }
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs'],
+          questionTemplateAndInputs,
+        )
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'expectedCheckinDate'], expectedCheckinDate)
+      }
+
+      const addedQuestions = Object.entries(questionTemplateAndInputs)
+        .map(([qId, inputValue]) => {
+          if (!inputValue || typeof inputValue !== 'string' || inputValue.trim() === '') return null
+          const templateId = parseInt(qId.split('-')[0], 10)
+
+          const templateData = parseQuestionTemplate(availableTemplates, templateId)
+
+          if (!templateData) return null
+
+          return {
+            id: qId,
+            fullText: `${templateData.prefix} ${inputValue}${templateData.suffix}`.trim(),
+          }
+        })
+        .filter(q => q !== null)
+
       return res.render('pages/check-in/questions/add-questions.njk', {
+        crn,
+        id,
+        back,
+        case: personalDetails,
+        addedQuestions,
+        data,
+        expectedCheckinDate,
+      })
+    }
+  },
+
+  postAddQuestionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const manageQuestionsSession = getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions']) || {}
+      const questionTemplateAndInputs = manageQuestionsSession.questionTemplateAndInputs || {}
+      const availableTemplates = manageQuestionsSession.availableTemplates || []
+      const formattedQuestions = Object.entries(questionTemplateAndInputs).map(([draftId, inputValue]) => {
+        const templateId = parseInt(draftId.split('-')[0], 10)
+        const originalTemplate = availableTemplates.find((t: any) => String(t.id) === String(templateId))
+
+        return {
+          id: templateId,
+          params: {
+            placeholders: {
+              [originalTemplate?.responseSpec?.placeholders?.[0] || 'text']: inputValue as string,
+            },
+            responseFormat: originalTemplate?.responseFormat || 'TEXT',
+          },
+        }
+      })
+
+      try {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupClient = new ESupervisionClient(token)
+
+        if (formattedQuestions.length === 0) {
+          await eSupClient.deleteAssignedQuestionsFromCheckIn(crn)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], false)
+        } else {
+          await eSupClient.putAssignQuestionsToCheckIn(crn, {
+            questions: formattedQuestions,
+            language: 'en-GB',
+            author: res.locals.user.username,
+          })
+          setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], true)
+        }
+
+        setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+      } catch (error: any) {
+        logger.error(`Failed to assign/delete questions for CRN ${crn}:`, error)
+        return renderError(error?.status || 500)(req, res)
+      }
+    }
+  },
+
+  getPreviewFeelingPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+      return res.render('pages/check-in/questions/preview/feeling.njk', {
         crn,
         back,
         id,
@@ -1317,43 +1561,202 @@ const checkInsController: Controller<typeof routes, void> = {
       })
     }
   },
-  getPreviewFeelingPage: hmppsAuthClient => {
+  getPreviewSupportPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
-
+      const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
       }
-
-      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-
-      return res.render('pages/check-in/questions/preview/feeling.njk', {
+      return res.render('pages/check-in/questions/preview/support.njk', {
         crn,
-        back: req.query.back,
+        back,
         id,
         data: req.session.data,
       })
     }
   },
 
-  getPreviewSupportPage: hmppsAuthClient => {
+  getQuestionsListPage: hmppsAuthClient => {
     return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_LIST_CHECK_IN_LIST_QUESTIONS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${req.params.crn as string}`)
+        return res.redirect(`/case/${crn}`)
       }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const eSupClient = new ESupervisionClient(token)
 
-      if (!isValidCrn(req.params.crn as string) || !isValidUUID(req.params.id as string)) {
+      const personalDetails = await masClient.getPersonalDetails(crn)
+      const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
+      const customisableTemplates = templatesList.templates.filter(
+        (t: any) => t.policy$hmpps_esupervision_api === 'CUSTOMISABLE',
+      )
+      const availableTemplates = customisableTemplates
+
+      setDataValue(
+        req.session.data,
+        ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
+        availableTemplates,
+      )
+      // redirect if questions >= 3
+      const questionTemplateAndInputs =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs']) || {}
+      if (Object.keys(questionTemplateAndInputs).length >= 3) {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+      }
+      // replace curly braces placeholder with [insert text] for presentation
+      const displayTemplates = templatesList.templates.map((q: any) => {
+        const start = q.template.indexOf('{{')
+        const end = q.template.indexOf('}}', start)
+
+        let displayTemplate = q.template
+        if (start !== -1 && end !== -1) {
+          displayTemplate = `${q.template.substring(0, start)}[insert text]${q.template.substring(end + 2)}`
+        }
+
+        return {
+          ...q,
+          displayTemplate,
+        }
+      })
+      return res.render('pages/check-in/questions/list-questions.njk', {
+        crn,
+        id,
+        back,
+        case: personalDetails,
+        templatesList: { templates: displayTemplates },
+        data: req.session.data,
+      })
+    }
+  },
+
+  postQuestionsListPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+    }
+  },
 
-      const { crn, id } = req.params as Record<string, string>
+  getEditQuestionPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, questionId } = req.params as Record<string, string>
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_EDIT', crn, SubjectType.CRN)
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+
+      let availableTemplates =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
+
+      if (availableTemplates.length === 0) {
+        const eSupClient = new ESupervisionClient(token)
+        const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
+        const customisableTemplates = templatesList.templates.filter(
+          (t: any) => t.policy$hmpps_esupervision_api === 'CUSTOMISABLE',
+        )
+        availableTemplates = customisableTemplates
+        setDataValue(
+          req.session.data,
+          ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
+          availableTemplates,
+        )
+      }
+
+      const templateId = questionId.split('-')[0]
+      const questionForView = parseQuestionTemplate(availableTemplates, templateId)
+
+      if (!questionForView) return renderError(404)(req, res)
+
+      return res.render('pages/check-in/questions/edit-question.njk', {
+        crn,
+        id,
+        questionId,
+        back,
+        case: personalDetails,
+        question: questionForView,
+        data: req.session.data,
+      })
+    }
+  },
+
+  postEditQuestionPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, questionId } = req.params as Record<string, string>
       const { data } = req.session
 
-      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      const inputValue = req.body?.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput
 
-      const viewData = { crn, id, back: req.query.back, data }
-      return res.render('pages/check-in/questions/preview/support.njk', viewData)
+      if (inputValue && inputValue.trim() !== '') {
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs', questionId],
+          inputValue.trim(),
+        )
+
+        if (data.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput !== undefined) {
+          delete data.esupervision[crn][id].manageQuestions.draftQuestionInput
+        }
+      }
+
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+    }
+  },
+
+  getSelectQuestionPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, templateId } = req.params as Record<string, string>
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_SELECT', crn, SubjectType.CRN)
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const questionTemplateAndInputs =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs']) || {}
+      if (Object.keys(questionTemplateAndInputs).length >= 3) {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+      }
+      const draftId = `${templateId}-${uuidv4()}`
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/${draftId}/edit`)
+    }
+  },
+
+  getDeleteQuestion: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, questionId } = req.params as Record<string, string>
+      const { data } = req.session
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_DELETE', crn, SubjectType.CRN)
+
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+
+      if (data.esupervision?.[crn]?.[id]?.manageQuestions?.questionTemplateAndInputs?.[questionId]) {
+        delete data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[questionId]
+      }
+
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
     }
   },
 }

@@ -143,7 +143,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
     })
-    cy.pause()
   })
   it('should redirect to the correct page when an option is selected', () => {
     loadPage({ journey })

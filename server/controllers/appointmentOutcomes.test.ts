@@ -13,7 +13,19 @@ const crn = 'X000001'
 const id = '1234'
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const contactId = '1234'
-const change = '/change/url'
+
+const mockFile = {
+  fieldname: 'fileUpload',
+  originalname: 'mock-file.pdf',
+  encoding: '7bit',
+  mimetype: 'application/pdf',
+  buffer: [] as any,
+  size: 584020,
+}
+
+const mockHmppsAuthClient = {
+  getSystemClientToken: jest.fn().mockResolvedValue('token'),
+} as any
 
 jest.mock('../data/masApiClient')
 
@@ -27,6 +39,20 @@ jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
 }))
+
+jest.mock('../data/hmppsAuthClient', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
+    }
+  })
+})
+
+jest.mock('./appointments', () => {
+  return {
+    isSuccessfulUpload: jest.fn(),
+  }
+})
 
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
@@ -56,13 +82,14 @@ jest.mock('./arrangeAppointment', () => ({
   getSentence: jest.fn(() => mockMiddlewareFn),
 }))
 
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+const isSuccessfulUploadMock = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const baseUrl = '/crn/X000001/appointment/appointment/1234'
 const baseOutcomeUrl = '/crn/X000001/appointment/appointment/1234/outcome'
 const completedUrl = `/completed/route`
-
 const mockRes = ({
   appointmentOutcome,
   appointmentCase,
@@ -233,39 +260,417 @@ describe('controllers/appointmentOutcomes', () => {
         maxFileSize: 5242880,
         errorMessages: null,
         uploadedFiles: [],
-        useDecorator: true,
         maxCharCount: 12000,
       })
     })
   })
 
   describe('postAddNote', () => {
-    it('should redirect to the error page if params are invalid', () => {
+    const sensitivity = 'No'
+    const notes = 'Mock notes'
+    it('should redirect to the error page if params are invalid', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { isValidParams: false } })
       controllers.appointmentOutcomes.postAddNote()(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
-    it('should redirect to the change url if in req url query', () => {
-      const req = mockReq({ query: { change } })
-      const res = mockRes()
-      const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAddNote()(req, res)
-      expect(spy).toHaveBeenCalledWith(change)
-    })
-    it('should redirect to the check your answers page if arrange appointment journey', () => {
+    it('should redirect to check your answers page if arrange appointment journey', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { uuid, contactId: undefined, id: uuid } })
       const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAddNote()(req, res)
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
-    it('should redirect to the manage appointment page if manage journey', () => {
+    it('should patch the appointment if manage journey', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAddNote()(req, res)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage`)
+      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUnacceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUnacceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
+    })
+  })
+  describe('postUnacceptableAbsence', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postUnacceptableAbsence', expectedOptions)
+    })
+  })
+  describe('getFailedToAttend', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getFailedToAttend()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
+    })
+  })
+  describe('postFailedToAttend', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'DECISION_PENDING',
+        'REFER_TO_OFFENDER_MANAGER',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postFailedToAttend', expectedOptions)
+    })
+  })
+
+  describe('getAttendedFailedToComply', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAttendedFailedToComply()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply')
+    })
+  })
+
+  describe('postAttendedFailedToComply', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postAttendedFailedToComply', expectedOptions)
+    })
+  })
+  describe('getAcceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
+    })
+  })
+  describe('postAcceptableAbsence', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUnacceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUnacceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
+    })
+  })
+  describe('postUnacceptableAbsence', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postUnacceptableAbsence', expectedOptions)
+    })
+  })
+  describe('getFailedToAttend', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getFailedToAttend()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
+    })
+  })
+  describe('postFailedToAttend', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'DECISION_PENDING',
+        'REFER_TO_OFFENDER_MANAGER',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postFailedToAttend', expectedOptions)
+    })
+  })
+  describe('getEnforcementAction', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/enforcement-action')
+    })
+  })
+  describe('postEnforcementAction', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+
+  describe('getAttendedFailedToComply', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAttendedFailedToComply()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply')
+    })
+  })
+
+  describe('postAttendedFailedToComply', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postAttendedFailedToComply', expectedOptions)
+    })
+  })
+  describe('getAcceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
+    })
+  })
+  describe('postAcceptableAbsence', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUnacceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUnacceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
+    })
+  })
+  describe('postUnacceptableAbsence', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postUnacceptableAbsence', expectedOptions)
+    })
+  })
+  describe('getFailedToAttend', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getFailedToAttend()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
+    })
+  })
+  describe('postFailedToAttend', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'DECISION_PENDING',
+        'REFER_TO_OFFENDER_MANAGER',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postFailedToAttend', expectedOptions)
+    })
+  })
+  describe('getEnforcementAction', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/enforcement-action')
+    })
+  })
+  describe('postEnforcementAction', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getInitiateBreachOrRecall', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/initiate-breach-or-recall')
+    })
+  })
+  describe('postInitiateBreachOrRecall', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+
+  describe('getAttendedFailedToComply', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAttendedFailedToComply()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply')
+    })
+  })
+
+  describe('postAttendedFailedToComply', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postAttendedFailedToComply', expectedOptions)
+    })
+  })
+  describe('getAcceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
+    })
+  })
+  describe('postAcceptableAbsence', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUnacceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUnacceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
+    })
+  })
+  describe('postUnacceptableAbsence', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postUnacceptableAbsence', expectedOptions)
+    })
+  })
+  describe('getFailedToAttend', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getFailedToAttend()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
+    })
+  })
+  describe('postFailedToAttend', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'DECISION_PENDING',
+        'REFER_TO_OFFENDER_MANAGER',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postFailedToAttend', expectedOptions)
+    })
+  })
+  describe('getEnforcementAction', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/enforcement-action')
+    })
+  })
+  describe('postEnforcementAction', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getInitiateBreachOrRecall', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/initiate-breach-or-recall')
+    })
+  })
+  describe('postInitiateBreachOrRecall', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
     })
   })
 

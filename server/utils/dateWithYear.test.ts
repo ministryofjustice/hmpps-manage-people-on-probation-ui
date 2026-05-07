@@ -1,4 +1,4 @@
-import { dateWithYear, dateToLongDate } from '.'
+import { dateWithYear, dateToLongDate, dateWithYearTimeFirst } from '.'
 
 describe('utils/dateWithYear', () => {
   it.each([
@@ -18,5 +18,15 @@ describe('utils/dateToLongDate', () => {
     ['Invalid format returns original', '29-11-2025', '29-11-2025'],
   ])('%s dateToLongDate(%s) => %s', (_: string, input: string, expected: string) => {
     expect(dateToLongDate(input as unknown as string)).toEqual(expected)
+  })
+})
+
+describe('utils/dateWithYearTimeFirst', () => {
+  it.each([
+    [null, null, ''],
+    ['Empty string', '', ''],
+    ['Date string ', '2023-05-25T09:08:34.123', '9:08am 25 May 2023'],
+  ])('%s dateWithYearTimeFirst(%s)', (_: string, input: string, expected: string) => {
+    expect(dateWithYearTimeFirst(input)).toEqual(expected)
   })
 })
