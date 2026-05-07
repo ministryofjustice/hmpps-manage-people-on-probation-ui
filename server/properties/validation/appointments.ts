@@ -161,7 +161,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page),
+      optional:
+        !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) ||
+        (['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) && isSensitive === true),
       checks: [
         {
           validator: isNotEmpty,

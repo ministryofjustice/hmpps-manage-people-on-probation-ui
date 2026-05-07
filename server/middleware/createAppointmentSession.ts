@@ -51,6 +51,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     let start = ''
     let end = ''
     let sensitivity: YesNo | undefined
+    let sensitivityLocked: boolean | undefined
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -72,6 +73,9 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     if (selection === 'RESCHEDULE') {
       sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
+      if (sensitivity === 'Yes') {
+        sensitivityLocked = true
+      }
     }
     appointmentSession = {
       ...appointmentSession,
@@ -91,7 +95,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       uuid: '',
       externalReference,
       enforcementAction,
-      // sensitivity,
+      sensitivity,
+      sensitivityLocked,
     }
     if (visorReport) {
       appointmentSession.visorReport = visorReport

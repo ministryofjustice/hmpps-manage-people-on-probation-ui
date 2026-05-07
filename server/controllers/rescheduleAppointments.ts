@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
-import { isValidCrn, isValidUUID } from '../utils'
+import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 
 import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
@@ -89,7 +89,9 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
   getRescheduleCheckYourAnswer: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id, contactId } = req.params as Record<string, string>
+      const { data } = req.session
       const isInPast = appointmentDateIsInPast(req)
+      const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
       await sendAuditMessage(res, 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE', crn, SubjectType.CRN)
       const { url } = req
       res.render('pages/reschedule/check-your-answers', {
@@ -98,6 +100,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         contactId,
         url,
         isInPast,
+        sensitivityLocked,
       })
     }
   },

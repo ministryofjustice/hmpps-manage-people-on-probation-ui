@@ -29,7 +29,8 @@ const appointments: Route<void> = (req, res, next) => {
 
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
+  const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+  const isSensitive = sensitivityLocked ?? res.locals.personAppointment?.appointment?.isSensitive
 
   let localParams: LocalParams = {
     crn,
@@ -201,6 +202,7 @@ const appointments: Route<void> = (req, res, next) => {
           page: 'supporting-information',
           notes: req.body.appointments[crn][id].notes,
           maxCharCount: maxCharCount as number,
+          isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
         }),
       ),
     }

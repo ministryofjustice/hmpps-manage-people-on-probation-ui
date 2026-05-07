@@ -76,6 +76,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     start: '',
     end: '',
     uuid,
+    sensitivityLocked: false,
   }
 
   it('should construct the correct session with date removed and redirect to arrange another appointment page', () => {
