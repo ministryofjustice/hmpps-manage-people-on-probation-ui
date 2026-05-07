@@ -3,9 +3,10 @@ import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
-import { getDataValue } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import MasApiClient from '../data/masApiClient'
+import { isSuccessfulUpload } from './appointments'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -112,12 +113,27 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       })
     }
   },
-  postAddNote: _hmppsAuthClient => {
+  postAddNote: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, isValidParams, id, uuid } = res.locals.appointmentOutcome
       const { change } = req.query as Record<string, string>
+      const { notes, sensitive } = req.body
       if (!isValidParams) {
         return renderError(404)(req, res)
+      }
+      const file = req.file as Express.Multer.File
+      if (file) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        const patchResponse = await masClient.patchDocuments(crn, id, file)
+        if (!isSuccessfulUpload(patchResponse)) {
+          return res.render('pages/appointment-outcomes/add-note', {
+            uploadError: 'File not uploaded. Please try again.',
+            patchResponse,
+            sensitive,
+            notes,
+          })
+        }
       }
       const redirect = uuid
         ? `/case/${crn}/arrange-appointment/${id}/check-your-answers`

@@ -222,5 +222,5 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
 
-  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote())
+  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
 }
