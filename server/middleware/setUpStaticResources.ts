@@ -15,6 +15,9 @@ export default function setUpStaticResources(): Router {
   // This retains the SP header
   const staticResourcesConfig = { maxAge: config.staticResourceCacheDuration, redirect: false }
 
+  // Default path of favicon requested by some browsers that doesn't respect the icons defined in the template
+  router.use('/favicon.ico', express.static(path.join(process.cwd(), '/assets/images/favicon.ico')))
+
   Array.of(
     '/dist/assets',
     '/dist/assets/css',
