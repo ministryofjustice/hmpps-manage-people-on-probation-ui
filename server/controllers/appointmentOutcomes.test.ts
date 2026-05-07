@@ -9,6 +9,10 @@ import { checkAuditMessage } from './testutils'
 import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
 import { appointmentOutcomeRequests } from './appointmentOutcomes'
 import { Activity } from '../data/model/schedule'
+import { isSuccessfulUpload } from './appointments'
+import TokenStore from '../data/tokenStore/redisTokenStore'
+import MasApiClient from '../data/masApiClient'
+import { HmppsAuthClient } from '../data'
 
 const crn = 'X000001'
 const id = '1234'
@@ -17,18 +21,16 @@ const contactId = '1234'
 const change = '/change/url'
 
 jest.mock('../data/masApiClient')
-
-const mockHmppsAuthClient = {
-  getSystemClientToken: jest.fn().mockResolvedValue('token'),
-} as any
-
-jest.mock('../data/masApiClient')
-jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
 }))
+jest.mock('./appointments', () => ({
+  isSuccessfulUpload: jest.fn(),
+}))
 
+jest.mock('../data/masApiClient')
+jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -59,6 +61,7 @@ jest.mock('./arrangeAppointment', () => ({
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
+const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 
 const baseUrl = '/crn/X000001/appointment/appointment/1234'
 const baseOutcomeUrl = '/crn/X000001/appointment/appointment/1234/outcome'
@@ -121,6 +124,11 @@ const mockReq = ({
 }
 
 type ExpectedRedirect = Partial<Record<AppointmentOutcomeType | AppointmentEnforcementAction, string>>
+
+const token = { access_token: 'token-1', expires_in: 300 }
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const expectedRedirect: ExpectedRedirect = {
   ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
@@ -275,31 +283,57 @@ describe('controllers/appointmentOutcomes', () => {
   })
 
   describe('postAddNote', () => {
-    it('should redirect to the error page if params are invalid', () => {
+    const file = new File(['file contents'], 'avatar.png', { type: 'image/png' })
+    it('should redirect to the error page if params are invalid', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { isValidParams: false } })
-      controllers.appointmentOutcomes.postAddNote()(req, res)
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
-    it('should redirect to the change url if in req url query', () => {
+    it('should upload the file', async () => {
+      isSuccessfulUploadSpy.mockReturnValueOnce(true)
+      const req = mockReq({ request: { file } })
+      const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
+      const patchDocumentsSpy = jest.spyOn(MasApiClient.prototype, 'patchDocuments')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, file)
+    })
+    it('should render the page if upload not successful', async () => {
+      isSuccessfulUploadSpy.mockReturnValueOnce(false)
+      const req = mockReq({ request: { file, body: { notes: 'Some notes', sensitive: 'no' } } })
+      const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
+      const renderSpy = jest.spyOn(res, 'render')
+      const patchDocumentsSpy = jest
+        .spyOn(MasApiClient.prototype, 'patchDocuments')
+        .mockResolvedValueOnce({ statusCode: 500 })
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, file)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointment-outcomes/add-note', {
+        uploadError: 'File not uploaded. Please try again.',
+        patchResponse: { statusCode: 500 },
+        sensitive: 'no',
+        notes: 'Some notes',
+      })
+    })
+    it('should redirect to the change url if in req url query', async () => {
       const req = mockReq({ request: { query: { change } } })
       const res = mockRes()
       const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAddNote()(req, res)
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(change)
     })
-    it('should redirect to the check your answers page if arrange appointment journey', () => {
+    it('should redirect to the check your answers page if arrange appointment journey', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { uuid, contactId: undefined, id: uuid } })
       const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAddNote()(req, res)
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
-    it('should redirect to the manage appointment page if manage journey', () => {
+    it('should redirect to the check your answers page if manage journey', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAddNote()(req, res)
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/check-your-answers`)
     })
   })
