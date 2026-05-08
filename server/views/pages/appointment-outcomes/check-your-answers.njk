@@ -1,0 +1,16 @@
+{% extends "../_form.njk" %}
+{% set notStandardForm = true %}
+{% set title = 'Check your answers then confirm the appointment outcome' %}
+{% set buttonText = 'Confirm this appointment' %}
+{% set showCalendarInsetText = not isInPast %}
+{% set outcome = true %}
+{% block beforeContent %}{% endblock %}
+{% block primary %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h2>
+        </div>
+    </div>
+    {% include "./appointment-summary.njk" %}
+
+{% endblock %}

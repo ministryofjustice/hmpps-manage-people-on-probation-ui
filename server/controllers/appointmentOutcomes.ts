@@ -13,6 +13,8 @@ export const appointmentOutcomeRequests = [
   'postOutcome',
   'getAddNote',
   'postAddNote',
+  'getCheckYourAnswers',
+  'postCheckYourAnswers',
   'getAttendedFailedToComply',
   'postAttendedFailedToComply',
   'getAcceptableAbsence',
@@ -139,6 +141,15 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         ? `/case/${crn}/arrange-appointment/${id}/check-your-answers`
         : `/case/${crn}/appointments/appointment/${id}/check-your-answers`
       return res.redirect(change ?? redirect)
+    }
+  },
+  getCheckYourAnswers: _hmppsAuthClient => {
+    return async (_req, res) => res.render('pages/appointment-outcomes/check-your-answers')
+  },
+  postCheckYourAnswers: _hmppsAuthClient => {
+    return async (_req, res) => {
+      const { id, crn } = res.locals.appointmentOutcome
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => {
