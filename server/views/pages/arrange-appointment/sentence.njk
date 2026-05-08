@@ -1,11 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
 {% set personForename = headerPersonName.forename %}
-{% set backLink = change if change else 
-  (back if back else 
-    '/case/' + crn + '/appointments'
-  ) %}
-{% set breadcrumb = 'Arrange an appointment' %}
+{% set backLink = change | default('/case/' + crn + '/appointments') %}
+
 {% block alertBanner %}
   {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
@@ -75,24 +72,6 @@
     }), allSentences) %}
     {% endif %}
   {% endfor %}
-  {% set allSentences = (allSentences.push({
-      text: appointment.meta.forename,
-      value: 'PERSON_LEVEL_CONTACT',
-      label: {
-        classes: 'govuk-!-font-weight-bold',
-        attributes: {
-          'data-qa': 'personLevelContactLabel'
-        }
-      },
-      hint: {
-        text: 'Relates to the person.'
-      },
-      attributes: {
-          'data-qa': 'personLevelContact',
-          'data-sentence': 'true',
-          'data-reset-conditional-radios': ''
-      }
-  }), allSentences) %}
   {{ govukRadios({
     fieldset: {
       legend: {
