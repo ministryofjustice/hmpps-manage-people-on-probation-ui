@@ -29,8 +29,8 @@
     "setup": "npm ci && hmpps-npm-script-run-allowlist"
   },
   "engines": {
-    "node": "^22",
-    "npm": "^10"
+    "node": "^24",
+    "npm": "^11"
   },
   "nyc": {
     "report-dir": "cypress_coverage",
@@ -187,9 +187,9 @@
     "@babel/preset-env": "^7.29.2",
     "@cypress/code-coverage": "^3.14.7",
     "@faker-js/faker": "^10.4.0",
+    "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
-    "@ministryofjustice/eslint-config-hmpps": "^0.0.5",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
     "@types/compression": "^1.8.1",
