@@ -30,7 +30,6 @@ const enforcementContactsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      // TODO: This should call getEnforcementContacts when the API is ready
       const enforcementActions = await masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortQuery)
 
       const pagination: Pagination = getPaginationLinks(
