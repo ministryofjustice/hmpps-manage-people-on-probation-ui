@@ -125,6 +125,7 @@ export interface AppointmentSession {
     letterSentBy?: EnforcementActionCreatedBy
     letterType?: EnforcementActionLetterType
   }
+  sensitivityLocked?: boolean
 }
 
 export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'
@@ -288,6 +289,7 @@ export interface LocalParams {
   useDecorator?: boolean
   isReschedule?: boolean
   options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[] | EnforcementActionCreatedByOption[]
+  isSensitive?: boolean
 }
 
 export interface ProbationDeliveryUnit {

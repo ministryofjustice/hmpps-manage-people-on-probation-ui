@@ -287,12 +287,14 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const url = encodeURIComponent(req.url)
       const { maxCharCount } = config
+      const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
         url,
         maxCharCount,
+        isSensitive,
       })
     }
   },
