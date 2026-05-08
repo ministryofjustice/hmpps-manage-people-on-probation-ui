@@ -30,7 +30,9 @@ const appointments: Route<void> = (req, res, next) => {
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
   const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
-  const isSensitive = sensitivityLocked ?? res.locals.personAppointment?.appointment?.isSensitive
+  const isSensitive =
+    (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) ??
+    res.locals.personAppointment?.appointment?.isSensitive
 
   let localParams: LocalParams = {
     crn,

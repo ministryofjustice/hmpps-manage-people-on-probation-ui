@@ -94,7 +94,7 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
     return renderError(404)(req, res)
   }
   const { sensitivityLocked } = getDataValue(data, ['appointments', crn, id])
-  if (sensitivityLocked) {
+  if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
     setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
   }
   const {
