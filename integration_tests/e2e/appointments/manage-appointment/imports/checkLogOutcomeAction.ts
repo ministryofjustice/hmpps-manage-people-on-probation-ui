@@ -37,7 +37,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
               .should(
                 'have.attr',
                 'href',
-                `/case/${crn}/appointments/appointment/${appointmentId}/update-enforcement-action`,
+                `/case/${crn}/appointments/appointment/${appointmentId}/outcome/update-enforcement-action`,
               )
           })
         } else {
@@ -86,7 +86,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
               .should(
                 'have.attr',
                 'href',
-                `/case/${crn}/appointments/appointment/${appointmentId}/update-enforcement-action`,
+                `/case/${crn}/appointments/appointment/${appointmentId}/outcome/update-enforcement-action`,
               )
           })
         } else {

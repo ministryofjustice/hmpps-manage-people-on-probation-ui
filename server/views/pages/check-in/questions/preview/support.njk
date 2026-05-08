@@ -5,8 +5,7 @@
 {% set formAnchorText = "Back to questions" %}
 {% set formAnchorLink = "/case/"+ crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set notStandardForm = true %}
-{% set back = back if back else '' %}
-{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 
 
 
@@ -30,7 +29,8 @@
                         { label: "Drugs", id: "drugsSupport", text: "Tell us what you want us to know about drugs (optional)" },
                         { label: "Money", id: "moneySupport", text: "Tell us what you want us to know about money (optional)" },
                         { label: "Housing", id: "housingSupport", text: "Tell us what you want us to know about housing (optional)" },
-                        { label: "Support system (family, relationships, friends)", id: "supportSystemSupport", text: "Tell us what you want us to know about your support system (optional)" },
+                        { label: "Employment and education", id: "employmentAndEducationSupport", text: "Tell us what you want us to know about employment and education (optional)" },
+                        { label: "Relationships (family, friends, partner)", id: "relationshipsSupport", text: "Tell us what you want us to know about your relationships (optional)" },
                         { label: "Something else", id: "otherSupport", text: "Tell us what you want us to know about (optional)" }
                     ] %}
 
@@ -56,7 +56,7 @@
                     <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input" id="no-help-checkbox" name="assistance" type="checkbox" readonly disabled>
                         <label class="govuk-label govuk-checkboxes__label" for="no-help-checkbox">
-                            No, I do not need help
+                            No, I do not need any support
                         </label>
                     </div>
 

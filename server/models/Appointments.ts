@@ -38,7 +38,6 @@ export const breachEnforcementActions = [
   'BREACH_REQUEST_ACTIONED',
   'SEND_CONFIRMATION_OF_BREACH',
   'IMMEDIATE_BREACH_OR_RECALL',
-  'NO_FURTHER_ACTION',
 ] as const
 
 export type BreachEnforcementAction = (typeof breachEnforcementActions)[number]
@@ -78,6 +77,7 @@ export const appointmentEnforcementActions = [
   'WITHDRAWAL_OF_WARNING',
   'SEND_LETTER',
   'SEND_ANOTHER_LETTER',
+  'WILL_BE_RESCHEDULED',
   ...breachEnforcementActions,
   ...letterEnforcementActions,
 ] as const
@@ -147,6 +147,7 @@ export interface AppointmentSession {
     date?: string
   }
   outcome?: AppointmentSessionOutcome
+  sensitivityLocked?: boolean
 }
 
 export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'
@@ -313,6 +314,12 @@ export interface LocalParams {
     | Option<AppointmentOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
+  isSensitive?: boolean
+}
+
+export interface ProbationDeliveryUnit {
+  code: string
+  description: string
 }
 
 export interface MasUserDetails {
@@ -323,6 +330,9 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+  staff?: {
+    probationDeliveryUnits?: ProbationDeliveryUnit[]
+  }
 }
 
 export interface AttendedCompliedAppointment {

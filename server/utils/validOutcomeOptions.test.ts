@@ -34,6 +34,10 @@ describe('utils/validOutcomeOptions', () => {
       value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
       text: 'Attended - sent home (behaviour)',
     },
+    {
+      value: 'WILL_BE_RESCHEDULED',
+      text: 'The appointment will be rescheduled',
+    },
   ]
   it('should return all outcome options', () => {
     const validOptions = validOutcomeOptions(contactOutcomes, outcomeOptions)
@@ -42,7 +46,7 @@ describe('utils/validOutcomeOptions', () => {
   it('should return only the valid outcome options', () => {
     contactOutcomes = [...contactOutcomes.filter(item => item.code !== 'AFTC')]
     const validOptions = validOutcomeOptions(contactOutcomes, outcomeOptions)
-    expect(validOptions).toStrictEqual([outcomeOptions[0], outcomeOptions[2]])
+    expect(validOptions).toStrictEqual([outcomeOptions[0], outcomeOptions[2], outcomeOptions[3]])
   })
 })
 
@@ -53,7 +57,11 @@ describe('utils/validEnforcementActionOptions', () => {
     { code: 'LCL', description: 'Licence Compliance Letter Sent', defaultResponsePeriodDays: 7 },
   ]
 
-  const enforcementActionOptions: Option<AppointmentEnforcementAction>[] = [
+  const enforcementActionOptions: Option<AppointmentEnforcementAction | ''>[] = [
+    {
+      value: '',
+      text: 'Select enforcement action',
+    },
     {
       value: 'BREACH_RECALL_INITIATED',
       text: 'Breach/recall initiated',
@@ -86,6 +94,6 @@ describe('utils/validEnforcementActionOptions', () => {
   it('should return only the valid enforcement action options', () => {
     contactEnforcementActions = [...contactEnforcementActions.filter(item => item.code !== 'LCL')]
     const validOptions = validEnforcementActionOptions(contactEnforcementActions, enforcementActionOptions)
-    expect(validOptions).toEqual([...enforcementActionOptions.slice(0, 2), ...enforcementActionOptions.slice(3)])
+    expect(validOptions).toEqual([...enforcementActionOptions.slice(0, 3), ...enforcementActionOptions.slice(4)])
   })
 })

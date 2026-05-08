@@ -43,16 +43,18 @@ type EnforcementRedirectMap = {
 const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, req: Request, res: Response): void => {
   const { baseOutcomeUrl, appointmentSession, reqUrl } = res.locals.appointmentOutcome
   const enforcementAction = appointmentSession?.outcome?.[pageKey] as AppointmentEnforcementAction
-  const isUpdateAction = reqUrl?.includes('/update-enforcement-action')
+  // const isUpdateAction = reqUrl?.includes('/update-enforcement-action')
   const redirectMap: EnforcementRedirectMap = {
     SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
     SEND_ANOTHER_LETTER: `${baseOutcomeUrl}/send-letter`,
+    BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+    BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
     DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
   }
-  if (!isUpdateAction) {
-    redirectMap.BREACH_RECALL_INITIATED = `${baseOutcomeUrl}/initiate-breach-or-recall`
-    redirectMap.BREACH_RECALL_INITIATED_AND_SEND_LETTER = `${baseOutcomeUrl}/initiate-breach-or-recall`
-  }
+  // if (!isUpdateAction) {
+  //   redirectMap.BREACH_RECALL_INITIATED = `${baseOutcomeUrl}/initiate-breach-or-recall`
+  //   redirectMap.BREACH_RECALL_INITIATED_AND_SEND_LETTER = `${baseOutcomeUrl}/initiate-breach-or-recall`
+  // }
   const redirect = redirectMap?.[enforcementAction] || `${baseOutcomeUrl}/add-note`
   return res.redirect(redirect)
 }
@@ -104,7 +106,6 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_NOTE', crn, SubjectType.CRN)
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       return res.render('pages/appointment-outcomes/add-note', {
-        useDecorator: true,
         errorMessages,
         body,
         validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),

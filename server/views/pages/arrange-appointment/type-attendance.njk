@@ -1,7 +1,15 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment type and attendance' %}
 {% set personForename = headerPersonName.forename %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+
+{% if change %}
+  {% set backLink = change %}
+{% elif allSentences.length === 1 %}
+  {% set backLink = '/case/' + crn + '/appointments/' %}
+{% else %}
+  {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+{% endif %}
+
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set attendanceUrl = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?change=' + url if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
@@ -43,20 +51,22 @@
   }) }}
 
   {# Appointment type radios #}
-  {{ govukRadios({
-    formGroup: {
-      attributes: {
-        'data-qa': 'type'
-      }
-    },
-    fieldset: {
-      legend: {
-        text: "What appointment are you arranging?",
-        classes: "govuk-fieldset__legend--m"
-      }
-    },
-    items: types
-  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
+  {% if types.length %}
+      {{ govukRadios({
+        formGroup: {
+          attributes: {
+            'data-qa': 'type'
+          }
+        },
+        fieldset: {
+          legend: {
+            text: "What appointment are you arranging?",
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: types
+      } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
+  {% endif %}
 
   {# Attendence #}
   <section data-qa="attendee">

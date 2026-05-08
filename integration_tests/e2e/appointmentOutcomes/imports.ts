@@ -47,6 +47,6 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
     cy.get(`.govuk-radios__input[value=${value}]`).click()
     outcomePage.getSubmitBtn().click()
     const page = new RedirectPage()
-    page.checkPageTitle(redirectPageTitle!)
+    page.checkPageTitle(redirectPageTitle)
   })
 }

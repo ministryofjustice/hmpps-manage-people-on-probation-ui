@@ -276,7 +276,6 @@ describe('controllers/appointmentOutcomes', () => {
         maxFileSize: 5242880,
         errorMessages: null,
         uploadedFiles: [],
-        useDecorator: true,
         maxCharCount: 12000,
       })
     })

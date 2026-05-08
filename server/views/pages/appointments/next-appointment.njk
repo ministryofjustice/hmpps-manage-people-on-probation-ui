@@ -1,5 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Do you want to arrange the next appointment with ' + personAppointment.personSummary.name.forename + '?'%}
+{% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.type %}
 {% set backLink = back if back else 
   '/case/' + crn + '/appointments/appointment/' + contactId + '/manage/' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
@@ -27,7 +28,7 @@
   } if errorMessages.nextAppointment,
     items: [
     {
-        text: ("Yes - another " + personAppointment.appointment.type) | toSentenceCase,
+        text: ("Yes - another " + appointmentDisplayName) | toSentenceCase,
         value: "KEEP_TYPE",
         checked: body.nextAppointment == "KEEP_TYPE"
     },

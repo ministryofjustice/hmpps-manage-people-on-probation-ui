@@ -79,7 +79,6 @@ const getExpectedOptions = ({ isProbationPractitioner = false } = {}): ExpectedO
       value: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
       text: 'Decision pending Alton’s response',
       RedirectPage: AddNotePage,
-      redirectPageName: 'Add a note',
       redirectPageTitle: 'Add a note',
     },
   ]
@@ -88,16 +87,14 @@ const getExpectedOptions = ({ isProbationPractitioner = false } = {}): ExpectedO
       value: 'REFER_TO_OFFENDER_MANAGER',
       text: 'Refer to offender manager',
       hint: 'Notify the allocated probation practitioner so they can take action.',
-      redirectPageName: 'Add a note',
-      redirectPageTitle: 'Add a note',
       RedirectPage: AddNotePage,
+      redirectPageTitle: 'Add a note',
     })
   }
   expectedOptions.push({
     value: 'DIFFERENT_ACTION',
     text: 'I want to add a different action',
     RedirectPage: EnforcementActionPage,
-    redirectPageName: 'Enforcement action',
     redirectPageTitle: 'Select an enforcement action for Alton’s failure to comply',
   })
   return expectedOptions

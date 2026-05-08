@@ -31,7 +31,10 @@
           "firstName": "Test",
           "surname": "User",
           "email": "user@email.com",
-          "enabled": true
+          "enabled": true,
+          "staff": {
+            "probationDeliveryUnits": [{ "code": "N03CTM", "description": "Test PDU" }]
+          }
         },
         "headers": {
           "Content-Type": "application/json"

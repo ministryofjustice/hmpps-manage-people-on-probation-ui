@@ -29,7 +29,10 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
 
   /* Letter related */
 
-  if (letterEnforcementActions.includes(currentEnforcementAction.action as LetterEnforcementAction)) {
+  if (
+    letterEnforcementActions.includes(currentEnforcementAction.action as LetterEnforcementAction) &&
+    !acceptableAbsence
+  ) {
     values = [
       'SEND_ANOTHER_LETTER',
       'BREACH_RECALL_INITIATED',
@@ -40,7 +43,11 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
 
   /* Breach related */
 
-  if (breachEnforcementActions.includes(currentEnforcementAction.action as BreachEnforcementAction)) {
+  if (
+    breachEnforcementActions.includes(currentEnforcementAction.action as BreachEnforcementAction) &&
+    !acceptableAbsence &&
+    sentenceType === 'COMMUNITY'
+  ) {
     values = [
       'BREACH_REQUESTED',
       'BREACH_CONFIRMATION_SENT',
@@ -57,7 +64,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
     'REFER_TO_OFFENDER_MANAGER',
     'YOT_OM_NOTIFIED',
   ]
-  if (pendingResponseActions.includes(currentEnforcementAction.action)) {
+  if (pendingResponseActions.includes(currentEnforcementAction.action) && !acceptableAbsence) {
     values = ['SEND_LETTER', 'BREACH_RECALL_INITIATED', 'BREACH_RECALL_INITIATED_AND_SEND_LETTER']
   }
 
@@ -68,15 +75,8 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
     'RECALL_REQUESTED',
     'IMMEDIATE_BREACH_OR_RECALL',
   ]
-  if (recallActions.includes(currentEnforcementAction.action)) {
+  if (recallActions.includes(currentEnforcementAction.action) && !acceptableAbsence && sentenceType === 'CUSTODY') {
     values = ['RECALL_REQUESTED', 'WITHDRAW_WARNING_LETTER']
-  }
-
-  /* Other enforcement action */
-
-  const otherAction: AppointmentEnforcementAction = 'NO_FURTHER_ACTION'
-  if (currentEnforcementAction.action === otherAction) {
-    return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
   }
 
   /* Acceptable absence */
@@ -84,6 +84,13 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   if (acceptableAbsence) {
     values = ['WITHDRAW_WARNING_LETTER']
   }
+
+  /* Any other enforcement action? */
+
+  if (!values.length) {
+    return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
+  }
+
   values = [...values, 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
   options = options.filter(option => values.includes(option.value as AppointmentEnforcementAction) || option?.divider)
   res.locals.appointmentOutcome.options = options

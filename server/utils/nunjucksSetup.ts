@@ -21,6 +21,8 @@ import {
   dateWithYearShortMonthAndTime,
   deliusDateFormat,
   deliusDeepLinkUrl,
+  deepLinkContactTypes,
+  drugHistoryContactTypes,
   fromIsoDateToPicker,
   fullName,
   getCurrentRisksToThemselves,
@@ -44,6 +46,7 @@ import {
   getRisksWithScore,
   interventionsLink,
   supervisionContactsAddLink,
+  supervisionContactsUpdateLink,
   isInThePast,
   isToday,
   oaSysUrl,
@@ -75,6 +78,7 @@ import {
   handleQuotes,
   dateToLongDate,
   merge,
+  dateWithYearTimeFirst,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -82,7 +86,7 @@ import config from '../config'
 import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
-import { to12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
+import { to12HourTimeWithMinutes, toIso12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
 import { to12HourTimeCompact } from './to12HourTimeCompact'
 
 export default function nunjucksSetup(
@@ -163,6 +167,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
+  njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
@@ -185,6 +190,8 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('addressToList', addressToList)
   njkEnv.addGlobal('lastUpdatedBy', lastUpdatedBy)
   njkEnv.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
+  njkEnv.addGlobal('deepLinkContactTypes', deepLinkContactTypes)
+  njkEnv.addGlobal('drugHistoryContactTypes', drugHistoryContactTypes)
   njkEnv.addGlobal('oaSysUrl', oaSysUrl)
   njkEnv.addGlobal('deliusHomepageUrl', deliusHomepageUrl)
   njkEnv.addGlobal('scheduledAppointments', scheduledAppointments)
@@ -196,6 +203,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('sentencePlanLink', sentencePlanLink)
   njkEnv.addGlobal('interventionsLink', interventionsLink)
   njkEnv.addGlobal('supervisionContactsAddLink', supervisionContactsAddLink)
+  njkEnv.addGlobal('supervisionContactsUpdateLink', supervisionContactsUpdateLink)
   njkEnv.addGlobal('setSortOrder', setSortOrder)
   njkEnv.addGlobal('sortAppointmentsDescending', sortAppointmentsDescending)
   njkEnv.addGlobal('isNotNull', isNotNull)
@@ -207,6 +215,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
   njkEnv.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
   njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
+  njkEnv.addFilter('toIso12HourTimeWithMinutes', toIso12HourTimeWithMinutes)
 
   arnsNunjucksSetup(njkEnv)
 }

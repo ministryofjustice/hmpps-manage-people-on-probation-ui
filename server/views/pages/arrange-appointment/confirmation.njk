@@ -1,4 +1,5 @@
 {% extends "../_form.njk" %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
@@ -49,9 +50,47 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+
       {% if flags.enableSmsReminders == true %}
         {% if smsSent %}
-          <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+          {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
+            <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.</p>
+            {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
+              {{ mojAlert({
+              variant: "warning",
+              title: "We could not send a confirmation text message to " + case.name.forename,
+              showTitleAsHeading: true,
+              dismissible: false,
+              text: "You need to give " + case.name.forename + " the appointment details.",
+              attributes: {
+                'data-qa': 'sms-err-msg-english'
+              }
+            }) }}
+
+          {% elif isWelshNotificationFailed and not isEnglishNotificationFailed %}
+          {{ mojAlert({
+            variant: "information",
+            title: "We could not send a confirmation text message to " + case.name.forename + " in Welsh",
+            showTitleAsHeading: true,
+            dismissible: false,
+            text: case.name.forename + " has received the appointment details in English. We have logged the text as a contact on NDelius.",
+            attributes: {
+              'data-qa': 'sms-err-msg-welsh'
+            }
+          }) }}
+
+          {% else %}
+            {{ mojAlert({
+              variant: "warning",
+              title: "We could not send a confirmation text message to " + case.name.forename,
+              showTitleAsHeading: true,
+              dismissible: false,
+              text: "You need to give " + case.name.forename + " the appointment details.",
+              attributes: {
+                'data-qa': 'sms-err-msg-combined'
+              }
+            }) }}
+          {% endif %}
         {% else %}
           <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
         {% endif %}

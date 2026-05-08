@@ -19,7 +19,7 @@ export const completeRescheduleAppointmentPage = (enableNonCompliance = false, c
       .getElement(`#appointments-${crn}-${pageUuid}-rescheduleAppointment-reason`)
       .clear()
       .type('Reschedule reason')
-    cy.get('[data-qa="sensitiveInformation"]').find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    cy.get('[data-qa="sensitiveInformation"]').find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
     rescheduleAppointmentPage.getSubmitBtn().click()
   })
 }

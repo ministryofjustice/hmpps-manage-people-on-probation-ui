@@ -5,7 +5,7 @@ import { mockAppResponse } from '../../controllers/mocks'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { ContactOutcomes } from '../../data/model/schedule'
 import { validOutcomeOptions } from '../../utils'
-import { outcomeOptions } from '../../properties'
+import { outcomeOptions } from '../../properties/appointment-outcomes'
 
 const contactId = '12345'
 const crn = 'X000001'

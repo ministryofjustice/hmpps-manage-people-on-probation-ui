@@ -77,15 +77,9 @@ describe('Confirmation page', () => {
         })
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
-        .getWhatHappensNext()
-        .find('p:nth-of-type(1)')
-        .invoke('text')
-        .then(text => {
-          const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
-          )
-        })
+        .getEnglishSMSErrorMsg()
+        .find('h2')
+        .should('contain.text', 'We could not send a confirmation text message to Alton')
 
       cy.get('[data-qa="outlook-err-msg-1"]').should(
         'contain.text',
@@ -109,6 +103,7 @@ describe('Confirmation page', () => {
     })
 
     it('should render the page', () => {
+      cy.task('stubPostMasOutlookEvent')
       loadPage()
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
       confirmPage.checkPageTitle('Appointment arranged')
@@ -124,15 +119,11 @@ describe('Confirmation page', () => {
         })
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
-        .getWhatHappensNext()
-        .find('p:nth-of-type(1)')
-        .invoke('text')
-        .then(text => {
-          const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
-          )
-        })
+        .getSMSConfirmationMsg()
+        .should(
+          'contain.text',
+          'Alton should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.',
+        )
       confirmPage
         .getWhatHappensNext()
         .find('p:nth-of-type(2)')
@@ -197,7 +188,7 @@ describe('Confirmation page', () => {
       loadPage('X000001')
       confirmPage
         .getlogOutcomeLink()
-        .should('contain.text', 'log appointment outcome for Thursday 21 March 2024')
+        .should('contain.text', 'log appointment outcome for Saturday 21 March 2026')
         .should('have.attr', 'href', `/case/X000001/appointments/appointment/5/manage`)
     })
 
@@ -229,15 +220,8 @@ describe('Confirmation page', () => {
         })
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
-        .getWhatHappensNext()
-        .find('p:nth-of-type(1)')
-        .invoke('text')
-        .then(text => {
-          const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
-          )
-        })
+        .getEnglishSMSErrorMsg()
+        .should('contain.text', 'We could not send a confirmation text message to Alton')
 
       cy.get('[data-qa="outlook-err-msg-1"]').should(
         'contain.text',
@@ -333,7 +317,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `Caroline will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
+              `Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.`,
             )
           })
 
@@ -380,50 +364,57 @@ describe('Confirmation page', () => {
       })
     })
   })
-  describe('Attending user has no listed email address', () => {
+
+  describe('SMS reminder', () => {
     beforeEach(() => {
       cy.task('resetMocks')
-      cy.task('stubProbationPractitionerNoEmail')
+    })
+
+    it('should render the page with an alert banner of type warning when the English language SMS reminder fails to send', () => {
+      cy.task('stubPostMasOutlookEventWithNoEnglishId')
       loadPage()
       confirmPage = new AppointmentConfirmationPage()
+
+      confirmPage
+        .getEnglishSMSErrorMsg()
+        .find('h2')
+        .should('contain.text', 'We could not send a confirmation text message to Alton')
     })
-    it('should render the page with error message when no user details found from MAS API', () => {
-      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
-      confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
-      confirmPage
-        .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
-        .invoke('text')
-        .then(text => {
-          const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
-          )
-        })
-      confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
-      confirmPage
-        .getWhatHappensNext()
-        .find('p:nth-of-type(1)')
-        .invoke('text')
-        .then(text => {
-          const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
-          )
-        })
 
-      cy.get('[data-qa="outlook-err-msg-1"]').should(
-        'contain.text',
-        'There is a technical problem with Outlook and we could not send a calendar invitation.',
-      )
-      cy.get('[data-qa="outlook-err-msg-2"]').should(
-        'contain.text',
-        'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
-      )
+    it('should render the page with an alert banner of type information when the Welsh language SMS reminder fails to send', () => {
+      cy.task('stubPersonalDetailsWelshPostcode')
+      cy.task('stubPostMasOutlookEventNoWelshId')
+      loadPage('X000001')
+      confirmPage = new AppointmentConfirmationPage()
 
-      confirmPage.getSubmitBtn().click()
-      const nextAppointmentPage = new OverviewPage()
-      nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
-      nextAppointmentPage.checkOnPage()
+      confirmPage
+        .getWelshSMSErrorMsg()
+        .find('h2')
+        .should('contain.text', 'We could not send a confirmation text message to Caroline')
+    })
+
+    it('should render the page with an alert banner of type warning when both the English and Welsh language SMS reminder fails to send', () => {
+      cy.task('stubPersonalDetailsWelshPostcode')
+      loadPage('X000001')
+      confirmPage = new AppointmentConfirmationPage()
+
+      confirmPage
+        .getCombinedSMSErrorMsg()
+        .should('contain.text', 'We could not send a confirmation text message to Caroline')
+    })
+
+    it('should render the page with a text letting the user know the SMS reminder has been sent', () => {
+      cy.task('stubPersonalDetailsWelshPostcode')
+      cy.task('stubPostMasOutlookEvent')
+      loadPage('X000001')
+      confirmPage = new AppointmentConfirmationPage()
+
+      confirmPage
+        .getSMSConfirmationMsg()
+        .should(
+          'contain.text',
+          'Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.',
+        )
     })
   })
 })

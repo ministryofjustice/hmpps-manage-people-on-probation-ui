@@ -12,3 +12,7 @@ export const dateToLongDate = (dmyDate: string): string | null => {
   if (!dt.isValid) return dmyDate
   return dt.toFormat('d MMMM yyyy')
 }
+export const dateWithYearTimeFirst = (datetimeString: string): string => {
+  if (!datetimeString || isBlank(datetimeString)) return ''
+  return `${govukTime(datetimeString)} ${DateTime.fromISO(datetimeString).toFormat('d MMMM yyyy')}`
+}

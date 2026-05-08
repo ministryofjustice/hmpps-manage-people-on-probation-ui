@@ -24,7 +24,6 @@ describe('ProbationFEComponentsMiddleware', () => {
     const res = {
       locals: {
         user: options?.token !== undefined ? { token: options.token } : undefined,
-        flags: { enableMopCookiePolicy: true, enableMopPrivacyPolicy: true },
       },
     } as unknown as Response
 
@@ -39,7 +38,7 @@ describe('ProbationFEComponentsMiddleware', () => {
       jsIncludes: ['a.js'],
     }
     const { req, res } = createReqRes({
-      session: { feComponents: cached, enableMopCookiePolicy: true, enableMopPrivacyPolicy: true },
+      session: { feComponents: cached },
     })
 
     const fakeService = { getProbationFEComponents: jest.fn() }
@@ -124,74 +123,12 @@ describe('updateLinks', () => {
         <a class="test__link" href="http://localhost:8100/privacy-policy">Privacy policy</a>
       </div>    `
 
-    const output = updateLinks(true, true, input)
+    const output = updateLinks(input)
 
     expect(output).toContain(`href="/privacy-policy"`)
     expect(output).toContain(`href="/cookies-policy"`)
-    expect(output).toContain(`target="_blank"`)
-    expect(output).toContain(`rel="noopener noreferrer"`)
     expect(output).toContain(`data-qa="cookiesPolicyLink"`)
     expect(output).toContain(`data-qa="privacyPolicyLink"`)
-    const matches = output.match(/rel="noopener noreferrer"/g) || []
-    expect(matches).toHaveLength(2)
-  })
-
-  it('should NOT update Privacy policy and Cookies policy links and add target blank', () => {
-    const input = `
-      <div>
-        <a class="test__link" href="http://localhost:8100/accessibility">Accessibility</a>
-        <a class="test__link" href="http://localhost:8100/cookies-policy">Cookies policy</a>
-        <a class="test__link" href="http://localhost:8100/privacy-policy">Privacy policy</a>
-      </div>    `
-
-    const output = updateLinks(false, false, input)
-
-    expect(output).not.toContain(`href="/privacy-policy"`)
-    expect(output).not.toContain(`href="/cookies-policy"`)
-    expect(output).not.toContain(`target="_blank"`)
-    expect(output).not.toContain(`rel="noopener noreferrer"`)
-    expect(output).not.toContain(`data-qa="cookiesPolicyLink"`)
-    expect(output).not.toContain(`data-qa="privacyPolicyLink"`)
-  })
-
-  it('should not have update Privacy policy and should have Cookies policy link and add target blank', () => {
-    const input = `
-      <div>
-        <a class="test__link" href="http://localhost:8100/accessibility">Accessibility</a>
-        <a class="test__link" href="http://localhost:8100/cookies-policy">Cookies policy</a>
-        <a class="test__link" href="http://localhost:8100/privacy-policy">Privacy policy</a>
-      </div>    `
-
-    const output = updateLinks(false, true, input)
-
-    expect(output).not.toContain(`href="/privacy-policy"`)
-    expect(output).toContain(`href="/cookies-policy"`)
-    expect(output).toContain(`target="_blank"`)
-    expect(output).toContain(`rel="noopener noreferrer"`)
-    expect(output).toContain(`data-qa="cookiesPolicyLink"`)
-    expect(output).not.toContain(`data-qa="privacyPolicyLink"`)
-    const matches = output.match(/rel="noopener noreferrer"/g) || []
-    expect(matches).toHaveLength(1)
-  })
-
-  it('should not have update cookie policy and should have privacy policy link and add target blank', () => {
-    const input = `
-      <div>
-        <a class="test__link" href="http://localhost:8100/accessibility">Accessibility</a>
-        <a class="test__link" href="http://localhost:8100/cookies-policy">Cookies policy</a>
-        <a class="test__link" href="http://localhost:8100/privacy-policy">Privacy policy</a>
-      </div>    `
-
-    const output = updateLinks(true, false, input)
-
-    expect(output).toContain(`href="/privacy-policy"`)
-    expect(output).not.toContain(`href="/cookies-policy"`)
-    expect(output).toContain(`target="_blank"`)
-    expect(output).toContain(`rel="noopener noreferrer"`)
-    expect(output).not.toContain(`data-qa="cookiesPolicyLink"`)
-    expect(output).toContain(`data-qa="privacyPolicyLink"`)
-    const matches = output.match(/rel="noopener noreferrer"/g) || []
-    expect(matches).toHaveLength(1)
   })
 
   it('should not modify unrelated links', () => {
@@ -199,7 +136,7 @@ describe('updateLinks', () => {
       <a href="http://localhost:8100/accessibility">Accessibility</a>
     `
 
-    const output = updateLinks(true, true, input)
+    const output = updateLinks(input)
 
     expect(output).toContain(`href="http://localhost:8100/accessibility"`)
     expect(output).not.toContain(`target="_blank"`)
@@ -211,7 +148,7 @@ describe('updateLinks', () => {
       <a href='http://localhost:8100/cookies-policy'>Cookies policy</a>
     `
 
-    const output = updateLinks(true, true, input)
+    const output = updateLinks(input)
 
     expect(output).toContain(`/privacy-policy`)
     expect(output).toContain(`/cookies-policy`)
@@ -229,7 +166,7 @@ describe('updateLinks', () => {
       </div>
     `
 
-    const output = updateLinks(true, true, input)
+    const output = updateLinks(input)
 
     expect(output).toContain(`/privacy-policy`)
     expect(output).toContain(`/cookies-policy`)
@@ -242,7 +179,7 @@ describe('updateLinks', () => {
         <a class="test__link" href="http://localhost:8100/privacy-policy">Privacy policy</a>
     `
 
-    const output = updateLinks(true, true, input)
+    const output = updateLinks(input)
 
     const policyMatches = (output.match(/privacy-policy/g) || []).length
     const cookieMatches = (output.match(/cookies-policy/g) || []).length
@@ -254,7 +191,7 @@ describe('updateLinks', () => {
   it('should return unchanged string if no matches found', () => {
     const input = `<div>No links here</div>`
 
-    const output = updateLinks(true, true, input)
+    const output = updateLinks(input)
 
     expect(output).toBe(input)
   })

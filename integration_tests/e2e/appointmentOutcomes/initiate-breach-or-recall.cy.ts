@@ -169,7 +169,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', msgs[0])
       cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
-      cy.get(`#appointments-${crn}-${id}-outcome-initiateBreachOrRecall-error`).should('contain.text', msgs[2])
+      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
     })
   })
   it('should show validation errors when only the first option is selected for send letter enforcement action', () => {
@@ -182,7 +182,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('not.exist')
       cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
-      cy.get(`#appointments-${crn}-${id}-outcome-initiateBreachOrRecall-error`).should('contain.text', msgs[2])
+      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
     })
   })
   it('should redirect to the correct page when an option is selected', () => {

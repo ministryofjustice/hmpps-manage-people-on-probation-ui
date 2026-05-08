@@ -76,14 +76,12 @@ const getExpectedOptions = ({
       value: 'BREACH_RECALL_INITIATED',
       text: `Initiate a ${text}`,
       RedirectPage: InitiateBreachOrRecallPage,
-      redirectPageName: `Initiate a ${text}`,
       redirectPageTitle: `Initiate a ${text}`,
     },
     {
       value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       text: `Initiate a ${text} and send a letter`,
       RedirectPage: InitiateBreachOrRecallPage,
-      redirectPageName: `Initiate a ${text}`,
       redirectPageTitle: `Initiate a ${text}`,
     },
   ]
@@ -92,7 +90,7 @@ const getExpectedOptions = ({
       value: 'REFER_TO_OFFENDER_MANAGER',
       text: 'Refer to offender manager',
       hint: 'Notify the allocated probation practitioner so they can take action.',
-      redirectPageName: 'Add a note',
+      redirectPageTitle: 'Add a note',
       RedirectPage: AddNotePage,
     })
   }
@@ -101,13 +99,12 @@ const getExpectedOptions = ({
       value: 'NO_FURTHER_ACTION',
       text: 'No further action',
       RedirectPage: AddNotePage,
-      redirectPageName: 'Add a note',
+      redirectPageTitle: 'Add a note',
     },
     {
       value: 'DIFFERENT_ACTION',
       text: 'I want to add a different action',
       RedirectPage: EnforcementActionPage,
-      redirectPageName: 'Enforcement action',
       redirectPageTitle: 'Select an enforcement action for Alton’s failure to comply',
     },
   )

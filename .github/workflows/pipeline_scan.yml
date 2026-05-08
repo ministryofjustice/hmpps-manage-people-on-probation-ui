@@ -167,13 +167,13 @@ jobs:
           path: results.txt
       - name: send a failure slack message
         if: steps.veracode-pipeline-scan.outcome == 'failure' && inputs.channel_id != 'NO_SLACK'
-        uses: ministryofjustice/hmpps-github-actions/.github/actions/slack_failure_results@v2 # WORKFLOW_VERSION
+        uses: ministryofjustice/hmpps-github-shared-actions/.github/actions/slack_failure_results@5a2c3da0779ed4d281f3e63c045fb7e5d295b6b1 # v1
         with:
           SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
           channel_id: ${{ inputs.channel_id }}
           input_file: results.txt
 
-      - uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
+      - uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
         if: steps.veracode-artifact-upload.conclusion == 'failure' && inputs.channel_id != 'NO_SLACK'
         with:
           channel-id: ${{ inputs.channel_id}}

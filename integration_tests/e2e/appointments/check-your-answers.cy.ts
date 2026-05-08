@@ -93,14 +93,6 @@ describe('Check your answers then confirm the appointment', () => {
       })
     })
 
-    it('should render the page with personal contact', () => {
-      loadPage({ hasVisor: false, typeOptionIndex: 2, sentenceOptionIndex: 4 })
-      cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
-      cy.get('[data-qa="appointmentSentence"]').should('not.exist')
-      cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
-      cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
-    })
-
     it(`should render the page if text message confirmation selected as 'No'`, () => {
       loadPage({ textMessageOptionIndex: 3 })
       const cyaPage = new AppointmentCheckYourAnswersPage()

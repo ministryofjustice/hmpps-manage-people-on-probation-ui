@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
+import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
@@ -33,6 +34,7 @@ import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
+import { filterContacts } from '../middleware/filterContacts'
 
 const routes = [
   'redirectToSentence',
@@ -90,6 +92,10 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   const { crn, id, contactId } = req.params as Record<string, string>
   if (!isValidCrn(crn) || !isValidUUID(id)) {
     return renderError(404)(req, res)
+  }
+  const { sensitivityLocked } = getDataValue(data, ['appointments', crn, id])
+  if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
+    setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
   }
   const {
     user: { providerCode, teamCode, username, locationCode },
@@ -159,6 +165,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change, validation } = req.query
       const { data } = req.session
       let { back } = req.query
+
+      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
+      }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       if (back) {
         setDataValue(data, ['backLink', 'sentence'], back)
@@ -218,6 +229,16 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-type`]: 'Select a valid appointment type',
         }
+      }
+      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        return res.render(`pages/arrange-appointment/type-attendance`, {
+          crn,
+          id,
+          url,
+          change,
+          errors,
+          allSentences: req?.session?.data?.sentences?.[crn],
+        })
       }
       return res.render(`pages/arrange-appointment/type-attendance`, { crn, id, url, change, errors })
     }
@@ -431,6 +452,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       const { forename, appointment } = res.locals.appointmentOutcome
 
+      const { data } = req.session
+      const isSensitive = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
       return res.render('pages/appointments/add-note', {
         crn,
         id,
@@ -444,6 +467,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         maxCharCount,
         forename,
         appointment,
+        isSensitive,
       })
     }
   },
@@ -503,6 +527,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_SUPPORTING_INFO', crn, SubjectType.CRN)
       const isInPast = appointmentDateIsInPast(req)
       const back = 'date-time'
+
+      const { data } = req.session
+      const isSensitive = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+
       return res.render(`pages/arrange-appointment/supporting-information`, {
         crn,
         id,
@@ -511,6 +539,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         showValidation,
         maxCharCount,
         isInPast,
+        isSensitive,
       })
     }
   },
@@ -589,15 +618,24 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
-      const { isOutLookEventFailed } = data
+      const { isOutLookEventFailed, isEnglishNotificationFailed, isWelshNotificationFailed } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
+      delete req.session.data.isEnglishNotificationFailed
+      delete req.session.data.isWelshNotificationFailed
       let appointmentType = null
 
       if (req.url.includes('reschedule')) {
         appointmentType = 'RESCHEDULE'
       }
 
+      if (res.locals.contactResponse) {
+        let outcomes = res.locals.contactResponse.content
+        if (res.locals.flags?.enableOutcomesV1) {
+          outcomes = filterContacts(outcomes)
+        }
+        res.locals.contactResponse.content = outcomes
+      }
       return res.render(`pages/arrange-appointment/confirmation`, {
         crn,
         backendId,
@@ -607,6 +645,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         appointmentType,
         smsSent,
+        isEnglishNotificationFailed,
+        isWelshNotificationFailed,
       })
     }
   },

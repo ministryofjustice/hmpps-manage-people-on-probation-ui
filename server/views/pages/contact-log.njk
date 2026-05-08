@@ -5,10 +5,8 @@
 {% set pageTitle = makePageTitle({pageHeading: "Contacts"}) %}
 {% set currentNavSection = 'timeline' %}
 {% set currentSectionName = 'Contacts' %}
-{% if flags.enableCreateContact == true %}
-  {% set headerActionText = 'Add a contact' %}
-  {% set headerActionHref = supervisionContactsAddLink(crn) %}
-{% endif %}
+{% set headerActionText = 'Add a contact' %}
+{% set headerActionHref = supervisionContactsAddLink(crn) %}
 {% set headerCRN = personActivity.personSummary.crn %}
 {% set headerDob = personActivity.personSummary.dateOfBirth %}
 {% set headerGender = personActivity.personSummary.gender %}
@@ -43,7 +41,7 @@
       }) }}
     {% endif %}
   {% endif %}
- {% if flags.enableCreateContact and showSuccessBanner %}
+ {% if showSuccessBanner %}
    {% set bannerType = 'warning' if uploadFailed else 'success' %}
    {% set bannerSharedParagraph %}<p class="govuk-body">You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.</p>{% endset %}
    {% set bannerHtml %}
