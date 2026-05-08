@@ -48,6 +48,11 @@ import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 import { ErrorSummary } from './model/common'
+import {
+  mapPersonActivityWithApprovedContactDisplayNames,
+  mapPersonAppointmentWithApprovedContactDisplayNames,
+  mapScheduleWithApprovedContactDisplayNames,
+} from '../utils/contactDisplayNames'
 
 interface GetUserScheduleProps {
   username: string
@@ -56,6 +61,8 @@ interface GetUserScheduleProps {
   ascending: string
   size: string
   type: string
+  fromDate?: string
+  toDate?: string
 }
 
 export default class MasApiClient extends RestClient {
@@ -229,11 +236,21 @@ export default class MasApiClient extends RestClient {
 
   async getPersonSchedule(crn: string, type: string, page: string, sortQuery?: string): Promise<Schedule> {
     const queryParameters = `?${new URLSearchParams({ size: '10', page }).toString()}${sortQuery ?? ''}`
-    return this.get({ path: `/schedule/${crn}/${type}${queryParameters}`, handle404: false })
+    const schedule = (await this.get({
+      path: `/schedule/${crn}/${type}${queryParameters}`,
+      handle404: false,
+    })) as Schedule
+    return mapScheduleWithApprovedContactDisplayNames(schedule)
   }
 
   async getPersonAppointment(crn: string, appointmentId: string): Promise<PersonAppointment | null> {
-    return this.get({ path: `/schedule/${crn}/appointment/${appointmentId}`, handle404: false })
+    const personAppointment = (await this.get({
+      path: `/schedule/${crn}/appointment/${appointmentId}`,
+      handle404: false,
+    })) as PersonAppointment | null
+    return personAppointment
+      ? mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment)
+      : personAppointment
   }
 
   async getPersonAppointmentNote(
@@ -241,7 +258,13 @@ export default class MasApiClient extends RestClient {
     appointmentId: string,
     noteId: string,
   ): Promise<PersonAppointment | null> {
-    return this.get({ path: `/schedule/${crn}/appointment/${appointmentId}/note/${noteId}`, handle404: false })
+    const personAppointment = (await this.get({
+      path: `/schedule/${crn}/appointment/${appointmentId}/note/${noteId}`,
+      handle404: false,
+    })) as PersonAppointment | null
+    return personAppointment
+      ? mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment)
+      : personAppointment
   }
 
   async postPersonActivityLog(
@@ -251,12 +274,13 @@ export default class MasApiClient extends RestClient {
     size = '10',
   ): Promise<PersonActivity | null> {
     const pageQuery = `?${new URLSearchParams({ size, page }).toString()}`
-    return this.post({
+    const personActivity = (await this.post({
       data: body,
       path: `/activity/${crn}${pageQuery}`,
       handle404: false,
       handle500: false,
-    })
+    })) as PersonActivity | null
+    return personActivity ? mapPersonActivityWithApprovedContactDisplayNames(personActivity) : personActivity
   }
 
   async getPersonRiskFlags(crn: string): Promise<PersonRiskFlags> {
@@ -405,9 +429,11 @@ export default class MasApiClient extends RestClient {
     ascending,
     size,
     type = 'upcoming',
+    fromDate,
+    toDate,
   }: GetUserScheduleProps): Promise<UserSchedule> {
     const searchParams = Object.fromEntries(
-      Object.entries({ size, page, sortBy, ascending }).filter(([_k, v]) => v),
+      Object.entries({ size, page, sortBy, ascending, fromDate, toDate }).filter(([_k, v]) => v),
     ) as Record<string, string>
     const pageQuery = `${new URLSearchParams(searchParams).toString()}`
     return this.get({

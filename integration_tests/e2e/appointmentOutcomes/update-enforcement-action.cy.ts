@@ -2,6 +2,7 @@ import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import { AppointmentEnforcementAction } from '../../../server/models/Appointments'
 import { enforcementActionMap } from '../../../server/properties/appointment-outcomes/code-map'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
+import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import UpdateEnforcementActionPage from '../../pages/appointmentOutcomes/update-enforcement-action.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
@@ -12,6 +13,7 @@ import { checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from 
 
 let manageAppointmentPage: ManageAppointmentPage
 let updateEnforcementActionPage: UpdateEnforcementActionPage
+let enforcementActionPage: EnforcementActionPage
 
 const loadPage = ({
   sentenceType = 'COMMUNITY',
@@ -65,52 +67,64 @@ const getExpectedOptions = ({
         value: 'SEND_ANOTHER_LETTER',
         text: 'Send another letter',
         RedirectPage: SendLetterPage,
-        redirectPageName: 'Send a letter',
+        redirectPageTitle: 'Send a letter',
       },
       {
         value: 'BREACH_RECALL_INITIATED',
         text: `Initiate a ${text}`,
-        RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        RedirectPage: InitiateBreachOrRecallPage,
+        redirectPageTitle: `Initiate a ${text}`,
+      },
+      {
+        value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        text: `Initiate a ${text} and send a letter`,
+        RedirectPage: InitiateBreachOrRecallPage,
+        redirectPageTitle: `Initiate a ${text} and send a letter`,
       },
       {
         value: 'WITHDRAW_WARNING_LETTER',
         text: `Withdraw warning letter`,
         RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
       },
     )
   }
-  if (action === 'BREACH_RECALL_INITIATED' && !acceptableAbsence) {
+  if (action === 'BREACH_RECALL_INITIATED' && sentenceType === 'COMMUNITY' && !acceptableAbsence) {
     expectedOptions.push(
       {
         value: 'BREACH_REQUESTED',
         text: 'Breach requested',
         RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
       },
       {
         value: 'BREACH_CONFIRMATION_SENT',
         text: 'Breach confirmation sent',
         RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
       },
       {
         value: 'BREACH_LETTER_SENT',
         text: 'Breach letter sent',
         RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
       },
       {
         value: 'BREACH_REQUEST_ACTIONED',
         text: 'Breach request actioned',
         RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
+      },
+      {
+        value: 'WITHDRAW_WARNING_LETTER',
+        text: 'Withdraw warning letter',
+        RedirectPage: AddNotePage,
+        redirectPageTitle: 'Add a note',
       },
     )
   }
   if (
-    ['DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION', 'REFER_TO_OFFENDER_MANAGER'].includes(action) &&
+    ['DECISION_PENDING_RESPONSE', 'REFER_TO_OFFENDER_MANAGER', 'YOT_OM_NOTIFIED'].includes(action) &&
     !acceptableAbsence
   ) {
     expectedOptions.push(
@@ -118,19 +132,39 @@ const getExpectedOptions = ({
         value: 'SEND_LETTER',
         text: 'Send a letter',
         RedirectPage: SendLetterPage,
-        redirectPageName: 'Send a letter',
+        redirectPageTitle: 'Send a letter',
       },
       {
         value: 'BREACH_RECALL_INITIATED',
         text: `Initiate a ${text}`,
-        RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        RedirectPage: InitiateBreachOrRecallPage,
+        redirectPageTitle: `Initiate a ${text}`,
       },
       {
         value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
         text: `Initiate a ${text} and send a letter`,
+        RedirectPage: InitiateBreachOrRecallPage,
+        redirectPageTitle: `Initiate a ${text} and send a letter`,
+      },
+    )
+  }
+  if (
+    ['BREACH_RECALL_INITIATED', 'RECALL_REQUESTED', 'IMMEDIATE_BREACH_OR_RECALL'].includes(action) &&
+    !acceptableAbsence &&
+    sentenceType === 'CUSTODY'
+  ) {
+    expectedOptions.push(
+      {
+        value: 'RECALL_REQUESTED',
+        text: 'Recall requested',
         RedirectPage: AddNotePage,
-        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
+      },
+      {
+        value: 'WITHDRAW_WARNING_LETTER',
+        text: 'Withdraw warning letter',
+        RedirectPage: AddNotePage,
+        redirectPageTitle: 'Add a note',
       },
     )
   }
@@ -139,7 +173,7 @@ const getExpectedOptions = ({
       value: 'WITHDRAW_WARNING_LETTER',
       text: 'Withdraw warning letter',
       RedirectPage: AddNotePage,
-      redirectPageName: 'Add a note',
+      redirectPageTitle: 'Add a note',
     })
   }
   expectedOptions.push(
@@ -147,13 +181,12 @@ const getExpectedOptions = ({
       value: 'NO_FURTHER_ACTION',
       text: 'No further action',
       RedirectPage: AddNotePage,
-      redirectPageName: 'Add a note',
+      redirectPageTitle: 'Add a note',
     },
     {
       value: 'DIFFERENT_ACTION',
       text: 'I want to add a different action',
       RedirectPage: EnforcementActionPage,
-      redirectPageName: 'Enforcement action',
       redirectPageTitle: 'Select an enforcement action for Alton’s failure to comply',
     },
   )
@@ -169,7 +202,7 @@ const checkCurrentEnforcementStatus = ({
 }
 
 const checkPage = () => {
-  describe('Current enforcement action is letter and sentence type is COMMUNITY', () => {
+  describe('Current enforcement action is letter related and sentence type is COMMUNITY', () => {
     const options = getExpectedOptions()
     const enforcementAction = 'FIRST_WARNING_LETTER_SENT'
     it('should have the correct back link', () => {
@@ -191,10 +224,12 @@ const checkPage = () => {
       checkOptionRedirectsToCorrectPage(options, loadPage, {
         Page: UpdateEnforcementActionPage,
         action: enforcementAction,
+        sentenceType: 'COMMUNITY',
       })
     })
   })
-  describe('Current enforcement action is breach', () => {
+
+  describe('Current enforcement action is breach related and sentence type is COMMUNITY', () => {
     const enforcementAction = 'BREACH_RECALL_INITIATED'
     const options = getExpectedOptions({ action: enforcementAction })
     it('should render the page', () => {
@@ -209,40 +244,40 @@ const checkPage = () => {
       checkOptionRedirectsToCorrectPage(options, loadPage, {
         Page: UpdateEnforcementActionPage,
         enforcementAction,
+        sentenceType: 'COMMUNITY',
       })
     })
   })
 
-  describe('Current enforcement action is NO_FURTHER_ACTION', () => {
+  describe('Current enforcement action is recall related and sentence type is CUSTODY', () => {
+    const enforcementAction = 'BREACH_RECALL_INITIATED'
+    const options = getExpectedOptions({ action: enforcementAction, sentenceType: 'CUSTODY' })
     it('should render the page', () => {
-      loadPage({ enforcementAction: 'NO_FURTHER_ACTION' })
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'No Further Action' })
+      loadPage({ enforcementAction, sentenceType: 'CUSTODY' })
+      updateEnforcementActionPage = new UpdateEnforcementActionPage()
+      updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
+      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
+      cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
+      checkOptions(options)
+    })
+    it('should redirect to the correct page when an option is selected', () => {
+      checkOptionRedirectsToCorrectPage(options, loadPage, {
+        Page: UpdateEnforcementActionPage,
+        enforcementAction,
+        sentenceType: 'CUSTODY',
+      })
     })
   })
 
-  describe('Current enforcement action is REFER_TO_OFFENDER_MANAGER', () => {
-    it('should render the page', () => {
-      loadPage({ enforcementAction: 'REFER_TO_OFFENDER_MANAGER' })
-      checkCurrentEnforcementStatus({ colour: 'purple', text: 'Refer to Offender Manager' })
-    })
-  })
-
-  describe('Current enforcement action is WITHDRAWAL_OF_WARNING', () => {
-    it('should render the page', () => {
-      loadPage({ enforcementAction: 'WITHDRAWAL_OF_WARNING' })
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of Warning' })
-      cy.pause()
-    })
-  })
-
-  const actions: AppointmentEnforcementAction[] = [
-    'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+  const pendingActions: AppointmentEnforcementAction[] = [
+    'DECISION_PENDING_RESPONSE',
     'REFER_TO_OFFENDER_MANAGER',
+    'YOT_OM_NOTIFIED',
   ]
-  actions.forEach(action => {
+  pendingActions.forEach(action => {
     const options = getExpectedOptions({ action, sentenceType: 'CUSTODY' })
     const sentenceType = 'CUSTODY'
-    describe(`current enforcement action is ${action} and sentence type is ${sentenceType}`, () => {
+    describe(`current enforcement action is pending with action ${action} and sentence type is ${sentenceType}`, () => {
       it(`should render the page`, () => {
         loadPage({ sentenceType, enforcementAction: action })
         updateEnforcementActionPage = new UpdateEnforcementActionPage()
@@ -259,6 +294,23 @@ const checkPage = () => {
       })
     })
   })
+
+  describe('Current enforcement action is other enforcement action', () => {
+    it('should redirect to the other enforcement action page', () => {
+      loadPage({ enforcementAction: 'NO_FURTHER_ACTION' })
+      enforcementActionPage = new EnforcementActionPage()
+      enforcementActionPage.checkPageTitle('Select an enforcement action for Alton’s failure to comply')
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'No Further Action' })
+    })
+  })
+
+  describe('Current enforcement action is WITHDRAWAL_OF_WARNING', () => {
+    it('should render the page', () => {
+      loadPage({ enforcementAction: 'WITHDRAWAL_OF_WARNING' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of Warning' })
+    })
+  })
+
   describe('Outcome is acceptable absence', () => {
     const acceptableAbsence = true
     const options = getExpectedOptions({ acceptableAbsence })

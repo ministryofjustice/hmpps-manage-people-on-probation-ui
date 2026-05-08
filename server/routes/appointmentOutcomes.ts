@@ -56,7 +56,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* get the contact outcomes and enforcement actions from api */
 
-  router.get([manageBasePath, arrangeBasePath], getContactOutcomes(hmppsAuthClient))
+  router.get(
+    [manageBasePath, arrangeBasePath, `${manageBasePath}/update-enforcement-action`],
+    getContactOutcomes(hmppsAuthClient),
+  )
 
   /* get outcome props for all outcome routes */
 
@@ -72,7 +75,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* get readable enforcement action from current appointment */
 
-  router.all(`${manageBasePath}/update-enforcement-action`, getCurrentEnforcementAction)
+  router.all(
+    [`${manageBasePath}/update-enforcement-action`, `${manageBasePath}/enforcement-action`],
+    getCurrentEnforcementAction,
+  )
 
   /* run the outcome page options middleware before validation */
 

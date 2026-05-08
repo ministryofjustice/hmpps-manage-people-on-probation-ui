@@ -62,7 +62,7 @@
         html: 'Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '')
       },
         afterHeading: {
-        html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '') + ' </span>' +  ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>' if outcomes.length else '')
+        html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '') + ' </span>' +  ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS">Log more outcomes</a>' if outcomes.length else '')
       },
         content: {
         html: outcomesTable

@@ -2,6 +2,7 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
+{% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set notes = '' %}
 {% set alert = '' %}
 {% set documents = [] %}
@@ -28,7 +29,7 @@
 {% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
-  {% set nextAppointmentHint = nextAppointment.appointment.type | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
+  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
   'their home' if nextAppointmentIsAtHome else 
     addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithYear + "." %}
 {% endif %}
@@ -45,7 +46,7 @@
         text: document.level if document.level else "Contact"
       },
       {
-        text: document.type if document.type else appointment.type
+        text: document.type if document.type else appointmentDisplayName
       },
       {
         text: document.createdAt | dateWithYear if document.createdAt else "",
@@ -130,7 +131,7 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointment.type) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "information",
@@ -229,7 +230,16 @@
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
         {% else %}
           <p class="govuk-body">
-            <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.</p>
+            {% if flags.enableDeepLinks and appointment.type in deepLinkContactTypes and appointment.eventNumber %}
+              {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
+                You can manage this appointment through the <a href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">unpaid work worksheet summary in NDelius (opens in a new tab)</a>.
+              {% else %}
+                You can manage this appointment through the person's <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">drug history in NDelius (opens in a new tab)</a>.
+              {% endif %}
+            {% else %}
+              <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.
+            {% endif %}
+          </p>
         {% endif %}
         {{ govukSummaryList({
   rows: [

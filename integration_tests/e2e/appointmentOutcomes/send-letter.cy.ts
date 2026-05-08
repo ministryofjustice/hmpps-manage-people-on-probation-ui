@@ -167,7 +167,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     getUuid(3).then(uuid => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[0])
-      cy.get(`#appointments-${crn}-${id}-outcome-sendLetter-error`).should('contain.text', msgs[1])
+      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[1])
     })
   })
   it('should redirect to the add note page when all options are selected', () => {

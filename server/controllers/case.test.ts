@@ -95,7 +95,7 @@ const mockPersonalDetails: PersonalDetailsSession = {
   riskData: mockRiskData,
 }
 const mockOverdueOutcomesResponse = {
-  content: [{}, {}, {}],
+  content: [{ date: '2021-01-01' }, { date: '2025-01-02' }, { date: '2025-01-03' }],
 }
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
@@ -113,7 +113,11 @@ const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
 
-const res = mockAppResponse()
+const res = mockAppResponse({
+  flags: {
+    enableOutcomesV1: true,
+  },
+})
 const renderSpy = jest.spyOn(res, 'render')
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -157,9 +161,10 @@ describe('caseController', () => {
         crn,
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: 3,
+        appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
     })
   })
@@ -195,10 +200,42 @@ describe('caseController', () => {
         crn,
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: 3,
+        appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
+    })
+  })
+  describe('getCase - checkins flag enabled and practitioner allocated', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
+      res.locals.flags = { enableESupervisionCheckins: true, enableOutcomesV1: true }
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = { enableOutcomesV1: true }
+    })
+
+    it('should render the overview page with canAccessCheckins true', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          hasPractitioner: true,
+          canAccessCheckins: true,
+        }),
+      )
     })
   })
   it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {

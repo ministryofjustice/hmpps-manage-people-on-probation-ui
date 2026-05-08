@@ -2,7 +2,7 @@ import { isNotEmpty, isValidCharCount } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 import { AppointmentsValidationArgs } from './appointments'
 
-interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
+export interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
   isInPast?: boolean
   msg?: string | string[]
   log?: string | string[]
@@ -114,8 +114,8 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       checks: [
         {
           validator: isNotEmpty,
-          msg: msgs[2],
-          log: logs[2],
+          msg: msgs[page === 'outcome/initiate-breach-or-recall' ? 2 : 1],
+          log: logs[page === 'outcome/initiate-breach-or-recall' ? 2 : 1],
         },
       ],
     },

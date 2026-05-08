@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
+import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
@@ -33,6 +34,7 @@ import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
+import { filterContacts } from '../middleware/filterContacts'
 
 const routes = [
   'redirectToSentence',
@@ -589,15 +591,24 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
-      const { isOutLookEventFailed } = data
+      const { isOutLookEventFailed, isEnglishNotificationFailed, isWelshNotificationFailed } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
+      delete req.session.data.isEnglishNotificationFailed
+      delete req.session.data.isWelshNotificationFailed
       let appointmentType = null
 
       if (req.url.includes('reschedule')) {
         appointmentType = 'RESCHEDULE'
       }
 
+      if (res.locals.contactResponse) {
+        let outcomes = res.locals.contactResponse.content
+        if (res.locals.flags?.enableOutcomesV1) {
+          outcomes = filterContacts(outcomes)
+        }
+        res.locals.contactResponse.content = outcomes
+      }
       return res.render(`pages/arrange-appointment/confirmation`, {
         crn,
         backendId,
@@ -607,6 +618,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         appointmentType,
         smsSent,
+        isEnglishNotificationFailed,
+        isWelshNotificationFailed,
       })
     }
   },

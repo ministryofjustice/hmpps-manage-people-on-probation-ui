@@ -34,7 +34,9 @@ import {
   documentSearchValidation,
   personDetailsValidation,
   eSuperVisionValidation,
+  appointmentOutcomesValidation,
   ESupervisionValidationArgs,
+  AppointmentOutcomesValidationArgs,
 } from '../properties'
 import { ValidationSpec } from '../models/Errors'
 
@@ -1052,5 +1054,101 @@ describe('validates restart contact preferences', () => {
     const spec = eSuperVisionValidation(args)
 
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe('validates appointment outcome page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    params: { crn, id },
+    body: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            outcome: { type: undefined },
+          },
+        },
+      },
+    },
+  } as unknown as Request
+
+  it('should return the correct validation errors if date is in the past', () => {
+    const args: AppointmentOutcomesValidationArgs = {
+      crn,
+      id,
+      page: 'outcome/index',
+      isInPast: true,
+    }
+    const spec = appointmentOutcomesValidation(args)
+    const expectedResult: Record<string, string> = {
+      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-outcomeType':
+        'Select an outcome for this appointment',
+    }
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should return the correct validation errors if date is in the future', () => {
+    const args: AppointmentOutcomesValidationArgs = {
+      crn,
+      id,
+      page: 'outcome/index',
+      isInPast: false,
+    }
+    const spec = appointmentOutcomesValidation(args)
+    const expectedResult: Record<string, string> = {
+      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-outcomeType':
+        'Select why they will not attend this appointment',
+    }
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    const args: AppointmentOutcomesValidationArgs = {
+      crn,
+      id,
+      page: 'outcome/index',
+      isInPast: true,
+    }
+    const spec = appointmentOutcomesValidation(args)
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Appointment outcome not selected')
+  })
+})
+
+describe('validates appointment enforcement action page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    params: { crn, id },
+    body: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            outcome: { enforcementAction: undefined },
+          },
+        },
+      },
+    },
+  } as unknown as Request
+
+  const args: AppointmentOutcomesValidationArgs = {
+    crn,
+    id,
+    page: `outcome/attended-failed-to-comply`,
+    msg: ['Select an action for this failure to comply'],
+    log: ['Action for failure to comply not selected'],
+  }
+  const spec = appointmentOutcomesValidation(args)
+  const expectedResult: Record<string, string> = {
+    'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-attendedFailedToComply':
+      'Select an action for this failure to comply',
+  }
+  it('should return the correct validation errors if date is in the past', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Action for failure to comply not selected')
   })
 })

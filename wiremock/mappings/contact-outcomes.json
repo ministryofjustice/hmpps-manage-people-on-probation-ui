@@ -39,54 +39,52 @@
             }
           ],
           "enforcementActions": [
-            [
-              { "code": "IBR", "description": "Breach / Recall Initiated", "defaultResponsePeriodDays": 7 },
-              { "code": "IBR", "description": null, "defaultResponsePeriodDays": 7 },
-              { "code": "ROM", "description": "Refer to Offender Manager", "defaultResponsePeriodDays": 7 },
-              { "code": "NFA", "description": "No Further Action", "defaultResponsePeriodDays": 7 },
-              {
-                "code": "EA12",
-                "description": "Decision Pending Response from Person on Probation",
-                "defaultResponsePeriodDays": 7
-              },
-              { "code": "LCL", "description": "Licence Compliance Letter Sent", "defaultResponsePeriodDays": 7 },
-              { "code": "EA02", "description": "First Warning Letter Sent", "defaultResponsePeriodDays": 7 },
-              { "code": "EA03", "description": "Second Warning Letter Sent", "defaultResponsePeriodDays": 7 },
-              { "code": "EA08", "description": "Breach Letter Sent", "defaultResponsePeriodDays": 7 },
-              { "code": "EA05", "description": "Other Enforcement Letter Sent", "defaultResponsePeriodDays": 7 },
-              { "code": "BRE", "description": "Breach Requested", "defaultResponsePeriodDays": 7 },
-              { "code": "BRE", "description": "Breach Request Actioned", "defaultResponsePeriodDays": 7 },
-              { "code": "EA09", "description": "Send Confirmation of Breach", "defaultResponsePeriodDays": 7 },
-              { "code": "EA10", "description": "Breach Confirmation Sent", "defaultResponsePeriodDays": 7 },
-              { "code": "EA11", "description": "Recall Requested", "defaultResponsePeriodDays": 7 },
-              { "code": "IMB", "description": "Immediate Breach or Recall", "defaultResponsePeriodDays": 7 },
-              { "code": "WLS", "description": "Enforcement Letter Requested", "defaultResponsePeriodDays": 7 },
-              { "code": "EA06", "description": "Withdraw Warning Letter", "defaultResponsePeriodDays": 7 },
-              {
-                "code": "C173",
-                "description": "Breach Action - Decision Pending Response",
-                "defaultResponsePeriodDays": 7
-              },
-              { "code": "EA13", "description": "YOT OM Notified", "defaultResponsePeriodDays": 7 },
-              { "code": "EA07", "description": "Withdrawal of Warning", "defaultResponsePeriodDays": 7 },
-              { "code": "AACL", "description": "Acceptable Absence - Court/Legal", "defaultResponsePeriodDays": 7 },
-              { "code": "AAEM", "description": "Acceptable Absence - Employment", "defaultResponsePeriodDays": 7 },
-              {
-                "code": "AAFC",
-                "description": "Acceptable Absence - Family/Childcare",
-                "defaultResponsePeriodDays": 7
-              },
-              { "code": "AAHO", "description": "Acceptable Absence - Holiday", "defaultResponsePeriodDays": 7 },
-              { "code": "AAME", "description": "Acceptable Absence - Medical", "defaultResponsePeriodDays": 7 },
-              { "code": "AARC", "description": "Acceptable Absence - RIC", "defaultResponsePeriodDays": 7 },
-              { "code": "AARE", "description": "Acceptable Absence - Religious", "defaultResponsePeriodDays": 7 },
-              {
-                "code": "CO05",
-                "description": "Acceptable Absence - Professional Judgement Decision",
-                "defaultResponsePeriodDays": 7
-              },
-              { "code": "EM01", "description": "Acceptable Failure", "defaultResponsePeriodDays": 7 }
-            ]
+            { "code": "IBR", "description": "Breach / Recall Initiated", "defaultResponsePeriodDays": 7 },
+            { "code": "IBR", "description": null, "defaultResponsePeriodDays": 7 },
+            { "code": "ROM", "description": "Refer to Offender Manager", "defaultResponsePeriodDays": 7 },
+            { "code": "NFA", "description": "No Further Action", "defaultResponsePeriodDays": 7 },
+            {
+              "code": "EA12",
+              "description": "Decision Pending Response from Person on Probation",
+              "defaultResponsePeriodDays": 7
+            },
+            { "code": "LCL", "description": "Licence Compliance Letter Sent", "defaultResponsePeriodDays": 7 },
+            { "code": "EA02", "description": "First Warning Letter Sent", "defaultResponsePeriodDays": 7 },
+            { "code": "EA03", "description": "Second Warning Letter Sent", "defaultResponsePeriodDays": 7 },
+            { "code": "EA08", "description": "Breach Letter Sent", "defaultResponsePeriodDays": 7 },
+            { "code": "EA05", "description": "Other Enforcement Letter Sent", "defaultResponsePeriodDays": 7 },
+            { "code": "BRE", "description": "Breach Requested", "defaultResponsePeriodDays": 7 },
+            { "code": "BRE", "description": "Breach Request Actioned", "defaultResponsePeriodDays": 7 },
+            { "code": "EA09", "description": "Send Confirmation of Breach", "defaultResponsePeriodDays": 7 },
+            { "code": "EA10", "description": "Breach Confirmation Sent", "defaultResponsePeriodDays": 7 },
+            { "code": "EA11", "description": "Recall Requested", "defaultResponsePeriodDays": 7 },
+            { "code": "IMB", "description": "Immediate Breach or Recall", "defaultResponsePeriodDays": 7 },
+            { "code": "WLS", "description": "Enforcement Letter Requested", "defaultResponsePeriodDays": 7 },
+            { "code": "EA06", "description": "Withdraw Warning Letter", "defaultResponsePeriodDays": 7 },
+            {
+              "code": "C173",
+              "description": "Breach Action - Decision Pending Response",
+              "defaultResponsePeriodDays": 7
+            },
+            { "code": "EA13", "description": "YOT OM Notified", "defaultResponsePeriodDays": 7 },
+            { "code": "EA07", "description": "Withdrawal of Warning", "defaultResponsePeriodDays": 7 },
+            { "code": "AACL", "description": "Acceptable Absence - Court/Legal", "defaultResponsePeriodDays": 7 },
+            { "code": "AAEM", "description": "Acceptable Absence - Employment", "defaultResponsePeriodDays": 7 },
+            {
+              "code": "AAFC",
+              "description": "Acceptable Absence - Family/Childcare",
+              "defaultResponsePeriodDays": 7
+            },
+            { "code": "AAHO", "description": "Acceptable Absence - Holiday", "defaultResponsePeriodDays": 7 },
+            { "code": "AAME", "description": "Acceptable Absence - Medical", "defaultResponsePeriodDays": 7 },
+            { "code": "AARC", "description": "Acceptable Absence - RIC", "defaultResponsePeriodDays": 7 },
+            { "code": "AARE", "description": "Acceptable Absence - Religious", "defaultResponsePeriodDays": 7 },
+            {
+              "code": "CO05",
+              "description": "Acceptable Absence - Professional Judgement Decision",
+              "defaultResponsePeriodDays": 7
+            },
+            { "code": "EM01", "description": "Acceptable Failure", "defaultResponsePeriodDays": 7 }
           ]
         },
         "headers": {

@@ -11,6 +11,13 @@ export default [
     extraFrontendGlobals: { $: 'readonly', MOJFrontend: 'readonly' },
   }),
   {
+    name: 'helper-scripts',
+    files: ['helper-scripts/**/*.mjs'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
     name: 'overrides',
     files: ['**/*.ts'],
     ignores: ['**/*.js'],

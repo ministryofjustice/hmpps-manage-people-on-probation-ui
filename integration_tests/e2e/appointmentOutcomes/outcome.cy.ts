@@ -73,7 +73,6 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
       {
         value: 'ATTENDED_COMPLIED',
         text: 'Attended - complied',
-        redirectPageName: 'Add a note',
         redirectPageTitle: 'Add a note',
         RedirectPage: AddNotePage,
       },
@@ -81,7 +80,6 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         value: 'ATTENDED_FAILED_TO_COMPLY',
         text: 'Attended - failed to comply',
         hint: 'For example, their behaviour was disruptive or they did not follow instructions.',
-        redirectPageName: 'Attended failed to comply',
         redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
         RedirectPage: AttendedFailedToComplyPage,
       },
@@ -91,14 +89,12 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
           text: 'Attended - sent home (behaviour)',
-          redirectPageName: 'Attended failed to comply',
           redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
           RedirectPage: AttendedFailedToComplyPage,
         },
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
-          redirectPageName: 'Attended failed to comply',
           redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
           RedirectPage: AttendedFailedToComplyPage,
         },
@@ -109,7 +105,6 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
     value: 'ACCEPTABLE_ABSENCE',
     text: 'Acceptable absence',
     hint: 'They provided an acceptable reason or evidence.',
-    redirectPageName: 'Acceptable absence',
     redirectPageTitle: 'Why was Alton’s absence acceptable?',
     RedirectPage: AcceptableAbsencePage,
   })
@@ -119,7 +114,6 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         value: 'UNACCEPTABLE_ABSENCE',
         text: 'Unacceptable absence',
         hint: 'They did not provide suitable evidence.',
-        redirectPageName: 'Unacceptable absence',
         redirectPageTitle: 'Enforcement action for Alton’s unacceptable absence',
         RedirectPage: UnacceptableAbsencePage,
       },
@@ -127,7 +121,6 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         value: 'FAILED_TO_ATTEND',
         text: 'Failed to attend',
         hint: 'You may still need to request and review evidence.',
-        redirectPageName: 'Failed to attend',
         redirectPageTitle: 'Enforcement action for Alton’s absence',
         RedirectPage: FailedToAttendPage,
       },
@@ -137,7 +130,6 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
     options.push({
       value: 'WILL_BE_RESCHEDULED',
       text: 'The appointment will be rescheduled',
-      redirectPageName: 'Reschedule an appointment',
       redirectPageTitle: 'Reschedule an appointment',
       RedirectPage: RescheduleAppointmentPage,
     })
@@ -220,6 +212,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       dateInPast: true,
     })
   })
+
   if (journey === 'MANAGE') {
     it('should render the page if appointment is in the future', () => {
       loadPage({ dateInPast: false })

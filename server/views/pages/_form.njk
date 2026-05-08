@@ -1,7 +1,7 @@
 {% extends "../partials/layout.njk" %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% block beforeContent %}
-  {% if breadcrumb and flags.enableBreadcrumbs and not change %}
+  {% if breadcrumb and not change %}
     {{ govukBreadcrumbs({
       items: [
         {

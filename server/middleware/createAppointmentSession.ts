@@ -59,7 +59,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     const externalReference = appointment?.externalReference || ''
     const enforcementAction = appointment?.enforcementAction || null
-
     if (!eventId) {
       type = ''
     }
