@@ -17,7 +17,6 @@ import {
   completeTextMessageConfirmationPage,
   completeSupportingInformationPage,
 } from './utils'
-import SentencePage from '../../pages/sentence'
 
 const mockData = mockResponse as Wiremock
 
@@ -43,7 +42,7 @@ describe('Arrange an appointment', () => {
 
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
 
-      const sentencePage = new SentencePage()
+      const sentencePage = new AppointmentSentencePage()
       sentencePage.getBackLink().click()
 
       cy.url().should('contain', `/case/X778160/appointments`)
