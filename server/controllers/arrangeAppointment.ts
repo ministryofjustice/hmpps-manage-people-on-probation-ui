@@ -93,6 +93,10 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   if (!isValidCrn(crn) || !isValidUUID(id)) {
     return renderError(404)(req, res)
   }
+  const { sensitivityLocked } = getDataValue(data, ['appointments', crn, id])
+  if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
+    setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
+  }
   const {
     user: { providerCode, teamCode, username, locationCode },
     eventId,
@@ -161,6 +165,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change, validation } = req.query
       const { data } = req.session
       let { back } = req.query
+
+      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
+      }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       if (back) {
         setDataValue(data, ['backLink', 'sentence'], back)
@@ -220,6 +229,16 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-type`]: 'Select a valid appointment type',
         }
+      }
+      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        return res.render(`pages/arrange-appointment/type-attendance`, {
+          crn,
+          id,
+          url,
+          change,
+          errors,
+          allSentences: req?.session?.data?.sentences?.[crn],
+        })
       }
       return res.render(`pages/arrange-appointment/type-attendance`, { crn, id, url, change, errors })
     }
@@ -433,6 +452,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       const { forename, appointment } = res.locals.appointmentOutcome
 
+      const { data } = req.session
+      const isSensitive = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
       return res.render('pages/appointments/add-note', {
         crn,
         id,
@@ -446,6 +467,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         maxCharCount,
         forename,
         appointment,
+        isSensitive,
       })
     }
   },
@@ -505,6 +527,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_SUPPORTING_INFO', crn, SubjectType.CRN)
       const isInPast = appointmentDateIsInPast(req)
       const back = 'date-time'
+
+      const { data } = req.session
+      const isSensitive = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+
       return res.render(`pages/arrange-appointment/supporting-information`, {
         crn,
         id,
@@ -513,6 +539,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         showValidation,
         maxCharCount,
         isInPast,
+        isSensitive,
       })
     }
   },

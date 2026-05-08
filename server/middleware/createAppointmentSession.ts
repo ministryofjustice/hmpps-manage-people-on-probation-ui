@@ -1,8 +1,7 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
 import { isoToDateTime, setDataValue } from '../utils'
-import { AppointmentOutcomeType, AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
-import { outcomeMap, enforcementActionMap } from '../properties/appointment-outcomes'
+import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
@@ -51,6 +50,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     let date = ''
     let start = ''
     let end = ''
+    let sensitivity: YesNo | undefined
+    let sensitivityLocked: boolean | undefined
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -70,6 +71,12 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     if (!eventId || !type || !providerCode || !teamCode || !username) {
       locationCode = ''
     }
+    if (selection === 'RESCHEDULE') {
+      sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
+      if (sensitivity === 'Yes') {
+        sensitivityLocked = true
+      }
+    }
     appointmentSession = {
       ...appointmentSession,
       user: {
@@ -88,6 +95,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       uuid: '',
       externalReference,
       enforcementAction,
+      sensitivity,
+      sensitivityLocked,
     }
     if (visorReport) {
       appointmentSession.visorReport = visorReport
@@ -105,38 +114,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       appointmentSession.user.name = appointment.officer.name
     }
     appointmentSession.smsOptIn = null
-
-    /*
-const outcome = appointment?.outcome || null
-if(outcome) {
-  const [outcomeType, {code: outcomeCode }] = Object.entries(outcomeMap).find(
-        ([_key, { description }]) => description.toLowerCase() === outcome.toLowerCase(),
-      ) 
-      if(outcomeType && outcomeCode) {
-        appointmentSession.outcome.outcomeType = outcomeType as AppointmentOutcomeType
-        appointmentSession.outcome.outcomeCode = outcomeCode
-      }
-
-
-
-
-    const action = appointment?.action || null
-    if (action) {
-      const [actionKey, {code}] = Object.entries(enforcementActionMap).find(
-        ([_key, { description }]) => description.toLowerCase() === action.toLowerCase(),
-      )
-      if(actionKey) {
-        if(['ATTENDED_FAILED_TO_COMPLY','UNACCEPTABLE_ABSENCE','ACCEPTABLE_ABSENCE', 'FAILED_TO_ATTEND'].includes(outcomeType)) {
-          
-        }
-        appointmentSession.outcome.
-      }
-      if(code) {
-        appointmentSession.outcome.enforcementActionCode = [code]
-      }
-    }
-  }
-  */
   }
   res.locals.appointmentSession = appointmentSession
   if (contactId) {

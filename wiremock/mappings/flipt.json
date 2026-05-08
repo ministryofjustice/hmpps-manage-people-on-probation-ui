@@ -156,26 +156,6 @@
               "rollouts": []
             },
             {
-              "key": "enableMopCookiePolicy",
-              "name": "enableMopCookiePolicy",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-04-07T12:00:00.000000Z",
-              "updatedAt": "2026-04-07T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableMopPrivacyPolicy",
-              "name": "enableMopPrivacyPolicy",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-04-07T12:00:00.000000Z",
-              "updatedAt": "2026-04-07T12:00:00.000000Z"
-            },
-            {
               "key": "enableSentencePlanUrl",
               "name": "enableSentencePlanUrl",
               "description": "",
@@ -233,6 +213,17 @@
             {
               "key": "enableHomePageOutcomesWithFilter",
               "name": "enableHomePageOutcomesWithFilter",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-04-23T12:00:00.000000Z",
+              "updatedAt": "2026-04-23T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableSensitivityRemoved",
+              "name": "enableSensitivityRemoved",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",

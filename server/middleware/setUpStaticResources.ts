@@ -16,7 +16,11 @@ export default function setUpStaticResources(): Router {
   const staticResourcesConfig = { maxAge: config.staticResourceCacheDuration, redirect: false }
 
   // Default path of favicon requested by some browsers that doesn't respect the icons defined in the template
-  router.use('/favicon.ico', express.static(path.join(process.cwd(), '/assets/images/favicon.ico')))
+  router.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'assets/images/favicon.ico'), {
+      maxAge: config.staticResourceCacheDuration,
+    })
+  })
 
   Array.of(
     '/dist/assets',

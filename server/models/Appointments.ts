@@ -147,6 +147,7 @@ export interface AppointmentSession {
     date?: string
   }
   outcome?: AppointmentSessionOutcome
+  sensitivityLocked?: boolean
 }
 
 export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'
@@ -313,6 +314,7 @@ export interface LocalParams {
     | Option<AppointmentOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
+  isSensitive?: boolean
 }
 
 export interface ProbationDeliveryUnit {
