@@ -14,8 +14,6 @@ export class FeatureFlags {
   enableESupervisionCustomQuestions?: boolean = undefined
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
-  enableMopCookiePolicy?: boolean = undefined
-  enableMopPrivacyPolicy?: boolean = undefined
   enableSentencePlanUrl?: boolean = undefined
   enableDeepLinks?: boolean = undefined
   enablePoPSearchExtraColumns?: boolean = undefined
