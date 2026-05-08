@@ -42,7 +42,6 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
   args: TArgs = {} as TArgs,
 ): void => {
   options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
-    console.log({ redirectPageTitle })
     loadPageFunc(args)
     const outcomePage = new args.Page()
     cy.get(`.govuk-radios__input[value=${value}]`).click()
