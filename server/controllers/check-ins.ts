@@ -531,7 +531,13 @@ const checkInsController: Controller<typeof routes, void> = {
       const { checkIn } = res.locals
 
       if (checkIn.status !== 'REVIEWED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+        return res.render('pages/check-in/update.njk', {
+          crn,
+          id,
+          back,
+          checkIn,
+          systemIdCheckPass: systemIdCheckPass(checkIn),
+        })
       }
       return res.render('pages/check-in/view.njk', {
         crn,
@@ -565,6 +571,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const notes: ESupervisionNote = {
         updatedBy: practitionerId,
         notes: checkIn.note,
+        sensitive: checkIn?.sensitiveContact === 'true',
       }
       await eSupervisionClient.postOffenderCheckInNote(id, notes)
 
@@ -688,6 +695,7 @@ const checkInsController: Controller<typeof routes, void> = {
         missedCheckinComment: checkIn?.missedCheckinComment,
         notes: checkIn?.furtherActions,
         riskManagementFeedback: risk,
+        sensitive: checkIn?.sensitiveContact === 'true',
       }
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
