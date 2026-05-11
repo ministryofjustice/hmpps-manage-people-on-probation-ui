@@ -1,4 +1,5 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { DateTime } from 'luxon'
 import { esupervisionAdditionalQuestions } from '../../server/controllers/mocks/esupervisionAdditionalQuestions'
 
 const stubOffenderSetup500Response = (): SuperAgentRequest =>
@@ -99,7 +100,7 @@ const stubAssignQuestions = () => {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        expectedCheckinDate: DateTime.now().plus({ days: 3 }).toISO(),
         listId: 3,
       },
     },
@@ -116,7 +117,7 @@ const stubGetUpcomingCheckinQuestions = () => {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        expectedCheckinDate: DateTime.now().plus({ days: 3 }).toISO(),
         questions: [],
       },
     },
@@ -134,7 +135,7 @@ const stubGetUpcomingCheckinQuestionItems = () => {
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
         upcoming: {
-          expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+          expectedCheckinDate: DateTime.now().plus({ days: 3 }).toISO(),
           items: [],
         },
       },
