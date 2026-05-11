@@ -12,12 +12,11 @@ const homeController: Controller<typeof routes, void> = {
   getHome: hmppsAuthClient => {
     return async (req, res) => {
       if (!res.locals.flags?.enableDeliusClient) return homeController.getHomeOld(hmppsAuthClient)(req, res)
-      const username = res.locals.user.username
-      const token = await hmppsAuthClient.getSystemClientToken(username)
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const deliusClient = new DeliusClient(token)
       let appointmentsRequiringOutcome
       let appointmentsRequiringOutcomeCount
-      const homePage: Homepage = await deliusClient.getHomepage(username)
+      const homePage: Homepage = await deliusClient.getHomepage(res.locals.user.username)
       appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
       appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
 

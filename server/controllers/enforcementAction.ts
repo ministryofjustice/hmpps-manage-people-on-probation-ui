@@ -52,5 +52,4 @@ const enforcementContactsController: Controller<typeof routes, void> = {
   },
 }
 
-
 export default enforcementContactsController
