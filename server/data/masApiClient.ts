@@ -239,15 +239,16 @@ export default class MasApiClient extends RestClient {
     return mapScheduleWithApprovedContactDisplayNames(schedule)
   }
 
-  async getEnforcementContacts(username: string, page: string): Promise<EnforcementContactsResponse> {
-    const queryParameters = `?${new URLSearchParams({
-      size: '10',
-      page,
-      filterDueDate: 'true',
-    }).toString()}`
+  async getEnforcementContacts(
+    username: string,
+    page: string,
+    sortQuery?: string,
+    size = '10',
+  ): Promise<EnforcementContactsResponse> {
+    const queryParameters = `?${new URLSearchParams({ size, page }).toString()}${sortQuery ?? ''}`
 
     const enforcementContacts = (await this.get({
-      path: `/contact/${username}/enforcements${queryParameters}`,
+      path: `/contacts/${username}/enforcement/${queryParameters}`,
       handle404: false,
     })) as EnforcementContactsResponse
 
