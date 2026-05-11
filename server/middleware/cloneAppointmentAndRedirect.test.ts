@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { setDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
@@ -15,11 +15,13 @@ jest.mock('../utils', () => {
   return {
     ...actualUtils,
     setDataValue: jest.fn(),
+    getDataValue: jest.fn(),
   }
 })
 
 // const mockedUuidv4 = uuidv4 as jest.Mock
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockedGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const mockAppt: AppointmentSession = {
   user: {
@@ -76,6 +78,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     start: '',
     end: '',
     uuid,
+    sensitivityLocked: false,
   }
 
   it('should construct the correct session with date removed and redirect to arrange another appointment page', () => {
@@ -94,6 +97,33 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     const expectedCloneReschedule = {
       ...expectedClone,
       uuid: request.params.id,
+    }
+
+    cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)
+
+    expect(mockedSetDataValue).toHaveBeenCalledWith(
+      request.session.data,
+      ['appointments', crn2, request.params.id],
+      expectedCloneReschedule,
+    )
+    expect(redirectSpy2).toHaveBeenCalledWith(
+      `/case/${crn2}/appointments/reschedule/${request.params.contactId}/${request.params.id}/check-your-answers`,
+    )
+  })
+
+  it('should lock sensitivity if reschedule set as sensitive', () => {
+    mockedGetDataValue.mockReturnValueOnce('Yes')
+    const { req: request, res: response } = setup()
+    const crn2 = request.params.crn
+    request.params.id = 'APPT123'
+    request.params.contactId = 'C9876'
+    const redirectSpy2 = jest.spyOn(response, 'redirect')
+
+    const expectedCloneReschedule = {
+      ...expectedClone,
+      uuid: request.params.id,
+      sensitivity: 'Yes',
+      sensitivityLocked: true,
     }
 
     cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)

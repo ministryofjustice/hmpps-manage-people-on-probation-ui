@@ -1,2 +1,9 @@
 {% extends "../_form.njk" %}
-{% set title = "Send a letter" %}
+
+{% set title = 'Send a letter' %}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+    {{ appointmentOutcome.sentence.type }}
+    {% include './_send-letter-radios.njk' %}
+{% endblock %}

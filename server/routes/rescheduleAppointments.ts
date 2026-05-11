@@ -32,13 +32,6 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, ar
     controllers.rescheduleAppointments.getRescheduleAppointment(hmppsAuthClient),
   )
 
-  router.get(
-    '/case/:crn/appointments/reschedule/:contactId/:id/check-your-answers',
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    controllers.rescheduleAppointments.getRescheduleCheckYourAnswer(hmppsAuthClient),
-  )
-
   router.post(
     '/case/:crn/appointments/reschedule/:contactId/:id',
     getPersonAppointment(hmppsAuthClient),
@@ -50,6 +43,13 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, ar
     createAppointmentSession,
     getUserProviders(hmppsAuthClient),
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
+  )
+
+  router.get(
+    '/case/:crn/appointments/reschedule/:contactId/:id/check-your-answers',
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+    controllers.rescheduleAppointments.getRescheduleCheckYourAnswer(hmppsAuthClient),
   )
 
   router.post(

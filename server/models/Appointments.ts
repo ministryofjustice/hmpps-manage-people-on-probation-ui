@@ -37,6 +37,25 @@ export type AppointmentEnforcementAction =
   | 'PROFESSIONAL_JUDGEMENT_DECISION'
   | 'ACCEPTABLE_FAILURE'
   | 'DECISION_PENDING'
+  | 'BREACH_REQUESTED'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_CONFIRMATION_SENT'
+  | 'BREACH_CONFIRMATION_SENT'
+  | 'BREACH_LETTER_SENT'
+  | 'BREACH_REQUEST_ACTIONED'
+  | 'SEND_CONFIRMATION_OF_BREACH'
+  | 'RECALL_REQUESTED'
+  | 'IMMEDIATE_BREACH_OR_RECALL'
+  | 'FIRST_WARNING_LETTER_SENT'
+  | 'SECOND_WARNING_LETTER_SENT'
+  | 'OTHER_ENFORCEMENT_LETTER_SENT'
+  | 'LICENCE_COMPLIANCE_LETTER_SENT'
+  | 'ENFORCEMENT_LETTER_REQUESTED'
+  | 'WITHDRAW_WARNING_LETTER'
+  | 'DECISION_PENDING_RESPONSE'
+  | 'YOT_OM_NOTIFIED'
+  | 'WITHDRAWAL_OF_WARNING'
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
@@ -48,7 +67,15 @@ export interface AppointmentOutcomeOption extends Option {
 }
 
 export interface AppointmentEnforcementActionOption extends Option {
-  value?: AppointmentEnforcementAction
+  value?: AppointmentEnforcementAction | ''
+}
+
+export interface EnforcementActionCreatedByOption extends Option {
+  value?: EnforcementActionCreatedBy
+}
+
+export interface EnforcementActionLetterTypeOption extends Option {
+  value?: EnforcementActionLetterType
 }
 
 export interface AppointmentSessionUser {
@@ -94,8 +121,21 @@ export interface AppointmentSession {
   outcome?: {
     type: AppointmentOutcomeType
     enforcementAction: AppointmentEnforcementAction
+    breachNSICreatedBy?: EnforcementActionCreatedBy
+    letterSentBy?: EnforcementActionCreatedBy
+    letterType?: EnforcementActionLetterType
   }
+  sensitivityLocked?: boolean
 }
+
+export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'
+
+export type EnforcementActionLetterType =
+  | 'LICENCE_COMPLIANCE_LETTER'
+  | 'FIRST_WARNING_LETTER'
+  | 'SECOND_WARNING_LETTER'
+  | 'BREACH_WARNING_LETTER'
+  | 'DIFFERENT_ENFORCEMENT_LETTER'
 
 export interface AppointmentType {
   code: string
@@ -248,7 +288,8 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
-  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[] | EnforcementActionCreatedByOption[]
+  isSensitive?: boolean
 }
 
 export interface ProbationDeliveryUnit {

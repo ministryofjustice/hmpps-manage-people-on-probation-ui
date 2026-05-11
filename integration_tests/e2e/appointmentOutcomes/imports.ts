@@ -4,8 +4,8 @@ export interface ExpectedOption<TPage extends Page> {
   value: string
   text: string
   hint?: string
-  RedirectPage: Constructor<TPage>
-  redirectPageName: string
+  RedirectPage?: Constructor<TPage>
+  redirectPageName?: string
   redirectPageTitle?: string
 }
 
@@ -13,13 +13,26 @@ export type Journey = 'MANAGE' | 'RESCHEDULE' | 'ARRANGE'
 
 type Constructor<T = any> = new (...args: any[]) => T
 
-export const checkOptions = <TPage extends Page>(options: ExpectedOption<TPage>[]): void => {
+export const checkOptions = <TPage extends Page>(options: ExpectedOption<TPage>[], radioGroupIndex = 0): void => {
   options.forEach(({ value, text, hint }, index) => {
-    cy.get('.govuk-radios__item').eq(index).find('label').should('contain.text', text)
+    cy.get('[data-module="govuk-radios"]')
+      .eq(radioGroupIndex)
+      .find('.govuk-radios__item')
+      .eq(index)
+      .find('label')
+      .should('contain.text', text)
     if (hint) {
-      cy.get('.govuk-radios__item').eq(index).find('.govuk-hint').should('contain.text', hint)
+      cy.get('[data-module="govuk-radios"]')
+        .eq(radioGroupIndex)
+        .find('.govuk-radios__item')
+        .eq(index)
+        .find('.govuk-hint')
+        .should('contain.text', hint)
     }
-    cy.get(`.govuk-radios__input[value=${value}]`).should('exist')
+    cy.get('[data-module="govuk-radios"]')
+      .eq(radioGroupIndex)
+      .find(`.govuk-radios__input[value=${value}]`)
+      .should('exist')
   })
 }
 

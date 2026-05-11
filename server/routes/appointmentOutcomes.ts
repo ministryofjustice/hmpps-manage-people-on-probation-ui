@@ -9,18 +9,25 @@ import {
   createAppointmentSession,
   getAppointmentTypes,
   getSentences,
-  getAppointmentOutcomeProps,
-  getAppointmentOutcomeOptions,
   redirectWizard,
   getPersonalDetails,
-  getAppointmentAttendedFailedToComplyOptions,
-  getAppointmentOutcomeBackLink,
-  getAppointmentAcceptableAbsenceOptions,
-  getAppointmentOutcomeEvidenceBy,
   parseMultipartBody,
 } from '../middleware'
+
+import {
+  getAttendedFailedToComplyOptions,
+  getBackLink,
+  getAcceptableAbsenceOptions,
+  getEnforcementActionOptions,
+  getBreachNSICreatedByOptions,
+  getSendLetterOptions,
+  getOutcomeEvidenceBy,
+  getOutcomeOptions,
+  getOutcomeProps,
+  getFailedToAttendOptions,
+} from '../middleware/appointment-outcomes'
+
 import validate from '../middleware/validation/index'
-import { getAppointmentFailedToAttendOptions } from '../middleware/getAppointmentFailedToAttendOptions'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
@@ -35,8 +42,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getPersonAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    createAppointmentSession,
   )
+
+  /* create appointment session in manage journey */
+
+  router.get(manageBasePath, createAppointmentSession)
 
   /* redirect page if required session data is not present */
 
@@ -46,13 +56,13 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.all(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
-    getAppointmentOutcomeProps,
-    getAppointmentOutcomeBackLink,
+    getOutcomeProps,
+    getBackLink,
   )
 
   /* run the outcome page options middleware before validation */
 
-  router.all([arrangeBasePath, manageBasePath], getAppointmentOutcomeOptions)
+  router.all([arrangeBasePath, manageBasePath], getOutcomeOptions)
 
   router.all(
     [
@@ -61,20 +71,81 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${arrangeBasePath}/unacceptable-absence`,
       `${manageBasePath}/unacceptable-absence`,
     ],
-    getAppointmentAttendedFailedToComplyOptions,
+    getAttendedFailedToComplyOptions,
   )
 
   router.all(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    getAppointmentAcceptableAbsenceOptions,
+    getAcceptableAbsenceOptions,
   )
 
   router.all(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    getAppointmentFailedToAttendOptions,
-    getAppointmentOutcomeEvidenceBy,
+    getFailedToAttendOptions,
+    getOutcomeEvidenceBy,
   )
-  /* run multer file upload error handler before validation */
+
+  router.all(
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
+    getEnforcementActionOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
+    getBreachNSICreatedByOptions,
+  )
+
+  router.all(
+    [
+      `${arrangeBasePath}/initiate-breach-or-recall`,
+      `${manageBasePath}/initiate-breach-or-recall`,
+      `${arrangeBasePath}/send-letter`,
+      `${manageBasePath}/send-letter`,
+    ],
+    getSendLetterOptions,
+  )
+
+  /* run file upload middleware and multipart parser before validation */
+
+  router.post(
+    `${manageBasePath}/add-note`,
+    multerErrorHandler('fileUpload'),
+    parseMultipartBody,
+    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
+  )
+
+  router.all(
+    [
+      `${arrangeBasePath}/attended-failed-to-comply`,
+      `${manageBasePath}/attended-failed-to-comply`,
+      `${arrangeBasePath}/unacceptable-absence`,
+      `${manageBasePath}/unacceptable-absence`,
+    ],
+    getAttendedFailedToComplyOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
+    getAcceptableAbsenceOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
+    getFailedToAttendOptions,
+    getOutcomeEvidenceBy,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
+    getEnforcementActionOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
+    getBreachNSICreatedByOptions,
+  )
+
+  /* run file upload middleware and multipart parser before validation */
 
   router.post(
     `${manageBasePath}/add-note`,

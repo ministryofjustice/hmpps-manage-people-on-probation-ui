@@ -7,7 +7,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { Document } from '../data/model/personalDetails'
-import { APPOINTMENTS_CODES } from '../properties'
+import { APPOINTMENTS_CODES, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -123,9 +123,7 @@ describe('/middleware/getPersonActivity', () => {
       user: {
         username: 'user-1',
       },
-      flags: {
-        enableContactLog: false,
-      },
+      flags: {},
     },
     redirect: jest.fn().mockReturnThis(),
   } as unknown as AppResponse
@@ -183,50 +181,7 @@ describe('/middleware/getPersonActivity', () => {
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
-    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', '10')
-    expect(tierSpy).toHaveBeenCalledWith(crn)
-    expect(personActivity).toEqual(mockPersonActivityResponse)
-    expect(tierCalculation).toEqual(mockTierCalculationResponse)
-  })
-
-  it('should request results with size 25 when enableContactLog is true', async () => {
-    req.params = { crn }
-    req.query = { page: '0' }
-    res.locals.filters = {
-      ...filterVals,
-      complianceOptions: [],
-      categoryOptions: [],
-      hideContactOptions: [],
-      selectedFilterItems: {},
-      baseUrl: '',
-      query: { ...filterVals },
-      maxDate: '21/1/2025',
-      crn,
-    }
-    res.locals.flags = {
-      enableContactLog: true,
-    }
-
-    req.session.activityLogFilters = {
-      keywords: filterVals.keywords,
-      dateFrom: filterVals.dateFrom,
-      dateTo: filterVals.dateTo,
-      compliance: ['complied', 'not complied'],
-    }
-
-    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-
-    const expectedBody: ActivityLogRequestBody = {
-      keywords: filterVals.keywords,
-      dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
-      dateTo: toIsoDateFromPicker(filterVals.dateTo),
-      filters: ['complied', 'notComplied'],
-      includeSystemGenerated: false,
-      typeCodes: APPOINTMENTS_CODES,
-    }
-
-    const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
-    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', '25')
+    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', String(ACTIVITY_LOG_PAGE_SIZE))
     expect(tierSpy).toHaveBeenCalledWith(crn)
     expect(personActivity).toEqual(mockPersonActivityResponse)
     expect(tierCalculation).toEqual(mockTierCalculationResponse)

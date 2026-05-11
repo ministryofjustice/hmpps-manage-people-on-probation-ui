@@ -1,15 +1,15 @@
 import { DateTime } from 'luxon'
-import { Activity } from '../data/model/schedule'
-import { AppointmentSession, AttendedCompliedAppointment } from '../models/Appointments'
-import { getDataValue } from '../utils/getDataValue'
-import { convertToTitleCase } from '../utils/convertToTitleCase'
-import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { Route } from '../@types'
-import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../utils'
-import { Sentence } from '../data/model/sentenceDetails'
-import { AppointmentOutcomeSentence } from '../models/Locals'
+import { Activity } from '../../data/model/schedule'
+import { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
+import { getDataValue } from '../../utils/getDataValue'
+import { convertToTitleCase } from '../../utils/convertToTitleCase'
+import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
+import { Route } from '../../@types'
+import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../../utils'
+import { Sentence } from '../../data/model/sentenceDetails'
+import { AppointmentOutcomeSentence } from '../../models/Locals'
 
-export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
+export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
   const id = uuid || contactId
   const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)

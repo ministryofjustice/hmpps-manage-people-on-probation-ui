@@ -8,8 +8,8 @@ import {
   redirectWizard,
   getAppointment,
   autoStoreSessionData,
-  getAppointmentOutcomeProps,
 } from '../middleware'
+import { getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import config from '../config'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
@@ -27,7 +27,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     '/case/:crn/appointments/appointment/:contactId/add-note',
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getPersonAppointment(hmppsAuthClient),
-    getAppointmentOutcomeProps,
+    getOutcomeProps,
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/add-note',
@@ -56,7 +56,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     redirectWizard(['eventId', 'type', 'date', 'outcomeRecorded']),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getAppointment(hmppsAuthClient),
-    getAppointmentOutcomeProps,
+    getOutcomeProps,
   )
   router.get('/case/:crn/arrange-appointment/:id/add-note', controllers.arrangeAppointments.getAddNote())
 

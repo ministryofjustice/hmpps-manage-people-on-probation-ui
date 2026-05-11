@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
-import { getAppointmentOutcomeProps } from './getAppointmentOutcomeProps'
-import { mockAppResponse, probationPractitioner as mockProbationPractitioner } from '../controllers/mocks'
-import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { Sentence } from '../data/model/sentenceDetails'
+import { getOutcomeProps } from './getOutcomeProps'
+import { mockAppResponse, probationPractitioner as mockProbationPractitioner } from '../../controllers/mocks'
+import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
+import { Sentence } from '../../data/model/sentenceDetails'
 
 const contactId = '12345'
 const crn = 'X000001'
@@ -131,21 +131,21 @@ const buildResponse = ({ date = pastDate, time = start, username = 'user-1' } = 
   return mockAppResponse(locals)
 }
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
+jest.mock('../../utils', () => {
+  const actualUtils = jest.requireActual('../../utils')
   return {
     ...actualUtils,
     getDataValue: jest.fn(),
   }
 })
 
-jest.mock('./appointmentDateIsInPast', () => ({
+jest.mock('../appointmentDateIsInPast', () => ({
   appointmentDateIsInPast: jest.fn(),
 }))
 
 const mockAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
-describe('/middleware/getAppointmentOutcomeProps()', () => {
+describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -155,7 +155,7 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
       const res = buildResponse()
       mockAppointmentDateIsInPast.mockReturnValueOnce(true)
       jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-      getAppointmentOutcomeProps(req, res, nextSpy)
+      getOutcomeProps(req, res, nextSpy)
       expect(res.locals.appointmentOutcome).toEqual(
         expect.objectContaining({
           forename,
@@ -189,7 +189,7 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
       const res = buildResponse({ username: 'DeborahFern' })
       mockAppointmentDateIsInPast.mockReturnValueOnce(true)
       jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-      getAppointmentOutcomeProps(req, res, nextSpy)
+      getOutcomeProps(req, res, nextSpy)
       expect(res.locals.appointmentOutcome).toEqual(
         expect.objectContaining({
           forename,
@@ -222,7 +222,7 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
       const res = buildResponse()
       mockAppointmentDateIsInPast.mockReturnValueOnce(false)
       jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-      getAppointmentOutcomeProps(req, res, nextSpy)
+      getOutcomeProps(req, res, nextSpy)
       expect(res.locals.appointmentOutcome).toEqual(
         expect.objectContaining({
           forename,
