@@ -3039,17 +3039,9 @@ describe('checkInsController', () => {
   })
   describe('Additional questions for online check ins journey', () => {
     describe('getStartQuestionsPage', () => {
-      it('renders start questions page when CRN is valid and check in date is in the future', async () => {
+      it('renders start questions page when CRN is valid', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
-        const futureDate = new Date()
-        futureDate.setDate(futureDate.getDate() + 5)
-
-        jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestions').mockResolvedValueOnce({
-          expectedCheckinDate: futureDate.toISOString(),
-          questions: [],
-        } as any)
-
         const req = baseReq()
         const { id } = req.params as Record<string, string>
         await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
