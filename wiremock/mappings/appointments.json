@@ -106,35 +106,6 @@
               "startDateTime": "2025-02-28T11:30:00Z",
               "endDateTime": "2025-02-28T12:00:00Z"
             }
-          ],
-          "enforcementActions": [
-            {
-              "id": 0,
-              "name": {
-                "surname": "Morrison",
-                "forename": "Stuart"
-              },
-              "crn": "X000001",
-              "type": "Planned telephone contact",
-              "location": "HMP Wakefield",
-              "startDateTime": "2025-03-17T09:00:00Z",
-              "endDateTime": "2025-03-17T09:30:00Z",
-              "outcome": "Not complied",
-              "enforcementAction": "Decision pending response"
-            },
-
-            {
-              "id": 1,
-              "name": {
-                "surname": "Emard",
-                "forename": "Garrett"
-              },
-              "crn": "X000001",
-              "type": "Home visit",
-              "startDateTime": "2025-03-17T10:00:00Z",
-              "outcome": "Did not attend",
-              "enforcementAction": "Further action required"
-            }
           ]
         },
         "headers": {

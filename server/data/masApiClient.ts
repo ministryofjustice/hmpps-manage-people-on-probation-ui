@@ -248,7 +248,7 @@ export default class MasApiClient extends RestClient {
     const queryParameters = `?${new URLSearchParams({ size, page }).toString()}${sortQuery ?? ''}`
 
     const enforcementContacts = (await this.get({
-      path: `/contacts/${username}/enforcement/${queryParameters}`,
+      path: `/contact/${username}/enforcements/${queryParameters}`,
       handle404: false,
     })) as EnforcementContactsResponse
 

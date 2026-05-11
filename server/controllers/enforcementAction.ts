@@ -6,46 +6,69 @@ import MasApiClient from '../data/masApiClient'
 import { Controller } from '../@types'
 
 const routes = ['getAllEnforcementContacts'] as const
+const colNames = ['surname', 'details', 'outcome', 'action']
+
+const directions = {
+  asc: 'ascending',
+  desc: 'descending',
+}
+
+type ColName = (typeof colNames)[number]
+type SortDir = 'asc' | 'desc'
 
 const enforcementContactsController: Controller<typeof routes, void> = {
   getAllEnforcementContacts: hmppsAuthClient => {
     return async (req, res) => {
-      const url = encodeURIComponent(req.url)
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
-      const [sortName, sortDirection] = sortedBy.split('.')
-      const isAscending: boolean = sortDirection === 'asc'
-      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-      const sortQuery =
-        sortName === 'time' ? `&sortBy=date&ascending=${isAscending}` : `&sortBy=${sortName}&ascending=${isAscending}`
-      const { crn } = req.params as Record<string, string>
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const { user } = res.locals
+      const { query, session, url } = req
+      const { sortBy = '' } = query as Record<string, string>
+
+      const pageNum: number = query.page ? Number.parseInt(query.page as string, 10) : 1
+      const [name, dir] = sortBy.split('.') as [ColName, SortDir]
+
+      const cols = colNames
+
+      const sortByOrder = cols.reduce((acc, colName) => {
+        const defaultSort = 'none'
+        return { ...acc, [colName]: name === colName ? directions?.[dir] || defaultSort : defaultSort }
+      }, {})
+
+      const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
+      const ascending = dir ? (dir === 'asc').toString() : ''
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ALL_ENFORCEMENT_ACTIONS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
+        who: user.username,
+        subjectId: user.username,
+        subjectType: 'USER',
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const enforcementActions = await masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortQuery)
+      const sortUrl = url.split('?')[0]
+
+      const enforcementContacts = await masClient.getEnforcementContacts(
+        user.username,
+        (pageNum - 1).toString(),
+        name,
+        ascending,
+      )
 
       const pagination: Pagination = getPaginationLinks(
-        req.query.page ? pageNum : 1,
-        enforcementActions.personSchedule?.totalPages || 0,
-        enforcementActions.personSchedule?.totalResults || 0,
+        query.page ? pageNum : 1,
+        enforcementContacts.totalPages || 0,
+        enforcementContacts.totalResults || 0,
         page => addParameters(req, { page: page.toString() }),
-        enforcementActions.personSchedule?.size || 10,
+        enforcementContacts?.size || 10,
       )
 
       return res.render('pages/my-enforcement-actions', {
-        enforcementActions,
-        crn,
-        sortedBy,
-        url,
+        enforcementContacts,
+        sortByOrder,
+        sortUrl,
         pagination,
+        backLink: session.backLink,
       })
     }
   },

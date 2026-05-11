@@ -1,117 +1,111 @@
-{% extends "../partials/case.njk" %}
-{% from "_components/compliance-tag/macro.njk" import appComplianceTag %}
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-{% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
-{% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
-{% set pageTitle = makePageTitle({pageHeading: "My enforcement actions"}) %}
-{% set currentNavSection = 'appointments' %}
-{% set headerCRN = enforcementActions.personSummary.crn %}
-{% set headerDob = enforcementActions.personSummary.dateOfBirth %}
-{% set offenderId = enforcementActions.personSummary.offenderId %}
-{% set headerGender = enforcementActions.personSummary.gender %}
-{% set enforcementActions = enforcementActions.personSchedule.appointments %}
-{% set pastAppointments = pastAppointments.personSchedule.appointments %}
-{% set upcomingAppointmentRows = [] %}
-{% set pastAppointmentRows = [] %}
+{% extends "../partials/layout.njk" %}
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{% set backLink = backLink | default('/') %}
+
 {% set hidePageHeader = true %}
-{% set backQueryParam = "?back=" + url if url else 
-    "" %}
-
-{% if enforcementActions.length > 0 %}
-    {% for enforcement in enforcementActions %}
-        {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + enforcement.id + "/manage" + backQueryParam %}
-        {% set appointmentDetails %}
-        <a class='govuk-link' href={{ manageUrl }}>
-            {{ appointment.type | toSentenceCase }}
-            {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
-        </a>
-        {% endset %}
-        {% set actionsButton %}
-        {{ manageAppointmentLink(flags, appointment, crn, manageUrl) }}
-        {% endset %}
-
-        {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
-            {
-                html: appointmentDetails,
-                attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
-            },
-            {
-                text: appointment.startDateTime | dateWithYear,
-                format: "numeric",
-                attributes: { "data-qa":"upcomingAppointmentDate"+loop.index }
-            },
-            {
-                text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
-                format: "numeric",
-                attributes: { "data-qa":"upcomingAppointmentTime"+loop.index }
-            },
-            {
-                html: actionsButton,
-                format: "numeric",
-                attributes: {"data-qa": "upcomingAppointmentAction" + loop.index }
-            }
-        ]), upcomingAppointmentRows) %}
-    {% endfor %}
-{% endif %}
 
 {% block beforeContent %}
+  {% if backLink %}
     {{ govukBackLink({
-        href: ('/case/' + crn + '/appointments')
-    }) }}
+    href: backLink
+  }) }}
+  {% endif %}
 {% endblock %}
 
-{% block pageContent %}
-    {% include "../partials/pop-header.njk" %}
-    <hr class="govuk-section-break--l">
+{% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="enforcementActions">
-                <h2 class="govuk-heading-m" id="section1">All upcoming appointments</h2>
-                {% if enforcementActions.length == 0 %}
-                    <p>There are no upcoming appointments.</p>
-                {% else %}
-                    {{ govukTable({
-                        firstCellIsHeader: false,
-                        attributes: {
-                            'data-module': 'moj-backend-sortable-table'
-                        },
-                        caption: 'Column headers with buttons are sortable',
-                        captionClasses: 'govuk-visually-hidden',
-                        head: [
-                            {
-                                text: "Appointment type",
-                                classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": setSortOrder('appointment', sortedBy) , 'col-name': 'appointment', 'data-qa': 'appointmentHeader', 'data-sort-name': 'appointment', 'data-sort-action': 'upcoming-appointments' }
-                            },
-                            {
-                                text: "Date",
-                                classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": setSortOrder('date', sortedBy) , 'col-name': 'date', 'data-qa': 'appointmentHeader', 'data-sort-name': 'date', 'data-sort-action': 'upcoming-appointments' },
-                                format: "numeric"
-                            },
-                            {
-                                text: "Time",
-                                classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": setSortOrder('time', sortedBy) , 'col-name': 'time', 'data-qa': 'appointmentHeader', 'data-sort-name': 'time', 'data-sort-action': 'upcoming-appointments' },
-                                format: "numeric"
-                            },
-                            {
-                                html: "Action",
-                                classes: "vertical-align--middle",
-                                format: "numeric"
-                            }
-                        ],
-                        rows: upcomingAppointmentRows
-                    }) }}
-
-                    {% if pagination.items | length > 1 %}
-                        {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
-                    {% endif %}
-
-                {% endif %}
-            </section>
-
+            <h1 class="govuk-heading-l" data-qa="pageHeading">My enforcement actions</h1>
         </div>
     </div>
 
+    {% if  enforcementContacts.enforcementContacts and enforcementContacts.enforcementContacts.length > 0 %}
+        {% set head = [
+            {
+                text: "Name / CRN",
+                attributes: {"aria-sort": sortByOrder.surname, "data-sort-name": "surname", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Appointment details",
+                attributes: {"aria-sort": sortByOrder.details, "data-sort-name": "details", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Appointment outcome",
+                attributes: {"aria-sort": sortByOrder.outcome, "data-sort-name": "outcome", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Enforcement action",
+                attributes: {"aria-sort": sortByOrder.action, "data-sort-name": "action", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Action",
+                classes: "nowrap"
+            }
+        ] %}
+
+        {% set rows = [] %}
+
+        {% for enforcement in enforcementContacts.enforcementContacts %}
+            {% set fullName %}
+                {{ enforcement.caseName.surname }}, {{ enforcement.caseName.forename }}
+            {% endset %}          
+
+            {% set row = [
+                { 
+                    classes: "nowrap",
+                    html: '<a class="govuk-!-font-weight-bold" href="/case/' + enforcement.crn + '">' + fullName + '</a>
+                    <br><span class="govuk-!-font-weight-bold secondary-text">' + enforcement.crn + '</span>', 
+                    attributes: { 'data-sort-value': enforcement.caseName.surname }
+                },
+                {
+                    classes: "nowrap",
+                    html: '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '">' + enforcement.appointmentType + '</a>' + "<br><span class='secondary-text'> " + enforcement.appointmentDate + "</span>",
+                    attributes: { "data-sort-value": enforcement.appointmentType }
+                },
+                {
+                    classes: "nowrap",
+                    text: enforcement.appointmentOutcome if enforcement.appointmentOutcome else 'Not Provided',
+                    attributes: { 'data-sort-value': enforcement.appointmentOutcome }
+                },
+                {
+                    classes: "nowrap",
+                    html: (enforcement.enforcementAction if enforcement.enforcementAction 
+                    else 
+                    'Not Provided') + '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>',
+                    attributes: { 'data-sort-value': enforcement.enforcementAction }
+                },
+                {
+                    classes: "nowrap",
+                    html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', enforcement.crn, enforcement.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius</a>' if enforcement.deliusManaged
+                    else 
+                    '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '" rel="external noopener noreferrer">Manage</a>'
+                }
+            ] %}
+
+            {% set rows = (rows.push(row), rows) %}
+        {% endfor %}
+
+
+        {{ govukTable({
+            attributes: {
+               'data-module': 'moj-backend-sortable-table'
+            },
+            caption: 'Column headers with buttons are sortable',
+            captionClasses: 'govuk-visually-hidden',
+            head: head,
+            rows: rows
+            })
+        }}
+
+        {% if pagination.items | length > 1 %}
+            {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
+        {% endif %}
+
+    {% else %}
+        <p>There are no enforcement actions to take.</p>
+    {% endif %}
 {% endblock %}

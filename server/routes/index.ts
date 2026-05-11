@@ -22,7 +22,6 @@ import whatsNew from './whatsNew'
 import appointmentOutcomesRoutes from './appointmentOutcomes'
 import footerRoute from './footer'
 import enforcementContactRoutes from './enforcementContacts'
-import enforcementActionsRoutes from './enforcementActions'
 
 export default function routes(router: Router, services: Services): Router {
   home(router, services)
@@ -47,6 +46,5 @@ export default function routes(router: Router, services: Services): Router {
   whatsNew(router, services)
   footerRoute(router, services)
   enforcementContactRoutes(router, services)
-  enforcementActionsRoutes(router, services)
   return router
 }
