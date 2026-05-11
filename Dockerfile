@@ -1,19 +1,9 @@
 # Stage: base image
-FROM node:22-alpine3.21 as base
+FROM ghcr.io/ministryofjustice/hmpps-node:24-alpine AS base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
-
-LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
-
-ENV TZ=Europe/London
-RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
-
-RUN addgroup -g 2000 appgroup && \
-    adduser -u 2000 -G appgroup -D appuser
-
-WORKDIR /app
 
 # Cache breaking and ensure required build / git args defined
 RUN test -n "$BUILD_NUMBER" || (echo "BUILD_NUMBER not set" && false)
@@ -24,12 +14,6 @@ RUN test -n "$GIT_BRANCH" || (echo "GIT_BRANCH not set" && false)
 ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
-
-RUN apk add --no-cache \
-    python3 \
-    python3-dev \
-    build-base \
-    ca-certificates
 
 # Stage: build assets
 FROM base as build
