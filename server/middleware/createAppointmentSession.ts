@@ -115,6 +115,43 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     appointmentSession.smsOptIn = null
   }
+
+  /*
+
+  Get outcome and enforcement action from appointment - not needed ?
+ 
+  const outcome = appointment?.outcome
+  const action = appointment?.action
+  if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome?.contactOutcomes && outcome) {
+    // match the appointment.outcome to contactOutcome.description
+    const contactOutcome = res.locals.appointmentOutcome.appointmentSession.outcome.contactOutcomes.find(
+      _outcome => _outcome.description === outcome,
+    )
+    if (contactOutcome) {
+      const outcomeType = Object.entries(outcomeMap).find(
+        ([_key, { code }]) => contactOutcome.code === code,
+      )?.[0] as AppointmentOutcomeType
+    }
+  }
+  if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome?.contactEnforcementActions && action) {
+    // match the appointment.action to contactEnforcementActions.description
+    const contactEnforcementAction =
+      res.locals.appointmentOutcome.appointmentSession.outcome.contactEnforcementActions.find(
+        _action => _action.description === outcome,
+      )
+    if (contactEnforcementAction) {
+      // map action to outcome page
+      const enforcementAction = Object.entries(enforcementActionMap).find(
+        ([_key, { code }]) => contactEnforcementAction.code === code,
+      )?.[0] as AppointmentEnforcementAction
+      if (enforcementAction) {
+        const pageKey = camelCase(enforcementAction)
+      }
+    }
+  }
+
+  */
+
   res.locals.appointmentSession = appointmentSession
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)

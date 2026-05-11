@@ -174,6 +174,18 @@ export interface AppointmentOutcomeEnforcementAction {
 
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE'
 
+export interface OutcomeSummary {
+  appointmentDetails: string
+  outcome: string
+  enforcementAction?: string
+  evidenceDueDate?: string
+  notes: string
+  sensitivity: string
+  documents?: string
+  nextAppointment?: string
+  enforcementActionChangeLink?: string
+}
+
 export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
@@ -206,6 +218,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   sendLetter?: boolean
   currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
   notePrepend?: string
+  summary?: OutcomeSummary
 }
 
 export interface AppResponse extends Response {

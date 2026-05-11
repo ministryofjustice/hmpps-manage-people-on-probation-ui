@@ -11,6 +11,7 @@ import {
   getSentences,
   redirectWizard,
   getPersonalDetails,
+  getNextComAppointment,
 } from '../middleware'
 
 import {
@@ -28,6 +29,7 @@ import {
   getUpdateEnforcementActionOptions,
   getCurrentEnforcementAction,
   getContactOutcomes,
+  getOutcomeSummary,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -232,6 +234,8 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${manageBasePath}/check-your-answers`],
+    getNextComAppointment(hmppsAuthClient),
+    getOutcomeSummary,
     controllers.appointmentOutcomes.getCheckYourAnswers(hmppsAuthClient),
   )
   router.post(

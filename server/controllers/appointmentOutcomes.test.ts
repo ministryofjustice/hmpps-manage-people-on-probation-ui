@@ -333,7 +333,7 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/check-your-answers`)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
     })
   })
 

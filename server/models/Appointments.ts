@@ -89,6 +89,13 @@ export interface AppointmentOutcome {
   complied: 'YES' | 'NO'
 }
 
+export type EnforcementActionPage =
+  | 'attendedFailedToComply'
+  | 'acceptableAbsence'
+  | 'unacceptableAbsence'
+  | 'failedToAttend'
+  | 'otherEnforcementAction'
+
 export interface AppointmentSessionOutcome {
   outcomeType?: AppointmentOutcomeType
   outcomeCode?: OutcomeCode

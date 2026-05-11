@@ -7,6 +7,7 @@ import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
+import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -33,9 +34,6 @@ export const appointmentOutcomeRequests = [
   'postUpdateEnforcementAction',
 ] as const
 
-type OutcomeRedirectMap = {
-  [K in AppointmentOutcomeType]: string
-}
 type EnforcementRedirectMap = {
   [K in AppointmentEnforcementAction]?: string
 }
@@ -72,17 +70,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         return renderError(404)(req, res)
       }
       const outcomeType = appointmentSession?.outcome?.outcomeType
-      const redirectMap: OutcomeRedirectMap = {
-        ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
-        ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
-        ATTENDED_SENT_HOME_BEHAVIOUR: `${baseOutcomeUrl}/attended-failed-to-comply`,
-        ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,
-        ACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/acceptable-absence`,
-        UNACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/unacceptable-absence`,
-        FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
+      const map: OutcomeRedirectMap = {
+        ...outcomeRedirectMap(baseOutcomeUrl),
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
-      return res.redirect(redirectMap[outcomeType])
+      return res.redirect(map[outcomeType])
     }
   },
   getAddNote: () => {
@@ -140,7 +132,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       }
       const redirect = uuid
         ? `/case/${crn}/arrange-appointment/${id}/check-your-answers`
-        : `/case/${crn}/appointments/appointment/${id}/check-your-answers`
+        : `/case/${crn}/appointments/appointment/${id}/outcome/check-your-answers`
       return res.redirect(change ?? redirect)
     }
   },

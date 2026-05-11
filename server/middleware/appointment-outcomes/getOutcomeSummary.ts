@@ -1,12 +1,118 @@
+import { DateTime } from 'luxon'
 import { Route } from '../../@types'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
+import { Option } from '../../models/Option'
+import { dateWithYear, govukTime } from '../../utils'
+import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
+import {
+  outcomeOptions,
+  attendedFailedToComplyOptions,
+  acceptableAbsenceOptions,
+  failedToAttendOptions,
+  enforcementActionOptions,
+  outcomeMap,
+  enforcementActionMap,
+} from '../../properties/appointment-outcomes'
+import { Activity } from '../../data/model/schedule'
+import { AppointmentOutcomeProps, OutcomeSummary } from '../../models/Locals'
 
-interface OutcomeSummary {
-  outcome: string
-  notes: string
-  sensitivity: string
-  documents: string
-  nextAppointment: string
-}
-export const getOutcomeSummary: Route<void> = (req, res, next) => {
+let summary: OutcomeSummary
+
+export const getOutcomeSummary: Route<void> = (_req, res, next) => {
+  const {
+    sentence: { type: sentenceType },
+    forename,
+    notePrepend,
+    appointmentHintText,
+    baseOutcomeUrl,
+    appointmentSession: {
+      notes,
+      sensitivity,
+      date,
+      outcome: {
+        outcomeType,
+        outcomeCode,
+        enforcementActionCode,
+        contactEnforcementActions,
+        attendedFailedToComply,
+        acceptableAbsence,
+        unacceptableAbsence,
+        failedToAttend,
+        letterSentBy,
+        breachNSICreatedBy,
+      },
+    },
+    appointment,
+  } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
+
+  const nextAppt = res?.locals?.nextAppointment?.appointment
+  let nextAppointment: string = 'No next appointment'
+  let type: string
+  let startDateTime: string
+  let endDateTime: string
+  if (nextAppt) {
+    ;({ type, startDateTime, endDateTime } = nextAppt)
+    nextAppointment = `${type} on ${dateWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
+  }
+  const allEnforcementActionOptions: Option<AppointmentEnforcementAction | ''>[] = [
+    ...attendedFailedToComplyOptions(sentenceType),
+    ...acceptableAbsenceOptions,
+    ...failedToAttendOptions(forename),
+    ...enforcementActionOptions(forename),
+  ]
+
+  const noOutcome = 'No outcome'
+  const noAction = 'No enforcement action'
+
+  const getSelectedOutcome = (): string => {
+    if (!outcomeCode) return noOutcome
+    const selected = Object.entries(outcomeMap).find(
+      ([_key, { code }]) => outcomeCode === code,
+    )[0] as AppointmentOutcomeType
+    if (!selected) return noOutcome
+    return outcomeOptions.find(option => option.value === selected)?.text || noOutcome
+  }
+
+  const getSelectedEnforcementAction = (): string => {
+    if (!enforcementActionCode?.length) {
+      return noAction
+    }
+    const selected = Object.entries(enforcementActionMap).find(
+      ([_key, { code }]) => enforcementActionCode.at(-1) === code,
+    )[0] as AppointmentOutcomeType
+    if (!selected) {
+      return noAction
+    }
+    return allEnforcementActionOptions.find(option => option?.value && selected === option.value)?.text || noAction
+  }
+
+  const defaultResponsePeriodDays = contactEnforcementActions.find(
+    action => action.code === enforcementActionCode.at(-1),
+  )?.defaultResponsePeriodDays
+  const evidenceDueDate = defaultResponsePeriodDays
+    ? DateTime.fromISO(date).plus({ days: defaultResponsePeriodDays }).toFormat('dd MMMM yyyy')
+    : null
+
+  const documents = appointment?.documents?.length
+    ? appointment.documents.map(document => document.name).join('<br>')
+    : null
+
+  summary = {
+    appointmentDetails: appointmentHintText,
+    outcome: getSelectedOutcome(),
+    notes: notes ?? 'No notes',
+    sensitivity,
+    nextAppointment,
+    documents,
+  }
+
+  if (evidenceDueDate) {
+    summary.evidenceDueDate = evidenceDueDate
+  }
+  if (attendedFailedToComply || acceptableAbsence || unacceptableAbsence || failedToAttend) {
+    summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : getSelectedEnforcementAction()
+    summary.enforcementActionChangeLink = outcomeRedirectMap(baseOutcomeUrl)[outcomeType]
+  }
+  if (summary) res.locals.appointmentOutcome.summary = summary
   return next()
 }
