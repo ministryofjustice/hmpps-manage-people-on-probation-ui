@@ -345,14 +345,14 @@ describe('controllers/appointments', () => {
         actionType: outcomeActionType,
         contactId,
         baseUrl: '',
-        outcomesFilter: '2Years',
+        outcomesFilter: 'PAST_TWO_YEARS',
       })
     })
     it('should filter outcomes when filter is set', async () => {
       const reqWithFilter = httpMocks.createRequest({
         ...reqObject,
         query: { ...reqObject.query, filter: 'true' },
-        body: { outcomesFilter: 'Older', 'appointment-id': id },
+        body: { outcomesFilter: 'OLDER_THAN_TWO_YEARS', 'appointment-id': id },
       })
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(reqWithFilter, res)
       checkSendAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', crn, 'CRN' as SubjectType)
@@ -362,7 +362,7 @@ describe('controllers/appointments', () => {
         actionType: outcomeActionType,
         contactId,
         baseUrl: '',
-        outcomesFilter: 'Older',
+        outcomesFilter: 'OLDER_THAN_TWO_YEARS',
       })
     })
     it('should redirect when filter is not set', async () => {
@@ -371,7 +371,7 @@ describe('controllers/appointments', () => {
       const reqWithoutFilter = httpMocks.createRequest({
         ...reqObject,
         query: { ...reqObject.query, filter: 'false' },
-        body: { outcomesFilter: 'All', 'appointment-id': id },
+        body: { outcomesFilter: 'ALL', 'appointment-id': id },
       })
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(reqWithoutFilter, res)
       const outcomeActionType = 'outcome'
@@ -385,7 +385,7 @@ describe('controllers/appointments', () => {
       const reqWithoutFilter = httpMocks.createRequest({
         ...reqObject,
         query: { ...reqObject.query, filter: 'false' },
-        body: { outcomesFilter: 'All', 'appointment-id': id },
+        body: { outcomesFilter: 'ALL', 'appointment-id': id },
       })
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(reqWithoutFilter, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -396,7 +396,7 @@ describe('controllers/appointments', () => {
       const reqWithoutFilter = httpMocks.createRequest({
         ...reqObject,
         query: { ...reqObject.query, filter: 'false' },
-        body: { outcomesFilter: 'All', 'appointment-id': id },
+        body: { outcomesFilter: 'ALL', 'appointment-id': id },
       })
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(reqWithoutFilter, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -553,7 +553,7 @@ describe('controllers/appointments', () => {
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',
-              sensitive: 'Yes',
+              sensitivity: 'Yes',
             },
             params: {
               contactId: id,
@@ -591,7 +591,7 @@ describe('controllers/appointments', () => {
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',
-              sensitive: 'Yes',
+              sensitivity: 'No',
             },
             params: {
               contactId: id,
@@ -618,7 +618,7 @@ describe('controllers/appointments', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
             id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
-            sensitive: true,
+            sensitive: false,
             outcomeRecorded: true,
           })
         })
@@ -755,7 +755,7 @@ describe('controllers/appointments', () => {
     const mockReq = httpMocks.createRequest({
       body: {
         notes: 'some mock notes',
-        sensitive: 'Yes',
+        sensitivity: 'Yes',
       },
       params: {
         contactId: id,
@@ -785,7 +785,7 @@ describe('controllers/appointments', () => {
     const mockReq = httpMocks.createRequest({
       body: {
         notes: 'some mock notes',
-        sensitive: 'Yes',
+        sensitivity: 'Yes',
       },
       params: {
         contactId: id,
@@ -804,7 +804,7 @@ describe('controllers/appointments', () => {
     expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
       uploadError: 'File not uploaded. Please try again.',
       patchResponse: expect.any(Object),
-      sensitive: 'Yes',
+      sensitive: true,
       notes: 'some mock notes',
     })
 
@@ -819,7 +819,7 @@ describe('controllers/appointments', () => {
     const mockReq = httpMocks.createRequest({
       body: {
         notes: 'some mock notes',
-        sensitive: 'Yes',
+        sensitivity: 'Yes',
       },
       params: {
         contactId: id,

@@ -1,5 +1,23 @@
 {% extends "../_form.njk" %}
-{% set initiateText = 'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
-    'recall' %}
-{% set title = 'Initiate a ' + initiateText %}
+{% set sendLetter = true if appointmentOutcome.appointmentSession.outcome.enforcementAction == 'INITIATE_BREACH_RECALL_AND_SEND_LETTER' else 
+  false %}
+{% set title = 'Initiate a ' + (
+'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
+  'recall') + (' and send a letter' if sendLetter) %}
 {% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+  {{ govukRadios({
+    fieldset: {
+      legend: {
+        text: "Who will create the breach NSI (non-statutory intervention)?",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: appointmentOutcome.options
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'breachNSICreatedBy'])) }}
+  {% if sendLetter %}
+    {% include './_send-letter-radios.njk' %}
+  {% endif %}
+{% endblock %}

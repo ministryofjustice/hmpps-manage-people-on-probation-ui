@@ -1,7 +1,7 @@
-import { Route } from '../@types'
-import { outcomeOptions } from '../properties/appointment-outcomes'
+import { Route } from '../../@types'
+import { outcomeOptions } from '../../properties/appointment-outcomes'
 
-export const getAppointmentOutcomeOptions: Route<void> = (_req, res, next) => {
+export const getOutcomeOptions: Route<void> = (_req, res, next) => {
   const { isInPast, appointmentSession } = res.locals.appointmentOutcome
   let options = outcomeOptions
   if (isInPast && appointmentSession?.type && !['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {

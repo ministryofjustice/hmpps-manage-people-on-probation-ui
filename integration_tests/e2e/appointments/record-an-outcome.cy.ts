@@ -3,10 +3,10 @@ import OverviewPage from '../../pages/overview'
 import RecordAnOutcomePage from '../../pages/appointments/record-an-outcome.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 
-const loadPage = (actionType = 'outcome') => {
-  cy.visit('/case/X000001')
+const loadPage = (actionType = 'outcome', crn = 'X000001') => {
+  cy.visit(`/case/${crn}`)
   const page = Page.verifyOnPage(OverviewPage)
-  page.getAppointmentsLink('X000001', actionType).click()
+  page.getAppointmentsLink(crn, actionType).click()
 }
 context('Record an outcome', () => {
   let recordAnOutcomePage: RecordAnOutcomePage
@@ -67,6 +67,14 @@ context('Record an outcome', () => {
       cy.get('label[for="appointment-id-3"]')
         .should('contain.text', 'Other call')
         .should('contain.text', 'Tuesday 21 February 2023 from 9:15am to 9:30am')
+    })
+    it('should reset filter when first visiting page from new case', () => {
+      loadPage()
+      cy.get('input#outcomesFilter').should('be.checked')
+      cy.get('input#outcomesFilter-3').click()
+      cy.get('[data-qa="submit-button"]').click()
+      loadPage('outcome', 'X000002')
+      cy.get('input#outcomesFilter').should('be.checked')
     })
   })
 })

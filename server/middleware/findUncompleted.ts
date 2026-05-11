@@ -8,9 +8,7 @@ export const findUncompleted = (req: Request, res: Response): string => {
   const { change } = req.query as Record<string, string>
   const data = req?.session?.data ?? {}
   const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-
   const dateInPast = appointmentDateIsInPast(req)
-
   const mapping: [string | undefined, string][] = [
     [appointment?.eventId, 'sentence'],
     [appointment?.type, 'type-attendance'],
@@ -18,13 +16,17 @@ export const findUncompleted = (req: Request, res: Response): string => {
     [appointment?.user?.locationCode, 'location-date-time'],
     [appointment?.date, 'location-date-time'],
     [appointment?.smsOptIn, 'text-message-confirmation'],
-    [appointment?.outcomeRecorded, 'attended-complied'],
-    [appointment?.sensitivity, dateInPast ? 'add-note' : 'supporting-information'],
   ]
+  if (res.locals.flags.enableNonCompliance) {
+    mapping.push([appointment?.outcome?.type, 'outcome'])
+  } else {
+    mapping.push([appointment?.outcomeRecorded, 'attended-complied'])
+  }
+  mapping.push([appointment?.sensitivity, dateInPast ? 'add-note' : 'supporting-information'])
   let appointmentIsIncomplete = false
   for (const [value, redirect] of mapping) {
     appointmentIsIncomplete = !value
-    if (redirect === 'attended-complied') {
+    if (['attended-complied', 'outcome'].includes(redirect)) {
       appointmentIsIncomplete = !value && dateInPast
     }
     if (redirect === 'text-message-confirmation') {

@@ -51,7 +51,7 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Reviewed on</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.reviewedAt | dateWithYear(true) }}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.reviewedAt | dateWithYearTimeFirst }}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Is the person in the image from the check in {{ checkIn.personalDetails.name.forename }}?</dt>
@@ -137,7 +137,7 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Checked in on</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYear(true) }}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYearTimeFirst }}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">{{"System ID and liveness check result" if checkIn.livenessEnabled else "System ID check result"}}</dt>

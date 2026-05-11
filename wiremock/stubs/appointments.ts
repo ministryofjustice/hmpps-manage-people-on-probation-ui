@@ -25,6 +25,7 @@ interface Args {
   outcome?: string
   inOffice?: boolean
   contactId?: string
+  enforcementActionResponseByDate?: string
   contactType?: string
 }
 
@@ -52,6 +53,7 @@ const getAppointmentStub = (
     outcome = '',
     inOffice = true,
     contactId = '6',
+    enforcementActionResponseByDate = '2024-04-21',
     contactType = undefined,
   }: Args = {} as Args,
 ): WiremockMapping => {
@@ -113,6 +115,9 @@ const getAppointmentStub = (
           rescheduledPop: true,
           didTheyComply: undefined,
           absentWaitingEvidence: true,
+          enforcementAction: {
+            responseByDate: enforcementActionResponseByDate,
+          },
           rearrangeOrCancelReason: '',
           rescheduledBy: {
             forename: '',

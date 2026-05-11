@@ -1,6 +1,6 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
-import { isoToDateTime, setDataValue } from '../utils'
+import { getDataValue, isoToDateTime, setDataValue } from '../utils'
 import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
@@ -50,6 +50,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     let date = ''
     let start = ''
     let end = ''
+    let sensitivity: YesNo | undefined
+    let sensitivityLocked: boolean | undefined
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -57,6 +59,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       ;({ time: end } = isoToDateTime(appointment.endDateTime))
     }
     const externalReference = appointment?.externalReference || ''
+    const enforcementAction = appointment?.enforcementAction || null
     if (!eventId) {
       type = ''
     }
@@ -67,6 +70,12 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     if (!eventId || !type || !providerCode || !teamCode || !username) {
       locationCode = ''
+    }
+    if (selection === 'RESCHEDULE') {
+      sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
+      if (sensitivity === 'Yes') {
+        sensitivityLocked = true
+      }
     }
     appointmentSession = {
       ...appointmentSession,
@@ -85,6 +94,9 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       username: res.locals.user.username,
       uuid: '',
       externalReference,
+      enforcementAction,
+      sensitivity,
+      sensitivityLocked,
     }
     if (visorReport) {
       appointmentSession.visorReport = visorReport

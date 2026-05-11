@@ -122,7 +122,7 @@ describe('Confirmation page', () => {
         .getSMSConfirmationMsg()
         .should(
           'contain.text',
-          'Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.',
+          'Alton should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.',
         )
       confirmPage
         .getWhatHappensNext()
@@ -317,7 +317,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `Caroline will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
+              `Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.`,
             )
           })
 
@@ -413,7 +413,7 @@ describe('Confirmation page', () => {
         .getSMSConfirmationMsg()
         .should(
           'contain.text',
-          'Caroline will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.',
+          'Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.',
         )
     })
   })

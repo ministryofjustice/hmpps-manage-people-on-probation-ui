@@ -1,3 +1,7 @@
 export * from './outcome'
 export * from './attended-failed-to-comply'
 export * from './acceptable-absence'
+export * from './failed-to-attend'
+export * from './enforcement-action'
+export * from './send-letter'
+export * from './initiate-breach-recall'

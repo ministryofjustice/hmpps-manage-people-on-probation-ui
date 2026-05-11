@@ -54,7 +54,7 @@
       {% if flags.enableSmsReminders == true %}
         {% if smsSent %}
           {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
-            <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+            <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.</p>
             {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
               {{ mojAlert({
               variant: "warning",

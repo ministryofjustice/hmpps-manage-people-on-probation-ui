@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import {
@@ -186,7 +186,7 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         surname: 'Wolff',
       },
     },
-    flags: { enableMAN2344: true },
+    flags: { enableMAN2344: true, enableSensitivityRemoved: true },
     ...(localsResponse || {}),
   })
 
@@ -257,8 +257,34 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
-    it('should render the sentence page', async () => {
-      await controllers.arrangeAppointments.getSentence()(mockReq, res)
+    it('should redirect to the appointments page if POP has one sentence', async () => {
+      const mockRequest = {
+        ...req,
+        query: {},
+        session: {
+          data: {
+            sentences: {
+              X000001: ['sentence'],
+            },
+          },
+        },
+      } as httpMocks.MockRequest<any>
+      await controllers.arrangeAppointments.getSentence()(mockRequest, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`)
+    })
+    it('should render the sentence page if POP has more than one sentence', async () => {
+      const mockRequest = {
+        ...req,
+        query: {},
+        session: {
+          data: {
+            sentences: {
+              X000001: ['sentence1', 'sentence2'],
+            },
+          },
+        },
+      } as httpMocks.MockRequest<any>
+      await controllers.arrangeAppointments.getSentence()(mockRequest, res)
       checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
@@ -1048,6 +1074,34 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
+    })
+    it('should update sensitivity if locked by previous setting', async () => {
+      const appointmentSession: AppointmentSession = {
+        user: {
+          username: 'X',
+          locationCode: `X`,
+          teamCode: 'X',
+          providerCode: 'X',
+        },
+        eventId: 'X',
+        type: 'X',
+        date: 'X',
+        sensitivity: 'No',
+        sensitivityLocked: true,
+      }
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      mockedPostAppointments.mockReturnValue(() =>
+        Promise.resolve({ appointments: [{ id: 0, externalReference: 'apt-ref-1' }] }),
+      )
+      const mockReq = createMockRequest({ appointmentSession })
+      await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'sensitivity'],
+        'Yes',
+      )
     })
   })
   describe('getConfirmation', () => {

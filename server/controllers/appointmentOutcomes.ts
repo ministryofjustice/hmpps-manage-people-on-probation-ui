@@ -9,7 +9,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 
-const routes = [
+export const appointmentOutcomeRequests = [
   'getOutcome',
   'postOutcome',
   'getAddNote',
@@ -39,7 +39,7 @@ type EnforcementRedirectMap = {
   [K in AppointmentEnforcementAction]?: string
 }
 
-const sharedRedirects = (req: Request, res: Response): void => {
+const enforcementActionRedirects = (req: Request, res: Response): void => {
   const { data } = req.session
   const { crn, id, baseOutcomeUrl } = res.locals.appointmentOutcome
   const enforcementAction = getDataValue<AppointmentEnforcementAction>(data, [
@@ -53,6 +53,7 @@ const sharedRedirects = (req: Request, res: Response): void => {
     SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
     INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
     INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+    DECISION_PENDING: `${baseOutcomeUrl}/add-note`,
     REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
     NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
     DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
@@ -60,7 +61,7 @@ const sharedRedirects = (req: Request, res: Response): void => {
   return res.redirect(redirectMap[enforcementAction])
 }
 
-const appointmentOutcomesController: Controller<typeof routes, void | AppResponse> = {
+const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
   getOutcome: _hmppsAuthClient => {
     return async (_req, res) => {
       return res.render('pages/appointment-outcomes/outcome')
@@ -159,13 +160,13 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     return async (_req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
   },
   postAttendedFailedToComply: () => {
-    return async (req, res) => sharedRedirects(req, res)
+    return async (req, res) => enforcementActionRedirects(req, res)
   },
   getAcceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
   },
   postAcceptableAbsence: () => {
-    return async (req, res) => {
+    return async (_req, res) => {
       const { baseOutcomeUrl } = res.locals.appointmentOutcome
       return res.redirect(`${baseOutcomeUrl}/add-note`)
     }
@@ -174,31 +175,40 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     return async (_req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')
   },
   postUnacceptableAbsence: () => {
-    return async (req, res) => sharedRedirects(req, res)
+    return async (req, res) => enforcementActionRedirects(req, res)
   },
   getFailedToAttend: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/failed-to-attend')
   },
   postFailedToAttend: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/failed-to-attend')
+    return async (req, res) => enforcementActionRedirects(req, res)
   },
   getEnforcementAction: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
   },
   postEnforcementAction: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
+    return async (_req, res) => {
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    }
   },
   getInitiateBreachOrRecall: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
   },
   postInitiateBreachOrRecall: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
+    return async (_req, res) => {
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    }
   },
   getSendLetter: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/send-letter')
   },
   postSendLetter: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/send-letter')
+    return async (_req, res) => {
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    }
   },
   getUpdateEnforcementAction: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')

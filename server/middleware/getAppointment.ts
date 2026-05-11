@@ -53,6 +53,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         notes,
         sensitivity,
+        sensitivityLocked,
         outcomeRecorded,
         rescheduleAppointment,
         smsOptIn,
@@ -154,7 +155,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         previousEnd: rescheduleAppointment?.previousEnd ?? null,
         notes: notes ?? null,
-        sensitivity: sensitivity ?? null,
+        sensitivity: sensitivityLocked ? 'Yes' : (sensitivity ?? null),
         outcomeRecorded: outcomeRecorded ?? null,
       }
     }

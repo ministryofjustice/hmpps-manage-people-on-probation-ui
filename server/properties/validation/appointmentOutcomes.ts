@@ -2,10 +2,11 @@ import { isNotEmpty } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 import { AppointmentsValidationArgs } from './appointments'
 
-interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
+export interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
   isInPast?: boolean
-  msg?: string
-  log?: string
+  msg?: string | string[]
+  log?: string | string[]
+  sendLetter?: boolean
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
@@ -13,8 +14,12 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     'outcome/attended-failed-to-comply',
     'outcome/acceptable-absence',
     'outcome/unacceptable-absence',
+    'outcome/failed-to-attend',
+    'outcome/enforcement-action',
   ]
-  const { crn, id, page, isInPast, msg, log } = args
+  const { crn, id, page, isInPast, msg, log, sendLetter } = args
+  const msgs = Array.isArray(msg) ? msg : [msg]
+  const logs = Array.isArray(log) ? log : [log]
   return {
     [`[appointments][${crn}][${id}][outcome][type]`]: {
       optional: page !== `outcome/index`,
@@ -31,8 +36,42 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       checks: [
         {
           validator: isNotEmpty,
-          msg,
-          log,
+          msg: msgs[0],
+          log: logs[0],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][breachNSICreatedBy]`]: {
+      optional: page !== 'outcome/initiate-breach-or-recall',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: msgs[0],
+          log: logs[0],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][letterSentBy]`]: {
+      optional:
+        !['outcome/initiate-breach-or-recall', 'outcome/send-letter'].includes(page) ||
+        (page === 'outcome/initiate-breach-or-recall' && !sendLetter),
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: msgs[page === 'outcome/initiate-breach-or-recall' ? 1 : 0],
+          log: logs[page === 'outcome/initiate-breach-or-recall' ? 1 : 0],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][letterType]`]: {
+      optional:
+        !['outcome/initiate-breach-or-recall', 'outcome/send-letter'].includes(page) ||
+        (page === 'outcome/initiate-breach-or-recall' && !sendLetter),
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: msgs[page === 'outcome/initiate-breach-or-recall' ? 2 : 1],
+          log: logs[page === 'outcome/initiate-breach-or-recall' ? 2 : 1],
         },
       ],
     },

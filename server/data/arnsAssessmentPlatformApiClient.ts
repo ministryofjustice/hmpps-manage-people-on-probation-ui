@@ -30,6 +30,7 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
       const response = await this.post<QueriesResponse>({
         path: '/query',
         data: request as unknown as Record<string, unknown>,
+        handle404: true,
       })
 
       const result = response?.queries?.[0]?.result
@@ -54,7 +55,7 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
 
       return { hasAgreedPlan, lastUpdatedDate: result.updatedAt }
     } catch (error) {
-      logger.error(error, 'Failed to get sentence plan from Assessment Platform API')
+      logger.error(error.name, 'Failed to get sentence plan from Assessment Platform API')
 
       return null
     }

@@ -17,6 +17,7 @@ import {
 import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
+import { filterContacts } from '../middleware/filterContacts'
 
 const routes = [
   'getAppointments',
@@ -196,20 +197,17 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      req.session.outcomesFilter = req?.body?.outcomesFilter ?? req.session.outcomesFilter
+      req.session.outcomesFilter = req.session.outcomesFilter ?? {}
+      req.session.outcomesFilter[crn] = req?.body?.outcomesFilter ?? req?.session?.outcomesFilter[crn]
       const content = res.locals.contactResponse?.content
-      let outcomes = content?.filter(contact => {
-        const contactDate = DateTime.fromISO(contact.date)
-        const twoYearsAgo = DateTime.now().minus({ years: 2 })
-        return contactDate >= twoYearsAgo
-      })
-      if (req.session.outcomesFilter === 'Older') {
+      let outcomes = filterContacts(content)
+      if (req.session.outcomesFilter[crn] === 'OLDER_THAN_TWO_YEARS') {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
           const twoYearsAgo = DateTime.now().minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
-      } else if (req.session.outcomesFilter === 'All') {
+      } else if (req.session.outcomesFilter[crn] === 'ALL') {
         outcomes = content
       }
       return res.render('pages/appointments/record-an-outcome', {
@@ -219,7 +217,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
         outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
-        outcomesFilter: req.session.outcomesFilter ?? '2Years',
+        outcomesFilter: req.session.outcomesFilter[crn] ?? 'PAST_TWO_YEARS',
       })
     }
   },
@@ -289,12 +287,14 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const url = encodeURIComponent(req.url)
       const { maxCharCount } = config
+      const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
         url,
         maxCharCount,
+        isSensitive,
       })
     }
   },
@@ -306,7 +306,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
 
-      const { notes, sensitive } = req.body as Record<string, string>
+      const { notes, sensitivity } = req.body as Record<string, string>
+      const sensitive = sensitivity === 'Yes'
       const outcomeRecorded = res?.locals?.personAppointment?.appointment?.hasOutcome === true
       const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -315,7 +316,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
         notes: handleQuotes(notes),
-        sensitive: sensitive === 'Yes',
+        sensitive,
         outcomeRecorded,
       }
 
