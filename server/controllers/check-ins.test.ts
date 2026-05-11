@@ -3042,6 +3042,7 @@ describe('checkInsController', () => {
       it('renders start questions page when CRN is valid', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
+
         const req = baseReq()
         const { id } = req.params as Record<string, string>
         await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
