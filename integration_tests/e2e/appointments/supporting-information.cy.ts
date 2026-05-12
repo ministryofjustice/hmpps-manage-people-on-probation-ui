@@ -79,7 +79,7 @@ describe('Add supporting information (optional)', () => {
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
     appointmentNotePage.getSubmitBtn().click()
     const checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
-    checkYourAnswersPage.checkOnPage()
+    checkYourAnswersPage.checkPageTitle('Check your answers')
   })
   it('should check for correct text', () => {
     cy.get('[data-qa="visorReport"]').should(

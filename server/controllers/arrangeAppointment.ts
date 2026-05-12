@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
-import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
@@ -560,11 +559,24 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getCheckYourAnswers: () => {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)
-      const { crn, id: uuid, contactId } = req.params as Record<string, string>
+      const { crn, id: uuid } = req.params as Record<string, string>
+      let { contactId } = req.params as Record<string, string>
       const id = uuid ?? contactId
       const { data } = req.session
       let location = null
-      await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CHECK_YOUR_ANSWERS', crn, SubjectType.CRN)
+      const { isReschedule } = res.locals.appointment
+      const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+      if (isReschedule) {
+        contactId = getDataValue(data, ['appointments', crn, uuid, 'rescheduleAppointment', 'contactId'])
+      }
+      await sendAuditMessage(
+        res,
+        !isReschedule
+          ? 'VIEW_MAS_APPOINTMENT_CHECK_YOUR_ANSWERS'
+          : 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE',
+        crn,
+        SubjectType.CRN,
+      )
       const {
         start,
         date,
@@ -577,12 +589,34 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       return res.render(`pages/arrange-appointment/check-your-answers`, {
         crn,
         id,
+        contactId,
         location,
         url,
         isInPast,
+        sensitivityLocked,
       })
     }
   },
+
+  // getRescheduleCheckYourAnswer: _hmppsAuthClient => {
+  //   return async (req, res) => {
+  //     const { crn, id, contactId } = req.params as Record<string, string>
+  //     const { data } = req.session
+  //     const isInPast = appointmentDateIsInPast(req)
+  //     const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+  //     await sendAuditMessage(res, 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE', crn, SubjectType.CRN)
+  //     const { url } = req
+  //     res.render('pages/reschedule/check-your-answers', {
+  //       crn,
+  //       id,
+  //       contactId,
+  //       url,
+  //       isInPast,
+  //       sensitivityLocked,
+  //     })
+  //   }
+  // },
+
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },

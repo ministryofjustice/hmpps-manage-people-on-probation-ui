@@ -1,5 +1,8 @@
 {{ govukRadios({
     fieldset: {
+       attributes: {
+        'data-qa': 'letterSentBy'
+      },
       legend: {
         text: "Who will send the letter?",
         isPageHeading: false,
@@ -11,6 +14,9 @@
 
 {{ govukRadios({
     fieldset: {
+       attributes: {
+        'data-qa': 'letterType'
+      },
       legend: {
         text: "Select the type of letter",
         isPageHeading: false,

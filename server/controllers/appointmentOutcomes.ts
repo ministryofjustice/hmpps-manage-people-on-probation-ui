@@ -8,6 +8,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
+import { getDataValue } from '../utils'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -40,6 +41,7 @@ type EnforcementRedirectMap = {
 
 const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, req: Request, res: Response): void => {
   const { baseOutcomeUrl, appointmentSession, reqUrl } = res.locals.appointmentOutcome
+  const { change } = req.query
   const enforcementAction = appointmentSession?.outcome?.[pageKey] as AppointmentEnforcementAction
   // const isUpdateAction = reqUrl?.includes('/update-enforcement-action')
   const redirectMap: EnforcementRedirectMap = {
@@ -53,7 +55,8 @@ const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, re
   //   redirectMap.BREACH_RECALL_INITIATED = `${baseOutcomeUrl}/initiate-breach-or-recall`
   //   redirectMap.BREACH_RECALL_INITIATED_AND_SEND_LETTER = `${baseOutcomeUrl}/initiate-breach-or-recall`
   // }
-  const redirect = redirectMap?.[enforcementAction] || `${baseOutcomeUrl}/add-note`
+  let redirect = redirectMap?.[enforcementAction] || `${baseOutcomeUrl}/add-note`
+  if (change) redirect = `${redirect}?change=${change}`
   return res.redirect(redirect)
 }
 
@@ -66,6 +69,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   postOutcome: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId, isValidParams, baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
+      const { change } = req.query
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
@@ -74,7 +78,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         ...outcomeRedirectMap(baseOutcomeUrl),
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
-      return res.redirect(map[outcomeType])
+      const redirect = `${map[outcomeType]}${change ? `?change=${change}` : ''}`
+      return res.redirect(redirect)
     }
   },
   getAddNote: () => {
@@ -110,7 +115,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, id, uuid } = res.locals.appointmentOutcome
+      const { crn, isValidParams, id, uuid, contactId, baseOutcomeUrl } = res.locals.appointmentOutcome
       const { change } = req.query as Record<string, string>
       const { notes, sensitive } = req.body
       if (!isValidParams) {
@@ -130,9 +135,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
           })
         }
       }
-      const redirect = uuid
-        ? `/case/${crn}/arrange-appointment/${id}/check-your-answers`
-        : `/case/${crn}/appointments/appointment/${id}/outcome/check-your-answers`
+      const path = contactId ? baseOutcomeUrl : `/case/${crn}/arrange-appointment/${id}`
+      const redirect = `${path}/check-your-answers`
       return res.redirect(change ?? redirect)
     }
   },

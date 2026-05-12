@@ -540,7 +540,7 @@ describe('Pick a date, location and time for this appointment', () => {
       notePage.checkOnPage()
       completeSupportingInformationPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkOnPage()
+      cyaPage.checkPageTitle('Check your answers')
     })
   })
 

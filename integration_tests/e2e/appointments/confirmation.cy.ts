@@ -270,7 +270,7 @@ describe('Confirmation page', () => {
           dateInPast: true,
         })
         completeAttendedCompliedPage(false, crn, uuid)
-        completeAddNotePage(crn, uuid)
+        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
         completeCYAPage()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage
@@ -304,7 +304,7 @@ describe('Confirmation page', () => {
       getUuid().then(uuid => {
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
-        completeRescheduling(uuid)
+        completeRescheduling({ id: uuid })
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
@@ -345,7 +345,7 @@ describe('Confirmation page', () => {
       getUuid().then(uuid => {
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
-        completeRescheduling(uuid, inPast)
+        completeRescheduling({ id: uuid, inPast })
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()

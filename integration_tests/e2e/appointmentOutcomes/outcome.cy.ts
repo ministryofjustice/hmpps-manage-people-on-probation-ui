@@ -57,7 +57,7 @@ const loadPage = ({ journey = 'MANAGE', dateInPast = false, inOffice = true, id 
     manageAppointmentPage.getTaskLink(1).click()
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ enableNonCompliance: true, crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {

@@ -19,8 +19,14 @@ import TextMessageConfirmationPage from '../../pages/appointments/text-message-c
 import { crn } from './imports/common'
 import { getUuid } from './utils'
 
-const loadPage = (c: string = crn) => {
-  cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
+const loadPage = ({
+  _crn = crn,
+  enableNonCompliance = false,
+}: { _crn?: string; enableNonCompliance?: boolean } = {}) => {
+  if (enableNonCompliance) {
+    cy.task('stubEnableNonCompliance')
+  }
+  cy.visit(`/case/${_crn}/appointments/appointment/6/next-appointment`)
   const nextAppointmentPage = new NextAppointmentPage()
   nextAppointmentPage.getRadio('option', 1).click()
   nextAppointmentPage.getSubmitBtn().click()
@@ -30,6 +36,7 @@ describe('Arrange another appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   it('should render the page', () => {
     cy.task('stubNextAppointment')
     loadPage()
@@ -39,6 +46,7 @@ describe('Arrange another appointment', () => {
       page: arrangeAnotherAppointmentPage,
       sendTextMessage: false,
       summaryHasDate: false,
+      anotherAppointment: true,
     })
     arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
   })
@@ -101,7 +109,7 @@ describe('Arrange another appointment', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
       cy.task('stubAppointmentNoEventId')
-      loadPage('X000001')
+      loadPage({ _crn: 'X000001' })
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
     })
@@ -126,7 +134,7 @@ describe('Arrange another appointment', () => {
     let locationPage: AppointmentdateTimePage
     beforeEach(() => {
       cy.task('stubAppointmentNoLocation')
-      loadPage('X000001')
+      loadPage({ _crn: 'X000001' })
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
       locationPage = new AppointmentdateTimePage()
@@ -175,7 +183,7 @@ describe('Arrange another appointment', () => {
       checkUpdateLocation(arrangeAnotherAppointmentPage)
     })
     it('should update the date when value is changed', () => {
-      checkUpdateDateTime(arrangeAnotherAppointmentPage)
+      checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
     })
     it('should update the notes when value is changed', () => {
       checkUpdateSensitivity(arrangeAnotherAppointmentPage)
@@ -189,6 +197,18 @@ describe('Arrange another appointment', () => {
     })
   })
 
+  describe('Arrange another appointment in the past - non compliance enabled', () => {
+    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    beforeEach(() => {
+      cy.task('stubNextAppointment')
+      loadPage({ enableNonCompliance: true })
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+    })
+    it('should update the date when value is changed and display outcome and action', () => {
+      checkUpdateDateTime({ page: arrangeAnotherAppointmentPage, inPast: true })
+    })
+  })
+
   describe('Practitioner submits the appointment', () => {
     let confirmPage: AppointmentConfirmationPage
     beforeEach(() => {
@@ -198,7 +218,7 @@ describe('Arrange another appointment', () => {
     it('should redirect to the confirmation page', () => {
       getUuid().then(_uuid => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-        checkUpdateDateTime(arrangeAnotherAppointmentPage)
+        checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
       })

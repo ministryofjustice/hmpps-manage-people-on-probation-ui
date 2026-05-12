@@ -128,7 +128,7 @@ describe('Check your answers then confirm the appointment', () => {
         checkUpdateLocation(cyaPage)
       })
       it('should update the date when value is changed', () => {
-        checkUpdateDateTime(cyaPage, DateTime.now().plus({ days: 2 }))
+        checkUpdateDateTime({ page: cyaPage })
       })
       it('should update the text message confirmation when value is changed', () => {
         checkUpdateTextMessageConfirmation(cyaPage)
@@ -223,7 +223,7 @@ describe('Check your answers then confirm the appointment', () => {
         cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
         addNotePage.getSubmitBtn().click()
         cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
     describe('changes past appointment to future appointment', () => {
@@ -242,7 +242,7 @@ describe('Check your answers then confirm the appointment', () => {
         cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
         supportingInfoPage.getSubmitBtn().click()
         cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
     describe('changes future appointment date to another date in the future', () => {
@@ -254,7 +254,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
 
@@ -277,7 +277,7 @@ describe('Check your answers then confirm the appointment', () => {
         cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
         addNotePage.getSubmitBtn().click()
         cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
 
@@ -288,7 +288,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
 
@@ -300,7 +300,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
   })
@@ -318,7 +318,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
     it('should be on the cya page', () => {
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkOnPage()
+      cyaPage.checkPageTitle('Check your answers')
     })
   })
 })

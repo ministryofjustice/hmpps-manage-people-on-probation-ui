@@ -70,6 +70,7 @@ export interface AppointmentLocals {
   notes?: string
   sensitivity?: string
   outcomeRecorded?: string
+  isReschedule?: boolean
 }
 
 export interface LocalsUser {

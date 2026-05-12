@@ -15,7 +15,7 @@ import {
   getPersonRiskFlags,
   getOverdueOutcomes,
 } from '../middleware'
-import { getOutcomeProps } from '../middleware/appointment-outcomes'
+import { getNotePrepend, getOutcomeProps, getOutcomeSummary } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
 import { getTimeOptions } from '../middleware/getTimeOptions'
@@ -142,10 +142,20 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     [
       '/case/:crn/arrange-appointment/:id/check-your-answers',
       '/case/:crn/appointments/appointment/:contactId/check-your-answers',
+      '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     ],
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
+    getOutcomeProps,
+    getNotePrepend,
+    getOutcomeSummary,
+  )
+  router.get(
+    [
+      '/case/:crn/arrange-appointment/:id/check-your-answers',
+      '/case/:crn/appointments/appointment/:contactId/check-your-answers',
+    ],
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
   router.post(
@@ -161,9 +171,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
   router.get(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    checkAnswers,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
   router.post(

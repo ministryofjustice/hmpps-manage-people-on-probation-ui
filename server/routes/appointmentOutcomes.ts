@@ -59,7 +59,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* get the contact outcomes and enforcement actions from api */
 
   router.get(
-    [manageBasePath, arrangeBasePath, `${manageBasePath}/update-enforcement-action`],
+    [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     getContactOutcomes(hmppsAuthClient),
   )
 

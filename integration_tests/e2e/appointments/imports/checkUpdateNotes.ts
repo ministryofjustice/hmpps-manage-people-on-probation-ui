@@ -17,7 +17,11 @@ export const checkUpdateNotes = (
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-notes`).focus().clear().type(updatedNotes)
     notePage.getSubmitBtn().click()
-    page.checkOnPage()
+    if (page instanceof AppointmentCheckYourAnswersPage) {
+      page.checkPageTitle('Check your answers then confirm the appointment')
+    } else {
+      page.checkOnPage()
+    }
     page.getSummaryListRow(index).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
   })
 }

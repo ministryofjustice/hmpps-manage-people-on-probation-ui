@@ -266,6 +266,7 @@ export interface AppointmentPatch {
 }
 
 export interface RescheduleAppointment {
+  contactId?: string
   whoNeedsToReschedule?: RescheduleRequestedBy
   reason?: string
   files?: string[]

@@ -63,8 +63,8 @@ const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 
-const baseUrl = '/crn/X000001/appointment/appointment/1234'
-const baseOutcomeUrl = '/crn/X000001/appointment/appointment/1234/outcome'
+const baseUrl = '/crn/X000001/appointments/appointment/1234'
+const baseOutcomeUrl = '/case/X000001/appointments/appointment/1234/outcome'
 const completedUrl = `/completed/route`
 
 const mockRes = ({

@@ -1,12 +1,13 @@
 import { dateWithYear } from '../../../../server/utils'
 import ArrangeAnotherAppointmentPage from '../../../pages/appointments/arrange-another-appointment.page'
 import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-your-answers.page'
-import RescheduleCheckYourAnswerPage from '../../../pages/appointments/reschedule-check-your-answer.page'
 import { pastDate, startTime, endTime, date } from './common'
 import { to24HourTimeWithMinutes } from '../utils'
 
 interface SummaryProps {
-  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage | RescheduleCheckYourAnswerPage
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
+  reschedule?: boolean
+  anotherAppointment?: boolean
   probationPractitioner?: boolean
   dateInPast?: boolean
   sendTextMessage?: boolean
@@ -16,6 +17,8 @@ interface SummaryProps {
 
 export const checkAppointmentSummary = ({
   page,
+  reschedule = false,
+  anotherAppointment = false,
   probationPractitioner = false,
   dateInPast = false,
   sendTextMessage = true,
@@ -23,20 +26,17 @@ export const checkAppointmentSummary = ({
   smsFeatureFlagDisabled = false,
 }: SummaryProps) => {
   const appointmentFor =
-    page instanceof RescheduleCheckYourAnswerPage ? 'Default Sentence Type (12 Months)' : '12 month Community order'
+    reschedule || anotherAppointment ? 'Default Sentence Type (12 Months)' : '12 month Community order'
   let attending = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
-  if (
-    page instanceof ArrangeAnotherAppointmentPage ||
-    (!(page instanceof AppointmentCheckYourAnswersPage) && probationPractitioner)
-  ) {
+  if (anotherAppointment || ((reschedule || anotherAppointment) && probationPractitioner)) {
     attending = 'Peter Parker (PS-PSO) (Automated Allocation Team, London)'
   }
-  if (page instanceof RescheduleCheckYourAnswerPage) {
+  if (reschedule) {
     attending = 'Terry Jones (PS-PSO) (Automated Allocation Team, London)'
   }
 
   const location =
-    page instanceof RescheduleCheckYourAnswerPage
+    reschedule || anotherAppointment
       ? ['The Building', '77 Some Street', 'Some City Centre', 'London', 'Essex', 'NW10 1EP']
       : ['Love Lane', 'Wakefield', 'West Yorkshire', 'WF2 9AG']
   page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
@@ -50,9 +50,8 @@ export const checkAppointmentSummary = ({
   for (const line of location) {
     page.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', line)
   }
-
   page.getSummaryListRow(5).find('.govuk-summary-list__key').should('contain.text', 'Date and time')
-  if (page instanceof AppointmentCheckYourAnswersPage) {
+  if (!reschedule && !anotherAppointment) {
     page
       .getSummaryListRow(5)
       .find('.govuk-summary-list__value li:nth-child(1)')
@@ -110,7 +109,7 @@ export const checkAppointmentSummary = ({
   page
     .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 7 : 6) + index)
     .find('.govuk-summary-list__value')
-    .should('contain.text', !(page instanceof AppointmentCheckYourAnswersPage) ? 'Not entered' : 'Some notes')
+    .should('contain.text', reschedule || anotherAppointment ? 'Not entered' : 'Some notes')
   page
     .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 8 : 7) + index)
     .find('.govuk-summary-list__key')
@@ -118,5 +117,5 @@ export const checkAppointmentSummary = ({
   page
     .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 8 : 7) + index)
     .find('.govuk-summary-list__value')
-    .should('contain.text', !(page instanceof AppointmentCheckYourAnswersPage) ? 'Not entered' : 'Yes')
+    .should('contain.text', reschedule || anotherAppointment ? 'Not entered' : 'Yes')
 }

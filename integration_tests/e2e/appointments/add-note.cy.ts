@@ -159,7 +159,7 @@ describe('Add a note', () => {
       addNotePage.getSubmitBtn().click()
 
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkOnPage()
+      cyaPage.checkPageTitle('Check your answers')
     })
   })
 })

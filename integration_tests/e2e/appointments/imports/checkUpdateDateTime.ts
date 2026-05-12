@@ -4,6 +4,8 @@ import ArrangeAnotherAppointmentPage from '../../../pages/appointments/arrange-a
 import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-your-answers.page'
 import AppointmentLocationDateTimePage from '../../../pages/appointments/location-date-time.page'
 import {
+  completeAddNotePage,
+  completeOutcome,
   completeSupportingInformationPage,
   completeTextMessageConfirmationPage,
   getCrn,
@@ -11,19 +13,30 @@ import {
   to24HourTimeWithMinutes,
 } from '../utils'
 import { crn } from './common'
+import OutcomePage from '../../../pages/appointmentOutcomes/outcome.page'
+import AttendedFailedToComplyPage from '../../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 
-export const checkUpdateDateTime = (
-  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
-  current?: DateTime,
-) => {
+export const checkUpdateDateTime = ({
+  page,
+  inPast = false,
+}: { page?: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage; inPast?: boolean } = {}) => {
+  let outcomePage: OutcomePage
+  let attendedFailedToComplyPage: AttendedFailedToComplyPage
   getCrn().then(pageCrn => {
     getUuid().then(pageUuid => {
-      const newDate = DateTime.now().plus({ days: 3 }).set({
-        hour: 7,
-        minute: 30,
-        second: 0,
-        millisecond: 0,
-      })
+      const newDate = !inPast
+        ? DateTime.now().plus({ days: 3 }).set({
+            hour: 7,
+            minute: 30,
+            second: 0,
+            millisecond: 0,
+          })
+        : DateTime.now().minus({ days: 1 }).set({
+            hour: 7,
+            minute: 30,
+            second: 0,
+            millisecond: 0,
+          })
       const changedStart = '09:30'
       const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
@@ -36,11 +49,19 @@ export const checkUpdateDateTime = (
       // Ignore warnings
       dateTimePage.getSubmitBtn().click()
       dateTimePage.getSubmitBtn().click()
-      if (!(page instanceof AppointmentCheckYourAnswersPage)) {
+      if (!inPast) {
         completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
         completeSupportingInformationPage(true, '', pageUuid)
       }
-      page.checkOnPage()
+      if (inPast) {
+        completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+        completeAddNotePage({ uuidOverride: pageUuid, crnOverride: crn })
+      }
+      if (page instanceof AppointmentCheckYourAnswersPage) {
+        page.checkPageTitle('Check your answers then confirm the appointment')
+      } else {
+        page.checkOnPage()
+      }
       page
         .getSummaryListRow(5)
         .find('.govuk-summary-list__value li:nth-child(1)')
@@ -53,6 +74,20 @@ export const checkUpdateDateTime = (
             )
           }
         })
+      if (inPast) {
+        page
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__key')
+          .should('contain.text', 'What was the outcome of this appointment?')
+        page
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'Attended - failed to comply')
+        page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Enforcement action')
+        page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No further action')
+        page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
+        page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', '18 May 2026')
+      }
     })
   })
 }

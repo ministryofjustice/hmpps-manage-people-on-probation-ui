@@ -20,7 +20,11 @@ export const checkUpdateSensitivity = (
       completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
     }
-    page.checkOnPage()
+    if (page instanceof AppointmentCheckYourAnswersPage) {
+      page.checkPageTitle('Check your answers then confirm the appointment')
+    } else {
+      page.checkOnPage()
+    }
     page.getSummaryListRow(index).find('.govuk-summary-list__value').should('contain.text', 'No')
   })
 }
