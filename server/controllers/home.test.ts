@@ -100,6 +100,7 @@ describe('homeController', () => {
       })
       it('should request the homepage data from the api', () => {
         expect(spy).toHaveBeenCalledWith(res.locals.user.username)
+        expect(masSpy).toHaveBeenCalledWith(res.locals.user.username, '0')
       })
     })
     describe('production', () => {

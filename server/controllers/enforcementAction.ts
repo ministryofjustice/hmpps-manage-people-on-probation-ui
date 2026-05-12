@@ -11,12 +11,7 @@ const enforcementContactsController: Controller<typeof routes, void> = {
   getAllEnforcementContacts: hmppsAuthClient => {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
-      const [sortName, sortDirection] = sortedBy.split('.')
-      const isAscending: boolean = sortDirection === 'asc'
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-      const sortQuery =
-        sortName === 'time' ? `&sortBy=date&ascending=${isAscending}` : `&sortBy=${sortName}&ascending=${isAscending}`
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -30,23 +25,14 @@ const enforcementContactsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      // TODO: This should call getEnforcementContacts when the API is ready
-      const enforcementActions = await masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortQuery)
-
-      const pagination: Pagination = getPaginationLinks(
-        req.query.page ? pageNum : 1,
-        enforcementActions.personSchedule?.totalPages || 0,
-        enforcementActions.personSchedule?.totalResults || 0,
-        page => addParameters(req, { page: page.toString() }),
-        enforcementActions.personSchedule?.size || 10,
+      const enforcementActions = await masClient.getEnforcementContacts(
+        res.locals.user.username,
+        (pageNum - 1).toString(),
       )
 
       return res.render('pages/my-enforcement-actions', {
         enforcementActions,
-        crn,
-        sortedBy,
         url,
-        pagination,
       })
     }
   },

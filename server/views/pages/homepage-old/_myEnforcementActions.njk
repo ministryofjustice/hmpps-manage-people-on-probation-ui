@@ -1,0 +1,84 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set tableData = {
+  firstCellIsHeader: true,
+  classes: 'govuk-!-margin-bottom-0',
+  head: [
+    {
+      text: "Person on probation"
+    },
+    {
+      text: "Appointment details"
+    },
+    {
+      text: "Appointment outcome"
+    },
+    {
+        text: "Enforcement action"
+    },
+    {
+        text: "Action"
+    }
+  ],
+  rows: []
+} %}
+
+{% if enforcementActions.length > 0 %}
+  {% for enforcementAction in enforcementActions %}
+      {% set dateAndTime %}
+      {% endset %}
+      {% set row = tableData.rows.push([
+          {
+              html: '<a class="govuk-!-font-weight-regular" href="/case/' + enforcementAction.crn + '">' + enforcementAction.caseName.surname + ', ' + enforcementAction.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + enforcementAction.crn + '</span>'
+          },
+          {
+              html:
+              '<a class="govuk-link" href="/case/' + enforcementAction.crn + '/appointments/appointment/' + enforcementAction.id + '/manage?back=' + url + '">'
+              + (enforcementAction.displayName if enforcementAction.displayName else enforcementAction.appointmentType)
+              + '</a><br>'
+              + '<span class="govuk-body-s">'
+              + enforcementAction.appointmentDate | dateWithYearShortMonth
+              + '</span>'
+          },
+          {
+              text: enforcementAction.appointmentOutcome if enforcementAction.appointmentOutcome else 'Not Provided'
+          },
+          {
+              html:
+              (enforcementAction.enforcementAction if enforcementAction.enforcementAction else 'Not Provided')
+              +
+              (
+              '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
+              if enforcementAction.isOverdue
+              else ''
+              )
+          },
+          {
+              classes: 'govuk-!-text-align-left',
+              html:
+              (
+              '<a class="govuk-link" href="' +
+              deliusDeepLinkUrl('UpdateContact', enforcementAction.crn, enforcementAction.id) +
+              '" target="_blank" rel="external noopener noreferrer">' +
+              'Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
+              )
+              if enforcementAction.deliusManaged
+              else
+                  (
+                  '<a class="govuk-link" href="/case/' +
+                  enforcementAction.crn +
+                  '/appointments/appointment/' +
+                  enforcementAction.id +
+                  '/manage?back=' +
+                  url +
+                  '" rel="external noopener noreferrer">Manage</a>'
+              )
+          }
+      ]) %}
+  {% endfor %}
+  <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+    {{ govukTable(tableData) }}
+  </div>
+{% else %}
+  <p class="govuk-body govuk-!-padding-3">There are no enforcement actions to take.</p>
+{% endif %}

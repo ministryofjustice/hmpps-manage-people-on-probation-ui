@@ -19,7 +19,6 @@ const homeController: Controller<typeof routes, void> = {
       appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
       appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
 
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
       const masClient = new MasApiClient(token)
@@ -59,9 +58,6 @@ const homeController: Controller<typeof routes, void> = {
     }
   },
 
-  /**
-   * @deprecated use getHome
-   */
   getHomeOld: hmppsAuthClient => {
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -72,12 +68,19 @@ const homeController: Controller<typeof routes, void> = {
       const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
         req.host.includes(host),
       )
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
+
+      const enforcementContactResponse = await masClient.getEnforcementContacts(
+        res.locals.user.username,
+        (pageNum - 1).toString(),
+      )
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
         totalOutcomes,
         appointments,
         outcomes,
+        enforcementActions: enforcementContactResponse.enforcementContacts,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,

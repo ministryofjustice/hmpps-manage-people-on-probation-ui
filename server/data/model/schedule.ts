@@ -25,6 +25,7 @@ export interface EnforcementContact {
   enforcementAction: string
   evidenceDueDate: string
   deliusManaged: boolean
+  isOverdue?: boolean
 }
 
 export interface CaseName {
