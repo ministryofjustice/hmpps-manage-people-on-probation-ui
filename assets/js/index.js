@@ -128,6 +128,7 @@ const recentCaseDisplay = () => {
       if (!Array.isArray(recentCases)) {
         recentCases = []
       }
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       recentCases = []
       localStorage.removeItem('recentCases')
