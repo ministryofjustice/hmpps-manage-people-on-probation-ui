@@ -52,6 +52,8 @@
             {% endif %}
             href="/case/{{ crn }}/activity-log">Contacts</a>
         </li>
+
+        {% if flags.enableCompliancePage %}
         <li class="moj-sub-navigation__item" data-qa="complianceTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'compliance' %}
@@ -59,6 +61,7 @@
             {% endif %}
             href="/case/{{ crn }}/compliance">Compliance</a>
         </li>
+        {% endif %}
         <li class="moj-sub-navigation__item" data-qa="interventionsTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'interventions' %}
