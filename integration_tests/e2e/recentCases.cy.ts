@@ -2,6 +2,18 @@ import Page from '../pages/page'
 import RecentCasesPage from '../pages/recentCases'
 
 context('Recent Cases', () => {
+  it('shows no recent cases and does not call check access when localStorage is empty', () => {
+    cy.visit('/recent-cases', {
+      onBeforeLoad(win) {
+        win.localStorage.removeItem('recentCases')
+      },
+    })
+
+    Page.verifyOnPage(RecentCasesPage)
+
+    cy.get('#recent-cases-none').should('be.visible')
+    cy.get('#recent-cases-table').should('not.be.visible')
+  })
   it('Recent Cases page is rendered', () => {
     cy.visit('/recent-cases', {
       onBeforeLoad(win) {
