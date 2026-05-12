@@ -18,6 +18,16 @@ const homeController: Controller<typeof routes, void> = {
       const homePage: Homepage = await deliusClient.getHomepage(res.locals.user.username)
       appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
       appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
+
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
+
+      const masClient = new MasApiClient(token)
+      const enforcementContactResponse = await masClient.getEnforcementContacts(
+        res.locals.user.username,
+        (pageNum - 1).toString(),
+      )
+
       const { upcomingAppointments } = homePage
       let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
       if (res.locals.flags.enableHomePageOutcomesWithFilter) {
@@ -35,6 +45,7 @@ const homeController: Controller<typeof routes, void> = {
         upcomingAppointments,
         appointmentsRequiringOutcome,
         appointmentsRequiringOutcomeCount,
+        enforcementActions: enforcementContactResponse.enforcementContacts,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,

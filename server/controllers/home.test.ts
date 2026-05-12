@@ -6,6 +6,7 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import DeliusClient from '../data/deliusClient'
+import MasApiClient from '../data/masApiClient'
 import homeRoutes from '../routes/home'
 import config from '../config'
 import { mockHomepage, mockAppResponse } from './mocks'
@@ -17,6 +18,7 @@ jest.mock('uuid', () => ({
 }))
 jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../data/deliusClient')
+jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
@@ -45,12 +47,27 @@ describe('homeController', () => {
       host: 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
     })
     const originalEnv = process.env.NODE_ENV
-    const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } = mockHomepage
+    const {
+      upcomingAppointments,
+      appointmentsRequiringOutcome,
+      appointmentsRequiringOutcomeCount,
+      enforcementContacts,
+    } = mockHomepage
     let spy: jest.SpyInstance
+    let masSpy: jest.SpyInstance
     beforeEach(async () => {
       jest.resetAllMocks()
       jest.resetModules()
       spy = jest.spyOn(DeliusClient.prototype, 'getHomepage').mockImplementation(() => Promise.resolve(mockHomepage))
+      masSpy = jest.spyOn(MasApiClient.prototype, 'getEnforcementContacts').mockImplementation(() =>
+        Promise.resolve({
+          enforcementContacts: mockHomepage.enforcementContacts,
+          size: 1,
+          page: 0,
+          totalResults: 1,
+          totalPages: 1,
+        }),
+      )
       await controllers.home.getHome(hmppsAuthClient)(req, res)
     })
     afterEach(() => {
@@ -69,6 +86,7 @@ describe('homeController', () => {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
+          enforcementActions: enforcementContacts,
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -97,12 +115,22 @@ describe('homeController', () => {
         spy = jest.spyOn(DeliusClient.prototype, 'getHomepage').mockImplementation(() => Promise.resolve(mockHomepage))
       })
       it('should render the page with no esupervision link', async () => {
+        masSpy = jest.spyOn(MasApiClient.prototype, 'getEnforcementContacts').mockImplementation(() =>
+          Promise.resolve({
+            enforcementContacts: mockHomepage.enforcementContacts,
+            size: 1,
+            page: 0,
+            totalResults: 1,
+            totalPages: 1,
+          }),
+        )
         await controllers.home.getHome(hmppsAuthClient)(mockReq, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
+          enforcementActions: enforcementContacts,
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -166,6 +194,7 @@ describe('homeController', () => {
           upcomingAppointments: mockHomepage.upcomingAppointments,
           appointmentsRequiringOutcome: [recentAppointment],
           appointmentsRequiringOutcomeCount: 1,
+          enforcementActions: enforcementContacts,
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,

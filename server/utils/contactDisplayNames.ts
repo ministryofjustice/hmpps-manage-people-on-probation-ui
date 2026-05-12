@@ -1,5 +1,5 @@
 import { PersonActivity } from '../data/model/activityLog'
-import { PersonAppointment, Schedule, Activity } from '../data/model/schedule'
+import { PersonAppointment, Schedule, Activity, EnforcementContactsResponse } from '../data/model/schedule'
 
 const approvedContactDisplayNames: Record<string, string> = {
   'Accommodation Evidence': 'Accommodation evidence',
@@ -221,5 +221,25 @@ export function mapPersonAppointmentWithApprovedContactDisplayNames(
   return {
     ...personAppointment,
     appointment: withApprovedContactDisplayName(personAppointment.appointment),
+  }
+}
+
+export function mapEnforcementContactsWithApprovedContactDisplayNames(
+  enforcementContacts: EnforcementContactsResponse,
+): EnforcementContactsResponse {
+  if (!enforcementContacts?.enforcementContacts) {
+    return enforcementContacts
+  }
+
+  return {
+    ...enforcementContacts,
+    enforcementContacts: enforcementContacts.enforcementContacts.map(contact => {
+      const displayName = getApprovedContactDisplayName(contact.appointmentType)
+      return {
+        ...contact,
+        displayName: displayName || contact.appointmentType,
+        isOverdue: contact.evidenceDueDate && new Date(contact.evidenceDueDate) < new Date(),
+      }
+    }),
   }
 }
