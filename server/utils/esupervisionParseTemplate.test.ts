@@ -16,6 +16,10 @@ describe('utils/parseQuestionTemplate', () => {
       id: 3,
       template: 'Are you currently {{thing}}?',
       responseSpec: { placeholders: ['thing'] },
+      questionExamples: [
+        'Are you currently taking the medication you were given by your doctor?',
+        'Are you currently in a relationship with someone?',
+      ],
     },
   ]
 
@@ -36,6 +40,19 @@ describe('utils/parseQuestionTemplate', () => {
       prefix: 'How was ',
       suffix: '?',
       placeholderWord: 'thing',
+    })
+  })
+  it('extracts the question examples ', () => {
+    const result = parseQuestionTemplate(mockQuestions, 3)
+    expect(result).toEqual({
+      id: 3,
+      prefix: 'Are you currently ',
+      suffix: '?',
+      placeholderWord: 'thing',
+      questionExamples: [
+        'Are you currently taking the medication you were given by your doctor?',
+        'Are you currently in a relationship with someone?',
+      ],
     })
   })
 })
