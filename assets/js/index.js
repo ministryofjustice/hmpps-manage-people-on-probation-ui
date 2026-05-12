@@ -117,10 +117,20 @@ const recentCaseDisplay = () => {
 
   if (recentCasesNone && recentCasesTable) {
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    let recentCases = JSON.parse(localStorage.getItem('recentCases') || '[]')
+    const storedRecentCases = localStorage.getItem('recentCases')
+    let recentCases = []
 
-    if (!Array.isArray(recentCases)) {
+    try {
+      if (storedRecentCases) {
+        recentCases = JSON.parse(storedRecentCases)
+      }
+
+      if (!Array.isArray(recentCases)) {
+        recentCases = []
+      }
+    } catch (error) {
       recentCases = []
+      localStorage.removeItem('recentCases')
     }
 
     $.ajax({
