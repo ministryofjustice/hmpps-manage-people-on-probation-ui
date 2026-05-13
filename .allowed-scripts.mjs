@@ -7,16 +7,18 @@ export default configureAllowedScripts({
     // Needed to interface with Sentry for app monitoring
     'node_modules/@sentry/cli@3.4.2': 'ALLOW',
     // Provides capabilities for integration testing
-    'node_modules/cypress@15.13.1': 'ALLOW',
+    'node_modules/cypress@15.15.0': 'ALLOW',
     // Provides native integration, supporting ability to write dtrace probes for bunyan
     'node_modules/dtrace-provider@0.8.8': 'ALLOW',
     // ESBuild is written in GoLang - this is needed to download prebuilt binaries for the specific platform
-    'node_modules/esbuild@0.27.7': 'ALLOW',
+    'node_modules/esbuild@0.28.0': 'ALLOW',
     // Needed by jest for running tests in watch mode
     'node_modules/fsevents@2.3.3': 'ALLOW',
     // Need by playwright for detecting file system changes during test runs
     'node_modules/playwright/node_modules/fsevents@2.3.2': 'ALLOW',
     // Native solution to quickly resolve module paths, used by jest and eslint
     'node_modules/unrs-resolver@1.11.1': 'ALLOW',
+    // Needed to support esbuild
+    'node_modules/tsx/node_modules/esbuild@0.27.7': 'ALLOW',
   },
 })
