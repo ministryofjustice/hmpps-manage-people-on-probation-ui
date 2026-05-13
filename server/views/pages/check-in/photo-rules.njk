@@ -6,6 +6,12 @@
 {% set summaryLink =  '/case/' + crn + '/appointments/' + id + '/check-in/checkin-summary' %}
 {% set hideButton =  true %}
 {% set checkinPhotoPage =  true %}
+
+{% block heading %}
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+    {{ title }}
+  </h1>
+{% endblock %}
 {% block form %}
 
     <p>Make sure:</p>
