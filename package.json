@@ -134,7 +134,7 @@
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.4",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.210.0",
     "@ministryofjustice/probation-search-frontend": "^2.4.0",
-    "@sentry/cli": "^2.46.0",
+    "@sentry/cli": "^3.4.2",
     "@sentry/node": "^10.53.1",
     "@types/cypress__code-coverage": "^3.10.2",
     "@types/qs": "6.15.1",
