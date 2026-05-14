@@ -4,7 +4,6 @@ export default function isTimeoutError(error: any): boolean {
   return (
     error?.code === 'ECONNABORTED' ||
     error?.code === 'ETIMEDOUT' ||
-    /timeout of \d+ms exceeded/i.test(message) ||
-    message.includes('timeout')
+    /timeout of \d+ms exceeded/i.test(message)
   )
 }
