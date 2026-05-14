@@ -29,11 +29,18 @@ const authClientArns = new AuthenticationClient(
   logger,
   config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
 )
+const authClientSearch = new AuthenticationClient(
+  config.apis.hmppsAuth,
+  logger,
+  config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
+)
+
 export const dataAccess = () => ({
   applicationInfo,
   hmppsAuthClient: new HmppsAuthClient(
     config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
   ),
+  authClientSearch,
   manageUsersApiClient: new ManageUsersApiClient(),
   probationFrontendComponentsApiClient: new ProbationFrontendComponentsApiClient(),
   authClientArns,
