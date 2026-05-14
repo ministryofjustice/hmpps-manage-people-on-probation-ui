@@ -88,6 +88,25 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       expect(nock.isDone()).toBe(true)
     })
 
+    it('should not retry if retry is false', async () => {
+      nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
+        [method]('/api/test')
+        .reply(500)
+
+      await expect(restClient[method]({ path: '/test', retry: false })).rejects.toThrow('Internal Server Error')
+      expect(nock.isDone()).toBe(true)
+    })
+
+    it('should not retry timeout errors', async () => {
+      nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
+        [method]('/api/test')
+        .delayConnection(1500)
+        .reply(200, { success: true })
+
+      await expect(restClient[method]({ path: '/test' })).rejects.toThrow('Timeout of 1000ms exceeded')
+      expect(nock.isDone()).toBe(true)
+    })
+
     if (method === 'get') {
       it('should handle 500s if configured to do so', async () => {
         nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
@@ -184,6 +203,16 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         .reply(500)
 
       await expect(restClient[method]({ path: '/test', retry: true })).rejects.toThrow('Internal Server Error')
+      expect(nock.isDone()).toBe(true)
+    })
+
+    it('should not retry timeout errors even when retry is true', async () => {
+      nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
+        [method]('/api/test')
+        .delayConnection(1500)
+        .reply(200, { success: true })
+
+      await expect(restClient[method]({ path: '/test', retry: true })).rejects.toThrow('Timeout of 1000ms exceeded')
       expect(nock.isDone()).toBe(true)
     })
 
