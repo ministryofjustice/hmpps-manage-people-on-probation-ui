@@ -28,9 +28,10 @@ type NavPage =
   | typeof CompliancePage
   | typeof InterventionsPage
 
-const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
-  (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
-).response.jsonBody.riskFlags
+const mockRiskFlags: RiskFlag[] = (
+  mockRiskData.mappings.find((mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001').response
+    .jsonBody as unknown as { riskFlags: RiskFlag[] }
+).riskFlags
 
 interface Args {
   page: RiskPage

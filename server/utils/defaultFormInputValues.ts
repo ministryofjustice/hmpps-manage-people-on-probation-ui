@@ -6,7 +6,7 @@ export const defaultFormInputValues = (
   id: string,
 ): HTMLInputElement => {
   const obj = object
-  if (data !== undefined) {
+  if (data !== undefined && data[id] !== undefined) {
     obj.id = id
     obj.name = id
     obj.value = data[id]
