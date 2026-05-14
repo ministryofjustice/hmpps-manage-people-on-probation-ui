@@ -21,10 +21,10 @@ import { getUuid } from './utils'
 
 const loadPage = ({
   _crn = crn,
-  enableNonCompliance = false,
+  enableNonCompliance = true,
 }: { _crn?: string; enableNonCompliance?: boolean } = {}) => {
-  if (enableNonCompliance) {
-    cy.task('stubEnableNonCompliance')
+  if (!enableNonCompliance) {
+    cy.task('stubDisableNonCompliance')
   }
   cy.visit(`/case/${_crn}/appointments/appointment/6/next-appointment`)
   const nextAppointmentPage = new NextAppointmentPage()
@@ -201,11 +201,23 @@ describe('Arrange another appointment', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
       cy.task('stubNextAppointment')
-      loadPage({ enableNonCompliance: true })
+      loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     })
     it('should update the date when value is changed and display outcome and action', () => {
       checkUpdateDateTime({ page: arrangeAnotherAppointmentPage, inPast: true })
+    })
+  })
+
+  describe('Arrange another appointment in the past - non compliance disabled', () => {
+    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    beforeEach(() => {
+      cy.task('stubNextAppointment')
+      loadPage({ enableNonCompliance: false })
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+    })
+    it('should update the date when value is changed and display outcome and action', () => {
+      checkUpdateDateTime({ enableNonCompliance: false, page: arrangeAnotherAppointmentPage, inPast: true })
     })
   })
 

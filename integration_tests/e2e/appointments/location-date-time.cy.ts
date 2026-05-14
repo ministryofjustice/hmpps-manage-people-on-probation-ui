@@ -20,7 +20,10 @@ import {
 } from './utils'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
-const loadPage = (urlCRN = crn, typeOptionIndex = 1) => {
+const loadPage = ({ urlCRN = crn, typeOptionIndex = 1, enableNonCompliance = true } = {}) => {
+  if (!enableNonCompliance) {
+    cy.task('stubDisableNonCompliance')
+  }
   completeSentencePage(1, '', urlCRN)
   completeTypePage(typeOptionIndex)
 }
@@ -111,7 +114,7 @@ describe('Pick a date, location and time for this appointment', () => {
   })
   describe('Page is rendered with risk to staff alert', () => {
     beforeEach(() => {
-      loadPage('X000001')
+      loadPage({ urlCRN: 'X000001' })
     })
     it('should render the alert with medium risk to staff details', () => {
       checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
@@ -120,7 +123,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Page is rendered with options for an appointment type which does not require a location', () => {
     beforeEach(() => {
       const typeOptionIndex = 2
-      loadPage(crn, typeOptionIndex)
+      loadPage({ urlCRN: crn, typeOptionIndex })
       locationDateTimePage = new AppointmentLocationDateTimePage()
     })
     it('should display the non-mandatory location option', () => {
@@ -140,7 +143,7 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should only display the last 2 radio options', () => {
       cy.task('stubNoUserLocationsFound')
       const typeOptionIndex = 2
-      loadPage(crn, typeOptionIndex)
+      loadPage({ urlCRN: crn, typeOptionIndex })
       locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage
         .getRadioLabel('locationCode', 1)
@@ -447,15 +450,16 @@ describe('Pick a date, location and time for this appointment', () => {
         statusCode: 200,
         body: { isInPast: true },
       }).as('isInPast')
-      loadPage()
     })
     it('should persist the log an outcome alert banner when form is submitted with validation errors', () => {
+      loadPage()
       selectPastDate()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
-    it('should persist the log an outcome alert banner when past date is submitted and cancel and go back link is clicked from log an outcome page', () => {
+    it('should persist the log an outcome alert banner when past date is submitted and cancel and go back link is clicked from log an outcome page - non compliance disabled', () => {
+      loadPage({ enableNonCompliance: false })
       selectPastDate()
       locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
       locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
@@ -468,7 +472,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.checkOnPage()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
-    it('should persist the log an outcome banner when change link is clicked on check your answers page', () => {
+    it('should persist the log an outcome banner when change link is clicked on check your answers page - non compliance disabled', () => {
+      loadPage({ enableNonCompliance: false })
       selectPastDate()
       locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
       locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
@@ -558,7 +563,7 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   const completeInvalidRescheduleDateTime = () => {
-    completeRescheduleAppointmentPage()
+    completeRescheduleAppointmentPage({ enableNonCompliance: false })
     const rescheduleCyaPage = new RescheduleCheckYourAnswerPage()
     rescheduleCyaPage.getSubmitBtn().click()
     locationDateTimePage = new AppointmentLocationDateTimePage()

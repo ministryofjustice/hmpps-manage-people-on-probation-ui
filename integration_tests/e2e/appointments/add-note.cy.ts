@@ -17,6 +17,7 @@ describe('Add a note', () => {
 
   beforeEach(() => {
     cy.task('resetMocks')
+    cy.task('stubDisableNonCompliance')
   })
 
   /* ------------------------------------------------------------------ */
@@ -105,20 +106,17 @@ describe('Add a note', () => {
       addNotePage.getFileUploadInput().attachFile(createFakeFile(6, 'pdf'))
       addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
       addNotePage.getSubmitBtn().click()
-
       addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
     })
     ;(['pdf', 'doc', 'docx'] as const).forEach(filetype => {
       it(`uploads a valid ${filetype} file`, () => {
         cy.task('stubPatchDocument200Response')
         cy.intercept('POST', '/case/*/appointments/appointment/*/add-note').as('submit')
-
         loadPage()
         addNotePage.getFileUploadInput().attachFile(createFakeFile(1, filetype))
         addNotePage.getNotesTextarea().type('Test note')
         addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
         addNotePage.getSubmitBtn().click()
-
         cy.wait('@submit')
         cy.url().should('include', '/manage')
       })

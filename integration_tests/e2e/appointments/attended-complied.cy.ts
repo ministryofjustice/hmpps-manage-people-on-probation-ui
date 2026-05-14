@@ -60,6 +60,7 @@ describe('Log attended and complied appointment', () => {
   }
   beforeEach(() => {
     cy.task('resetMocks')
+    cy.task('stubDisableNonCompliance')
   })
   describe('Manage appointment journey', () => {
     const manageJourney = true

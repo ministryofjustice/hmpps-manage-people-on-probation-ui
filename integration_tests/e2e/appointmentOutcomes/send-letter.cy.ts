@@ -29,15 +29,10 @@ const loadPage = ({
   journey = 'MANAGE',
   sentenceType = 'COMMUNITY',
 }: { journey?: Journey; sentenceType?: SentenceType } = {}): void => {
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (sentenceType !== 'COMMUNITY') {
     cy.task('stubSentences', { sentenceType })
   }
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
@@ -49,7 +44,7 @@ const loadPage = ({
     completeLocationDateTimePage({ dateInPast: true })
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage({ enableNonCompliance: true, crn })
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {

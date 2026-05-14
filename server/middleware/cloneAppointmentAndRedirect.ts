@@ -26,10 +26,12 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       notes: null,
       sensitivity: isSensitive === 'Yes' ? isSensitive : appointmentToClone.sensitivity,
       sensitivityLocked: appointmentToClone.sensitivity === 'Yes' || isSensitive === 'Yes',
-      rescheduleAppointment: {
+    }
+    if (apptType === 'RESCHEDULE') {
+      clonedAppt.rescheduleAppointment = {
         contactId,
         ...(appointmentToClone?.rescheduleAppointment || {}),
-      },
+      }
     }
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)

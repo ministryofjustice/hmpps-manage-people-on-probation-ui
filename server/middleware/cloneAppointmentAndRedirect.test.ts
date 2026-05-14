@@ -80,9 +80,6 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     end: '',
     uuid,
     sensitivityLocked: false,
-    rescheduleAppointment: {
-      contactId: 'C9876',
-    },
   }
 
   it('should construct the correct session with date removed and redirect to arrange another appointment page', () => {
@@ -100,6 +97,9 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
 
     const expectedCloneReschedule = {
       ...expectedClone,
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
       uuid: request.params.id,
     }
 
@@ -126,6 +126,9 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     const expectedCloneReschedule = {
       ...expectedClone,
       uuid: request.params.id,
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
       sensitivity: 'Yes',
       sensitivityLocked: true,
     }

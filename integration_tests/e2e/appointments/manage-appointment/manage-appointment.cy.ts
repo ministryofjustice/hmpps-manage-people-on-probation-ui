@@ -116,13 +116,13 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
-        cy.task('stubEnableNonCompliance')
         loadPage()
       })
       appointmentActions()
     })
     describe('enableNonCompliance feature flag is disabled', () => {
       beforeEach(() => {
+        cy.task('stubDisableNonCompliance')
         loadPage()
       })
       appointmentActions(false)
@@ -147,7 +147,6 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
-        cy.task('stubEnableNonCompliance')
         loadPage()
       })
       appointmentDetails()
@@ -155,6 +154,7 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is disabled', () => {
       beforeEach(() => {
+        cy.task('stubDisableNonCompliance')
         loadPage()
       })
       appointmentDetails(false)

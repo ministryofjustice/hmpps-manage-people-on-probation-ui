@@ -345,7 +345,7 @@ const stubDisableOGRS4 = (): SuperAgentRequest =>
     },
   })
 
-const stubEnableNonCompliance = (): SuperAgentRequest =>
+const stubDisableNonCompliance = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
@@ -363,7 +363,7 @@ const stubEnableNonCompliance = (): SuperAgentRequest =>
             key: 'enableNonCompliance',
             name: 'enableNonCompliance',
             description: '',
-            enabled: true,
+            enabled: false,
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2026-02-26T12:00:00.000000Z',
             updatedAt: '2026-02-26T12:00:00.000000Z',
@@ -563,7 +563,7 @@ export default {
   stubDisableTierLink,
   stubDisableOGRS4,
   stubEnableESupervisionCustomQuestions,
-  stubEnableNonCompliance,
+  stubDisableNonCompliance,
   stubEnableDeepLinks,
   stubDisableSentencePlanUrl,
   stubOgrs4SummaryCardEnabled,

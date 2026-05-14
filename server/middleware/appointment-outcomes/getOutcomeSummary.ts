@@ -87,7 +87,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       return allEnforcementActionOptions.find(option => option?.value && selected === option.value)?.text || noAction
     }
 
-    const defaultResponsePeriodDays = contactEnforcementActions.find(
+    const defaultResponsePeriodDays = contactEnforcementActions?.find(
       action => action.code === enforcementActionCode?.at(-1),
     )?.defaultResponsePeriodDays
     const evidenceDueDate = defaultResponsePeriodDays

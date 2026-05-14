@@ -15,8 +15,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
   const index = enableNonCompliance ? 2 : 1
   describe('Appointment Reschedule link', () => {
     beforeEach(() => {
-      if (enableNonCompliance) {
-        cy.task('stubEnableNonCompliance')
+      if (!enableNonCompliance) {
+        cy.task('stubDisableNonCompliance')
       }
       loadPage()
       manageAppointmentPage = new ManageAppointmentPage()
@@ -25,8 +25,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Complied appointment with future date', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: true, hasComplied: true, isFuture: true })
         loadPage()
@@ -46,8 +46,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in future with no outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: false, isFuture: true })
         loadPage()
@@ -74,8 +74,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in past with outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: true, hasComplied: true, isFuture: false })
         loadPage()
@@ -95,8 +95,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in past with no outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: false, isFuture: false })
         loadPage()

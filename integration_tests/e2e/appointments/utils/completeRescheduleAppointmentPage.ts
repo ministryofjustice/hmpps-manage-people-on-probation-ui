@@ -2,9 +2,9 @@ import { getUuid } from './common'
 import ManageAppointmentPage from '../../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../../pages/appointments/reschedule-appointment.page'
 
-export const completeRescheduleAppointmentPage = ({ enableNonCompliance = false, crn = 'X000001' } = {}) => {
-  if (enableNonCompliance) {
-    cy.task('stubEnableNonCompliance')
+export const completeRescheduleAppointmentPage = ({ enableNonCompliance = true, crn = 'X000001' } = {}) => {
+  if (!enableNonCompliance) {
+    cy.task('stubDisableNonCompliance')
   }
   cy.visit(`/case/${crn}/appointments/appointment/6/manage`)
   const manageAppointmentPage = new ManageAppointmentPage()

@@ -8,6 +8,7 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  uncheckAllRadios,
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
@@ -27,13 +28,8 @@ const loadPage = ({
   sentenceLength = 25,
 }: { journey?: Journey; sentenceLength?: number } = {}): void => {
   const endDate = sentenceLength === 12 ? '2024-12-01' : '2027-01-01'
-  cy.task('stubEnableNonCompliance')
   cy.task('stubSentences', { endDate })
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
@@ -45,7 +41,7 @@ const loadPage = ({
     completeLocationDateTimePage({ dateInPast: true })
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage({ enableNonCompliance: true, crn })
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
@@ -53,6 +49,7 @@ const loadPage = ({
     })
   }
   outcomePage = new OutcomePage()
+  uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=ACCEPTABLE_ABSENCE]`).click()
   outcomePage.getSubmitBtn().click()
 }
@@ -168,9 +165,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
 }
 
 describe('Acceptable absence', () => {
-  before(() => {
-    cy.request('POST', '/__test/clear-session')
-  })
   afterEach(() => {
     cy.task('resetMocks')
   })

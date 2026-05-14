@@ -8,7 +8,7 @@ describe('Reschedule Appointment', () => {
   let rescheduleAppointmentPage: RescheduleAppointmentPage
   let checkYourAnswerPage: AppointmentCheckYourAnswersPage
 
-  const loadPage = (enableNonCompliance = false) => {
+  const loadPage = (enableNonCompliance = true) => {
     cy.visit('/case/X000001/appointments/appointment/6/manage')
     const index = enableNonCompliance ? 2 : 1
     manageAppointmentPage = new ManageAppointmentPage()

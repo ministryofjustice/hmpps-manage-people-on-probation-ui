@@ -97,6 +97,7 @@ const mockAppointment: AppointmentSession = {
   sensitivity: 'Yes',
   visorReport: 'No',
   rescheduleAppointment: {
+    contactId: '12345',
     reason: 'Reschedule reason',
     whoNeedsToReschedule: 'SERVICE',
     sensitivity: 'No',

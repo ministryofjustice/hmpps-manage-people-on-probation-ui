@@ -45,6 +45,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, ar
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
   )
 
+  /*
   router.get(
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
     getOverdueOutcomes(hmppsAuthClient),
@@ -60,6 +61,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, ar
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
     controllers.arrangeAppointments.postConfirmation(),
   )
+    */
 }
 
 export default rescheduleAppointmentRoutes

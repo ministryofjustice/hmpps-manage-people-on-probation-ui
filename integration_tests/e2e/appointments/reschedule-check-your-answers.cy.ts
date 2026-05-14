@@ -22,7 +22,7 @@ describe('Change appointment details and reschedule', () => {
   })
 
   it('should render the page', () => {
-    completeRescheduleAppointmentPage({ enableNonCompliance: true, crn })
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
     checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
     checkPopHeader()
@@ -50,7 +50,7 @@ describe('Change appointment details and reschedule', () => {
 
   describe('User clicks submit without selecting a date and time', () => {
     beforeEach(() => {
-      completeRescheduleAppointmentPage({ enableNonCompliance: true })
+      completeRescheduleAppointmentPage()
       checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
       checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
       checkYourAnswerPage.getSubmitBtn().click()
@@ -79,7 +79,7 @@ describe('Change appointment details and reschedule', () => {
     })
     it('should display the previous appointment date and outlook invite', () => {
       getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, enableNonCompliance: true })
+        completeRescheduling({ id: uuid })
         cy.get('[data-qa="previousDateTime"]').should(
           'contain.text',
           `Wednesday 21 February 2024 at 10:15am to 10:30am`,
@@ -106,14 +106,14 @@ describe('Change appointment details and reschedule', () => {
 
   describe('Reschedule appointment in the past - non compliance enabled', () => {
     beforeEach(() => {
-      completeRescheduleAppointmentPage({ enableNonCompliance: true })
+      completeRescheduleAppointmentPage()
       checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
       checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
       checkYourAnswerPage.getSubmitBtn().click()
     })
     it('should display the log outcomes alert banner and not display outlook invite text', () => {
       getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: true })
+        completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage
           .getSummaryListRow(6)
           .find('.govuk-summary-list__key')
@@ -134,16 +134,14 @@ describe('Change appointment details and reschedule', () => {
           .getSummaryListRow(8)
           .find('.govuk-summary-list__key')
           .should('contain.text', 'Evidence due date')
-        checkYourAnswerPage
-          .getSummaryListRow(8)
-          .find('.govuk-summary-list__value')
-          .should('contain.text', '18 May 2026')
+        const evidenceDate = DateTime.now().plus({ days: 6 }).toFormat('dd MMMM yyyy')
+        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
         cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
       })
     })
     it('should redirect to the outcome page when change link is clicked', () => {
       getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: true })
+        completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
         outcomePage = new OutcomePage()
         cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).should('be.checked')
@@ -151,7 +149,7 @@ describe('Change appointment details and reschedule', () => {
     })
     it('should redirect to the correct enforcement page when change link is clicked', () => {
       getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: true })
+        completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
         attendedFailedToComplyPage = new AttendedFailedToComplyPage()
         cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
@@ -159,7 +157,7 @@ describe('Change appointment details and reschedule', () => {
     })
     it('should redirect to the correct enforcement page when evidence due date change link is clicked', () => {
       getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: true })
+        completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__actions').find('a').click()
         attendedFailedToComplyPage = new AttendedFailedToComplyPage()
         cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
@@ -169,14 +167,14 @@ describe('Change appointment details and reschedule', () => {
 
   describe('Reschedule appointment in the past - non compliance disabled', () => {
     beforeEach(() => {
-      completeRescheduleAppointmentPage()
+      completeRescheduleAppointmentPage({ enableNonCompliance: false })
       checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
       checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
       checkYourAnswerPage.getSubmitBtn().click()
     })
     it('should display the log outcomes alert banner and not display outlook invite text', () => {
       getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, inPast: true })
+        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: false })
         checkYourAnswerPage
           .getSummaryListRow(6)
           .find('.govuk-summary-list__key')

@@ -25,11 +25,6 @@ const loadPage = ({
   enforcementAction?: AppointmentEnforcementAction
 } = {}): void => {
   const action = enforcementActionMap?.[enforcementAction]?.description || null
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', {
     eventId: 2501192724,
     isFuture: false,

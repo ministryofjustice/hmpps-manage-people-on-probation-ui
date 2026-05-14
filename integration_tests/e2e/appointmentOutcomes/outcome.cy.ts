@@ -10,6 +10,7 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  uncheckAllRadios,
 } from '../appointments/utils'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
@@ -40,28 +41,26 @@ interface Args {
 }
 
 const loadPage = ({ journey = 'MANAGE', dateInPast = false, inOffice = true, id = appointmentId }: Args = {}) => {
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { isFuture: dateInPast === false, eventId: 2501192724, inOffice })
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
   if (journey === 'ARRANGE') {
     completeSentencePage()
     completeTypePage(inOffice ? 1 : 2)
     completeLocationDateTimePage({ dateInPast })
+    uncheckAllRadios()
   }
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${id}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getTaskLink(1).click()
+    uncheckAllRadios()
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage({ enableNonCompliance: true, crn })
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
       completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid })
+      uncheckAllRadios()
     })
   }
 }
