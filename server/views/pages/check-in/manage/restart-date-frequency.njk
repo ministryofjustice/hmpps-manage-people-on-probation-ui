@@ -5,8 +5,12 @@
 {% set buttonText =  "Continue" %}
 
 {% block form %}
-    <h3 class="govuk-heading-s" >When would you like {{case.name.forename}} to complete their next online check in?</h3>
     {{ mojDatePicker({
+        name: "date",
+        label: {
+            text: "When would you like " + case.name.forename + " to complete their next online check in?",
+            classes: "govuk-label--s govuk-!-margin-bottom-3"
+        },
         formGroup: {
             classes: "govuk-!-margin-bottom-3",
             attributes: {
