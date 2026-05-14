@@ -40,7 +40,7 @@
 {% block pageContent %}
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
       {% if flags.enableESupervisionCustomQuestions === true %}
-          {% set checkinLabel = 'Next check in' %}
+          {% set checkinLabel = 'Next check in due' %}
           {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
               {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
           {% else %}
@@ -110,8 +110,8 @@
             {{ govukSummaryList({
                 rows: [
                     {
-                        key: { html: '<span data-qa="firstCheckInDueLabel">' + checkinLabel + '</span>'},
-                        value: { html: '<span data-qa="firstCheckInValue">' + checkinText + '</span>'}
+                        key: { html: '<span data-qa="nextCheckinDueLabel">' + checkinLabel + '</span>'},
+                        value: { html: '<span data-qa="nextCheckInValue">' + checkinText + '</span>'}
                     },
                     {
                         key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
