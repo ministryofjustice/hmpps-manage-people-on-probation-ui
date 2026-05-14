@@ -133,7 +133,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
-  it('should show validation error when no option is selected', () => {
+  it('should show validation error when no option is selected for breach created by', () => {
     const msg = 'Select an enforcement action for their failure to comply'
     loadPage({ journey })
     enforcementActionPage = new EnforcementActionPage()

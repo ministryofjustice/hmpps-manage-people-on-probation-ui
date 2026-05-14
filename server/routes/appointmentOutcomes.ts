@@ -114,46 +114,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 
-  router.all(
-    [
-      `${arrangeBasePath}/attended-failed-to-comply`,
-      `${manageBasePath}/attended-failed-to-comply`,
-      `${arrangeBasePath}/unacceptable-absence`,
-      `${manageBasePath}/unacceptable-absence`,
-    ],
-    getAttendedFailedToComplyOptions,
-  )
-
-  router.all(
-    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    getAcceptableAbsenceOptions,
-  )
-
-  router.all(
-    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    getFailedToAttendOptions,
-    getOutcomeEvidenceBy,
-  )
-
-  router.all(
-    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
-    getEnforcementActionOptions,
-  )
-
-  router.all(
-    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
-    getBreachNSICreatedByOptions,
-  )
-
-  /* run file upload middleware and multipart parser before validation */
-
-  router.post(
-    `${manageBasePath}/add-note`,
-    multerErrorHandler('fileUpload'),
-    parseMultipartBody,
-    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
-  )
-
   /* validate outcome options and store session data on all outcome post routes */
 
   router.post(
