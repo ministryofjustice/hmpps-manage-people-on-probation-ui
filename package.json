@@ -25,7 +25,7 @@
     "int-test-ui": "cypress open --e2e --browser chrome",
     "clean": "rm -rf dist build node_modules stylesheets",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist && sentry-cli sourcemaps upload --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist",
-    "coverage-report": "cpy cypress_coverage/coverage-final.json coverage --rename=int-{{basename}} --flat && cpy test_results/jest/coverage-final.json coverage --rename=unit-{{basename}} --flat && npx nyc report --reporter lcov -t coverage --report-dir coverage --exclude-after-remap false",
+    "coverage-report": "rm -rf coverage && mkdir -p coverage && cpy cypress_coverage/coverage-final.json coverage --rename=int-{{basename}} --flat && cpy test_results/jest/coverage-final.json coverage --rename=unit-{{basename}} --flat && npx nyc report --reporter lcov -t coverage --report-dir coverage --exclude-after-remap false",
     "setup": "npm ci && hmpps-npm-script-run-allowlist"
   },
   "engines": {
