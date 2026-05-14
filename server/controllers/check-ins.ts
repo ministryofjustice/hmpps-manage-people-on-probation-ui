@@ -576,7 +576,7 @@ const checkInsController: Controller<typeof routes, void> = {
       await eSupervisionClient.postOffenderCheckInNote(id, notes)
 
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'note'], null)
-
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'sensitiveContact'], null)
       return res.redirect(url)
     }
   },
@@ -699,6 +699,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'sensitiveContact'], null)
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
