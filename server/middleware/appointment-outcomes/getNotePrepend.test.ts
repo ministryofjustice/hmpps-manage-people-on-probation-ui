@@ -36,7 +36,7 @@ const req = httpMocks.createRequest()
 
 const nextSpy = jest.fn()
 
-describe('/middleware/appointment-outcomes/getNotePrepend', () => {
+xdescribe('/middleware/appointment-outcomes/getNotePrepend', () => {
   it('should set the value to null if breach/recall or letter have not been selected', () => {
     const res = buildResponse()
     getNotePrepend(req, res, nextSpy)

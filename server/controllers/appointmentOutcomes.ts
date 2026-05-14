@@ -1,14 +1,14 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
-import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../models/Appointments'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
-import { getDataValue } from '../utils'
+import { setDataValue } from '../utils'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -40,8 +40,8 @@ type EnforcementRedirectMap = {
 }
 
 const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, req: Request, res: Response): void => {
-  const { baseOutcomeUrl, appointmentSession, reqUrl } = res.locals.appointmentOutcome
-  const { change } = req.query
+  const { baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
+  const { change } = req.query as Record<string, string>
   const enforcementAction = appointmentSession?.outcome?.[pageKey] as AppointmentEnforcementAction
   // const isUpdateAction = reqUrl?.includes('/update-enforcement-action')
   const redirectMap: EnforcementRedirectMap = {
@@ -55,8 +55,12 @@ const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, re
   //   redirectMap.BREACH_RECALL_INITIATED = `${baseOutcomeUrl}/initiate-breach-or-recall`
   //   redirectMap.BREACH_RECALL_INITIATED_AND_SEND_LETTER = `${baseOutcomeUrl}/initiate-breach-or-recall`
   // }
-  let redirect = redirectMap?.[enforcementAction] || `${baseOutcomeUrl}/add-note`
-  if (change) redirect = `${redirect}?change=${change}`
+  let redirect = redirectMap?.[enforcementAction]
+  if (redirect) {
+    redirect = `${redirect}${change ? `?change=${change}` : ''}`
+  } else {
+    redirect = change || `${baseOutcomeUrl}/add-note`
+  }
   return res.redirect(redirect)
 }
 
@@ -141,7 +145,10 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {
-    return async (_req, res) => res.render('pages/appointment-outcomes/check-your-answers')
+    return async (req, res) => {
+      const url = encodeURIComponent(req.url)
+      res.render('pages/appointment-outcomes/check-your-answers', { url })
+    }
   },
   postCheckYourAnswers: _hmppsAuthClient => {
     return async (_req, res) => {
@@ -156,12 +163,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   getAcceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
   },
-  postAcceptableAbsence: () => {
-    return async (_req, res) => {
-      const { baseOutcomeUrl } = res.locals.appointmentOutcome
-      return res.redirect(`${baseOutcomeUrl}/add-note`)
-    }
-  },
+  postAcceptableAbsence: () => async (req, res) => enforcementActionRedirects('acceptableAbsence', req, res),
   getUnacceptableAbsence: () => {
     return async (_req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')
   },
@@ -173,29 +175,37 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   getEnforcementAction: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
   },
-  postEnforcementAction: () => {
-    return async (_req, res) => {
-      const { baseOutcomeUrl } = res.locals.appointmentOutcome
-      return res.redirect(`${baseOutcomeUrl}/add-note`)
-    }
-  },
+  postEnforcementAction: () => async (req, res) => enforcementActionRedirects('otherEnforcementAction', req, res),
   getInitiateBreachOrRecall: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
-  },
-  postInitiateBreachOrRecall: () => {
-    return async (_req, res) => {
-      const { baseOutcomeUrl } = res.locals.appointmentOutcome
-      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    return async (req, res) => {
+      const { change } = req.query
+      const { appointmentSession, crn, id } = res.locals.appointmentOutcome
+      const { letterType, breachNSICreatedBy } = appointmentSession.outcome
+      if (change && letterType && !breachNSICreatedBy) {
+        setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'letterSentBy'], null)
+        setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'letterType'], null)
+      }
+      return res.render('pages/appointment-outcomes/initiate-breach-or-recall')
     }
   },
+  postInitiateBreachOrRecall: () => async (req, res) => enforcementActionRedirects('breachNSICreatedBy', req, res),
   getSendLetter: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/send-letter')
-  },
-  postSendLetter: () => {
-    return async (_req, res) => {
-      const { baseOutcomeUrl } = res.locals.appointmentOutcome
-      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    return async (req, res) => {
+      const { change } = req.query
+      const { appointmentSession, crn, id } = res.locals.appointmentOutcome
+      const { breachNSICreatedBy, letterType } = appointmentSession.outcome
+      if (change && breachNSICreatedBy && letterType) {
+        setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'breachNSICreatedBy'], null)
+        setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'letterSentBy'], null)
+        setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'letterType'], null)
+      }
+      return res.render('pages/appointment-outcomes/send-letter')
     }
+  },
+  postSendLetter: () => async (req, res) => {
+    const { id, crn } = res.locals.appointmentOutcome
+    setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'breachNSICreatedBy'], null)
+    return enforcementActionRedirects('letterType', req, res)
   },
   getUpdateEnforcementAction: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')

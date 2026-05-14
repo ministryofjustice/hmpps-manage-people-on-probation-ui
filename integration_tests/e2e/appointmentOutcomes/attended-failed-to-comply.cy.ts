@@ -139,6 +139,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select an action for this failure to comply'
     loadPage({ journey })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+    uncheckAllRadios()
     attendedFailedToComplyPage.getSubmitBtn().click()
     attendedFailedToComplyPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {

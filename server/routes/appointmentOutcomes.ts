@@ -30,6 +30,8 @@ import {
   getCurrentEnforcementAction,
   getContactOutcomes,
   getOutcomeSummary,
+  getNotePrepend,
+  resetSelectedActions,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -149,7 +151,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* Outcome index  */
 
   router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
-  router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
+  router.post([arrangeBasePath, manageBasePath], resetSelectedActions(), controllers.appointmentOutcomes.postOutcome())
 
   /* Add note routes are initiated before csrf in app file */
 
@@ -165,6 +167,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
+    resetSelectedActions(['breachNSICreatedBy', 'letterSentBy', 'letterType']),
     controllers.appointmentOutcomes.postAttendedFailedToComply(),
   )
 
@@ -235,6 +238,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get(
     [`${manageBasePath}/check-your-answers`],
     getNextComAppointment(hmppsAuthClient),
+    getNotePrepend,
     getOutcomeSummary,
     controllers.appointmentOutcomes.getCheckYourAnswers(hmppsAuthClient),
   )

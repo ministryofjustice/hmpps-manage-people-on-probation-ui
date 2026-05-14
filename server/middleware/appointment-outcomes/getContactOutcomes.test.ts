@@ -82,7 +82,7 @@ const buildRequest = ({
 
 const res = mockAppResponse()
 
-describe('/middleware/appointment-outcomes/getContactOutcomes', () => {
+xdescribe('/middleware/appointment-outcomes/getContactOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

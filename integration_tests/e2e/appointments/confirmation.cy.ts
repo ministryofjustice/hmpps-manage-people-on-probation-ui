@@ -283,7 +283,7 @@ describe('Confirmation page', () => {
           dateInPast: true,
         })
         completeAttendedCompliedPage({ manageJourney: false, _crn: crn, _uuid: uuid })
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         completeCYAPage()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage
@@ -325,7 +325,7 @@ describe('Confirmation page', () => {
           dateInPast: true,
         })
         completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         completeCYAPage()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage

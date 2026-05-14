@@ -66,7 +66,7 @@ export const checkUpdateDateTime = ({
         } else {
           completeAttendedCompliedPage({ _crn: pageCrn, _uuid: pageUuid })
         }
-        completeAddNotePage({ uuidOverride: pageUuid, crnOverride: crn })
+        completeAddNotePage({ idOverride: pageUuid, crnOverride: crn })
       }
       if (page instanceof AppointmentCheckYourAnswersPage) {
         page.checkPageTitle('Check your answers then confirm the appointment')

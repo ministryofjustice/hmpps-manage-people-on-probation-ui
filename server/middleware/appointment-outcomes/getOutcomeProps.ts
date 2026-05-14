@@ -65,7 +65,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   }
 
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
-  const unacceptableAbsence = appointmentSession?.outcome?.acceptableAbsence
+  const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
   const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction
   const failedToAttend = appointmentSession?.outcome?.failedToAttend
   const sendBreachOrRecallLetter = [attendedFailedToComply, unacceptableAbsence, updateEnforcementAction].some(
