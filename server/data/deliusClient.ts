@@ -22,7 +22,7 @@ export interface Homepage {
   upcomingAppointments: AppointmentSummary[]
   appointmentsRequiringOutcome: AppointmentSummary[]
   appointmentsRequiringOutcomeCount: number
-  enforcementContacts: EnforcementContact[]
+  enforcementContacts?: EnforcementContact[]
 }
 
 export interface AppointmentSummary {

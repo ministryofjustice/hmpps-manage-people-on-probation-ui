@@ -56,8 +56,8 @@ describe('enforcementContactsController', () => {
       expect(sendAuditMessageSpy).toHaveBeenCalledWith({
         action: 'VIEW_MAS_ALL_ENFORCEMENT_ACTIONS',
         who: username,
-        subjectId: crn,
-        subjectType: 'CRN',
+        subjectId: res.locals.user.username,
+        subjectType: 'USER',
         correlationId: 'f1654ea3-0abb-46eb-860b-654a96edbe20',
         service: 'hmpps-manage-people-on-probation-ui',
       })

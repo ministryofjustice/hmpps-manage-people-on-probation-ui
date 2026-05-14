@@ -85,6 +85,23 @@ describe('contactDisplayNames', () => {
     })
   })
 
+  it('maps enforcement contacts and calculates isOverdue correctly for today', () => {
+    const today = new Date().toISOString().split('T')[0]
+
+    const response = {
+      enforcementContacts: [
+        {
+          appointmentType: 'Phone Contact from PoP',
+          evidenceDueDate: today,
+        },
+      ],
+    } as unknown as EnforcementContactsResponse
+
+    const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
+
+    expect(result.enforcementContacts[0].isOverdue).toBe(false)
+  })
+
   it('mapScheduleWithApprovedContactDisplayNames maps appointments in schedule', () => {
     const schedule = {
       personSchedule: {

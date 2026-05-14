@@ -76,9 +76,9 @@
     ]
   }) }}
 
-
+  {% if flags.enableMyEnforcementActionsOverview %}
   {{ probationAccordion({
-    id: "accordion-default",
+    id: "accordion-default-enforcementAction-old",
     attributes: {
       'data-qa': 'homepage-enforcement-actions'
     },
@@ -98,6 +98,7 @@
       }
     ]
   }) }}
+  {% endif %}
 
   <hr class="govuk-section-break--l">
 

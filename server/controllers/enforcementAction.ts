@@ -19,8 +19,8 @@ const enforcementContactsController: Controller<typeof routes, void> = {
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ALL_ENFORCEMENT_ACTIONS',
         who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
+        subjectId: res.locals.user.username,
+        subjectType: 'USER',
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })

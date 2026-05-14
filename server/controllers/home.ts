@@ -4,6 +4,7 @@ import config from '../config'
 import DeliusClient, { AppointmentSummary, Homepage } from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import { EnforcementContact } from '../data/model/schedule'
 
 const routes = ['getHome', 'getHomeOld'] as const
 
@@ -22,10 +23,15 @@ const homeController: Controller<typeof routes, void> = {
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
       const masClient = new MasApiClient(token)
-      const enforcementContactResponse = await masClient.getEnforcementContacts(
-        res.locals.user.username,
-        (pageNum - 1).toString(),
-      )
+
+      let enforcementActions: EnforcementContact[] = []
+      if (res.locals.flags?.enableMyEnforcementActionsOverview) {
+        const enforcementContactResponse = await masClient.getEnforcementContacts(
+          res.locals.user.username,
+          (pageNum - 1).toString(),
+        )
+        enforcementActions = enforcementContactResponse.enforcementContacts
+      }
 
       const { upcomingAppointments } = homePage
       let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
@@ -44,7 +50,7 @@ const homeController: Controller<typeof routes, void> = {
         upcomingAppointments,
         appointmentsRequiringOutcome,
         appointmentsRequiringOutcomeCount,
-        enforcementActions: enforcementContactResponse.enforcementContacts,
+        enforcementActions,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
@@ -70,17 +76,21 @@ const homeController: Controller<typeof routes, void> = {
       )
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
-      const enforcementContactResponse = await masClient.getEnforcementContacts(
-        res.locals.user.username,
-        (pageNum - 1).toString(),
-      )
+      let enforcementActions: EnforcementContact[] = []
+      if (res.locals.flags?.enableMyEnforcementActionsOverview) {
+        const enforcementContactResponse = await masClient.getEnforcementContacts(
+          res.locals.user.username,
+          (pageNum - 1).toString(),
+        )
+        enforcementActions = enforcementContactResponse.enforcementContacts
+      }
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
         totalOutcomes,
         appointments,
         outcomes,
-        enforcementActions: enforcementContactResponse.enforcementContacts,
+        enforcementActions,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
