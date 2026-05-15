@@ -36,7 +36,7 @@ const req = httpMocks.createRequest()
 
 const nextSpy = jest.fn()
 
-xdescribe('/middleware/appointment-outcomes/getNotePrepend', () => {
+describe('/middleware/appointment-outcomes/getNotePrepend', () => {
   it('should set the value to null if breach/recall or letter have not been selected', () => {
     const res = buildResponse()
     getNotePrepend(req, res, nextSpy)
@@ -61,5 +61,17 @@ xdescribe('/middleware/appointment-outcomes/getNotePrepend', () => {
     const res = buildResponse({ letterSentBy: 'USER', letterType: 'BREACH_LETTER_SENT' })
     getNotePrepend(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach warning letter')
+  })
+  it('should set the correct value if breach/recall initiated by USER, letter sent by CASE_ADMIN, letter type is FIRST_WARNING_LETTER_SENT and sentence type is CUSTODY', () => {
+    const res = buildResponse({
+      breachNSICreatedBy: 'USER',
+      sentenceType: 'CUSTODY',
+      letterSentBy: 'CASE_ADMIN',
+      letterType: 'FIRST_WARNING_LETTER_SENT',
+    })
+    getNotePrepend(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.notePrepend).toEqual(
+      'I will initiate the recall\nCase administrator will send a first warning letter',
+    )
   })
 })

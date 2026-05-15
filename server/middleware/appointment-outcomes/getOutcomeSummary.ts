@@ -47,7 +47,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       },
       appointment,
     } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
-    // below needs changing to actual next appointment, not current appointment 👇
     const nextAppt = res?.locals?.nextAppointment?.appointment
     let nextAppointment: string = 'No next appointment'
     let type: string

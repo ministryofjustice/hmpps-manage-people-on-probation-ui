@@ -26,7 +26,8 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 const setDataValueSpy = setDataValue as jest.MockedFn<typeof setDataValue>
 const getDataValueSpy = getDataValue as jest.MockedFn<typeof getDataValue>
 
-getDataValueSpy.mockImplementation(() => type)
+const outcome = { outcomeType: 'ATTENDED_COMPLIED' }
+getDataValueSpy.mockImplementation(() => ({ outcome, type }))
 
 const nextSpy = jest.fn()
 
@@ -82,7 +83,7 @@ const buildRequest = ({
 
 const res = mockAppResponse()
 
-xdescribe('/middleware/appointment-outcomes/getContactOutcomes', () => {
+describe('/middleware/appointment-outcomes/getContactOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -90,36 +91,22 @@ xdescribe('/middleware/appointment-outcomes/getContactOutcomes', () => {
     const req = buildRequest()
     await getContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
     expect(getContactOutcomesSpy).toHaveBeenCalledWith(type)
-    expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId, 'type'])
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      1,
-      req.session.data,
-      ['appointments', crn, contactId, 'outcome', 'contactOutcomes'],
-      mockContactOutcomes,
-    )
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      2,
-      req.session.data,
-      ['appointments', crn, contactId, 'outcome', 'contactEnforcementActions'],
-      mockContactEnforcementActions,
-    )
+    expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId])
+    expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId, 'outcome'], {
+      ...outcome,
+      contactOutcomes: mockContactOutcomes,
+      contactEnforcementActions: mockContactEnforcementActions,
+    })
   })
   it('should set the data if arrange journey', async () => {
     const req = buildRequest({ _contactId: null, _id: id })
     await getContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
-    expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'type'])
+    expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id])
     expect(getContactOutcomesSpy).toHaveBeenCalledWith(type)
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      1,
-      req.session.data,
-      ['appointments', crn, id, 'outcome', 'contactOutcomes'],
-      mockContactOutcomes,
-    )
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      2,
-      req.session.data,
-      ['appointments', crn, id, 'outcome', 'contactEnforcementActions'],
-      mockContactEnforcementActions,
-    )
+    expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'outcome'], {
+      ...outcome,
+      contactOutcomes: mockContactOutcomes,
+      contactEnforcementActions: mockContactEnforcementActions,
+    })
   })
 })

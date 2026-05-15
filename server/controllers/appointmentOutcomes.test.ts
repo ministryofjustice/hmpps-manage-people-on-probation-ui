@@ -7,7 +7,6 @@ import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
 import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
-import { appointmentOutcomeRequests } from './appointmentOutcomes'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -165,28 +164,7 @@ const checkOutcomeRedirects = (expectedOptions: AppointmentOutcomeType[]): void 
   })
 }
 
-/*
-const checkEnforcementActionRedirects = ({
-  controller = 'postAttendedFailedToComply',
-  pageKey = 'attendedFailedToComply',
-  expectedOptions = [],
-}: {
-  controller?: (typeof appointmentOutcomeRequests)[number]
-  pageKey?: keyof AppointmentSessionOutcome
-  expectedOptions?: AppointmentEnforcementAction[]
-} = {}): void => {
-  expectedOptions.forEach(option => {
-    const req = mockReq()
-    const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { [pageKey]: option } } } })
-    const spy = jest.spyOn(res, 'redirect')
-    mockGetDataValue.mockReturnValueOnce(option)
-    controllers.appointmentOutcomes[controller]()(req, res)
-    expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
-  })
-}
-  */
-
-xdescribe('controllers/appointmentOutcomes', () => {
+describe('controllers/appointmentOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -349,26 +327,6 @@ xdescribe('controllers/appointmentOutcomes', () => {
     })
   })
 
-  /*
-  describe('postAttendedFailedToComply', () => {
-    it('should redirect to the correct page based on enforcement action', () => {
-      const expectedOptions: AppointmentEnforcementAction[] = [
-        'SEND_LETTER',
-        'BREACH_RECALL_INITIATED',
-        'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
-        'REFER_TO_OFFENDER_MANAGER',
-        'NO_FURTHER_ACTION',
-        'DIFFERENT_ACTION',
-      ]
-      checkEnforcementActionRedirects({
-        controller: 'postAttendedFailedToComply',
-        pageKey: 'attendedFailedToComply',
-        expectedOptions,
-      })
-    })
-  })
-    */
-
   describe('getAcceptableAbsence', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -378,17 +336,7 @@ xdescribe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
     })
   })
-  /*
-  describe('postAcceptableAbsence', () => {
-    it('should redirect to the add note page', () => {
-      const req = mockReq()
-      const res = mockRes()
-      const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
-      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
-    })
-  })
-    */
+
   describe('getUnacceptableAbsence', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -398,25 +346,7 @@ xdescribe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
     })
   })
-  /*
-  describe('postUnacceptableAbsence', () => {
-    it('should redirect to the correct page based on enforcement action', () => {
-      const expectedOptions: AppointmentEnforcementAction[] = [
-        'SEND_LETTER',
-        'BREACH_RECALL_INITIATED',
-        'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
-        'REFER_TO_OFFENDER_MANAGER',
-        'NO_FURTHER_ACTION',
-        'DIFFERENT_ACTION',
-      ]
-      checkEnforcementActionRedirects({
-        controller: 'postUnacceptableAbsence',
-        pageKey: 'unacceptableAbsence',
-        expectedOptions,
-      })
-    })
-  })
-    */
+
   describe('getFailedToAttend', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -426,19 +356,6 @@ xdescribe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
     })
   })
-  /*
-  describe('postFailedToAttend', () => {
-    it('should redirect to the correct page based on enforcement action', () => {
-      const expectedOptions: AppointmentEnforcementAction[] = [
-        'SEND_LETTER',
-        'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
-        'REFER_TO_OFFENDER_MANAGER',
-        'DIFFERENT_ACTION',
-      ]
-      checkEnforcementActionRedirects({ controller: 'postFailedToAttend', pageKey: 'failedToAttend', expectedOptions })
-    })
-  })
-    */
 
   describe('getEnforcementAction', () => {
     it('should render the correct view', async () => {
@@ -450,18 +367,6 @@ xdescribe('controllers/appointmentOutcomes', () => {
     })
   })
 
-  /*
-  describe('postEnforcementAction', () => {
-    it('should redirect to the add note page', () => {
-      const req = mockReq()
-      const res = mockRes()
-      const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postEnforcementAction()(req, res)
-      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
-    })
-  })
-    */
-
   describe('getInitiateBreachOrRecall', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -472,17 +377,6 @@ xdescribe('controllers/appointmentOutcomes', () => {
     })
   })
 
-  /*
-  describe('postInitiateBreachOrRecall', () => {
-    it('should redirect to the add note page', () => {
-      const req = mockReq()
-      const res = mockRes()
-      const spy = jest.spyOn(res, 'redirect')
-      controllers.appointmentOutcomes.postInitiateBreachOrRecall()(req, res)
-      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
-    })
-  })
-    */
   describe('getUpdateEnforcementAction', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -492,33 +386,4 @@ xdescribe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/update-enforcement-action')
     })
   })
-
-  /*
-  describe('postUpdateEnforcementAction', () => {
-    it('should redirect to the correct page', () => {
-      const expectedOptions: AppointmentEnforcementAction[] = [
-        'SEND_ANOTHER_LETTER',
-        'BREACH_RECALL_INITIATED',
-        'WITHDRAW_WARNING_LETTER',
-        'NO_FURTHER_ACTION',
-        'DIFFERENT_ACTION',
-        'SEND_LETTER',
-        'BREACH_RECALL_INITIATED',
-        'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
-        'BREACH_REQUESTED',
-        'BREACH_CONFIRMATION_SENT',
-        'BREACH_LETTER_SENT',
-        'BREACH_REQUEST_ACTIONED',
-        'WITHDRAW_WARNING_LETTER',
-        'NO_FURTHER_ACTION',
-        'DIFFERENT_ACTION',
-      ]
-      checkEnforcementActionRedirects({
-        controller: 'postUpdateEnforcementAction',
-        pageKey: 'updateEnforcementAction',
-        expectedOptions,
-      })
-    })
-  })
-    */
 })
