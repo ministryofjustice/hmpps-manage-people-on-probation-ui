@@ -45,7 +45,7 @@
           },
           {
               html:
-              (enforcementAction.enforcementAction if enforcementAction.enforcementAction else 'Not Provided')
+              ((enforcementAction.enforcementAction if enforcementAction.enforcementAction else 'Not Provided') | escape)
               +
               (
               '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
