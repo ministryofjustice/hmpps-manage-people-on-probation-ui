@@ -8,7 +8,7 @@ import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
 
-const appointmentTypesWithoutLocation = ['COPT', 'COVC']
+const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC'])
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
@@ -41,7 +41,7 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     }
 
     // we should not be sending location when its telephone or video contact
-    if (!appointmentTypesWithoutLocation.includes(appointmentTypeCode)) {
+    if (!appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
       const locationMatch = locations.find(loc => loc.code === locationCode)
       if (locationMatch) {
         appointmentLocation =
