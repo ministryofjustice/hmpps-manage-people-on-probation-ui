@@ -79,11 +79,10 @@ describe('enforcementContactsController', () => {
       const res = mockAppResponse()
 
       const mockEnforcementActions = {
-        personSchedule: {
-          totalPages: 0,
-          totalResults: 0,
-          size: 10,
-        },
+        totalPages: 0,
+        totalResults: 0,
+        size: 10,
+        content: [],
       }
 
       const getPersonScheduleSpy = jest
