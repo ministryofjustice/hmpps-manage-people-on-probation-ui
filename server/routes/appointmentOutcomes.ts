@@ -35,6 +35,7 @@ import {
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
+import { handleEnforcementActionRedirect } from '../middleware/appointment-outcomes/handleEnforcementActionRedirect'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -165,10 +166,28 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
   )
+
+  /* Reset secondary enforcement action selections */
+
+  router.post(
+    [
+      `${arrangeBasePath}/attended-failed-to-comply`,
+      `${manageBasePath}/attended-failed-to-comply`,
+      `${arrangeBasePath}/acceptable-absence`,
+      `${manageBasePath}/acceptable-absence`,
+      `${arrangeBasePath}/unacceptable-absence`,
+      `${manageBasePath}/unacceptable-absence`,
+      `${arrangeBasePath}/failed-to-attend`,
+      `${manageBasePath}/failed-to-attend`,
+      `${arrangeBasePath}/enforcement-action`,
+      `${manageBasePath}/enforcement-action`,
+    ],
+    resetSelectedActions(['breachNSICreatedBy', 'letterSentBy', 'letterType']),
+  )
+
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    resetSelectedActions(['breachNSICreatedBy', 'letterSentBy', 'letterType']),
-    controllers.appointmentOutcomes.postAttendedFailedToComply(),
+    handleEnforcementActionRedirect('attendedFailedToComply'),
   )
 
   /* Acceptable absence */
@@ -179,7 +198,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    controllers.appointmentOutcomes.postAcceptableAbsence(),
+    handleEnforcementActionRedirect('acceptableAbsence'),
   )
 
   router.get(
@@ -188,15 +207,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
-    controllers.appointmentOutcomes.postUnacceptableAbsence(),
-  )
-  router.get(
-    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
-    controllers.appointmentOutcomes.getEnforcementAction(),
-  )
-  router.post(
-    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
-    controllers.appointmentOutcomes.postEnforcementAction(),
+    handleEnforcementActionRedirect('unacceptableAbsence'),
   )
   router.get(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
@@ -204,7 +215,15 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    controllers.appointmentOutcomes.postFailedToAttend(),
+    handleEnforcementActionRedirect('failedToAttend'),
+  )
+  router.get(
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
+    controllers.appointmentOutcomes.getEnforcementAction(),
+  )
+  router.post(
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
+    handleEnforcementActionRedirect('otherEnforcementAction'),
   )
   router.get(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
@@ -212,7 +231,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
-    controllers.appointmentOutcomes.postInitiateBreachOrRecall(),
+    handleEnforcementActionRedirect('breachNSICreatedBy'),
   )
   router.get(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
@@ -220,7 +239,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
-    controllers.appointmentOutcomes.postSendLetter(),
+    handleEnforcementActionRedirect('letterType'),
   )
   router.get(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
@@ -228,7 +247,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
-    controllers.appointmentOutcomes.postUpdateEnforcementAction(),
+    handleEnforcementActionRedirect('updateEnforcementAction'),
   )
 
   router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))

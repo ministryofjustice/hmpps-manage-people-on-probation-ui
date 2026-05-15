@@ -3,11 +3,9 @@ import ManageAppointmentPage from '../../pages/appointments/manage-appointment.p
 import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../server/models/Appointments'
 import { completeAction, completeAddNotePage, completeOutcome } from '../appointments/utils'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
-import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 
 let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
-let outcomePage: OutcomePage
 
 const crn = 'X000001'
 
@@ -24,7 +22,7 @@ const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null }: Props = {}):
   manageAppointmentPage.getTaskLink(1).click()
   completeOutcome({ outcome, action })
   completeAddNotePage({ journey: 'MANAGE', crnOverride: crn })
-  // will need to complete next supervision appointment page(s) here when added
+  // 👉 will need to complete next supervision appointment page(s) here when added 👈
 }
 
 const checkSummary = ({
@@ -104,7 +102,6 @@ const checkSummary = ({
 }
 
 const checkPage = () => {
-  /*
   describe('Outcome is attended and complied or attended but sent home due to probation service issues', () => {
     const outcomes: Props[] = [
       { outcome: 'ATTENDED_COMPLIED', outcomeText: 'Attended - complied' },
@@ -186,7 +183,7 @@ const checkPage = () => {
         .should('contain.text', 'No further action')
     })
   })
-*/
+
   describe('User updates the enforcement action by clicking the enforcement action change link', () => {
     it('should render the page with updated outcome and enforcement action', () => {
       cy.task('stubAppointment', { documents: true, isFuture: false })
@@ -212,7 +209,6 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(4).find('.govuk-summary-list__actions').find('a').click()
       completeAction({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'REFER_TO_OFFENDER_MANAGER' })
-      cy.pause()
       checkYourAnswersOutcomePage
         .getSummaryListRow(2)
         .find('.govuk-summary-list__value')
@@ -220,9 +216,30 @@ const checkPage = () => {
       checkYourAnswersOutcomePage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'I will send a first warning letter')
+        .should('contain.text', 'Refer to offender manager')
     })
   })
+
+  describe('User updates the notes by clicking the change link', () => {
+    it('should render the page with updates notes', () => {
+      const value = 'Some changed notes'
+      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
+      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+      checkYourAnswersOutcomePage.getSummaryListRow(5).find('.govuk-summary-list__actions').find('a').click()
+      completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, value })
+      checkYourAnswersOutcomePage.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', value)
+    })
+  })
+  describe('User updates the sensitivity by clicking the change link', () => {
+    it('should render the page with updated sensitivity', () => {
+      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
+      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+      checkYourAnswersOutcomePage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
+      completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, sensitivityIndex: 1 })
+      checkYourAnswersOutcomePage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'No')
+    })
+  })
+  // 👉 add tests for change documents and next appointment here 👈
 }
 
 describe('Check your answers - outcomes', () => {

@@ -159,6 +159,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
     })
   })
+
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })
