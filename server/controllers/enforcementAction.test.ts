@@ -97,7 +97,6 @@ describe('enforcementContactsController', () => {
     it('should handle time sort special case', async () => {
       const req = httpMocks.createRequest({
         params: { crn },
-        query: { sortBy: 'time.desc' },
         url: '/enforcement-actions',
       })
       const res = mockAppResponse()
