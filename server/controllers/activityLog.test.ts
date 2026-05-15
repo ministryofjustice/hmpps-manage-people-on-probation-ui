@@ -234,6 +234,36 @@ describe('/controllers/activityLogController', () => {
     it('should request the person appointment note', () => {
       expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
     })
+
+    it('should render the activity page with showSuccessBanner true when flash exists', async () => {
+      const reqWithFlash = httpMocks.createRequest({
+        params: { crn, id },
+        query: { view: 'default' },
+        session: {},
+      })
+
+      reqWithFlash.flash = jest.fn().mockImplementation((key: string) => {
+        if (key === 'contactUpdated') return ['success']
+        return []
+      })
+
+      const resWithFlash = mockAppResponse({
+        filters: {},
+        flags: {},
+      })
+
+      const renderSpyWithFlash = jest.spyOn(resWithFlash, 'render')
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(reqWithFlash, resWithFlash)
+
+      expect(renderSpyWithFlash).toHaveBeenCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          showSuccessBanner: true,
+        }),
+      )
+    })
+
     it('should render the activity page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
         personAppointment: mockPersonAppointment,
@@ -243,6 +273,7 @@ describe('/controllers/activityLogController', () => {
         queryParams: ['view=default'],
         isActivityLog: true,
         url: '',
+        showSuccessBanner: false,
       })
     })
   })
