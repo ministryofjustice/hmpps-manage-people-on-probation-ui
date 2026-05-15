@@ -12,7 +12,6 @@ const enforcementContactsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
