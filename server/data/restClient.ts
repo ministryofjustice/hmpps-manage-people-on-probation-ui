@@ -10,6 +10,7 @@ import { escapeForLog } from '../utils/escapeForLog'
 import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
 import 'multer'
+import isTimeoutError from '../utils/isTimeoutError'
 
 interface Request {
   path: string
@@ -24,6 +25,7 @@ interface Request {
   errorMessage?: string
   file?: Express.Multer.File
   isMultipart?: boolean
+  retry?: boolean
 }
 
 interface RequestWithBody extends Request {
@@ -60,6 +62,7 @@ export default class RestClient {
     handle500 = false,
     handle401 = false,
     errorMessage = '',
+    retry = true,
   }: Request): Promise<TResponse | null> {
     logger.info(escapeForLog(`${this.name} GET: ${path}`))
 
@@ -76,7 +79,12 @@ export default class RestClient {
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
+          if (retry === false) return false
+
           if (err) logger.info(`Retry handler found ${this.name} API error with ${err.code} ${err.message}`)
+
+          if (isTimeoutError(err)) return false
+
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
         .auth(this.token, { type: 'bearer' })
@@ -137,7 +145,10 @@ export default class RestClient {
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
           if (retry === false) return false
+
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+
+          if (isTimeoutError(err)) return false
           return undefined
         })
         .auth(this.token, { type: 'bearer' })
@@ -218,6 +229,7 @@ export default class RestClient {
     headers = {},
     responseType = '',
     raw = false,
+    retry = true,
   }: Request): Promise<Response> {
     logger.info(escapeForLog(`${this.name} DELETE: ${path}`))
 
@@ -234,7 +246,11 @@ export default class RestClient {
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
+          if (retry === false) return false
+
           if (err) logger.info(`Retry handler found ${this.name} API error with ${err.code} ${err.message}`)
+
+          if (isTimeoutError(err)) return false
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
         .auth(this.token, { type: 'bearer' })

@@ -2,8 +2,7 @@ import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
 import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
-import { isValidHost } from '../utils/isValidHost'
-import { isValidPath } from '../utils/isValidPath'
+import { isValidHost, isValidPath } from '../utils'
 import logger from '../../logger'
 import { ErrorSummary } from './model/common'
 
@@ -86,6 +85,25 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         .reply(500)
 
       await expect(restClient[method]({ path: '/test' })).rejects.toThrow('Internal Server Error')
+      expect(nock.isDone()).toBe(true)
+    })
+
+    it('should not retry if retry is false', async () => {
+      nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
+        [method]('/api/test')
+        .reply(500)
+
+      await expect(restClient[method]({ path: '/test', retry: false })).rejects.toThrow('Internal Server Error')
+      expect(nock.isDone()).toBe(true)
+    })
+
+    it('should not retry timeout errors', async () => {
+      nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
+        [method]('/api/test')
+        .delayConnection(1500)
+        .reply(200, { success: true })
+
+      await expect(restClient[method]({ path: '/test' })).rejects.toThrow('Timeout of 1000ms exceeded')
       expect(nock.isDone()).toBe(true)
     })
 
@@ -185,6 +203,16 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         .reply(500)
 
       await expect(restClient[method]({ path: '/test', retry: true })).rejects.toThrow('Internal Server Error')
+      expect(nock.isDone()).toBe(true)
+    })
+
+    it('should not retry timeout errors even when retry is true', async () => {
+      nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
+        [method]('/api/test')
+        .delayConnection(1500)
+        .reply(200, { success: true })
+
+      await expect(restClient[method]({ path: '/test', retry: true })).rejects.toThrow('Timeout of 1000ms exceeded')
       expect(nock.isDone()).toBe(true)
     })
 
