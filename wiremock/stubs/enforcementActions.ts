@@ -4,7 +4,7 @@ import { WiremockMapping } from '../../integration_tests/utils'
 const getStub = (): WiremockMapping => {
   const mapping: WiremockMapping = {
     request: {
-      urlPathPattern: '/mas/user/USER1/enforcement-contacts',
+      urlPathPattern: '/mas/contact/USER1/enforcements',
       method: 'GET',
     },
     response: {

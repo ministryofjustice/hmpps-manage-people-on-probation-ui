@@ -1,15 +1,4 @@
-import { EnforcementAction } from '../../../server/data/model/schedule'
-import mockResponse from '../../../wiremock/mappings/enforcement-contacts.json'
 import EnforcementActionsPage from '../../pages/enforcementActions'
-import { getWiremockData, Wiremock } from '../../utils'
-
-const mockData = mockResponse as Wiremock
-
-const mockEnforcementActions = getWiremockData<EnforcementAction[]>(
-  mockData,
-  '/mas/user/USER1/enforcement-contacts',
-  'enforcementActions',
-)
 
 context('Enforcement actions', () => {
   afterEach(() => {
@@ -17,7 +6,7 @@ context('Enforcement actions', () => {
   })
 
   it('should render the enforcement actions page', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
@@ -27,15 +16,19 @@ context('Enforcement actions', () => {
     page.getTableColumnHeading(3).should('contain.text', 'Enforcement action')
     page.getTableColumnHeading(4).should('contain.text', 'Action')
 
-    page.getTableCell(1, 1).find('a').should('contain.text', 'Smith, John').should('have.attr', 'href', '/case/X778160')
+    page
+      .getTableCell(1, 1)
+      .find('a')
+      .should('contain.text', 'Emard, Garrett')
+      .should('have.attr', 'href', '/case/X000001')
     page
       .getTableCell(1, 2)
       .find('a')
-      .should('contain.text', 'Office Appointment')
+      .should('contain.text', 'Planned office visit')
       .should(
         'have.attr',
         'href',
-        '/case/X778160/appointments/appointment/4/manage?back=/caseload/my-enforcement-actions',
+        '/case/X000001/appointments/appointment/1/manage?back=/caseload/appointments/enforcement-actions',
       )
     page.getTableCell(1, 3).should('contain.text', 'Unacceptable absence')
     page.getTableCell(1, 4).should('contain.text', 'Breach initiated')
@@ -44,7 +37,7 @@ context('Enforcement actions', () => {
     page
       .getTableCell(2, 1)
       .find('a')
-      .should('contain.text', 'Taylor, Sarah')
+      .should('contain.text', 'Bradtke, Ethan')
       .should('have.attr', 'href', '/case/X000001')
     page
       .getTableCell(2, 2)
@@ -53,15 +46,15 @@ context('Enforcement actions', () => {
       .should(
         'have.attr',
         'href',
-        '/case/X000001/appointments/appointment/4/manage?back=/caseload/my-enforcement-actions',
+        '/case/X000001/appointments/appointment/4/manage?back=/caseload/appointments/enforcement-actions',
       )
     page.getTableCell(2, 3).should('contain.text', 'Failed to attend')
-    page.getTableCell(2, 4).should('contain.text', 'Warning issued')
+    page.getTableCell(2, 4).should('contain.text', 'Warning letter issued')
     page.getTableCell(2, 5).find('a').should('contain.text', 'Manage')
   })
 
   it('should navigate using the pagination next button', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
@@ -74,7 +67,7 @@ context('Enforcement actions', () => {
   })
 
   it('should navigate using the pagination previous button', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
@@ -88,7 +81,7 @@ context('Enforcement actions', () => {
   })
 
   it('should navigate clicking on a page number in the pagination', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
@@ -99,7 +92,7 @@ context('Enforcement actions', () => {
   })
 
   it('should navigate back to the homepage page when clicking the back link', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
@@ -108,32 +101,32 @@ context('Enforcement actions', () => {
   })
 
   it('should navigate to the case page when clicking on the name link', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
 
     page.getTableCell(1, 1).find('a').click()
-    cy.url().should('include', '/case/X778160')
+    cy.url().should('include', '/case/X000001')
   })
 
   it('should navigate to the appointment management page when clicking on the appointment details link', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
     page.getTableCell(1, 2).find('a').click()
-    cy.url().should('include', '/case/X778160/appointments/appointment/4/manage')
+    cy.url().should('include', '/case/X000001/appointments/appointment/1/manage')
   })
 
   it('should navigate to NDelius when clicking on the manage on NDelius link', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
 
     const ndeliusUrl =
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=4'
+      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=1'
 
     page.getTableCell(1, 5).find('a').should('have.attr', 'href', ndeliusUrl)
 
@@ -146,18 +139,21 @@ context('Enforcement actions', () => {
   })
 
   it('should navigate to appointment details when clicking on the manage link', () => {
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')
 
     page.getTableCell(2, 5).find('a').click()
-    cy.url().should('include', '/case/X000001/appointments/appointment/4/manage?back=/caseload/my-enforcement-actions')
+    cy.url().should(
+      'include',
+      '/case/X000001/appointments/appointment/4/manage?back=/caseload/appointments/enforcement-actions',
+    )
   })
 
   it('should render the page with a message saying there are no results', () => {
     cy.task('stubNoEnforcementActions')
-    cy.visit('/caseload/my-enforcement-actions')
+    cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 
     page.checkPageTitle('My enforcement actions')

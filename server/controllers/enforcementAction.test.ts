@@ -6,7 +6,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { mockAppResponse } from './mocks'
-import { EnforcementContactsResponse } from '../models/Appointments'
+import { EnforcementContactsResponse } from '../data/model/schedule'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 
@@ -72,6 +72,9 @@ describe('enforcementAction controller', () => {
     .mockImplementation(() => Promise.resolve(mockResponse))
 
   describe('getAllEnforcementContacts', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
     it('should render the enforcement action page with no sort filter', async () => {
       const expectedSortByOrder = {
         surname: 'none',
@@ -88,9 +91,9 @@ describe('enforcementAction controller', () => {
         session: { backLink: '/back' },
       })
 
-      await controllers.enforcementContacts.getAllEnforcementContacts(hmppsAuthClient)(req, res)
+      await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
 
-      expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', '', '')
+      expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', '25', '', '')
       expect(renderSpy).toHaveBeenCalledWith('pages/my-enforcement-actions', {
         enforcementContacts: mockResponse,
         sortByOrder: expectedSortByOrder,
@@ -128,9 +131,9 @@ describe('enforcementAction controller', () => {
           session: { backLink: null },
         })
 
-        await controllers.enforcementContacts.getAllEnforcementContacts(hmppsAuthClient)(req, res)
+        await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
 
-        expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', expectedSortBy, expectedAscending)
+        expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', '25', expectedSortBy, expectedAscending)
         expect(renderSpy).toHaveBeenCalledWith(
           'pages/my-enforcement-actions',
           expect.objectContaining({ sortByOrder: expectedSortByOrder }),
@@ -145,7 +148,7 @@ describe('enforcementAction controller', () => {
         session: { backLink: null },
       })
 
-      await controllers.enforcementContacts.getAllEnforcementContacts(hmppsAuthClient)(req, res)
+      await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
 
       checkSendAuditMessage(res, 'VIEW_MAS_ALL_ENFORCEMENT_ACTIONS', 'user-1', SubjectType.USER)
     })
