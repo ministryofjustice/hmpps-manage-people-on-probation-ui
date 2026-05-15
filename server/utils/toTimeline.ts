@@ -3,7 +3,7 @@ import { dateWithYearShortMonthAndTime } from './dateWithYearShortMonthAndTime'
 import { toDate } from './toDate'
 
 export const toTimeline = (riskScores: RiskScoresDto[]): TimelineItem[] => {
-  const sorted = [...riskScores].sort((a, b) => +toDate(b.completedDate) - +toDate(a.completedDate))
+  const sorted = [...riskScores].sort((a, b) => +toDate(b.completedDate)! - +toDate(a.completedDate)!)
   return sorted.map(riskScore => {
     const scores = {
       RSR: {

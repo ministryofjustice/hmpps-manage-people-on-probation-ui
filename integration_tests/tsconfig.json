@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2023",
     "noEmit": true,
-    "lib": ["es5", "dom", "es2015.promise", "es2023"],
+    "strict": false,
+    "lib": ["dom", "es2015.promise", "es2023"],
     "types": ["cypress", "express", "express-session"],
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "rootDir": "/"
   },
   "include": ["**/*.ts"]
 }
