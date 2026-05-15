@@ -34,7 +34,7 @@
           {
               html:
               '<a class="govuk-link" href="/case/' + enforcementAction.crn + '/appointments/appointment/' + enforcementAction.id + '/manage?back=' + url + '">'
-              + (enforcementAction.displayName if enforcementAction.displayName else enforcementAction.appointmentType)
+              + ((enforcementAction.displayName if enforcementAction.displayName else enforcementAction.appointmentType) | escape)
               + '</a><br>'
               + '<span class="govuk-body-s">'
               + enforcementAction.appointmentDate | dateWithYearShortMonth
