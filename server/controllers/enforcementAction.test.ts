@@ -36,16 +36,16 @@ describe('enforcementContactsController', () => {
       const renderSpy = jest.spyOn(res, 'render')
 
       const mockEnforcementActions = {
-        enforcementContacts: [],
-        size: 10,
-        page: 0,
-        totalResults: 1,
-        totalPages: 1,
+        personSchedule: {
+          totalPages: 1,
+          totalResults: 1,
+          size: 10,
+        },
       }
 
       const getPersonScheduleSpy = jest
         .spyOn(MasApiClient.prototype, 'getEnforcementContacts')
-        .mockResolvedValue(mockEnforcementActions)
+        .mockResolvedValue(mockEnforcementActions as any)
 
       const sendAuditMessageSpy = jest.spyOn(auditService, 'sendAuditMessage')
 
@@ -79,10 +79,11 @@ describe('enforcementContactsController', () => {
       const res = mockAppResponse()
 
       const mockEnforcementActions = {
-        totalPages: 0,
-        totalResults: 0,
-        size: 10,
-        content: [],
+        personSchedule: {
+          totalPages: 0,
+          totalResults: 0,
+          size: 10,
+        },
       }
 
       const getPersonScheduleSpy = jest
