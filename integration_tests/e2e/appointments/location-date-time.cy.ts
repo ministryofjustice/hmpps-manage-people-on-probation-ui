@@ -218,6 +218,7 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       cy.clock(DateTime.fromISO(mockedNow).toMillis())
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
@@ -242,6 +243,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Continue is clicked entering a date which is invalid', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerInput().clear().type('xxxxxxxx')
       locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
@@ -262,6 +264,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Continue is clicked selecting an end time the same as the start time', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
@@ -283,6 +286,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Continue is clicked selecting an end time before the start time', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
@@ -304,6 +308,7 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       cy.task('stubAppointmentClash')
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
@@ -324,6 +329,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Continue is clicked entering a date which is later than 31/12/2199', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerInput().clear().type('1/1/2200')
       locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
@@ -344,6 +350,7 @@ describe('Pick a date, location and time for this appointment', () => {
     const value = DateTime.now().toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
@@ -374,6 +381,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Date is entered which is in the past', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getDatePickerInput().type(`${yesterday.toFormat('d/M/yyyy')}`)
     })
     it('should display the log an outcome alert banner', () => {
@@ -400,6 +408,7 @@ describe('Pick a date, location and time for this appointment', () => {
         body: { isInPast: true },
       }).as('isInPast')
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).clear().type('08:00')
@@ -424,6 +433,7 @@ describe('Pick a date, location and time for this appointment', () => {
         body: { isInPast: false },
       }).as('isInPast')
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
@@ -448,7 +458,20 @@ describe('Pick a date, location and time for this appointment', () => {
         body: { isInPast: true },
       }).as('isInPast')
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
     })
+    it('should not display the warning message if enableNonCompliance flag is true', () => {
+      cy.task('stubEnableNonCompliance')
+      loadPage()
+      selectPastDate()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
+    })
+
+    it('should display the warning message if enableNonCompliance flag is false', () => {
+      selectPastDate()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
+    })
+
     it('should persist the log an outcome alert banner when form is submitted with validation errors', () => {
       selectPastDate()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
@@ -486,6 +509,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Date in the past is selected, the the alert banner is dismissed', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       selectPastDate()
     })
     it('should display the log an outcome alert banner', () => {
@@ -507,6 +531,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
+      logOutcomePage = new AttendedCompliedPage()
       logOutcomePage.getCancelGoBackLink().click()
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })

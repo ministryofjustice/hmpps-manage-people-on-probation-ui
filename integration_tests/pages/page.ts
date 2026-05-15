@@ -129,6 +129,8 @@ export default abstract class Page {
 
   getBackLink = (): PageElement => cy.get('.govuk-back-link')
 
+  getInsetText = (): PageElement => cy.get('.govuk-inset-text')
+
   getCancelGoBackLink = (): PageElement => cy.get('[data-qa="cancelGoBackLink"]')
 
   getSubmitBtn = (): PageElement => cy.get('[data-qa="submit-btn"]')

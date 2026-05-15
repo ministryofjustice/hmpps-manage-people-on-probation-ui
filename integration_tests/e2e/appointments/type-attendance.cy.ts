@@ -86,6 +86,31 @@ describe('Arrange an appointment', () => {
         })
       })
 
+      describe('enableNonCompliance flag', () => {
+        it('should display the bullet point for non-compliance if enableNonCompliance is false', () => {
+          loadPage()
+          typePage = Page.verifyOnPage(AppointmentTypePage)
+          typePage
+            .getInsetText()
+            .find('ul')
+            .find('li')
+            .should('contain.text', 'appointments you know have non-attendance or non-compliance')
+          checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+        })
+
+        it('should not display the bullet point for non-compliance if enableNonCompliance is true', () => {
+          cy.task('stubEnableNonCompliance')
+          loadPage()
+          typePage = Page.verifyOnPage(AppointmentTypePage)
+          typePage
+            .getInsetText()
+            .find('ul')
+            .find('li')
+            .should('not.contain.text', 'appointments you know have non-attendance or non-compliance')
+          checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+        })
+      })
+
       describe('Continue is clicked without first selecting a type', () => {
         beforeEach(() => {
           loadPage()
