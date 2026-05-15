@@ -25,4 +25,22 @@ export const mockHomepage = {
       startDateTime: '2025-03-04T11:30:00Z',
     },
   ],
+  enforcementContacts: [
+    {
+      id: 12345,
+      caseName: {
+        surname: 'Smith',
+        forename: 'John',
+        middleName: 'Michael',
+      },
+      crn: 'X123456',
+      dob: '1988-04-12',
+      appointmentType: 'Office Appointment',
+      appointmentDate: '2026-05-01',
+      appointmentOutcome: 'Unacceptable absence',
+      enforcementAction: 'Breach initiated',
+      evidenceDueDate: '2026-05-08',
+      deliusManaged: true,
+    },
+  ],
 } as Homepage

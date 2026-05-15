@@ -5,6 +5,14 @@
 {% set formId =  true %}
 {% set formIdName =  'photoForm' %}
 {% set checkinPhotoPage =  true %}
+{% set uploadPhotoLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'upload-a-photo' if not cya else 'checkin-summary' %}
+
+{% block heading %}
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+    {{ title }}
+  </h1>
+{% endblock %}
+
 {% block form %}
     <div class="es-photo-capture es-hidden" id="es-photo-capture">
         <div class="es-photo-capture__wrap">
@@ -27,4 +35,18 @@
     </div>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
     <input type="hidden" name="userPhotoUpload" id="userPhotoUpload" value="false" />
+    
+    <div id="es-photo-capture__error" class="es-hidden">
+        <div class="govuk-inset-text es-inset-text--error">
+            <h2 class="govuk-heading-m es-heading--error">You need to accept permissions on your device</h2>
+            <p>We are unable to access your camera to take a photo. Check your browser settings and permissions.</p>
+        </div>
+        <div class="govuk-button-group">
+            <button class="govuk-button" disabled>Take photo</button>
+            <a
+                href="{{ uploadPhotoLink }}"
+                class="govuk-link govuk-link--no-visited-state"
+            >Upload photo instead</a>
+        </div>
+    </div>
 {% endblock %}

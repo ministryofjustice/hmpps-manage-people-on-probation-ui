@@ -154,6 +154,11 @@ describe('masApiClient', () => {
         () => masApiClient.getPersonSchedule('X000001', '1', '0'),
       ],
       [
+        'getEnforcementContacts',
+        '/contact/USER1/enforcements?size=10&page=0&filterDueDate=true',
+        () => masApiClient.getEnforcementContacts('USER1', '0'),
+      ],
+      [
         'getPersonAppointment',
         '/schedule/X000001/appointment/1',
         () => masApiClient.getPersonAppointment('X000001', '1'),

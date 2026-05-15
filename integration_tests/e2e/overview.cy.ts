@@ -17,6 +17,7 @@ context('Overview', () => {
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
     page.getTab('activityLog').should('contain.text', 'Contacts')
+    page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
     checkPopHeader()
     page
@@ -182,6 +183,7 @@ context('Overview', () => {
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
     page.getTab('activityLog').should('contain.text', 'Contacts')
+    page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
 
     cy.get(`[data-qa=errors]`).should(

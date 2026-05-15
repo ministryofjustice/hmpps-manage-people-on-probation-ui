@@ -31,10 +31,18 @@
         {% endif %}
         {% block heading %}
           {% if title %}
-            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">
               {{ title }}
             </h2>
           {% endif %}
+            {% if checkIn.sensitive %}
+                <div class="govuk-!-margin-bottom-7">
+                    {{ govukTag({
+                    html: 'Sensitive',
+                    classes: "govuk-tag--yellow"
+                    }) }}
+                </div>
+            {% endif %}
         {% endblock %}
 
         <h2 class="govuk-heading-m">Practitioner review</h2>
@@ -53,27 +61,59 @@
                 </div>
             {% endif %}
         </dl>
+        <div class="govuk-grid-column-two-thirds govuk-!-padding-0">
+            <h2 class="govuk-heading-m">Add further information</h2>
+            <form method="post" autocomplete="off" action="{{ paths.current }}">
+                {{ govukCharacterCount({
+                    rows: '10',
+                    maxlength: maxCharCount,
+                    formGroup: {
+                        attributes: { "data-qa": "notes"}
+                    }
+                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
 
-        <h2 class="govuk-heading-m">Add further information</h2>
-        <form method="post" autocomplete="off" action="{{ paths.current }}">
-            {{ govukCharacterCount({
-                rows: '10',
-                maxlength: maxCharCount,
-                formGroup: {
-                    attributes: { "data-qa": "notes"}
-                }
-            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
+            {% if checkIn.sensitive !== 'true' and checkIn.sensitive !== true %}
+                {{ govukRadios({
+                    fieldset: {
+                        legend: {
+                            text: 'Does this online check in include sensitive information?',
+                            classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
+                        }
+                    },
+                    hint: {
+                        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+                    },
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'sensitiveContact'
+                        }
+                    },
+                    items: [
+                        {
+                            value: true,
+                            text: "Yes, it includes sensitive information"
+                        },
+                        {
+                            value: false,
+                            text: "No, it is not sensitive"
+                        }
+                    ]
+                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'sensitiveContact'])) }}
+            {% else %}
+                <input type="hidden" name="esupervision[{{ crn }}][{{ id }}][checkins][sensitiveContact]" value="true">
+            {% endif %}
 
-            <div class="govuk-button-group">
-                {{ govukButton({
-                html: "Add update",
-                attributes: {
-                    'data-qa': 'submit-btn'
-                }
-                }) }}
-            </div>
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-        </form>
+                <div class="govuk-button-group">
+                    {{ govukButton({
+                    html: "Add update",
+                    attributes: {
+                        'data-qa': 'submit-btn'
+                    }
+                    }) }}
+                </div>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            </form>
+        </div>
     </div>
 </div>
 

@@ -2,12 +2,19 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { HTTPError } from 'superagent'
 import httpMocks from 'node-mocks-http'
+import * as Sentry from '@sentry/node'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import { statusErrors, type StatusErrorCode } from './properties'
 import createErrorHandler from './errorHandler'
 import logger from '../logger'
 import { AppResponse } from './models/Locals'
-import type { Services } from './services' // Required for typing the mock
+import type { Services } from './services'
+
+jest.mock('@sentry/node', () => ({
+  getClient: jest.fn(),
+  captureException: jest.fn(),
+  setUser: jest.fn(),
+}))
 
 const mockTechnicalUpdatesService = {
   getLatestTechnicalUpdateHeading: jest.fn(() => 'Mock Heading'),
@@ -46,12 +53,16 @@ const renderSpy = jest.spyOn(res, 'render')
 const nextSpy = jest.fn()
 const loggerErrorSpy = jest.spyOn(logger, 'error')
 
+const sentryGetClientSpy = Sentry.getClient as jest.Mock
+const sentryCaptureExceptionSpy = Sentry.captureException as jest.Mock
+
 beforeEach(() => {
   app = appWithAllRoutes({ services: mockServices })
 })
 
 afterEach(() => {
   jest.resetAllMocks()
+  sentryGetClientSpy.mockReturnValue(undefined)
 })
 
 const mockError = (status = 500): HTTPError => {
@@ -63,7 +74,7 @@ const mockError = (status = 500): HTTPError => {
     stack: 'mock-stack',
     name: '',
     message: 'Mock error message',
-  }
+  } as HTTPError
 }
 
 const checkLocalsVars = (error: HTTPError, production = false): void => {
@@ -223,5 +234,52 @@ describe('Error has no status', () => {
   checkLocalsVars(error, production)
   it('should set the response status', () => {
     expect(statusSpy).toHaveBeenCalledWith(error.status)
+  })
+})
+describe('Timeout errors', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should capture timeout errors in Sentry when Sentry is configured', () => {
+    const error = {
+      ...mockError(),
+      code: 'ECONNABORTED',
+      message: 'Timeout of 1000ms exceeded',
+    } as HTTPError
+
+    sentryGetClientSpy.mockReturnValue({})
+
+    createErrorHandler(false)(error, req, res, nextSpy)
+
+    expect(sentryCaptureExceptionSpy).toHaveBeenCalledWith(error, {
+      tags: {
+        'error.kind': 'timeout',
+        'request.path': req.originalUrl,
+        'user.username': res.locals.user?.username,
+      },
+    })
+  })
+  it('should not capture non-timeout errors in Sentry', () => {
+    const error = mockError()
+
+    sentryGetClientSpy.mockReturnValue({})
+
+    createErrorHandler(false)(error, req, res, nextSpy)
+
+    expect(sentryCaptureExceptionSpy).not.toHaveBeenCalled()
+  })
+  it('should not capture timeout errors when Sentry is not configured', () => {
+    const error = {
+      ...mockError(),
+      code: 'ECONNABORTED',
+      message: 'Timeout of 1000ms exceeded',
+    } as HTTPError
+
+    sentryGetClientSpy.mockReturnValue(undefined)
+
+    createErrorHandler(false)(error, req, res, nextSpy)
+
+    expect(sentryCaptureExceptionSpy).not.toHaveBeenCalled()
   })
 })

@@ -18,21 +18,21 @@ export interface Scores {
 
 export interface Score {
   type: string
-  level: string
-  score: number
+  level?: string
+  score?: number
 }
 
 export interface ScoreTwoYears {
   type: string
-  level: string
-  oneYear: number
-  twoYears: number
+  level?: string
+  oneYear?: number
+  twoYears?: number
 }
 
 export interface RoshRiskWidgetDto {
   overallRisk?: string
-  assessedOn?: string
-  risks: { riskTo: string; community: string | string[]; custody: string | string[] }[]
+  assessedOn?: string | null
+  risks?: { riskTo: string; community: string | string[]; custody: string | string[] }[]
 }
 
 export interface RiskScoresDto {

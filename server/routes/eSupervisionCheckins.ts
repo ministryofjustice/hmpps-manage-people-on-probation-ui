@@ -6,6 +6,7 @@ import { autoStoreSessionData, redirectWizard, renderError } from '../middleware
 import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 import { AppResponse } from '../models/Locals'
+import { getCheckInQuestionsRedirect } from '../middleware/getCheckInQuestionsRedirect'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.use(
@@ -266,9 +267,9 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getViewCheckIn(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/:id/check-in/view', [
-    validate.checkInReview,
-    autoStoreSessionData(hmppsAuthClient),
     getCheckIn(hmppsAuthClient),
+    autoStoreSessionData(hmppsAuthClient),
+    validate.checkInReview,
     controllers.checkIns.postViewCheckIn(hmppsAuthClient),
   ])
   router.get('/case/:crn/appointments/:id/check-in/view-expired', [
@@ -277,8 +278,8 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   ])
   router.post('/case/:crn/appointments/:id/check-in/view-expired', [
     getCheckIn(hmppsAuthClient),
-    validate.checkInReview,
     autoStoreSessionData(hmppsAuthClient),
+    validate.checkInReview,
     controllers.checkIns.postViewCheckIn(hmppsAuthClient),
   ])
   router.get('/case/:crn/appointments/:id/check-in/review/expired', [
@@ -307,12 +308,14 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/:id/check-in/review/notes', [
-    autoStoreSessionData(hmppsAuthClient),
     getCheckIn(hmppsAuthClient),
+    validate.checkInReview,
+    autoStoreSessionData(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getStartQuestionsPage(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/check-in/manage/:id/questions/start', [
@@ -321,6 +324,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/add', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getAddQuestionsPage(hmppsAuthClient),
   ])
 
@@ -330,6 +334,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/list', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getQuestionsListPage(hmppsAuthClient),
   ])
 
@@ -339,6 +344,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getEditQuestionPage(hmppsAuthClient),
   ])
 
@@ -349,17 +355,21 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/:templateId/select', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getSelectQuestionPage(hmppsAuthClient),
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/delete', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getDeleteQuestion(hmppsAuthClient),
   ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient),
   ])
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/support', [
+    getCheckInQuestionsRedirect(hmppsAuthClient),
     controllers.checkIns.getPreviewSupportPage(hmppsAuthClient),
   ])
 }

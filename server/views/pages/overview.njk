@@ -635,6 +635,12 @@
                     {{ overview.compliance.breachesOnCurrentOrderCount }} breaches on current order
               {%- endswitch -%}
                   {% endif %}
+
+              {% if flags.enableCompliancePage %}
+                  <p>
+                    <a href={{crn}}/compliance>View all compliance details</a>
+                  </p>
+              {% endif %}
                   {% endset %}
                   {% set activity %}
                   {% if overview.activity %}

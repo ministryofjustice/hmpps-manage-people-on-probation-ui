@@ -21,6 +21,10 @@ export default class IndexPage extends Page {
 
   getOutcomesToLogRows = (): PageElement => cy.get('[data-qa=homepage-outcomes] tbody tr')
 
+  getEnforcementActions = (): PageElement => cy.get('[data-qa=homepage-enforcement-actions]')
+
+  getEnforcementActionRows = (): PageElement => cy.get('[data-qa=homepage-enforcement-actions] tbody tr')
+
   getOtherServices = (): PageElement => cy.get('[data-qa=homepage-services-section]')
 
   getSearchSubmit = (): PageElement => cy.get('[data-qa=search-submit]')
