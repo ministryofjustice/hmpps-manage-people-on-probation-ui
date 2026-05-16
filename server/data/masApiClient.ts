@@ -2,7 +2,13 @@ import { Response } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
-import { ContactOutcomesResponse, EnforcementContactsResponse, PersonAppointment, Schedule } from './model/schedule'
+import {
+  EnforcementContactsResponse,
+  ContactOutcomesResponse,
+  LinkedContactResponse,
+  PersonAppointment,
+  Schedule,
+} from './model/schedule'
 import {
   AddressOverview,
   AddressOverviewSummary,
@@ -531,8 +537,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 
-  async getBreachRecallInformation(crn: string): Promise<string> {
-    const response: string = await this.get({ path: `/breachRecall`, handle404: true })
-    return response
+  async getRelatedContacts(crn: string, appointmentId: string): Promise<LinkedContactResponse> {
+    return (await this.get({
+      path: `/schedule/${crn}/appointment/${appointmentId}/linked-contacts`,
+      handle404: false,
+    })) as LinkedContactResponse
   }
 }
