@@ -87,6 +87,7 @@ describe('Manage an appointment', () => {
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
+    manageAppointmentPage.getRelatedContacts().should('contain.text', 'Related contacts')
   })
 
   describe('Alert banner', () => {
@@ -209,6 +210,40 @@ describe('Manage an appointment', () => {
             )
         })
       })
+    })
+  })
+
+  describe('Related contacts', () => {
+    it('should display related contacts section with related contact details', () => {
+      loadPage()
+
+      manageAppointmentPage = new ManageAppointmentPage()
+
+      manageAppointmentPage.getRelatedContacts().find('h3').should('contain.text', 'Related contacts')
+
+      manageAppointmentPage
+        .getRelatedContacts()
+        .find('li')
+        .eq(0)
+        .should('contain.text', 'Breach Action - Breach Letter Sent')
+        .and('contain.text', 'Created by J.Frost')
+        .and('contain.text', '12 May 2026')
+
+      manageAppointmentPage
+        .getRelatedContacts()
+        .find('li')
+        .eq(1)
+        .should('contain.text', 'First warning letter sent')
+        .and('contain.text', 'Created by T.Morris')
+        .and('contain.text', '19 May 2026')
+
+      manageAppointmentPage
+        .getRelatedContacts()
+        .find('li')
+        .eq(2)
+        .should('contain.text', 'First warning letter requested')
+        .and('contain.text', 'Created by J.Smith')
+        .and('contain.text', '16 May 2026')
     })
   })
 })
