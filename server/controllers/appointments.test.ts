@@ -687,7 +687,7 @@ describe('controllers/appointments', () => {
         appointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({})
+      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({}, 'KEEP_TYPE')
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
     })
 

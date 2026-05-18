@@ -142,6 +142,7 @@ export interface AppointmentSession {
   enforcementAction?: EnforcementAction
   outcomeRecorded?: YesNo
   contactId?: string
+  linkedContactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions

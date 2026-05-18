@@ -383,12 +383,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
       const { appointmentSession } = res.locals
-      if (nextAppointment === 'CHANGE_TYPE') {
-        const uuid = v4()
-        return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
-      }
-      if (nextAppointment === 'KEEP_TYPE') {
-        return cloneAppointmentAndRedirect(appointmentSession)(req, res)
+      if (nextAppointment !== 'NO') {
+        return cloneAppointmentAndRedirect(appointmentSession, nextAppointment)(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
