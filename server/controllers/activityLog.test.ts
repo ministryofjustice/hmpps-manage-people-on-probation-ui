@@ -264,6 +264,56 @@ describe('/controllers/activityLogController', () => {
       )
     })
 
+    it('should render the activity page with showSuccessBanner false when the user returns to the page without flash data', async () => {
+      const reqWithoutFlash = httpMocks.createRequest({
+        params: { crn, id },
+        query: { view: 'default' },
+        session: {},
+      })
+
+      reqWithoutFlash.flash = jest.fn().mockImplementation((key: string) => {
+        if (key === 'contactUpdated') return []
+        return []
+      })
+
+      const resWithoutFlash = mockAppResponse({
+        filters: {},
+        flags: {},
+      })
+
+      const renderSpyWithoutFlash = jest.spyOn(resWithoutFlash, 'render')
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(reqWithoutFlash, resWithoutFlash)
+
+      expect(renderSpyWithoutFlash).toHaveBeenCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          showSuccessBanner: false,
+        }),
+      )
+    })
+
+    it('should set flash and redirect to clean URL when showSuccessBanner query exists', async () => {
+      const reqAfterFlash = httpMocks.createRequest({
+        params: { crn, id },
+        path: `/case/${crn}/activity/${id}`,
+        query: {
+          showSuccessBanner: 'true',
+        },
+        session: {},
+      })
+
+      reqAfterFlash.flash = jest.fn()
+
+      const redirectSpy = jest.spyOn(res, 'redirect')
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(reqAfterFlash, res)
+
+      expect(reqAfterFlash.flash).toHaveBeenCalledWith('contactUpdated', 'success')
+
+      expect(redirectSpy).toHaveBeenCalledWith('/case/X000001/activity/1234')
+    })
+
     it('should render the activity page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
         personAppointment: mockPersonAppointment,
