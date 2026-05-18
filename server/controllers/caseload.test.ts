@@ -801,27 +801,44 @@ describe('caseloadController', () => {
         limitedAccess: false,
       },
     ]
-    jest.spyOn(utils, 'checkRecentlyViewedAccess').mockImplementation(() => mockRecentlyViewed)
-    const mockUserAccess = {
-      crn: accessCrn,
-      userExcluded: false,
-      userRestricted: false,
-    } as unknown as UserAccess
-    const checkUserAccessSpy = jest
-      .spyOn(MasApiClient.prototype, 'checkUserAccess')
-      .mockImplementation(() => Promise.resolve(mockUserAccess))
-    const req = httpMocks.createRequest({
-      session: {},
-      body: mockRecentlyViewed,
+
+    let checkUserAccessSpy: jest.SpyInstance
+
+    beforeEach(() => {
+      jest.spyOn(utils, 'checkRecentlyViewedAccess').mockImplementation(() => mockRecentlyViewed)
+      checkUserAccessSpy = jest
+        .spyOn(MasApiClient.prototype, 'checkUserAccess')
+        .mockImplementation(() => Promise.resolve({ access: [] }))
     })
-    beforeEach(async () => {
+
+    it('should request the user access from the api when recently viewed cases are provided', async () => {
+      const req = httpMocks.createRequest({
+        session: {},
+        body: mockRecentlyViewed,
+      })
       await controllers.caseload.checkAccess(hmppsAuthClient)(req, res)
-    })
-    it('should request the user access from the api', () => {
       expect(checkUserAccessSpy).toHaveBeenCalledWith(res.locals.user.username, [accessCrn])
-    })
-    it('should send the updated recently viewed access in the request', () => {
       expect(sendSpy).toHaveBeenCalledWith(mockRecentlyViewed)
+    })
+
+    it('should return empty array if recently viewed cases are not provided', async () => {
+      const req = httpMocks.createRequest({
+        session: {},
+        body: [],
+      })
+      await controllers.caseload.checkAccess(hmppsAuthClient)(req, res)
+      expect(checkUserAccessSpy).not.toHaveBeenCalled()
+      expect(sendSpy).toHaveBeenCalledWith([])
+    })
+
+    it('should return empty array if recently viewed cases are null', async () => {
+      const req = httpMocks.createRequest({
+        session: {},
+        body: null,
+      })
+      await controllers.caseload.checkAccess(hmppsAuthClient)(req, res)
+      expect(checkUserAccessSpy).not.toHaveBeenCalled()
+      expect(sendSpy).toHaveBeenCalledWith([])
     })
   })
 })

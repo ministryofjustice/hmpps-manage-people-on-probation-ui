@@ -25,6 +25,25 @@ context('Sign In', () => {
     page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
+  it('Renders the enforcement actions', () => {
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+    page.getEnforcementActions().should('exist')
+    page.getEnforcementActions().should('contain.text', 'My enforcement actions')
+    page.getEnforcementActionRows().should('have.length', 2)
+    page.getEnforcementActions().find('button').should('have.attr', 'aria-expanded', 'false')
+
+    // Check for "Overdue" label for the first row (Garrett Emard in wiremock mapping)
+    page.getEnforcementActionRows().eq(0).should('contain.text', 'Overdue')
+
+    // Check for "Manage on NDelius" link for the first row (deliusManaged: true)
+    page.getEnforcementActionRows().eq(0).find('a').contains('Manage on NDelius').should('exist')
+
+    // Check for "Manage" link for the second row (Ethan Bradtke in wiremock mapping, deliusManaged: false)
+    page.getEnforcementActionRows().eq(1).find('a').contains('Manage').should('exist')
+    page.getEnforcementActionRows().eq(1).should('not.contain.text', 'Overdue')
+  })
+
   it('Renders the the outcomes to log', () => {
     cy.task('stubDisableHomePageOutcome')
     cy.visit('/')
@@ -37,6 +56,7 @@ context('Sign In', () => {
 
   it('Renders correctly when appointments and outcomes to log are empty', () => {
     cy.task('stubEmptyHomepage')
+    cy.task('stubEmptyEnforcementContacts')
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
     page.getAppointments().should('exist')
@@ -49,6 +69,11 @@ context('Sign In', () => {
     page.getOutcomesToLog().should('not.contain.text', 'Log more outcomes')
     page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'true')
     page.getAppointmentRows().should('not.exist')
+    page.getEnforcementActions().should('exist')
+    page.getEnforcementActions().should('contain.text', 'My enforcement actions')
+    page.getEnforcementActions().should('not.contain.text', 'View all enforcement actions')
+    page.getEnforcementActions().find('button').should('have.attr', 'aria-expanded', 'true')
+    page.getEnforcementActionRows().should('not.exist')
   })
 
   it('Renders "Other Services" section', () => {

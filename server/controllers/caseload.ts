@@ -334,11 +334,14 @@ const caseloadController: Controller<typeof routes, void, Args> = {
   checkAccess: hmppsAuthClient => {
     return async (req, res) => {
       const recentlyViewed: RecentlyViewedCase[] = req.body
-      const crns = recentlyViewed.map(c => c.crn)
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const userAccess = await masClient.checkUserAccess(res.locals.user.username, crns)
-      const updated = checkRecentlyViewedAccess(recentlyViewed, userAccess)
+      let updated: RecentlyViewedCase[] = []
+      if (recentlyViewed && recentlyViewed.length > 0) {
+        const crns = recentlyViewed.map(c => c.crn)
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        const userAccess = await masClient.checkUserAccess(res.locals.user.username, crns)
+        updated = checkRecentlyViewedAccess(recentlyViewed, userAccess)
+      }
       res.send(updated)
     }
   },

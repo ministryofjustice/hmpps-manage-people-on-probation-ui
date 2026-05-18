@@ -246,7 +246,7 @@ export interface RescheduleAppointment {
 }
 
 export interface AppointmentChecks {
-  [index: string]: AppointmentCheck | string
+  [index: string]: AppointmentCheck | string | undefined
   nonWorkingDayName?: string
   isWithinOneHourOfMeetingWith?: AppointmentCheck
   overlapsWithMeetingWith?: AppointmentCheck

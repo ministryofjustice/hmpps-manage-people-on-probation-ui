@@ -7,7 +7,7 @@ export const defaultFormSelectValues = (object: SelectElement, data: CaseSearchF
     obj.id = id
     obj.name = id
 
-    obj.items.forEach(item => {
+    obj.items?.forEach(item => {
       if (item.value === data[id]) {
         item.selected = 'selected'
       }

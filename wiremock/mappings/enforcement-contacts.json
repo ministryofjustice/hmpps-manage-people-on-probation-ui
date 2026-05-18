@@ -1,0 +1,56 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/contact/USER1/enforcements",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "size": 2,
+          "page": 0,
+          "totalResults": 25,
+          "totalPages": 13,
+          "enforcementContacts": [
+            {
+              "caseName": {
+                "forename": "Garrett",
+                "middleName": "",
+                "surname": "Emard"
+              },
+              "id": 1,
+              "crn": "X000001",
+              "dob": "1988-04-12",
+              "appointmentType": "Planned office visit",
+              "appointmentDate": "2026-05-01",
+              "appointmentOutcome": "Unacceptable absence",
+              "enforcementAction": "Breach initiated",
+              "evidenceDueDate": "2026-05-08",
+              "deliusManaged": true
+            },
+            {
+              "caseName": {
+                "forename": "Ethan",
+                "middleName": "",
+                "surname": "Bradtke"
+              },
+              "id": 4,
+              "crn": "X000001",
+              "dob": "1992-11-30",
+              "appointmentType": "Home Visit",
+              "appointmentDate": "2026-05-03",
+              "appointmentOutcome": "Failed to attend",
+              "enforcementAction": "Warning letter issued",
+              "evidenceDueDate": "2030-05-10",
+              "deliusManaged": false
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
