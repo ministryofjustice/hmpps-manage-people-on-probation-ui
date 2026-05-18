@@ -1057,7 +1057,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
+      const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
+      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id, isSensitiveNotesEnabled })
     }
   },
 
@@ -1362,20 +1363,30 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+
       const reasonData = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])
-      const sensitiveData = getDataValue(req.session.data, [
-        'esupervision',
-        crn,
-        id,
-        'manageCheckin',
-        'stopCheckinSensitive',
-      ])
+
+      const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
+
+      let isSensitive = false
+      if (isSensitiveNotesEnabled) {
+        const sensitiveData = getDataValue(req.session.data, [
+          'esupervision',
+          crn,
+          id,
+          'manageCheckin',
+          'stopCheckinSensitive',
+        ])
+        isSensitive = sensitiveData === 'true'
+      }
+
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupervisionClient = new ESupervisionClient(token)
+
       const body: DeactivateOffenderRequest = {
         requestedBy: res.locals.user.username,
         reason: handleQuotes(reasonData),
-        sensitive: sensitiveData === 'true',
+        sensitive: isSensitive,
       }
       res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin'], null)

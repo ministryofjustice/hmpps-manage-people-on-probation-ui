@@ -2642,6 +2642,7 @@ describe('checkInsController', () => {
         },
       }
       const req = baseReq(data)
+      res.locals.flags = { enableStopCheckinSensitiveFlag: true }
       await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
 
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')

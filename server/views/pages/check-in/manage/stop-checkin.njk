@@ -24,33 +24,34 @@
             }
         } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])) }}
 
-
-        {{ govukRadios({
-            fieldset: {
-                legend: {
-                    text: 'Does the reason for stopping include sensitive information?',
-                    classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
-                }
-            },
-            hint: {
-                text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
-            },
-            formGroup: {
-                attributes: {
-                    'data-qa': 'sensitiveContact'
-                }
-            },
-            items: [
-                {
-                    value: true,
-                    text: "Yes, it includes sensitive information"
+        {% if isSensitiveNotesEnabled %}
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: 'Does the reason for stopping include sensitive information?',
+                        classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
+                    }
                 },
-                {
-                    value: false,
-                    text: "No, it is not sensitive"
-                }
-            ]
-        } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'stopCheckinSensitive'])) }}
+                hint: {
+                    text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'sensitiveContact'
+                    }
+                },
+                items: [
+                    {
+                        value: true,
+                        text: "Yes, it includes sensitive information"
+                    },
+                    {
+                        value: false,
+                        text: "No, it is not sensitive"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'stopCheckinSensitive'])) }}
+        {% endif %}
 
 
 {% endblock %}
