@@ -232,19 +232,28 @@ export default class MasApiClient extends RestClient {
 
   async getPersonSchedule(crn: string, type: string, page: string, sortQuery?: string): Promise<Schedule> {
     const queryParameters = `?${new URLSearchParams({ size: '10', page }).toString()}${sortQuery ?? ''}`
+
     const schedule = (await this.get({
       path: `/schedule/${crn}/${type}${queryParameters}`,
       handle404: false,
     })) as Schedule
+
     return mapScheduleWithApprovedContactDisplayNames(schedule)
   }
 
-  async getEnforcementContacts(username: string, page: string): Promise<EnforcementContactsResponse> {
+  async getEnforcementContacts(
+    username: string,
+    page: string,
+    size: string = '5',
+    sortQuery?: string,
+    ascending?: string,
+  ): Promise<EnforcementContactsResponse> {
+    const filterQuery = `${sortQuery}=${ascending}`
     const queryParameters = `?${new URLSearchParams({
-      size: '10',
+      size,
       page,
       filterDueDate: 'true',
-    }).toString()}`
+    }).toString()}&${sortQuery ? filterQuery : ''}`
 
     const enforcementContacts = (await this.get({
       path: `/contact/${username}/enforcements${queryParameters}`,
