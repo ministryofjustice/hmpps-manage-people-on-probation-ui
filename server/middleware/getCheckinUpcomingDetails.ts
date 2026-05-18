@@ -12,7 +12,7 @@ export const getUpcomingCheckinDetails = (hmppsAuthClient: HmppsAuthClient): Rou
       const eSupervisionClient = new ESupervisionClient(token)
       const response = await eSupervisionClient.getUpcomingCheckinQuestions(crn, 'en-GB')
       res.locals.upcomingCheckin = response || null
-    } catch (error) {
+    } catch {
       logger.info(`No upcoming check in found for CRN ${crn}`)
       res.locals.upcomingCheckin = null
     }
