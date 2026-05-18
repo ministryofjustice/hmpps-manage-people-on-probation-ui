@@ -80,7 +80,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
       {
         value: 'ATTENDED_FAILED_TO_COMPLY',
         text: 'Attended - failed to comply',
-        hint: 'For example, their behaviour was disruptive or they did not follow instructions.',
+        hint: 'For example, they did not follow instructions.',
         redirectPageName: 'Attended failed to comply',
         redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
         RedirectPage: AttendedFailedToComplyPage,
@@ -91,6 +91,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
           text: 'Attended - sent home (behaviour)',
+          hint: 'For example, their behaviour was disruptive.',
           redirectPageName: 'Attended failed to comply',
           redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
           RedirectPage: AttendedFailedToComplyPage,
@@ -98,6 +99,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
+          hint: 'For example, the building was unexpectedly closed.',
           redirectPageName: 'Attended failed to comply',
           redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
           RedirectPage: AttendedFailedToComplyPage,
