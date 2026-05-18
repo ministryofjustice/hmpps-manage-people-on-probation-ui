@@ -139,10 +139,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.get('/case/:crn/arrange-appointment/:id/check-your-answers', redirectWizard(['eventId']))
 
   router.get(
-    [
-      '/case/:crn/arrange-appointment/:id/check-your-answers',
-      '/case/:crn/appointments/appointment/:contactId/check-your-answers',
-    ],
+    ['/case/:crn/arrange-appointment/:id/check-your-answers'],
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
