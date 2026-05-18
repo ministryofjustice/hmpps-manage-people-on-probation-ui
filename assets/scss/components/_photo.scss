@@ -1,5 +1,3 @@
-@use 'govuk-frontend/dist/govuk/index' as gds;
-
 .es-photo-capture {
   &__wrap {
     position: relative;
@@ -108,11 +106,11 @@
 }
 
 .es-inset-text--error {
-  border-left-color: gds.$govuk-error-colour;
+  border-left-color: 	#ca3535
 }
 
 .es-heading--error {
-  color: gds.$govuk-error-colour;
+  color: 	#ca3535
 }
 
 .es-hidden {
