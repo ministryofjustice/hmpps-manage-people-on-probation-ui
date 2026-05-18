@@ -1307,17 +1307,24 @@ describe('checkInsController', () => {
   })
 
   describe('getViewCheckIn', () => {
-    it('redirect if checkIn not reviewed', async () => {
+    it('redirect to update page if checkIn not reviewed', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       const resReview = reviewRes('SUBMITTED')
-      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      const renderReviewSpy = jest.spyOn(resReview, 'render')
       await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
 
-      expect(reviewRedirectSpy).toHaveBeenCalledWith(
-        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      expect(renderReviewSpy).toHaveBeenCalledWith(
+        'pages/check-in/update.njk',
+        expect.objectContaining({
+          crn: req.params.crn,
+          id: req.params.id,
+          back: req.query.back,
+          checkIn: resReview.locals.checkIn,
+          systemIdCheckPass: expect.anything(),
+        }),
       )
     })
 

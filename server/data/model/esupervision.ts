@@ -28,6 +28,7 @@ export interface ESupervisionCheckIn {
   notes?: Note[]
   checkinLogs: ESupervisionCheckInLogs
   reviewDueDate?: string
+  sensitive?: boolean
 }
 
 export interface ESupervisionLog {
@@ -57,11 +58,13 @@ export interface ESupervisionReview {
   notes?: string
   missedCheckinComment?: string
   riskManagementFeedback?: boolean
+  sensitive?: boolean
 }
 
 export interface ESupervisionNote {
   updatedBy: string
   notes: string
+  sensitive?: boolean
 }
 
 export type ExternalUserId = string

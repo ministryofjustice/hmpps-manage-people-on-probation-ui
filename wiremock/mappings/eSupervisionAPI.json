@@ -300,8 +300,9 @@
       },
       "response": {
         "status": 200,
+        "transformers": ["response-template"],
         "jsonBody": {
-          "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
+          "expectedCheckinDate": "{{now offset='5 days' format='yyyy-MM-dd'}}T10:00:00+01:00",
           "questions": [
             {
               "question": "How was your appointment??",
@@ -324,9 +325,10 @@
       },
       "response": {
         "status": 200,
+        "transformers": ["response-template"],
         "jsonBody": {
           "upcoming": {
-            "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
+            "expectedCheckinDate": "{{now offset='5 days' format='yyyy-MM-dd'}}T10:00:00+01:00",
             "items": []
           }
         },
@@ -347,8 +349,9 @@
       },
       "response": {
         "status": 200,
+        "transformers": ["response-template"],
         "jsonBody": {
-          "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
+          "expectedCheckinDate": "{{now offset='5 days' format='yyyy-MM-dd'}}T10:00:00+01:00",
           "listId": 3
         },
         "headers": {

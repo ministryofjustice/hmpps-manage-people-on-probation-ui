@@ -1,3 +1,4 @@
+{% from "moj/components/banner/macro.njk" import mojBanner %}
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
@@ -45,6 +46,15 @@
 {% set isOutcomeRecorded = appointment.hasOutcome %}
 
 {% block content %}
+
+{{ mojBanner({
+      type: 'success',
+      html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact Updated</h2>',
+      classes: 'govuk-!-margin-bottom-2',
+      attributes: { "data-qa": "contactUpdated"},
+      iconFallbackText: 'Success'
+  }) if showSuccessBanner and flags.enableManageContacts == true }}
+
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
@@ -73,7 +83,6 @@
       {% endif %}
     </p>
   {% endif %}
-
   {% set appointmentDetails %}
   {% set showAction = false %}
   {% set noMargin = true %}

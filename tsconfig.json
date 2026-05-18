@@ -5,6 +5,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "outDir": "./dist",
+    "strict": false,
     "sourceMap": true,
     "skipLibCheck": true,
     "noEmit": false,
@@ -18,7 +19,8 @@
     "typeRoots": ["./server/@types", "./node_modules/@types"],
     "types": ["node", "jest"],
     "inlineSources": true,
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
+    "rootDir": "/",
 
     // Set `sourceRoot` to  "/" to strip the build path prefix
     // from generated source code references.

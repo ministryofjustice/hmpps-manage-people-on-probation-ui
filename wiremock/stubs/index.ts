@@ -21,6 +21,7 @@ import eSupervisionAPI from './eSupervisionAPI'
 import document from './document'
 import overdueOutcomes from './overdueOutcomes'
 import sentences from './sentences'
+import enforcementActions from './enforcementActions'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -46,6 +47,7 @@ export default {
   ...document,
   ...overdueOutcomes,
   ...sentences,
+  ...enforcementActions,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({
       request: {

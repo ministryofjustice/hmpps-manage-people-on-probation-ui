@@ -104,3 +104,26 @@
     }
   }
 }
+
+.es-inset-text--error {
+  border-left-color: 	#ca3535
+}
+
+.es-heading--error {
+  color: 	#ca3535
+}
+
+.es-hidden {
+  display: none;
+}
+
+.es-show {
+  display: block;
+}
+
+.es-debug {
+  background: #f499be;
+  outline: 3px solid #f499be;
+  color: #000;
+}
+
