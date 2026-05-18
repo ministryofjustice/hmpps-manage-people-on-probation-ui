@@ -1,6 +1,6 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
-import { PersonalDetails } from '../data/model/personalDetails'
+import { Document, PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
@@ -187,10 +187,20 @@ export interface OutcomeSummary {
   enforcementActionChangeLink?: string
 }
 
+export interface OutcomeCurrentEnforcementAction {
+  action: AppointmentEnforcementAction
+  code?: string
+  description: string
+  tagColour: TagColour
+  link?: string
+  evidenceDueDate?: string
+}
+
 export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
   appointment: TAppointment
+  documents: Document[]
   crn: string
   uuid: string | undefined
   contactId: string | undefined
@@ -217,7 +227,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
-  currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
+  currentEnforcementAction?: OutcomeCurrentEnforcementAction
   notePrepend?: string
   summary?: OutcomeSummary
 }

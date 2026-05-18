@@ -20,7 +20,7 @@
 {% endif %}
 {% if flags.enableNonCompliance and appointment.hasOutcome %}
   {% set outcomeLabel = 'Change appointment outcome' %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action' %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
 
 {% if appointment.location.officeName %}
@@ -178,6 +178,21 @@
         }
       }
     },
+    {
+      title: {
+        html: '<span>Change enforcement action</span>'
+      },
+      hint: {
+        text: "Evidence due date: " + appointmentOutcome.currentEnforcementAction.evidenceDueDate
+      } if appointmentOutcome.currentEnforcementAction.evidenceDueDate,
+      href: appointmentOutcome.currentEnforcementAction?.link,
+      status: {
+        tag: {
+          text: appointmentOutcome.currentEnforcementAction?.text,
+          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction?.tagColour
+        }
+      }
+    } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action,
     {
       title: {
         text: "Add appointment notes"

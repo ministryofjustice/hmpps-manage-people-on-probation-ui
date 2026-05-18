@@ -12,7 +12,7 @@ import {
   getOverdueOutcomes,
   getPersonRiskFlags,
 } from '../middleware'
-import { getOutcomeProps } from '../middleware/appointment-outcomes'
+import { getCurrentEnforcementAction, getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
 
@@ -77,8 +77,11 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/manage',
+    getPersonAppointment(hmppsAuthClient),
     getSentences(hmppsAuthClient),
     getNextComAppointment(hmppsAuthClient),
+    getOutcomeProps,
+    getCurrentEnforcementAction,
     controllers.appointments.getManageAppointment(hmppsAuthClient),
   )
 

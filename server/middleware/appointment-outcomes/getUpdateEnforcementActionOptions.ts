@@ -30,7 +30,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   /* Letter related */
 
   if (
-    letterEnforcementActions.includes(currentEnforcementAction.action as LetterEnforcementAction) &&
+    letterEnforcementActions.includes(currentEnforcementAction?.action as LetterEnforcementAction) &&
     !acceptableAbsence
   ) {
     values = [
@@ -44,7 +44,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   /* Breach related */
 
   if (
-    breachEnforcementActions.includes(currentEnforcementAction.action as BreachEnforcementAction) &&
+    breachEnforcementActions.includes(currentEnforcementAction?.action as BreachEnforcementAction) &&
     !acceptableAbsence &&
     sentenceType === 'COMMUNITY'
   ) {
@@ -64,7 +64,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
     'REFER_TO_OFFENDER_MANAGER',
     'YOT_OM_NOTIFIED',
   ]
-  if (pendingResponseActions.includes(currentEnforcementAction.action) && !acceptableAbsence) {
+  if (pendingResponseActions.includes(currentEnforcementAction?.action) && !acceptableAbsence) {
     values = ['SEND_LETTER', 'BREACH_RECALL_INITIATED', 'BREACH_RECALL_INITIATED_AND_SEND_LETTER']
   }
 
@@ -75,7 +75,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
     'RECALL_REQUESTED',
     'IMMEDIATE_BREACH_OR_RECALL',
   ]
-  if (recallActions.includes(currentEnforcementAction.action) && !acceptableAbsence && sentenceType === 'CUSTODY') {
+  if (recallActions.includes(currentEnforcementAction?.action) && !acceptableAbsence && sentenceType === 'CUSTODY') {
     values = ['RECALL_REQUESTED', 'WITHDRAW_WARNING_LETTER']
   }
 

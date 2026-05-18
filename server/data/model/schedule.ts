@@ -101,7 +101,15 @@ export interface Activity {
   externalReference?: string
 }
 
+export interface PersonAppointmentEnforcementAction {
+  code?: string
+  description?: string
+  responseByDate?: string
+}
+
 export interface PersonAppointment {
   personSummary: PersonSummary
   appointment: Activity
+  documents: Document[]
+  enforcementAction?: PersonAppointmentEnforcementAction
 }

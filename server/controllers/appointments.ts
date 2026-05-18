@@ -376,7 +376,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   postNextAppointment: _hmppsAuthClient => {
     return async (req, res) => {
-      const { body, url } = req
+      const { body } = req
       const { crn, contactId } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)

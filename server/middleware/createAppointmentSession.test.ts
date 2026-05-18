@@ -146,6 +146,7 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
     ...mockAppointment,
     ...values,
   },
+  documents: [],
 })
 
 const expectedSession = (
