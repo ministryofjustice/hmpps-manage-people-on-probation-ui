@@ -147,12 +147,12 @@ context('Enforcement actions', () => {
     page.getTableCell(2, 5).find('a').click()
     cy.url().should(
       'include',
-      '/case/X000001/appointments/appointment/4/manage?back=/caseload/appointments/enforcement-actions',
+      'case/X000001/appointments/appointment/4/manage?back=%2Fcaseload%2Fappointments%2Fenforcement-actions',
     )
   })
 
   it('should render the page with a message saying there are no results', () => {
-    cy.task('stubNoEnforcementActions')
+    cy.task('stubNoEnforcementContacts')
     cy.visit('/caseload/appointments/enforcement-actions')
     const page = new EnforcementActionsPage()
 

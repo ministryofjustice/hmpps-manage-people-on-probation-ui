@@ -237,6 +237,7 @@ export default class MasApiClient extends RestClient {
       path: `/schedule/${crn}/${type}${queryParameters}`,
       handle404: false,
     })) as Schedule
+
     return mapScheduleWithApprovedContactDisplayNames(schedule)
   }
 
@@ -252,7 +253,7 @@ export default class MasApiClient extends RestClient {
       size,
       page,
       filterDueDate: 'true',
-    }).toString()}${sortQuery ? filterQuery : ''}`
+    }).toString()}&${sortQuery ? filterQuery : ''}`
 
     const enforcementContacts = (await this.get({
       path: `/contact/${username}/enforcements${queryParameters}`,

@@ -98,6 +98,7 @@ describe('enforcementAction controller', () => {
         enforcementContacts: mockResponse,
         sortByOrder: expectedSortByOrder,
         sortUrl: '/caseload/my-enforcement-actions',
+        sortUrlEncoded: '%2Fcaseload%2Fmy-enforcement-actions',
         pagination: getPaginationLinks(
           1,
           mockResponse.totalPages,
@@ -182,6 +183,50 @@ describe('enforcementAction controller', () => {
           expect.anything(),
         )
       })
+    })
+
+    it('should render enforcement actions page with empty results', async () => {
+      const emptyResponse = {
+        size: 25,
+        page: 0,
+        totalResults: 0,
+        totalPages: 0,
+        enforcementContacts: [],
+      } as unknown as EnforcementContactsResponse
+
+      jest
+        .spyOn(MasApiClient.prototype, 'getEnforcementContacts')
+        .mockImplementationOnce(() => Promise.resolve(emptyResponse))
+
+      const req = httpMocks.createRequest({
+        query: { page: '1' },
+        url: '/caseload/my-enforcement-actions',
+        session: { backLink: null },
+      })
+
+      await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/my-enforcement-actions',
+        expect.objectContaining({
+          enforcementContacts: emptyResponse,
+        }),
+      )
+    })
+
+    it('should handle API errors gracefully', async () => {
+      const error = new Error('API call failed')
+      jest.spyOn(MasApiClient.prototype, 'getEnforcementContacts').mockImplementationOnce(() => Promise.reject(error))
+
+      const req = httpMocks.createRequest({
+        query: { page: '1' },
+        url: '/caseload/my-enforcement-actions',
+        session: { backLink: null },
+      })
+
+      await expect(controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)).rejects.toThrow(
+        'API call failed',
+      )
     })
   })
 })

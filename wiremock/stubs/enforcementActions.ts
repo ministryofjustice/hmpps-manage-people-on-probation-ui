@@ -24,14 +24,14 @@ const getStub = (): WiremockMapping => {
       middleName: '',
       surname: 'Schmeler',
     },
-    enforcementActions: [],
+    enforcementContacts: [],
   }
 
   return mapping
 }
 
-const stubNoEnforcementActions = (): SuperAgentRequest => {
+const stubNoEnforcementContacts = (): SuperAgentRequest => {
   return superagent.post('http://localhost:9091/__admin/mappings').send(getStub())
 }
 
-export default { stubNoEnforcementActions }
+export default { stubNoEnforcementContacts }

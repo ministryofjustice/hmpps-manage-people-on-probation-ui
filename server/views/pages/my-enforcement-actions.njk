@@ -59,13 +59,12 @@
             {% set row = [
                 { 
                     classes: "nowrap",
-                    html: '<a class="govuk-!-font-weight-bold" href="/case/' + enforcement.crn + '">' + fullName + '</a>
-                    <br><span class="govuk-!-font-weight-bold secondary-text">' + enforcement.crn + '</span>', 
+                    html: '<a class="govuk-!-font-weight-bold" href="/case/' + enforcement.crn + '">' + fullName + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + enforcement.crn + '</span>',
                     attributes: { 'data-sort-value': enforcement.caseName.surname }
                 },
                 {
                     classes: "nowrap",
-                    html: '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '">' + enforcement.appointmentType + '</a>' + "<br><span class='secondary-text'> " + enforcement.appointmentDate + "</span>",
+                    html: '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '">' + enforcement.appointmentType + '</a>' + "<br><span class='secondary-text'> " + (enforcement.appointmentDate | dateWithYearShortMonth) + "</span>",
                     attributes: { "data-sort-value": enforcement.appointmentType }
                 },
                 {
@@ -86,9 +85,9 @@
                 },
                 {
                     classes: "nowrap",
-                    html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', enforcement.crn, enforcement.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius</a>' if enforcement.deliusManaged
+                    html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', enforcement.crn, enforcement.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>' if enforcement.deliusManaged
                     else 
-                    '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '" rel="external noopener noreferrer">Manage</a>'
+                    '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrlEncoded + '" rel="external noopener noreferrer">Manage</a>'
                 }
             ] %}
 

@@ -16,6 +16,9 @@ const directions = {
 type ColName = (typeof colNames)[number]
 type SortDir = 'asc' | 'desc'
 
+const isValidColName = (value: string): value is ColName => colNames.includes(value as any)
+const isValidDir = (value: string): value is SortDir => value === 'asc' || value === 'desc'
+
 const enforcementContactsController: Controller<typeof routes, void> = {
   getAllEnforcementContacts: hmppsAuthClient => {
     return async (req, res) => {
@@ -24,13 +27,25 @@ const enforcementContactsController: Controller<typeof routes, void> = {
       const { sortBy = '' } = query as Record<string, string>
 
       const pageNum: number = query.page ? Number.parseInt(query.page as string, 10) : 1
-      const [name, dir] = sortBy.split('.') as [ColName, SortDir]
+
+      // Validate sort parameters - only allow values in colNames and asc|desc
+      let name: ColName | '' = ''
+      let dir: SortDir | '' = ''
+
+      if (sortBy) {
+        const [rawName, rawDir] = sortBy.split('.')
+        // Only allow column names from colNames and directions asc|desc
+        if (isValidColName(rawName) && isValidDir(rawDir)) {
+          name = rawName
+          dir = rawDir
+        }
+      }
 
       const cols = colNames
 
       const sortByOrder = cols.reduce((acc, colName) => {
         const defaultSort = 'none'
-        return { ...acc, [colName]: name === colName ? directions?.[dir] || defaultSort : defaultSort }
+        return { ...acc, [colName]: name === colName && dir ? directions[dir as SortDir] : defaultSort }
       }, {})
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
@@ -46,7 +61,8 @@ const enforcementContactsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const sortUrl = url.split('?')[0]
+      const sortUrl = req.url.split('?')[0]
+      const sortUrlEncoded = encodeURIComponent(req.url)
 
       const enforcementContacts = await masClient.getEnforcementContacts(
         user.username,
@@ -68,6 +84,7 @@ const enforcementContactsController: Controller<typeof routes, void> = {
         enforcementContacts,
         sortByOrder,
         sortUrl,
+        sortUrlEncoded,
         pagination,
         backLink: session.backLink,
       })
