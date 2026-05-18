@@ -2,8 +2,7 @@ import { Request, Response } from 'express'
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
-import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentPatch } from '../models/Appointments'
-import { getDataValue, handleQuotes } from '../utils'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
@@ -39,26 +38,23 @@ type EnforcementRedirectMap = {
   [K in AppointmentEnforcementAction]?: string
 }
 
-const enforcementActionRedirects = (req: Request, res: Response): void => {
-  const { data } = req.session
-  const { crn, id, baseOutcomeUrl } = res.locals.appointmentOutcome
-  const enforcementAction = getDataValue<AppointmentEnforcementAction>(data, [
-    'appointments',
-    crn,
-    id,
-    'outcome',
-    'enforcementAction',
-  ])
+const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, req: Request, res: Response): void => {
+  const { baseOutcomeUrl, appointmentSession, reqUrl } = res.locals.appointmentOutcome
+  const enforcementAction = appointmentSession?.outcome?.[pageKey] as AppointmentEnforcementAction
+  // const isUpdateAction = reqUrl?.includes('/update-enforcement-action')
   const redirectMap: EnforcementRedirectMap = {
     SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
-    INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-    INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-    DECISION_PENDING: `${baseOutcomeUrl}/add-note`,
-    REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
-    NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
+    SEND_ANOTHER_LETTER: `${baseOutcomeUrl}/send-letter`,
+    BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+    BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
     DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
   }
-  return res.redirect(redirectMap[enforcementAction])
+  // if (!isUpdateAction) {
+  //   redirectMap.BREACH_RECALL_INITIATED = `${baseOutcomeUrl}/initiate-breach-or-recall`
+  //   redirectMap.BREACH_RECALL_INITIATED_AND_SEND_LETTER = `${baseOutcomeUrl}/initiate-breach-or-recall`
+  // }
+  const redirect = redirectMap?.[enforcementAction] || `${baseOutcomeUrl}/add-note`
+  return res.redirect(redirect)
 }
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
@@ -69,12 +65,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId, isValidParams, baseOutcomeUrl, id } = res.locals.appointmentOutcome
+      const { crn, contactId, isValidParams, baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
-      const { data } = req.session
-      const type = getDataValue<AppointmentOutcomeType>(data, ['appointments', crn, id, 'outcome', 'type'])
+      const outcomeType = appointmentSession?.outcome?.outcomeType
       const redirectMap: OutcomeRedirectMap = {
         ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
         ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
@@ -85,7 +80,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
-      return res.redirect(redirectMap[type])
+      return res.redirect(redirectMap[outcomeType])
     }
   },
   getAddNote: () => {
@@ -121,29 +116,17 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, contactId, uuid, appointmentSession } = res.locals.appointmentOutcome
+      const { crn, isValidParams, id, uuid } = res.locals.appointmentOutcome
+      const { change } = req.query as Record<string, string>
+      const { notes, sensitive } = req.body
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
-      // if not manage journey, redirect to CYA page
-      if (uuid) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
-      }
-      // if manage journey, patch appointment then redirect to manage page
-      const { notes, sensitivity } = appointmentSession
-      const sensitive = sensitivity === 'Yes'
       const file = req.file as Express.Multer.File
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const body: AppointmentPatch = {
-        id: parseInt(contactId, 10),
-        notes: handleQuotes(notes),
-        sensitive,
-        outcomeRecorded: true,
-      }
-      await masClient.patchAppointment(body)
       if (file) {
-        const patchResponse = await masClient.patchDocuments(crn, contactId, file)
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        const patchResponse = await masClient.patchDocuments(crn, id, file)
         if (!isSuccessfulUpload(patchResponse)) {
           return res.render('pages/appointment-outcomes/add-note', {
             uploadError: 'File not uploaded. Please try again.',
@@ -153,15 +136,16 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
           })
         }
       }
-      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
+      const redirect = uuid
+        ? `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+        : `/case/${crn}/appointments/appointment/${id}/check-your-answers`
+      return res.redirect(change ?? redirect)
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => {
     return async (_req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
   },
-  postAttendedFailedToComply: () => {
-    return async (req, res) => enforcementActionRedirects(req, res)
-  },
+  postAttendedFailedToComply: () => async (req, res) => enforcementActionRedirects('attendedFailedToComply', req, res),
   getAcceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
   },
@@ -174,15 +158,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   getUnacceptableAbsence: () => {
     return async (_req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')
   },
-  postUnacceptableAbsence: () => {
-    return async (req, res) => enforcementActionRedirects(req, res)
-  },
+  postUnacceptableAbsence: () => async (req, res) => enforcementActionRedirects('unacceptableAbsence', req, res),
   getFailedToAttend: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/failed-to-attend')
   },
-  postFailedToAttend: () => {
-    return async (req, res) => enforcementActionRedirects(req, res)
-  },
+  postFailedToAttend: () => async (req, res) => enforcementActionRedirects('failedToAttend', req, res),
   getEnforcementAction: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
   },
@@ -213,9 +193,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   getUpdateEnforcementAction: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')
   },
-  postUpdateEnforcementAction: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')
-  },
+  postUpdateEnforcementAction: () => async (req, res) =>
+    enforcementActionRedirects('updateEnforcementAction', req, res),
 }
 
 export default appointmentOutcomesController

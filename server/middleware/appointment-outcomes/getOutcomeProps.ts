@@ -64,6 +64,16 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     length: sentenceLength,
   }
 
+  const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
+  const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
+  const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction
+  const failedToAttend = appointmentSession?.outcome?.failedToAttend
+  const sendBreachOrRecallLetter = [attendedFailedToComply, unacceptableAbsence, updateEnforcementAction].some(
+    value => value === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+  )
+  const sendLetter = [attendedFailedToComply, unacceptableAbsence, failedToAttend].some(
+    value => value === 'SEND_LETTER',
+  )
   const appointmentHintText = `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
   const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
   const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
@@ -85,6 +95,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     sentence,
     isProbationPractitioner,
     appointmentHintText,
+    sendBreachOrRecallLetter,
+    sendLetter,
   }
   return next()
 }

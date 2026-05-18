@@ -10,10 +10,8 @@ import {
   completeRescheduleAppointmentPage,
   getUuid,
 } from '../appointments/utils'
-import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
-import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
 import { ExpectedOption, Journey, checkOptions } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -63,12 +61,12 @@ const loadPage = ({
   cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
   outcomePage.getSubmitBtn().click()
   attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  const action = sendLetter ? 'INITIATE_BREACH_RECALL_AND_SEND_LETTER' : 'INITIATE_BREACH_RECALL'
+  const action = sendLetter ? 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' : 'BREACH_RECALL_INITIATED'
   cy.get(`.govuk-radios__input[value=${action}]`).click()
   attendedFailedToComplyPage.getSubmitBtn().click()
 }
 
-type RedirectPages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
+type RedirectPages = AddNotePage
 
 type OptionsFor = 'BREACH_CREATED_BY' | 'LETTER_SENT_BY' | 'LETTER_TYPE'
 const getExpectedOptions = ({
@@ -101,8 +99,8 @@ const getExpectedOptions = ({
   }
   if (optionsFor === 'LETTER_TYPE') {
     expectedOptions = [
-      { value: 'LICENCE_COMPLIANCE_LETTER', text: 'Licence compliance letter' },
-      { value: 'DIFFERENT_ENFORCEMENT_LETTER', text: 'A different enforcement letter' },
+      { value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' },
+      { value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' },
     ]
   }
   return expectedOptions
