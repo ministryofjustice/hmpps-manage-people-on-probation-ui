@@ -374,6 +374,7 @@ describe('controllers/arrangeAppointment', () => {
     })
     describe('If sentence page has been completed', () => {
       beforeEach(async () => {
+        jest.clearAllMocks()
         const appointmentSession: Record<string, string> = { eventId: '49' }
         const mockReq = createMockRequest({ appointmentSession })
         mockedIsValidCrn.mockReturnValue(true)
