@@ -152,5 +152,36 @@ describe('enforcementAction controller', () => {
 
       checkSendAuditMessage(res, 'VIEW_MAS_ALL_ENFORCEMENT_ACTIONS', 'user-1', SubjectType.USER)
     })
+
+    describe('pagination', () => {
+      test.each`
+        pageNumber | pageLabel
+        ${'1'}     | ${'first page'}
+        ${'4'}     | ${'middle page'}
+        ${'8'}     | ${'last page'}
+      `('should calculate correct pagination for $pageLabel', async ({ pageNumber }) => {
+        const req = httpMocks.createRequest({
+          query: { page: pageNumber },
+          url: `/caseload/my-enforcement-actions?page=${pageNumber}`,
+          session: { backLink: null },
+        })
+
+        await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith(
+          'pages/my-enforcement-actions',
+          expect.objectContaining({
+            pagination: expect.anything(),
+          }),
+        )
+        expect(getEnforcementContactsSpy).toHaveBeenCalledWith(
+          'user-1',
+          expect.anything(),
+          '25',
+          expect.anything(),
+          expect.anything(),
+        )
+      })
+    })
   })
 })

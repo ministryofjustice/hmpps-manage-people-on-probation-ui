@@ -243,7 +243,7 @@ export default class MasApiClient extends RestClient {
   async getEnforcementContacts(
     username: string,
     page: string,
-    size: string = '10',
+    size: string = '5',
     sortQuery?: string,
     ascending?: string,
   ): Promise<EnforcementContactsResponse> {
