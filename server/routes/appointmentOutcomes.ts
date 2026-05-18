@@ -123,10 +123,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getSendLetterOptions,
   )
 
-  /* run file upload middleware and multipart parser before validation */
-
-  // router.post(`${manageBasePath}/add-note`, multerErrorHandler('fileUpload'), parseMultipartBody)
-
   /* validate outcome options and store session data on all outcome post routes */
 
   router.post(
@@ -144,8 +140,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
   router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
-
-  /* Add note routes are initiated before csrf in app file */
 
   /* Attended - failed to comply */
 
