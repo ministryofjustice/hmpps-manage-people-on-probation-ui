@@ -100,7 +100,7 @@ const stubAssignQuestions = () => {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        expectedCheckinDate: DateTime.now().plus({ days: 3 }).toISO(),
+        expectedCheckinDate: DateTime.now().plus({ days: 5 }).toISO(),
         listId: 3,
       },
     },
@@ -111,13 +111,13 @@ const stubGetUpcomingCheckinQuestions = () => {
   return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       method: 'GET',
-      urlPattern: '/v2/questions/upcoming/.+?/offender-questions\\?language=en-GB',
+      urlPattern: '/v2/questions/upcoming/.+?/offender-questions.*',
     },
     response: {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        expectedCheckinDate: DateTime.now().plus({ days: 3 }).toISO(),
+        expectedCheckinDate: DateTime.now().plus({ days: 5 }).toISO(),
         questions: [],
       },
     },
@@ -135,7 +135,7 @@ const stubGetUpcomingCheckinQuestionItems = () => {
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
         upcoming: {
-          expectedCheckinDate: DateTime.now().plus({ days: 3 }).toISO(),
+          expectedCheckinDate: DateTime.now().plus({ days: 5 }).toISO(),
           items: [],
         },
       },

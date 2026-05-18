@@ -40,7 +40,7 @@
 {% block pageContent %}
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
       {% if flags.enableESupervisionCustomQuestions === true %}
-          {% set checkinLabel = 'Next check in due' %}
+          {% set checkinLabel = 'Next check in' %}
           {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
               {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
           {% else %}

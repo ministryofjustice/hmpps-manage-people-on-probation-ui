@@ -866,6 +866,7 @@ context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -888,6 +889,7 @@ context('check-ins overview and manage pages', () => {
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -907,6 +909,7 @@ context('check-ins overview and manage pages', () => {
   it('should show checkin details', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
     appointmentsPage.checkOnPage()
@@ -929,7 +932,7 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
-    manageCheckins.getElementData('nextCheckinDueLabel').should('contain.text', 'Next check in due')
+    manageCheckins.getElementData('nextCheckinDueLabel').should('contain.text', 'Next check in')
     const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
     manageCheckins.getElementData('nextCheckInValue').should('contain.text', expectedDate)
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')

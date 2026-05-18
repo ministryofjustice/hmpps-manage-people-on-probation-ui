@@ -30,7 +30,7 @@ import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
 import {
   ESupervisionCheckIn,
-  EsupervisionUpcomingQuestionItemsResponse,
+  EsupervisionUpcomingQuestionsResponse,
   OffenderCheckinsByCRNResponse,
 } from '../data/model/esupervision'
 
@@ -148,7 +148,7 @@ interface Locals {
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
-  upcomingCheckin?: EsupervisionUpcomingQuestionItemsResponse
+  upcomingCheckin?: EsupervisionUpcomingQuestionsResponse
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
