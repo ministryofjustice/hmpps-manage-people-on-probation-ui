@@ -48,8 +48,17 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the task name', () => {
           manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
-        it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+        it('should display a link to arrange next appointment', () => {
+          manageAppointmentPage
+            .getTaskLink(index)
+            .should('contain.text', name)
+            .should(
+              'have.attr',
+              'href',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
+            )
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
@@ -135,8 +144,17 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the task name', () => {
           manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
-        it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+        it('should display a link to arrange next appointment', () => {
+          manageAppointmentPage
+            .getTaskLink(index)
+            .should('contain.text', name)
+            .should(
+              'have.attr',
+              'href',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
+            )
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
@@ -212,8 +230,17 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the task name', () => {
           manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
-        it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+        it('should display a link to arrange next appointment', () => {
+          manageAppointmentPage
+            .getTaskLink(index)
+            .should('contain.text', name)
+            .should(
+              'have.attr',
+              'href',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
+            )
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
@@ -237,8 +264,17 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the task name', () => {
           manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
-        it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+        it('should display a link to arrange next appointment', () => {
+          manageAppointmentPage
+            .getTaskLink(index)
+            .should('contain.text', name)
+            .should(
+              'have.attr',
+              'href',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
+            )
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
@@ -305,8 +341,17 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the task name', () => {
           manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
-        it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+        it('should display a link to arrange next appointment', () => {
+          manageAppointmentPage
+            .getTaskLink(index)
+            .should('contain.text', name)
+            .should(
+              'have.attr',
+              'href',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
+            )
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
@@ -346,8 +391,17 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the task name', () => {
           manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
-        it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+        it('should display a link to arrange next appointment', () => {
+          manageAppointmentPage
+            .getTaskLink(index)
+            .should('contain.text', name)
+            .should(
+              'have.attr',
+              'href',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
+            )
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
