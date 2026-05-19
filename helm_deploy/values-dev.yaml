@@ -32,6 +32,15 @@ generic-service:
         ctl:ruleRemoveTargetById=942131;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
       
+      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/arrange-appointment/[^/]+/add-note$" \
+        "id:100107,phase:1,pass,nolog,\
+        ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
+        ctl:ruleRemoveTargetById=942430;ARGS,\
+        ctl:ruleRemoveTargetById=942200;ARGS,\
+        ctl:ruleRemoveTargetById=942360;ARGS,\
+        ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942370;ARGS"
+  
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/arrange-appointment/[^/]+/supporting-information$" \
         "id:100104,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
