@@ -24,7 +24,7 @@ export default class ManageAppointmentPage extends Page {
 
   getTaskName = (rowIndex: number) => {
     return cy.get(
-      `[data-qa="appointmentActions"] li:nth-child(${rowIndex}) .govuk-task-list__name-and-hint div:nth-child(1)`,
+      `[data-qa="appointmentActions"] li:nth-child(${rowIndex}) .govuk-task-list__name-and-hint :nth-child(1)`,
     )
   }
 
