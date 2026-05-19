@@ -1,37 +1,41 @@
 import { Route } from '../../@types'
-import { EnforcementActionLetterTypeOption } from '../../models/Appointments'
-import { letterSentByOptions, letterTypeOptions } from '../../properties/appointment-outcomes'
+import { EnforcementActionLetterType } from '../../models/Appointments'
+import { Option } from '../../models/Option'
+import { letterSentByOptions, letterTypeOptions as _letterTypeOptions } from '../../properties/appointment-outcomes'
+import { validEnforcementActionOptions } from '../../utils'
 
 export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   const {
     sentence: { type: sentenceType },
-    appointmentSession: {
-      outcome: { enforcementAction },
-    },
+    sendLetter,
+    sendBreachOrRecallLetter,
+    appointmentSession,
   } = res.locals.appointmentOutcome
 
-  let filteredLetterTypeOptions: EnforcementActionLetterTypeOption[]
+  let filteredLetterTypeOptions: Option<EnforcementActionLetterType>[]
 
-  if (
-    enforcementAction === 'INITIATE_BREACH_RECALL_AND_SEND_LETTER' ||
-    (enforcementAction === 'SEND_LETTER' && sentenceType === 'CUSTODY')
-  ) {
-    filteredLetterTypeOptions = letterTypeOptions.filter(typeOption =>
-      ['LICENCE_COMPLIANCE_LETTER', 'DIFFERENT_ENFORCEMENT_LETTER'].includes(typeOption.value),
+  const letterTypeOptions = validEnforcementActionOptions<EnforcementActionLetterType>(
+    appointmentSession.outcome.contactEnforcementActions,
+    _letterTypeOptions,
+  )
+
+  if (sendBreachOrRecallLetter || (sendLetter && sentenceType === 'CUSTODY')) {
+    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
+      ['LICENCE_COMPLIANCE_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
     )
   }
-  if (enforcementAction === 'SEND_LETTER' && sentenceType === 'COMMUNITY') {
-    filteredLetterTypeOptions = letterTypeOptions.filter(typeOption =>
-      ['FIRST_WARNING_LETTER', 'BREACH_WARNING_LETTER', 'DIFFERENT_ENFORCEMENT_LETTER'].includes(typeOption.value),
+  if (sendLetter && sentenceType === 'COMMUNITY') {
+    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
+      ['FIRST_WARNING_LETTER_SENT', 'BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
     )
   }
-  if (enforcementAction === 'SEND_LETTER' && ['PSS', 'YOUTH_CUSTODY'].includes(sentenceType)) {
-    filteredLetterTypeOptions = letterTypeOptions.filter(typeOption =>
+  if (sendLetter && ['PSS', 'YOUTH_CUSTODY'].includes(sentenceType)) {
+    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
       [
-        'FIRST_WARNING_LETTER',
-        'SECOND_WARNING_LETTER',
-        'BREACH_WARNING_LETTER',
-        'DIFFERENT_ENFORCEMENT_LETTER',
+        'FIRST_WARNING_LETTER_SENT',
+        'SECOND_WARNING_LETTER_SENT',
+        'BREACH_LETTER_SENT',
+        'OTHER_ENFORCEMENT_LETTER_SENT',
       ].includes(typeOption.value),
     )
   }

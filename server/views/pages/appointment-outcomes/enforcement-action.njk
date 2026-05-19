@@ -1,6 +1,15 @@
 {% extends "../_form.njk" %}
 {% set backLink = appointmentOutcome.backLink %}
-
+{% block afterHeading %}
+  {% if appointmentOutcome.currentEnforcementAction %}
+    {{ govukInsetText({
+  html: "The current enforcement status is: " + govukTag({
+          text: appointmentOutcome.currentEnforcementAction.text,
+          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
+        })
+}) }}
+  {% endif %}
+{% endblock %}
 {% block form %}
   {{ govukSelect({
   label: {
@@ -9,5 +18,5 @@
     attributes: { 'data-qa': 'pageHeading' }
   },
   items: appointmentOutcome.options
- } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+ } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'otherEnforcementAction'])) }}
 {% endblock %}

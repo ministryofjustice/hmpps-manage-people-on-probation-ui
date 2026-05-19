@@ -3,6 +3,7 @@ import { getBackLink } from './getBackLink'
 import { AppointmentOutcomeType } from '../../models/Appointments'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 import { getDataValue } from '../../utils'
+import { Activity } from '../../data/model/schedule'
 
 const nextSpy = jest.fn()
 const crn = 'X000001'
@@ -26,12 +27,12 @@ jest.mock('../../utils', () => {
 
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
-const appointment = (id: string, type: AppointmentOutcomeType) => ({
+const appointment = (id: string, outcomeType: AppointmentOutcomeType) => ({
   appointments: {
     [crn]: {
       [id]: {
         outcome: {
-          type,
+          outcomeType,
         },
       },
     },
@@ -57,7 +58,7 @@ const mockReq = ({
   return httpMocks.createRequest(req)
 }
 
-const mockRes = (appointmentOutcome: Partial<AppointmentOutcomeProps> = {}): httpMocks.MockResponse<any> => {
+const mockRes = (appointmentOutcome: Partial<AppointmentOutcomeProps<Activity>> = {}): httpMocks.MockResponse<any> => {
   const res = {
     locals: {
       appointmentOutcome: {

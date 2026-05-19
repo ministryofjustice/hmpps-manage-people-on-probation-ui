@@ -21,5 +21,6 @@ export class FeatureFlags {
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
+  enableShowNextCheckinDate?: boolean = undefined
   enableStopCheckinSensitiveFlag?: boolean = undefined
 }
