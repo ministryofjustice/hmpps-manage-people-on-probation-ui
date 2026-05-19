@@ -1,12 +1,16 @@
 {% extends "../_form.njk" %}
-{% set title = "Set up  online check ins" %}
+{% set title = "Set up online check ins" %}
 {% set backLink = backLink %}
-{% set radioLabel =  "How often would you like "+ case.name.forename + " to check in?" %}
+{% set radioLabel = "How often would you like " + case.name.forename + " to check in?" %}
 
 {% block form %}
     <input type="hidden" name="checkInMinDate" value="{{checkInMinDate}}">
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-1" >When would you like {{case.name.forename}} to complete their first online <br/> check in?</h3>
     {{ mojDatePicker({
+        name: "date",
+        label: {
+            text: "When would you like " + case.name.forename + " to complete their first online check in?",
+            classes: "govuk-label--s govuk-!-margin-bottom-3"
+        },
         hint: {
             text: "They will get a notification to use online check ins from this date."
         },
@@ -22,7 +26,7 @@
     {{ govukRadios({
         fieldset: {
             legend: {
-                text: radioLabel ,
+                text: radioLabel,
                 classes: "govuk-label--m govuk-!-font-weight-bold"
             }
         },

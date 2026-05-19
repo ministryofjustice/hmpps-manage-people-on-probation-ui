@@ -1307,17 +1307,24 @@ describe('checkInsController', () => {
   })
 
   describe('getViewCheckIn', () => {
-    it('redirect if checkIn not reviewed', async () => {
+    it('redirect to update page if checkIn not reviewed', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       const resReview = reviewRes('SUBMITTED')
-      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      const renderReviewSpy = jest.spyOn(resReview, 'render')
       await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
 
-      expect(reviewRedirectSpy).toHaveBeenCalledWith(
-        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      expect(renderReviewSpy).toHaveBeenCalledWith(
+        'pages/check-in/update.njk',
+        expect.objectContaining({
+          crn: req.params.crn,
+          id: req.params.id,
+          back: req.query.back,
+          checkIn: resReview.locals.checkIn,
+          systemIdCheckPass: expect.anything(),
+        }),
       )
     })
 
@@ -2627,20 +2634,22 @@ describe('checkInsController', () => {
           [crn]: {
             [uuid]: {
               manageCheckin: {
-                stopCheckin: 'YES',
-                reason: 'Reason for stopping check in',
+                stopCheckinReason: 'Reason for stopping check in',
+                stopCheckinSensitive: 'true',
               },
             },
           },
         },
       }
       const req = baseReq(data)
+      res.locals.flags = { enableStopCheckinSensitiveFlag: true }
       await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
 
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')
       expect(postDeactivateOffender).toHaveBeenCalledWith(uuid, {
         requestedBy: 'testuser',
         reason: 'Reason for stopping check in',
+        sensitive: true,
       })
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
     })

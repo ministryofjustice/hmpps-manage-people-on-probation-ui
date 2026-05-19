@@ -1,4 +1,5 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { DateTime } from 'luxon'
 import { esupervisionAdditionalQuestions } from '../../server/controllers/mocks/esupervisionAdditionalQuestions'
 
 const stubOffenderSetup500Response = (): SuperAgentRequest =>
@@ -99,7 +100,7 @@ const stubAssignQuestions = () => {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        expectedCheckinDate: DateTime.now().plus({ days: 5 }).toISO(),
         listId: 3,
       },
     },
@@ -110,13 +111,13 @@ const stubGetUpcomingCheckinQuestions = () => {
   return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       method: 'GET',
-      urlPattern: '/v2/questions/upcoming/.+?/offender-questions\\?language=en-GB',
+      urlPattern: '/v2/questions/upcoming/.+?/offender-questions.*',
     },
     response: {
       status: 200,
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
-        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        expectedCheckinDate: DateTime.now().plus({ days: 5 }).toISO(),
         questions: [],
       },
     },
@@ -134,7 +135,7 @@ const stubGetUpcomingCheckinQuestionItems = () => {
       headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       jsonBody: {
         upcoming: {
-          expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+          expectedCheckinDate: DateTime.now().plus({ days: 5 }).toISO(),
           items: [],
         },
       },

@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { isBlank } from './isBlank'
 
-export const toIsoDateFromPicker = (datetimeString: string): string => {
+export const toIsoDateFromPicker = (datetimeString?: string): string | null => {
   if (!datetimeString || isBlank(datetimeString)) return null
   const converted = DateTime.fromFormat(datetimeString, 'd/M/yyyy').toFormat('yyyy-MM-dd')
   if (converted === 'Invalid DateTime') {
@@ -10,7 +10,7 @@ export const toIsoDateFromPicker = (datetimeString: string): string => {
   return converted
 }
 
-export const toIsoDateTimeFromPicker = (datetimeString: string): string => {
+export const toIsoDateTimeFromPicker = (datetimeString?: string): string | null => {
   if (!datetimeString || isBlank(datetimeString)) return null
 
   const converted = DateTime.fromFormat(datetimeString, 'd/M/yyyy').toFormat('yyyy-MM-dd')

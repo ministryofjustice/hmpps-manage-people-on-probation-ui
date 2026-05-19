@@ -2,7 +2,7 @@ import { Response } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
-import { ContactOutcomesResponse, PersonAppointment, Schedule } from './model/schedule'
+import { ContactOutcomesResponse, EnforcementContactsResponse, PersonAppointment, Schedule } from './model/schedule'
 import {
   AddressOverview,
   AddressOverviewSummary,
@@ -13,8 +13,8 @@ import {
   PersonalDetailsMainAddress,
   PersonalDetailsUpdateRequest,
   PersonSummary,
-  ProvisionOverview,
   ProfessionalContact,
+  ProvisionOverview,
 } from './model/personalDetails'
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
@@ -49,6 +49,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 import { ErrorSummary } from './model/common'
 import {
+  mapEnforcementContactsWithApprovedContactDisplayNames,
   mapPersonActivityWithApprovedContactDisplayNames,
   mapPersonAppointmentWithApprovedContactDisplayNames,
   mapScheduleWithApprovedContactDisplayNames,
@@ -236,11 +237,35 @@ export default class MasApiClient extends RestClient {
 
   async getPersonSchedule(crn: string, type: string, page: string, sortQuery?: string): Promise<Schedule> {
     const queryParameters = `?${new URLSearchParams({ size: '10', page }).toString()}${sortQuery ?? ''}`
+
     const schedule = (await this.get({
       path: `/schedule/${crn}/${type}${queryParameters}`,
       handle404: false,
     })) as Schedule
+
     return mapScheduleWithApprovedContactDisplayNames(schedule)
+  }
+
+  async getEnforcementContacts(
+    username: string,
+    page: string,
+    size: string = '5',
+    sortQuery?: string,
+    ascending?: string,
+  ): Promise<EnforcementContactsResponse> {
+    const filterQuery = `${sortQuery}=${ascending}`
+    const queryParameters = `?${new URLSearchParams({
+      size,
+      page,
+      filterDueDate: 'true',
+    }).toString()}&${sortQuery ? filterQuery : ''}`
+
+    const enforcementContacts = (await this.get({
+      path: `/contact/${username}/enforcements${queryParameters}`,
+      handle404: false,
+    })) as EnforcementContactsResponse
+
+    return mapEnforcementContactsWithApprovedContactDisplayNames(enforcementContacts)
   }
 
   async getPersonAppointment(crn: string, appointmentId: string): Promise<PersonAppointment | null> {

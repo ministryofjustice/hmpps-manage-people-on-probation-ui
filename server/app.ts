@@ -3,7 +3,6 @@ import express, { Router } from 'express'
 import createError from 'http-errors'
 
 import * as Sentry from '@sentry/node'
-// @ts-expect-error Import untyped middleware for cypress coverage
 import cypressCoverage from '@cypress/code-coverage/middleware/express'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'

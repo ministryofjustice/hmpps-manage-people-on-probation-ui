@@ -2,6 +2,7 @@ import CaseSearchService from '@ministryofjustice/probation-search-frontend/serv
 import { getPdu, getManagedBy, services } from './index'
 import config from '../config'
 import { dataAccess } from '../data'
+import auth from '../authentication/auth'
 
 jest.mock('../config', () => ({
   env: 'test-env',
@@ -186,8 +187,10 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
 
     it('should initialize CaseSearchService with correct parameters', () => {
       const hmppsAuthClient = {}
+      const authClientSearch = {}
       dataAccessMock.mockReturnValue({
         hmppsAuthClient,
+        authClientSearch,
         applicationInfo: {},
         manageUsersApiClient: {},
         probationFrontendComponentsApiClient: {},
@@ -197,7 +200,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
       const result = services()
 
       expect(CaseSearchServiceMock).toHaveBeenCalledWith({
-        oauthClient: hmppsAuthClient,
+        hmppsAuthClient: authClientSearch,
         environment: config.env,
         extraColumns: [
           {
@@ -214,7 +217,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
       expect(result.searchServiceWithoutExtraColumns).toBeInstanceOf(CaseSearchService)
 
       expect(CaseSearchServiceMock).toHaveBeenCalledWith({
-        oauthClient: hmppsAuthClient,
+        hmppsAuthClient: authClientSearch,
         environment: config.env,
         extraColumns: [],
       })

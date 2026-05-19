@@ -163,6 +163,10 @@
             {% endif %}
         </dl>
 
+   </div>
+</div>
+<div class="govuk-grid-row">
+   <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">What action are you taking after reviewing this check in? (optional)</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
@@ -172,6 +176,33 @@
                     attributes: { "data-qa": "notes"}
                 }
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'furtherActions'])) }}
+
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: 'Does this online check in include sensitive information?',
+                        classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
+                    }
+                },
+                hint: {
+                    text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'sensitiveContact'
+                    }
+                },
+                items: [
+                    {
+                        value: true,
+                        text: "Yes, it includes sensitive information"
+                    },
+                    {
+                        value: false,
+                        text: "No, it is not sensitive"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'sensitiveContact'])) }}
 
             <h2 class="govuk-heading-m">Did this information help you to manage their risk? (optional)</h2>
             {{ govukRadios({

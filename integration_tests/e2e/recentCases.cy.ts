@@ -2,6 +2,18 @@ import Page from '../pages/page'
 import RecentCasesPage from '../pages/recentCases'
 
 context('Recent Cases', () => {
+  it('Recent cases when localStorage is empty', () => {
+    cy.visit('/recent-cases', {
+      onBeforeLoad(win) {
+        win.localStorage.removeItem('recentCases')
+      },
+    })
+
+    Page.verifyOnPage(RecentCasesPage)
+
+    cy.get('#recent-cases-none').should('be.visible')
+    cy.get('#recent-cases-table').should('not.be.visible')
+  })
   it('Recent Cases page is rendered', () => {
     cy.visit('/recent-cases', {
       onBeforeLoad(win) {
@@ -72,5 +84,17 @@ context('Recent Cases', () => {
         .eq(1)
         .within(() => cy.get('td').eq(3).should('contain.text', 'Restricted')),
     )
+  })
+  it('Recent cases localStorage is invalid JSON', () => {
+    cy.visit('/recent-cases', {
+      onBeforeLoad(win) {
+        win.localStorage.setItem('recentCases', 'not-valid-json')
+      },
+    })
+
+    Page.verifyOnPage(RecentCasesPage)
+
+    cy.get('#recent-cases-none').should('be.visible')
+    cy.get('#recent-cases-table').should('not.be.visible')
   })
 })

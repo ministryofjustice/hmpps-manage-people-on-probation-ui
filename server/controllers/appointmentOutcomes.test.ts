@@ -346,7 +346,6 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
     })
   })
-
   describe('getFailedToAttend', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -356,7 +355,6 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
     })
   })
-
   describe('getEnforcementAction', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -366,7 +364,6 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/enforcement-action')
     })
   })
-
   describe('getInitiateBreachOrRecall', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
@@ -376,7 +373,6 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/initiate-breach-or-recall')
     })
   })
-
   describe('getUpdateEnforcementAction', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
