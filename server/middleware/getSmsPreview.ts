@@ -8,7 +8,7 @@ import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
 
-const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC'])
+const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC', 'CHVS', 'CODC'])
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
