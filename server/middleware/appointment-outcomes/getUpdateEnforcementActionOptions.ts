@@ -92,7 +92,9 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   }
 
   values = [...values, 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
-  options = options.filter(option => values.includes(option.value as AppointmentEnforcementAction) || option?.divider)
+  options = options
+    .filter(option => values.includes(option.value as AppointmentEnforcementAction) || option?.divider)
+    .filter(option => option.value !== currentEnforcementAction?.action)
   res.locals.appointmentOutcome.options = options
   return next()
 }

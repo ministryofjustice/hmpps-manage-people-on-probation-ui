@@ -386,6 +386,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (nextAppointment !== 'NO') {
         return cloneAppointmentAndRedirect(appointmentSession, nextAppointment)(req, res)
       }
+      if (res.locals.flags?.enableNonCompliance && req.url.includes('/outcome/next-appointment')) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
+      }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
   },

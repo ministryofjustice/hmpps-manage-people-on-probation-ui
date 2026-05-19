@@ -12,6 +12,8 @@ import {
   redirectWizard,
   getPersonalDetails,
   getNextComAppointment,
+  getAppointment,
+  getUserProviders,
 } from '../middleware'
 
 import {
@@ -231,6 +233,18 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
   router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
   router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+
+  router.all(
+    `${manageBasePath}/next-appointment`,
+    getPersonAppointment(hmppsAuthClient),
+    getSentences(hmppsAuthClient),
+    getNextComAppointment(hmppsAuthClient),
+    getAppointmentTypes(hmppsAuthClient),
+    getUserProviders(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
+  router.get(`${manageBasePath}/next-appointment`, controllers.appointments.getNextAppointment(hmppsAuthClient))
+  router.post(`${manageBasePath}/next-appointment`, controllers.appointments.postNextAppointment(hmppsAuthClient))
 
   router.get(
     [`${manageBasePath}/check-your-answers`],

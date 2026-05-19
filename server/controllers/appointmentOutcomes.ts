@@ -40,7 +40,7 @@ type EnforcementRedirectMap = {
 }
 
 const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, req: Request, res: Response): void => {
-  const { baseOutcomeUrl, appointmentSession, reqUrl } = res.locals.appointmentOutcome
+  const { baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
   const { change } = req.query
   const enforcementAction = appointmentSession?.outcome?.[pageKey] as AppointmentEnforcementAction
   // const isUpdateAction = reqUrl?.includes('/update-enforcement-action')
@@ -138,13 +138,16 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       const path = contactId ? baseOutcomeUrl : `/case/${crn}/arrange-appointment/${id}`
       let redirect = `${path}/check-your-answers`
       if (isInPast && contactId) {
-        redirect = `/case/${crn}/appointments/appointment/${contactId}/next-appointment`
+        redirect = `${path}/next-appointment`
       }
       return res.redirect(change ?? redirect)
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {
-    return async (_req, res) => res.render('pages/appointment-outcomes/check-your-answers')
+    return async (req, res) => {
+      const url = encodeURIComponent(req.url)
+      return res.render('pages/appointment-outcomes/check-your-answers', { url })
+    }
   },
   postCheckYourAnswers: _hmppsAuthClient => {
     return async (_req, res) => {

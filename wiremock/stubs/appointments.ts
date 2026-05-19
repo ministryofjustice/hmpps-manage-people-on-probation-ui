@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import superagent, { SuperAgentRequest } from 'superagent'
 import { WiremockMapping } from '../../integration_tests/utils'
+import { PersonAppointmentEnforcementAction } from '../../server/data/model/schedule'
 
 interface Args {
   isFuture?: boolean
@@ -18,6 +19,7 @@ interface Args {
   eventId?: number
   noType?: boolean
   noAttendee?: boolean
+  wasAbsent?: boolean
   noLocation?: boolean
   createNext?: boolean
   startDateTime?: string
@@ -28,6 +30,8 @@ interface Args {
   enforcementActionResponseByDate?: string
   action?: string
   contactType?: string
+  rescheduled?: boolean
+  enforcementAction?: PersonAppointmentEnforcementAction
 }
 
 const getAppointmentStub = (
@@ -54,9 +58,11 @@ const getAppointmentStub = (
     outcome = '',
     inOffice = true,
     contactId = '6',
-    enforcementActionResponseByDate = '2024-04-21',
     action = '',
     contactType = undefined,
+    rescheduled = false,
+    enforcementAction = null,
+    wasAbsent = false,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -86,7 +92,7 @@ const getAppointmentStub = (
           appointmentNote: null,
           isSensitive,
           hasOutcome: false,
-          wasAbsent: true,
+          wasAbsent,
           officer: {
             code: '',
             name: {
@@ -112,20 +118,10 @@ const getAppointmentStub = (
             ldu: '',
             telephoneNumber: '',
           },
-          rescheduled: true,
-          rescheduledStaff: true,
-          rescheduledPop: true,
+          rescheduled,
           didTheyComply: undefined,
           absentWaitingEvidence: true,
-          enforcementAction: {
-            responseByDate: enforcementActionResponseByDate,
-          },
           rearrangeOrCancelReason: '',
-          rescheduledBy: {
-            forename: '',
-            middleName: '',
-            surname: '',
-          },
           repeating: true,
           nonComplianceReason: '',
           documents: [],
@@ -161,6 +157,8 @@ const getAppointmentStub = (
           },
           nsiId: 0,
         },
+        documents,
+        enforcementAction,
       },
       headers: {
         'Content-Type': 'application/json',
@@ -187,6 +185,16 @@ const getAppointmentStub = (
 
     mapping.response.jsonBody.appointment.startDateTime = start
     mapping.response.jsonBody.appointment.endDateTime = end
+  }
+  if (rescheduled) {
+    mapping.response.jsonBody.appointmentrescheduled = true
+    mapping.response.jsonBody.appointmentrescheduled.rescheduledStaff = true
+    mapping.response.jsonBody.appointmentrescheduled.rescheduledPop = true
+    mapping.response.jsonBody.appointment.rescheduledBy = {
+      forename: '',
+      middleName: '',
+      surname: '',
+    }
   }
   if (notes) {
     mapping.response.jsonBody.appointment.appointmentNotes = [
@@ -231,9 +239,9 @@ const getAppointmentStub = (
     if (acceptableAbsence !== undefined) {
       mapping.response.jsonBody.appointment.acceptableAbsence = acceptableAbsence
       mapping.response.jsonBody.appointment.wasAbsent = true
+      mapping.response.jsonBody.appointment.acceptableAbsenceReason = 'Holiday'
     }
   }
-
   if (hasRarActivity) {
     mapping.response.jsonBody.appointment.rarCategory = 'Stepping Stones'
   }
@@ -308,7 +316,7 @@ const getNextAppointmentStub = ({ appointment = true, usernameIsCom = true, home
           isSensitive: false,
           didTheyComply: false,
           hasOutcome: false,
-          wasAbsent: true,
+          wasAbsent: false,
           appointmentNotes: [{ id: 1, createdBy: '', notes: 'Some notes', hasNoteBeenTruncated: false }],
           location: {
             buildingName: 'The Building',

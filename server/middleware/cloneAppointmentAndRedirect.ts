@@ -48,7 +48,6 @@ export const cloneAppointmentAndRedirect = (
     }
 
     clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
-
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)
   }

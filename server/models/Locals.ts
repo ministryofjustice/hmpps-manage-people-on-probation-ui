@@ -173,7 +173,7 @@ export interface AppointmentOutcomeEnforcementAction {
   responseByDays?: number
 }
 
-export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE'
+export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
 
 export interface OutcomeSummary {
   appointmentDetails: string
@@ -187,13 +187,20 @@ export interface OutcomeSummary {
   enforcementActionChangeLink?: string
 }
 
-export interface OutcomeCurrentEnforcementAction {
+export interface CurrentOutcome {
+  status: string
+  reason: string
+  tagColour: TagColour
+}
+
+export interface CurrentEnforcementAction {
   action: AppointmentEnforcementAction
   code?: string
   description: string
   tagColour: TagColour
   link?: string
   evidenceDueDate?: string
+  evidenceWarning?: string
 }
 
 export interface AppointmentOutcomeProps<TAppointment> {
@@ -227,7 +234,8 @@ export interface AppointmentOutcomeProps<TAppointment> {
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
-  currentEnforcementAction?: OutcomeCurrentEnforcementAction
+  currentEnforcementAction?: CurrentEnforcementAction
+  currentOutcome?: CurrentOutcome
   notePrepend?: string
   summary?: OutcomeSummary
 }

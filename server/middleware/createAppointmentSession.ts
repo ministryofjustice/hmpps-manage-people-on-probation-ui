@@ -1,12 +1,25 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
 import { isoToDateTime, setDataValue } from '../utils'
-import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
+import {
+  // AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+  AppointmentSession,
+  AppointmentSessionSelection,
+  YesNo,
+} from '../models/Appointments'
+
+import {
+  type OutcomeCode,
+  outcomeMap,
+  // enforcementActionMap,
+  EnforcementActionCode,
+} from '../properties/appointment-outcomes'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
 export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
-  const { appointment } = res.locals.personAppointment
+  const { appointment /* enforcementAction */ } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
   let appointmentSession: AppointmentSession = {
@@ -59,7 +72,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       ;({ time: end } = isoToDateTime(appointment.endDateTime))
     }
     const externalReference = appointment?.externalReference || ''
-    const enforcementAction = appointment?.enforcementAction || null
     if (!eventId) {
       type = ''
     }
@@ -94,7 +106,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       username: res.locals.user.username,
       uuid: '',
       externalReference,
-      enforcementAction,
       sensitivity,
       sensitivityLocked,
     }
@@ -116,41 +127,49 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     appointmentSession.smsOptIn = null
   }
 
-  /*
+  // Hydrate the logged outcome 👇
 
-  Get outcome and enforcement action from appointment - not needed ?
- 
   const outcome = appointment?.outcome
-  const action = appointment?.action
-  if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome?.contactOutcomes && outcome) {
-    // match the appointment.outcome to contactOutcome.description
-    const contactOutcome = res.locals.appointmentOutcome.appointmentSession.outcome.contactOutcomes.find(
-      _outcome => _outcome.description === outcome,
+  let outcomeType: AppointmentOutcomeType | null = null
+  let outcomeCode: OutcomeCode | null = null
+  // const enforcementActionCode: EnforcementActionCode[] = []
+  if (outcome) {
+    const contactOutcome = Object.entries(outcomeMap).find(
+      ([_key, { description }]) => description.toLowerCase() === outcome.toLowerCase(),
     )
-    if (contactOutcome) {
-      const outcomeType = Object.entries(outcomeMap).find(
-        ([_key, { code }]) => contactOutcome.code === code,
-      )?.[0] as AppointmentOutcomeType
-    }
+    outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
+    outcomeCode = contactOutcome?.[1]?.code || null
   }
-  if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome?.contactEnforcementActions && action) {
-    // match the appointment.action to contactEnforcementActions.description
-    const contactEnforcementAction =
-      res.locals.appointmentOutcome.appointmentSession.outcome.contactEnforcementActions.find(
-        _action => _action.description === outcome,
-      )
-    if (contactEnforcementAction) {
-      // map action to outcome page
-      const enforcementAction = Object.entries(enforcementActionMap).find(
-        ([_key, { code }]) => contactEnforcementAction.code === code,
-      )?.[0] as AppointmentEnforcementAction
-      if (enforcementAction) {
-        const pageKey = camelCase(enforcementAction)
+  appointmentSession.outcome = {
+    ...appointmentSession.outcome,
+    outcomeType,
+    outcomeCode,
+  }
+
+  // Hydrate the logged enforcement action - not needed? 👇
+
+  /* 
+  if (enforcementAction?.code) {
+    const matchedAction = Object.entries(enforcementActionMap).find(
+      ([_key, { code: _code }]) => _code === enforcementAction.code,
+    )
+
+    const actionKey = matchedAction?.[0] as AppointmentEnforcementAction
+    const actionCode = matchedAction?.[1]?.code as EnforcementActionCode
+    if (actionCode) {
+      enforcementActionCode.push(actionCode)
+    }
+    if (actionKey) {
+      const { options, pageKey } = outcomeMap[outcomeType]
+      if (options?.includes(actionKey)) {
+        appointmentSession.outcome = {
+          ...appointmentSession.outcome,
+          [pageKey]: actionKey,
+        }
       }
     }
   }
-
-  */
+    */
 
   res.locals.appointmentSession = appointmentSession
   if (contactId) {

@@ -103,6 +103,5 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     sendBreachOrRecallLetter,
     sendLetter,
   }
-  console.log(res.locals.appointmentOutcome)
   return next()
 }

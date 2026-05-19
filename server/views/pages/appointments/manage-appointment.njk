@@ -93,6 +93,15 @@
   {% set outcomeTagColour = 'green' %}
   {% set compliedTagColor = 'blue' %}
 {% endif %}
+
+{% set outcomeHint = null %}
+{% if not flags.enableNonCompliance and not appointment.isInPast %}
+  {% set outcomeHint = "You cannot log an attended and complied outcome until the appointment has happened." %}
+{% endif %}
+{% if flags.enableNonCompliance and appointmentOutcome.currentOutcome.reason %}
+  {% set outcomeHint = appointmentOutcome.currentOutcome.reason %}
+{% endif %}
+
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
   {% set alert = "You must log an outcome and should add notes to this appointment." %}
 {% endif %}
@@ -143,6 +152,17 @@
   }
 }) }}
       {% endif %}
+      {% if appointmentOutcome.currentEnforcementAction.evidenceWarning and not appointment.deliusManaged %}
+        {{ mojAlert({
+  variant: "warning",
+  showTitleAsHeading: true,
+  dismissible: false,
+  text: appointmentOutcome.currentEnforcementAction.evidenceWarning,
+  attributes: {
+    'data-qa': 'evidenceWarning'
+  }
+}) }}
+      {% endif %}
       {% if appointment.isSensitive === true %}
         {% set text = 'Sensitive' %}
         {% set shorthand = '!' %}
@@ -168,13 +188,13 @@
         html: '<span>' + outcomeLabel + '</span>'
       },
       hint: {
-        text: "You cannot log an attended and complied outcome until the appointment has happened."
-      } if not flags.enableNonCompliance and not appointment.isInPast,
+        text: outcomeHint
+      } if outcomeHint,
       href: outcomeLink,
       status: {
         tag: {
-          text: compliedStatus,
-          classes: "govuk-tag--" + compliedTagColor
+          text: compliedStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
+          classes: "govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
         }
       }
     },
@@ -185,11 +205,11 @@
       hint: {
         text: "Evidence due date: " + appointmentOutcome.currentEnforcementAction.evidenceDueDate
       } if appointmentOutcome.currentEnforcementAction.evidenceDueDate,
-      href: appointmentOutcome.currentEnforcementAction?.link,
+      href: '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action',
       status: {
         tag: {
-          text: appointmentOutcome.currentEnforcementAction?.text,
-          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction?.tagColour
+          text: appointmentOutcome.currentEnforcementAction.description,
+          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
         }
       }
     } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action,
@@ -264,8 +284,8 @@
     },
     value: {
       html: govukTag({
-          text: outcomeStatus,
-          classes: "govuk-tag--" + outcomeTagColour
+          text: outcomeStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
+          classes: "govuk-tag--" + (outcomeTagColour if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
         })
       }
     } if (outcomeStatus and appointment.deliusManaged),

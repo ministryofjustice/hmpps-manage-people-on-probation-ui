@@ -11,8 +11,9 @@ import {
   getNextComAppointment,
   getOverdueOutcomes,
   getPersonRiskFlags,
+  getAppointment,
 } from '../middleware'
-import { getCurrentEnforcementAction, getOutcomeProps } from '../middleware/appointment-outcomes'
+import { getCurrentOutcome, getCurrentEnforcementAction, getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
 
@@ -60,19 +61,23 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   /* ----------------- 👆 -----------------  */
 
+  router.all(
+    '/case/:crn/appointments/appointment/:contactId/next-appointment',
+    getPersonAppointment(hmppsAuthClient),
+    getSentences(hmppsAuthClient),
+    getNextComAppointment(hmppsAuthClient),
+    getAppointmentTypes(hmppsAuthClient),
+    getUserProviders(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
-    getNextComAppointment(hmppsAuthClient),
     controllers.appointments.getNextAppointment(hmppsAuthClient),
   )
   router.post(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
-    getPersonAppointment(hmppsAuthClient),
     validate.appointments,
-    getAppointmentTypes(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
     createAppointmentSession,
-    getUserProviders(hmppsAuthClient),
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
   router.get(
@@ -80,7 +85,10 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     getPersonAppointment(hmppsAuthClient),
     getSentences(hmppsAuthClient),
     getNextComAppointment(hmppsAuthClient),
+    getAppointmentTypes(hmppsAuthClient),
+    createAppointmentSession,
     getOutcomeProps,
+    getCurrentOutcome,
     getCurrentEnforcementAction,
     controllers.appointments.getManageAppointment(hmppsAuthClient),
   )

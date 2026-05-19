@@ -1,10 +1,13 @@
 /* eslint-disable import/no-cycle */
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, EnforcementActionPage } from '../../models/Appointments'
+import { acceptableAbsenceOptions, attendedFailedToComplyOptions, failedToAttendOptions } from '.'
 
 export type OutcomeMap = {
   [K in AppointmentOutcomeType]?: {
     code: OutcomeCode
     description?: string
+    options?: AppointmentEnforcementAction[]
+    pageKey?: EnforcementActionPage
   }
 }
 
@@ -49,12 +52,42 @@ export type OutcomeCode = 'ATTC' | 'AFTC' | 'ATSH' | 'AFDA' | 'AAM11' | 'UAAB' |
 
 export const outcomeMap: OutcomeMap = {
   ATTENDED_COMPLIED: { code: 'ATTC', description: 'Attended - Complied' },
-  ATTENDED_FAILED_TO_COMPLY: { code: 'AFTC', description: 'Attended - Failed To Comply' },
-  ATTENDED_SENT_HOME_BEHAVIOUR: { code: 'ATSH', description: 'Attended - Sent Home (behaviour)' },
-  ATTENDED_SENT_HOME_SERVICE_ISSUES: { code: 'AFDA', description: 'Attended - FTC Deemed Acceptable' },
-  ACCEPTABLE_ABSENCE: { code: 'AAM11', description: 'Acceptable - Critical  Communications - no breach' },
-  UNACCEPTABLE_ABSENCE: { code: 'UAAB', description: 'Unacceptable Absence' },
-  FAILED_TO_ATTEND: { code: 'AFTA', description: 'Failed To Attend' },
+  ATTENDED_FAILED_TO_COMPLY: {
+    code: 'AFTC',
+    description: 'Attended - Failed To Comply',
+    options: attendedFailedToComplyOptions().map(option => option.value),
+    pageKey: 'attendedFailedToComply',
+  },
+  ATTENDED_SENT_HOME_BEHAVIOUR: {
+    code: 'ATSH',
+    description: 'Attended - Sent Home (behaviour)',
+    options: attendedFailedToComplyOptions().map(option => option.value),
+    pageKey: 'attendedFailedToComply',
+  },
+  ATTENDED_SENT_HOME_SERVICE_ISSUES: {
+    code: 'AFDA',
+    description: 'Attended - FTC Deemed Acceptable',
+    options: attendedFailedToComplyOptions().map(option => option.value),
+    pageKey: 'attendedFailedToComply',
+  },
+  ACCEPTABLE_ABSENCE: {
+    code: 'AAM11',
+    description: 'Acceptable - Critical  Communications - no breach',
+    options: acceptableAbsenceOptions.map(option => option.value),
+    pageKey: 'acceptableAbsence',
+  },
+  UNACCEPTABLE_ABSENCE: {
+    code: 'UAAB',
+    description: 'Unacceptable Absence',
+    options: attendedFailedToComplyOptions().map(option => option.value),
+    pageKey: 'unacceptableAbsence',
+  },
+  FAILED_TO_ATTEND: {
+    code: 'AFTA',
+    description: 'Failed To Attend',
+    options: failedToAttendOptions().map(option => option.value),
+    pageKey: 'failedToAttend',
+  },
 }
 
 export const enforcementActionMap: EnforcementActionMap = {
