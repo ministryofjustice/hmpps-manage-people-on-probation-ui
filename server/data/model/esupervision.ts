@@ -171,6 +171,7 @@ export interface CheckinScheduleResponse {
 export interface DeactivateOffenderRequest {
   requestedBy: string
   reason: string
+  sensitive: boolean
 }
 export interface ReactivateOffenderRequest {
   requestedBy: string

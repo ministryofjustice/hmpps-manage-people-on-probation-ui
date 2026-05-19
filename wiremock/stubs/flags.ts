@@ -596,6 +596,60 @@ const stubEnableShowNextCheckinDate = (): SuperAgentRequest =>
     },
   })
 
+const stubEnableStopCheckinSensitiveFlag = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          {
+            key: 'enableESupervisionCheckins',
+            name: 'enableESupervisionCheckins',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-04-16T12:00:00.000000Z',
+            updatedAt: '2026-04-16T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+          {
+            key: 'enableManageCheckins',
+            name: 'enableManageCheckins',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2025-01-13T15:28:37.920581Z',
+            updatedAt: '2025-01-13T17:06:39.269084Z',
+            rules: [],
+            rollouts: [],
+          },
+          {
+            key: 'enableStopCheckinSensitiveFlag',
+            name: 'enableStopCheckinSensitiveFlag',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-05-18T12:00:00.000000Z',
+            updatedAt: '2026-05-18T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubNoSentencePlan,
   stubNoSanIndicator,
@@ -613,4 +667,5 @@ export default {
   stubDisableESupervisionCheckins,
   stubDisableHomePageOutcome,
   stubEnableShowNextCheckinDate,
+  stubEnableStopCheckinSensitiveFlag,
 }
