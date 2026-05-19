@@ -505,9 +505,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-        const practitionerId = pp?.username ? pp.username : res.locals.user.username
+        const practitionerId = res.locals.user.username
         const eSupervisionClient = new ESupervisionClient(token)
         await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
       }
