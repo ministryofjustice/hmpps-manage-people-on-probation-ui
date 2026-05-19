@@ -1083,7 +1083,7 @@ describe('validates appointment outcome page', () => {
     }
     const spec = appointmentOutcomesValidation(args)
     const expectedResult: Record<string, string> = {
-      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-type':
+      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-outcomeType':
         'Select an outcome for this appointment',
     }
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
@@ -1097,7 +1097,7 @@ describe('validates appointment outcome page', () => {
     }
     const spec = appointmentOutcomesValidation(args)
     const expectedResult: Record<string, string> = {
-      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-type':
+      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-outcomeType':
         'Select why they will not attend this appointment',
     }
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
@@ -1141,7 +1141,7 @@ describe('validates appointment enforcement action page', () => {
   }
   const spec = appointmentOutcomesValidation(args)
   const expectedResult: Record<string, string> = {
-    'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-enforcementAction':
+    'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-attendedFailedToComply':
       'Select an action for this failure to comply',
   }
   it('should return the correct validation errors if date is in the past', () => {

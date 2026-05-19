@@ -1,23 +1,54 @@
 import httpMocks from 'node-mocks-http'
 import { mockAppResponse } from '../../controllers/mocks'
 import { getSendLetterOptions } from './getSendLetterOptions'
+import { SentenceType } from '../../data/model/sentenceDetails'
+import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../../models/Appointments'
+import { ContactEnforcementActions } from '../../data/model/schedule'
+import { letterTypeOptions } from '../../properties/appointment-outcomes'
+import { validEnforcementActionOptions } from '../../utils'
+
+interface Props {
+  sentenceType?: SentenceType
+  enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
+  sendBreachOrRecallLetter?: boolean
+  sendLetter?: boolean
+}
+
+const contactEnforcementActions: ContactEnforcementActions[] = [
+  { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+  { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
+  { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
 
 const buildResponse = ({
   sentenceType = 'COMMUNITY',
-  enforcementAction = 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
-} = {}): httpMocks.MockResponse<any> => {
+  enforcementAction = {},
+  sendBreachOrRecallLetter = false,
+  sendLetter = false,
+}: Props = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
       sentence: { type: sentenceType },
+      sendBreachOrRecallLetter,
+      sendLetter,
       appointmentSession: {
         outcome: {
-          enforcementAction,
+          ...enforcementAction,
+          contactEnforcementActions,
         },
       },
     },
   }
   return mockAppResponse(locals)
 }
+
+jest.mock('../../utils', () => ({
+  validEnforcementActionOptions: jest.fn(() => letterTypeOptions),
+}))
+
+const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.MockedFunction<
+  typeof validEnforcementActionOptions
+>
 
 const nextSpy = jest.fn()
 const req = httpMocks.createRequest()
@@ -36,13 +67,14 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  it('should define the correct options if enforcement action is INITIATE_BREACH_RECALL_AND_SEND_LETTER', () => {
-    const res = buildResponse()
+  it('should define the correct options if enforcement action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
+    const res = buildResponse({ sendBreachOrRecallLetter: true })
     getSendLetterOptions(req, res, nextSpy)
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactEnforcementActions, letterTypeOptions)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER', text: 'Licence compliance letter' }),
-        expect.objectContaining({ value: 'DIFFERENT_ENFORCEMENT_LETTER', text: `A different enforcement letter` }),
+        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
       ]),
     )
     expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
@@ -50,12 +82,12 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
   it('should define the correct options if enforcement action is SEND_LETTER and sentence type is CUSTODY', () => {
-    const res = buildResponse({ enforcementAction: 'SEND_LETTER', sentenceType: 'CUSTODY' })
+    const res = buildResponse({ sentenceType: 'CUSTODY', sendLetter: true })
     getSendLetterOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER', text: 'Licence compliance letter' }),
-        expect.objectContaining({ value: 'DIFFERENT_ENFORCEMENT_LETTER', text: `A different enforcement letter` }),
+        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
       ]),
     )
     expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
@@ -63,29 +95,30 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
   it('should define the correct options if enforcement action is SEND_LETTER and sentence type is COMMUNITY', () => {
-    const res = buildResponse({ enforcementAction: 'SEND_LETTER', sentenceType: 'COMMUNITY' })
+    const res = buildResponse({ sendLetter: true, sentenceType: 'COMMUNITY' })
     getSendLetterOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'FIRST_WARNING_LETTER', text: 'First warning letter' }),
-        expect.objectContaining({ value: 'BREACH_WARNING_LETTER', text: 'Breach warning letter' }),
-        expect.objectContaining({ value: 'DIFFERENT_ENFORCEMENT_LETTER', text: `A different enforcement letter` }),
+        expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
+        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
       ]),
     )
     expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(3)
     checkLetterSentByOptions(res)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
-  ;['PSS', 'YOUTH_CUSTODY'].forEach(sentenceType => {
+  const sentenceTypes: SentenceType[] = ['PSS', 'YOUTH_CUSTODY']
+  sentenceTypes.forEach(sentenceType => {
     it(`should define the correct options if enforcement action is SEND_LETTER and sentence type is ${sentenceType}`, () => {
-      const res = buildResponse({ enforcementAction: 'SEND_LETTER', sentenceType })
+      const res = buildResponse({ sendLetter: true, sentenceType })
       getSendLetterOptions(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ value: 'FIRST_WARNING_LETTER', text: 'First warning letter' }),
-          expect.objectContaining({ value: 'SECOND_WARNING_LETTER', text: 'Second warning letter' }),
-          expect.objectContaining({ value: 'BREACH_WARNING_LETTER', text: 'Breach warning letter' }),
-          expect.objectContaining({ value: 'DIFFERENT_ENFORCEMENT_LETTER', text: `A different enforcement letter` }),
+          expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
+          expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
+          expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
+          expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
         ]),
       )
       expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(4)

@@ -5,6 +5,34 @@ export interface Schedule {
   personSummary: PersonSummary
   personSchedule: PersonSchedule
 }
+export interface EnforcementContactsResponse {
+  size: number
+  page: number
+  totalResults: number
+  totalPages: number
+  enforcementContacts: EnforcementContact[]
+}
+
+export interface EnforcementContact {
+  caseName: CaseName
+  id: number
+  crn: string
+  dob: string
+  appointmentType: string
+  displayName?: string
+  appointmentDate: string
+  appointmentOutcome: string
+  enforcementAction: string
+  evidenceDueDate: string
+  deliusManaged: boolean
+  isOverdue?: boolean
+}
+
+export interface CaseName {
+  forename: string
+  middleName: string
+  surname: string
+}
 
 export interface Officer {
   code?: string
@@ -29,6 +57,20 @@ export interface PersonSchedule {
 }
 export interface EnforcementAction {
   responseByDate: string
+}
+
+export interface ContactOutcomes {
+  code: string
+  description: string
+}
+
+export interface ContactEnforcementActions extends ContactOutcomes {
+  defaultResponsePeriodDays?: number
+}
+
+export interface ContactOutcomesResponse {
+  outcomes: ContactOutcomes[]
+  enforcementActions?: ContactEnforcementActions[]
 }
 
 export interface Activity {

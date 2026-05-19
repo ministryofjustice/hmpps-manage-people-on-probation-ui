@@ -8,6 +8,8 @@ import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
 
+const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC'])
+
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
     const { crn, id: uuid } = req.params as Record<string, string>
@@ -37,12 +39,17 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       appointmentTypeCode,
       includeWelshPreview,
     }
-    const locationMatch = locations.find(loc => loc.code === locationCode)
-    if (locationMatch) {
-      appointmentLocation =
-        locationMatch?.address?.officeName || locationMatch?.address?.buildingName || locationMatch.description || ''
+
+    // we should not be sending location when its telephone or video contact
+    if (!appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
+      const locationMatch = locations.find(loc => loc.code === locationCode)
+      if (locationMatch) {
+        appointmentLocation =
+          locationMatch?.address?.officeName || locationMatch?.address?.buildingName || locationMatch.description || ''
+      }
+      if (appointmentLocation) body.appointmentLocation = appointmentLocation
     }
-    if (appointmentLocation) body.appointmentLocation = appointmentLocation
+
     if (JSON.stringify(smsPreview?.request) === JSON.stringify(body) && smsPreview?.preview) {
       ;({ preview } = smsPreview)
     } else {

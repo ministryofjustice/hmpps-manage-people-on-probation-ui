@@ -11,8 +11,8 @@ interface Props<DataT, ItemT> {
 
 export const findReplace = <DataT, ItemT = never>({ data, path, key, find, replace }: Props<DataT, ItemT>): DataT => {
   const replaceTerm = (str: string) => {
-    if (str.includes(find)) {
-      return str.split(find).join(replace)
+    if (str.includes(find!)) {
+      return str.split(find!).join(replace!)
     }
     return str
   }
@@ -21,17 +21,17 @@ export const findReplace = <DataT, ItemT = never>({ data, path, key, find, repla
   if (node) {
     if (Array.isArray(node)) {
       setDataValue(
-        newData,
+        newData as unknown as Record<string, unknown>,
         path[0],
         (node as ItemT[]).map(item => {
           return {
             ...item,
-            [key]: replaceTerm(item[key] as string),
+            [key!]: replaceTerm(item[key!] as string),
           }
         }),
       )
     } else {
-      setDataValue(newData, path, replaceTerm(node))
+      setDataValue(newData as unknown as Record<string, unknown>, path, replaceTerm(node))
     }
   }
   return newData

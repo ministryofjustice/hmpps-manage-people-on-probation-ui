@@ -20,4 +20,6 @@ export class FeatureFlags {
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
+  enableMyEnforcementActionsOverview?: boolean = undefined
+  enableShowNextCheckinDate?: boolean = undefined
 }

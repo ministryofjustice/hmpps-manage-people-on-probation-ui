@@ -99,7 +99,7 @@ const homeSearch = () => {
 const crissHeaders = () => {
   const btn = document.getElementById('crissButton')
   if (btn) {
-    const textarea = document.getElementById('notes')
+    const textarea = document.querySelector('textarea')
     const status = document.getElementById('crissStatus')
     btn.addEventListener('click', () => {
       if (textarea.value.trim() === '') {

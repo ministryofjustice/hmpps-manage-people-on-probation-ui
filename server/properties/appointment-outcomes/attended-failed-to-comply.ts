@@ -1,17 +1,18 @@
-import { AppointmentEnforcementActionOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 import { SentenceType } from '../../data/model/sentenceDetails'
 
-export const attendedFailedToComplyOptions = (sentenceType: SentenceType): AppointmentEnforcementActionOption[] => [
+export const attendedFailedToComplyOptions = (sentenceType: SentenceType): Option<AppointmentEnforcementAction>[] => [
   {
     value: 'SEND_LETTER',
     text: 'Send a letter',
   },
   {
-    value: 'INITIATE_BREACH_RECALL',
+    value: 'BREACH_RECALL_INITIATED',
     text: `Initiate a ${sentenceType === 'COMMUNITY' ? 'breach' : 'recall'}`,
   },
   {
-    value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+    value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
     text: `Initiate a ${sentenceType === 'COMMUNITY' ? 'breach' : 'recall'} and send a letter`,
   },
   {

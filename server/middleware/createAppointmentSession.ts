@@ -1,6 +1,6 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
-import { getDataValue, isoToDateTime, setDataValue } from '../utils'
+import { isoToDateTime, setDataValue } from '../utils'
 import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')

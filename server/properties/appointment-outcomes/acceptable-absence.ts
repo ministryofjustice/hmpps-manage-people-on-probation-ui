@@ -1,36 +1,37 @@
-import { AppointmentEnforcementActionOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const acceptableAbsenceOptions: AppointmentEnforcementActionOption[] = [
+export const acceptableAbsenceOptions: Option<AppointmentEnforcementAction>[] = [
   {
-    value: 'COURT_LEGAL',
+    value: 'ACCEPTABLE_ABSENCE_COURT_LEGAL',
     text: 'Court / legal',
   },
   {
-    value: 'EMPLOYMENT',
+    value: 'ACCEPTABLE_ABSENCE_EMPLOYMENT',
     text: 'Employment',
   },
   {
-    value: 'FAMILY_CHILDCARE',
+    value: 'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE',
     text: 'Family / childcare',
   },
   {
-    value: 'HOLIDAY',
+    value: 'ACCEPTABLE_ABSENCE_HOLIDAY',
     text: 'Holiday',
   },
   {
-    value: 'MEDICAL',
+    value: 'ACCEPTABLE_ABSENCE_MEDICAL',
     text: 'Medical',
   },
   {
-    value: 'RELIGIOUS',
+    value: 'ACCEPTABLE_ABSENCE_RELIGIOUS',
     text: 'Religious',
   },
   {
-    value: 'RIC',
+    value: 'ACCEPTABLE_ABSENCE_RIC',
     text: 'RIC (remanded in custody)',
   },
   {
-    value: 'PROFESSIONAL_JUDGEMENT_DECISION',
+    value: 'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION',
     text: 'Professional judgement decision',
   },
   {

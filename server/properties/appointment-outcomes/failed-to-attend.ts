@@ -1,12 +1,13 @@
-import { AppointmentEnforcementActionOption } from '../../models/Appointments'
+import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { Option } from '../../models/Option'
 
-export const failedToAttendOptions = (name: string): AppointmentEnforcementActionOption[] => [
+export const failedToAttendOptions = (name: string): Option<AppointmentEnforcementAction>[] => [
   {
     value: 'SEND_LETTER',
     text: 'Send a letter',
   },
   {
-    value: 'DECISION_PENDING',
+    value: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
     text: `Decision pending ${name}’s response`,
   },
   {

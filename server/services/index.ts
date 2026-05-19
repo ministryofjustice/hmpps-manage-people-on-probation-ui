@@ -34,6 +34,7 @@ export const services = () => {
   const {
     applicationInfo,
     hmppsAuthClient,
+    authClientSearch,
     manageUsersApiClient,
     probationFrontendComponentsApiClient,
     arnsComponents,
@@ -42,7 +43,7 @@ export const services = () => {
   const userService = new UserService(manageUsersApiClient)
 
   const searchService = new CaseSearchService({
-    oauthClient: hmppsAuthClient,
+    hmppsAuthClient: authClientSearch,
     environment: config.env,
     extraColumns: [
       {
@@ -57,7 +58,7 @@ export const services = () => {
   })
 
   const searchServiceWithoutExtraColumns = new CaseSearchService({
-    oauthClient: hmppsAuthClient,
+    hmppsAuthClient: authClientSearch,
     environment: config.env,
     extraColumns: [],
   })

@@ -4,6 +4,7 @@ import { loadPage, crn, appointmentId } from './common'
 export const checkLogOutcomeAction = (enableNonCompliance = true) => {
   describe('Log appointment outcome action', () => {
     const name = enableNonCompliance ? 'Log appointment outcome' : 'Log attended and complied appointment'
+    const changeLabel = 'Change appointment outcome'
     let manageAppointmentPage = new ManageAppointmentPage()
     if (enableNonCompliance) {
       it('should not display the hint text', () => {
@@ -28,12 +29,23 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
-        it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(1).should('contain.text', name)
-        })
-        it('should not display a link to log the outcome', () => {
-          manageAppointmentPage.getTaskLink(1).should('not.exist')
-        })
+        if (enableNonCompliance) {
+          it('should display a link the change the outcome', () => {
+            manageAppointmentPage.getTaskLink(1).should('contain.text', changeLabel)
+            manageAppointmentPage
+              .getTaskLink(1)
+              .should(
+                'have.attr',
+                'href',
+                `/case/${crn}/appointments/appointment/${appointmentId}/outcome/update-enforcement-action`,
+              )
+          })
+        } else {
+          it('should not display a link to log the outcome', () => {
+            manageAppointmentPage.getTaskLink(1).should('not.exist')
+            manageAppointmentPage.getTaskName(1).should('contain.text', name)
+          })
+        }
         it(`should display the status as 'Complied'`, () => {
           manageAppointmentPage
             .getTaskStatus(1)
@@ -66,12 +78,25 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
-        it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(1).should('contain.text', name)
-        })
-        it('should not display a link to log the outcome', () => {
-          manageAppointmentPage.getTaskLink(1).should('not.exist')
-        })
+        if (enableNonCompliance) {
+          it('should display the change outcome link', () => {
+            manageAppointmentPage.getTaskLink(1).should('contain.text', changeLabel)
+            manageAppointmentPage
+              .getTaskLink(1)
+              .should(
+                'have.attr',
+                'href',
+                `/case/${crn}/appointments/appointment/${appointmentId}/outcome/update-enforcement-action`,
+              )
+          })
+        } else {
+          it('should display the task name', () => {
+            manageAppointmentPage.getTaskName(1).should('contain.text', name)
+          })
+          it('should not display a link to log the outcome', () => {
+            manageAppointmentPage.getTaskLink(1).should('not.exist')
+          })
+        }
         it(`should display the status as 'Complied'`, () => {
           manageAppointmentPage
             .getTaskStatus(1)

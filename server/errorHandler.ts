@@ -1,13 +1,28 @@
 import type { Request, NextFunction } from 'express'
+import * as Sentry from '@sentry/node'
 import type { HTTPError } from 'superagent'
 import logger from '../logger'
 import { statusErrors, type StatusErrorCode } from './properties'
 import { AppResponse } from './models/Locals'
+import isTimeoutError from './utils/isTimeoutError'
 
 export default function createErrorHandler(production: boolean) {
   return (error: HTTPError, req: Request, res: AppResponse, _next: NextFunction): void => {
     const { status } = error
     logger.error(`Error handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`, error)
+
+    if (isTimeoutError(error) && Sentry.getClient()) {
+      const eventId = Sentry.captureException(error, {
+        tags: {
+          'error.kind': 'timeout',
+          'request.path': req.originalUrl,
+          'user.username': res.locals.user?.username ?? 'unknown',
+        },
+      })
+
+      logger.info(`Sentry timeout eventId: ${eventId}`)
+    }
+
     const { title, message } =
       statusErrors[statusErrors?.[status as StatusErrorCode] ? (status as StatusErrorCode) : 500]
 

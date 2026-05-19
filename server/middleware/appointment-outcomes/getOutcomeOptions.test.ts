@@ -3,6 +3,9 @@ import httpMocks from 'node-mocks-http'
 import { getOutcomeOptions } from './getOutcomeOptions'
 import { mockAppResponse } from '../../controllers/mocks'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
+import { ContactOutcomes } from '../../data/model/schedule'
+import { validOutcomeOptions } from '../../utils'
+import { outcomeOptions } from '../../properties/appointment-outcomes'
 
 const contactId = '12345'
 const crn = 'X000001'
@@ -17,6 +20,17 @@ const start = '09:00'
 const end = '10:00'
 const now = DateTime.now()
 const futureDate = now.plus({ day: 1 }).toFormat('yyyy-MM-dd')
+
+const contactOutcomes: ContactOutcomes[] = [
+  {
+    code: 'ATTC',
+    description: 'Attended - Complied',
+  },
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed To Comply',
+  },
+]
 
 const nextSpy = jest.fn()
 
@@ -90,6 +104,9 @@ const buildResponse = ({
       isInPast,
       appointmentSession: {
         type,
+        outcome: {
+          contactOutcomes,
+        },
       },
     },
   }
@@ -99,6 +116,12 @@ const buildResponse = ({
 jest.mock('../appointmentDateIsInPast', () => ({
   appointmentDateIsInPast: jest.fn(),
 }))
+
+jest.mock('../../utils', () => ({
+  validOutcomeOptions: jest.fn(() => outcomeOptions),
+}))
+
+const validOutcomeOptionsSpy = validOutcomeOptions as jest.MockedFunction<typeof validOutcomeOptions>
 
 const mockAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
@@ -112,6 +135,7 @@ describe('/middleware/appointment-outcomes/getOutcomeOptions', () => {
     const res = buildResponse({ type: 'COPT' })
     mockAppointmentDateIsInPast.mockReturnValue(true)
     getOutcomeOptions(req, res, nextSpy)
+    expect(validOutcomeOptions).toHaveBeenCalledWith(contactOutcomes, outcomeOptions)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
