@@ -1,4 +1,5 @@
 import { EvaluationRequest, EvaluationResponse, FliptEvaluationClient } from '@flipt-io/flipt-client'
+import * as Sentry from '@sentry/node'
 import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
 import logger from '../../logger'
@@ -37,7 +38,6 @@ export default class FlagService {
 
     const requests: EvaluationRequest[] = flagList.flatMap(flag => {
       if (PDU_GATED_FLAGS.has(flag)) {
-        // Fail closed: if the user has no PDUs, don't evaluate — the flag resolves to false.
         return pduCodes.map(pduCode => buildRequest(flag, pduCode))
       }
       return [buildRequest(flag)]
@@ -49,18 +49,36 @@ export default class FlagService {
       return results.filter(r => r.booleanEvaluationResponse?.flagKey === key)
     }
 
-    flagList.forEach(f => {
+    for (const f of flagList) {
       const matching = responsesFor(flags.responses, f)
       if (PDU_GATED_FLAGS.has(f)) {
         featureFlags[f] = matching.some(r => r.booleanEvaluationResponse?.enabled === true)
       } else if (matching.length === 1) {
         featureFlags[f] = matching[0].booleanEvaluationResponse.enabled === true
       } else {
-        // Fail closed: unexpected response shape from Flipt for a non-PDU-gated flag.
-        logger.warn(`Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`)
+        const message = `Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`
+
+        logger.warn(message)
+
+        const client = Sentry.getClient()
+        if (client) {
+          const eventId = Sentry.captureException(new Error(message), {
+            tags: {
+              flag: f,
+              service: 'FlagService',
+            },
+            extra: {
+              matchingLength: matching.length,
+            },
+          })
+
+          logger.info(`Sentry eventId: ${eventId}`)
+        }
+
         featureFlags[f] = false
       }
-    })
+    }
+
     return featureFlags
   }
 }

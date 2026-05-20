@@ -34,7 +34,9 @@ import {
   documentSearchValidation,
   personDetailsValidation,
   eSuperVisionValidation,
+  appointmentOutcomesValidation,
   ESupervisionValidationArgs,
+  AppointmentOutcomesValidationArgs,
 } from '../properties'
 import { ValidationSpec } from '../models/Errors'
 
@@ -834,41 +836,6 @@ describe('validates manage checkin settings', () => {
   })
 })
 
-describe('validates stop checkin', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-  const testRequest = {
-    params: { crn, id },
-    body: {
-      esupervision: {
-        [crn]: {
-          [id]: {
-            manageCheckin: { stopCheckin: undefined },
-          },
-        },
-      },
-    },
-  } as unknown as Request
-  const expectedResult: Record<string, string> = {
-    [`esupervision-${crn}-${id}-manageCheckin-stopCheckin`]: 'Select yes if you want to stop check ins for the person',
-  }
-  const args: ESupervisionValidationArgs = {
-    crn,
-    id,
-    page: 'stop-checkin',
-    stopCheckIn: '',
-  }
-  const spec = eSuperVisionValidation(args)
-  it('should return the correct validation errors', () => {
-    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
-  })
-  it('should log the error', () => {
-    validateWithSpec(testRequest, spec)
-    expect(loggerSpy).toHaveBeenCalledWith('Stop checkin, not selected')
-  })
-})
-
 describe('validates stop checkin reason', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -879,20 +846,25 @@ describe('validates stop checkin reason', () => {
       esupervision: {
         [crn]: {
           [id]: {
-            manageCheckin: { stopCheckin: 'YES', reason: undefined },
+            manageCheckin: {
+              stopCheckinReason: undefined,
+              stopCheckinSensitive: 'false',
+            },
           },
         },
       },
     },
   } as unknown as Request
+
   const expectedResult: Record<string, string> = {
-    [`esupervision-${crn}-${id}-manageCheckin-reason`]: 'Enter the reason for stopping',
+    [`esupervision-${crn}-${id}-manageCheckin-stopCheckinReason`]: 'Enter the reason for stopping',
   }
+
   const args: ESupervisionValidationArgs = {
     crn,
     id,
     page: 'stop-checkin',
-    stopCheckIn: 'YES',
+    isSensitiveNotesEnabled: true,
   }
   const spec = eSuperVisionValidation(args)
   it('should return the correct validation errors', () => {
@@ -901,6 +873,45 @@ describe('validates stop checkin reason', () => {
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
     expect(loggerSpy).toHaveBeenCalledWith('Stop checkin, reason not provided')
+  })
+})
+
+describe('validates stop checkin sensitive flag', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            manageCheckin: {
+              stopCheckinReason: 'No longer available',
+              stopCheckinSensitive: undefined,
+            },
+          },
+        },
+      },
+    },
+  } as unknown as Request
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-manageCheckin-stopCheckinSensitive`]:
+      'Select yes if the reason for stopping includes sensitive information',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'stop-checkin',
+    isSensitiveNotesEnabled: true,
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Stop checkin sensitive selection not completed')
   })
 })
 
@@ -1052,5 +1063,101 @@ describe('validates restart contact preferences', () => {
     const spec = eSuperVisionValidation(args)
 
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe('validates appointment outcome page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    params: { crn, id },
+    body: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            outcome: { type: undefined },
+          },
+        },
+      },
+    },
+  } as unknown as Request
+
+  it('should return the correct validation errors if date is in the past', () => {
+    const args: AppointmentOutcomesValidationArgs = {
+      crn,
+      id,
+      page: 'outcome/index',
+      isInPast: true,
+    }
+    const spec = appointmentOutcomesValidation(args)
+    const expectedResult: Record<string, string> = {
+      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-outcomeType':
+        'Select an outcome for this appointment',
+    }
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should return the correct validation errors if date is in the future', () => {
+    const args: AppointmentOutcomesValidationArgs = {
+      crn,
+      id,
+      page: 'outcome/index',
+      isInPast: false,
+    }
+    const spec = appointmentOutcomesValidation(args)
+    const expectedResult: Record<string, string> = {
+      'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-outcomeType':
+        'Select why they will not attend this appointment',
+    }
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    const args: AppointmentOutcomesValidationArgs = {
+      crn,
+      id,
+      page: 'outcome/index',
+      isInPast: true,
+    }
+    const spec = appointmentOutcomesValidation(args)
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Appointment outcome not selected')
+  })
+})
+
+describe('validates appointment enforcement action page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    params: { crn, id },
+    body: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            outcome: { enforcementAction: undefined },
+          },
+        },
+      },
+    },
+  } as unknown as Request
+
+  const args: AppointmentOutcomesValidationArgs = {
+    crn,
+    id,
+    page: `outcome/attended-failed-to-comply`,
+    msg: ['Select an action for this failure to comply'],
+    log: ['Action for failure to comply not selected'],
+  }
+  const spec = appointmentOutcomesValidation(args)
+  const expectedResult: Record<string, string> = {
+    'appointments-X000001-bfb940b1-77ab-45a6-8f3c-aa481c403555-outcome-attendedFailedToComply':
+      'Select an action for this failure to comply',
+  }
+  it('should return the correct validation errors if date is in the past', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Action for failure to comply not selected')
   })
 })

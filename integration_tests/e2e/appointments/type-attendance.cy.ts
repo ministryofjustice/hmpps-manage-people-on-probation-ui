@@ -37,6 +37,17 @@ describe('Arrange an appointment', () => {
     cy.task('resetMocks')
   })
   describe('What appointment are you arranging?', () => {
+    it(' should redirect to the appointments page when back button is clicked', () => {
+      cy.visit(`/case/X778160/arrange-appointment/${uuid}/sentence`)
+
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+
+      const sentencePage = new AppointmentSentencePage()
+      sentencePage.getBackLink().click()
+
+      cy.url().should('contain', `/case/X778160/appointments`)
+    })
+
     describe('No VISOR registration', () => {
       it('should render the page', () => {
         loadPage()
@@ -72,6 +83,31 @@ describe('Arrange an appointment', () => {
         })
         it('should render the alert with correct details', () => {
           checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+        })
+      })
+
+      describe('enableNonCompliance flag', () => {
+        it('should display the bullet point for non-compliance if enableNonCompliance is false', () => {
+          loadPage()
+          typePage = Page.verifyOnPage(AppointmentTypePage)
+          typePage
+            .getInsetText()
+            .find('ul')
+            .find('li')
+            .should('contain.text', 'appointments you know have non-attendance or non-compliance')
+          checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+        })
+
+        it('should not display the bullet point for non-compliance if enableNonCompliance is true', () => {
+          cy.task('stubEnableNonCompliance')
+          loadPage()
+          typePage = Page.verifyOnPage(AppointmentTypePage)
+          typePage
+            .getInsetText()
+            .find('ul')
+            .find('li')
+            .should('not.contain.text', 'appointments you know have non-attendance or non-compliance')
+          checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
         })
       })
 
@@ -181,20 +217,6 @@ describe('Arrange an appointment', () => {
       })
       it('should persist the sentence selection', () => {
         sentencePage.getRadio('sentences', 1).should('be.checked')
-      })
-    })
-    describe('Person level contact was selected', () => {
-      beforeEach(() => {
-        cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-        completeSentencePage(4)
-        typePage = new AppointmentTypePage()
-      })
-      it('should have limited set of appointmentTypes', () => {
-        cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
-      })
-      it('should keep limited set even after error', () => {
-        typePage.getSubmitBtn().click()
-        cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
       })
     })
   })

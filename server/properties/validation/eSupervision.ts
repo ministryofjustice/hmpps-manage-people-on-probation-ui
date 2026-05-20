@@ -22,10 +22,22 @@ export interface ESupervisionValidationArgs {
   editCheckInMobile?: string
   change?: string
   stopCheckIn?: string
+  isSensitiveNotesEnabled?: boolean
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change, stopCheckIn } = args
+  const {
+    crn,
+    id,
+    page,
+    checkInEmail,
+    checkInMobile,
+    editCheckInEmail,
+    editCheckInMobile,
+    change,
+    stopCheckIn,
+    isSensitiveNotesEnabled = false,
+  } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][eligibility]`]: {
       optional: page !== 'eligibility-check',
@@ -224,23 +236,23 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckin]`]: {
+    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckinReason]`]: {
       optional: page !== 'stop-checkin',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select yes if you want to stop check ins for the person',
-          log: 'Stop checkin, not selected',
-        },
-      ],
-    },
-    [`[esupervision][${crn}][${id}][manageCheckin][reason]`]: {
-      optional: page !== `stop-checkin` || (page === 'stop-checkin' && stopCheckIn !== 'YES'),
       checks: [
         {
           validator: isNotEmpty,
           msg: 'Enter the reason for stopping',
           log: 'Stop checkin, reason not provided',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckinSensitive]`]: {
+      optional: page !== 'stop-checkin' || !isSensitiveNotesEnabled,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select yes if the reason for stopping includes sensitive information',
+          log: 'Stop checkin sensitive selection not completed',
         },
       ],
     },

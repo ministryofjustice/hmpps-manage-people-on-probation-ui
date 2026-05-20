@@ -18,7 +18,7 @@ export const findUncompleted = (req: Request, res: Response): string => {
     [appointment?.smsOptIn, 'text-message-confirmation'],
   ]
   if (res.locals.flags.enableNonCompliance) {
-    mapping.push([appointment?.outcome?.type, 'outcome'])
+    mapping.push([appointment?.outcome?.outcomeType, 'outcome'])
   } else {
     mapping.push([appointment?.outcomeRecorded, 'attended-complied'])
   }

@@ -1,0 +1,117 @@
+{% extends "../partials/layout.njk" %}
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{% set backLink = backLink | default('/') %}
+
+{% set hidePageHeader = true %}
+
+{% block beforeContent %}
+  {% if backLink %}
+    {{ govukBackLink({
+    href: backLink
+  }) }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l" data-qa="pageHeading">My enforcement actions</h1>
+        </div>
+    </div>
+
+    {% if flags.enableMyEnforcementActionsOverview %}
+
+    {% if  enforcementContacts.enforcementContacts and enforcementContacts.enforcementContacts.length > 0 %}
+        {% set head = [
+            {
+                text: "Name / CRN",
+                attributes: {"aria-sort": sortByOrder.surname, "data-sort-name": "surname", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Appointment details",
+                attributes: {"aria-sort": sortByOrder.details, "data-sort-name": "details", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Appointment outcome",
+                attributes: {"aria-sort": sortByOrder.outcome, "data-sort-name": "outcome", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Enforcement action",
+                attributes: {"aria-sort": sortByOrder.action, "data-sort-name": "action", "data-sort-action": sortUrl  },
+                classes: "nowrap"
+            },
+            {
+                text: "Action",
+                classes: "nowrap"
+            }
+        ] %}
+
+        {% set rows = [] %}
+
+        {% for enforcement in enforcementContacts.enforcementContacts %}
+            {% set fullName %}
+                {{ enforcement.caseName.surname }}, {{ enforcement.caseName.forename }}
+            {% endset %}          
+
+            {% set row = [
+                { 
+                    classes: "nowrap",
+                    html: '<a class="govuk-!-font-weight-bold" href="/case/' + enforcement.crn + '">' + fullName + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + enforcement.crn + '</span>',
+                    attributes: { 'data-sort-value': enforcement.caseName.surname }
+                },
+                {
+                    classes: "nowrap",
+                    html: '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '">' + enforcement.appointmentType + '</a>' + "<br><span class='secondary-text'> " + (enforcement.appointmentDate | dateWithYearShortMonth) + "</span>",
+                    attributes: { "data-sort-value": enforcement.appointmentType }
+                },
+                {
+                    classes: "nowrap",
+                    text: enforcement.appointmentOutcome if enforcement.appointmentOutcome else 'Not Provided',
+                    attributes: { 'data-sort-value': enforcement.appointmentOutcome }
+                },
+                {
+                    classes: "nowrap",
+                    html:
+                    ((enforcement.enforcementAction | escape) if enforcement.enforcementAction else 'Not Provided')
+                    +
+                    (
+                    '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
+                    if enforcement.isOverdue
+                    else ''
+                    )
+                },
+                {
+                    classes: "nowrap",
+                    html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', enforcement.crn, enforcement.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>' if enforcement.deliusManaged
+                    else 
+                    '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrlEncoded + '" rel="external noopener noreferrer">Manage</a>'
+                }
+            ] %}
+
+            {% set rows = (rows.push(row), rows) %}
+        {% endfor %}
+
+
+        {{ govukTable({
+            attributes: {
+               'data-module': 'moj-backend-sortable-table'
+            },
+            caption: 'Column headers with buttons are sortable',
+            captionClasses: 'govuk-visually-hidden',
+            head: head,
+            rows: rows
+            })
+        }}
+
+        {% if pagination.items | length > 1 %}
+            {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
+        {% endif %}
+
+    {% else %}
+        <p>There are no enforcement actions to take.</p>
+    {% endif %}
+    {% endif %}
+{% endblock %}

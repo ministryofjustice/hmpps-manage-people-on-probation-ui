@@ -17,6 +17,7 @@ jest.mock('uuid', () => ({
 jest.mock('../utils', () => ({
   isValidCrn: jest.fn(),
   isValidUUID: jest.fn(),
+  getDataValue: jest.fn(),
 }))
 
 const mockMiddlewareFn = jest.fn()
@@ -161,6 +162,17 @@ describe('rescheduleAppointmentController', () => {
       const req = httpMocks.createRequest({
         params: { crn, id, contactId },
         url: '/some-url',
+        session: {
+          data: {
+            appointments: {
+              [crn]: {
+                [id]: {
+                  sensitivityLocked: false,
+                },
+              },
+            },
+          },
+        },
       })
 
       await rescheduleAppointmentController.getRescheduleCheckYourAnswer(null)(req, res, null)

@@ -68,13 +68,13 @@
               "rollouts": []
             },
             {
-              "key": "enableCreateContact",
-              "name": "enableCreateContact",
+              "key": "enableManageContacts",
+              "name": "enableManageContacts",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-01-30T15:28:37.920581Z",
-              "updatedAt": "2026-01-30T17:06:39.269084Z",
+              "createdAt": "2026-04-23T12:00:00.000000Z",
+              "updatedAt": "2026-04-23T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             },
@@ -105,17 +105,6 @@
               "name": "enableOGRS4SummaryCardDetail",
               "description": "",
               "enabled": false,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableBreadcrumbs",
-              "name": "enableBreadcrumbs",
-              "description": "",
-              "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-02-26T12:00:00.000000Z",
               "updatedAt": "2026-02-26T12:00:00.000000Z",
@@ -167,26 +156,6 @@
               "rollouts": []
             },
             {
-              "key": "enableMopCookiePolicy",
-              "name": "enableMopCookiePolicy",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-04-07T12:00:00.000000Z",
-              "updatedAt": "2026-04-07T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableMopPrivacyPolicy",
-              "name": "enableMopPrivacyPolicy",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-04-07T12:00:00.000000Z",
-              "updatedAt": "2026-04-07T12:00:00.000000Z"
-            },
-            {
               "key": "enableSentencePlanUrl",
               "name": "enableSentencePlanUrl",
               "description": "",
@@ -205,17 +174,6 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-04-10T12:00:00.000000Z",
               "updatedAt": "2026-04-10T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enablePoPSearchExtraColumns",
-              "name": "enablePoPSearchExtraColumns",
-              "description": "",
-              "enabled": false,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             },
@@ -249,6 +207,50 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-04-23T12:00:00.000000Z",
               "updatedAt": "2026-04-23T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableSensitivityRemoved",
+              "name": "enableSensitivityRemoved",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-04-23T12:00:00.000000Z",
+              "updatedAt": "2026-04-23T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableMyEnforcementActionsOverview",
+              "name": "enableMyEnforcementActionsOverview",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-02-26T12:00:00.000000Z",
+              "updatedAt": "2026-02-26T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableShowNextCheckinDate",
+              "name": "enableShowNextCheckinDate",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-05-18T12:00:00.000000Z",
+              "updatedAt": "2026-05-18T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableStopCheckinSensitiveFlag",
+              "name": "enableStopCheckinSensitiveFlag",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-05-18T12:00:00.000000Z",
+              "updatedAt": "2026-05-18T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             }

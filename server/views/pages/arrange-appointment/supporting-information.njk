@@ -22,6 +22,7 @@
    }
 }| decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
 
+{% if not isSensitive or not flags.enableSensitivityRemoved %}
     {{ govukRadios({
     fieldset: {
         legend: {
@@ -49,4 +50,7 @@
         }
     ]
 } | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
+{% else %}
+    <p>You already told us that this contact includes sensitive information.</p>    
+{% endif %}
 {% endblock %}

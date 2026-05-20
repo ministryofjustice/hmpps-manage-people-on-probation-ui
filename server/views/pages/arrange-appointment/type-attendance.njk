@@ -1,7 +1,15 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment type and attendance' %}
 {% set personForename = headerPersonName.forename %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+
+{% if change %}
+  {% set backLink = change %}
+{% elif allSentences.length === 1 %}
+  {% set backLink = '/case/' + crn + '/appointments/' %}
+{% else %}
+  {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+{% endif %}
+
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set attendanceUrl = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?change=' + url if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
@@ -32,31 +40,39 @@
   <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
 
   {# Inset text for NDelius info #}
-  {{ govukInsetText({
-    html: 'Use <a href="' + deliusDeepLinkUrl('ContactList', crn, entry.id) + '" target="_blank" rel="external noopener noreferrer">NDelius (opens in new tab)</a> to arrange:
+  {% set insetHtml = 'Use <a href="' + deliusDeepLinkUrl('ContactList', crn, entry.id) + '" target="_blank" rel="external noopener noreferrer">NDelius (opens in new tab)</a> to arrange:
       <ul class="govuk-list govuk-list--bullet">
         <li>any other type of appointment not listed below</li>
         <li>appointments that require document templates</li>
-        <li>appointments for RAR toolkits or NSIs (non-statutory interventions)</li>
-        <li>appointments you know have non-attendance or non-compliance</li>
-      </ul>'
+        <li>appointments for RAR toolkits or NSIs (non-statutory interventions)</li>' %}
+  {% if not flags.enableNonCompliance %}
+    {% set insetHtml = insetHtml + '
+        <li>appointments you know have non-attendance or non-compliance</li>' %}
+  {% endif %}
+  {% set insetHtml = insetHtml + '
+      </ul>' %}
+
+  {{ govukInsetText({
+    html: insetHtml
   }) }}
 
   {# Appointment type radios #}
-  {{ govukRadios({
-    formGroup: {
-      attributes: {
-        'data-qa': 'type'
-      }
-    },
-    fieldset: {
-      legend: {
-        text: "What appointment are you arranging?",
-        classes: "govuk-fieldset__legend--m"
-      }
-    },
-    items: types
-  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
+  {% if types.length %}
+      {{ govukRadios({
+        formGroup: {
+          attributes: {
+            'data-qa': 'type'
+          }
+        },
+        fieldset: {
+          legend: {
+            text: "What appointment are you arranging?",
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        items: types
+      } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
+  {% endif %}
 
   {# Attendence #}
   <section data-qa="attendee">

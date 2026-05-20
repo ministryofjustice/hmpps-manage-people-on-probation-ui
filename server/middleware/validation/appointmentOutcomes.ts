@@ -6,11 +6,18 @@ import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
-  let errorMessages = res?.locals?.errorMessages || {}
-  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
-  const { crn, id, isInPast, baseOutcomeUrl, reqUrl } = res.locals.appointmentOutcome
+  const { crn, id, isInPast, baseOutcomeUrl, reqUrl, sendBreachOrRecallLetter } = res.locals.appointmentOutcome
   const { maxCharCount } = config
-  const localParams: LocalParams = null
+
+  req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
+
+  let localParams: LocalParams = { crn, id }
+  if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
+    localParams = { ...localParams, maxCharCount: maxCharCount as number }
+  }
+
+  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
+  let errorMessages = res?.locals?.errorMessages || {}
 
   const validateOutcome = (): void => {
     if (reqUrl !== baseOutcomeUrl) return
@@ -41,7 +48,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/attended-failed-to-comply`,
           msg: 'Select an action for this failure to comply',
-          log: 'Action for failure to comply not selected',
+          log: 'Attended failed to comply action not selected',
         }),
       ),
     }
@@ -75,7 +82,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
         appointmentOutcomesValidation({
           crn,
           id,
-          page: `outcome/acceptable-absence`,
+          page: `outcome/unacceptable-absence`,
           msg: 'Select an action for their unacceptable absence',
           log: 'Unacceptable absence enforcement action not selected',
         }),
@@ -96,6 +103,83 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/failed-to-attend`,
           msg: 'Select an enforcement action for their absence',
           log: 'Failed to attend enforcement action not selected',
+        }),
+      ),
+    }
+  }
+
+  const validateEnforcementAction = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/enforcement-action`)) return
+    render = 'pages/appointment-outcomes/enforcement-action'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/enforcement-action`,
+          msg: 'Select an enforcement action for their failure to comply',
+          log: 'Enforcement action not selected',
+        }),
+      ),
+    }
+  }
+
+  const validateInitiateBreachRecall = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/initiate-breach-or-recall`)) return
+    render = 'pages/appointment-outcomes/initiate-breach-or-recall'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/initiate-breach-or-recall`,
+          msg: [
+            'Select who will create the breach NSI',
+            'Select who will send the letter',
+            'Select the type of letter',
+          ],
+          log: ['breach NSI created by not selected', 'letter sent by no selected', 'letter type not selected'],
+          sendBreachOrRecallLetter,
+        }),
+      ),
+    }
+  }
+
+  const validateSendLetter = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/send-letter`)) return
+    render = 'pages/appointment-outcomes/send-letter'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/send-letter`,
+          msg: ['Select who will send the letter', 'Select the type of letter'],
+          log: ['letter sent by no selected', 'letter type not selected'],
+        }),
+      ),
+    }
+  }
+
+  const validateUpdateEnforcementAction = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/update-enforcement-action`)) return
+    render = 'pages/appointment-outcomes/update-enforcement-action'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/update-enforcement-action`,
+          msg: 'Select another enforcement action',
+          log: 'Another enforcement action not selected',
         }),
       ),
     }
@@ -124,6 +208,10 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateAcceptableAbsence()
   validateUnacceptableAbsence()
   validateFailedToAttend()
+  validateEnforcementAction()
+  validateInitiateBreachRecall()
+  validateSendLetter()
+  validateUpdateEnforcementAction()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {

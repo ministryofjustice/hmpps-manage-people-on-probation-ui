@@ -26,6 +26,8 @@ const eSuperVision: Route<void> = (req, res, next) => {
     'manageCheckin',
     'editCheckInEmail',
   ])
+  // ESUPERVISION FEATURE FLAG
+  const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
 
   const { back = '', cya = '' } = req.query as Record<string, string>
   const localParams: LocalParams = {
@@ -205,14 +207,13 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`case/${crn}/appointments/check-in/manage/${id}/stop-checkin`)) {
       render = `pages/check-in/manage/stop-checkin`
       localParams.id = id
-      const stopCheckIn = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
       errorMessages = validateWithSpec(
         req,
         eSuperVisionValidation({
           crn,
           id,
           page: 'stop-checkin',
-          stopCheckIn,
+          isSensitiveNotesEnabled,
         }),
       )
     }
@@ -333,7 +334,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateEditQuestion()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    return res.render(render, { errorMessages, ...localParams })
+    return res.render(render, { errorMessages, isSensitiveNotesEnabled, ...localParams })
   }
   return next()
 }

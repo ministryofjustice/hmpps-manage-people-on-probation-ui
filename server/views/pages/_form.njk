@@ -1,7 +1,7 @@
 {% extends "../partials/layout.njk" %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% block beforeContent %}
-  {% if breadcrumb and flags.enableBreadcrumbs and not change %}
+  {% if breadcrumb and not change %}
     {{ govukBreadcrumbs({
       items: [
         {
@@ -61,6 +61,7 @@
             </h2>
           {% endif %}
         {% endblock %}
+        {% block afterHeading %}{% endblock %}
         <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %} {% if formId %} id="{{ formIdName }}"{% endif %}>
           {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
           {% block form %}{% endblock %}

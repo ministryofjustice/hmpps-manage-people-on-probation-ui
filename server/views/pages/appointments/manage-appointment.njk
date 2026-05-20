@@ -8,10 +8,21 @@
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% set sentence = sentences[0].order.description %}
-{% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/attended-complied' %}
-{% if flags.enableNonCompliance %}
+
+{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else 
+  'Log attended and complied appointment' %}
+{% set outcomeLink = null %}
+{% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/attended-complied' %}
+{% endif %}
+{% if flags.enableNonCompliance and not appointment.hasOutcome %}
   {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
+{% if flags.enableNonCompliance and appointment.hasOutcome %}
+  {% set outcomeLabel = 'Change appointment outcome' %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action' %}
+{% endif %}
+
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
@@ -154,12 +165,12 @@
   items: [
     {
       title: {
-        html: '<span>' + ('Log appointment outcome' if flags.enableNonCompliance else 'Log attended and complied appointment') + '</span>'
+        html: '<span>' + outcomeLabel + '</span>'
       },
       hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
       } if not flags.enableNonCompliance and not appointment.isInPast,
-      href: null if appointment.hasOutcome or (not appointment.hasOutcome and not flags.enableNonCompliance and not appointment.isInPast) else outcomeLink,
+      href: outcomeLink,
       status: {
         tag: {
           text: compliedStatus,
@@ -200,7 +211,7 @@
       hint: {
         text: nextAppointmentHint
       },
-      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not nextAppointment.appointment and not hasDeceased,
+      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not hasDeceased,
       status: {
         tag: {
           text: "Not started",

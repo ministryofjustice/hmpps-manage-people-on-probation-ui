@@ -12,8 +12,10 @@ import {
   NextAppointmentResponse,
   YesNo,
   AttendedCompliedAppointment,
-  AppointmentOutcomeOption,
-  AppointmentEnforcementActionOption,
+  AppointmentOutcomeType,
+  AppointmentEnforcementAction,
+  EnforcementActionLetterType,
+  EnforcementActionCreatedBy,
   ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
@@ -21,12 +23,22 @@ import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import { Activity, PersonAppointment, PersonSchedule } from '../data/model/schedule'
+import {
+  Activity,
+  ContactEnforcementActions,
+  ContactOutcomes,
+  PersonAppointment,
+  PersonSchedule,
+} from '../data/model/schedule'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
-import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
+import {
+  ESupervisionCheckIn,
+  EsupervisionUpcomingQuestionsResponse,
+  OffenderCheckinsByCRNResponse,
+} from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -142,6 +154,7 @@ interface Locals {
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
+  upcomingCheckin?: EsupervisionUpcomingQuestionsResponse
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
@@ -150,7 +163,8 @@ interface Locals {
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
   feedbackEmail?: string
-  appointmentOutcome?: AppointmentOutcomeProps
+  appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
+  action?: string
 }
 
 export interface AppointmentOutcomeSentence {
@@ -163,10 +177,12 @@ export interface AppointmentOutcomeEnforcementAction {
   responseByDays?: number
 }
 
-export interface AppointmentOutcomeProps {
+export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE'
+
+export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
-  appointment: AttendedCompliedAppointment | Activity
+  appointment: TAppointment
   crn: string
   uuid: string | undefined
   contactId: string | undefined
@@ -179,12 +195,22 @@ export interface AppointmentOutcomeProps {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  outcomes?: ContactOutcomes[]
+  enforcementActions?: ContactEnforcementActions[]
+  options?:
+    | Option<AppointmentOutcomeType>[]
+    | Option<AppointmentEnforcementAction | ''>[]
+    | Option<EnforcementActionCreatedBy>[]
+  letterSentByOptions?: Option<EnforcementActionCreatedBy>[]
+  letterTypeOptions?: Option<EnforcementActionLetterType>[]
   sentence?: AppointmentOutcomeSentence
   enforcementAction?: AppointmentOutcomeEnforcementAction
-  sentenceType?: SentenceType
   isProbationPractitioner?: boolean
   appointmentHintText?: string
+  sendBreachOrRecallLetter?: boolean
+  sendLetter?: boolean
+  currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
+  notePrepend?: string
 }
 
 export interface AppResponse extends Response {

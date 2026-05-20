@@ -7,7 +7,7 @@ export interface SentenceDetails {
   sentence: Sentence
 }
 
-export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE'
+export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE' | 'PSS' | 'YOUTH_CUSTODY'
 
 export interface Sentences {
   personSummary: PersonSummary

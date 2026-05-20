@@ -89,6 +89,15 @@ const activityLogController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
+      if (req.query?.showSuccessBanner) {
+        req.flash('contactUpdated', 'success')
+        const cleanParams = new URLSearchParams(req.query as Record<string, string>)
+        cleanParams.delete('showSuccessBanner')
+        const cleanQuery = cleanParams.toString()
+        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
+      }
+      const showSuccessBanner = !!req.flash('contactUpdated')?.[0]
+
       let { url } = req
       url = encodeURIComponent(url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -118,6 +127,7 @@ const activityLogController: Controller<typeof routes, void> = {
         id,
         url,
         isActivityLog,
+        showSuccessBanner,
       })
     }
   },

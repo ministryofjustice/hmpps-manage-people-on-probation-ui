@@ -27,6 +27,10 @@
 {% include './_outcomes.njk' %}
 {% endset %}
 
+{% set myEnforcementActionsTable %}
+  {% include './_myEnforcementActions.njk' %}
+{% endset %}
+
 {% block content %}
   {{ probationAccordion({
     id: "accordion-default",
@@ -71,6 +75,31 @@
       }
     ]
   }) }}
+
+  {% if flags.enableMyEnforcementActionsOverview %}
+  {{ probationAccordion({
+    id: "accordion-default-enforcementAction-new",
+    attributes: {
+      'data-qa': 'homepage-enforcement-actions'
+    },
+    rememberExpanded: false,
+    items: [
+      {
+        heading: {
+        html: 'My enforcement actions'
+      },
+        afterHeading: {
+        html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">My enforcement actions</span><a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/enforcement-actions">View all enforcement actions</a>'  if enforcementActions.length else ''
+      },
+        content: {
+        html: myEnforcementActionsTable
+      },
+        expanded: true if enforcementActions.length == 0 else false
+      }
+    ]
+  }) }}
+  {% endif %}
+
 
   <hr class="govuk-section-break--l">
 

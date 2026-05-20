@@ -73,17 +73,15 @@ const getExpectedOptions = ({
   const expectedOptions: ExpectedOption<RedirectPages>[] = [
     { value: 'SEND_LETTER', text: 'Send a letter', RedirectPage: SendLetterPage, redirectPageName: 'Send a letter' },
     {
-      value: 'INITIATE_BREACH_RECALL',
+      value: 'BREACH_RECALL_INITIATED',
       text: `Initiate a ${text}`,
       RedirectPage: InitiateBreachOrRecallPage,
-      redirectPageName: `Initiate a ${text}`,
       redirectPageTitle: `Initiate a ${text}`,
     },
     {
-      value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+      value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       text: `Initiate a ${text} and send a letter`,
       RedirectPage: InitiateBreachOrRecallPage,
-      redirectPageName: `Initiate a ${text}`,
       redirectPageTitle: `Initiate a ${text}`,
     },
   ]
@@ -92,7 +90,7 @@ const getExpectedOptions = ({
       value: 'REFER_TO_OFFENDER_MANAGER',
       text: 'Refer to offender manager',
       hint: 'Notify the allocated probation practitioner so they can take action.',
-      redirectPageName: 'Add a note',
+      redirectPageTitle: 'Add a note',
       RedirectPage: AddNotePage,
     })
   }
@@ -101,13 +99,12 @@ const getExpectedOptions = ({
       value: 'NO_FURTHER_ACTION',
       text: 'No further action',
       RedirectPage: AddNotePage,
-      redirectPageName: 'Add a note',
+      redirectPageTitle: 'Add a note',
     },
     {
       value: 'DIFFERENT_ACTION',
       text: 'I want to add a different action',
       RedirectPage: EnforcementActionPage,
-      redirectPageName: 'Enforcement action',
       redirectPageTitle: 'Select an enforcement action for Alton’s failure to comply',
     },
   )
@@ -149,7 +146,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     attendedFailedToComplyPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
+      cy.get(`#appointments-${crn}-${id}-outcome-unacceptableAbsence-error`).should('contain.text', msg)
     })
   })
   it('should redirect to the correct page when an option is selected', () => {

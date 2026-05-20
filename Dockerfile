@@ -1,17 +1,12 @@
 # Stage: base image
-FROM node:22-alpine3.21 as base
+FROM ghcr.io/ministryofjustice/hmpps-node:24-alpine AS base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
 
-LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
-
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
-
-RUN addgroup -g 2000 appgroup && \
-    adduser -u 2000 -G appgroup -D appuser
 
 WORKDIR /app
 
@@ -25,12 +20,6 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apk add --no-cache \
-    python3 \
-    python3-dev \
-    build-base \
-    ca-certificates
-
 # Stage: build assets
 FROM base as build
 
@@ -38,7 +27,7 @@ ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
 
-COPY package*.json .allowed-scripts.mjs ./
+COPY package*.json .allowed-scripts.mjs .npmrc ./
 RUN CYPRESS_INSTALL_BINARY=0 NPM_CONFIG_AUDIT=false NPM_CONFIG_FUND=false npm run setup
 
 ENV NODE_ENV='production'

@@ -184,7 +184,7 @@
     visuallyHiddenText: "sensitivity"
      } 
      ] 
-     } if showAction }
+     } if showAction and (not flags.enableSensitivityRemoved or not sensitivityLocked) }
 ] }) }}
     {% if showCalendarInsetText %}
         {{ govukInsetText({

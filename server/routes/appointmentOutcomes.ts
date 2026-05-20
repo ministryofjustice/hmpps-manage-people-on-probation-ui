@@ -9,19 +9,28 @@ import {
   createAppointmentSession,
   getAppointmentTypes,
   getSentences,
-  getAppointmentOutcomeProps,
-  getAppointmentOutcomeOptions,
   redirectWizard,
   getPersonalDetails,
-  getAppointmentAttendedFailedToComplyOptions,
-  getAppointmentOutcomeBackLink,
-  getAppointmentAcceptableAbsenceOptions,
-  getAppointmentOutcomeEvidenceBy,
-  parseMultipartBody,
 } from '../middleware'
+
+import {
+  getAttendedFailedToComplyOptions,
+  getBackLink,
+  getAcceptableAbsenceOptions,
+  getEnforcementActionOptions,
+  getBreachNSICreatedByOptions,
+  getSendLetterOptions,
+  getOutcomeEvidenceBy,
+  getOutcomeOptions,
+  getOutcomeProps,
+  getFailedToAttendOptions,
+  saveMappedCode,
+  getUpdateEnforcementActionOptions,
+  getCurrentEnforcementAction,
+  getContactOutcomes,
+} from '../middleware/appointment-outcomes'
+
 import validate from '../middleware/validation/index'
-import { getAppointmentFailedToAttendOptions } from '../middleware/getAppointmentFailedToAttendOptions'
-import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -35,24 +44,41 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getPersonAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    createAppointmentSession,
   )
+
+  /* create appointment session in manage journey */
+
+  router.get([manageBasePath, `${manageBasePath}/update-enforcement-action`], createAppointmentSession)
 
   /* redirect page if required session data is not present */
 
   router.get(arrangeBasePath, redirectWizard(['eventId', 'type', 'date']))
 
+  /* get the contact outcomes and enforcement actions from api */
+
+  router.get(
+    [manageBasePath, arrangeBasePath, `${manageBasePath}/update-enforcement-action`],
+    getContactOutcomes(hmppsAuthClient),
+  )
+
   /* get outcome props for all outcome routes */
 
   router.all(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
-    getAppointmentOutcomeProps,
-    getAppointmentOutcomeBackLink,
+    getOutcomeProps,
+    getBackLink,
+  )
+
+  /* get readable enforcement action from current appointment */
+
+  router.all(
+    [`${manageBasePath}/update-enforcement-action`, `${manageBasePath}/enforcement-action`],
+    getCurrentEnforcementAction,
   )
 
   /* run the outcome page options middleware before validation */
 
-  router.all([arrangeBasePath, manageBasePath], getAppointmentOutcomeOptions)
+  router.all([arrangeBasePath, manageBasePath], getOutcomeOptions)
 
   router.all(
     [
@@ -61,26 +87,40 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${arrangeBasePath}/unacceptable-absence`,
       `${manageBasePath}/unacceptable-absence`,
     ],
-    getAppointmentAttendedFailedToComplyOptions,
+    getAttendedFailedToComplyOptions,
   )
 
   router.all(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    getAppointmentAcceptableAbsenceOptions,
+    getAcceptableAbsenceOptions,
   )
 
   router.all(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    getAppointmentFailedToAttendOptions,
-    getAppointmentOutcomeEvidenceBy,
+    getFailedToAttendOptions,
+    getOutcomeEvidenceBy,
   )
-  /* run multer file upload error handler before validation */
 
-  router.post(
-    `${manageBasePath}/add-note`,
-    multerErrorHandler('fileUpload'),
-    parseMultipartBody,
-    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
+  router.all(
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
+    getEnforcementActionOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
+    getBreachNSICreatedByOptions,
+  )
+
+  router.all(`${manageBasePath}/update-enforcement-action`, getUpdateEnforcementActionOptions)
+
+  router.all(
+    [
+      `${arrangeBasePath}/initiate-breach-or-recall`,
+      `${manageBasePath}/initiate-breach-or-recall`,
+      `${arrangeBasePath}/send-letter`,
+      `${manageBasePath}/send-letter`,
+    ],
+    getSendLetterOptions,
   )
 
   /* validate outcome options and store session data on all outcome post routes */
@@ -91,24 +131,15 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     autoStoreSessionData(hmppsAuthClient),
   )
 
+  /* save the mapped outcome and action code */
+
+  router.post([arrangeBasePath, manageBasePath], saveMappedCode('OUTCOME'))
+  router.post([`${arrangeBasePath}/*path`, `${manageBasePath}/*path`], saveMappedCode('ACTION'))
+
   /* Outcome index  */
 
   router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
   router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
-
-  /* Add note */
-
-  router.all(`${manageBasePath}/add-note`, getPersonAppointment(hmppsAuthClient))
-
-  router.get(
-    [`${arrangeBasePath}/add-note`, `${manageBasePath}/add-note`],
-    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
-  )
-
-  router.post(
-    [`${arrangeBasePath}/add-note`, `${manageBasePath}/add-note`],
-    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
-  )
 
   /* Attended - failed to comply */
 
@@ -184,4 +215,8 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
     controllers.appointmentOutcomes.postUpdateEnforcementAction(),
   )
+
+  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+
+  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
 }

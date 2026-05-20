@@ -505,9 +505,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-        const practitionerId = pp?.username ? pp.username : res.locals.user.username
+        const practitionerId = res.locals.user.username
         const eSupervisionClient = new ESupervisionClient(token)
         await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
       }
@@ -531,7 +529,13 @@ const checkInsController: Controller<typeof routes, void> = {
       const { checkIn } = res.locals
 
       if (checkIn.status !== 'REVIEWED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+        return res.render('pages/check-in/update.njk', {
+          crn,
+          id,
+          back,
+          checkIn,
+          systemIdCheckPass: systemIdCheckPass(checkIn),
+        })
       }
       return res.render('pages/check-in/view.njk', {
         crn,
@@ -557,19 +561,18 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
 
-      const masClient = new MasApiClient(token)
-      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+      const practitionerUsername = res.locals.user.username
 
       const eSupervisionClient = new ESupervisionClient(token)
       const notes: ESupervisionNote = {
-        updatedBy: practitionerId,
+        updatedBy: practitionerUsername,
         notes: checkIn.note,
+        sensitive: checkIn?.sensitiveContact === 'true',
       }
       await eSupervisionClient.postOffenderCheckInNote(id, notes)
 
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'note'], null)
-
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'sensitiveContact'], null)
       return res.redirect(url)
     }
   },
@@ -675,22 +678,22 @@ const checkInsController: Controller<typeof routes, void> = {
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+      const practitionerUsername = res.locals.user.username
       let risk: boolean = null
       if (checkIn?.riskManagementFeedback) {
         risk = checkIn.riskManagementFeedback === 'yes'
       }
       const review: ESupervisionReview = {
-        reviewedBy: practitionerId,
+        reviewedBy: practitionerUsername,
         manualIdCheck: checkIn?.manualIdCheck,
         missedCheckinComment: checkIn?.missedCheckinComment,
         notes: checkIn?.furtherActions,
         riskManagementFeedback: risk,
+        sensitive: checkIn?.sensitiveContact === 'true',
       }
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'sensitiveContact'], null)
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
@@ -1048,7 +1051,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
+      const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
+      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id, isSensitiveNotesEnabled })
     }
   },
 
@@ -1353,16 +1357,33 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const stopCheckinVal = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
-      if (stopCheckinVal === 'YES') {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const eSupervisionClient = new ESupervisionClient(token)
-        const body: DeactivateOffenderRequest = {
-          requestedBy: res.locals.user.username,
-          reason: handleQuotes(getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'reason'])),
-        }
-        res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
+
+      const reasonData = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])
+
+      const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
+
+      let isSensitive = false
+      if (isSensitiveNotesEnabled) {
+        const sensitiveData = getDataValue(req.session.data, [
+          'esupervision',
+          crn,
+          id,
+          'manageCheckin',
+          'stopCheckinSensitive',
+        ])
+        isSensitive = sensitiveData === 'true'
       }
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+
+      const body: DeactivateOffenderRequest = {
+        requestedBy: res.locals.user.username,
+        reason: handleQuotes(reasonData),
+        sensitive: isSensitive,
+      }
+      res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin'], null)
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
   },

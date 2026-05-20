@@ -1,5 +1,6 @@
 import config from '../config'
 import RestClient from './restClient'
+import { EnforcementContact } from './model/schedule'
 
 export default class DeliusClient extends RestClient {
   constructor(token: string) {
@@ -21,6 +22,7 @@ export interface Homepage {
   upcomingAppointments: AppointmentSummary[]
   appointmentsRequiringOutcome: AppointmentSummary[]
   appointmentsRequiringOutcomeCount: number
+  enforcementContacts?: EnforcementContact[]
 }
 
 export interface AppointmentSummary {

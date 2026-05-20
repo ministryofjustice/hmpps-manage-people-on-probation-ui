@@ -3,60 +3,34 @@ import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import { getDataValue } from '../utils'
 import { renderError } from '../middleware'
-import { mockAppResponse, mockPersonAppointment } from './mocks'
+import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
-import MasApiClient from '../data/masApiClient'
-import { isSuccessfulUpload } from './appointments'
-import HmppsAuthClient from '../data/hmppsAuthClient'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
 import { appointmentOutcomeRequests } from './appointmentOutcomes'
+import { Activity } from '../data/model/schedule'
+import { isSuccessfulUpload } from './appointments'
+import TokenStore from '../data/tokenStore/redisTokenStore'
+import MasApiClient from '../data/masApiClient'
+import { HmppsAuthClient } from '../data'
 
 const crn = 'X000001'
 const id = '1234'
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const contactId = '1234'
-
-const mockFile = {
-  fieldname: 'fileUpload',
-  originalname: 'mock-file.pdf',
-  encoding: '7bit',
-  mimetype: 'application/pdf',
-  buffer: [] as any,
-  size: 584020,
-}
+const change = '/change/url'
 
 jest.mock('../data/masApiClient')
-
-jest.mock('../data/masApiClient')
-
-jest.mock('../data/masApiClient')
-
-const mockHmppsAuthClient = {
-  getSystemClientToken: jest.fn().mockResolvedValue('token'),
-} as any
-
-jest.mock('../data/masApiClient')
-jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
 }))
+jest.mock('./appointments', () => ({
+  isSuccessfulUpload: jest.fn(),
+}))
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
-})
-
-jest.mock('./appointments', () => {
-  return {
-    isSuccessfulUpload: jest.fn(),
-  }
-})
-
+jest.mock('../data/masApiClient')
+jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -85,28 +59,19 @@ jest.mock('./arrangeAppointment', () => ({
   getSentence: jest.fn(() => mockMiddlewareFn),
 }))
 
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-const isSuccessfulUploadMock = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
+const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 
 const baseUrl = '/crn/X000001/appointment/appointment/1234'
 const baseOutcomeUrl = '/crn/X000001/appointment/appointment/1234/outcome'
 const completedUrl = `/completed/route`
-const patchAppointmentSpy = jest
-  .spyOn(MasApiClient.prototype, 'patchAppointment')
-  .mockImplementation(() => Promise.resolve(mockPersonAppointment))
-
-const patchDocumentResponse = {
-  statusCode: 200,
-}
-const patchDocumentsSpy = jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue(patchDocumentResponse)
 
 const mockRes = ({
   appointmentOutcome,
   appointmentCase,
 }: {
-  appointmentOutcome?: Partial<AppointmentOutcomeProps>
+  appointmentOutcome?: Partial<AppointmentOutcomeProps<Activity>>
   appointmentCase?: Record<string, any>
 } = {}) => {
   return mockAppResponse({
@@ -128,7 +93,15 @@ const mockRes = ({
   })
 }
 
-const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> => {
+const mockReq = ({
+  request = {},
+  type = 'ATTENDED_COMPLIED',
+  enforcementAction = {},
+}: {
+  request?: Record<string, any>
+  type?: AppointmentOutcomeType
+  enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
+} = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: { crn: 'R000101' },
     session: {
@@ -137,7 +110,8 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
           crn: {
             [contactId]: {
               outcome: {
-                type: 'ATTENDED_COMPLIED',
+                type,
+                ...enforcementAction,
               },
             },
           },
@@ -151,6 +125,11 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
 
 type ExpectedRedirect = Partial<Record<AppointmentOutcomeType | AppointmentEnforcementAction, string>>
 
+const token = { access_token: 'token-1', expires_in: 300 }
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+tokenStore.getToken.mockResolvedValue(token.access_token)
+
 const expectedRedirect: ExpectedRedirect = {
   ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
   ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
@@ -161,21 +140,43 @@ const expectedRedirect: ExpectedRedirect = {
   FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
   WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
   SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
-  INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-  INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-  DECISION_PENDING: `${baseOutcomeUrl}/add-note`,
+  BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION: `${baseOutcomeUrl}/add-note`,
   REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
   NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
   DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
+  SEND_ANOTHER_LETTER: `${baseOutcomeUrl}/send-letter`,
+  WITHDRAW_WARNING_LETTER: `${baseOutcomeUrl}/add-note`,
+  BREACH_REQUESTED: `${baseOutcomeUrl}/add-note`,
+  BREACH_CONFIRMATION_SENT: `${baseOutcomeUrl}/add-note`,
+  BREACH_LETTER_SENT: `${baseOutcomeUrl}/add-note`,
+  BREACH_REQUEST_ACTIONED: `${baseOutcomeUrl}/add-note`,
 }
 
-const checkRedirects = (
-  controller: (typeof appointmentOutcomeRequests)[number],
-  expectedOptions: AppointmentEnforcementAction[] | AppointmentOutcomeType[],
-): void => {
+const checkOutcomeRedirects = (expectedOptions: AppointmentOutcomeType[]): void => {
   expectedOptions.forEach(option => {
     const req = mockReq()
-    const res = mockRes()
+    const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { outcomeType: option } } } })
+    const spy = jest.spyOn(res, 'redirect')
+    mockGetDataValue.mockReturnValueOnce(option)
+    controllers.appointmentOutcomes.postOutcome()(req, res)
+    expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
+  })
+}
+
+const checkEnforcementActionRedirects = ({
+  controller = 'postAttendedFailedToComply',
+  pageKey = 'attendedFailedToComply',
+  expectedOptions = [],
+}: {
+  controller?: (typeof appointmentOutcomeRequests)[number]
+  pageKey?: keyof AppointmentSessionOutcome
+  expectedOptions?: AppointmentEnforcementAction[]
+} = {}): void => {
+  expectedOptions.forEach(option => {
+    const req = mockReq()
+    const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { [pageKey]: option } } } })
     const spy = jest.spyOn(res, 'redirect')
     mockGetDataValue.mockReturnValueOnce(option)
     controllers.appointmentOutcomes[controller]()(req, res)
@@ -187,6 +188,7 @@ describe('controllers/appointmentOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
   describe('getOutcome', () => {
     const req = mockReq()
     const res = mockRes()
@@ -217,7 +219,7 @@ describe('controllers/appointmentOutcomes', () => {
         'FAILED_TO_ATTEND',
         'WILL_BE_RESCHEDULED',
       ]
-      checkRedirects('postOutcome', expectedOptions)
+      checkOutcomeRedirects(expectedOptions)
     })
   })
 
@@ -229,19 +231,21 @@ describe('controllers/appointmentOutcomes', () => {
     }
     const actionType = 'mockType'
     const req = mockReq({
-      params: {
-        crn,
-        id,
-        contactId,
-        actionType,
-      },
-      session: {
-        cache: {
-          uploadedFiles,
+      request: {
+        params: {
+          crn,
+          id,
+          contactId,
+          actionType,
         },
-        errorMessages,
-        body: {
-          fieldName: 'value',
+        session: {
+          cache: {
+            uploadedFiles,
+          },
+          errorMessages,
+          body: {
+            fieldName: 'value',
+          },
         },
       },
     })
@@ -278,110 +282,58 @@ describe('controllers/appointmentOutcomes', () => {
   })
 
   describe('postAddNote', () => {
-    const sensitivity = 'No'
-    const notes = 'Mock notes'
+    const file = new File(['file contents'], 'avatar.png', { type: 'image/png' })
     it('should redirect to the error page if params are invalid', async () => {
       const req = mockReq()
-      const res = mockRes({ appointmentOutcome: { isValidParams: false, appointmentSession: { sensitivity, notes } } })
+      const res = mockRes({ appointmentOutcome: { isValidParams: false } })
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
-    it('should redirect to check your answers page if arrange appointment journey', async () => {
-      const req = mockReq()
-      const res = mockRes({
-        appointmentOutcome: {
-          appointmentSession: { sensitivity, notes },
-          uuid,
-          contactId: undefined,
-          id: uuid,
-        },
+    it('should upload the file', async () => {
+      isSuccessfulUploadSpy.mockReturnValueOnce(true)
+      const req = mockReq({ request: { file } })
+      const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
+      const patchDocumentsSpy = jest.spyOn(MasApiClient.prototype, 'patchDocuments')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, file)
+    })
+    it('should render the page if upload not successful', async () => {
+      isSuccessfulUploadSpy.mockReturnValueOnce(false)
+      const req = mockReq({ request: { file, body: { notes: 'Some notes', sensitive: 'no' } } })
+      const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
+      const renderSpy = jest.spyOn(res, 'render')
+      const patchDocumentsSpy = jest
+        .spyOn(MasApiClient.prototype, 'patchDocuments')
+        .mockResolvedValueOnce({ statusCode: 500 })
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, file)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointment-outcomes/add-note', {
+        uploadError: 'File not uploaded. Please try again.',
+        patchResponse: { statusCode: 500 },
+        sensitive: 'no',
+        notes: 'Some notes',
       })
+    })
+    it('should redirect to the change url if in req url query', async () => {
+      const req = mockReq({ request: { query: { change } } })
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(change)
+    })
+    it('should redirect to the check your answers page if arrange appointment journey', async () => {
+      const req = mockReq()
+      const res = mockRes({ appointmentOutcome: { uuid, contactId: undefined, id: uuid } })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
-    it('should patch the appointment if manage journey', async () => {
+    it('should redirect to the check your answers page if manage journey', async () => {
       const req = mockReq()
-      const res = mockRes({
-        appointmentOutcome: {
-          appointmentSession: { sensitivity, notes },
-          uuid: undefined,
-          contactId,
-          id: contactId,
-        },
-      })
+      const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
+      const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(patchAppointmentSpy).toHaveBeenCalledWith({
-        id: parseInt(contactId, 10),
-        notes,
-        sensitive: false,
-        outcomeRecorded: true,
-      })
-    })
-    it('should patch the file upload if exists', async () => {
-      const req = mockReq({ file: mockFile })
-      const res = mockRes({
-        appointmentOutcome: {
-          appointmentSession: { sensitivity, notes },
-          uuid: undefined,
-          contactId,
-          id: contactId,
-        },
-      })
-      isSuccessfulUploadMock.mockReturnValue(true)
-      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, contactId, mockFile)
-    })
-    it('should render the upload error', async () => {
-      const req = mockReq({ file: mockFile })
-      const res = mockRes({
-        appointmentOutcome: {
-          appointmentSession: { sensitivity, notes },
-          uuid: undefined,
-          contactId,
-          id: contactId,
-        },
-      })
-      const spy = jest.spyOn(res, 'render')
-      isSuccessfulUploadMock.mockReturnValue(false)
-      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/add-note', {
-        uploadError: 'File not uploaded. Please try again.',
-        patchResponse: patchDocumentResponse,
-        sensitive: false,
-        notes,
-      })
-    })
-  })
-
-  describe('getAttendedFailedToComply', () => {
-    it('should render the correct view', async () => {
-      const req = mockReq()
-      const res = mockRes()
-      const spy = jest.spyOn(res, 'render')
-      controllers.appointmentOutcomes.getAttendedFailedToComply()(req, res)
-      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply')
-    })
-  })
-
-  describe('postAttendedFailedToComply', () => {
-    it('should redirect to the correct page based on enforcement action', async () => {
-      const checks = {
-        SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
-        INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
-        NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
-        DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
-      }
-      Object.entries(checks).forEach(([enforcementAction, redirectUrl]) => {
-        const req = mockReq()
-        const res = mockRes()
-        const spy = jest.spyOn(res, 'redirect')
-        mockGetDataValue.mockReturnValueOnce(enforcementAction)
-        controllers.appointmentOutcomes.postAttendedFailedToComply()(req, res)
-        expect(spy).toHaveBeenCalledWith(redirectUrl)
-      })
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/check-your-answers`)
     })
   })
 
@@ -399,13 +351,17 @@ describe('controllers/appointmentOutcomes', () => {
     it('should redirect to the correct page based on enforcement action', () => {
       const expectedOptions: AppointmentEnforcementAction[] = [
         'SEND_LETTER',
-        'INITIATE_BREACH_RECALL',
-        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'BREACH_RECALL_INITIATED',
+        'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
         'REFER_TO_OFFENDER_MANAGER',
         'NO_FURTHER_ACTION',
         'DIFFERENT_ACTION',
       ]
-      checkRedirects('postAttendedFailedToComply', expectedOptions)
+      checkEnforcementActionRedirects({
+        controller: 'postAttendedFailedToComply',
+        pageKey: 'attendedFailedToComply',
+        expectedOptions,
+      })
     })
   })
   describe('getAcceptableAbsence', () => {
@@ -439,13 +395,17 @@ describe('controllers/appointmentOutcomes', () => {
     it('should redirect to the correct page based on enforcement action', () => {
       const expectedOptions: AppointmentEnforcementAction[] = [
         'SEND_LETTER',
-        'INITIATE_BREACH_RECALL',
-        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'BREACH_RECALL_INITIATED',
+        'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
         'REFER_TO_OFFENDER_MANAGER',
         'NO_FURTHER_ACTION',
         'DIFFERENT_ACTION',
       ]
-      checkRedirects('postUnacceptableAbsence', expectedOptions)
+      checkEnforcementActionRedirects({
+        controller: 'postUnacceptableAbsence',
+        pageKey: 'unacceptableAbsence',
+        expectedOptions,
+      })
     })
   })
   describe('getFailedToAttend', () => {
@@ -461,11 +421,83 @@ describe('controllers/appointmentOutcomes', () => {
     it('should redirect to the correct page based on enforcement action', () => {
       const expectedOptions: AppointmentEnforcementAction[] = [
         'SEND_LETTER',
-        'DECISION_PENDING',
+        'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
         'REFER_TO_OFFENDER_MANAGER',
         'DIFFERENT_ACTION',
       ]
-      checkRedirects('postFailedToAttend', expectedOptions)
+      checkEnforcementActionRedirects({ controller: 'postFailedToAttend', pageKey: 'failedToAttend', expectedOptions })
+    })
+  })
+  describe('getEnforcementAction', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/enforcement-action')
+    })
+  })
+  describe('postEnforcementAction', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getInitiateBreachOrRecall', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/initiate-breach-or-recall')
+    })
+  })
+  describe('postInitiateBreachOrRecall', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUpdateEnforcementAction', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUpdateEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/update-enforcement-action')
+    })
+  })
+
+  describe('postUpdateEnforcementAction', () => {
+    it('should redirect to the correct page', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_ANOTHER_LETTER',
+        'BREACH_RECALL_INITIATED',
+        'WITHDRAW_WARNING_LETTER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+        'SEND_LETTER',
+        'BREACH_RECALL_INITIATED',
+        'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        'BREACH_REQUESTED',
+        'BREACH_CONFIRMATION_SENT',
+        'BREACH_LETTER_SENT',
+        'BREACH_REQUEST_ACTIONED',
+        'WITHDRAW_WARNING_LETTER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkEnforcementActionRedirects({
+        controller: 'postUpdateEnforcementAction',
+        pageKey: 'updateEnforcementAction',
+        expectedOptions,
+      })
     })
   })
 })

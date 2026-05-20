@@ -40,20 +40,23 @@ const riskController: Controller<typeof routes, void> = {
       const arnsClient = new ArnsApiClient(token)
 
       // remove predictors below with migration to ARNS predictor timeline component
-      const [predictors, needs, sanIndicatorResponse] = await Promise.all([
-        arnsClient.getPredictorsAll(crn),
-        arnsClient.getNeeds(crn),
-        arnsClient.getSanIndicator(crn),
-      ])
-
+      let predictors
+      let needs
+      let sanIndicatorResponse
       let timeline: TimelineItem[] = []
-      let predictorScores
-      if (Array.isArray(predictors)) {
-        timeline = toTimeline(predictors)
+      if (res?.locals?.flags?.enableOGRS4) {
+        ;[needs, sanIndicatorResponse] = await Promise.all([arnsClient.getNeeds(crn), arnsClient.getSanIndicator(crn)])
+      } else {
+        ;[predictors, needs, sanIndicatorResponse] = await Promise.all([
+          arnsClient.getPredictorsAll(crn),
+          arnsClient.getNeeds(crn),
+          arnsClient.getSanIndicator(crn),
+        ])
+        if (Array.isArray(predictors)) {
+          timeline = toTimeline(predictors)
+        }
       }
-      if (timeline.length > 0) {
-        ;[predictorScores] = timeline
-      }
+
       const oasysLink = config.oaSys.link
       return res.render('pages/risk', {
         crn,

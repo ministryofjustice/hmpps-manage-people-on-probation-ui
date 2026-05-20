@@ -374,6 +374,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Date is entered which is in the past', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getDatePickerInput().type(`${yesterday.toFormat('d/M/yyyy')}`)
     })
     it('should display the log an outcome alert banner', () => {
@@ -424,6 +425,7 @@ describe('Pick a date, location and time for this appointment', () => {
         body: { isInPast: false },
       }).as('isInPast')
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
@@ -449,6 +451,18 @@ describe('Pick a date, location and time for this appointment', () => {
       }).as('isInPast')
       loadPage()
     })
+    it('should not display the warning message if enableNonCompliance flag is true', () => {
+      cy.task('stubEnableNonCompliance')
+      loadPage()
+      selectPastDate()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
+    })
+
+    it('should display the warning message if enableNonCompliance flag is false', () => {
+      selectPastDate()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
+    })
+
     it('should persist the log an outcome alert banner when form is submitted with validation errors', () => {
       selectPastDate()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
@@ -507,6 +521,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
+      logOutcomePage = new AttendedCompliedPage()
       logOutcomePage.getCancelGoBackLink().click()
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })

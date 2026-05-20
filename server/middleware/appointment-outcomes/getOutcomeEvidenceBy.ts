@@ -1,8 +1,8 @@
 import { DateTime } from 'luxon'
-import { Route } from '../@types'
-import { AppointmentOutcomeEnforcementAction } from '../models/Locals'
+import { Route } from '../../@types'
+import { AppointmentOutcomeEnforcementAction } from '../../models/Locals'
 
-export const getAppointmentOutcomeEvidenceBy: Route<void> = (req, res, next) => {
+export const getOutcomeEvidenceBy: Route<void> = (req, res, next) => {
   const { appointmentSession } = res.locals.appointmentOutcome
   const enforcementActionResponseByDate = appointmentSession?.enforcementAction?.responseByDate ?? null
   let enforcementAction: AppointmentOutcomeEnforcementAction = null

@@ -1,19 +1,19 @@
-import { Route } from '../@types'
-import { AppointmentOutcomeType } from '../models/Appointments'
-import { getDataValue } from '../utils'
+import { Route } from '../../@types'
+import { AppointmentOutcomeType } from '../../models/Appointments'
+import { getDataValue } from '../../utils'
 
-export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
+export const getBackLink: Route<void> = (req, res, next) => {
   const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id } = res.locals.appointmentOutcome
   let backLink = baseOutcomeUrl
-  if (reqUrl === baseOutcomeUrl) {
+  if ([baseOutcomeUrl, `${baseOutcomeUrl}/update-enforcement-action`].includes(reqUrl)) {
     backLink = uuid ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`
   }
-  let type: AppointmentOutcomeType
-  if (req?.body?.appointments?.[crn]?.[id]?.outcome?.type) {
-    type = req.body.appointments[crn][id].outcome.type
+  let outcomeType: AppointmentOutcomeType
+  if (req?.body?.appointments?.[crn]?.[id]?.outcome?.outcomeType) {
+    outcomeType = req.body.appointments[crn][id].outcome.outcomeType
   } else {
-    type = req?.session?.data
-      ? getDataValue<AppointmentOutcomeType>(req.session.data, ['appointments', crn, id, 'outcome', 'type'])
+    outcomeType = req?.session?.data
+      ? getDataValue<AppointmentOutcomeType>(req.session.data, ['appointments', crn, id, 'outcome', 'outcomeType'])
       : null
   }
   if (
@@ -23,7 +23,7 @@ export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
       `${baseOutcomeUrl}/initiate-breach-or-recall`,
     ].some(route => route === reqUrl)
   ) {
-    switch (type) {
+    switch (outcomeType) {
       case 'ATTENDED_SENT_HOME_BEHAVIOUR':
       case 'ATTENDED_FAILED_TO_COMPLY':
       case 'ATTENDED_SENT_HOME_SERVICE_ISSUES':

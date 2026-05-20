@@ -13,7 +13,6 @@ import { getMockedTime } from '../../routes/testRoutes'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
-import { standardiseDateValue } from '../../utils/standardiseDateValue'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
@@ -30,6 +29,10 @@ const appointments: Route<void> = (req, res, next) => {
 
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+  const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+  const isSensitive =
+    (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) ??
+    res.locals.personAppointment?.appointment?.isSensitive
 
   let localParams: LocalParams = {
     crn,
@@ -42,6 +45,7 @@ const appointments: Route<void> = (req, res, next) => {
     back,
     change,
     alertDismissed,
+    isSensitive,
   }
 
   if (
@@ -200,6 +204,7 @@ const appointments: Route<void> = (req, res, next) => {
           page: 'supporting-information',
           notes: req.body.appointments[crn][id].notes,
           maxCharCount: maxCharCount as number,
+          isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
         }),
       ),
     }
@@ -237,6 +242,7 @@ const appointments: Route<void> = (req, res, next) => {
         page: `arrange-appointment/${id}/add-note`,
         notes: req.body.appointments[crn][id].notes,
         maxCharCount: maxCharCount as number,
+        isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
       }),
     )
   }
@@ -259,6 +265,7 @@ const appointments: Route<void> = (req, res, next) => {
           notes: req.body.notes,
           fileOrNote: req.body.fileOrNote,
           maxCharCount: maxCharCount as number,
+          isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
         }),
       ),
     }
@@ -276,6 +283,7 @@ const appointments: Route<void> = (req, res, next) => {
             id,
             page: 'reschedule-appointment',
             maxCharCount: maxCharCount as number,
+            isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
           }),
         ),
       }

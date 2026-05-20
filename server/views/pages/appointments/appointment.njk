@@ -1,6 +1,8 @@
+{% from "moj/components/banner/macro.njk" import mojBanner %}
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
+{% set excludedTypes = ['critical communications', 'alcohol consumption', 'unplanned contact'] %}
 {% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set pageTitle = makePageTitle({
   pageHeading: [appointmentDisplayName, 'note']}) %}
@@ -9,6 +11,11 @@
 {% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set shouldShowManageButton =
+  flags.enableManageContacts
+  and appointment.displayName
+  and (appointment.type | lower) not in excludedTypes
+%}
 {% block beforeContent %}
   {% if backLink %}
     {{ govukBackLink({
@@ -17,12 +24,37 @@
   {% endif %}
 {% endblock %}
 
+{% set actions = { items: [] } %}
+
+{% if shouldShowManageButton %}
+  {% set actions = {
+    items: [{
+      href: supervisionContactsUpdateLink(crn, appointment.id),
+      text: 'Update contact',
+      classes: 'govuk-!-font-weight-bold',
+      attributes: {
+        'data-qa': 'manage-link',
+        'data-event-name': 'update-contact'
+      }
+    }]
+  } %}
+{% endif %}
+
 {% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else 
   'Upcoming' %}
 {% set title = appointmentDisplayName + ' with ' + appointment.officer.name | fullName %}
 {% set isOutcomeRecorded = appointment.hasOutcome %}
 
 {% block content %}
+
+{{ mojBanner({
+      type: 'success',
+      html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact Updated</h2>',
+      classes: 'govuk-!-margin-bottom-2',
+      attributes: { "data-qa": "contactUpdated"},
+      iconFallbackText: 'Success'
+  }) if showSuccessBanner and flags.enableManageContacts == true }}
+
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
@@ -51,7 +83,6 @@
       {% endif %}
     </p>
   {% endif %}
-
   {% set appointmentDetails %}
   {% set showAction = false %}
   {% set noMargin = true %}
@@ -61,8 +92,9 @@
 
   {{ appSummaryCard({
   attributes: {'data-qa': 'appointmentDetailsCard'},
-  titleText: 'Appointment details' if appointment.isAppointment else 'Details',
+  titleText: 'Appointment details' if appointment.isAppointment else 'Contact details',
   headingLevel: '3',
+  actions: actions,
   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
   html: appointmentDetails
 }) }}

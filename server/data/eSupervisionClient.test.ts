@@ -358,6 +358,7 @@ describe('ESupervisionClient', () => {
       const body: DeactivateOffenderRequest = {
         requestedBy: 'requestedBy',
         reason: 'reason',
+        sensitive: true,
       }
 
       const response = {}

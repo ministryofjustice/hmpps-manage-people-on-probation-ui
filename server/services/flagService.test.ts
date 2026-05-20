@@ -1,7 +1,13 @@
 import { FliptEvaluationClient } from '@flipt-io/flipt-client'
+import * as Sentry from '@sentry/node'
 import { FlagService } from '.'
 
 const email = 'test@example.com'
+
+jest.mock('@sentry/node', () => ({
+  getClient: jest.fn(() => ({})),
+  captureException: jest.fn(),
+}))
 
 jest.mock('@flipt-io/flipt-client', () => ({
   FliptEvaluationClient: {
@@ -205,5 +211,57 @@ describe('FlagService', () => {
         }),
       ]),
     )
+  })
+
+  it('captures message in Sentry when enableSentencePlan flag has unexpected response count', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
+      ],
+    })
+
+    const result = await service.getFlags({ email })
+
+    expect(result.enableSentencePlan).toBe(false)
+    expect(result.enableSanIndicator).toBe(true)
+    expect(result.enableESupervisionCheckins).toBe(true)
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining('Expected exactly 1 response for flag enableSentencePlan, got 2'),
+      }),
+      expect.objectContaining({
+        tags: {
+          flag: 'enableSentencePlan',
+          service: 'FlagService',
+        },
+        extra: {
+          matchingLength: 2,
+        },
+      }),
+    )
+  })
+
+  it('does not capture Sentry exception when no Sentry client exists', async () => {
+    ;(Sentry.getClient as jest.Mock).mockReturnValue(undefined)
+
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+      ],
+    })
+
+    const result = await service.getFlags({ email })
+
+    expect(result.enableSentencePlan).toBe(false)
+
+    expect(Sentry.getClient).toHaveBeenCalled()
+
+    expect(Sentry.captureException).not.toHaveBeenCalled()
   })
 })

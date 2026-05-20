@@ -1,5 +1,6 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
+import { uncork } from 'bunyan-format'
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
@@ -9,6 +10,7 @@ import { escapeForLog } from '../utils/escapeForLog'
 import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
 import 'multer'
+import isTimeoutError from '../utils/isTimeoutError'
 
 interface Request {
   path: string
@@ -23,6 +25,7 @@ interface Request {
   errorMessage?: string
   file?: Express.Multer.File
   isMultipart?: boolean
+  retry?: boolean
 }
 
 interface RequestWithBody extends Request {
@@ -59,7 +62,8 @@ export default class RestClient {
     handle500 = false,
     handle401 = false,
     errorMessage = '',
-  }: Request): Promise<TResponse> {
+    retry = true,
+  }: Request): Promise<TResponse | null> {
     logger.info(escapeForLog(`${this.name} GET: ${path}`))
 
     const apiUrl = this.apiUrl()
@@ -75,7 +79,12 @@ export default class RestClient {
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
+          if (retry === false) return false
+
           if (err) logger.info(`Retry handler found ${this.name} API error with ${err.code} ${err.message}`)
+
+          if (isTimeoutError(err)) return false
+
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
         .auth(this.token, { type: 'bearer' })
@@ -126,7 +135,7 @@ export default class RestClient {
       isMultipart = false,
       errorMessage = '',
     }: RequestWithBody,
-  ): Promise<Response> {
+  ): Promise<Response | null> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
 
     try {
@@ -136,7 +145,10 @@ export default class RestClient {
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
           if (retry === false) return false
+
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
+
+          if (isTimeoutError(err)) return false
           return undefined
         })
         .auth(this.token, { type: 'bearer' })
@@ -169,7 +181,7 @@ export default class RestClient {
       const result = await request
       return raw ? (result as Response) : result.body
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error as unknown as Error)
       const sanitisedErrorMessage = sanitisedError.message
 
       if (sanitisedError.status === 400) {
@@ -199,15 +211,15 @@ export default class RestClient {
     }
   }
 
-  async patch<Response = unknown>(request: RequestWithBody): Promise<Response> {
+  async patch<Response = unknown>(request: RequestWithBody): Promise<Response | null> {
     return this.requestWithBody('patch', request)
   }
 
-  async post<Response = unknown>(request: RequestWithBody): Promise<Response> {
+  async post<Response = unknown>(request: RequestWithBody): Promise<Response | null> {
     return this.requestWithBody('post', request)
   }
 
-  async put<Response = unknown>(request: RequestWithBody): Promise<Response> {
+  async put<Response = unknown>(request: RequestWithBody): Promise<Response | null> {
     return this.requestWithBody('put', request)
   }
 
@@ -217,6 +229,7 @@ export default class RestClient {
     headers = {},
     responseType = '',
     raw = false,
+    retry = true,
   }: Request): Promise<Response> {
     logger.info(escapeForLog(`${this.name} DELETE: ${path}`))
 
@@ -233,7 +246,11 @@ export default class RestClient {
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
+          if (retry === false) return false
+
           if (err) logger.info(`Retry handler found ${this.name} API error with ${err.code} ${err.message}`)
+
+          if (isTimeoutError(err)) return false
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
         .auth(this.token, { type: 'bearer' })
@@ -243,7 +260,7 @@ export default class RestClient {
 
       return raw ? (result as Response) : result.body
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error as unknown as Error)
       logger.warn({ ...sanitisedError }, escapeForLog(`Error calling ${this.name}, path: '${path}', verb: 'DELETE'`))
       throw sanitisedError
     }

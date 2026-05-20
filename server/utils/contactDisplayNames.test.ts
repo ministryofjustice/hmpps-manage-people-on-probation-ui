@@ -1,10 +1,13 @@
 import {
+  normalizeContactDisplayNameKey,
   getApprovedContactDisplayName,
+  mapScheduleWithApprovedContactDisplayNames,
   mapPersonActivityWithApprovedContactDisplayNames,
   mapPersonAppointmentWithApprovedContactDisplayNames,
+  mapEnforcementContactsWithApprovedContactDisplayNames,
 } from './contactDisplayNames'
 import { PersonActivity } from '../data/model/activityLog'
-import { PersonAppointment } from '../data/model/schedule'
+import { PersonAppointment, EnforcementContactsResponse } from '../data/model/schedule'
 
 describe('contactDisplayNames', () => {
   it('returns the approved display name for a legacy contact type', () => {
@@ -43,5 +46,79 @@ describe('contactDisplayNames', () => {
       type: 'Management Oversight - HVRA',
       displayName: 'Management oversight – home visit risk assessment',
     })
+  })
+
+  it('maps enforcement contacts and calculates isOverdue', () => {
+    const now = new Date()
+    const pastDate = new Date(now.getTime() - 1000 * 60 * 60 * 24).toISOString().split('T')[0] // yesterday
+    const futureDate = new Date(now.getTime() + 1000 * 60 * 60 * 24).toISOString().split('T')[0] // tomorrow
+
+    const response = {
+      enforcementContacts: [
+        {
+          appointmentType: 'Phone Contact from PoP',
+          evidenceDueDate: pastDate,
+        },
+        {
+          appointmentType: 'Home Visit',
+          evidenceDueDate: futureDate,
+        },
+        {
+          appointmentType: 'Office Appointment',
+          evidenceDueDate: undefined,
+        },
+      ],
+    } as unknown as EnforcementContactsResponse
+
+    const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
+
+    expect(result.enforcementContacts[0]).toMatchObject({
+      displayName: 'Telephone contact from person on probation',
+      isOverdue: true,
+    })
+    expect(result.enforcementContacts[1]).toMatchObject({
+      displayName: 'Home Visit', // No mapping in approvedContactDisplayNames for "Home Visit" (it's "Home visit" lowercase in mapping usually, let's check)
+      isOverdue: false,
+    })
+    expect(result.enforcementContacts[2]).toMatchObject({
+      isOverdue: undefined,
+    })
+  })
+
+  it('maps enforcement contacts and calculates isOverdue correctly for today', () => {
+    const today = new Date().toISOString().split('T')[0]
+
+    const response = {
+      enforcementContacts: [
+        {
+          appointmentType: 'Phone Contact from PoP',
+          evidenceDueDate: today,
+        },
+      ],
+    } as unknown as EnforcementContactsResponse
+
+    const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
+
+    expect(result.enforcementContacts[0].isOverdue).toBe(false)
+  })
+
+  it('mapScheduleWithApprovedContactDisplayNames maps appointments in schedule', () => {
+    const schedule = {
+      personSchedule: {
+        appointments: [
+          { id: 1, type: 'Phone Contact from PoP' },
+          { id: 2, type: 'Unknown' },
+        ],
+      },
+    } as any
+    const result = mapScheduleWithApprovedContactDisplayNames(schedule)
+    expect(result.personSchedule.appointments[0].displayName).toBe('Telephone contact from person on probation')
+    expect(result.personSchedule.appointments[1].displayName).toBeUndefined()
+  })
+
+  it('normalizeContactDisplayNameKey normalizes various strings', () => {
+    expect(normalizeContactDisplayNameKey('Phone – Contact')).toBe('phone - contact')
+    expect(normalizeContactDisplayNameKey('  Multiple   Spaces  ')).toBe('multiple spaces')
+    expect(normalizeContactDisplayNameKey('slash/separated')).toBe('slash / separated')
   })
 })
