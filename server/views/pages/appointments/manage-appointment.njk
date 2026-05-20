@@ -9,18 +9,14 @@
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% set sentence = sentences[0].order.description %}
 
-{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else 
-  'Log attended and complied appointment' %}
-{% set outcomeLink = null %}
-{% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/attended-complied' %}
-{% endif %}
-{% if flags.enableNonCompliance and not appointment.hasOutcome %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
-{% endif %}
-{% if flags.enableNonCompliance and appointment.hasOutcome %}
+{% set flag = true if flags.enableNonCompliance else false%}
+
+{% if flags.enableNonCompliance %}
   {% set outcomeLabel = 'Change appointment outcome' %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action' %}
+  {% set  outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/attendance-compliance' %}
+{% else %}
+  {% set outcomeLabel = 'Log attended and complied appointment' %}
+  {% set outcomeLink = null %}
 {% endif %}
 
 {% if appointment.location.officeName %}
@@ -85,13 +81,19 @@
 {% endif %}
 {% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == false %}
   {% set outcomeStatus = 'Unacceptable absence' %}
+  {% set compliedStatus = outcomeStatus if appointment.didTheyComply  else 'Failed to comply' %}
+  {% set absenceReason = appointment.outcome %}
   {% set outcomeTagColour = 'red' %}
-  {% set compliedTagColor = 'red' %}
+  {% set compliedTagColor = 'yellow' if appointment.didTheyComply else 'red' %}
 {% endif %}
+
 {% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == true %}
   {% set outcomeStatus = 'Acceptable absence' %}
+  {% set compliedStatus = outcomeStatus %}
+  {% set absenceReason = appointment.acceptabFauleAbsenceReason %}
+
   {% set outcomeTagColour = 'green' %}
-  {% set compliedTagColor = 'blue' %}
+  {% set compliedTagColor = 'green' %}
 {% endif %}
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
   {% set alert = "You must log an outcome and should add notes to this appointment." %}
@@ -129,35 +131,38 @@
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
   {% endif %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
-      {% if alert and not appointment.deliusManaged %}
-        {{ mojAlert({
-  variant: "information",
-  showTitleAsHeading: true,
-  dismissible: false,
-  text: alert,
-  attributes: {
-    'data-qa': 'appointmentAlert'
-  }
-}) }}
-      {% endif %}
-      {% if appointment.isSensitive === true %}
-        {% set text = 'Sensitive' %}
-        {% set shorthand = '!' %}
-        {% set iconClass = 'waiting' %}
-        {% set colour = 'yellow' %}
-        {% set tagClasses = 'app-compliance-tag govuk-tag--' + colour + ' govuk-!-margin-bottom-6' %}
-        {{ govukTag({ text: text, classes: tagClasses, attributes: { 'data-qa': 'sensitiveTag' } }) }}
-      {% endif %}
-      {% if not appointment.deliusManaged %}
-        <section data-qa="appointmentActions">
-          <h3 class="govuk-heading-m">Appointment actions</h3>
-          {{ govukInsetText({
-  html: 'You must <a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
-}) }}
-          {{ govukTaskList({
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-three-quarters">
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
+        {% if alert and not appointment.deliusManaged %}
+          {{ mojAlert({
+            variant: "information",
+            showTitleAsHeading: true,
+            dismissible: false,
+            text: alert,
+            attributes: {
+              'data-qa': 'appointmentAlert'
+            }
+          }) }}
+        {% endif %}
+
+        {% if appointment.isSensitive === true %}
+          {% set text = 'Sensitive' %}
+          {% set shorthand = '!' %}
+          {% set iconClass = 'waiting' %}
+          {% set colour = 'yellow' %}
+          {% set tagClasses = 'app-compliance-tag govuk-tag--' + colour + ' govuk-!-margin-bottom-6' %}
+          {{ govukTag({ text: text, classes: tagClasses, attributes: { 'data-qa': 'sensitiveTag' } }) }}
+        {% endif %}
+        {% if not appointment.deliusManaged %}
+          <section data-qa="appointmentActions">
+            <h3 class="govuk-heading-m">Appointment actions </h3>
+            {% if not flags.enableNonCompliance %}
+              {{ govukInsetText({
+                html: 'You must <a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
+              }) }}
+            {% endif %}
+            {{ govukTaskList({
   idPrefix: "appointment-actions",
   attributes: {
         'data-qa': 'appointmentActions'
@@ -168,8 +173,8 @@
         html: '<span>' + outcomeLabel + '</span>'
       },
       hint: {
-        text: "You cannot log an attended and complied outcome until the appointment has happened."
-      } if not flags.enableNonCompliance and not appointment.isInPast,
+        text: "You cannot log an attended and complied outcome until the appointment has happened." if not flags.enableNonCompliance and not appointment.isInPast else absenceReason
+      },
       href: outcomeLink,
       status: {
         tag: {
@@ -178,6 +183,18 @@
         }
       }
     },
+    {
+      title: {
+        text: "Change enforcement action"
+      },
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/update-enforcement-action',
+      status: {
+        tag: {
+          text: appointment.action,
+          classes: "govuk-tag--yellow"
+        }
+      } 
+    } if flags.enableNonCompliance,
     {
       title: {
         text: "Add appointment notes"
@@ -222,26 +239,28 @@
     }
     ]
 }) }}
-        </section>
-      {% endif %}
-      <section data-qa="appointmentDetails">
-        <h3 class="govuk-heading-m">Appointment details</h3>
-        {% if not appointment.deliusManaged %}
-          <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
-        {% else %}
-          <p class="govuk-body">
-            {% if flags.enableDeepLinks and appointment.type in deepLinkContactTypes and appointment.eventNumber %}
-              {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
-                You can manage this appointment through the <a href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">unpaid work worksheet summary in NDelius (opens in a new tab)</a>.
-              {% else %}
-                You can manage this appointment through the person's <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">drug history in NDelius (opens in a new tab)</a>.
-              {% endif %}
-            {% else %}
-              <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.
-            {% endif %}
-          </p>
+          </section>
         {% endif %}
-        {{ govukSummaryList({
+        <section data-qa="appointmentDetails">
+          <h3 class="govuk-heading-m">Appointment details</h3>
+          {% if not appointment.deliusManaged %}
+            <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
+          {% else %}
+            <p class="govuk-body">
+              {% if flags.enableDeepLinks and appointment.type in deepLinkContactTypes and appointment.eventNumber %}
+                {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
+                  You can manage this appointment through the
+                  <a href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">unpaid work worksheet summary in NDelius (opens in a new tab)</a>.
+                {% else %}
+                  You can manage this appointment through the person's
+                  <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">drug history in NDelius (opens in a new tab)</a>.
+                {% endif %}
+              {% else %}
+                <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.
+              {% endif %}
+            </p>
+          {% endif %}
+          {{ govukSummaryList({
   rows: [
   {
     key: {
@@ -378,7 +397,7 @@
     },
     {
       key: {
-        text: "Appointment notes"
+        text: "Appointment notes" 
       },
      value: { html: '<span data-qa="notesValue">' + notes + '</span>' if notes else 'No notes' },
       actions: {
@@ -419,12 +438,12 @@
     }
   ]
 }) }}
-      </section>
-      {% if appointment.documents.length > 0 %}
-        <section data-qa="associatedDocuments">
-          <h3 class="govuk-heading-m">Associated documents</h3>
-          <p class="govuk-body">Documents associated with this appointment</p>
-          {{ govukTable({
+        </section>
+        {% if appointment.documents.length > 0 %}
+          <section data-qa="associatedDocuments">
+            <h3 class="govuk-heading-m">Associated documents</h3>
+            <p class="govuk-body">Documents associated with this appointment</p>
+            {{ govukTable({
   attributes: {
     'data-module': 'moj-mpop-sortable-table'
   },
@@ -464,9 +483,10 @@
   ],
   rows: documents
 }) }}
-        </section>
-      {% endif %}
-      <p class="govuk-body-s" data-qa="lastUpdated">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
+          </section>
+        {% endif %}
+        <p class="govuk-body-s" data-qa="lastUpdated">Last updated by {{ appointment.lastUpdatedBy | fullName }} on
+        {{ appointment.lastUpdated | dateWithYear }}</p>
+      </div>
     </div>
-  </div>
-{% endblock %}
+  {% endblock %}

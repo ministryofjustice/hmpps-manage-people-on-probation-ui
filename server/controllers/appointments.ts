@@ -157,6 +157,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+
+      console.log('appointment here: ', personAppointment.appointment)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
