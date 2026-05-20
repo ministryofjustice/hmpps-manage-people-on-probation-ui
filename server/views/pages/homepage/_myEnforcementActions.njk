@@ -41,11 +41,14 @@
               + '</span>'
           },
           {
-              text: enforcementAction.appointmentOutcome if enforcementAction.appointmentOutcome else 'Not Provided'
+              text:
+              ((enforcementAction.appointmentOutcome | lower | capitalize)
+              if enforcementAction.appointmentOutcome
+              else 'Not provided')
           },
           {
               html:
-              ((enforcementAction.enforcementAction | escape) if enforcementAction.enforcementAction else 'Not Provided')
+              ((enforcementAction.enforcementAction | lower | capitalize) if enforcementAction.enforcementAction else 'Not provided')
               +
               (
               '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
