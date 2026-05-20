@@ -39,7 +39,6 @@
               }
             }
           },
-          "furtherActions": "Nothing for now",
           "surveyResponse": {
             "mentalHealth": "well",
             "assistance": ["thing1", "thing2"],
@@ -492,7 +491,6 @@
               }
             }
           },
-          "furtherActions": "Nothing for now",
           "surveyResponse": {
             "mentalHealth": "well",
             "assistance": ["thing1", "thing2"],
@@ -556,7 +554,6 @@
               }
             }
           },
-          "furtherActions": "Nothing for now",
           "surveyResponse": {
             "mentalHealth": "well",
             "assistance": ["thing1", "thing2"],
@@ -618,7 +615,6 @@
               }
             }
           },
-          "furtherActions": "Nothing for now",
           "surveyResponse": {
             "mentalHealth": "well",
             "assistance": ["thing1", "thing2"],

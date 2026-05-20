@@ -687,7 +687,7 @@ const checkInsController: Controller<typeof routes, void> = {
         reviewedBy: practitionerUsername,
         manualIdCheck: checkIn?.manualIdCheck,
         missedCheckinComment: checkIn?.missedCheckinComment,
-        notes: checkIn?.furtherActions,
+        notes: checkIn?.notes,
         riskManagementFeedback: risk,
         sensitive: checkIn?.sensitiveContact === 'true',
       }
