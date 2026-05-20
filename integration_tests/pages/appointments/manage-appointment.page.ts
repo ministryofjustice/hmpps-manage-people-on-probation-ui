@@ -55,7 +55,7 @@ export default class ManageAppointmentPage extends Page {
   }
 
   getAppointmentNotesRow() {
-    return cy.get('[data-qa="appointmentNotesRow"]')
+    return cy.get('[data-qa="appointmentDetails"]').contains('.govuk-summary-list__row', 'Appointment notes')
   }
 
   getAssociatedDocumentsTableColumnHeading = (index: number) => {
