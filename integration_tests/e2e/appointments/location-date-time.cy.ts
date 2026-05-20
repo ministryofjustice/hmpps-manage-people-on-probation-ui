@@ -211,7 +211,6 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     const mockedNow = mockedTime.toUTC().toISO()
     before(() => {
-      // set the mocked time on the back end
       cy.request({
         method: 'POST',
         url: 'http://localhost:3007/__test/set-mocked-time',
@@ -266,7 +265,6 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).clear().type('09:30')
@@ -368,9 +366,7 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const future = now.plus({ days: 2 })
       locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
-      it('should hide the alert banner', () => {
-        locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
-      })
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
   describe('Date is selected from the picker which is in the past - non compliance disabled', () => {
@@ -385,9 +381,7 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const future = now.plus({ days: 2 })
       locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
-      it('should hide the alert banner', () => {
-        locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
-      })
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
     })
   })
 
@@ -441,7 +435,6 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElementInput(`startTime`).clear().type('08:00')
     })
     it('should not display the log an outcome alert banner', () => {
-      // cy.wait('@isInPast')
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
     })
   })
@@ -489,7 +482,6 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
     })
     it('should not display the log an outcome alert banner', () => {
-      // cy.wait('@isInPast')
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
     })
   })

@@ -187,7 +187,7 @@ export interface OutcomeSummary {
   evidenceDueDate?: string
   notes: string
   sensitivity: string
-  documents?: string
+  documents?: string[]
   nextAppointment?: string
   enforcementActionChangeLink?: string
 }

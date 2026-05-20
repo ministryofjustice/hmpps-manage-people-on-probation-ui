@@ -202,7 +202,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
       nextAppointment: 'No next appointment',
-      documents: 'FILE1<br>FILE2',
+      documents: ['FILE1', 'FILE2'],
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
   })

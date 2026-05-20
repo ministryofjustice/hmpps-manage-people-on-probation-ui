@@ -87,7 +87,7 @@ export const isEnforcementActionMapKey = (value: string): value is AppointmentEn
   return appointmentEnforcementActions.includes(value as AppointmentEnforcementAction)
 }
 
-export const isEnforcementActionPageKey = (value: string): value is AppointmentEnforcementAction => {
+export const isEnforcementActionPageKey = (value: string): value is EnforcementActionPage => {
   return enforcementActionPageKeys.includes(value as EnforcementActionPage)
 }
 

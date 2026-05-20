@@ -188,38 +188,38 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   describe('Appointment date is in the past - non compliance disabled', () => {
+    const cyaPage = new AppointmentCheckYourAnswersPage()
     beforeEach(() => {
       loadPage({ dateInPast: true, enableNonCompliance: false })
     })
     it('should display the attended and complied row', () => {
-      const cyaPage = new AppointmentCheckYourAnswersPage()
       checkAppointmentSummary({
         page: cyaPage,
         probationPractitioner: false,
         dateInPast: true,
         enableNonCompliance: false,
       })
-      it('should update the notes when value is changed', () => {
-        checkUpdateNotes(cyaPage)
-      })
-      it('should update the sensitivity when value is changed', () => {
-        checkUpdateSensitivity(cyaPage)
-      })
+    })
+    it('should update the notes when value is changed', () => {
+      checkUpdateNotes(cyaPage)
+    })
+    it('should update the sensitivity when value is changed', () => {
+      checkUpdateSensitivity(cyaPage)
     })
   })
   describe('Appointment date is in the past - non compliance enabled', () => {
+    const cyaPage = new AppointmentCheckYourAnswersPage()
     beforeEach(() => {
       loadPage({ dateInPast: true })
     })
     it('should display the attended and complied row', () => {
-      const cyaPage = new AppointmentCheckYourAnswersPage()
       checkAppointmentSummary({ page: cyaPage, probationPractitioner: false, dateInPast: true })
-      it('should update the notes when value is changed', () => {
-        checkUpdateNotes(cyaPage)
-      })
-      it('should update the sensitivity when value is changed', () => {
-        checkUpdateSensitivity(cyaPage)
-      })
+    })
+    it('should update the notes when value is changed', () => {
+      checkUpdateNotes(cyaPage)
+    })
+    it('should update the sensitivity when value is changed', () => {
+      checkUpdateSensitivity(cyaPage)
     })
   })
 

@@ -9,7 +9,8 @@ type EnforcementRedirectMap = {
 export const handleEnforcementActionRedirect = (pageKey: EnforcementActionPage): Route<void> => {
   return (req, res) => {
     const { baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
-    const { change } = req.query as Record<string, string>
+    const { change: _change } = req.query as Record<string, string>
+    const change = _change ? decodeURIComponent(_change) : undefined
     const enforcementAction = appointmentSession?.outcome?.[pageKey] as AppointmentEnforcementAction
     const redirectMap: EnforcementRedirectMap = {
       SEND_LETTER: `${baseOutcomeUrl}/send-letter`,

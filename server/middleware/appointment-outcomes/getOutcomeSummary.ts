@@ -17,9 +17,8 @@ import {
 import { Activity } from '../../data/model/schedule'
 import { AppointmentOutcomeProps, OutcomeSummary } from '../../models/Locals'
 
-let summary: OutcomeSummary
-
 export const getOutcomeSummary: Route<void> = (_req, res, next) => {
+  let summary: OutcomeSummary
   if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome) {
     const {
       sentence: { type: sentenceType },
@@ -71,7 +70,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       if (!outcomeCode) return noOutcome
       const selected = Object.entries(outcomeMap).find(
         ([_key, { code }]) => outcomeCode === code,
-      )[0] as AppointmentOutcomeType
+      )?.[0] as AppointmentOutcomeType
       if (!selected) return noOutcome
       return outcomeOptions.find(option => option.value === selected)?.text || noOutcome
     }
@@ -82,7 +81,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       }
       const selected = Object.entries(enforcementActionMap).find(
         ([_key, { code }]) => enforcementActionCode?.at(-1) === code,
-      )[0] as AppointmentOutcomeType
+      )?.[0] as AppointmentOutcomeType
       if (!selected) {
         return noAction
       }
@@ -96,9 +95,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       ? DateTime.fromISO(date).plus({ days: defaultResponsePeriodDays }).toFormat('dd MMMM yyyy')
       : null
 
-    const documents = appointment?.documents?.length
-      ? appointment.documents.map(document => document.name).join('<br>')
-      : null
+    const documents = appointment?.documents?.length ? appointment.documents.map(document => document.name) : null
 
     const enforcementAction = getSelectedEnforcementAction()
     const outcome = `${getSelectedOutcome()}${acceptableAbsence ? ` - ${enforcementAction.toLowerCase()}` : ''}`
