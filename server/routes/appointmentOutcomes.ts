@@ -244,16 +244,21 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAppointment(hmppsAuthClient),
   )
   router.get(`${manageBasePath}/next-appointment`, controllers.appointments.getNextAppointment(hmppsAuthClient))
-  router.post(`${manageBasePath}/next-appointment`, controllers.appointments.postNextAppointment(hmppsAuthClient))
+
+  router.post(
+    `${manageBasePath}/next-appointment`,
+    validate.appointments,
+    controllers.appointments.postNextAppointment(hmppsAuthClient),
+  )
 
   router.get(
-    [`${manageBasePath}/check-your-answers`],
+    [`${arrangeBasePath}/check-your-answers`, `${manageBasePath}/check-your-answers`],
     getNextComAppointment(hmppsAuthClient),
     getOutcomeSummary,
     controllers.appointmentOutcomes.getCheckYourAnswers(hmppsAuthClient),
   )
   router.post(
-    [`${manageBasePath}/check-your-answers`],
+    [`${arrangeBasePath}/check-your-answers`, `${manageBasePath}/check-your-answers`],
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
   )
 }

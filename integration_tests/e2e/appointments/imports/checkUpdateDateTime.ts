@@ -58,7 +58,7 @@ export const checkUpdateDateTime = ({
       dateTimePage.getSubmitBtn().click()
       if (!inPast && page instanceof ArrangeAnotherAppointmentPage) {
         completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
-        completeSupportingInformationPage(true, '', pageUuid)
+        completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
       }
       if (inPast) {
         if (enableNonCompliance) {
@@ -66,7 +66,7 @@ export const checkUpdateDateTime = ({
         } else {
           completeAttendedCompliedPage({ _crn: pageCrn, _uuid: pageUuid })
         }
-        completeAddNotePage({ uuidOverride: pageUuid, crnOverride: crn })
+        completeAddNotePage({ idOverride: pageUuid, crnOverride: crn })
       }
       if (page instanceof AppointmentCheckYourAnswersPage) {
         page.checkPageTitle('Check your answers then confirm the appointment')

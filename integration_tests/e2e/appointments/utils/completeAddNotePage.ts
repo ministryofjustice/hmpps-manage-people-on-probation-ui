@@ -1,15 +1,32 @@
 import AddNotePage from '../../../pages/appointments/add-note.page'
-import { crn, uuid } from '../imports/common'
+import { crn, uuid, appointmentId } from '../imports/common'
 
 export const completeAddNotePage = ({
   crnOverride = '',
-  uuidOverride = '',
-}: { crnOverride?: string; uuidOverride?: string } = {}) => {
+  idOverride = '',
+  journey = 'ARRANGE',
+  value = 'Some notes',
+  sensitivityIndex = 0,
+}: {
+  crnOverride?: string
+  idOverride?: string
+  journey?: 'ARRANGE' | 'MANAGE'
+  value?: string
+  sensitivityIndex?: number
+} = {}) => {
+  let id = journey === 'ARRANGE' ? uuid : appointmentId
+  if (idOverride) id = idOverride
   const addNotePage = new AddNotePage()
-  addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
   addNotePage
-    .getElement(`#appointments-${crnOverride || crn}-${uuidOverride || uuid}-notes`)
+    .getElement(`#appointments-${crnOverride || crn}-${id}-notes`)
     .focus()
-    .type('Some notes')
+    .clear()
+    .type(value)
+  addNotePage
+    .getSensitiveInformation()
+    .find('.govuk-radios__item')
+    .eq(sensitivityIndex)
+    .find('.govuk-radios__input')
+    .click()
   addNotePage.getSubmitBtn().click()
 }

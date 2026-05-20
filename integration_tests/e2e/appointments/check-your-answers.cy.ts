@@ -46,7 +46,7 @@ const loadPage = ({
   if (!enableNonCompliance) {
     cy.task('stubDisableNonCompliance')
   }
-  completeSentencePage(sentenceOptionIndex, '')
+  completeSentencePage({ eventIndex: sentenceOptionIndex })
   completeTypePage(typeOptionIndex, hasVisor)
   completeLocationDateTimePage({ dateInPast })
   if (!dateInPast && textMessageFeatureFlag) {
@@ -58,7 +58,7 @@ const loadPage = ({
       page.getElementInput('mobileNumber').clear().type('07783889300')
       cy.get('[data-qa=submitBtn]').click()
     }
-    completeSupportingInformationPage(notes)
+    completeSupportingInformationPage({ notes })
   }
   if (dateInPast) {
     if (!enableNonCompliance) {
@@ -70,7 +70,7 @@ const loadPage = ({
     completeAddNotePage()
   }
   if (!dateInPast && !textMessageFeatureFlag) {
-    completeSupportingInformationPage(notes)
+    completeSupportingInformationPage({ notes })
   }
 }
 
@@ -250,7 +250,7 @@ describe('Check your answers then confirm the appointment', () => {
         cy.get(`#${recordOutcome}`).should('not.be.checked')
         cy.get(`#${recordOutcome}`).click()
         logOutcomePage.getSubmitBtn().click()
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkPageTitle('Check your answers')
       })
@@ -262,7 +262,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         completeOutcome({ outcome: 'ATTENDED_COMPLIED' })
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkPageTitle('Check your answers')
       })
@@ -314,7 +314,7 @@ describe('Check your answers then confirm the appointment', () => {
         cy.get(`#${recordOutcome}`).should('not.be.checked')
         cy.get(`#${recordOutcome}`).click()
         logOutcomePage.getSubmitBtn().click()
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkPageTitle('Check your answers')
       })
@@ -329,7 +329,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         completeOutcome({ outcome: 'ATTENDED_COMPLIED' })
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkPageTitle('Check your answers')
       })

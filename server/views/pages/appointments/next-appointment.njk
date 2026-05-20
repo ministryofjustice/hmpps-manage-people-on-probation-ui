@@ -22,12 +22,12 @@
     id: "nextAppointment",
     formGroup: {
       attributes: {
-        'data-qa': 'option'
+        'data-qa': 'anotherAppointment'
       } 
     },
     fieldset: {
       legend: {
-        html: '<span data-qa="pageHeading">Do you want to arrange another appointment with ' + personAppointment.personSummary.name.forename + '?' + '</span>',
+        text: 'Do you want to arrange another appointment with ' + personAppointment.personSummary.name.forename + '?',
         classes: "govuk-fieldset__legend--m"
       }
     },

@@ -29,7 +29,7 @@ export const cloneAppointmentAndRedirect = (
       notes: null,
     }
 
-    if (contactId) {
+    if (req.url.includes('/outcome/next-appointment')) {
       clonedAppt.linkedContactId = contactId
     }
 
@@ -48,6 +48,7 @@ export const cloneAppointmentAndRedirect = (
     }
 
     clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
+
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)
   }

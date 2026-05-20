@@ -33,7 +33,7 @@ const loadPage = ({
   completeTextMessageConfirmOptionIndex?: number
   enableNonCompliance?: boolean
 } = {}) => {
-  completeSentencePage(1, '', crnOverride)
+  completeSentencePage({ eventIndex: 1, crnOverride })
   completeTypePage(1, false)
   completeLocationDateTimePage({ index: 1, crnOverride, dateInPast })
   if (dateInPast) {
@@ -46,7 +46,7 @@ const loadPage = ({
     completeAddNotePage()
   } else {
     completeTextMessageConfirmationPage({ index: completeTextMessageConfirmOptionIndex, _crn: crnOverride })
-    completeSupportingInformationPage(true, crnOverride)
+    completeSupportingInformationPage({ notes: true, crnOverride })
   }
   completeCYAPage()
 }
@@ -269,11 +269,11 @@ describe('Confirmation page', () => {
     const crn = 'X000001'
     it('should update the cya page', () => {
       cy.task('stubDisableNonCompliance')
-      completeSentencePage(1, '', crn)
+      completeSentencePage({ eventIndex: 1, crnOverride: crn })
       completeTypePage(1, false)
       completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
       completeTextMessageConfirmationPage({ index: 1, _crn: crn })
-      completeSupportingInformationPage(true, crn)
+      completeSupportingInformationPage({ notes: true, crnOverride: crn })
       const cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(5).find('.govuk-link').click()
       getUuid().then(uuid => {
@@ -283,7 +283,7 @@ describe('Confirmation page', () => {
           dateInPast: true,
         })
         completeAttendedCompliedPage({ manageJourney: false, _crn: crn, _uuid: uuid })
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         completeCYAPage()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage
@@ -311,11 +311,11 @@ describe('Confirmation page', () => {
   describe('Appointment changed to date in the past - non compliance enabled', () => {
     const crn = 'X000001'
     it('should update the cya page', () => {
-      completeSentencePage(1, '', crn)
+      completeSentencePage({ eventIndex: 1, crnOverride: crn })
       completeTypePage(1, false)
       completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
       completeTextMessageConfirmationPage({ index: 1, _crn: crn })
-      completeSupportingInformationPage(true, crn)
+      completeSupportingInformationPage({ notes: true, crnOverride: crn })
       const cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(5).find('.govuk-link').click()
       getUuid().then(uuid => {
@@ -325,7 +325,7 @@ describe('Confirmation page', () => {
           dateInPast: true,
         })
         completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
-        completeAddNotePage({ crnOverride: crn, uuidOverride: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         completeCYAPage()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage

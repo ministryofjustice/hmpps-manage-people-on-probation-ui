@@ -123,7 +123,7 @@ context('Appointment journey', () => {
   const crn = 'X000001'
   const loadPage = () => {
     cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-    completeSentencePage(1, '', crn)
+    completeSentencePage({ eventIndex: 1, crnOverride: crn })
     completeTypePage()
     completeLocationDateTimePage({ crnOverride: crn })
     completeTextMessageConfirmationPage({ _crn: crn })

@@ -8,7 +8,6 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
-import { getDataValue } from '../utils'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -115,7 +114,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, id, contactId, baseOutcomeUrl, isInPast } = res.locals.appointmentOutcome
+      const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl, appointmentSession } =
+        res.locals.appointmentOutcome
       const { change } = req.query as Record<string, string>
       const { notes, sensitive } = req.body
       if (!isValidParams) {
@@ -135,12 +135,23 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
           })
         }
       }
-      const path = contactId ? baseOutcomeUrl : `/case/${crn}/arrange-appointment/${id}`
-      let redirect = `${path}/check-your-answers`
-      if (isInPast && contactId) {
-        redirect = `${path}/next-appointment`
+      let redirect = baseOutcomeUrl
+      if (change) {
+        redirect = change
       }
-      return res.redirect(change ?? redirect)
+      /* Arrange or reschedule appointment journey */
+      if (uuid) {
+        redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      }
+      /* Manage appointment journey with no next appointment arranged */
+      if (contactId && !appointmentSession?.linkedContactId) {
+        redirect = `${baseOutcomeUrl}/next-appointment`
+      }
+      /* Manage appointment journey with next appointment arranged */
+      if (contactId && appointmentSession?.linkedContactId) {
+        redirect = `${baseOutcomeUrl}/check-your-answers`
+      }
+      return res.redirect(redirect)
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {
@@ -160,7 +171,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAttendedFailedToComply: () => async (req, res) => enforcementActionRedirects('attendedFailedToComply', req, res),
   getAcceptableAbsence: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
+    return async (_req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
   },
   postAcceptableAbsence: () => {
     return async (_req, res) => {
@@ -173,11 +184,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postUnacceptableAbsence: () => async (req, res) => enforcementActionRedirects('unacceptableAbsence', req, res),
   getFailedToAttend: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/failed-to-attend')
+    return async (_req, res) => res.render('pages/appointment-outcomes/failed-to-attend')
   },
   postFailedToAttend: () => async (req, res) => enforcementActionRedirects('failedToAttend', req, res),
   getEnforcementAction: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/enforcement-action')
+    return async (_req, res) => res.render('pages/appointment-outcomes/enforcement-action')
   },
   postEnforcementAction: () => {
     return async (_req, res) => {
@@ -186,7 +197,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getInitiateBreachOrRecall: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
+    return async (_req, res) => res.render('pages/appointment-outcomes/initiate-breach-or-recall')
   },
   postInitiateBreachOrRecall: () => {
     return async (_req, res) => {
@@ -195,7 +206,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getSendLetter: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/send-letter')
+    return async (_req, res) => res.render('pages/appointment-outcomes/send-letter')
   },
   postSendLetter: () => {
     return async (_req, res) => {
@@ -204,7 +215,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getUpdateEnforcementAction: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')
+    return async (_req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')
   },
   postUpdateEnforcementAction: () => async (req, res) =>
     enforcementActionRedirects('updateEnforcementAction', req, res),

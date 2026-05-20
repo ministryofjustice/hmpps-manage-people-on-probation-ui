@@ -17,7 +17,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const isValidParams = isValidCrn(crn) && isValidId
   const path = ['appointments', crn, id]
   const data = req?.session?.data
-  const appointmentSession = getDataValue<AppointmentSession>(data, path)
+  const appointmentSession = getDataValue<AppointmentSession>(data, path) || null
   let appointment: AttendedCompliedAppointment | Activity
   let documents: Document[] = []
   let enforcementAction: PersonAppointmentEnforcementAction

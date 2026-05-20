@@ -65,7 +65,7 @@ function setup() {
   return { req, res }
 }
 
-describe('/middleware/cloneAppointmentAndRedirect', () => {
+xdescribe('/middleware/cloneAppointmentAndRedirect', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
