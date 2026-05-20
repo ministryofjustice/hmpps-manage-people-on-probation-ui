@@ -2,12 +2,6 @@
 {% set showAction = true %}
 {% set buttonText = 'Confirm appointment outcome' %}
 
-{% set documents = '' %}
-{% if appointmentOutcome.summary.documents.length > 0 %}
-    {% for document in appointmentOutcome.summary.documents %}
-        {% set documents = documents + '<br>' %}
-    {% endfor %}
-{% endif %}
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',
@@ -83,7 +77,7 @@
             } if appointmentOutcome.summary.sensitivity,
             {
                 key: { text: "Documents"},
-                value: { html: documents | safe },
+                value: { html: appointmentOutcome.summary.documents | join('<br>') | safe },
                 actions: {
                     items: [ 
                         {
