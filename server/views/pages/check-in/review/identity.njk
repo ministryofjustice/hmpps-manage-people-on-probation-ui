@@ -83,7 +83,7 @@
         </dl>
 
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
-            {% if flags.enableShowNextCheckinDate === false %}
+            {% if flags.enableShowMatchWithConcern === true %}
                 {{ govukRadios({
                     fieldset: {
                         legend: {
