@@ -385,6 +385,7 @@ export default class MasApiClient extends RestClient {
     id: string,
     body: RescheduleAppointmentRequestBody,
   ): Promise<RescheduleAppointmentResponse> {
+    console.log(body)
     return this.put({
       data: body,
       path: `/appointments/${id}/recreate`,

@@ -192,9 +192,7 @@ export default abstract class Page {
 
   assertRiskTags(ogrs4 = false) {
     if (ogrs4) {
-      cy.get(`[data-predictor-badge]`)
-        .eq(0)
-        .get('[data-test-id=nameAndBand')
+      cy.get('[data-test-id=nameAndBand')
         .should('contain.text', 'Combined serious reoffending predictor')
         .should('contain.text', 'LOW')
         .get('[data-test-id=score')
@@ -202,15 +200,11 @@ export default abstract class Page {
         .get('[data-test-id=staticOrDynamic')
         .should('contain.text', 'Dynamic')
 
-      cy.get(`[data-predictor-badge]`)
-        .eq(1)
-        .get('[data-test-id=nameAndBand')
+      cy.get('[data-test-id=nameAndBand')
         .should('contain.text', 'RISK OF SERIOUS HARM')
         .should('contain.text', 'VERY HIGH')
     } else {
-      cy.get(`[data-predictor-badge]`)
-        .eq(0)
-        .get('[data-test-id=nameAndBand')
+      cy.get('[data-test-id=nameAndBand')
         .should('contain.text', 'RSR')
         .should('contain.text', 'LOW')
         .get('[data-test-id=score')
@@ -218,11 +212,7 @@ export default abstract class Page {
         .get('[data-test-id=staticOrDynamic')
         .should('contain.text', 'Dynamic')
 
-      cy.get(`[data-predictor-badge]`)
-        .eq(1)
-        .get('[data-test-id=nameAndBand')
-        .should('contain.text', 'ROSH')
-        .should('contain.text', 'VERY HIGH')
+      cy.get('[data-test-id=nameAndBand').should('contain.text', 'ROSH').should('contain.text', 'VERY HIGH')
     }
   }
 
