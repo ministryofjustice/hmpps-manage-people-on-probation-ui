@@ -23,6 +23,7 @@ export interface ESupervisionCheckIn {
   livenessEnabled?: boolean
   manualIdCheck?: Match
   flaggedResponses: string[]
+  furtherActions?: string
   missedCheckinComment?: string
   notes?: Note[]
   checkinLogs: ESupervisionCheckInLogs

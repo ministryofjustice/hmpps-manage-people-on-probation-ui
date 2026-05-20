@@ -23,4 +23,5 @@ export class FeatureFlags {
   enableMyEnforcementActionsOverview?: boolean = undefined
   enableShowNextCheckinDate?: boolean = undefined
   enableStopCheckinSensitiveFlag?: boolean = undefined
+  enableFurtherActionsDeprecation?: boolean = undefined
 }
