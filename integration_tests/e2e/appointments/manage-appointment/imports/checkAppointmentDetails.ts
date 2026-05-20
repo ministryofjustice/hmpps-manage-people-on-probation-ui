@@ -250,7 +250,7 @@ export const checkAppointmentDetails = (
     }
   })
   it('should display the correct values if notes added to appointment', () => {
-    let index = deliusManaged && hasOutcome ? 7 : 6
+    let index = deliusManaged && hasOutcome ? 6 : 5
     if (enableNonCompliance && !deliusManaged) index += 1
     if (!enableNonCompliance) {
       cy.task('stubDisableNonCompliance')
@@ -290,7 +290,7 @@ export const checkAppointmentDetails = (
   })
 
   it('should display the correct values if no notes added to appointment', () => {
-    let index = deliusManaged && hasOutcome ? 7 : 6
+    let index = deliusManaged && hasOutcome ? 6 : 5
     if (enableNonCompliance && !deliusManaged) index += 1
     if (!enableNonCompliance) {
       cy.task('stubDisableNonCompliance')
@@ -327,7 +327,7 @@ export const checkAppointmentDetails = (
     })
   }
   it('should display sensitive', () => {
-    const baseIndex = deliusManaged && hasOutcome ? 8 : 7
+    const baseIndex = deliusManaged && hasOutcome ? 7 : 6
     let index = baseIndex + (hasOutcomeText ? 1 : 0)
     if (enableNonCompliance && !deliusManaged) index += 1
     if (!enableNonCompliance) {
