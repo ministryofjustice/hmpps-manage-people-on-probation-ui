@@ -134,7 +134,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     outcomeCode,
   }
 
-  // console.log('createAppointmentSession()', crn, contactId, appointmentSession)
   res.locals.appointmentSession = appointmentSession
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)

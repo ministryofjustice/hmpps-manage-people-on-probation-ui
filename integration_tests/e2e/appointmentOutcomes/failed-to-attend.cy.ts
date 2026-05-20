@@ -148,6 +148,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select an enforcement action for their absence'
     loadPage({ journey })
     failedToAttendPage = new FailedToAttendPage()
+    uncheckAllRadios()
     failedToAttendPage.getSubmitBtn().click()
     failedToAttendPage.checkErrorSummaryBox([msg])
     getUuid(3).then(pageUuid => {

@@ -25,7 +25,7 @@
             },
             {
                 key: { text: "Enforcement action"},
-                value: { html: appointmentOutcome.summary.enforcementAction },
+                value: { html: appointmentOutcome.summary.enforcementAction  | replace('\n', '<br>') | safe  },
                 actions: {
                     items: [ 
                         {
@@ -77,7 +77,7 @@
             } if appointmentOutcome.summary.sensitivity,
             {
                 key: { text: "Documents"},
-                value: { html: appointmentOutcome.summary.documents },
+                value: { html: appointmentOutcome.summary.documents | join('<br>') | safe },
                 actions: {
                     items: [ 
                         {

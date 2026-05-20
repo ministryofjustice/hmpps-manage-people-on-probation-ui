@@ -2,7 +2,7 @@ import { ErrorSummary } from '../data/model/common'
 import { RiskScoresDto, TimelineItem } from '../data/model/risk'
 import { toTimeline } from './toTimeline'
 
-export const toPredictors = (predictors: RiskScoresDto[] | ErrorSummary | null): TimelineItem => {
+export const toPredictors = (predictors: RiskScoresDto[] | ErrorSummary | null): TimelineItem | undefined => {
   let timeline: TimelineItem[] = []
   let predictorScores
   if (Array.isArray(predictors)) {

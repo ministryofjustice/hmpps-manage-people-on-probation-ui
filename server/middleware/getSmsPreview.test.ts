@@ -418,4 +418,107 @@ describe('middleware/getSmsPreview', () => {
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
   })
+
+  describe('appointmentTypesWithoutLocation', () => {
+    it('should not include appointmentLocation when appointmentTypeCode is COPT (telephone)', async () => {
+      const appointment: AppointmentSession = {
+        ...constructMockAppointmentSession(),
+        type: 'COPT',
+        smsPreview: undefined,
+      }
+      const req = buildRequest({ appointment })
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          appointmentLocation: expect.anything(),
+        }),
+      )
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentTypeCode: 'COPT',
+        }),
+      )
+    })
+
+    it('should not include appointmentLocation when appointmentTypeCode is COVC (video)', async () => {
+      const appointment: AppointmentSession = {
+        ...constructMockAppointmentSession(),
+        type: 'COVC',
+        smsPreview: undefined,
+      }
+      const req = buildRequest({ appointment })
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          appointmentLocation: expect.anything(),
+        }),
+      )
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentTypeCode: 'COVC',
+        }),
+      )
+    })
+
+    it('should not include appointmentLocation when appointmentTypeCode is CHVS Home Visit to Case', async () => {
+      const appointment: AppointmentSession = {
+        ...constructMockAppointmentSession(),
+        type: 'CHVS',
+        smsPreview: undefined,
+      }
+      const req = buildRequest({ appointment })
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          appointmentLocation: expect.anything(),
+        }),
+      )
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentTypeCode: 'CHVS',
+        }),
+      )
+    })
+
+    it('should not include appointmentLocation when appointmentTypeCode is CODC Planned Doorstep Contact', async () => {
+      const appointment: AppointmentSession = {
+        ...constructMockAppointmentSession(),
+        type: 'CODC',
+        smsPreview: undefined,
+      }
+      const req = buildRequest({ appointment })
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          appointmentLocation: expect.anything(),
+        }),
+      )
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentTypeCode: 'CODC',
+        }),
+      )
+    })
+
+    it('should include appointmentLocation for other appointment types', async () => {
+      const appointment: AppointmentSession = {
+        ...constructMockAppointmentSession(),
+        type: 'OTHER',
+        smsPreview: undefined,
+      }
+      const req = buildRequest({ appointment })
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          appointmentTypeCode: 'OTHER',
+          appointmentLocation,
+        }),
+      )
+    })
+  })
 })

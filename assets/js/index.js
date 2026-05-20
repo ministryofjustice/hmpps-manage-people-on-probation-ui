@@ -117,7 +117,22 @@ const recentCaseDisplay = () => {
 
   if (recentCasesNone && recentCasesTable) {
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    let recentCases = JSON.parse(localStorage.getItem('recentCases'))
+    const storedRecentCases = localStorage.getItem('recentCases')
+    let recentCases = []
+
+    try {
+      if (storedRecentCases) {
+        recentCases = JSON.parse(storedRecentCases)
+      }
+
+      if (!Array.isArray(recentCases)) {
+        recentCases = []
+      }
+      // eslint-disable-next-line no-unused-vars
+    } catch (error) {
+      recentCases = []
+      localStorage.removeItem('recentCases')
+    }
 
     $.ajax({
       async: false,
@@ -141,7 +156,7 @@ const recentCaseDisplay = () => {
       return value
     }
 
-    if (recentCases != null) {
+    if (recentCases.length > 0) {
       recentCasesNone.style.display = 'none'
       recentCases.forEach(recentCase => {
         const tableBody = document.getElementById('tabBody')

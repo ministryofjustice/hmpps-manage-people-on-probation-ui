@@ -12,6 +12,6 @@ export const setDataValue = <TData extends Record<string, any>, TValue = any>(
     }
     target = target[key]
   }
-  target[path.at(-1)] = value
+  target[path.at(-1)!] = value
   return data
 }

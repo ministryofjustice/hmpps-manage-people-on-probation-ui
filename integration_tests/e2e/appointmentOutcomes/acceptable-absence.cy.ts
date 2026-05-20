@@ -151,6 +151,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select why their absence was acceptable'
     loadPage({ journey })
     acceptableAbsencePage = new AcceptableAbsencePage()
+    uncheckAllRadios()
     acceptableAbsencePage.getSubmitBtn().click()
     acceptableAbsencePage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
@@ -158,6 +159,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
     })
   })
+
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })

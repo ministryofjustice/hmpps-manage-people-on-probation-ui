@@ -866,13 +866,15 @@ context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
     overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
-    overviewPage.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
-    overviewPage.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    overviewPage.getElementData('nextCheckinDueLabel').should('contain.text', 'Next check in due')
+    const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
+    overviewPage.getElementData('nextCheckInValue').should('contain.text', expectedDate)
     overviewPage.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     overviewPage.getElementData('frequencyValue').should('contain.text', 'Every week')
     overviewPage.getElementData('contactPrefLabel').should('contain.text', 'Contact preferences')
@@ -887,6 +889,7 @@ context('check-ins overview and manage pages', () => {
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -906,6 +909,7 @@ context('check-ins overview and manage pages', () => {
   it('should show checkin details', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
     appointmentsPage.checkOnPage()
@@ -928,8 +932,9 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
-    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'Next check in')
-    manageCheckins.getElementData('firstCheckInValue').should('contain.text', '20 April 2026')
+    manageCheckins.getElementData('nextCheckinDueLabel').should('contain.text', 'Next check in')
+    const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
+    manageCheckins.getElementData('nextCheckInValue').should('contain.text', expectedDate)
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
     manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
@@ -1010,32 +1015,26 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to stop check in', () => {
     cy.task('resetMocks')
+    cy.task('stubEnableStopCheckinSensitiveFlag')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('stop-checkin-btn').click()
     const stopCheckIn = new StopCheckins()
-    stopCheckIn
-      .getHeader()
-      .find('h1.govuk-fieldset__heading')
-      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
     stopCheckIn.getSubmitBtn().click()
-    stopCheckIn.checkErrorSummaryBox(['Select yes if you want to stop check ins for the person'])
-    stopCheckIn.getElementData('stopCheckIn').find('input[type="radio"][value="YES"]').click()
-    stopCheckIn.getSubmitBtn().click()
-    stopCheckIn
-      .getHeader()
-      .find('h1.govuk-fieldset__heading')
-      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
-    stopCheckIn.getSubmitBtn().click()
-    stopCheckIn.checkErrorSummaryBox(['Enter the reason for stopping'])
+    stopCheckIn.checkErrorSummaryBox([
+      'Enter the reason for stopping',
+      'Select yes if the reason for stopping includes sensitive information',
+    ])
     stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
+    stopCheckIn.getElementData('sensitiveContact').find('input[type="radio"][value="false"]').click({ force: true })
     stopCheckIn.getSubmitBtn().click()
     manageCheckins.checkOnPage()
   })
 
   it('should able to stop and restart online check ins', () => {
     cy.task('resetMocks')
+    cy.task('stubEnableStopCheckinSensitiveFlag')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
 
     const restartDatePage = new RestartDateFrequencyPage()

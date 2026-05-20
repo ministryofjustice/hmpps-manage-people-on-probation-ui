@@ -145,6 +145,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select who will create the breach NSI'
     loadPage({ journey })
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+    uncheckAllRadios()
     initiateBreachOrRecallPage.getSubmitBtn().click()
     initiateBreachOrRecallPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {

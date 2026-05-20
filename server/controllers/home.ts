@@ -4,6 +4,7 @@ import config from '../config'
 import DeliusClient, { AppointmentSummary, Homepage } from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import { EnforcementContact } from '../data/model/schedule'
 
 const routes = ['getHome', 'getHomeOld'] as const
 
@@ -18,6 +19,20 @@ const homeController: Controller<typeof routes, void> = {
       const homePage: Homepage = await deliusClient.getHomepage(res.locals.user.username)
       appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
       appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
+
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
+
+      const masClient = new MasApiClient(token)
+
+      let enforcementActions: EnforcementContact[] = []
+      if (res.locals.flags?.enableMyEnforcementActionsOverview) {
+        const enforcementContactResponse = await masClient.getEnforcementContacts(
+          res.locals.user.username,
+          (pageNum - 1).toString(),
+        )
+        enforcementActions = enforcementContactResponse.enforcementContacts
+      }
+
       const { upcomingAppointments } = homePage
       let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
       if (res.locals.flags.enableHomePageOutcomesWithFilter) {
@@ -35,6 +50,7 @@ const homeController: Controller<typeof routes, void> = {
         upcomingAppointments,
         appointmentsRequiringOutcome,
         appointmentsRequiringOutcomeCount,
+        enforcementActions,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
@@ -48,9 +64,6 @@ const homeController: Controller<typeof routes, void> = {
     }
   },
 
-  /**
-   * @deprecated use getHome
-   */
   getHomeOld: hmppsAuthClient => {
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -61,12 +74,23 @@ const homeController: Controller<typeof routes, void> = {
       const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
         req.host.includes(host),
       )
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
+
+      let enforcementActions: EnforcementContact[] = []
+      if (res.locals.flags?.enableMyEnforcementActionsOverview) {
+        const enforcementContactResponse = await masClient.getEnforcementContacts(
+          res.locals.user.username,
+          (pageNum - 1).toString(),
+        )
+        enforcementActions = enforcementContactResponse.enforcementContacts
+      }
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
         totalOutcomes,
         appointments,
         outcomes,
+        enforcementActions,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,

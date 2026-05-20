@@ -81,6 +81,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select an enforcement action for their failure to comply'
     loadPage({ journey })
     enforcementActionPage = new EnforcementActionPage()
+    cy.get('select').select('')
     enforcementActionPage.getSubmitBtn().click()
     enforcementActionPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {

@@ -379,12 +379,13 @@ describe('Test eSuperVision validation', () => {
   })
 
   describe('Test stop-checkin', () => {
-    it('passes when stopCheckin is NO', () => {
+    it('passes when both reason and sensitive fields are provided', () => {
       const esupervision = {
         [crn]: {
           [id]: {
             manageCheckin: {
-              stopCheckin: 'NO',
+              stopCheckinReason: 'Reason for stopping',
+              stopCheckinSensitive: 'false',
             },
           },
         },
@@ -395,43 +396,43 @@ describe('Test eSuperVision validation', () => {
       expect(next).toHaveBeenCalled()
     })
 
-    it('passes when stopCheckin is YES with reason provided', () => {
-      const esupervision = {
-        [crn]: {
-          [id]: {
-            manageCheckin: {
-              stopCheckin: 'YES',
-              reason: 'Reason for stopping',
-            },
-          },
-        },
-      }
-      const req = makeReq({ url: manageStopCheckinsUrl, body: { esupervision }, session: { data: { esupervision } } })
-      const res = makeRes()
-      validation.eSuperVision(req, res, next)
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('fails when stopCheckin not selected', () => {
+    it('fails when both fields are missing', () => {
       const req = makeReq({ url: manageStopCheckinsUrl, body: { esupervision: {} }, session: { data: {} } })
       const res = makeRes()
       validation.eSuperVision(req, res, next)
       expect(res.render).toHaveBeenCalled()
     })
 
-    it('fails when stopCheckin YES but reason missing', () => {
+    it('fails when reason is missing but sensitive is selected', () => {
       const esupervision = {
         [crn]: {
           [id]: {
             manageCheckin: {
-              stopCheckin: 'YES',
-              reason: '',
+              stopCheckinReason: '',
+              stopCheckinSensitive: 'true',
             },
           },
         },
       }
       const req = makeReq({ url: manageStopCheckinsUrl, body: { esupervision }, session: { data: { esupervision } } })
       const res = makeRes()
+      validation.eSuperVision(req, res, next)
+      expect(res.render).toHaveBeenCalled()
+    })
+
+    it('fails when reason is provided but sensitive flag is not inputted', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            manageCheckin: {
+              stopCheckinReason: 'Reason for stopping',
+            },
+          },
+        },
+      }
+      const req = makeReq({ url: manageStopCheckinsUrl, body: { esupervision }, session: { data: { esupervision } } })
+      const res = makeRes()
+      res.locals.flags = { enableStopCheckinSensitiveFlag: true }
       validation.eSuperVision(req, res, next)
       expect(res.render).toHaveBeenCalled()
     })

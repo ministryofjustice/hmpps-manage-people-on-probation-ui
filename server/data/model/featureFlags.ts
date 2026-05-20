@@ -16,9 +16,11 @@ export class FeatureFlags {
   enableNonCompliance?: boolean = undefined
   enableSentencePlanUrl?: boolean = undefined
   enableDeepLinks?: boolean = undefined
-  enablePoPSearchExtraColumns?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
+  enableMyEnforcementActionsOverview?: boolean = undefined
+  enableShowNextCheckinDate?: boolean = undefined
+  enableStopCheckinSensitiveFlag?: boolean = undefined
 }

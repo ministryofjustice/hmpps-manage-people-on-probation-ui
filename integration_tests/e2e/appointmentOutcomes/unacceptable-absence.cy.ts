@@ -139,6 +139,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select an action for their unacceptable absence'
     loadPage({ journey })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+    uncheckAllRadios()
     attendedFailedToComplyPage.getSubmitBtn().click()
     attendedFailedToComplyPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {

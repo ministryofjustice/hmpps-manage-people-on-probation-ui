@@ -12,13 +12,13 @@ import {
   enforcementActionOptions,
   outcomeMap,
   enforcementActionMap,
+  letterTypeOptions,
 } from '../../properties/appointment-outcomes'
 import { Activity } from '../../data/model/schedule'
 import { AppointmentOutcomeProps, OutcomeSummary } from '../../models/Locals'
 
-let summary: OutcomeSummary
-
 export const getOutcomeSummary: Route<void> = (_req, res, next) => {
+  let summary: OutcomeSummary
   if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome) {
     const {
       sentence: { type: sentenceType },
@@ -40,12 +40,12 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
           unacceptableAbsence,
           failedToAttend,
           letterSentBy,
+          letterType,
           breachNSICreatedBy,
         },
       },
       appointment,
     } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
-
     const nextAppt = res?.locals?.nextAppointment?.appointment
     let nextAppointment: string = 'No next appointment'
     let type: string
@@ -60,6 +60,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       ...acceptableAbsenceOptions,
       ...failedToAttendOptions(forename),
       ...enforcementActionOptions(forename),
+      ...letterTypeOptions,
     ]
 
     const noOutcome = 'No outcome'
@@ -69,7 +70,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       if (!outcomeCode) return noOutcome
       const selected = Object.entries(outcomeMap).find(
         ([_key, { code }]) => outcomeCode === code,
-      )[0] as AppointmentOutcomeType
+      )?.[0] as AppointmentOutcomeType
       if (!selected) return noOutcome
       return outcomeOptions.find(option => option.value === selected)?.text || noOutcome
     }
@@ -80,7 +81,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       }
       const selected = Object.entries(enforcementActionMap).find(
         ([_key, { code }]) => enforcementActionCode?.at(-1) === code,
-      )[0] as AppointmentOutcomeType
+      )?.[0] as AppointmentOutcomeType
       if (!selected) {
         return noAction
       }
@@ -94,25 +95,26 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       ? DateTime.fromISO(date).plus({ days: defaultResponsePeriodDays }).toFormat('dd MMMM yyyy')
       : null
 
-    const documents = appointment?.documents?.length
-      ? appointment.documents.map(document => document.name).join('<br>')
-      : null
+    const documents = appointment?.documents?.length ? appointment.documents.map(document => document.name) : null
+
+    const enforcementAction = getSelectedEnforcementAction()
+    const outcome = `${getSelectedOutcome()}${acceptableAbsence ? ` - ${enforcementAction.toLowerCase()}` : ''}`
 
     summary = {
       appointmentDetails: appointmentHintText,
-      outcome: getSelectedOutcome(),
+      outcome,
       notes: notes ?? 'No notes',
       sensitivity,
       nextAppointment,
       documents,
     }
 
-    if (evidenceDueDate) {
-      summary.evidenceDueDate = evidenceDueDate
-    }
-    if (attendedFailedToComply || acceptableAbsence || unacceptableAbsence || failedToAttend) {
-      summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : getSelectedEnforcementAction()
+    if (attendedFailedToComply || unacceptableAbsence || failedToAttend || letterType) {
+      summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : enforcementAction
       summary.enforcementActionChangeLink = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
+      if (evidenceDueDate) {
+        summary.evidenceDueDate = evidenceDueDate
+      }
     }
     if (summary) res.locals.appointmentOutcome.summary = summary
   }

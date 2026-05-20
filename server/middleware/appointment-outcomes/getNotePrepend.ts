@@ -13,19 +13,19 @@ export const getNotePrepend: Route<void> = (_req, res, next) => {
     let breachNSICreatedBy: string
     let letterSentBy: string
     let letterType: string
-    let text: string = null
+    let text: string[] = []
     const getUser = (user: EnforcementActionCreatedBy) => (user === 'CASE_ADMIN' ? 'Case administrator' : 'I')
     if (_breachNSICreatedBy) {
       const breachOrRecall = type === 'COMMUNITY' ? 'breach' : 'recall'
       breachNSICreatedBy = getUser(_breachNSICreatedBy)
-      text = `${breachNSICreatedBy} will initiate the ${breachOrRecall}`
+      text = [`${breachNSICreatedBy} will initiate the ${breachOrRecall}`]
     }
     if (_letterSentBy) {
       letterSentBy = getUser(_letterSentBy)
       letterType = letterTypeOptions.find(option => option.value === _letterType).text
-      text = `${letterSentBy} will send a ${letterType.toLowerCase()}`
+      text.push(`${letterSentBy} will send a ${letterType.toLowerCase()}`)
     }
-    res.locals.appointmentOutcome.notePrepend = text
+    res.locals.appointmentOutcome.notePrepend = text.length ? text.join('\n') : null
   }
   return next()
 }

@@ -9,6 +9,7 @@ const identityUrl = `${checkInUrl}/review/identity`
 const notesUrl = `${checkInUrl}/review/notes`
 const expiredUrl = `${checkInUrl}/review/expired`
 const viewUrl = `${checkInUrl}/view`
+const viewExpiredUrl = `${checkInUrl}/view-expired`
 
 const reqBase = {
   method: 'POST',
@@ -155,6 +156,87 @@ describe('/controllers/arrangeAppointmentController', () => {
     } as RequestOptions
     const reqView = httpMocks.createRequest(reqBaseView)
     validation.checkInReview(reqView, res, next)
+    expect(res.render).toHaveBeenCalled()
+  })
+  it('validation passes for notes page', async () => {
+    const esupervision = {
+      [crn]: {
+        [id]: {
+          checkins: {
+            sensitiveContact: 'false',
+          },
+        },
+      },
+    }
+    const reqBaseNotes = {
+      ...reqBase,
+      url: notesUrl,
+      session: {
+        data: {
+          esupervision,
+        },
+      },
+      body: {
+        esupervision,
+      },
+    } as RequestOptions
+    const reqNotes = httpMocks.createRequest(reqBaseNotes)
+    validation.checkInReview(reqNotes, res, next)
+    expect(next).toHaveBeenCalled()
+  })
+
+  it('validation fails on notes page if no option selected', async () => {
+    const reqBaseNotes = {
+      ...reqBase,
+      url: notesUrl,
+      session: {
+        data: {},
+      },
+      body: {},
+    } as RequestOptions
+    const reqNotes = httpMocks.createRequest(reqBaseNotes)
+    validation.checkInReview(reqNotes, res, next)
+    expect(res.render).toHaveBeenCalled()
+  })
+
+  it('validation passes for view expired page', async () => {
+    const esupervision = {
+      [crn]: {
+        [id]: {
+          checkins: {
+            note: 'This is a test note',
+            sensitiveContact: 'true',
+          },
+        },
+      },
+    }
+    const reqBaseViewExpired = {
+      ...reqBase,
+      url: viewExpiredUrl,
+      session: {
+        data: {
+          esupervision,
+        },
+      },
+      body: {
+        esupervision,
+      },
+    } as RequestOptions
+    const reqViewExpired = httpMocks.createRequest(reqBaseViewExpired)
+    validation.checkInReview(reqViewExpired, res, next)
+    expect(next).toHaveBeenCalled()
+  })
+  it('validation fails on view expired page if no option selected', async () => {
+    const reqBaseViewExpired = {
+      ...reqBase,
+      url: notesUrl,
+      session: {
+        data: {},
+      },
+      body: {},
+    } as RequestOptions
+    const reqViewExpired = httpMocks.createRequest(reqBaseViewExpired)
+    validation.checkInReview(reqViewExpired, res, next)
     expect(res.render).toHaveBeenCalled()
   })
 })

@@ -34,7 +34,11 @@ import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
-import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
+import {
+  ESupervisionCheckIn,
+  EsupervisionUpcomingQuestionsResponse,
+  OffenderCheckinsByCRNResponse,
+} from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -151,6 +155,7 @@ interface Locals {
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
+  upcomingCheckin?: EsupervisionUpcomingQuestionsResponse
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
@@ -182,7 +187,7 @@ export interface OutcomeSummary {
   evidenceDueDate?: string
   notes: string
   sensitivity: string
-  documents?: string
+  documents?: string[]
   nextAppointment?: string
   enforcementActionChangeLink?: string
 }

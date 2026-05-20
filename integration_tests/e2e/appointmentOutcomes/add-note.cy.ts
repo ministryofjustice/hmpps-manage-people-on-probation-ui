@@ -161,7 +161,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         cy.wait('@submit')
         const cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkPageTitle('Check your answers')
-        // cy.url().should('include', '/manage')
       })
     })
   }
