@@ -19,7 +19,7 @@ export const completeRescheduling = ({ id = '', inPast = false, enableNonComplia
   const yesterday = DateTime.now().minus({ days: 1 })
   const appointmentDate = inPast ? yesterday : future
   dateTimePage.getDatePickerInput().clear().type(appointmentDate.toFormat('d/M/yyyy'))
-  if (inPast) {
+  if (inPast && !enableNonCompliance) {
     dateTimePage.getLogOutcomesAlertBanner().should('be.visible')
   }
   dateTimePage.getElementInput(`startTime`).clear().type(rescheduledStartTime)

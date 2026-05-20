@@ -6,6 +6,7 @@ import InitiateBreachOrRecallPage from '../../../pages/appointmentOutcomes/initi
 import OutcomePage from '../../../pages/appointmentOutcomes/outcome.page'
 import SendLetterPage from '../../../pages/appointmentOutcomes/send-letter.page'
 import UnacceptableAbsencePage from '../../../pages/appointmentOutcomes/unacceptable-absence.page'
+import { uncheckAllRadios } from './uncheckAllRadios'
 
 type ActionPage =
   | typeof AttendedFailedToComplyPage
@@ -43,6 +44,7 @@ export const completeOutcome = ({
   action = null,
 }: { outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}) => {
   const outcomePage = new OutcomePage()
+  uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=${outcome}]`).click()
   outcomePage.getSubmitBtn().click()
   if (action) {

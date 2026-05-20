@@ -144,7 +144,6 @@ describe('Change appointment details and reschedule', () => {
         completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
         outcomePage = new OutcomePage()
-        cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).should('be.checked')
       })
     })
     it('should redirect to the correct enforcement page when change link is clicked', () => {

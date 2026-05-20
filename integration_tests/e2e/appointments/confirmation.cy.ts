@@ -419,6 +419,36 @@ describe('Confirmation page', () => {
     })
   })
 
+  describe('Appointment rescheduled to a date and time in the past - non compliance disabled', () => {
+    let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+    beforeEach(() => {
+      completeRescheduleAppointmentPage({ enableNonCompliance: false })
+    })
+    it('should render the confirmation page', () => {
+      const inPast = true
+      getUuid().then(uuid => {
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        completeRescheduling({ id: uuid, inPast, enableNonCompliance: false })
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        confirmPage = new AppointmentConfirmationPage()
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(0)
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+          })
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(1)
+          .should('contain.text', 'The appointment has been updated on the NDelius contact log and officer diary.')
+      })
+    })
+  })
+
   describe('SMS reminder', () => {
     beforeEach(() => {
       cy.task('resetMocks')

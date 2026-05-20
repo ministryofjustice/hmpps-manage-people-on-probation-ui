@@ -12,6 +12,7 @@ const loadManagePage = () => {
 }
 
 const loadPage = () => {
+  cy.task('stubDisableNonCompliance')
   completeSentencePage()
   completeTypePage()
   completeLocationDateTimePage({ dateInPast: true })
