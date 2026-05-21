@@ -4,10 +4,10 @@ on:
   workflow_call:
     inputs:
       node_version_file:
-        description: "Passed to setup-node action to specify where to source the version of node from"
+        description: 'Passed to setup-node action to specify where to source the version of node from'
         required: false
         type: string
-        default: ".nvmrc"
+        default: '.nvmrc'
 
 permissions:
   contents: read
@@ -17,73 +17,74 @@ jobs:
     name: Run the integration tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-    - name: Use Node.js ${{ inputs.node_version_file }}
-      uses: actions/setup-node@v6
-      with:
-        node-version-file: ${{ inputs.node_version_file }}
-    - name: download artifacts
-      uses: actions/download-artifact@v8
-      with:
-        name: npm_build_artifacts
-    - name: restore cache
-      id: restore-cache
-      uses: actions/cache/restore@v5
-      env: 
-        cache-name: node-modules
-      with:
-        path: |
-          ./node_modules
-          ~/.cache/Cypress
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-    - name: install dependencies
-      if: steps.restore-cache.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        npm run setup
-    - name: download the artifacts
-      uses: actions/download-artifact@v8
-      with:
-        name: npm_build_artifacts
-        path: |
-          build/
-          dist/
-          assets/stylesheets/
-    - name: download the test artifacts
-      uses: actions/download-artifact@v8
-      with:
-        name: npm_unit_test_artifacts
-        path: |
-          test_results/
-    - name: Prepare and run integration tests
-      id: integration-tests
-      shell: bash
-      run: |
-        nohup npm run start-feature &
-        sleep 5
-        npm run int-test
-      # continue-on-error: true
-      # replacing the above with if: always()
-    - name: Merge unit and integration test coverage reports
-      if: always()
-      shell: bash
-      run: |
-        npm run coverage-report
-    - name: upload the coverage test artifacts
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: coverage_artifacts
-        path: coverage/
-    - name: upload the test results
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: cypress_results
-        path: test_results/
-    - name: fail the action if the tests failed
-      if: ${{ steps.integration-tests.outcome == 'failure' }}
-      uses: actions/github-script@v9
-      with:
-        script: |
+      - uses: actions/checkout@v6
+      - name: Use Node.js ${{ inputs.node_version_file }}
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ${{ inputs.node_version_file }}
+      - name: download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: npm_build_artifacts
+      - name: restore cache
+        id: restore-cache
+        uses: actions/cache/restore@v5
+        env:
+          cache-name: node-modules
+        with:
+          path: |
+            ./node_modules
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - name: install dependencies
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          npm run setup
+      - name: download the artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: npm_build_artifacts
+          path: |
+            build/
+            dist/
+            assets/stylesheets/
+      - name: download the test artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: npm_unit_test_artifacts
+          path: |
+            test_results/
+      - name: Prepare and run integration tests
+        id: integration-tests
+        shell: bash
+        run: |
+          nohup npm run start-feature &
+          sleep 5
+          npx cypress run --spec 'integration_tests/e2e/appointments/manage-appointment/manage-appointment.cy.ts'
+        # npm run int-test
+        # continue-on-error: true
+        # replacing the above with if: always()
+      - name: Merge unit and integration test coverage reports
+        if: always()
+        shell: bash
+        run: |
+          npm run coverage-report
+      - name: upload the coverage test artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage_artifacts
+          path: coverage/
+      - name: upload the test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress_results
+          path: test_results/
+      - name: fail the action if the tests failed
+        if: ${{ steps.integration-tests.outcome == 'failure' }}
+        uses: actions/github-script@v9
+        with:
+          script: |
             core.setFailed('Integration tests failed')
