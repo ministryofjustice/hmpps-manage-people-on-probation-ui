@@ -3,6 +3,17 @@
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
+  {% if breach %}
+    {{ mojAlert({
+    variant: "warning",
+    title: "There is a live breach for this sentence",
+    showTitleAsHeading: true,
+    dismissible: false,
+    attributes: { "data-qa": "breach-warning" },
+    text: 'The breach for '+ breach.order.description + ' was initiated on ' + breach.activeBreach.startDate | dateWithYear
+  }) }}
+  {% endif %}
+
   {{ govukRadios({
   formGroup: {
       attributes: {
@@ -27,7 +38,7 @@
                     attributes: { "data-qa": "submit-btn" }
                 }) }}
     <a class="govuk-link" href="{{ backLink }}" data-qa="cancelGoBackLink">
-                    Cancel and go back
-                </a>
+      Cancel and go back
+    </a>
   </div>
 {% endblock %}

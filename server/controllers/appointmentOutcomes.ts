@@ -7,6 +7,8 @@ import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
+import { getDataValue } from '../utils'
+import { getBreach } from '../middleware/appointment-outcomes/getBreach'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -58,9 +60,14 @@ const enforcementActionRedirects = (pageKey: keyof AppointmentSessionOutcome, re
 }
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
-  getOutcome: _hmppsAuthClient => {
-    return async (_req, res) => {
-      return res.render('pages/appointment-outcomes/outcome')
+  getOutcome: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+
+      const breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      return res.render('pages/appointment-outcomes/outcome', { breach })
     }
   },
   postOutcome: _hmppsAuthClient => {
@@ -190,8 +197,14 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       return res.redirect(`${baseOutcomeUrl}/add-note`)
     }
   },
-  getUpdateEnforcementAction: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/update-enforcement-action')
+  getUpdateEnforcementAction: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      const breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      return res.render('pages/appointment-outcomes/update-enforcement-action', { breach })
+    }
   },
   postUpdateEnforcementAction: () => async (req, res) =>
     enforcementActionRedirects('updateEnforcementAction', req, res),

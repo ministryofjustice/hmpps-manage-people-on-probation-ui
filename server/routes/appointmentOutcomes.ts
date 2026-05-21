@@ -138,7 +138,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Outcome index  */
 
-  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
+  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome(hmppsAuthClient))
   router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
 
   /* Attended - failed to comply */
