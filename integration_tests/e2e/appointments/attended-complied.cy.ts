@@ -12,6 +12,7 @@ const loadManagePage = () => {
 }
 
 const loadPage = () => {
+  cy.task('stubDisableNonCompliance')
   completeSentencePage()
   completeTypePage()
   completeLocationDateTimePage({ dateInPast: true })
@@ -60,6 +61,7 @@ describe('Log attended and complied appointment', () => {
   }
   beforeEach(() => {
     cy.task('resetMocks')
+    cy.task('stubDisableNonCompliance')
   })
   describe('Manage appointment journey', () => {
     const manageJourney = true

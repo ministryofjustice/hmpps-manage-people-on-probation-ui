@@ -88,6 +88,7 @@ describe('Arrange an appointment', () => {
 
       describe('enableNonCompliance flag', () => {
         it('should display the bullet point for non-compliance if enableNonCompliance is false', () => {
+          cy.task('stubDisableNonCompliance')
           loadPage()
           typePage = Page.verifyOnPage(AppointmentTypePage)
           typePage
@@ -99,7 +100,6 @@ describe('Arrange an appointment', () => {
         })
 
         it('should not display the bullet point for non-compliance if enableNonCompliance is true', () => {
-          cy.task('stubEnableNonCompliance')
           loadPage()
           typePage = Page.verifyOnPage(AppointmentTypePage)
           typePage

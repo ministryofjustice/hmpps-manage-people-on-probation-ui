@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
 
 export type OutcomeMap = {

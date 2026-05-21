@@ -155,36 +155,4 @@ describe('rescheduleAppointmentController', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
   })
-
-  describe('getRescheduleCheckYourAnswer', () => {
-    it('should render the check your answers page', async () => {
-      mockedAppointmentDateIsInPast.mockReturnValue(true)
-      const req = httpMocks.createRequest({
-        params: { crn, id, contactId },
-        url: '/some-url',
-        session: {
-          data: {
-            appointments: {
-              [crn]: {
-                [id]: {
-                  sensitivityLocked: false,
-                },
-              },
-            },
-          },
-        },
-      })
-
-      await rescheduleAppointmentController.getRescheduleCheckYourAnswer(null)(req, res, null)
-
-      expect(renderSpy).toHaveBeenCalledWith('pages/reschedule/check-your-answers', {
-        crn,
-        id,
-        contactId,
-        url: '/some-url',
-        isInPast: true,
-      })
-      checkSendAuditMessage(res, 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE', crn, SubjectType.CRN)
-    })
-  })
 })

@@ -25,11 +25,6 @@ type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
 
 const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
   const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
-  cy.task('stubEnableNonCompliance')
   if (journey === 'ARRANGE') {
     completeSentencePage()
     completeTypePage()
@@ -41,7 +36,7 @@ const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
     manageAppointmentPage.getTaskLink(1).click()
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
@@ -143,7 +138,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
       addNotePage.getSubmitBtn().click()
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkOnPage()
+      cyaPage.checkPageTitle('Check your answers')
     })
   }
   if (journey === 'MANAGE') {
@@ -165,8 +160,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         addNotePage.getSubmitBtn().click()
         cy.wait('@submit')
         const cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
-        // cy.url().should('include', '/manage')
+        cyaPage.checkPageTitle('Check your answers')
       })
     })
   }

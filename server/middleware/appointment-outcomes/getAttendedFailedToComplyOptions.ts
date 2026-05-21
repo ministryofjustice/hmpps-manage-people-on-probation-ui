@@ -9,7 +9,6 @@ export const getAttendedFailedToComplyOptions: Route<void> = (_req, res, next) =
     isProbationPractitioner,
     appointmentSession,
   } = res.locals.appointmentOutcome
-
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
     appointmentSession.outcome.contactEnforcementActions,
     attendedFailedToComplyOptions(type),

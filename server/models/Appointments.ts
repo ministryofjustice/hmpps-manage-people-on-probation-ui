@@ -1,15 +1,9 @@
-/* eslint-disable import/no-cycle */
 import { type Name } from '../data/model/personalDetails'
-import {
-  type EnforcementAction,
-  type Activity,
-  ContactOutcomes,
-  ContactEnforcementActions,
-} from '../data/model/schedule'
+import type { EnforcementAction, Activity, ContactOutcomes, ContactEnforcementActions } from '../data/model/schedule'
 import { type Errors } from './Errors'
-import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
-import { Option } from './Option'
-import { OutcomeCode, EnforcementActionCode } from '../properties/appointment-outcomes/code-map'
+import type { SmsPreviewSession, SmsOptInOptions } from '../data/model/OutlookEvent'
+import { type Option } from './Option'
+import type { OutcomeCode, EnforcementActionCode } from '../properties/appointment-outcomes/code-map'
 
 export type YesNo = '' | 'Yes' | 'No'
 
@@ -88,6 +82,28 @@ export interface AppointmentOutcome {
   type: AppointmentOutcomeType
   complied: 'YES' | 'NO'
 }
+
+export const isEnforcementActionMapKey = (value: string): value is AppointmentEnforcementAction => {
+  return appointmentEnforcementActions.includes(value as AppointmentEnforcementAction)
+}
+
+export const isEnforcementActionPageKey = (value: string): value is EnforcementActionPage => {
+  return enforcementActionPageKeys.includes(value as EnforcementActionPage)
+}
+
+export const enforcementActionPageKeys = [
+  'attendedFailedToComply',
+  'acceptableAbsence',
+  'unacceptableAbsence',
+  'failedToAttend',
+  'otherEnforcementAction',
+  'breachNSICreatedBy',
+  'letterType',
+  'letterSentBy',
+  'updateEnforcementAction',
+] as const satisfies readonly (keyof AppointmentSessionOutcome)[]
+
+export type EnforcementActionPage = (typeof enforcementActionPageKeys)[number]
 
 export interface AppointmentSessionOutcome {
   outcomeType?: AppointmentOutcomeType
@@ -259,6 +275,7 @@ export interface AppointmentPatch {
 }
 
 export interface RescheduleAppointment {
+  contactId?: string
   whoNeedsToReschedule?: RescheduleRequestedBy
   reason?: string
   files?: string[]

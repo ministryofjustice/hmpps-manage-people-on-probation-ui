@@ -3,7 +3,7 @@ import { isBlank } from './isBlank'
 
 export const govukTime = (datetimeString?: string): string | null => {
   if (!datetimeString || isBlank(datetimeString)) return null
-  const datetime = DateTime.fromISO(datetimeString)
+  const datetime = DateTime.fromISO(datetimeString, { zone: 'Europe/London' })
   const hourMinuteFormat = datetime.minute === 0 ? 'ha' : 'h:mma'
   return datetime.toFormat(hourMinuteFormat).toLowerCase()
 }

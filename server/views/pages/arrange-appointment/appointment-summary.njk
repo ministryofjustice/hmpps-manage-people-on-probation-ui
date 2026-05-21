@@ -145,6 +145,35 @@
       actions: { items: [ { href: changePath + "/location-date-time?change=" + url,
       text: "Choose date and time" if appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
+
+    {
+        key: { text: 'What was the outcome of this appointment?' },
+        value: { text: appointmentOutcome.summary.outcome },
+        actions: {
+            items: [
+                { href: appointmentOutcome.baseOutcomeUrl + "?change=" + url, text: 'Change', visuallyHiddenText: 'outcome of this appointment' }
+            ]
+        }
+    } if appointmentOutcome.summary.outcome and flags.enableNonCompliance and isInPast,
+    {
+        key: { text: 'Enforcement action' },
+        value: { text: appointmentOutcome.summary.enforcementAction | nl2br },
+        actions: {
+            items: [
+                { href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url, text: 'Change', visuallyHiddenText: 'enforcement action' }
+            ]
+        }
+    } if appointmentOutcome.summary.enforcementAction and flags.enableNonCompliance and isInPast,
+    {
+        key: { text:'Evidence due date' },
+        value: { text: appointmentOutcome.summary.evidenceDueDate },
+        actions: {
+            items: [
+                { href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url, text: 'Change', visuallyHiddenText: 'evidence due date' }
+            ]
+        }
+    } if appointmentOutcome.summary.evidenceDueDate and flags.enableNonCompliance and isInPast,
+
            { key: { text: "Text message confirmation" },
     value: { html: textMessageConfirmationHtml + ('<span class="govuk-summary-list__hint">' + noDateHint + '</span>' if not appointment.date )  },
     actions: {
@@ -164,12 +193,12 @@
     visuallyHiddenText: "outcome recorded"
      } 
      ] 
-     } if showAction } if appointment.outcomeRecorded,  
-       { key: { text: "Supporting information" },
+     } if showAction } if appointment.outcomeRecorded and not flags.enableNonCompliance,  
+       { key: { text: "Notes" if isInPast else "Supporting information" },
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 
-    href: changeOutcomePath + ("/add-note" if isInPast else "/supporting-information") + "?change=" + url, 
+    href:   (appointmentOutcome.baseOutcomeUrl + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "notes"
      } 
@@ -179,7 +208,7 @@
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ { 
-    href: changeOutcomePath + ("/add-note" if isInPast else "/supporting-information") + "?change=" + url, 
+    href:   (appointmentOutcome.baseOutcomeUrl + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
     text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
     visuallyHiddenText: "sensitivity"
      } 

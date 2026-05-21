@@ -1,13 +1,17 @@
 import { DateTime } from 'luxon'
-import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import { checkAppointmentSummary, checkPopHeader } from './imports'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import { completeRescheduleAppointmentPage, getUuid, completeRescheduling, to24HourTimeWithMinutes } from './utils'
+import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
+import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 
 describe('Change appointment details and reschedule', () => {
-  let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+  let checkYourAnswerPage: AppointmentCheckYourAnswersPage
   let dateTimePage: AppointmentLocationDateTimePage
+  let outcomePage: OutcomePage
+  let attendedFailedToComplyPage: AttendedFailedToComplyPage
   const crn = 'X000001'
   const future = DateTime.now().plus({ days: 2 })
   const startTime = '09:10'
@@ -18,12 +22,14 @@ describe('Change appointment details and reschedule', () => {
   })
 
   it('should render the page', () => {
-    completeRescheduleAppointmentPage()
-    checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+    completeRescheduleAppointmentPage({ crn })
+    checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
+    checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
     checkPopHeader()
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Change appointment details and reschedule')
     checkAppointmentSummary({
       page: checkYourAnswerPage,
+      reschedule: true,
       probationPractitioner: false,
       sendTextMessage: false,
       summaryHasDate: false,
@@ -45,7 +51,8 @@ describe('Change appointment details and reschedule', () => {
   describe('User clicks submit without selecting a date and time', () => {
     beforeEach(() => {
       completeRescheduleAppointmentPage()
-      checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+      checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
+      checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
       checkYourAnswerPage.getSubmitBtn().click()
     })
 
@@ -72,7 +79,7 @@ describe('Change appointment details and reschedule', () => {
     })
     it('should display the previous appointment date and outlook invite', () => {
       getUuid().then(uuid => {
-        completeRescheduling(uuid)
+        completeRescheduling({ id: uuid })
         cy.get('[data-qa="previousDateTime"]').should(
           'contain.text',
           `Wednesday 21 February 2024 at 10:15am to 10:30am`,
@@ -87,6 +94,7 @@ describe('Change appointment details and reschedule', () => {
               `${dayOfWeek(future.toISODate())} ${dateWithYear(future.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
             )
           })
+
         cy.get('[data-qa="calendarInviteInset"]').should('be.visible')
         cy.get('[data-qa="calendarInviteInset"]').should(
           'contain.text',
@@ -96,15 +104,88 @@ describe('Change appointment details and reschedule', () => {
     })
   })
 
-  describe('Reschedule appointment in the past', () => {
+  describe('Reschedule appointment in the past - non compliance enabled', () => {
     beforeEach(() => {
       completeRescheduleAppointmentPage()
-      checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+      checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
+      checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
       checkYourAnswerPage.getSubmitBtn().click()
     })
     it('should display the log outcomes alert banner and not display outlook invite text', () => {
       getUuid().then(uuid => {
-        completeRescheduling(uuid, true)
+        completeRescheduling({ id: uuid, inPast: true })
+        checkYourAnswerPage
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__key')
+          .should('contain.text', 'What was the outcome of this appointment?')
+        checkYourAnswerPage
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'Attended - failed to comply')
+        checkYourAnswerPage
+          .getSummaryListRow(7)
+          .find('.govuk-summary-list__key')
+          .should('contain.text', 'Enforcement action')
+        checkYourAnswerPage
+          .getSummaryListRow(7)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'No further action')
+        checkYourAnswerPage
+          .getSummaryListRow(8)
+          .find('.govuk-summary-list__key')
+          .should('contain.text', 'Evidence due date')
+        const evidenceDate = DateTime.now().plus({ days: 6 }).toFormat('dd MMMM yyyy')
+        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
+        cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
+      })
+    })
+    it('should redirect to the outcome page when change link is clicked', () => {
+      getUuid().then(uuid => {
+        completeRescheduling({ id: uuid, inPast: true })
+        checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
+        outcomePage = new OutcomePage()
+      })
+    })
+    it('should redirect to the correct enforcement page when change link is clicked', () => {
+      getUuid().then(uuid => {
+        completeRescheduling({ id: uuid, inPast: true })
+        checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
+        attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+        cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
+      })
+    })
+    it('should redirect to the correct enforcement page when evidence due date change link is clicked', () => {
+      getUuid().then(uuid => {
+        completeRescheduling({ id: uuid, inPast: true })
+        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__actions').find('a').click()
+        attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+        cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
+      })
+    })
+  })
+
+  describe('Reschedule appointment in the past - non compliance disabled', () => {
+    beforeEach(() => {
+      completeRescheduleAppointmentPage({ enableNonCompliance: false })
+      checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
+      checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
+      checkYourAnswerPage.getSubmitBtn().click()
+    })
+    it('should display the log outcomes alert banner and not display outlook invite text', () => {
+      getUuid().then(uuid => {
+        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: false })
+        checkYourAnswerPage
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__key')
+          .should('contain.text', 'Attended and complied')
+        checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+        checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Notes')
+        checkYourAnswerPage
+          .getSummaryListRow(7)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'Not entered')
+        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
+        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
         cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
       })
     })

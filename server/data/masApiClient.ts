@@ -2,7 +2,7 @@ import { Response } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
-import { EnforcementContactsResponse, ContactOutcomesResponse, PersonAppointment, Schedule } from './model/schedule'
+import { ContactOutcomesResponse, EnforcementContactsResponse, PersonAppointment, Schedule } from './model/schedule'
 import {
   AddressOverview,
   AddressOverviewSummary,

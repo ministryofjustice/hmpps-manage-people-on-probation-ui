@@ -47,6 +47,7 @@ function setup() {
   const req = httpMocks.createRequest({
     params: {
       crn: 'X000001',
+      contactId: 'C9876',
     },
     session: {
       data: {
@@ -87,7 +88,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
 
-  it('should reuse existing id and redirect to reschedule check answers when apptType is RESCHEDULE', () => {
+  it('should reuse existing id and redirect to check answers when apptType is RESCHEDULE', () => {
     const { req: request, res: response } = setup()
     const crn2 = request.params.crn
     request.params.id = 'APPT123'
@@ -96,6 +97,9 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
 
     const expectedCloneReschedule = {
       ...expectedClone,
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
       uuid: request.params.id,
     }
 
@@ -107,7 +111,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
       expectedCloneReschedule,
     )
     expect(redirectSpy2).toHaveBeenCalledWith(
-      `/case/${crn2}/appointments/reschedule/${request.params.contactId}/${request.params.id}/check-your-answers`,
+      `/case/${crn2}/arrange-appointment/${request.params.id}/check-your-answers`,
     )
   })
 
@@ -122,6 +126,9 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     const expectedCloneReschedule = {
       ...expectedClone,
       uuid: request.params.id,
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
       sensitivity: 'Yes',
       sensitivityLocked: true,
     }
@@ -134,7 +141,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
       expectedCloneReschedule,
     )
     expect(redirectSpy2).toHaveBeenCalledWith(
-      `/case/${crn2}/appointments/reschedule/${request.params.contactId}/${request.params.id}/check-your-answers`,
+      `/case/${crn2}/arrange-appointment/${request.params.id}/check-your-answers`,
     )
   })
 })

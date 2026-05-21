@@ -16,11 +16,11 @@ describe('utils/dateIsInPast', () => {
     expect(dateIsInPast(yesterday)).toEqual({ isInPast: true, isToday: false })
   })
   it('should return false if date is today and start time is in future', () => {
-    const timeInFuture = now.plus({ hours: 1 }).toFormat('HH:mm')
+    const timeInFuture = now.plus({ minutes: 1 }).toFormat('HH:mm')
     expect(dateIsInPast(today, timeInFuture)).toEqual({ isInPast: false, isToday: true })
   })
   it('should return true if date is today and start time is in past', () => {
-    const timeInPast = now.minus({ hours: 1 }).toFormat('HH:mm')
+    const timeInPast = now.minus({ minutes: 1 }).toFormat('HH:mm')
     expect(dateIsInPast(today, timeInPast)).toEqual({ isInPast: true, isToday: true })
   })
 })
