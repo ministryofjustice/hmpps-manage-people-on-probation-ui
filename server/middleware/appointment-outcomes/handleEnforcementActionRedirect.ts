@@ -21,7 +21,7 @@ export const handleEnforcementActionRedirect = (pageKey: EnforcementActionPage):
     }
     let redirect = redirectMap?.[enforcementAction]
     if (redirect) {
-      redirect = `${redirect}${change ? `?change=${change}` : ''}`
+      redirect = `${redirect}${change ? `?change=${encodeURIComponent(change)}` : ''}`
     } else if (change) {
       redirect = change.includes('/outcome') ? change : findUncompleted(req, res)
     } else {

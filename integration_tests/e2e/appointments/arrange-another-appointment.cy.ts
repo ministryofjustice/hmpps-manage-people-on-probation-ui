@@ -186,11 +186,11 @@ describe('Arrange another appointment', () => {
       checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
     })
     it('should update the notes when value is changed', () => {
-      checkUpdateSensitivity(arrangeAnotherAppointmentPage)
-      checkUpdateNotes(arrangeAnotherAppointmentPage)
+      checkUpdateSensitivity({ page: arrangeAnotherAppointmentPage })
+      checkUpdateNotes({ page: arrangeAnotherAppointmentPage })
     })
     it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity(arrangeAnotherAppointmentPage)
+      checkUpdateSensitivity({ page: arrangeAnotherAppointmentPage })
     })
     it('validation errors on change pages do not reset backLink/changeLink', () => {
       checkUpdateBackLinkRefresh(arrangeAnotherAppointmentPage)

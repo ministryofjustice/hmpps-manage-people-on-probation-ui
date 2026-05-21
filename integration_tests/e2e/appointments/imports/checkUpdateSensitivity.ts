@@ -5,13 +5,17 @@ import AppointmentNotePage from '../../../pages/appointments/note.page'
 import { crn } from './common'
 import { getUuid, completeLocationDateTimePage, completeTextMessageConfirmationPage } from '../utils'
 
-export const checkUpdateSensitivity = (
-  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+export const checkUpdateSensitivity = ({
+  page,
   dateInPast = false,
-  sendTextMessage = true,
-) => {
+  enableNonCompliance = true,
+}: {
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
+  dateInPast?: boolean
+  enableNonCompliance?: boolean
+}) => {
   getUuid().then(pageUuid => {
-    const index = !dateInPast && sendTextMessage ? 8 : 7
+    const index = enableNonCompliance && dateInPast ? 10 : 8
     page.getSummaryListRow(index).find('.govuk-link').click()
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()

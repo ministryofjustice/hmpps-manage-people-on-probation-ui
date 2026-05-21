@@ -144,10 +144,10 @@ describe('Check your answers then confirm the appointment', () => {
         checkUpdateTextMessageConfirmation(cyaPage)
       })
       it('should update the notes when value is changed', () => {
-        checkUpdateNotes(cyaPage)
+        checkUpdateNotes({ page: cyaPage })
       })
       it('should update the sensitivity when value is changed', () => {
-        checkUpdateSensitivity(cyaPage)
+        checkUpdateSensitivity({ page: cyaPage })
       })
       it('should update the text message confirmation when mobile number is changed', () => {
         const updateMobileNumber = true
@@ -201,10 +201,10 @@ describe('Check your answers then confirm the appointment', () => {
       })
     })
     it('should update the notes when value is changed', () => {
-      checkUpdateNotes(cyaPage)
+      checkUpdateNotes({ page: cyaPage, dateInPast: true, enableNonCompliance: false })
     })
     it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity(cyaPage)
+      checkUpdateSensitivity({ page: cyaPage, dateInPast: true, enableNonCompliance: false })
     })
   })
   describe('Appointment date is in the past - non compliance enabled', () => {
@@ -216,10 +216,10 @@ describe('Check your answers then confirm the appointment', () => {
       checkAppointmentSummary({ page: cyaPage, probationPractitioner: false, dateInPast: true })
     })
     it('should update the notes when value is changed', () => {
-      checkUpdateNotes(cyaPage)
+      checkUpdateNotes({ page: cyaPage, dateInPast: true })
     })
     it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity(cyaPage)
+      checkUpdateSensitivity({ page: cyaPage, dateInPast: true })
     })
   })
 

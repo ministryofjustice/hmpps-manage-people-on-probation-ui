@@ -157,7 +157,7 @@
     } if appointmentOutcome.summary.outcome and flags.enableNonCompliance and isInPast,
     {
         key: { text: 'Enforcement action' },
-        value: { text: appointmentOutcome.summary.enforcementAction },
+        value: { text: appointmentOutcome.summary.enforcementAction | nl2br },
         actions: {
             items: [
                 { href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url, text: 'Change', visuallyHiddenText: 'enforcement action' }
