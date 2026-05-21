@@ -48,7 +48,7 @@
           },
           {
               html:
-              ((enforcementAction.enforcementAction | lower | capitalize) if enforcementAction.enforcementAction else 'Not provided')
+              (((enforcementAction.enforcementAction | lower | capitalize) | escape) if enforcementAction.enforcementAction else ('Not provided' | escape))
               +
               (
               '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
