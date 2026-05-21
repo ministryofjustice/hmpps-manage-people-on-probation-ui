@@ -48,54 +48,6 @@
     <link href="/assets/css/fallback_prob_fe_app_header.css" nonce="{{ cspNonce }}" rel="stylesheet"/>
     <link href="/assets/css/fallback_prob_fe_app_footer.css" nonce="{{ cspNonce }}" rel="stylesheet"/>
   {% endif %}
-  <!-- BEGIN Optimal Intercept Snippet --> 
-  <div class='owInviteSnippet' id='owInviteSnippet'> 
-    <div class='owInviteMessage' id='owInviteMessage'> Got a spare 5 minutes to help us improve our website? </div>
-    <a class='owInviteOk' id='owInviteOk' href='https://c8ht4lmd.optimalworkshop.com/treejack/hx0ain7i?tag=intercept&utm_medium=intercept&recording=false' target='_blank' rel='noopener noreferrer' > I'll do it </a> 
-    <a class='owInviteCancel' id='owInviteCancel' href='javascript:void(0)' > No thanks </a> 
-  </div> 
-  <script nonce="{{ cspNonce }}"> 
-    (function() { 
-      function show() { 
-        setTimeout(function() { 
-          var inviteSnippet = document.getElementById('owInviteSnippet'); 
-          inviteSnippet.style.display = 'block'; 
-          inviteSnippet.style.opacity = 1; 
-        }, 2000); 
-      }
-      function dismiss() { 
-        var date = new Date(); 
-        date.setMonth(date.getMonth() + 1); 
-        document.cookie = 'ow-intercept-treejack-etjdsmsh = Done; path=/; expires = ' + date.toUTCString() + ';'; 
-        document.getElementById('owInviteSnippet').style.display = 'none'; 
-      } 
-      function init() { 
-        document.getElementById('owInviteSnippet').addEventListener('click', function(e) { 
-          if (e.target.tagName === 'A') { 
-            dismiss(); 
-          } 
-        });
-        if (document.cookie.indexOf('ow-intercept-treejack-etjdsmsh') === -1) { 
-          var request = new XMLHttpRequest(); 
-          request.onloadend = function() { 
-            try { 
-              if (this.response && JSON.parse(this.response).active === true) { 
-                show(); 
-              } 
-            } catch(e) {} 
-          }; 
-          request.open('POST', 'https://app.optimalworkshop.com/survey_status/treejack/etjdsmsh/active');
-          request.send(); 
-        } 
-      } 
-      if (document.readyState === 'complete') { 
-        init(); 
-      } else { 
-        window.addEventListener('load', init); 
-      } 
-    })(); 
-  </script> 
-  <!-- END Optimal snippet -->
 {% endblock %}
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}
@@ -157,4 +109,52 @@
     {% if maxFileSize %}window.maxFileSize = {{ maxFileSize }}{% endif %}
     {% if fileUploadLimit %}window.fileUploadLimit = {{ fileUploadLimit }}{% endif %}
   </script>
+  <!-- BEGIN Optimal Intercept Snippet --> 
+  <div class='owInviteSnippet' id='owInviteSnippet'> 
+    <div class='owInviteMessage' id='owInviteMessage'> Got a spare 5 minutes to help us improve our website? </div>
+    <a class='owInviteOk' id='owInviteOk' href='https://c8ht4lmd.optimalworkshop.com/treejack/hx0ain7i?tag=intercept&utm_medium=intercept&recording=false' target='_blank' rel='noopener noreferrer' > I'll do it </a> 
+    <a class='owInviteCancel' id='owInviteCancel' href='javascript:void(0)' > No thanks </a> 
+  </div> 
+  <script nonce="{{ cspNonce }}"> 
+    (function() { 
+      function show() { 
+        setTimeout(function() { 
+          var inviteSnippet = document.getElementById('owInviteSnippet'); 
+          inviteSnippet.style.display = 'block'; 
+          inviteSnippet.style.opacity = 1; 
+        }, 2000); 
+      }
+      function dismiss() { 
+        var date = new Date(); 
+        date.setMonth(date.getMonth() + 1); 
+        document.cookie = 'ow-intercept-treejack-etjdsmsh = Done; path=/; expires = ' + date.toUTCString() + ';'; 
+        document.getElementById('owInviteSnippet').style.display = 'none'; 
+      } 
+      function init() { 
+        document.getElementById('owInviteSnippet').addEventListener('click', function(e) { 
+          if (e.target.tagName === 'A') { 
+            dismiss(); 
+          } 
+        });
+        if (document.cookie.indexOf('ow-intercept-treejack-etjdsmsh') === -1) { 
+          var request = new XMLHttpRequest(); 
+          request.onloadend = function() { 
+            try { 
+              if (this.response && JSON.parse(this.response).active === true) { 
+                show(); 
+              } 
+            } catch(e) {} 
+          }; 
+          request.open('POST', 'https://app.optimalworkshop.com/survey_status/treejack/etjdsmsh/active');
+          request.send(); 
+        } 
+      } 
+      if (document.readyState === 'complete') { 
+        init(); 
+      } else { 
+        window.addEventListener('load', init); 
+      } 
+    })(); 
+  </script> 
+  <!-- END Optimal snippet -->
 {% endblock %}
