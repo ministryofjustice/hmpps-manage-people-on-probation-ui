@@ -76,7 +76,14 @@ const baseModel: TestModel = {
   hasDeceased: false,
 }
 
-const render = (model = {} as any) =>
+type TestModelOverride = Partial<Omit<TestModel, 'flags' | 'personAppointment'>> & {
+  flags?: Partial<TestModel['flags']>
+  personAppointment?: Partial<Omit<PersonAppointment, 'appointment'>> & {
+    appointment?: Partial<Activity>
+  }
+}
+
+const render = (model: TestModelOverride = {}) =>
   cheerio.load(
     env.render('pages/appointments/manage-appointment.njk', {
       ...baseModel,
@@ -103,7 +110,7 @@ describe('Alert banner', () => {
         personAppointment: {
           appointment: {
             deliusManaged: false,
-            appointmentNotes: [{ id: '1', note: 'Some notes' }],
+            appointmentNotes: [{ id: 1, note: 'Some notes' }],
             isInPast: false,
           },
         },
@@ -174,7 +181,7 @@ describe('Alert banner', () => {
               deliusManaged: false,
               isInPast: true,
               hasOutcome: false,
-              appointmentNotes: [{ id: '1', note: 'Some notes' }],
+              appointmentNotes: [{ id: 1, note: 'Some notes' }],
             },
           },
         })
