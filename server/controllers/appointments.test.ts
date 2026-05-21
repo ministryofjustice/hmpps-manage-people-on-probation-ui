@@ -171,6 +171,10 @@ const getNextAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getNextAppointment')
   .mockImplementation(() => Promise.resolve(nextApptResponse()))
 
+const getRelatedContactsSpy = jest
+  .spyOn(MasApiClient.prototype, 'getRelatedContacts')
+  .mockImplementation(() => Promise.resolve([]))
+
 const patchAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'patchAppointment')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
@@ -306,8 +310,20 @@ describe('controllers/appointments', () => {
   })
 
   describe('get manage appointment', () => {
+    const mockRelatedContacts = [
+      {
+        contactId: 2510615347,
+        contactTypeDescription: 'Breach Action - Breach Letter Sent',
+        contactDate: '2026-05-12',
+        createdBy: {
+          forename: 'James',
+          surname: 'Frost',
+        },
+      },
+    ]
     beforeEach(async () => {
       mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
@@ -316,6 +332,9 @@ describe('controllers/appointments', () => {
     })
     it('should request the next appointment', () => {
       expect(getNextAppointmentSpy).toHaveBeenCalledWith('user-1', crn, id)
+    })
+    it('should request related contacts', () => {
+      expect(MasApiClient.prototype.getRelatedContacts).toHaveBeenCalledWith(crn, id)
     })
     it('should render the manage appointment page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
@@ -328,6 +347,7 @@ describe('controllers/appointments', () => {
         url: '',
         canReschedule: true,
         contactId: '1234',
+        relatedContacts: mockRelatedContacts,
       })
     })
   })
