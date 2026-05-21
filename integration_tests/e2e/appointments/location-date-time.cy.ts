@@ -358,7 +358,7 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage = new AppointmentLocationDateTimePage()
-      locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
+      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
     })
     it('should not display the log an outcome alert banner', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
@@ -366,22 +366,22 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const future = now.plus({ days: 2 })
       locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
     })
   })
   describe('Date is selected from the picker which is in the past - non compliance disabled', () => {
     beforeEach(() => {
       loadPage({ enableNonCompliance: false })
       locationDateTimePage = new AppointmentLocationDateTimePage()
-      locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
+      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
     })
     it('should display the log an outcome alert banner', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const future = now.plus({ days: 2 })
-      locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
+      locationDateTimePage.getDatePickerInput().clear().type(future.toFormat('d/M/yyyy'))
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
 

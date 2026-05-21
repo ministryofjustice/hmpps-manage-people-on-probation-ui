@@ -7,8 +7,8 @@ const now = DateTime.now().plus({ days: 1 })
 const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00+01:00`
 const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00+01:00`
 const futureDate = now.toFormat('d MMMM yyyy')
-const startTime = DateTime.fromISO(start).toFormat('ha').toLowerCase()
-const endTime = DateTime.fromISO(end).toFormat('ha').toLowerCase()
+const startTime = DateTime.fromISO(start, { zone: 'Europe/London' }).toFormat('ha').toLowerCase()
+const endTime = DateTime.fromISO(end, { zone: 'Europe/London' }).toFormat('ha').toLowerCase()
 
 export const checkRescheduleLink = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
