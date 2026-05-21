@@ -70,7 +70,7 @@
                 {
                     classes: "nowrap",
                     text: 
-                    ((enforcement.appointmentOutcome | lower | capitalize)
+                    ((enforcement.appointmentOutcome | toSentenceCase)
                     if enforcement.appointmentOutcome
                     else 'Not provided'),
                     attributes: { 'data-sort-value': enforcement.appointmentOutcome }
