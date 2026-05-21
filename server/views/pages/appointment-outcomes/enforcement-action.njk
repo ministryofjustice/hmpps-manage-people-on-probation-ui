@@ -1,15 +1,27 @@
 {% extends "../_form.njk" %}
 {% set backLink = appointmentOutcome.backLink %}
 {% block afterHeading %}
+  {% if breach %}
+    {{ mojAlert({
+      variant: "warning",
+      title: "There is a live breach for this sentence",
+      showTitleAsHeading: true,
+      dismissible: false,
+      attributes: { "data-qa": "breach-warning" },
+      text: 'The breach for '+ breach.order.description + ' was initiated on ' + breach.activeBreach.startDate | dateWithYear
+    }) }}
+  {% endif %}
+
   {% if appointmentOutcome.currentEnforcementAction %}
     {{ govukInsetText({
-  html: "The current enforcement status is: " + govukTag({
-          text: appointmentOutcome.currentEnforcementAction.text,
-          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
-        })
-}) }}
+      html: "The current enforcement status is: " + govukTag({
+        text: appointmentOutcome.currentEnforcementAction.text,
+        classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
+      })
+    }) }}
   {% endif %}
 {% endblock %}
+
 {% block form %}
   {{ govukSelect({
   label: {

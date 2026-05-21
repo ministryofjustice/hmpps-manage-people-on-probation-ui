@@ -334,6 +334,14 @@ const checkPage = () => {
       cy.get(`#appointments-${crn}-${appointmentId}-outcome-updateEnforcementAction-error`).should('contain.text', msg)
     })
   })
+
+  describe('breach warning banner', () => {
+    it('should not show when there is no active breach', () => {
+      loadPage()
+      updateEnforcementActionPage = new UpdateEnforcementActionPage()
+      updateEnforcementActionPage.getBreachWarning().should('not.exist')
+    })
+  })
 }
 
 describe('Update enforcement action', () => {

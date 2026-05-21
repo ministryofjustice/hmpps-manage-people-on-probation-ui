@@ -2,6 +2,19 @@
 {% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s absence' %}
 {% set backLink = appointmentOutcome.backLink %}
 
+{% block afterHeading %}
+{% if breach %}
+  {{ mojAlert({
+    variant: "warning",
+    title: "There is a live breach for this sentence",
+    showTitleAsHeading: true,
+    dismissible: false,
+    attributes: { "data-qa": "breach-warning" },
+    text: 'The breach for '+ breach.order.description + ' was initiated on ' + breach.activeBreach.startDate | dateWithYear
+  }) }}
+{% endif %}
+{% endblock %}
+
 {% block form %}
   {% if appointmentOutcome.enforcementAction.responseByDate %}
     {{ mojTicketPanel({

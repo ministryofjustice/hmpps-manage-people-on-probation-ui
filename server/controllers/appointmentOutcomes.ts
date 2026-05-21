@@ -1,10 +1,14 @@
-import { Controller, FileCache, Route } from '../@types'
+import { Request, Response } from 'express'
+import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
-import { type AppResponse } from '../models/Locals'
+import { AppResponse } from '../models/Locals'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
+import { getDataValue } from '../utils'
+import { getBreach } from '../middleware/appointment-outcomes/getBreach'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
 
 export const appointmentOutcomeRequests = [
@@ -25,9 +29,17 @@ export const appointmentOutcomeRequests = [
 ] as const
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
-  getOutcome: _hmppsAuthClient => {
-    return async (_req, res) => {
-      return res.render('pages/appointment-outcomes/outcome')
+  getOutcome: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/outcome', { breach })
     }
   },
   postOutcome: _hmppsAuthClient => {
@@ -116,17 +128,103 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
-  getAttendedFailedToComply: _hmppsAuthClient => async (_req, res) =>
-    res.render('pages/appointment-outcomes/attended-failed-to-comply'),
-  getAcceptableAbsence: () => async (_req, res) => res.render('pages/appointment-outcomes/acceptable-absence'),
-  getUnacceptableAbsence: () => async (_req, res) => res.render('pages/appointment-outcomes/unacceptable-absence'),
-  getFailedToAttend: () => async (_req, res) => res.render('pages/appointment-outcomes/failed-to-attend'),
-  getEnforcementAction: () => async (_req, res) => res.render('pages/appointment-outcomes/enforcement-action'),
-  getInitiateBreachOrRecall: () => async (_req, res) =>
-    res.render('pages/appointment-outcomes/initiate-breach-or-recall'),
-  getSendLetter: () => async (_req, res) => res.render('pages/appointment-outcomes/send-letter'),
-  getUpdateEnforcementAction: () => async (_req, res) =>
-    res.render('pages/appointment-outcomes/update-enforcement-action'),
+  getAttendedFailedToComply: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/attended-failed-to-comply', { breach })
+    }
+  },
+
+  getUnacceptableAbsence: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/unacceptable-absence', { breach })
+    }
+  },
+  getFailedToAttend: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/failed-to-attend', { breach })
+    }
+  },
+  getEnforcementAction: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/enforcement-action', { breach })
+    }
+  },
+  getInitiateBreachOrRecall: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/initiate-breach-or-recall', { breach })
+    }
+  },
+  getSendLetter: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/send-letter', { breach })
+    }
+  },
+  getUpdateEnforcementAction: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/update-enforcement-action', { breach })
+    }
+  },
+  getAcceptableAbsence: hmppsAuthClient => {
+    return async (req, res) => {
+      const { params, session } = req
+      const { headerCRN, user } = res.locals
+      const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
+      let breach = null
+      if (res.locals?.flags?.enableNonCompliance) {
+        breach = await getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
+      }
+      return res.render('pages/appointment-outcomes/acceptable-absence', { breach })
+    }
+  },
 }
 
 export default appointmentOutcomesController

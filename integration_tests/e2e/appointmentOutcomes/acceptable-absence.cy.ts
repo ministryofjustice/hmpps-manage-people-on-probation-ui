@@ -164,6 +164,22 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })
   })
+
+  describe('breach warning banner', () => {
+    if (journey === 'ARRANGE') {
+      it('should show when breach is active and enableNonCompliance is enabled', () => {
+        cy.task('stubBreachCompliance')
+        loadPage({ journey })
+        acceptableAbsencePage = new AcceptableAbsencePage()
+        acceptableAbsencePage.getBreachWarning().should('exist')
+      })
+    }
+    it('should not show when there is no active breach', () => {
+      loadPage({ journey })
+      acceptableAbsencePage = new AcceptableAbsencePage()
+      acceptableAbsencePage.getBreachWarning().should('not.exist')
+    })
+  })
 }
 
 describe('Acceptable absence', () => {

@@ -143,7 +143,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Outcome index 👇 */
 
-  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
+  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome(hmppsAuthClient))
   router.post([arrangeBasePath, manageBasePath], resetSelectedActions(), controllers.appointmentOutcomes.postOutcome())
 
   /* Attended - failed to comply 👇 */
@@ -184,7 +184,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    controllers.appointmentOutcomes.getAcceptableAbsence(),
+    controllers.appointmentOutcomes.getAcceptableAbsence(hmppsAuthClient),
   )
   router.post(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
@@ -195,7 +195,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
-    controllers.appointmentOutcomes.getUnacceptableAbsence(),
+    controllers.appointmentOutcomes.getUnacceptableAbsence(hmppsAuthClient),
   )
   router.post(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
@@ -206,7 +206,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    controllers.appointmentOutcomes.getFailedToAttend(),
+    controllers.appointmentOutcomes.getFailedToAttend(hmppsAuthClient),
   )
   router.post(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
@@ -228,7 +228,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
-    controllers.appointmentOutcomes.getInitiateBreachOrRecall(),
+    controllers.appointmentOutcomes.getInitiateBreachOrRecall(hmppsAuthClient),
   )
   router.post(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
@@ -239,7 +239,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
-    controllers.appointmentOutcomes.getSendLetter(),
+    controllers.appointmentOutcomes.getSendLetter(hmppsAuthClient),
   )
   router.post(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
@@ -250,7 +250,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
-    controllers.appointmentOutcomes.getUpdateEnforcementAction(),
+    controllers.appointmentOutcomes.getUpdateEnforcementAction(hmppsAuthClient),
   )
   router.post(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
