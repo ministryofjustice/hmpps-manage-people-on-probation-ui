@@ -11,16 +11,18 @@ export const getContactOutcomes = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     const id = contactId || uuid
     const path = ['appointments', crn, id]
     const appointment = getDataValue<AppointmentSession>(data, [...path])
-    const { type, outcome } = appointment
-    if (type) {
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const { outcomes = [], enforcementActions = [] } = await masClient.getContactOutcomes(type)
-      setDataValue(data, [...path, 'outcome'], {
-        ...outcome,
-        contactOutcomes: outcomes,
-        contactEnforcementActions: enforcementActions,
-      })
+    if (appointment) {
+      const { type, outcome } = appointment
+      if (type) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        const { outcomes = [], enforcementActions = [] } = await masClient.getContactOutcomes(type)
+        setDataValue(data, [...path, 'outcome'], {
+          ...outcome,
+          contactOutcomes: outcomes,
+          contactEnforcementActions: enforcementActions,
+        })
+      }
     }
     return next()
   }
