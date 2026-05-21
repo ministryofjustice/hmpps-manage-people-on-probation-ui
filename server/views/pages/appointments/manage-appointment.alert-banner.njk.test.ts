@@ -41,21 +41,37 @@ env.addFilter('govukTime', govukTime)
 env.addFilter('handleQuotes', handleQuotes)
 
 const crn = 'X000001'
+const appointmentId = '1'
 
-const baseModel: {
+type TestModel = {
   crn: string
+  contactId: string
   title: string
   pageTitle: string
-  flags: { enableNonCompliance: boolean }
+  url: string
+  flags: {
+    enableNonCompliance: boolean
+    enableDeepLinks: boolean
+  }
+  deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
   sentences: Array<{ order: { description: string } }>
   nextAppointment: Record<string, unknown>
   canReschedule: boolean
-} = {
+  hasDeceased: boolean
+}
+
+const baseModel: TestModel = {
   crn,
+  contactId: appointmentId,
   title: 'Manage planned office visit (NS) with Terry Jones',
   pageTitle: 'Manage planned office visit (NS) with Terry Jones',
-  flags: { enableNonCompliance: false },
+  url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
+  flags: {
+    enableNonCompliance: false,
+    enableDeepLinks: false,
+  },
+  deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {
     personSummary: {
       name: {
@@ -64,12 +80,16 @@ const baseModel: {
       },
     } as PersonSummary,
     appointment: {
-      id: '1',
+      id: appointmentId,
+      eventNumber: '7654321',
       type: 'planned office visit (NS)',
-      startDateTime: '',
+      displayName: 'planned office visit (NS)',
+      startDateTime: '2023-03-20T10:00:00.000Z',
+      endDateTime: '2023-03-20T11:00:00.000Z',
       deliusManaged: false,
       hasOutcome: false,
       didTheyComply: false,
+      wasAbsent: false,
       acceptableAbsence: false,
       appointmentNotes: [],
       documents: [],
@@ -84,8 +104,11 @@ const baseModel: {
     } as Activity,
   },
   sentences: [{ order: { description: 'ORA Community Order' } }],
-  nextAppointment: {},
+  nextAppointment: {
+    usernameIsCom: true,
+  },
   canReschedule: true,
+  hasDeceased: false,
 }
 
 const render = (model = {} as any) =>
@@ -93,12 +116,20 @@ const render = (model = {} as any) =>
     env.render('pages/appointments/manage-appointment.njk', {
       ...baseModel,
       ...model,
+      flags: {
+        ...baseModel.flags,
+        ...model.flags,
+      },
       personAppointment: {
         ...baseModel.personAppointment,
         ...model.personAppointment,
         appointment: {
           ...baseModel.personAppointment.appointment,
           ...model.personAppointment?.appointment,
+          didTheyComply:
+            model.personAppointment?.appointment?.hasComplied ??
+            model.personAppointment?.appointment?.didTheyComply ??
+            baseModel.personAppointment.appointment.didTheyComply,
         },
       },
     }),
@@ -111,8 +142,8 @@ describe('Alert banner', () => {
         personAppointment: {
           appointment: {
             deliusManaged: false,
-            notes: true,
-            isFuture: true,
+            appointmentNotes: [{ id: '1', note: 'Some notes' }],
+            isInPast: false,
           },
         },
       })
@@ -127,7 +158,9 @@ describe('Alert banner', () => {
         personAppointment: {
           appointment: {
             deliusManaged: true,
-            notes: false,
+            isInPast: true,
+            hasOutcome: false,
+            appointmentNotes: [],
           },
         },
       })

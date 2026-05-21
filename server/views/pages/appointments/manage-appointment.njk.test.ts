@@ -10,8 +10,10 @@ import {
   fullName,
   deliusDeepLinkUrl,
   govukTime,
+  handleQuotes,
 } from '../../../utils'
-import { Activity } from '../../../data/model/schedule'
+import { Activity, PersonAppointment } from '../../../data/model/schedule'
+import { PersonSummary } from '../../../data/model/personalDetails'
 
 const env = nunjucks.configure(
   [
@@ -36,28 +38,48 @@ env.addFilter('yearsSince', yearsSince)
 env.addFilter('toSentenceCase', toSentenceCase)
 env.addFilter('fullName', fullName)
 env.addFilter('govukTime', govukTime)
+env.addFilter('handleQuotes', handleQuotes)
 
 const crn = 'X000001'
 const appointmentId = '123456'
 
-const baseModel = {
+type TestModel = {
+  crn: string
+  contactId: string
+  title: string
+  pageTitle: string
+  url: string
+  flags: {
+    enableNonCompliance: boolean
+    enableDeepLinks: boolean
+  }
+  deepLinkContactTypes: string[]
+  personAppointment: PersonAppointment
+  sentences: Array<{ order: { description: string } }>
+  nextAppointment: Record<string, unknown>
+  canReschedule: boolean
+  hasDeceased: boolean
+  back?: string
+}
+
+const baseModel: TestModel = {
   crn,
   contactId: appointmentId,
   title: 'Manage planned office visit (NS) with Terry Jones',
   pageTitle: 'Manage planned office visit (NS) with Terry Jones',
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
-  deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   flags: {
     enableNonCompliance: true,
     enableDeepLinks: false,
   },
+  deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {
     personSummary: {
       name: {
         forename: 'Terry',
         surname: 'Jones',
       },
-    },
+    } as PersonSummary,
     appointment: {
       id: appointmentId,
       eventNumber: '7654321',
@@ -94,7 +116,9 @@ const baseModel = {
       },
     },
   ],
-  nextAppointment: {},
+  nextAppointment: {
+    usernameIsCom: true,
+  },
   canReschedule: true,
   hasDeceased: false,
 }
@@ -119,6 +143,10 @@ const render = (model = {} as any) => {
         appointment: {
           ...baseModel.personAppointment.appointment,
           ...appointmentOverride,
+          didTheyComply:
+            appointmentOverride.hasComplied ??
+            appointmentOverride.didTheyComply ??
+            baseModel.personAppointment.appointment.didTheyComply,
           type:
             appointmentOverride.contactType ?? appointmentOverride.type ?? baseModel.personAppointment.appointment.type,
         },
@@ -272,7 +300,7 @@ describe('Manage an appointment', () => {
             appointment: {
               deliusManaged: true,
               hasOutcome: true,
-              didTheyComply: true,
+              hasComplied: true,
             },
           })
 
@@ -287,7 +315,7 @@ describe('Manage an appointment', () => {
             appointment: {
               deliusManaged: true,
               hasOutcome: true,
-              didTheyComply: false,
+              hasComplied: false,
               wasAbsent: true,
               acceptableAbsence: true,
             },
@@ -304,7 +332,7 @@ describe('Manage an appointment', () => {
             appointment: {
               deliusManaged: true,
               hasOutcome: true,
-              didTheyComply: false,
+              hasComplied: false,
               wasAbsent: true,
               acceptableAbsence: false,
             },
@@ -350,7 +378,7 @@ describe('Manage an appointment', () => {
             appointment: {
               deliusManaged: true,
               hasOutcome: true,
-              didTheyComply: true,
+              hasComplied: true,
             },
           })
 
@@ -365,7 +393,7 @@ describe('Manage an appointment', () => {
             appointment: {
               deliusManaged: true,
               hasOutcome: true,
-              didTheyComply: false,
+              hasComplied: false,
               wasAbsent: true,
               acceptableAbsence: true,
             },
@@ -382,7 +410,7 @@ describe('Manage an appointment', () => {
             appointment: {
               deliusManaged: true,
               hasOutcome: true,
-              didTheyComply: false,
+              hasComplied: false,
               wasAbsent: true,
               acceptableAbsence: false,
             },
