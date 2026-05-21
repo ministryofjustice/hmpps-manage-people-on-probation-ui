@@ -208,6 +208,18 @@ export interface CurrentEnforcementAction {
   evidenceWarning?: string
 }
 
+export interface OutcomeSummary {
+  appointmentDetails: string
+  outcome: string
+  enforcementAction?: string
+  evidenceDueDate?: string
+  notes: string
+  sensitivity: string
+  documents?: string[]
+  nextAppointment?: string
+  enforcementActionChangeLink?: string
+}
+
 export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string

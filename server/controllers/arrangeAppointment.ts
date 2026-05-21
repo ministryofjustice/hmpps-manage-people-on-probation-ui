@@ -601,6 +601,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       })
     }
   },
+
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },

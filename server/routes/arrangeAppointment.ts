@@ -15,7 +15,6 @@ import {
   getPersonRiskFlags,
   getOverdueOutcomes,
   getPersonAppointment,
-  createAppointmentSession,
 } from '../middleware'
 import {
   getContactOutcomes,

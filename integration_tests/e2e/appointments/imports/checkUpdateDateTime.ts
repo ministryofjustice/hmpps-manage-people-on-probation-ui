@@ -73,6 +73,19 @@ export const checkUpdateDateTime = ({
       } else {
         page.checkOnPage()
       }
+      if (inPast) {
+        if (enableNonCompliance) {
+          completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+        } else {
+          completeAttendedCompliedPage({ _crn: pageCrn, _uuid: pageUuid })
+        }
+        completeAddNotePage({ idOverride: pageUuid, crnOverride: crn })
+      }
+      if (page instanceof AppointmentCheckYourAnswersPage) {
+        page.checkPageTitle('Check your answers then confirm the appointment')
+      } else {
+        page.checkOnPage()
+      }
       page
         .getSummaryListRow(5)
         .find('.govuk-summary-list__value li:nth-child(1)')
