@@ -168,6 +168,95 @@ describe('/middleware/getAppointment', () => {
       notes: null,
       sensitivity: null,
       outcomeRecorded: null,
+      isReschedule: false,
+    })
+    expect(getOverviewSpy).toHaveBeenCalledWith(crn)
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should assign appointment to locals var if reschedule appointment journey', async () => {
+    const getOverviewSpy = jest
+      .spyOn(MasApiClient.prototype, 'getOverview')
+      .mockImplementation(() => Promise.resolve(mockOverview))
+
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: '100',
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              '100': { ...mockAppt, rescheduleAppointment: { ...mockAppt.rescheduleAppointment, contactId: '12345' } },
+            },
+          },
+          appointmentTypes: mockTypes,
+          sentences: {
+            [crn]: mockSentences,
+          },
+          providers: {
+            [username]: [],
+          },
+          teams: {
+            [username]: [],
+          },
+          staff: {
+            [username]: [],
+          },
+        },
+      },
+    })
+    const res = {
+      locals: {
+        user: {
+          username,
+        },
+        attendingUser: {
+          staffCode: '',
+          homeArea: '',
+          team: '',
+          username: '',
+        },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
+    await getAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.appointment).toStrictEqual({
+      meta: {
+        isVisor: false,
+        forename: 'Joe',
+        change: null,
+        userIsAttending: true,
+        hasLocation: true,
+      },
+      type: {
+        code: 'COAP',
+        description: 'Planned Office Visit (NS)',
+        isLocationRequired: true,
+        isPersonLevelContact: false,
+      },
+      visorReport: null,
+      appointmentFor: {
+        sentence: '12 month Community order',
+        requirement: null,
+        licenceCondition: null,
+        nsi: null,
+        forename: null,
+        mobileNumber: '',
+      },
+      attending: { name: '', team: '', region: '', html: '' },
+      location: '',
+      textMessageConfirmation: 'Yes',
+      date: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      start: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      previousStart: '',
+      end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      previousEnd: '',
+      notes: null,
+      sensitivity: null,
+      outcomeRecorded: null,
+      isReschedule: true,
     })
     expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()

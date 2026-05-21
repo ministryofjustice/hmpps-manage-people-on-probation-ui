@@ -1,14 +1,14 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
-import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import { getUuid } from './utils'
 
 describe('Reschedule Appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let rescheduleAppointmentPage: RescheduleAppointmentPage
-  let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+  let checkYourAnswerPage: AppointmentCheckYourAnswersPage
 
-  const loadPage = (enableNonCompliance = false) => {
+  const loadPage = (enableNonCompliance = true) => {
     cy.visit('/case/X000001/appointments/appointment/6/manage')
     const index = enableNonCompliance ? 2 : 1
     manageAppointmentPage = new ManageAppointmentPage()
@@ -103,6 +103,7 @@ describe('Reschedule Appointment', () => {
 
     cy.get('[data-qa=sensitiveInformation]').find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     rescheduleAppointmentPage.getSubmitBtn().click()
-    checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+    checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
+    checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
   })
 })

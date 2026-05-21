@@ -1,0 +1,119 @@
+{% set changePath = appointmentOutcome.baseOutcomeUrl %}
+{% set showAction = true %}
+{% set buttonText = 'Confirm appointment outcome' %}
+
+<form method="post" autocomplete="off" action="{{ paths.current }}">
+    {{ govukSummaryList({
+        classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',
+        rows: [
+            { 
+                key: { text: "Appointment details" },
+                value: { text: appointmentOutcome.summary.appointmentDetails }
+            },
+            {
+            key: { text: "What was the outcome of this appointment?" },
+            value: { html: appointmentOutcome.summary.outcome },
+            actions: {
+                items: [
+                {
+                    href: changePath + "?change=" + url,
+                    text: "Change",
+                    visuallyHiddenText: "outcome of appointment"
+                }
+                ]
+            } if showAction
+            },
+            {
+                key: { text: "Enforcement action"},
+                value: { html: appointmentOutcome.summary.enforcementAction  | replace('\n', '<br>') | safe  },
+                actions: {
+                    items: [ 
+                        {
+                            href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "enforcement action"
+                        } 
+                    ] 
+                } if showAction
+            } if appointmentOutcome.summary.enforcementAction,
+            {
+                key: { text: "Evidence due date"},
+                value: { text: appointmentOutcome.summary.evidenceDueDate },
+                actions: {
+                    items: [ 
+                        {
+                            href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "evidence due date"
+                        } 
+                    ] 
+                } if showAction
+            } if appointmentOutcome.summary.evidenceDueDate,
+            {
+                key: { text: "Notes"},
+                value: { text: appointmentOutcome.summary.notes },
+                actions: {
+                    items: [ 
+                        {
+                            href: changePath + "/add-note?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "notes"
+                        } 
+                    ] 
+                } if showAction
+            } if appointmentOutcome.summary.notes,
+            {
+                key: { text: "Sensitivity"},
+                value: { text: appointmentOutcome.summary.sensitivity },
+                actions: {
+                    items: [ 
+                        {
+                            href: changePath + "/add-note?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "sensitivity"
+                        } 
+                    ] 
+                } if showAction
+            } if appointmentOutcome.summary.sensitivity,
+            {
+                key: { text: "Documents"},
+                value: { html: appointmentOutcome.summary.documents | join('<br>') | safe },
+                actions: {
+                    items: [ 
+                        {
+                            href: changePath + "/add-note?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "documents"
+                        } 
+                    ] 
+                } if showAction
+            } if appointmentOutcome.summary.documents,
+            {
+                key: { text: "Next appointment"},
+                value: { text: appointmentOutcome.summary.nextAppointment },
+                actions: {
+                    items: [ 
+                        {
+                            href: changePath + "/next-appointment?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "next appointment"
+                        } 
+                    ] 
+                } if showAction
+            } if appointmentOutcome.summary.nextAppointment
+  
+] }) }}
+    <div class="govuk-button-group">
+        {{ govukButton({
+          html: buttonText,
+          attributes: {
+            'data-qa': 'submit-btn'
+          }
+        }) }}
+        {% if showAnchorLink === true %}
+            <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink">
+                {{ formAnchorText }}</a>
+        {% endif %}
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+</form>

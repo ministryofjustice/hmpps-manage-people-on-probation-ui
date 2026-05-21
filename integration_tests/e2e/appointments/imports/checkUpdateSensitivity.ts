@@ -5,13 +5,17 @@ import AppointmentNotePage from '../../../pages/appointments/note.page'
 import { crn } from './common'
 import { getUuid, completeLocationDateTimePage, completeTextMessageConfirmationPage } from '../utils'
 
-export const checkUpdateSensitivity = (
-  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+export const checkUpdateSensitivity = ({
+  page,
   dateInPast = false,
-  sendTextMessage = true,
-) => {
+  enableNonCompliance = true,
+}: {
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
+  dateInPast?: boolean
+  enableNonCompliance?: boolean
+}) => {
   getUuid().then(pageUuid => {
-    const index = !dateInPast && sendTextMessage ? 8 : 7
+    const index = enableNonCompliance && dateInPast ? 10 : 8
     page.getSummaryListRow(index).find('.govuk-link').click()
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()
@@ -20,7 +24,11 @@ export const checkUpdateSensitivity = (
       completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
     }
-    page.checkOnPage()
+    if (page instanceof AppointmentCheckYourAnswersPage) {
+      page.checkPageTitle('Check your answers then confirm the appointment')
+    } else {
+      page.checkOnPage()
+    }
     page.getSummaryListRow(index).find('.govuk-summary-list__value').should('contain.text', 'No')
   })
 }

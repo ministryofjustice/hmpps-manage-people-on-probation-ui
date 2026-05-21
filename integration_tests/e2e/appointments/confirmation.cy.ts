@@ -2,8 +2,7 @@ import { DateTime } from 'luxon'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
-import CheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
-
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import { checkPopHeader } from './imports'
 import OverviewPage from '../../pages/overview'
 import YourCasesPage from '../../pages/myCases'
@@ -20,14 +19,30 @@ import {
   getUuid,
   completeRescheduleAppointmentPage,
   completeRescheduling,
+  completeOutcome,
 } from './utils'
 
-const loadPage = (crnOverride = '', dateInPast = false, completeTextMessageConfirmOptionIndex = 1) => {
+const loadPage = ({
+  crnOverride = '',
+  dateInPast = false,
+  completeTextMessageConfirmOptionIndex = 1,
+  enableNonCompliance = true,
+}: {
+  crnOverride?: string
+  dateInPast?: boolean
+  completeTextMessageConfirmOptionIndex?: number
+  enableNonCompliance?: boolean
+} = {}) => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
   completeLocationDateTimePage({ index: 1, crnOverride, dateInPast })
   if (dateInPast) {
-    completeAttendedCompliedPage()
+    if (enableNonCompliance) {
+      completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+    }
+    if (!enableNonCompliance) {
+      completeAttendedCompliedPage()
+    }
     completeAddNotePage()
   } else {
     completeTextMessageConfirmationPage({ index: completeTextMessageConfirmOptionIndex, _crn: crnOverride })
@@ -89,7 +104,6 @@ describe('Confirmation page', () => {
         'contain.text',
         'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
       )
-
       confirmPage.getSubmitBtn().click()
       const nextAppointmentPage = new OverviewPage()
       nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
@@ -101,7 +115,6 @@ describe('Confirmation page', () => {
     beforeEach(() => {
       confirmPage = new AppointmentConfirmationPage()
     })
-
     it('should render the page', () => {
       cy.task('stubPostMasOutlookEvent')
       loadPage()
@@ -151,7 +164,7 @@ describe('Confirmation page', () => {
 
     it('should render the page with pop telephone number', () => {
       cy.task('stubPersonalDetailsNoMobileNumber')
-      loadPage('X000001', false, 2)
+      loadPage({ crnOverride: 'X000001', completeTextMessageConfirmOptionIndex: 2 })
       confirmPage = new AppointmentConfirmationPage()
       confirmPage
         .getWhatHappensNext()
@@ -164,7 +177,7 @@ describe('Confirmation page', () => {
     })
     it('should render the page with no contact numbers', () => {
       cy.task('stubPersonalDetailsNoTelephoneNumbers')
-      loadPage('X000001', false, 2)
+      loadPage({ crnOverride: 'X000001', dateInPast: false, completeTextMessageConfirmOptionIndex: 2 })
       confirmPage = new AppointmentConfirmationPage()
       confirmPage.getPopContactNumber().should('not.exist')
       confirmPage
@@ -179,13 +192,13 @@ describe('Confirmation page', () => {
 
     it('should render the page with no log outcomes link', () => {
       cy.task('stubNoOverdueOutcomes')
-      loadPage('X000001')
+      loadPage({ crnOverride: 'X000001' })
       confirmPage.getlogOutcomeLink().should('not.exist')
     })
 
     it('should render the page with log outcome for a single appointment link', () => {
       cy.task('stubSingleOverdueOutcome')
-      loadPage('X000001')
+      loadPage({ crnOverride: 'X000001' })
       confirmPage
         .getlogOutcomeLink()
         .should('contain.text', 'log appointment outcome for Saturday 21 March 2026')
@@ -240,8 +253,7 @@ describe('Confirmation page', () => {
   })
   describe('Appointment arranged in the past', () => {
     beforeEach(() => {
-      const dateInPast = true
-      loadPage('', dateInPast)
+      loadPage({ dateInPast: true })
       confirmPage = new AppointmentConfirmationPage()
     })
     it('should render the page', () => {
@@ -253,15 +265,16 @@ describe('Confirmation page', () => {
     })
   })
 
-  describe('Appointment changed to date in the past', () => {
+  describe('Appointment changed to date in the past - non compliance disabled', () => {
     const crn = 'X000001'
     it('should update the cya page', () => {
+      cy.task('stubDisableNonCompliance')
       completeSentencePage(1, '', crn)
       completeTypePage(1, false)
       completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
       completeTextMessageConfirmationPage({ index: 1, _crn: crn })
       completeSupportingInformationPage(true, crn)
-      const cyaPage = new CheckYourAnswersPage()
+      const cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(5).find('.govuk-link').click()
       getUuid().then(uuid => {
         completeLocationDateTimePage({
@@ -269,8 +282,8 @@ describe('Confirmation page', () => {
           crnOverride: crn,
           dateInPast: true,
         })
-        completeAttendedCompliedPage(false, crn, uuid)
-        completeAddNotePage(crn, uuid)
+        completeAttendedCompliedPage({ manageJourney: false, _crn: crn, _uuid: uuid })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
         completeCYAPage()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage
@@ -295,17 +308,59 @@ describe('Confirmation page', () => {
     })
   })
 
-  describe('Appointment rescheduled to a date and time in the future', () => {
+  describe('Appointment changed to date in the past - non compliance enabled', () => {
+    const crn = 'X000001'
+    it('should update the cya page', () => {
+      completeSentencePage(1, '', crn)
+      completeTypePage(1, false)
+      completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
+      completeTextMessageConfirmationPage({ index: 1, _crn: crn })
+      completeSupportingInformationPage(true, crn)
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
+      getUuid().then(uuid => {
+        completeLocationDateTimePage({
+          index: 1,
+          crnOverride: crn,
+          dateInPast: true,
+        })
+        completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
+        completeCYAPage()
+        confirmPage = new AppointmentConfirmationPage()
+        confirmPage
+          .getWhatHappensNext()
+          .find('p:nth-of-type(1)')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+          })
+        confirmPage
+          .getWhatHappensNext()
+          .find('p:nth-of-type(2)')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(
+              `The appointment has been added to the NDelius contact log and officer diary.`,
+            )
+          })
+      })
+    })
+  })
+
+  describe('Appointment rescheduled to a date and time in the future - non compliance enabled', () => {
     let checkYourAnswerPage: RescheduleCheckYourAnswerPage
     beforeEach(() => {
-      completeRescheduleAppointmentPage()
+      completeRescheduleAppointmentPage({ enableNonCompliance: true })
     })
     it('should render the confirmation page', () => {
       getUuid().then(uuid => {
-        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
         checkYourAnswerPage.getSubmitBtn().click()
-        completeRescheduling(uuid)
-        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        completeRescheduling({ id: uuid })
+        checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
         checkYourAnswerPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
         checkPopHeader()
@@ -320,7 +375,6 @@ describe('Confirmation page', () => {
               `Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.`,
             )
           })
-
         cy.get('[data-qa="what-happens-next"]')
           .find('p')
           .eq(1)
@@ -335,17 +389,47 @@ describe('Confirmation page', () => {
       })
     })
   })
-  describe('Appointment rescheduled to a date and time in the past', () => {
+  describe('Appointment rescheduled to a date and time in the past - non compliance enabled', () => {
     let checkYourAnswerPage: RescheduleCheckYourAnswerPage
     beforeEach(() => {
-      completeRescheduleAppointmentPage()
+      completeRescheduleAppointmentPage({ enableNonCompliance: true })
     })
     it('should render the confirmation page', () => {
       const inPast = true
       getUuid().then(uuid => {
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
-        completeRescheduling(uuid, inPast)
+        completeRescheduling({ id: uuid, inPast })
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        confirmPage = new AppointmentConfirmationPage()
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(0)
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+          })
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(1)
+          .should('contain.text', 'The appointment has been updated on the NDelius contact log and officer diary.')
+      })
+    })
+  })
+
+  describe('Appointment rescheduled to a date and time in the past - non compliance disabled', () => {
+    let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+    beforeEach(() => {
+      completeRescheduleAppointmentPage({ enableNonCompliance: false })
+    })
+    it('should render the confirmation page', () => {
+      const inPast = true
+      getUuid().then(uuid => {
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        completeRescheduling({ id: uuid, inPast, enableNonCompliance: false })
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
@@ -384,7 +468,7 @@ describe('Confirmation page', () => {
     it('should render the page with an alert banner of type information when the Welsh language SMS reminder fails to send', () => {
       cy.task('stubPersonalDetailsWelshPostcode')
       cy.task('stubPostMasOutlookEventNoWelshId')
-      loadPage('X000001')
+      loadPage({ crnOverride: 'X000001' })
       confirmPage = new AppointmentConfirmationPage()
 
       confirmPage
@@ -395,7 +479,7 @@ describe('Confirmation page', () => {
 
     it('should render the page with an alert banner of type warning when both the English and Welsh language SMS reminder fails to send', () => {
       cy.task('stubPersonalDetailsWelshPostcode')
-      loadPage('X000001')
+      loadPage({ crnOverride: 'X000001' })
       confirmPage = new AppointmentConfirmationPage()
 
       confirmPage
@@ -406,9 +490,8 @@ describe('Confirmation page', () => {
     it('should render the page with a text letting the user know the SMS reminder has been sent', () => {
       cy.task('stubPersonalDetailsWelshPostcode')
       cy.task('stubPostMasOutlookEvent')
-      loadPage('X000001')
+      loadPage({ crnOverride: 'X000001' })
       confirmPage = new AppointmentConfirmationPage()
-
       confirmPage
         .getSMSConfirmationMsg()
         .should(

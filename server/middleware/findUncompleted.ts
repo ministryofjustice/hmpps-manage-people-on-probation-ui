@@ -22,7 +22,11 @@ export const findUncompleted = (req: Request, res: Response): string => {
   } else {
     mapping.push([appointment?.outcomeRecorded, 'attended-complied'])
   }
-  mapping.push([appointment?.sensitivity, dateInPast ? 'add-note' : 'supporting-information'])
+  if (res.locals.flags.enableNonCompliance) {
+    mapping.push([appointment?.sensitivity, dateInPast ? 'outcome/add-note' : 'supporting-information'])
+  } else {
+    mapping.push([appointment?.sensitivity, dateInPast ? 'add-note' : 'supporting-information'])
+  }
   let appointmentIsIncomplete = false
   for (const [value, redirect] of mapping) {
     appointmentIsIncomplete = !value

@@ -9,6 +9,7 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  uncheckAllRadios,
 } from '../appointments/utils'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
@@ -30,11 +31,6 @@ const loadPage = ({
   sentenceType = 'COMMUNITY',
   sendLetter = false,
 }: { journey?: Journey; sentenceType?: SentenceType; sendLetter?: boolean } = {}): void => {
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (sentenceType === 'CUSTODY') {
     cy.task('stubSentences', { sentenceType: 'CUSTODY' })
@@ -50,7 +46,7 @@ const loadPage = ({
     completeLocationDateTimePage({ dateInPast: true })
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
@@ -58,6 +54,7 @@ const loadPage = ({
     })
   }
   outcomePage = new OutcomePage()
+  uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
   outcomePage.getSubmitBtn().click()
   attendedFailedToComplyPage = new AttendedFailedToComplyPage()
@@ -148,6 +145,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select who will create the breach NSI'
     loadPage({ journey })
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+    uncheckAllRadios()
     initiateBreachOrRecallPage.getSubmitBtn().click()
     initiateBreachOrRecallPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
@@ -157,10 +155,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   })
 
   it('should show validation errors when no options are selected for send letter enforcement action', () => {
-    cy.request({
-      method: 'POST',
-      url: 'http://localhost:3007/__test/clear-session',
-    })
     loadPage({ journey, sendLetter: true })
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
     initiateBreachOrRecallPage.getSubmitBtn().click()

@@ -1133,7 +1133,7 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should render the reschedule appointment confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { backendId: 1234, user: { username: '' } },
+        appointmentSession: { backendId: 1234, user: { username: '' }, rescheduleAppointment: { contactId: '1234' } },
         dataSession: { isOutLookEventFailed: false },
         request: { url: '/reschedule/url' },
       })

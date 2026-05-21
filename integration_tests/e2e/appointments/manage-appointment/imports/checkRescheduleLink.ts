@@ -7,16 +7,16 @@ const now = DateTime.now().plus({ days: 1 })
 const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00+01:00`
 const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00+01:00`
 const futureDate = now.toFormat('d MMMM yyyy')
-const startTime = DateTime.fromISO(start).toFormat('ha').toLowerCase()
-const endTime = DateTime.fromISO(end).toFormat('ha').toLowerCase()
+const startTime = DateTime.fromISO(start, { zone: 'Europe/London' }).toFormat('ha').toLowerCase()
+const endTime = DateTime.fromISO(end, { zone: 'Europe/London' }).toFormat('ha').toLowerCase()
 
 export const checkRescheduleLink = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
   const index = enableNonCompliance ? 2 : 1
   describe('Appointment Reschedule link', () => {
     beforeEach(() => {
-      if (enableNonCompliance) {
-        cy.task('stubEnableNonCompliance')
+      if (!enableNonCompliance) {
+        cy.task('stubDisableNonCompliance')
       }
       loadPage()
       manageAppointmentPage = new ManageAppointmentPage()
@@ -25,8 +25,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Complied appointment with future date', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: true, hasComplied: true, isFuture: true })
         loadPage()
@@ -46,8 +46,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in future with no outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: false, isFuture: true })
         loadPage()
@@ -74,8 +74,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in past with outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: true, hasComplied: true, isFuture: false })
         loadPage()
@@ -95,8 +95,8 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in past with no outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
-        if (enableNonCompliance) {
-          cy.task('stubEnableNonCompliance')
+        if (!enableNonCompliance) {
+          cy.task('stubDisableNonCompliance')
         }
         cy.task('stubAppointment', { hasOutcome: false, isFuture: false })
         loadPage()

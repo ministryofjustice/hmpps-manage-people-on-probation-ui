@@ -21,6 +21,10 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
       completeSupportingInformationPage(true, '', pageUuid)
     }
-    page.checkOnPage()
+    if (page instanceof AppointmentCheckYourAnswersPage) {
+      page.checkPageTitle('Check your answers then confirm the appointment')
+    } else {
+      page.checkOnPage()
+    }
   })
 }

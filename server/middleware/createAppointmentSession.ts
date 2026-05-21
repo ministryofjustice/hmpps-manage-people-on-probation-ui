@@ -115,6 +115,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     appointmentSession.smsOptIn = null
   }
+
   res.locals.appointmentSession = appointmentSession
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)

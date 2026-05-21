@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Request as ExpressRequest } from 'express'
-import { DateTime } from 'luxon'
+import { Request, Response } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
@@ -63,7 +62,7 @@ const routes = [
   'postTextMessageConfirmation',
 ] as const
 
-const resetSessionValues = (req: ExpressRequest) => {
+const resetSessionValues = (req: Request, res: Response) => {
   const { crn, id } = req.params as Record<string, string>
   const { data } = req.session
   const path = ['appointments', crn, id]
@@ -74,7 +73,11 @@ const resetSessionValues = (req: ExpressRequest) => {
   const updatedDateIsInPast = appointmentDateIsInPast(req)
   const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
   if (!retainOutcomeRecorded) {
-    setDataValue(data, [...path, 'outcomeRecorded'], null)
+    if (res.locals.flags.enableNonCompliance) {
+      setDataValue(data, [...path, 'outcome', 'outcomeType'], null)
+    } else {
+      setDataValue(data, [...path, 'outcomeRecorded'], null)
+    }
   }
   if (updatedDateIsInPast && smsOptIn?.includes('YES')) {
     setDataValue(data, [...path, 'smsOptIn'], 'NO')
@@ -87,7 +90,7 @@ const resetSessionValues = (req: ExpressRequest) => {
   }
 }
 
-export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
+export const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
   const { data } = req.session
   const { crn, id, contactId } = req.params as Record<string, string>
   if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -103,6 +106,7 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
     type,
     date,
     sensitivity,
+    rescheduleAppointment,
   } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
   const mapping = {
     eventId: 'sentence',
@@ -115,7 +119,7 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
     sensitivity: 'supporting-information',
   }
   const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
-  let baseUrl = `/case/${crn}/arrange-appointment/${id}`
+  const baseUrl = `/case/${crn}/arrange-appointment/${id}`
   let backendId
   for (const [k, v] of Object.entries(mapping)) {
     const value = requiredValues[k as keyof typeof requiredValues]
@@ -123,8 +127,7 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
       return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
     }
   }
-  if (req.url.includes('reschedule')) {
-    baseUrl = `/case/${crn}/appointments/reschedule/${contactId}/${id}`
+  if (rescheduleAppointment?.contactId) {
     const response: RescheduleAppointmentResponse | PersonAppointment = await postRescheduleAppointments(client)(
       req,
       res,
@@ -136,7 +139,6 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   }
   // setting backendId (part of AppointmentSession ) to create 'anotherAppointment' link in confirmation.njk
   setDataValue(data, ['appointments', crn, id, 'backendId'], backendId)
-
   return res.redirect(`${baseUrl}/confirmation`)
 }
 
@@ -370,7 +372,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       const path = ['appointments', crn, id]
       if (change) {
-        resetSessionValues(req)
+        resetSessionValues(req, res)
       }
       const selectedLocation = getDataValue(data, [...path, 'user', 'locationCode'])
       let nextPage = res.locals?.flags?.enableSmsReminders ? `text-message-confirmation` : `supporting-information`
@@ -560,11 +562,24 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getCheckYourAnswers: () => {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)
-      const { crn, id: uuid, contactId } = req.params as Record<string, string>
+      const { crn, id: uuid } = req.params as Record<string, string>
+      let { contactId } = req.params as Record<string, string>
       const id = uuid ?? contactId
       const { data } = req.session
       let location = null
-      await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CHECK_YOUR_ANSWERS', crn, SubjectType.CRN)
+      const { isReschedule } = res.locals.appointment
+      const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+      if (isReschedule) {
+        contactId = getDataValue(data, ['appointments', crn, uuid, 'rescheduleAppointment', 'contactId'])
+      }
+      await sendAuditMessage(
+        res,
+        !isReschedule
+          ? 'VIEW_MAS_APPOINTMENT_CHECK_YOUR_ANSWERS'
+          : 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE',
+        crn,
+        SubjectType.CRN,
+      )
       const {
         start,
         date,
@@ -577,12 +592,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       return res.render(`pages/arrange-appointment/check-your-answers`, {
         crn,
         id,
+        contactId,
         location,
         url,
         isInPast,
+        sensitivityLocked,
       })
     }
   },
+
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
@@ -590,16 +608,17 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
-      const { forename } = res.locals.case.name
       const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const attending = getDataValue(data, ['appointments', crn, id, 'user'])
-      const smsOptIn = getDataValue<SmsOptInOptions>(data, ['appointments', crn, id, 'smsOptIn'])
+      const {
+        user: attending,
+        smsOptIn,
+        rescheduleAppointment,
+      } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
       const smsSent = smsOptIn?.includes('YES')
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
-
       let attendingName = 'your'
       if (attending.username.toUpperCase() !== res.locals.user.username) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -616,7 +635,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           attendingName = `The officer´s`
         }
       }
-      // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed, isEnglishNotificationFailed, isWelshNotificationFailed } = data
       const isInPast = appointmentDateIsInPast(req)
@@ -624,11 +642,9 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       delete req.session.data.isEnglishNotificationFailed
       delete req.session.data.isWelshNotificationFailed
       let appointmentType = null
-
-      if (req.url.includes('reschedule')) {
+      if (rescheduleAppointment?.contactId) {
         appointmentType = 'RESCHEDULE'
       }
-
       if (res.locals.contactResponse) {
         let outcomes = res.locals.contactResponse.content
         if (res.locals.flags?.enableOutcomesV1) {

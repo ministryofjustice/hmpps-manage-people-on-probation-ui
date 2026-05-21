@@ -14,8 +14,14 @@ import {
   getSmsPreview,
   getPersonRiskFlags,
   getOverdueOutcomes,
+  getPersonAppointment,
 } from '../middleware'
-import { getOutcomeProps } from '../middleware/appointment-outcomes'
+import {
+  getContactOutcomes,
+  getNotePrepend,
+  getOutcomeProps,
+  getOutcomeSummary,
+} from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
 import { getTimeOptions } from '../middleware/getTimeOptions'
@@ -139,14 +145,29 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.get('/case/:crn/arrange-appointment/:id/check-your-answers', redirectWizard(['eventId']))
 
   router.get(
-    ['/case/:crn/arrange-appointment/:id/check-your-answers'],
+    [
+      '/case/:crn/arrange-appointment/:id/check-your-answers',
+      '/case/:crn/appointments/appointment/:contactId/check-your-answers',
+      '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
+    ],
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
+    getOutcomeProps,
+    getContactOutcomes(hmppsAuthClient),
+    getNotePrepend,
+    getOutcomeSummary,
+  )
+  router.get(
+    [
+      '/case/:crn/arrange-appointment/:id/check-your-answers',
+      '/case/:crn/appointments/appointment/:contactId/check-your-answers',
+    ],
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
+    getPersonAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient),
   )
   router.get(
@@ -158,13 +179,11 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
   router.get(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    checkAnswers,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
+    getPersonAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
   )
   router.all(

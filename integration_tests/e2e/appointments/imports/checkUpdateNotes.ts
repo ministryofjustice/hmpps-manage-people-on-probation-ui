@@ -5,19 +5,27 @@ import AppointmentNotePage from '../../../pages/appointments/note.page'
 import { getUuid } from '../utils'
 import { crn } from './common'
 
-export const checkUpdateNotes = (
-  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+export const checkUpdateNotes = ({
+  page,
   dateInPast = false,
-  sendTextMessage = true,
-) => {
+  enableNonCompliance = true,
+}: {
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
+  dateInPast?: boolean
+  enableNonCompliance?: boolean
+}) => {
   getUuid().then(pageUuid => {
-    const index = !dateInPast && sendTextMessage ? 7 : 6
+    const index = enableNonCompliance && dateInPast ? 9 : 7
     page.getSummaryListRow(index).find('.govuk-link').click()
     const updatedNotes = 'Some updated notes'
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-notes`).focus().clear().type(updatedNotes)
     notePage.getSubmitBtn().click()
-    page.checkOnPage()
+    if (page instanceof AppointmentCheckYourAnswersPage) {
+      page.checkPageTitle('Check your answers then confirm the appointment')
+    } else {
+      page.checkOnPage()
+    }
     page.getSummaryListRow(index).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
   })
 }
