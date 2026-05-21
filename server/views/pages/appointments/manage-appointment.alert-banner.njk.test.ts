@@ -126,10 +126,6 @@ const render = (model = {} as any) =>
         appointment: {
           ...baseModel.personAppointment.appointment,
           ...model.personAppointment?.appointment,
-          didTheyComply:
-            model.personAppointment?.appointment?.hasComplied ??
-            model.personAppointment?.appointment?.didTheyComply ??
-            baseModel.personAppointment.appointment.didTheyComply,
         },
       },
     }),
@@ -195,7 +191,7 @@ describe('Alert banner', () => {
               deliusManaged: false,
               isInPast: true,
               hasOutcome: true,
-              hasComplied: true,
+              didTheyComply: true,
               appointmentNotes: [],
             },
           },

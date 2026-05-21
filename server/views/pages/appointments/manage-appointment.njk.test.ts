@@ -123,10 +123,8 @@ const baseModel: TestModel = {
   hasDeceased: false,
 }
 
-const render = (model = {} as any) => {
-  const appointmentOverride = model.appointment ?? model.personAppointment?.appointment ?? {}
-
-  return cheerio.load(
+const render = (model = {} as Partial<TestModel> & { enableNonCompliance?: boolean; enableDeepLinks?: boolean }) =>
+  cheerio.load(
     env.render('pages/appointments/manage-appointment.njk', {
       ...baseModel,
       ...model,
@@ -142,18 +140,11 @@ const render = (model = {} as any) => {
         ...model.personAppointment,
         appointment: {
           ...baseModel.personAppointment.appointment,
-          ...appointmentOverride,
-          didTheyComply:
-            appointmentOverride.hasComplied ??
-            appointmentOverride.didTheyComply ??
-            baseModel.personAppointment.appointment.didTheyComply,
-          type:
-            appointmentOverride.contactType ?? appointmentOverride.type ?? baseModel.personAppointment.appointment.type,
+          ...model.personAppointment?.appointment,
         },
       },
     }),
   )
-}
 
 describe('Manage an appointment', () => {
   it('should render the page', () => {
@@ -248,9 +239,11 @@ describe('Manage an appointment', () => {
     describe('Appointment type is NDelius managed', () => {
       it('should not display the appointment actions', () => {
         const $ = render({
-          appointment: {
-            deliusManaged: true,
-          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: true,
+            } as Activity,
+          } as PersonAppointment,
         })
 
         expect($('[data-qa="appointmentActions"]').length).toBe(0)
@@ -270,9 +263,11 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: true,
-            appointment: {
-              deliusManaged: false,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: false,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -283,10 +278,12 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: true,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: false,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: false,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -297,11 +294,13 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: true,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: true,
-              hasComplied: true,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: true,
+                didTheyComply: true,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -312,13 +311,15 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: true,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: true,
-              hasComplied: false,
-              wasAbsent: true,
-              acceptableAbsence: true,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: true,
+                didTheyComply: false,
+                wasAbsent: true,
+                acceptableAbsence: true,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -329,13 +330,15 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: true,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: true,
-              hasComplied: false,
-              wasAbsent: true,
-              acceptableAbsence: false,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: true,
+                didTheyComply: false,
+                wasAbsent: true,
+                acceptableAbsence: false,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -348,9 +351,11 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: false,
-            appointment: {
-              deliusManaged: false,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: false,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -361,10 +366,12 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: false,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: false,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: false,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -375,11 +382,13 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: false,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: true,
-              hasComplied: true,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: true,
+                didTheyComply: true,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -390,13 +399,15 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: false,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: true,
-              hasComplied: false,
-              wasAbsent: true,
-              acceptableAbsence: true,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: true,
+                didTheyComply: false,
+                wasAbsent: true,
+                acceptableAbsence: true,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -407,13 +418,15 @@ describe('Manage an appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
             enableNonCompliance: false,
-            appointment: {
-              deliusManaged: true,
-              hasOutcome: true,
-              hasComplied: false,
-              wasAbsent: true,
-              acceptableAbsence: false,
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                hasOutcome: true,
+                didTheyComply: false,
+                wasAbsent: true,
+                acceptableAbsence: false,
+              } as Activity,
+            } as PersonAppointment,
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
@@ -426,10 +439,12 @@ describe('Manage an appointment', () => {
         it('should display the drug history deep link with correct wording', () => {
           const $ = render({
             enableDeepLinks: true,
-            appointment: {
-              deliusManaged: true,
-              contactType: 'Drug Test Appointment (NS)',
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                type: 'Drug Test Appointment (NS)',
+              } as Activity,
+            } as PersonAppointment,
           })
 
           const section = $('[data-qa="appointmentDetails"]')
@@ -448,10 +463,12 @@ describe('Manage an appointment', () => {
         it('should display the UPW worksheet deep link with correct wording', () => {
           const $ = render({
             enableDeepLinks: true,
-            appointment: {
-              deliusManaged: true,
-              contactType: 'CP/UPW - Appointment/Attendance (NS)',
-            },
+            personAppointment: {
+              appointment: {
+                deliusManaged: true,
+                type: 'CP/UPW - Appointment/Attendance (NS)',
+              } as Activity,
+            } as PersonAppointment,
           })
 
           const section = $('[data-qa="appointmentDetails"]')
