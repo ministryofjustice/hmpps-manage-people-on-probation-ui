@@ -218,6 +218,7 @@
     "audit-ci": "^7.1.0",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^30.4.1",
+    "cheerio": "1.2.0",
     "concurrently": "^9.1.2",
     "cookie-session": "^2.1.0",
     "cpy-cli": "7.0.0",
