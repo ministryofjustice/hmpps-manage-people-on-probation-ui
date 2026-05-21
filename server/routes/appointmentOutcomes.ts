@@ -14,6 +14,7 @@ import {
   getNextComAppointment,
   getAppointment,
   getUserProviders,
+  getOverdueOutcomes,
 } from '../middleware'
 
 import {
@@ -292,6 +293,12 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.post(
     [`${arrangeBasePath}/check-your-answers`, `${manageBasePath}/check-your-answers`],
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
+  )
+
+  router.get(
+    [`${arrangeBasePath}/confirmation`, `${manageBasePath}/confirmation`],
+    getOverdueOutcomes(hmppsAuthClient),
+    controllers.appointmentOutcomes.getConfirmation(hmppsAuthClient),
   )
 
   router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))

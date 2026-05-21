@@ -192,6 +192,20 @@ export interface OutcomeSummary {
   enforcementActionChangeLink?: string
 }
 
+export interface OutcomeConfirmationAction {
+  text: string
+  href: string
+  external?: boolean
+}
+
+export interface OutcomeConfirmation {
+  title: string
+  type: string
+  date: string
+  text: string[]
+  actions: OutcomeConfirmationAction[]
+}
+
 export interface CurrentOutcome {
   status: string
   reason: string
@@ -243,6 +257,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   currentOutcome?: CurrentOutcome
   notePrepend?: string
   summary?: OutcomeSummary
+  confirmation?: OutcomeConfirmation
 }
 
 export interface AppResponse extends Response {

@@ -22,6 +22,7 @@ export const appointmentOutcomeRequests = [
   'getInitiateBreachOrRecall',
   'getSendLetter',
   'getUpdateEnforcementAction',
+  'getConfirmation',
 ] as const
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
@@ -129,6 +130,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     return async (_req, res) => {
       const { id, crn } = res.locals.appointmentOutcome
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+    }
+  },
+  getConfirmation: _hmppsAuthClient => {
+    return async (_req, res) => {
+      return res.render('pages/appointment-outcomes/confirmation')
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => async (_req, res) =>
