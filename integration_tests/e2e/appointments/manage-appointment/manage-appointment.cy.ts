@@ -22,5 +22,6 @@ describe('Manage an appointment', () => {
     manageAppointmentPage.getBackLink().click()
 
     cy.location('pathname').should('eq', `/case/${crn}/appointments`)
+    cy.contains('h1', 'Appointments').should('be.visible')
   })
 })
