@@ -175,6 +175,16 @@ export interface AppointmentOutcomeSentence {
 
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
 
+export interface AppointmentOutcomeEnforcementAction {
+  responseByDate?: string
+  responseByDays?: number
+}
+
+export interface BreachWarning {
+  order: string
+  breachDate: string
+}
+
 export interface OutcomeSummary {
   appointmentDetails: string
   outcome: string
@@ -235,6 +245,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   sendLetter?: boolean
   currentEnforcementAction?: CurrentEnforcementAction
   currentOutcome?: CurrentOutcome
+  breachWarning?: BreachWarning | null
   notePrepend?: string
   summary?: OutcomeSummary
 }

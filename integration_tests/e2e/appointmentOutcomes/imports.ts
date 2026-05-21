@@ -50,3 +50,22 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
     page.checkPageTitle(redirectPageTitle)
   })
 }
+
+export const checkBreachWarningBanner = <TArgs extends Record<string, any>>(
+  loadPageFunc: (args: any) => void,
+  args: TArgs = {} as TArgs,
+): void => {
+  describe('breach warning banner', () => {
+    it('should show when there is a breach', () => {
+      cy.task('stubBreachCompliance')
+      loadPageFunc(args)
+      const page = new args.Page()
+      page.getBreachWarning().should('exist')
+    })
+    it('should not show when there is no active breach', () => {
+      loadPageFunc(args)
+      const page = new args.Page()
+      page.getBreachWarning().should('not.exist')
+    })
+  })
+}

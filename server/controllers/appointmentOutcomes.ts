@@ -1,4 +1,4 @@
-import { Controller, FileCache, Route } from '../@types'
+import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { type AppResponse } from '../models/Locals'
 import config from '../config'
