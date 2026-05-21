@@ -7,7 +7,7 @@ export const checkUploadDocumentsAction = () => {
   describe('Upload documents action', () => {
     describe('Appointment has associated documents', () => {
       beforeEach(() => {
-        cy.task('stubAppointment', { isFuture: true, deliusManaged: false, documents: true })
+        cy.task('stubAppointment', { isFuture: true, deliusManaged: false, documents: true, eventId: '2501192724' })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -26,6 +26,7 @@ export const checkUploadDocumentsAction = () => {
     })
     describe('Appointment does not have associated documents', () => {
       beforeEach(() => {
+        cy.task('stubAppointment', { isFuture: false, deliusManaged: false, documents: false, eventId: '2501192724' })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })

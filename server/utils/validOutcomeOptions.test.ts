@@ -4,7 +4,7 @@ import { Option } from '../models/Option'
 import { validOutcomeOptions, validEnforcementActionOptions } from './validOutcomeOptions'
 
 describe('utils/validOutcomeOptions', () => {
-  let contactOutcomes: Partial<ContactOutcomes[]> = [
+  let contactOutcomes: ContactOutcomes[] = [
     {
       code: 'ATTC',
       description: 'Attended - Complied',

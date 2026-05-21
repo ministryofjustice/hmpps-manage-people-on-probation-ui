@@ -23,7 +23,7 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   if (!(page instanceof AppointmentCheckYourAnswersPage)) {
     getUuid().then(pageUuid => {
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
-      completeSupportingInformationPage(true, '', pageUuid)
+      completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
     })
   }
   if (page instanceof AppointmentCheckYourAnswersPage) {

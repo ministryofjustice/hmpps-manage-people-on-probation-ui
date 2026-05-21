@@ -1,11 +1,13 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
 import { isoToDateTime, setDataValue } from '../utils'
-import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
+import { AppointmentOutcomeType, AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
+
+import { type OutcomeCode, outcomeMap } from '../properties/appointment-outcomes'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
-export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
+export const createAppointmentSession = (req: Request, res: AppResponse, next?: NextFunction) => {
   const { appointment } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
@@ -59,7 +61,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       ;({ time: end } = isoToDateTime(appointment.endDateTime))
     }
     const externalReference = appointment?.externalReference || ''
-    const enforcementAction = appointment?.enforcementAction || null
     if (!eventId) {
       type = ''
     }
@@ -94,7 +95,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       username: res.locals.user.username,
       uuid: '',
       externalReference,
-      enforcementAction,
       sensitivity,
       sensitivityLocked,
     }
@@ -116,9 +116,30 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     appointmentSession.smsOptIn = null
   }
 
+  // Hydrate the logged outcome 👇
+
+  const outcome = appointment?.outcome
+  let outcomeType: AppointmentOutcomeType | null = null
+  let outcomeCode: OutcomeCode | null = null
+  if (outcome) {
+    const contactOutcome = Object.entries(outcomeMap).find(
+      ([_key, { description }]) => description.toLowerCase() === outcome.toLowerCase(),
+    )
+    outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
+    outcomeCode = contactOutcome?.[1]?.code || null
+  }
+  appointmentSession.outcome = {
+    ...appointmentSession.outcome,
+    outcomeType,
+    outcomeCode,
+  }
+
   res.locals.appointmentSession = appointmentSession
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)
   }
-  return next()
+  if (next) {
+    return next()
+  }
+  return null
 }

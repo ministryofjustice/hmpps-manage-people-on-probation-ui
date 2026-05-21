@@ -18,6 +18,7 @@ const getMockPersonAppointment = ({ hasOutcome = false, deliusManaged = false } 
       hasOutcome,
       deliusManaged,
     },
+    documents: [],
   }
   return mock
 }

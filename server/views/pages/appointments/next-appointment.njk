@@ -1,12 +1,20 @@
 {% extends "../_form.njk" %}
-{% set title = 'Do you want to arrange the next appointment with ' + personAppointment.personSummary.name.forename + '?'%}
+{% set title = personAppointment.personSummary.name.forename + "’s next supervision appointment" %}
 {% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.type %}
+{% set sentence = appointment.appointmentFor.sentence %}
 {% set backLink = back if back else 
   '/case/' + crn + '/appointments/appointment/' + contactId + '/manage/' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% block heading %}{% endblock %}
-
+{% block afterHeading %}
+  {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personSummary.name.forename + '’s' + sentence + '.' %}
+  {% if nextAppointment.appointment %}
+    {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithYear + " with " + personAppointment.personSummary.name.forename + " " + personAppointment.personSummary.name.surname + " for their " + sentence %}
+  {% endif %}
+  {{ govukInsetText({
+    html: nextAppointmentText
+  }) }}
+{% endblock %}
 {% block form %}
 
   {{ govukRadios({
@@ -14,17 +22,17 @@
     id: "nextAppointment",
     formGroup: {
       attributes: {
-        'data-qa': 'option'
+        'data-qa': 'anotherAppointment'
       } 
     },
     fieldset: {
       legend: {
-        html: '<span data-qa="pageHeading">' + title + '</span>',
-        classes: "govuk-fieldset__legend--l"
+        text: 'Do you want to arrange another appointment with ' + personAppointment.personSummary.name.forename + '?',
+        classes: "govuk-fieldset__legend--m"
       }
     },
     errorMessage: {
-    text: "Select whether or not you wanted to arrange the next appointment"
+    text: "Select if you want to arrange the next appointment"
   } if errorMessages.nextAppointment,
     items: [
     {

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { Activity } from '../../data/model/schedule'
+import { Activity, PersonAppointmentEnforcementAction } from '../../data/model/schedule'
 import { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
 import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
@@ -8,6 +8,7 @@ import { Route } from '../../@types'
 import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../../utils'
 import { Sentence } from '../../data/model/sentenceDetails'
 import { AppointmentOutcomeSentence } from '../../models/Locals'
+import { Document } from '../../data/model/personalDetails'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
@@ -16,15 +17,17 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const isValidParams = isValidCrn(crn) && isValidId
   const path = ['appointments', crn, id]
   const data = req?.session?.data
-  const appointmentSession = getDataValue<AppointmentSession>(data, path)
+  const appointmentSession = getDataValue<AppointmentSession>(data, path) || null
   let appointment: AttendedCompliedAppointment | Activity
+  let documents: Document[] = []
+  let enforcementAction: PersonAppointmentEnforcementAction
   const { forename, surname } = res.locals.case.name
   const reqUrl = req.url.split('?')[0]
   const baseUrl = uuid ? `/case/${crn}/arrange-appointment/${id}` : `/case/${crn}/appointments/appointment/${id}`
   const baseOutcomeUrl = `${baseUrl}/outcome`
   const completedUrl = uuid ? `${baseUrl}/check-your-answers` : `${baseUrl}/manage`
   if (contactId) {
-    ;({ appointment } = res.locals.personAppointment)
+    ;({ appointment, documents = [] } = res.locals.personAppointment)
   } else {
     const description = res?.locals?.appointment?.type?.description
     const name = res?.locals?.appointment?.attending?.name
@@ -81,6 +84,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     forename,
     surname,
     appointment,
+    documents,
+    enforcementAction,
     crn,
     uuid,
     contactId,

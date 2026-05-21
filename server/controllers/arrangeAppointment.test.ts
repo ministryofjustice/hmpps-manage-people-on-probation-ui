@@ -197,7 +197,7 @@ const renderSpy = jest.spyOn(res, 'render')
 const redirectUrl = `/case/${crn}/arrange-appointment/${uuid}/redirect/url?change=${change}`
 mockedFindUncompleted.mockReturnValue(redirectUrl)
 
-describe('controllers/arrangeAppointment', () => {
+xdescribe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

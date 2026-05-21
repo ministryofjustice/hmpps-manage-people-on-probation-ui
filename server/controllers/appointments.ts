@@ -14,7 +14,12 @@ import {
   getDataValue,
   canRescheduleAppointment,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
+import {
+  renderError,
+  cloneAppointmentAndRedirect,
+  getCheckinOffenderDetails,
+  createAppointmentSession,
+} from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
@@ -373,7 +378,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-
+  /*
   postNextAppointment: _hmppsAuthClient => {
     return async (req, res) => {
       const { body, url } = req
@@ -389,6 +394,31 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       if (nextAppointment === 'KEEP_TYPE') {
         return cloneAppointmentAndRedirect(appointmentSession)(req, res)
+      }
+       if (res.locals.flags?.enableNonCompliance && req.url.includes('/outcome/next-appointment')) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
+      }
+      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
+    }
+  },
+  */
+  postNextAppointment: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { body } = req
+      const { crn, contactId } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isNumericString(contactId)) {
+        return renderError(404)(req, res)
+      }
+      const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
+      if (nextAppointment === 'KEEP_TYPE') {
+        createAppointmentSession(req, res)
+      }
+      const { appointmentSession } = res.locals
+      if (nextAppointment !== 'NO') {
+        return cloneAppointmentAndRedirect(appointmentSession, nextAppointment)(req, res)
+      }
+      if (res.locals.flags?.enableNonCompliance && req.url.includes('/outcome/next-appointment')) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }

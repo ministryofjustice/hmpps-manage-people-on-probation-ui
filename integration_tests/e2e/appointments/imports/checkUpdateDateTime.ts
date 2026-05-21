@@ -58,7 +58,20 @@ export const checkUpdateDateTime = ({
       dateTimePage.getSubmitBtn().click()
       if (!inPast && page instanceof ArrangeAnotherAppointmentPage) {
         completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
-        completeSupportingInformationPage(true, '', pageUuid)
+        completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
+      }
+      if (inPast) {
+        if (enableNonCompliance) {
+          completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+        } else {
+          completeAttendedCompliedPage({ _crn: pageCrn, _uuid: pageUuid })
+        }
+        completeAddNotePage({ idOverride: pageUuid, crnOverride: crn })
+      }
+      if (page instanceof AppointmentCheckYourAnswersPage) {
+        page.checkPageTitle('Check your answers then confirm the appointment')
+      } else {
+        page.checkOnPage()
       }
       if (inPast) {
         if (enableNonCompliance) {
