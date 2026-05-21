@@ -78,7 +78,7 @@
                 {
                     classes: "nowrap",
                     html:
-                    ((((enforcement.enforcementAction | lower | capitalize) if enforcement.enforcementAction else 'Not provided') | escape))
+                    ((((enforcement.enforcementAction | toSentenceCase) if enforcement.enforcementAction else 'Not provided') | escape))
                     +
                     (
                     '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
