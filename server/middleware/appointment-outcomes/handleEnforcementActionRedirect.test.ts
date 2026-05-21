@@ -46,7 +46,8 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
     handleEnforcementActionRedirect('unacceptableAbsence')(req, res)
-    expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/initiate-breach-or-recall?change=${change}`)
+    const expectedRedirectUrl = `${baseOutcomeUrl}/initiate-breach-or-recall?change=${encodeURIComponent(change)}`
+    expect(redirectSpy).toHaveBeenCalledWith(expectedRedirectUrl)
   })
   it('should redirect to the other enforcement action page', () => {
     const req = httpMocks.createRequest()
