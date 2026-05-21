@@ -197,7 +197,7 @@ export const checkAppointmentDetails = (
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
   })
-  it('should display with no RAR activity', () => {
+  it('should NOT display RAR activity when no RAR category is present', () => {
     if (!enableNonCompliance) {
       cy.task('stubDisableNonCompliance')
     }
@@ -209,8 +209,7 @@ export const checkAppointmentDetails = (
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     let index = hasOutcome && deliusManaged ? 5 : 4
     if (enableNonCompliance && !deliusManaged) index += 1
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'RAR activity')
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Not provided')
+    manageAppointmentPage.getRarActivityRow().should('not.exist')
     if (!deliusManaged) {
       manageAppointmentPage
         .getAppointmentDetailsListItem(index, 'actions')
@@ -230,12 +229,15 @@ export const checkAppointmentDetails = (
   it('should display the VISOR report', () => {
     let index = deliusManaged && hasOutcome ? 6 : 5
     if (enableNonCompliance && !deliusManaged) index += 1
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'VISOR report')
-    manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No')
+
+    manageAppointmentPage.getVisorReportRow().find('.govuk-summary-list__key').should('contain.text', 'VISOR report')
+
+    manageAppointmentPage.getVisorReportRow().find('.govuk-summary-list__value').should('contain.text', 'No')
+
     if (!deliusManaged) {
       manageAppointmentPage
-        .getAppointmentDetailsListItem(index, 'actions')
-        .find('a')
+        .getVisorReportRow()
+        .find('.govuk-summary-list__actions a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
         .should(
@@ -248,7 +250,7 @@ export const checkAppointmentDetails = (
     }
   })
   it('should display the correct values if notes added to appointment', () => {
-    let index = deliusManaged && hasOutcome ? 7 : 6
+    let index = deliusManaged && hasOutcome ? 6 : 5
     if (enableNonCompliance && !deliusManaged) index += 1
     if (!enableNonCompliance) {
       cy.task('stubDisableNonCompliance')
@@ -256,46 +258,39 @@ export const checkAppointmentDetails = (
     cy.task('stubAppointment', { ...args, notes: true })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
-    page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Appointment notes')
+    page.getAppointmentNotesRow().find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
+
+    page.getAppointmentNotesRow().find('.app-note').eq(0).find('p').eq(0).should('contain.text', 'Some notes')
+
     page
-      .getAppointmentDetailsListItem(index, 'value')
-      .find('.app-note')
-      .eq(0)
-      .find('p')
-      .eq(0)
-      .should('contain.text', 'Some notes')
-    page
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentNotesRow()
       .find('.app-note')
       .eq(0)
       .find('p')
       .eq(1)
       .should('contain.text', 'Comment added by Terry Jones on 6 April 2023')
+
+    page.getAppointmentNotesRow().find('.app-note').eq(1).find('p').eq(0).should('contain.text', 'Some more notes')
+
     page
-      .getAppointmentDetailsListItem(index, 'value')
-      .find('.app-note')
-      .eq(1)
-      .find('p')
-      .eq(0)
-      .should('contain.text', 'Some more notes')
-    page
-      .getAppointmentDetailsListItem(index, 'value')
+      .getAppointmentNotesRow()
       .find('.app-note')
       .eq(1)
       .find('p')
       .eq(1)
       .should('contain.text', 'Comment added by Terry Jones on 7 April 2023')
+
     if (!deliusManaged) {
       page
-        .getAppointmentDetailsListItem(index, 'actions')
-        .find('a')
+        .getAppointmentNotesRow()
+        .find('.govuk-summary-list__actions a')
         .should('contain.text', 'Add to notes')
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
 
   it('should display the correct values if no notes added to appointment', () => {
-    let index = deliusManaged && hasOutcome ? 7 : 6
+    let index = deliusManaged && hasOutcome ? 6 : 5
     if (enableNonCompliance && !deliusManaged) index += 1
     if (!enableNonCompliance) {
       cy.task('stubDisableNonCompliance')
@@ -332,7 +327,7 @@ export const checkAppointmentDetails = (
     })
   }
   it('should display sensitive', () => {
-    const baseIndex = deliusManaged && hasOutcome ? 8 : 7
+    const baseIndex = deliusManaged && hasOutcome ? 7 : 6
     let index = baseIndex + (hasOutcomeText ? 1 : 0)
     if (enableNonCompliance && !deliusManaged) index += 1
     if (!enableNonCompliance) {
