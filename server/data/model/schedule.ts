@@ -5,6 +5,21 @@ export interface Schedule {
   personSummary: PersonSummary
   personSchedule: PersonSchedule
 }
+
+export type LinkedContactResponse = LinkedContact[]
+
+export interface LinkedContact {
+  contactId: number
+  contactTypeDescription: string
+  contactDate: string
+  createdBy: CreatedBy
+}
+export interface CreatedBy {
+  forename: string
+  middleName?: string
+  surname: string
+}
+
 export interface EnforcementContactsResponse {
   size: number
   page: number

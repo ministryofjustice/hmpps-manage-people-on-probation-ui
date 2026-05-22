@@ -149,9 +149,10 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
-      const [personAppointment, nextAppointment] = await Promise.all([
+      const [personAppointment, nextAppointment, relatedContacts] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
         masClient.getNextAppointment(username, crn, contactId),
+        masClient.getRelatedContacts(crn, contactId),
       ])
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
@@ -168,6 +169,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         canReschedule: canRescheduleAppointment(personAppointment),
         contactId,
         hasDeceased,
+        relatedContacts,
       })
     }
   },
