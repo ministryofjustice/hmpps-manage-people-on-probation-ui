@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-cycle
 import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 
