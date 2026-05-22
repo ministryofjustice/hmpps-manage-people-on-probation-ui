@@ -54,6 +54,10 @@ export default class ManageAppointmentPage extends Page {
     )
   }
 
+  getAppointmentNotesRow() {
+    return cy.get('[data-qa="appointmentDetails"]').contains('.govuk-summary-list__row', 'Appointment notes')
+  }
+
   getAssociatedDocumentsTableColumnHeading = (index: number) => {
     return cy.get('[data-qa="associatedDocuments"]').find(`.govuk-table .govuk-table__head tr th:nth-child(${index})`)
   }
@@ -69,6 +73,14 @@ export default class ManageAppointmentPage extends Page {
   getLastUpdated = () => cy.get('[data-qa="lastUpdated"]')
 
   getPageHeading = () => cy.get('[data-qa="pageHeading"]')
+
+  getRarActivityRow() {
+    return cy.get('[data-qa="rarActivityRow"]')
+  }
+
+  getVisorReportRow() {
+    return cy.get('.visor-report-row')
+  }
 
   getRelatedContact = (index: number) => cy.get(`[data-qa="relatedContacts"] li:nth-child(${index})`)
 
