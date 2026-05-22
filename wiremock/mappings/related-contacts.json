@@ -1,0 +1,68 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/mas/schedule/X778160/appointment/.*/linked-contacts"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [
+          {
+            "contactId": 2510615347,
+            "contactTypeDescription": "Breach Action - Breach Letter Sent",
+            "contactDate": "2026-05-12",
+            "createdBy": {
+              "forename": "James",
+              "surname": "Frost"
+            }
+          },
+          {
+            "contactId": 2510615348,
+            "contactTypeDescription": "First warning letter sent",
+            "contactDate": "2026-05-19",
+            "createdBy": {
+              "forename": "Teddy",
+              "surname": "Morris"
+            }
+          },
+          {
+            "contactId": 2510615349,
+            "contactTypeDescription": "First warning letter requested",
+            "contactDate": "2026-05-16",
+            "createdBy": {
+              "forename": "Jack",
+              "surname": "Smith"
+            }
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/mas/schedule/X000001/appointment/.*/linked-contacts"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [
+          {
+            "contactId": 2510615347,
+            "contactTypeDescription": "Breach Action - Breach Letter Sent",
+            "contactDate": "2026-05-12",
+            "createdBy": {
+              "forename": "James",
+              "surname": "Frost"
+            }
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
