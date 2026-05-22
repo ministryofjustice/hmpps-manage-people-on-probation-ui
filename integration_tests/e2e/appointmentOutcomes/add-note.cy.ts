@@ -14,12 +14,14 @@ import {
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 
 let addNotePage: AddNotePage
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
 let attendedFailedToComplyPage: AttendedFailedToComplyPage
 let checkYourAnswersPage: RescheduleCheckYourAnswerPage
+let nextAppointmentPage: NextAppointmentPage
 
 type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
 
@@ -159,8 +161,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
         addNotePage.getSubmitBtn().click()
         cy.wait('@submit')
-        const cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkPageTitle('Check your answers')
+        nextAppointmentPage = new NextAppointmentPage()
+        nextAppointmentPage.checkPageTitle(`Eula’s next supervision appointment`)
       })
     })
   }
@@ -168,7 +170,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     loadPage({ journey })
     addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
     addNotePage.getSubmitBtn().click()
-    checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
+    nextAppointmentPage = new NextAppointmentPage()
   })
 }
 
