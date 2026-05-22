@@ -168,7 +168,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
         title: 'Enforcement outcome added',
         text: [
           'This outcome has been saved against the appointment on NDelius.',
-          'Liase with your case administrator to create a breach/recall NSI on NDelius.',
+          'Liaise with your case administrator to create a breach/recall NSI on NDelius.',
         ],
         type,
         date: 'Monday 22 December 2025 from 9:15am to 9:30am',

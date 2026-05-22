@@ -33,6 +33,7 @@ import {
   getCurrentEnforcementAction,
   getContactOutcomes,
   getOutcomeSummary,
+  getConfirmation,
   getNotePrepend,
   resetSelectedActions,
 } from '../middleware/appointment-outcomes'
@@ -298,6 +299,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get(
     [`${arrangeBasePath}/confirmation`, `${manageBasePath}/confirmation`],
     getOverdueOutcomes(hmppsAuthClient),
+    getConfirmation,
     controllers.appointmentOutcomes.getConfirmation(hmppsAuthClient),
   )
 

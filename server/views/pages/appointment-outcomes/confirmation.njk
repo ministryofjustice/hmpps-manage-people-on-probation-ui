@@ -1,30 +1,12 @@
 {% extends "../_form.njk" %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
-
-{% set title = "Enforcement outcome added" %}
-{% set text = ['This enforcement outcome has been added to the NDelius Enforcement Diary.'] %}
-{% set outcomeTypes = ['ATTENDED_COMPLIED', 'ATTENDED_SENT_HOME_SERVICE_ISSUES', 'ACCEPTABLE_ABSENCE'] %}
-{% if outcomeTypes.includes(appointmentOutcome.appointmentSession.outcome.outcomeType) %}
-    {% set title = "Appointment outcome updated" %}
-    {% set text = ['This outcome has been saved against the appointment on NDelius.'] %}
-{% endif %}
-{% set appointmentDatesHtml %}
-<span data-qa="appointment-date">{{ appointmentOutcome.appointment.startDateTime | dayOfWeek }}
-    {{ appointmentOutcome.appointment.startDateTime | dateWithYear }}
-    from
-    {{ appointmentOutcome.appointment.startDateTime | to12HourTimeCompact}}
-    to
-    {{ appointmentOutcome.appointment.endDateTime | to12HourTimeCompact}}</span>
-{% endset %}
-{% if appointmentOutcome.appointmentSession.letterSentBy === 'CASE_ADMIN' %}
-
-    {% set text = (text.push('Follow your local process to request a'), teamRadioItems) %}
-{% endif %}
-
+{% set buttonText = "Return to " + appointmentOutcome.forename + "'s overview" %}
+{% set title = appointmentOutcome.confirmation.title %}
+{% set notStandardForm = true %}
 {% set panelHtml %}
 <div class="govuk-!-font-size-27">
-    <strong>{{ appointmentOutcome.appointment.type }}</strong><br/>
-    {{ appointmentDatesHtml | safe }}
+    <strong>{{ appointmentOutcome.confirmation.type }}</strong><br/>
+    <span>{{ appointmentOutcome.confirmation.date }}</span>
 </div>
 {% endset %}
 
@@ -38,142 +20,40 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
             <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-
-            {% if flags.enableSmsReminders == true %}
-                {% if smsSent %}
-                    {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
-                        <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.</p>
-                    {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
-                        {{ mojAlert({
-              variant: "warning",
-              title: "We could not send a confirmation text message to " + case.name.forename,
-              showTitleAsHeading: true,
-              dismissible: false,
-              text: "You need to give " + case.name.forename + " the appointment details.",
-              attributes: {
-                'data-qa': 'sms-err-msg-english'
-              }
-            }) }}
-
-                    {% elif isWelshNotificationFailed and not isEnglishNotificationFailed %}
-                        {{ mojAlert({
-            variant: "information",
-            title: "We could not send a confirmation text message to " + case.name.forename + " in Welsh",
-            showTitleAsHeading: true,
-            dismissible: false,
-            text: case.name.forename + " has received the appointment details in English. We have logged the text as a contact on NDelius.",
-            attributes: {
-              'data-qa': 'sms-err-msg-welsh'
-            }
-          }) }}
-
-                    {% else %}
-                        {{ mojAlert({
-              variant: "warning",
-              title: "We could not send a confirmation text message to " + case.name.forename,
-              showTitleAsHeading: true,
-              dismissible: false,
-              text: "You need to give " + case.name.forename + " the appointment details.",
-              attributes: {
-                'data-qa': 'sms-err-msg-combined'
-              }
-            }) }}
-                    {% endif %}
-                {% else %}
-                    <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
-                {% endif %}
-            {% endif %}
-            {% if not isInPast %}
-                {% if flags.enableSmsReminders == false %}
-                    <p class="govuk-body">
-        You need to send
-        {{case.name.forename}}
-        the appointment details.
-      {% if phoneNumber %}
-         Their phone number is
-         <span data-qa="{{ phoneNumber }}">
-                                {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
-                                {% else %}{{ case.telephoneNumber + "." }}
-                                {% endif %}
-                            </span>
-                        {% endif %}
-                    </p>
-                {% endif %}
-                {% if isOutLookEventFailed %}
-                    <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
-                    <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
-            {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
-                {% else %}
-                    {% if not isInPast %}
-                        <p class="govuk-!-margin-bottom-0" data-qa="">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on{% else %} has been added to{% endif %}:</p>
-                        <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
-                            <li>{{ attendingName }} calendar</li>
-                            <li>the NDelius contact log and officer diary, along with any supporting information</li>
-                        </ul>
-                    {% else %}
-                        <p class="govuk-body">The appointment details have been updated on the NDelius contact log and officer diary.</p>
-                    {% endif %}
-                {% endif %}
-            {% else %}
-                <p class="govuk-body">The appointment has been {% if appointmentType == 'RESCHEDULE' %}updated on{% else %}added to{% endif %} the NDelius contact log and officer diary.</p>
-            {% endif %}
+            {% for text in appointmentOutcome.confirmation.text %}
+                <p class="govuk-body">{{ text }}</p>
+            {% endfor %}
         </div>
-        {% if not linkedAppointment %}
-            <div class="govuk-grid
-    <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
-                <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
+        {% if appointmentOutcome.confirmation.actions.length %}
+            <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
+                <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions</h2>
                 <p class="govuk-!-margin-bottom-0">You can:</p>
                 <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
-                    <li>
-                        <a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
-                        arrange another appointment
-                    </a>
-                    </li>
-                    {% if contactResponse.content.length > 0 %}
+                    {% for action in appointmentOutcome.confirmation.actions %}
                         <li>
-                            {% if contactResponse.content.length == 1 %}
-                                <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
-        log appointment outcome for {{ contactResponse.content[0].date | dayOfWeek + ' ' + contactResponse.content[0].date | dateWithYear }}
-                                </a>
-                            {% endif %}
-                            {% if contactResponse.content.length > 1 %}
-                                <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
-        log outcomes for {{ contactResponse.content.length }} appointments
-          </a>
-                            {% endif %}
+                            <a class="govuk-link" href="{{ action.href }}"{% if action.external %} target="_blank" rel="noopener noreferrer"{% endif %} data-qa="anotherAppointmentLink">
+                                {{ action.text }}
+                            </a>
                         </li>
-                    {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
-        </div>
-        <form method="post" autocomplete="off" action="{{ paths.current  }}">
-            <div class="govuk-button-group">
-                {{ govukButton({
+        {% endif %}
+        <div class="govuk-grid-column-two-thirds govuk-!-margin-top-4">
+            <form method="post" autocomplete="off" action="{{ paths.current  }}">
+                <div class="govuk-button-group">
+                    {{ govukButton({
       html: buttonText,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-                <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
-      Return to all cases
+                    <a class="govuk-link" href="{{ cases }}" data-qa="returnToManageAppointment">
+      Return to manage appointment
     </a>
-            </div>
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-        </form>
-    {% else %}
-        <div class="govuk-grid-column-two-thirds" data-qa="logAppointmentOutcome">
-            <p class="govuk-body">You can now finish logging the outcome for {{ linkedAppointment.type }} on {{ linkedAppointment.date }}</p>
-            <form method="post" autocomplete="off" action="{{ paths.current }}">
-                <div class="govuk-button-group">
-                    {{ govukButton({
-      html: 'Return to log appointment outcome',
-      attributes: {
-        'data-qa': 'submit-btn'
-      }
-    }) }}
-                    <input type="hidden" name="_linkedContactId" value="{{ linkedAppointment.contactId }}">
-                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                </form>
-            </div>
-        {% endif %}
-    {% endblock %}
+                </div>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            </form>
+        </div>
+    </div>
+{% endblock %}

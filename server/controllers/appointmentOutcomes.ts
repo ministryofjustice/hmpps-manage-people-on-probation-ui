@@ -128,8 +128,9 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postCheckYourAnswers: _hmppsAuthClient => {
     return async (_req, res) => {
-      const { id, crn } = res.locals.appointmentOutcome
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+      const { id, crn, baseOutcomeUrl } = res.locals.appointmentOutcome
+      // 👉 PUT request here to update outcome
+      return res.redirect(`${baseOutcomeUrl}/confirmation`)
     }
   },
   getConfirmation: _hmppsAuthClient => {

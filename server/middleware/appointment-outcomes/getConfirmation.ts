@@ -108,7 +108,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   ) {
     text = [noDiaryActionText]
     if (appointmentSession?.outcome?.breachNSICreatedBy) {
-      text.push('Liase with your case administrator to create a breach/recall NSI on NDelius.')
+      text.push('Liaise with your case administrator to create a breach/recall NSI on NDelius.')
     }
   }
 
@@ -117,11 +117,8 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   if (
     !appointmentSession?.outcome?.letterSentBy &&
     appointmentSession.outcome.outcomeType === 'UNACCEPTABLE_ABSENCE' &&
-    // !outcomes.includes(appointmentSession.outcome.outcomeType) &&
     !allSelectedActions.includes('NO_FURTHER_ACTION')
   ) {
-    console.log('unacceptable absence')
-
     title = 'Unacceptable absence outcome added'
     text = noDiaryActions.some(action => allSelectedActions.includes(action)) ? [noDiaryActionText] : [diaryActionText]
   }
@@ -161,7 +158,6 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     text,
     actions,
   }
-  console.log(confirmation)
   res.locals.appointmentOutcome.confirmation = confirmation
   return next()
 }
