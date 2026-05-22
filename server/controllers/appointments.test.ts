@@ -171,9 +171,7 @@ const getNextAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getNextAppointment')
   .mockImplementation(() => Promise.resolve(nextApptResponse()))
 
-const getRelatedContactsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getRelatedContacts')
-  .mockImplementation(() => Promise.resolve([]))
+let getRelatedContactsSpy: jest.SpiedFunction<MasApiClient['getRelatedContacts']>
 
 const patchAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'patchAppointment')
