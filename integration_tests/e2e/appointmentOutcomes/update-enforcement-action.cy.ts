@@ -25,6 +25,7 @@ const loadPage = ({
   enforcementAction?: AppointmentEnforcementAction
 } = {}): void => {
   const action = enforcementActionMap?.[enforcementAction]?.description || null
+  const code = enforcementActionMap?.[enforcementAction]?.code || null
   cy.task('stubAppointment', {
     eventId: 2501192724,
     isFuture: false,
@@ -33,13 +34,17 @@ const loadPage = ({
     notes: false,
     acceptableAbsence,
     action,
+    enforcementAction: {
+      code,
+      description: action,
+    },
   })
   if (sentenceType !== 'COMMUNITY') {
     cy.task('stubSentences', { sentenceType })
   }
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
   manageAppointmentPage = new ManageAppointmentPage()
-  manageAppointmentPage.getTaskLink(1).click()
+  manageAppointmentPage.getTaskLink(2).click()
 }
 
 type RedirectPages = SendLetterPage | AddNotePage | EnforcementActionPage

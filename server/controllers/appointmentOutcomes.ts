@@ -114,9 +114,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (contactId && appointmentSession?.linkedContactId) {
         redirect = `${baseOutcomeUrl}/check-your-answers`
       }
-      if (change) {
-        redirect = change
-      }
+      if (change) redirect = change
       return res.redirect(redirect)
     }
   },

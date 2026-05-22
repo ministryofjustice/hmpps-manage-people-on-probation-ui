@@ -32,8 +32,11 @@ export const getBackLink: Route<void> = (req, res, next) => {
       case 'UNACCEPTABLE_ABSENCE':
         backLink = `${baseOutcomeUrl}/unacceptable-absence` // used for all 3 pages
         break
-      default:
+      case 'FAILED_TO_ATTEND':
         backLink = `${baseOutcomeUrl}/failed-to-attend` // <-- only used for EVIDENCE_REQUESTED type
+        break
+      default:
+        backLink = `/case/${crn}/appointments/appointment/${id}/manage`
     }
   }
   res.locals.appointmentOutcome.backLink = backLink
