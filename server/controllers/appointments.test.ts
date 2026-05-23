@@ -174,17 +174,11 @@ const patchAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'patchAppointment')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
 
-const getCalculationDetailsSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-
-const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(mockPractitioner))
 
-xdescribe('controllers/appointments', () => {
+describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
@@ -681,12 +675,21 @@ xdescribe('controllers/appointments', () => {
         body: {
           nextAppointment: 'KEEP_TYPE',
         },
+        session: {
+          data: {
+            appointments: {
+              [crn]: {
+                [contactId]: { eventId: '2' },
+              },
+            },
+          },
+        },
       })
       const mockRes = mockAppResponse({
         appointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({}, 'KEEP_TYPE')
+      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({ eventId: '2' }, 'KEEP_TYPE')
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
     })
 
@@ -701,6 +704,9 @@ xdescribe('controllers/appointments', () => {
         },
         body: {
           nextAppointment: 'CHANGE_TYPE',
+        },
+        session: {
+          data: {},
         },
       })
       const mockRes = mockAppResponse({
@@ -720,6 +726,9 @@ xdescribe('controllers/appointments', () => {
         },
         body: {
           nextAppointment: 'NO',
+        },
+        session: {
+          data: {},
         },
       })
       await controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, res)

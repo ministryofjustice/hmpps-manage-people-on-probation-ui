@@ -55,7 +55,7 @@ const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.M
 const nextSpy = jest.fn()
 const req = httpMocks.createRequest()
 
-xdescribe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
+describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
   it('should define the correct options if current enforcement action is LETTER related', () => {
     const res = buildResponse()
     validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
@@ -79,13 +79,12 @@ xdescribe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', (
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should define the correct options if current enforcement action is BREACH related', () => {
+  it('should define the correct options if current enforcement action is BREACH related and current action is BREACH_REQUESTED', () => {
     const res = buildResponse({ action: 'BREACH_REQUESTED' })
     validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
     getUpdateEnforcementActionOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'BREACH_REQUESTED' }),
         expect.objectContaining({ value: 'BREACH_CONFIRMATION_SENT' }),
         expect.objectContaining({ value: 'BREACH_LETTER_SENT' }),
         expect.objectContaining({ value: 'BREACH_REQUEST_ACTIONED' }),
@@ -95,7 +94,7 @@ xdescribe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', (
         expect.objectContaining({ value: 'DIFFERENT_ACTION' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(8)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(7)
   })
   const currentActions: AppointmentEnforcementAction[] = [
     'DECISION_PENDING_RESPONSE',

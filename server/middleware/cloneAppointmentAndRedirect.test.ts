@@ -65,7 +65,7 @@ function setup() {
   return { req, res }
 }
 
-xdescribe('/middleware/cloneAppointmentAndRedirect', () => {
+describe('/middleware/cloneAppointmentAndRedirect', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -79,7 +79,7 @@ xdescribe('/middleware/cloneAppointmentAndRedirect', () => {
     start: '',
     end: '',
     uuid,
-    linkedContactId: 'C9876',
+    // linkedContactId: 'C9876',
     sensitivityLocked: false,
   }
 
@@ -102,6 +102,35 @@ xdescribe('/middleware/cloneAppointmentAndRedirect', () => {
         contactId: 'C9876',
       },
       uuid: request.params.id,
+    }
+
+    cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)
+
+    expect(mockedSetDataValue).toHaveBeenCalledWith(
+      request.session.data,
+      ['appointments', crn2, request.params.id],
+      expectedCloneReschedule,
+    )
+    expect(redirectSpy2).toHaveBeenCalledWith(
+      `/case/${crn2}/arrange-appointment/${request.params.id}/check-your-answers`,
+    )
+  })
+
+  it('should reuse existing id, add the linkedContactId and redirect to check answers when apptType is RESCHEDULE and in outcome journey', () => {
+    const { req: request, res: response } = setup()
+    const crn2 = request.params.crn
+    request.params.id = 'APPT123'
+    request.params.contactId = 'C9876'
+    request.url = '/outcome/next-appointment'
+    const redirectSpy2 = jest.spyOn(response, 'redirect')
+
+    const expectedCloneReschedule = {
+      ...expectedClone,
+      uuid: request.params.id,
+      linkedContactId: 'C9876',
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
     }
 
     cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)

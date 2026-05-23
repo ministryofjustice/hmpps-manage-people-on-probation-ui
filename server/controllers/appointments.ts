@@ -380,14 +380,14 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postNextAppointment: _hmppsAuthClient => {
     return async (req, res) => {
-      const { body } = req
+      const { body, session } = req
       const { crn, contactId, id: uuid } = req.params as Record<string, string>
       const id = uuid || contactId
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
       const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
-      const currentAppointment = getDataValue(req.session.data, ['appointments', crn, id])
+      const currentAppointment = getDataValue(session.data, ['appointments', crn, id])
       if (nextAppointment !== 'NO') {
         return cloneAppointmentAndRedirect(currentAppointment, nextAppointment)(req, res)
       }

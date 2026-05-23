@@ -52,8 +52,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     let date = ''
     let start = ''
     let end = ''
-    let sensitivity: YesNo | undefined
-    let sensitivityLocked: boolean | undefined
+    let sensitivity: YesNo | undefined = null
+    let sensitivityLocked: boolean | undefined = null
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -128,10 +128,12 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
     outcomeCode = contactOutcome?.[1]?.code || null
   }
-  appointmentSession.outcome = {
-    ...appointmentSession.outcome,
-    outcomeType,
-    outcomeCode,
+  if (appointmentSession?.outcome && outcomeType) {
+    appointmentSession.outcome = {
+      ...appointmentSession.outcome,
+      outcomeType,
+      outcomeCode,
+    }
   }
 
   res.locals.appointmentSession = appointmentSession
