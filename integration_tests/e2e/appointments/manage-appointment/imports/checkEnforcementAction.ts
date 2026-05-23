@@ -107,7 +107,6 @@ export const checkEnforcementAction = (enableNonCompliance = true) => {
             .getTaskStatus(2)
             .should('contain.html', 'class="govuk-tag govuk-tag--purple"')
             .should('contain.text', 'Refer to Offender Manager')
-          cy.pause()
         })
       })
       describe('Appointment has acceptable absence outcome', () => {
@@ -117,6 +116,7 @@ export const checkEnforcementAction = (enableNonCompliance = true) => {
       })
     } else {
       it('should not display a link to change the enforcement action', () => {
+        manageAppointmentPage = new ManageAppointmentPage()
         manageAppointmentPage.getTaskLink(2).should('contain.text', 'Add appointment notes')
       })
     }

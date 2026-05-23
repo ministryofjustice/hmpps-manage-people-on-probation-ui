@@ -57,6 +57,8 @@ const appointmentDetails = (enableNonCompliance = true) => {
         deliusManaged: true,
         hasOutcome: true,
         acceptableAbsence: true,
+        wasAbsent: true,
+        hasComplied: true,
         eventId: '2501192724',
       })
       loadPage()
@@ -75,6 +77,8 @@ const appointmentDetails = (enableNonCompliance = true) => {
         deliusManaged: true,
         hasOutcome: true,
         acceptableAbsence: false,
+        hasComplied: false,
+        wasAbsent: true,
         eventId: '2501192724',
       })
       loadPage()

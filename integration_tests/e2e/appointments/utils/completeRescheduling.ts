@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import AddNotePage from '../../../pages/appointments/add-note.page'
 import AttendedCompliedPage from '../../../pages/appointments/attended-complied.page'
 import AppointmentLocationDateTimePage from '../../../pages/appointments/location-date-time.page'
-import AppointmentNotePage from '../../../pages/appointments/note.page'
 import TextMessageConfirmationPage from '../../../pages/appointments/text-message-confirmation.page'
 import { completeOutcome } from './completeOutcome'
 
@@ -13,7 +12,6 @@ export const completeRescheduling = ({ id = '', inPast = false, enableNonComplia
   const rescheduledEndTime = '10:30'
   let attendedCompliedPage: AttendedCompliedPage
   let addNotePage: AddNotePage
-  let supportingInformationPage: AppointmentNotePage
   let textMessageConfirmPage: TextMessageConfirmationPage
   const future = DateTime.now().plus({ days: 2 })
   const yesterday = DateTime.now().minus({ days: 1 })
@@ -44,8 +42,5 @@ export const completeRescheduling = ({ id = '', inPast = false, enableNonComplia
     textMessageConfirmPage = new TextMessageConfirmationPage()
     textMessageConfirmPage.getSmsOptIn().find(`#appointments-${urlCrn}-${id}-smsOptIn`).click()
     textMessageConfirmPage.getSubmitBtn().click()
-    supportingInformationPage = new AppointmentNotePage()
-    cy.get(`#appointments-${urlCrn}-${id}-sensitivity-2`).click()
-    supportingInformationPage.getSubmitBtn().click()
   }
 }

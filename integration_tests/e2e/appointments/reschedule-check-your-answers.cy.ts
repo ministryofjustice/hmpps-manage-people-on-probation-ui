@@ -34,7 +34,6 @@ describe('Change appointment details and reschedule', () => {
       sendTextMessage: false,
       summaryHasDate: false,
     })
-
     cy.get('p')
       .eq(1)
       .should(

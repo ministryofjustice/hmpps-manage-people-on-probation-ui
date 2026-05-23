@@ -7,12 +7,14 @@ export const completeAddNotePage = ({
   journey = 'ARRANGE',
   value = 'Some notes',
   sensitivityIndex = 0,
+  sensitivityIsLocked = false,
 }: {
   crnOverride?: string
   idOverride?: string
   journey?: 'ARRANGE' | 'MANAGE'
   value?: string
   sensitivityIndex?: number
+  sensitivityIsLocked?: boolean
 } = {}) => {
   let id = journey === 'ARRANGE' ? uuid : appointmentId
   if (idOverride) id = idOverride
@@ -22,11 +24,13 @@ export const completeAddNotePage = ({
     .focus()
     .clear()
     .type(value)
-  addNotePage
-    .getSensitiveInformation()
-    .find('.govuk-radios__item')
-    .eq(sensitivityIndex)
-    .find('.govuk-radios__input')
-    .click()
+  if (!sensitivityIsLocked) {
+    addNotePage
+      .getSensitiveInformation()
+      .find('.govuk-radios__item')
+      .eq(sensitivityIndex)
+      .find('.govuk-radios__input')
+      .click()
+  }
   addNotePage.getSubmitBtn().click()
 }

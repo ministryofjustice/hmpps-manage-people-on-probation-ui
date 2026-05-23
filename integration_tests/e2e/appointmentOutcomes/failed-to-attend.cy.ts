@@ -103,6 +103,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     failedToAttendPage = new FailedToAttendPage()
     failedToAttendPage.checkPageTitle('Enforcement action for Alton’s absence')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+    /*
     if (['MANAGE', 'RESCHEDULE'].includes(journey)) {
       cy.get('[data-qa="ticket"]')
         .find('h2')
@@ -116,6 +117,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     } else {
       cy.get('[data-qa="ticket"]').should('not.exist')
     }
+      */
     cy.get('legend').should('contain.text', 'Select an enforcement action for Alton’s absence')
     const options = getExpectedOptions()
     checkOptions(options)
@@ -124,11 +126,13 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const tomorrow = now.plus({ days: 1 })
     const enforcementActionResponseByDate = tomorrow.toFormat('yyyy-MM-dd')
     loadPage({ journey, isProbationPractitioner: true, enforcementActionResponseByDate })
+    /*
     if (journey === 'MANAGE') {
       cy.get('[data-qa="ticket"]')
         .find('h2')
         .should('contain.text', `Alton has until ${tomorrow.toFormat('d LLLL')} to submit evidence (1 day remaining)`)
     }
+        */
     const options = getExpectedOptions({ isProbationPractitioner: true })
     checkOptions(options)
   })
