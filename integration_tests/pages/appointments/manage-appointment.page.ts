@@ -14,6 +14,10 @@ export default class ManageAppointmentPage extends Page {
     return cy.get(`[data-qa="appointmentDetails"]`)
   }
 
+  getRelatedContacts = () => {
+    return cy.get(`[data-qa="relatedContacts"]`)
+  }
+
   getAssociatedDocuments = () => {
     return cy.get(`[data-qa="associatedDocuments"]`)
   }
@@ -65,4 +69,9 @@ export default class ManageAppointmentPage extends Page {
   getLastUpdated = () => cy.get('[data-qa="lastUpdated"]')
 
   getPageHeading = () => cy.get('[data-qa="pageHeading"]')
+
+  getRelatedContact = (index: number) => cy.get(`[data-qa="relatedContacts"] li:nth-child(${index})`)
+
+  getRelatedContactLink = (index: number) =>
+    cy.get(`[data-qa="relatedContacts"] li:nth-child(${index})`).find('.govuk-link')
 }
