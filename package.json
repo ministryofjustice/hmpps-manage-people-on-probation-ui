@@ -255,6 +255,7 @@
       "cookie": "0.7.2"
     },
     "formidable": "3.5.4",
+    "uuid": "$uuid",
     "cross-spawn": "7.0.6",
     "qs": "^6.14.1",
     "@cypress/code-coverage": {
