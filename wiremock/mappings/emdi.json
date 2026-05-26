@@ -1,0 +1,19 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/emdi/people/exists/.*",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uri": "http://emdi-people-gps-loc"
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    }
+  ]
+}

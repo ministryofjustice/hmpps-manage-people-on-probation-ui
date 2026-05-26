@@ -85,6 +85,7 @@ describe('riskController', () => {
     })
     describe('getSentence', () => {
       beforeEach(async () => {
+        res.locals.flags = { enableEMDISentencesShowGPSData: true }
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
       })
       checkAuditMessage(res, 'VIEW_MAS_SENTENCE', uuidv4(), crn, 'CRN')

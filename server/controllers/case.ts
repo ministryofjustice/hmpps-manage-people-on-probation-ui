@@ -6,6 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import { filterContacts } from '../middleware/filterContacts'
 import { getCheckinOffenderDetails } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
+import { existsInEMDI } from '../middleware/existsInEMDI'
 
 const routes = ['getCase'] as const
 
@@ -42,6 +43,10 @@ const caseController: Controller<typeof routes, void> = {
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
+      if (res.locals.flags.enableEMDIOverviewShowGPSData) {
+        res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
+      }
+
       return res.render('pages/overview', {
         overview,
         needs,

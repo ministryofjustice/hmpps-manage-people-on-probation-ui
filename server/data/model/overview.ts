@@ -1,5 +1,6 @@
 import { Mappa } from './risk'
 import { Name, PersonalCircumstance } from './personalDetails'
+import { LicenceCondition, Requirement } from './sentenceDetails'
 
 export interface Overview {
   absencesWithoutEvidence: number
@@ -23,6 +24,8 @@ export interface Sentence {
   mainOffence: Offence
   order?: Order
   rarDescription?: string
+  licenceConditions?: LicenceCondition[]
+  requirements?: Requirement[]
 }
 
 export interface Rar {

@@ -7,6 +7,12 @@
 {% set headerCRN = crn %}
 {% set headerDob = sentenceDetails.personSummary.dateOfBirth %}
 {% set headerGender = sentenceDetails.personSummary.gender %}
+{% set licencesEMDILink %}
+    <a class="govuk-link" href="{{ locationMonitoringUri }}">View GPS location monitoring data</a>
+{% endset %}
+{% set requirementsEMDILink %}
+    <a class="govuk-link" href="{{ locationMonitoringUri }}">View(GPS tagging) Trail Monitoring data</a>
+{% endset %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -156,7 +162,11 @@
                                   {
                                       key: { text: 'Notes' },
                                       value: { html: notes }
-                                  }
+                                  },
+                                  {
+                                      key: { text: 'GPS Data' },
+                                      value: { html: licencesEMDILink | safe }
+                                  } if flags.enableEMDISentencesShowGPSData and locationMonitoringUri
                               ]
                           }) }}
                     {% endset %}
@@ -215,7 +225,11 @@
                                   {
                                       key: { text: 'Notes' },
                                       value: { html: reqNotes }
-                                  }
+                                  },
+                                  {
+                                      key: { text: 'GPS Data' },
+                                      value: { html: requirementsEMDILink | safe }
+                                  } if flags.enableEMDISentencesShowGPSData and locationMonitoringUri
                               ]
                           }) }}
                     {% endset %}
