@@ -8,6 +8,10 @@ export const getBreach = async (
   crn: string,
   selectedSentence: number,
 ): Promise<SentenceCompliance | null> => {
+  if (!Number.isFinite(Number(selectedSentence))) {
+    return null
+  }
+
   try {
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
@@ -17,6 +21,10 @@ export const getBreach = async (
     ])
 
     const sentence = popSentences.sentences.find(({ id }) => String(id) === String(selectedSentence))
+
+    if (!sentence) {
+      return null
+    }
 
     return (
       compliance.currentSentences.find(
