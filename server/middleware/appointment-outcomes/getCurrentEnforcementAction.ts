@@ -30,11 +30,8 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
       evidenceDueDate = dateWithYear(responseByDate)
       const date = DateTime.fromISO(responseByDate).startOf('day')
       const today = DateTime.now().startOf('day')
-      const daysBetween = Math.ceil(date.diff(today, 'days').days)
-      evidenceWarning =
-        daysBetween >= 0
-          ? `${forename} has until ${DateTime.fromISO(responseByDate).toFormat('d MMMM')} to submit evidence (${daysBetween} day${daysBetween !== 1 ? 's' : ''} remaining)`
-          : null
+      const daysBetween = Math.max(0, Math.ceil(date.diff(today, 'days').days))
+      evidenceWarning = `${forename} has until ${DateTime.fromISO(responseByDate).toFormat('d MMMM')} to submit evidence (${daysBetween} day${daysBetween !== 1 ? 's' : ''} remaining)`
     }
     const map: Map = {
       NO_FURTHER_ACTION: 'GREEN',
@@ -44,8 +41,8 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
     if (map?.[action]) {
       tagColour = map[action]
     }
-    const { outcomeType } = appointmentSession.outcome
-    const link = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
+    const outcomeType = appointmentSession?.outcome?.outcomeType
+    const link = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)?.[outcomeType] : baseOutcomeUrl
     currentEnforcementAction = {
       description,
       action,

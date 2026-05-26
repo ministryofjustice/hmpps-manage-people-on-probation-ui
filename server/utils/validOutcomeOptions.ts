@@ -12,7 +12,7 @@ export const validOutcomeOptions = (
   options: Option<AppointmentOutcomeType>[],
 ): Option<AppointmentOutcomeType>[] => {
   const ignore: AppointmentOutcomeType[] = ['WILL_BE_RESCHEDULED']
-  if (!contactOutcomes) return options
+  if (!contactOutcomes?.length) return options
   return options.filter(
     ({ value }) =>
       (outcomeMap?.[value]?.code &&
@@ -33,7 +33,7 @@ export const validEnforcementActionOptions = <
     'NO_FURTHER_ACTION',
     'DIFFERENT_ACTION',
   ]
-  if (!contactEnforcementActions) return options
+  if (!contactEnforcementActions?.length) return options
   return options.filter(
     ({ value, divider }) =>
       (value &&

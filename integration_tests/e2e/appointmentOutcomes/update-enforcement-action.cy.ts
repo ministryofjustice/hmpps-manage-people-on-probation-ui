@@ -34,6 +34,7 @@ const loadPage = ({
     notes: false,
     acceptableAbsence,
     action,
+    outcome: action ? 'Attended - Failed To Comply' : null,
     enforcementAction: {
       code,
       description: action,
