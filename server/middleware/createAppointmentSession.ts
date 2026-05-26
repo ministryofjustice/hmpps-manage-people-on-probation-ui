@@ -8,7 +8,7 @@ import { persistOutcomeAndAction } from './appointment-outcomes/persistOutcomeAn
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
-export const createAppointmentSession = (req: Request, res: AppResponse, next?: NextFunction) => {
+export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
@@ -118,32 +118,14 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
   }
 
   // persist the logged outcome and action 👇
-  appointmentSession.outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
-
-  const outcome = appointment?.outcome
-  let outcomeType: AppointmentOutcomeType | null = null
-  let outcomeCode: OutcomeCode | null = null
+  const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
   if (outcome) {
-    const contactOutcome = Object.entries(outcomeMap).find(
-      ([_key, { description }]) => description.toLowerCase() === outcome.toLowerCase(),
-    )
-    outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
-    outcomeCode = contactOutcome?.[1]?.code || null
-  }
-  if (outcomeType) {
-    appointmentSession.outcome = {
-      ...(appointmentSession?.outcome || {}),
-      outcomeType,
-      outcomeCode,
-    }
+    appointmentSession.outcome = outcome
   }
 
   res.locals.appointmentSession = appointmentSession
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)
   }
-  if (next) {
-    return next()
-  }
-  return null
+  return next()
 }

@@ -259,10 +259,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
-    redirectWizard([
-      { path: ['outcome', 'outcomeType'] },
-      { path: enforcementActionDataPaths, value: ['SEND_LETTER'] },
-    ]),
+    redirectWizard([{ path: ['outcome', 'outcomeType'] }, { path: enforcementActionDataPaths }]), // 👈 Can only match that any enforcement action has been logged
     controllers.appointmentOutcomes.getSendLetter(),
   )
   router.post(

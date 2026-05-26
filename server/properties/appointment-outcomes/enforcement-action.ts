@@ -82,4 +82,8 @@ export const enforcementActionOptions = (name: string = ''): Option<AppointmentE
     value: 'WITHDRAWAL_OF_WARNING',
     text: 'Withdrawal of warning',
   },
+  {
+    value: 'DECISION_PENDING_RESPONSE',
+    text: 'Decision pending response',
+  },
 ]

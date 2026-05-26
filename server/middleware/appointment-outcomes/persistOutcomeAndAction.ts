@@ -63,13 +63,13 @@ export const persistOutcomeAndAction = (
           if (actionKey) {
             if (match.options.find(option => option?.value === actionKey)) {
               actionPageKey = match.key
-            } else if (enforcementActionOptions().find(option => option.value === actionKey)) {
-              actionPageKey = 'otherEnforcementAction'
             } else if (letterTypeOptions.find(option => option.value === actionKey)) {
               actionPageKey = 'letterType'
+            } else if (enforcementActionOptions().find(option => option.value === actionKey)) {
+              actionPageKey = 'otherEnforcementAction'
             }
             if (actionPageKey) {
-              outcomeSession = { ...outcomeSession, [actionPageKey]: actionKey }
+              outcomeSession = { ...outcomeSession, [actionPageKey]: actionKey, enforcementActionCode: [actionCode] }
             }
           }
         }
