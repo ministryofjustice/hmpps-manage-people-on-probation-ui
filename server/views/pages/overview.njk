@@ -178,6 +178,128 @@
             }) }}
   {% endset %}
 
+    {# ------------------------------------------------------------------ #}
+    {# SUPERVISION PACKAGE COMPONENT                                      #}
+    {# ------------------------------------------------------------------ #}
+    {% set supervisionPackage %}
+
+        <div class="app-supervision-package govuk-!-margin-bottom-6">
+
+            <div class="govuk-grid-row">
+
+                <div class="govuk-grid-column-one-half">
+
+                    <h2 class="govuk-heading-l govuk-!-margin-bottom-2">
+                        Supervision package
+                    </h2>
+
+                    <div class="govuk-!-margin-bottom-3">
+                        <strong class="govuk-body">Tier C</strong>
+
+                        <strong class="govuk-tag govuk-tag--orange govuk-!-margin-left-2">
+                            Provisional
+                        </strong>
+                    </div>
+
+                    <div class="app-supervision-package__warning govuk-!-margin-bottom-4">
+        <span class="app-supervision-package__warning-icon">
+          !
+        </span>
+
+                        <span class="govuk-!-font-weight-bold">
+          There is no ROSH summary
+        </span>
+                    </div>
+
+                    <p class="govuk-body-s govuk-!-margin-bottom-1">
+                        Last updated: 12 May 2026
+                    </p>
+
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        The supervision package was created on 12 May 2026.
+                    </p>
+
+                    <a href="#" class="govuk-link govuk-body-s">
+                        View change history
+                    </a>
+
+                </div>
+
+                <div class="govuk-grid-column-one-half">
+
+                    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
+                        Phase: early engagement
+                    </h3>
+
+                    <p class="govuk-body">
+                        You should see Stuart every week for the first 8 weeks of their sentence.
+                    </p>
+
+                    <div class="app-supervision-package__timeline govuk-!-margin-top-6">
+
+                        <div class="app-supervision-package__marker"></div>
+
+                        <div class="app-supervision-package__bar">
+
+                            <div class="app-supervision-package__phase app-supervision-package__phase--current">
+            <span class="app-supervision-package__label">
+              Early engagement
+            </span>
+
+                                <span class="app-supervision-package__meta">
+              Weekly for 8 weeks
+            </span>
+                            </div>
+
+                            <div class="app-supervision-package__phase app-supervision-package__phase--future">
+            <span class="app-supervision-package__label">
+              Standard supervision
+            </span>
+
+                                <span class="app-supervision-package__meta">
+              Ends on 29 June 2026
+            </span>
+                            </div>
+
+                            <div class="app-supervision-package__phase app-supervision-package__phase--end">
+            <span class="app-supervision-package__label">
+              Early termination
+            </span>
+
+                                <span class="app-supervision-package__meta">
+              Assess if eligible
+            </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="govuk-button-group govuk-!-margin-top-9">
+
+                <button class="govuk-button" data-module="govuk-button">
+                    Complete risk assessment
+                </button>
+
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Arrange an appointment
+                </button>
+
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Update NDelius risk flags
+                </button>
+
+            </div>
+
+        </div>
+
+    {% endset %}
+
+    {{ supervisionPackage | safe }}
+
   {{ appSummaryCard({
       titleText: 'Appointments',
       headingLevel: 3,
