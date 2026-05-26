@@ -6,7 +6,11 @@ import logger from '../../logger'
 export const getUpcomingCheckinDetails = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn } = req.params as Record<string, string>
-
+    const checkinStatus = res.locals.offenderCheckinsByCRNResponse?.status
+    if (checkinStatus !== 'VERIFIED') {
+      res.locals.upcomingCheckin = null
+      return
+    }
     try {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupervisionClient = new ESupervisionClient(token)
