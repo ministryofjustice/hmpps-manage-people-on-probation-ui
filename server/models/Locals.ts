@@ -178,6 +178,11 @@ export interface AppointmentOutcomeEnforcementAction {
   responseByDays?: number
 }
 
+export interface BreachWarning {
+  order: string
+  breachDate: string
+}
+
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE'
 
 export interface OutcomeSummary {
@@ -222,6 +227,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
+  breachWarning?: BreachWarning | null
   currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
   notePrepend?: string
   summary?: OutcomeSummary

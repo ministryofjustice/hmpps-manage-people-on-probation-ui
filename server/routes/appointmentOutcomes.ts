@@ -32,6 +32,7 @@ import {
   getOutcomeSummary,
   getNotePrepend,
   resetSelectedActions,
+  getBreach,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -72,6 +73,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     getOutcomeProps,
     getBackLink,
+    getBreach(hmppsAuthClient),
   )
 
   /* get readable enforcement action from current appointment 👇 */
@@ -143,7 +145,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Outcome index 👇 */
 
-  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome(hmppsAuthClient))
+  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
   router.post([arrangeBasePath, manageBasePath], resetSelectedActions(), controllers.appointmentOutcomes.postOutcome())
 
   /* Attended - failed to comply 👇 */
@@ -184,7 +186,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    controllers.appointmentOutcomes.getAcceptableAbsence(hmppsAuthClient),
+    controllers.appointmentOutcomes.getAcceptableAbsence(),
   )
   router.post(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
@@ -195,7 +197,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
-    controllers.appointmentOutcomes.getUnacceptableAbsence(hmppsAuthClient),
+    controllers.appointmentOutcomes.getUnacceptableAbsence(),
   )
   router.post(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
@@ -206,7 +208,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    controllers.appointmentOutcomes.getFailedToAttend(hmppsAuthClient),
+    controllers.appointmentOutcomes.getFailedToAttend(),
   )
   router.post(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
@@ -217,7 +219,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
-    controllers.appointmentOutcomes.getEnforcementAction(hmppsAuthClient),
+    controllers.appointmentOutcomes.getEnforcementAction(),
   )
   router.post(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
@@ -228,7 +230,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
-    controllers.appointmentOutcomes.getInitiateBreachOrRecall(hmppsAuthClient),
+    controllers.appointmentOutcomes.getInitiateBreachOrRecall(),
   )
   router.post(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
@@ -239,7 +241,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
-    controllers.appointmentOutcomes.getSendLetter(hmppsAuthClient),
+    controllers.appointmentOutcomes.getSendLetter(),
   )
   router.post(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
@@ -250,7 +252,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
-    controllers.appointmentOutcomes.getUpdateEnforcementAction(hmppsAuthClient),
+    controllers.appointmentOutcomes.getUpdateEnforcementAction(),
   )
   router.post(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],

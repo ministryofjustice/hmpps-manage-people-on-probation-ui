@@ -336,6 +336,13 @@ const checkPage = () => {
   })
 
   describe('breach warning banner', () => {
+    it('should show when breach is active and enableNonCompliance is enabled', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      updateEnforcementActionPage = new UpdateEnforcementActionPage()
+      updateEnforcementActionPage.getBreachWarning().should('exist')
+    })
+
     it('should not show when there is no active breach', () => {
       loadPage()
       updateEnforcementActionPage = new UpdateEnforcementActionPage()

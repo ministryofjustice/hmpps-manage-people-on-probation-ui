@@ -1,5 +1,3 @@
-import Page, { PageElement } from '../page'
+import Page from '../page'
 
-export default class AttendedFailedToComplyPage extends Page {
-  getBreachWarning = (): PageElement => cy.get('[data-qa="breach-warning"]')
-}
+export default class AttendedFailedToComplyPage extends Page {}

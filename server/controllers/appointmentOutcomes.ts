@@ -1,26 +1,11 @@
-import { Request, Response } from 'express'
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
-import { AppResponse } from '../models/Locals'
+import { type AppResponse } from '../models/Locals'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
-import { getDataValue } from '../utils'
-import { getBreach } from '../middleware/appointment-outcomes/getBreach'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
-
-async function getBreachInfo(
-  hmppsAuthClient: Parameters<typeof getBreach>[0],
-  req: Request,
-  res: Response,
-): Promise<Awaited<ReturnType<typeof getBreach>> | null> {
-  if (!res.locals?.flags?.enableNonCompliance) return null
-  const { params, session } = req
-  const { headerCRN, user } = res.locals
-  const selectedSentence = getDataValue(session.data, ['appointments', headerCRN, params.id, 'eventId'])
-  return getBreach(hmppsAuthClient, user.username, headerCRN, selectedSentence)
-}
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -40,10 +25,9 @@ export const appointmentOutcomeRequests = [
 ] as const
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
-  getOutcome: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/outcome', { breach })
+  getOutcome: _hmppsAuthClient => {
+    return async (_req, res) => {
+      return res.render('pages/appointment-outcomes/outcome')
     }
   },
   postOutcome: _hmppsAuthClient => {
@@ -132,55 +116,17 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
-  getAttendedFailedToComply: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/attended-failed-to-comply', { breach })
-    }
-  },
-
-  getUnacceptableAbsence: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/unacceptable-absence', { breach })
-    }
-  },
-  getFailedToAttend: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/failed-to-attend', { breach })
-    }
-  },
-  getEnforcementAction: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/enforcement-action', { breach })
-    }
-  },
-  getInitiateBreachOrRecall: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/initiate-breach-or-recall', { breach })
-    }
-  },
-  getSendLetter: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/send-letter', { breach })
-    }
-  },
-  getUpdateEnforcementAction: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/update-enforcement-action', { breach })
-    }
-  },
-  getAcceptableAbsence: hmppsAuthClient => {
-    return async (req, res) => {
-      const breach = await getBreachInfo(hmppsAuthClient, req, res)
-      return res.render('pages/appointment-outcomes/acceptable-absence', { breach })
-    }
-  },
+  getAttendedFailedToComply: _hmppsAuthClient => async (_req, res) =>
+    res.render('pages/appointment-outcomes/attended-failed-to-comply'),
+  getAcceptableAbsence: () => async (_req, res) => res.render('pages/appointment-outcomes/acceptable-absence'),
+  getUnacceptableAbsence: () => async (_req, res) => res.render('pages/appointment-outcomes/unacceptable-absence'),
+  getFailedToAttend: () => async (_req, res) => res.render('pages/appointment-outcomes/failed-to-attend'),
+  getEnforcementAction: () => async (_req, res) => res.render('pages/appointment-outcomes/enforcement-action'),
+  getInitiateBreachOrRecall: () => async (_req, res) =>
+    res.render('pages/appointment-outcomes/initiate-breach-or-recall'),
+  getSendLetter: () => async (_req, res) => res.render('pages/appointment-outcomes/send-letter'),
+  getUpdateEnforcementAction: () => async (_req, res) =>
+    res.render('pages/appointment-outcomes/update-enforcement-action'),
 }
 
 export default appointmentOutcomesController

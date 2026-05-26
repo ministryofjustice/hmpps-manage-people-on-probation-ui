@@ -1,20 +1,11 @@
-{% extends "../_form.njk" %}
+{% extends "../_appointment-outcome-form.njk" %}
 {% set outcome = 'acceptable absence' if appointmentOutcome.appointment.acceptableAbsence == true else 
   'failure to comply' %}
 {% set title = 'Update enforcement action for ' + appointmentOutcome.forename + '’s ' + outcome %}
 {% set backLink = appointmentOutcome.backLink %}
 {% set hideButton = true %}
 {% block afterHeading %}
-  {% if breach %}
-    {{ mojAlert({
-    variant: "warning",
-    title: "There is a live breach for this sentence",
-    showTitleAsHeading: true,
-    dismissible: false,
-    attributes: { "data-qa": "breach-warning" },
-    text: 'The breach for '+ breach.order.description + ' was initiated on ' + breach.activeBreach.startDate | dateWithYear
-  }) }}
-  {% endif %}
+  {{ super() }}
   {% if appointmentOutcome.currentEnforcementAction %}
     {{ govukInsetText({
   html: "The current enforcement status is: " + govukTag({
@@ -42,7 +33,7 @@
                     attributes: { "data-qa": "submit-btn" }
                 }) }}
     <a class="govuk-link" href="{{ backLink }}" data-qa="cancelGoBackLink">
-      Cancel and go back
-    </a>
+                    Cancel and go back
+                </a>
   </div>
 {% endblock %}

@@ -37,9 +37,6 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/arnsApiClient')
-jest.mock('../middleware/appointment-outcomes/getBreach', () => ({
-  getBreach: jest.fn().mockResolvedValue(null),
-}))
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -65,7 +62,7 @@ const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue
 const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
 
-const baseUrl = '/case/X000001/appointments/appointment/1234'
+const baseUrl = '/crn/X000001/appointments/appointment/1234'
 const baseOutcomeUrl = '/case/X000001/appointments/appointment/1234/outcome'
 const completedUrl = `/completed/route`
 
@@ -178,7 +175,7 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes()
       const spy = jest.spyOn(res, 'render')
       await controllers.appointmentOutcomes.getOutcome(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/outcome', { breach: null })
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/outcome')
     })
 
     it('should send an audit message when getAddNote is called', async () => {
@@ -263,7 +260,7 @@ describe('controllers/appointmentOutcomes', () => {
         const res = mockRes()
         const spy = jest.spyOn(res, 'render')
         await controllers.appointmentOutcomes[controllerName](hmppsAuthClient)(mockReq(), res)
-        expect(spy).toHaveBeenCalledWith(viewName, { breach: null })
+        expect(spy).toHaveBeenCalledWith(viewName)
       },
     )
   })
