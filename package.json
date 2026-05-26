@@ -267,7 +267,7 @@
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "^3.14.0"
     },
-    "fast-xml-parser": "5.5.7",
+    "fast-xml-parser": "5.7.0",
     "serialize-javascript": "^7.0.3"
   }
 }
