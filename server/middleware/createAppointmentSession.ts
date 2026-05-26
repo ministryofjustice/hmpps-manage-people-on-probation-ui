@@ -4,11 +4,12 @@ import { isoToDateTime, setDataValue } from '../utils'
 import { AppointmentOutcomeType, AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
 import { type OutcomeCode, outcomeMap } from '../properties/appointment-outcomes'
+import { persistOutcomeAndAction } from './appointment-outcomes/persistOutcomeAndAction'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
 export const createAppointmentSession = (req: Request, res: AppResponse, next?: NextFunction) => {
-  const { appointment } = res.locals.personAppointment
+  const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
   let appointmentSession: AppointmentSession = {
@@ -116,7 +117,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     appointmentSession.smsOptIn = null
   }
 
-  // Hydrate the logged outcome 👇
+  // persist the logged outcome and action 👇
+  appointmentSession.outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
 
   const outcome = appointment?.outcome
   let outcomeType: AppointmentOutcomeType | null = null
@@ -128,9 +130,9 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
     outcomeCode = contactOutcome?.[1]?.code || null
   }
-  if (appointmentSession?.outcome && outcomeType) {
+  if (outcomeType) {
     appointmentSession.outcome = {
-      ...appointmentSession.outcome,
+      ...(appointmentSession?.outcome || {}),
       outcomeType,
       outcomeCode,
     }

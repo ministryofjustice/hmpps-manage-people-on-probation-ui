@@ -1,5 +1,6 @@
 import { Name, PersonSummary, Document, Address } from './personalDetails'
 import { Note } from './note'
+import { EnforcementActionCode } from '../../properties/appointment-outcomes'
 
 export interface Schedule {
   personSummary: PersonSummary
@@ -145,7 +146,7 @@ export interface Activity {
 }
 
 export interface PersonAppointmentEnforcementAction {
-  code?: string
+  code?: EnforcementActionCode
   description?: string
   responseByDate?: string
 }

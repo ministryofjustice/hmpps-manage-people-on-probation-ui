@@ -1,7 +1,7 @@
 import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 
-export const enforcementActionOptions = (name: string): Option<AppointmentEnforcementAction | ''>[] => [
+export const enforcementActionOptions = (name: string = ''): Option<AppointmentEnforcementAction | ''>[] => [
   {
     value: '',
     text: 'Select enforcement action',
