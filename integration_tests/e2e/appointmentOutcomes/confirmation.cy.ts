@@ -8,6 +8,7 @@ import ConfirmationOutcomePage from '../../pages/appointmentOutcomes/confirmatio
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
+import OverviewPage from '../../pages/overview'
 import { appointmentId, crn } from '../appointments/imports/common'
 import { completeOutcome, completeAddNotePage } from '../appointments/utils'
 
@@ -15,6 +16,7 @@ let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
 let confirmationPage: ConfirmationOutcomePage
 let nextAppointmentPage: NextAppointmentPage
+let overviewPage: OverviewPage
 
 interface Props {
   outcome?: AppointmentOutcomeType
@@ -212,6 +214,31 @@ const checkPage = () => {
       confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
       confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
       confirmationPage.getFurtherActionLinks().should('have.length', 2)
+    })
+  })
+  describe('User click the return to overview button', () => {
+    it('should return to the overview page', () => {
+      loadPage({
+        outcome: 'UNACCEPTABLE_ABSENCE',
+        action: 'NO_FURTHER_ACTION',
+      })
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.getSubmitBtn().should('contain.text', 'Return to Alton’s overview').click()
+      overviewPage = new OverviewPage()
+      overviewPage.checkOnPage()
+      cy.get('[data-qa=name]').should('contain.text', 'Alton Berge')
+    })
+  })
+  describe('User click the return to manage appointment link', () => {
+    it('should return to the manage appointment page', () => {
+      loadPage({
+        outcome: 'UNACCEPTABLE_ABSENCE',
+        action: 'NO_FURTHER_ACTION',
+      })
+      confirmationPage = new ConfirmationOutcomePage()
+      cy.get('[data-qa=returnToManageAppointment]').should('contain.text', 'Return to manage appointment').click()
+      manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.checkPageTitle('Manage 3 way meeting (NS) with Terry Jones')
     })
   })
 }

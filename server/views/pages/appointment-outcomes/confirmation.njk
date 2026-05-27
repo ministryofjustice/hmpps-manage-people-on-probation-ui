@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
-{% set buttonText = "Return to " + appointmentOutcome.forename + "'s overview" %}
+{% set buttonText = "Return to " + appointmentOutcome.forename + "’s overview" %}
 {% set title = appointmentOutcome.confirmation.title %}
 {% set notStandardForm = true %}
 {% set panelHtml %}
@@ -40,19 +40,20 @@
             </div>
         {% endif %}
         <div class="govuk-grid-column-two-thirds govuk-!-margin-top-4">
-            <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            <form method="post" autocomplete="off" action="">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                 <div class="govuk-button-group">
                     {{ govukButton({
       html: buttonText,
+      href: '/case/' + appointmentOutcome.crn,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-                    <a class="govuk-link" href="{{ cases }}" data-qa="returnToManageAppointment">
+                    <a class="govuk-link" href="/case/{{ appointmentOutcome.crn }}/appointments/appointment/{{ appointmentOutcome.contactId }}/manage" data-qa="returnToManageAppointment">
       Return to manage appointment
     </a>
                 </div>
-                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             </form>
         </div>
     </div>

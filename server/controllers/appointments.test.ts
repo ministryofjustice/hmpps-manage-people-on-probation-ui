@@ -178,7 +178,7 @@ const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(mockPractitioner))
 
-xdescribe('controllers/appointments', () => {
+describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({

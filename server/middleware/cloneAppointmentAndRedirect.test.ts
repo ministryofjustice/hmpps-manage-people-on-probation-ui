@@ -65,7 +65,7 @@ function setup() {
   return { req, res }
 }
 
-xdescribe('/middleware/cloneAppointmentAndRedirect', () => {
+describe('/middleware/cloneAppointmentAndRedirect', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -79,7 +79,6 @@ xdescribe('/middleware/cloneAppointmentAndRedirect', () => {
     start: '',
     end: '',
     uuid,
-    linkedContactId: 'C9876',
     sensitivityLocked: false,
   }
 

@@ -299,6 +299,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/check-your-answers`, `${manageBasePath}/check-your-answers`],
+    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     getNextComAppointment(hmppsAuthClient),
     getNotePrepend,
     getOutcomeSummary,
@@ -311,12 +312,17 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/confirmation`, `${manageBasePath}/confirmation`],
+    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     getOverdueOutcomes(hmppsAuthClient),
     getConfirmation,
     controllers.appointmentOutcomes.getConfirmation(hmppsAuthClient),
   )
 
-  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+  router.get(
+    `${arrangeBasePath}/add-note`,
+    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
+    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
+  )
 
   router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
 }

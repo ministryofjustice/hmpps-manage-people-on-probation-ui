@@ -182,7 +182,7 @@ const expectedSession = (
   }
 }
 
-xdescribe('/middleware/createAppointmentSession', () => {
+describe('/middleware/createAppointmentSession', () => {
   const mockReq = (nextAppointment = 'KEEP_TYPE') => {
     return httpMocks.createRequest({
       params: {

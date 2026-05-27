@@ -30,7 +30,7 @@ const buildResponse = ({
 const req = httpMocks.createRequest()
 const nextSpy = jest.fn()
 
-xdescribe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
+describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
   it('should not set the current enforcement action to null if does not exist', () => {
     const res = buildResponse()
     getCurrentEnforcementAction(req, res, nextSpy)

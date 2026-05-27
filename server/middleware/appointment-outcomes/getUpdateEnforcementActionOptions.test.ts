@@ -55,7 +55,7 @@ const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.M
 const nextSpy = jest.fn()
 const req = httpMocks.createRequest()
 
-xdescribe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
+describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
   it('should define the correct options if current enforcement action is LETTER related', () => {
     const res = buildResponse()
     validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
