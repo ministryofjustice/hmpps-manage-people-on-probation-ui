@@ -23,7 +23,6 @@ import {
   getEnforcementActionOptions,
   getBreachNSICreatedByOptions,
   getSendLetterOptions,
-  getOutcomeEvidenceBy,
   getOutcomeOptions,
   getOutcomeProps,
   getFailedToAttendOptions,
@@ -108,11 +107,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAcceptableAbsenceOptions,
   )
 
-  router.all(
-    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    getFailedToAttendOptions,
-    getOutcomeEvidenceBy,
-  )
+  router.all([`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`], getFailedToAttendOptions)
 
   router.all(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
