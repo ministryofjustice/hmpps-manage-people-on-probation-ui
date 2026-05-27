@@ -30,7 +30,7 @@ services:
       - ARNS_ASSESSMENT_PLATFORM_API_URL=http://wiremock:8080/assessment-platform
       - PROBATION_FRONTEND_COMPONENTS_API_URL=http://wiremock:8080/probation-frontend-components
       - E_SUPERVISION_API_URL=http://wiremock:8080/esupervision
-      - E_SUPERVISION_API_URL=http://wiremock:8080/emdi
+      - EMDI_API_URL=http://wiremock:8080/emdi
       - AUDIT_ENABLED=false
       - API_CLIENT_ID=clientid
       - API_CLIENT_SECRET=clientsecret
