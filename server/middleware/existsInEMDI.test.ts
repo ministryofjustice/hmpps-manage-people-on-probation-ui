@@ -12,7 +12,7 @@ describe('existsInEMDI', () => {
     jest.clearAllMocks()
   })
 
-  it('should return the uri when the person exists in EMDI', async () => {
+  it('should return undefined', async () => {
     const mockResponse = { uri: '/people/X123456' }
     mockEMDIClient.prototype.existsInEMDI.mockResolvedValue(mockResponse)
 
@@ -20,7 +20,18 @@ describe('existsInEMDI', () => {
 
     expect(EMDIClient).toHaveBeenCalledWith(token)
     expect(mockEMDIClient.prototype.existsInEMDI).toHaveBeenCalledWith(crn)
-    expect(result).toBe('/people/X123456')
+    expect(result).toBe(undefined)
+  })
+
+  it('should return the uri when the person exists in EMDI', async () => {
+    const mockResponse = { uri: 'https://emdi/people/X123456' }
+    mockEMDIClient.prototype.existsInEMDI.mockResolvedValue(mockResponse)
+
+    const result = await existsInEMDI(crn, token)
+
+    expect(EMDIClient).toHaveBeenCalledWith(token)
+    expect(mockEMDIClient.prototype.existsInEMDI).toHaveBeenCalledWith(crn)
+    expect(result).toBe('https://emdi/people/X123456')
   })
 
   it('should return undefined when the person does not exist in EMDI', async () => {

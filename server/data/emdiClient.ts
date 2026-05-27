@@ -11,6 +11,12 @@ export default class EMDIClient extends RestClient {
   }
 
   async existsInEMDI(crn: string): Promise<PersonExistsResponse | null> {
-    return this.get({ path: `/people/exists/${crn}`, handle404: true })
+    return this.get({
+      path: `/people/exists/${crn}`,
+      handle404: true,
+      handle500: true,
+      errorMessage:
+        'The EMDI service is experiencing technical difficulties. It has not been possible to provide EMDI information',
+    })
   }
 }

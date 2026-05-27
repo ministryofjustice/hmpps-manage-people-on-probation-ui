@@ -1,11 +1,11 @@
 import { LicenceCondition, Requirement } from '../data/model/sentenceDetails'
 
 export const checkLocationMonitoring = (
-  licenceConditions: LicenceCondition[],
-  requirements: Requirement[],
+  licenceConditions: LicenceCondition[] | null | undefined,
+  requirements: Requirement[] | null | undefined,
 ): {
-  hasLicenceConditionsLMData?: boolean
-  hasRequirementsLMData?: boolean
+  hasLicenceConditionsLMData: boolean
+  hasRequirementsLMData: boolean
 } => {
   const hasLicenceConditionsLMData = (licenceConditions || []).some(item =>
     item.mainDescription?.toLowerCase().includes('location monitoring'),

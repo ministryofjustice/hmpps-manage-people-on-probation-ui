@@ -8,7 +8,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "uri": "http://emdi-people-gps-loc"
+          "uri": "https://emdi-people-gps-loc"
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"

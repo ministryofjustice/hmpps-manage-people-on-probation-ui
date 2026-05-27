@@ -70,7 +70,7 @@ const getSentenceRequirementNoteSpy = jest
 
 const existsInEMDISpy = existsInEMDI as jest.Mock
 
-describe('riskController', () => {
+describe('sentenceController', () => {
   const req = httpMocks.createRequest({
     params: {
       crn,

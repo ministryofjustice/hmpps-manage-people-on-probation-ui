@@ -471,6 +471,11 @@
                     "hasNoteBeenTruncated": false
                   }
                 ]
+              },
+              {
+                "id": 2500841296,
+                "mainDescription": "Licence - Location Monitoring (GPS Tagging)",
+                "active": true
               }
             ]
           }
