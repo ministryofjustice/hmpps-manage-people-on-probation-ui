@@ -1,6 +1,6 @@
 {% extends "pages/_form.njk" %}
  
-{% block afterHeading %}
+{% block beforeHeading %}
   {% if appointmentOutcome.breachWarning %}
     {{ mojAlert({
     variant: "warning",

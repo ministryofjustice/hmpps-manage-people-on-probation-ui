@@ -95,7 +95,7 @@ describe('/middleware/appointment-outcomes/getBreach', () => {
     res = mockAppResponse({
       appointmentOutcome: { crn, id, breachWarning: null },
       user: { username },
-    }) as AppResponse
+    })
     next = jest.fn()
     mockGetSystemClientToken.mockResolvedValue('token-1')
     mockGetPersonCompliance.mockResolvedValue(personComplianceFixture())
