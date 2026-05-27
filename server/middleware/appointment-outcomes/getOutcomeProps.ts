@@ -20,7 +20,6 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const appointmentSession = getDataValue<AppointmentSession>(data, path) || null
   let appointment: AttendedCompliedAppointment | Activity
   let documents: Document[] = []
-  let enforcementAction: PersonAppointmentEnforcementAction
   const { forename, surname } = res.locals.case.name
   const reqUrl = req.url.split('?')[0]
   const baseUrl = uuid ? `/case/${crn}/arrange-appointment/${id}` : `/case/${crn}/appointments/appointment/${id}`
@@ -85,7 +84,6 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     surname,
     appointment,
     documents,
-    enforcementAction,
     crn,
     uuid,
     contactId,

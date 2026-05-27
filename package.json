@@ -180,8 +180,7 @@
     "uuid": "14.0.0",
     "webpack": "^5.107.1",
     "webpack-cli": "^7.0.2",
-    "wiremock": "^3.13.1",
-    "cheerio": "1.2.0"
+    "wiremock": "^3.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -248,7 +247,8 @@
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "tsx": "^4.22.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "cheerio": "1.2.0"
   },
   "overrides": {
     "csurf": {
