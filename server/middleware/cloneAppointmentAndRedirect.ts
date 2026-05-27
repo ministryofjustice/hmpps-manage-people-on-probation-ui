@@ -1,13 +1,12 @@
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, AppointmentSessionSelection } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { getDataValue, setDataValue } from '../utils'
 
-type AppointmentCloneType = 'RESCHEDULE' | 'KEEP_TYPE' | 'RESCHEDULE' | 'CHANGE_TYPE'
 export const cloneAppointmentAndRedirect = (
   appointmentToClone: AppointmentSession = {},
-  apptType: AppointmentCloneType = 'KEEP_TYPE',
+  apptType: AppointmentSessionSelection = 'KEEP_TYPE',
 ) => {
   return (req: Request, res: AppResponse): void => {
     const { data } = req.session

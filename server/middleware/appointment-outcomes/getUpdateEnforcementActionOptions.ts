@@ -13,12 +13,18 @@ import { validEnforcementActionOptions } from '../../utils'
 
 export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) => {
   const {
+    crn,
+    id,
     sentence: { type: sentenceType },
     appointment: { acceptableAbsence },
     baseOutcomeUrl,
     appointmentSession,
     currentEnforcementAction,
   } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
+
+  if (!currentEnforcementAction?.action) {
+    return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+  }
 
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
     appointmentSession.outcome.contactEnforcementActions,

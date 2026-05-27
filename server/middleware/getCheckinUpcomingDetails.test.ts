@@ -42,6 +42,14 @@ describe('getUpcomingCheckinDetails', () => {
         authSource: 'test',
         token: '1234',
       },
+      offenderCheckinsByCRNResponse: {
+        status: 'VERIFIED',
+        uuid: '',
+        crn: '',
+        firstCheckin: '',
+        checkinInterval: 'WEEKLY',
+        contactPreference: 'PHONE',
+      },
     }
   })
 
@@ -71,5 +79,23 @@ describe('getUpcomingCheckinDetails', () => {
     expect(mockGetUpcomingCheckinQuestions).toHaveBeenCalledWith(crn, 'en-GB')
     expect(res.locals.upcomingCheckin).toBeNull()
     expect(logger.info).toHaveBeenCalledWith(`No upcoming check in found for CRN ${crn}`)
+  })
+
+  it('checks status and if it is not VERIFIED it does not call the endpoint and returns check in as null', async () => {
+    res.locals.offenderCheckinsByCRNResponse = {
+      status: 'INITIAL',
+      uuid: '',
+      crn: '',
+      firstCheckin: '',
+      checkinInterval: 'WEEKLY',
+      contactPreference: 'PHONE',
+    }
+
+    const req = httpMocks.createRequest({ params: { crn } })
+
+    await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
+
+    expect(mockGetUpcomingCheckinQuestions).not.toHaveBeenCalled()
+    expect(res.locals.upcomingCheckin).toBeNull()
   })
 })

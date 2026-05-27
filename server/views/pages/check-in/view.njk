@@ -67,7 +67,17 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe if checkIn.furtherActions else 'None' }}</dd>
+                {% if flags.enableFurtherActionsDeprecation === true %}
+                    {% set reviewActionNotes = 'None' %}
+                    {% for log in checkIn.checkinLogs.logs %}
+                        {% if log.logEntryType == 'OFFENDER_CHECKIN_REVIEW_SUBMITTED' and log.notes %}
+                            {% set reviewActionNotes = log.notes | safe %}
+                        {% endif %}
+                    {% endfor %}
+                    <dd class="govuk-summary-list__value">{{ reviewActionNotes }}</dd>
+                {% else %}
+                    <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe if checkIn.furtherActions else 'None' }}</dd>
+                {% endif %}
             </div>
             {% if checkIn.notes.length > 0 %}
                 <div class="govuk-summary-list__row">

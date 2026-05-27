@@ -187,9 +187,9 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.endDateTime = end
   }
   if (rescheduled) {
-    mapping.response.jsonBody.appointmentrescheduled = true
-    mapping.response.jsonBody.appointmentrescheduled.rescheduledStaff = true
-    mapping.response.jsonBody.appointmentrescheduled.rescheduledPop = true
+    mapping.response.jsonBody.appointment.rescheduled = true
+    mapping.response.jsonBody.appointment.rescheduledStaff = true
+    mapping.response.jsonBody.appointment.rescheduledPop = true
     mapping.response.jsonBody.appointment.rescheduledBy = {
       forename: '',
       middleName: '',

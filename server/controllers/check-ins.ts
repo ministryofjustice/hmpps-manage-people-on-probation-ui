@@ -505,9 +505,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-        const practitionerId = pp?.username ? pp.username : res.locals.user.username
+        const practitionerId = res.locals.user.username
         const eSupervisionClient = new ESupervisionClient(token)
         await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
       }
@@ -563,13 +561,11 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
 
-      const masClient = new MasApiClient(token)
-      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+      const practitionerUsername = res.locals.user.username
 
       const eSupervisionClient = new ESupervisionClient(token)
       const notes: ESupervisionNote = {
-        updatedBy: practitionerId,
+        updatedBy: practitionerUsername,
         notes: checkIn.note,
         sensitive: checkIn?.sensitiveContact === 'true',
       }
@@ -682,18 +678,18 @@ const checkInsController: Controller<typeof routes, void> = {
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
-      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+      const practitionerUsername = res.locals.user.username
       let risk: boolean = null
       if (checkIn?.riskManagementFeedback) {
         risk = checkIn.riskManagementFeedback === 'yes'
       }
+      const enableFurtherActionsDeprecation = res.locals.flags?.enableFurtherActionsDeprecation === true
+      const reviewNotes = enableFurtherActionsDeprecation ? checkIn?.notes : checkIn?.furtherActions
       const review: ESupervisionReview = {
-        reviewedBy: practitionerId,
+        reviewedBy: practitionerUsername,
         manualIdCheck: checkIn?.manualIdCheck,
         missedCheckinComment: checkIn?.missedCheckinComment,
-        notes: checkIn?.furtherActions,
+        notes: reviewNotes,
         riskManagementFeedback: risk,
         sensitive: checkIn?.sensitiveContact === 'true',
       }

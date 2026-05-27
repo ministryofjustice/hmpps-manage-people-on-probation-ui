@@ -5,11 +5,11 @@
 {% set hidePageHeader = true %}
 
 {% block beforeContent %}
-  {% if backLink %}
-    {{ govukBackLink({
+    {% if backLink %}
+        {{ govukBackLink({
     href: backLink
   }) }}
-  {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -21,8 +21,8 @@
 
     {% if flags.enableMyEnforcementActionsOverview %}
 
-    {% if  enforcementContacts.enforcementContacts and enforcementContacts.enforcementContacts.length > 0 %}
-        {% set head = [
+        {% if  enforcementContacts.enforcementContacts and enforcementContacts.enforcementContacts.length > 0 %}
+            {% set head = [
             {
                 text: "Name / CRN",
                 attributes: {"aria-sort": sortByOrder.surname, "data-sort-name": "surname", "data-sort-action": sortUrl  },
@@ -49,14 +49,14 @@
             }
         ] %}
 
-        {% set rows = [] %}
+            {% set rows = [] %}
 
-        {% for enforcement in enforcementContacts.enforcementContacts %}
-            {% set fullName %}
+            {% for enforcement in enforcementContacts.enforcementContacts %}
+                {% set fullName %}
                 {{ enforcement.caseName.surname }}, {{ enforcement.caseName.forename }}
-            {% endset %}          
+                {% endset %}
 
-            {% set row = [
+                {% set row = [
                 { 
                     classes: "nowrap",
                     html: '<a class="govuk-!-font-weight-bold" href="/case/' + enforcement.crn + '">' + fullName + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + enforcement.crn + '</span>',
@@ -69,13 +69,16 @@
                 },
                 {
                     classes: "nowrap",
-                    text: enforcement.appointmentOutcome if enforcement.appointmentOutcome else 'Not Provided',
+                    text: 
+                    ((enforcement.appointmentOutcome | toSentenceCase)
+                    if enforcement.appointmentOutcome
+                    else 'Not provided'),
                     attributes: { 'data-sort-value': enforcement.appointmentOutcome }
                 },
                 {
                     classes: "nowrap",
                     html:
-                    ((enforcement.enforcementAction | escape) if enforcement.enforcementAction else 'Not Provided')
+                    ((((enforcement.enforcementAction | toSentenceCase) if enforcement.enforcementAction else 'Not provided') | escape))
                     +
                     (
                     '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
@@ -91,8 +94,8 @@
                 }
             ] %}
 
-            {% set rows = (rows.push(row), rows) %}
-        {% endfor %}
+                {% set rows = (rows.push(row), rows) %}
+            {% endfor %}
 
 
         {{ govukTable({
@@ -106,12 +109,12 @@
             })
         }}
 
-        {% if pagination.items | length > 1 %}
-            {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
-        {% endif %}
+            {% if pagination.items | length > 1 %}
+                {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
+            {% endif %}
 
-    {% else %}
-        <p>There are no enforcement actions to take.</p>
-    {% endif %}
+        {% else %}
+            <p>There are no enforcement actions to take.</p>
+        {% endif %}
     {% endif %}
 {% endblock %}

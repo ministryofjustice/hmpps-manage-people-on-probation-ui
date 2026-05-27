@@ -173,11 +173,6 @@ export interface AppointmentOutcomeSentence {
   length: number | null
 }
 
-export interface AppointmentOutcomeEnforcementAction {
-  responseByDate?: string
-  responseByDays?: number
-}
-
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
 
 export interface OutcomeSummary {
@@ -248,7 +243,6 @@ export interface AppointmentOutcomeProps<TAppointment> {
   letterSentByOptions?: Option<EnforcementActionCreatedBy>[]
   letterTypeOptions?: Option<EnforcementActionLetterType>[]
   sentence?: AppointmentOutcomeSentence
-  enforcementAction?: AppointmentOutcomeEnforcementAction
   isProbationPractitioner?: boolean
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean

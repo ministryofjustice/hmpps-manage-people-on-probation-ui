@@ -150,7 +150,7 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
 })
 
 const expectedSession = (
-  values: Record<string, string | number | Record<string, string | Name | null>>,
+  values: Record<string, string | number | boolean | Record<string, string | Name | null>>,
 ): AppointmentSession => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
@@ -172,11 +172,12 @@ const expectedSession = (
     start,
     end,
     eventId: eventId.toString(),
-    enforcementAction: null,
     username,
     uuid: '',
     externalReference,
     smsOptIn: null,
+    sensitivity: null,
+    sensitivityLocked: null,
     ...values,
   }
 }
@@ -227,27 +228,6 @@ xdescribe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession).toEqual(
       expectedSession({
         eventId: '49',
-      }),
-    )
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
-  it('should set the enforcementAction', () => {
-    const mockAppt = mockPersonAppointmentResponse({
-      eventId: 0,
-      eventNumber: '1234567',
-      enforcementAction: { responseByDate: '2026-04-20' },
-    })
-    const req = mockReq()
-    const res = mockAppResponse({
-      personAppointment: mockAppt,
-      appointmentTypes: mockTypes,
-    })
-    createAppointmentSession(req, res, nextSpy)
-    expect(res.locals.appointmentSession).toEqual(
-      expectedSession({
-        eventId: '49',
-        enforcementAction: { responseByDate: '2026-04-20' },
       }),
     )
     expect(nextSpy).toHaveBeenCalled()

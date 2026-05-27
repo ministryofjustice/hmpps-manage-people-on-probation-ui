@@ -26,5 +26,10 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
     } else {
       page.checkOnPage()
     }
+    if (page instanceof AppointmentCheckYourAnswersPage) {
+      page.checkPageTitle('Check your answers then confirm the appointment')
+    } else {
+      page.checkOnPage()
+    }
   })
 }

@@ -601,6 +601,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       })
     }
   },
+
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
@@ -618,7 +619,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         rescheduleAppointment,
         linkedContactId,
       } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-      const smsSent = smsOptIn?.includes('YES')
+      const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
       if (attending.username.toUpperCase() !== res.locals.user.username) {
@@ -637,7 +638,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         }
       }
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
-      const { isOutLookEventFailed, isEnglishNotificationFailed, isWelshNotificationFailed } = data
+      const { isOutLookEventFailed = null, isEnglishNotificationFailed = null, isWelshNotificationFailed = null } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
       delete req.session.data.isEnglishNotificationFailed

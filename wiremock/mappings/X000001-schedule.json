@@ -441,7 +441,8 @@
             },
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"
@@ -534,7 +535,8 @@
             },
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"
@@ -631,7 +633,8 @@
             },
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"
@@ -738,7 +741,7 @@
               "surname": "Smith"
             },
             "description": "",
-            "outcome": "User-generated free text content",
+            "outcome": "Attended - Failed To Comply",
             "deliusManaged": true,
             "isVisor": true,
             "eventId": 0,
@@ -749,6 +752,12 @@
             },
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
+          },
+          "documents": [],
+          "enforcementAction": {
+            "code": "NFA",
+            "description": "No Further Action",
+            "responseByDate": ""
           }
         },
         "headers": {
@@ -858,7 +867,8 @@
             },
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"
@@ -966,7 +976,8 @@
             },
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"
@@ -1085,7 +1096,8 @@
             "eventId": 0,
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"
@@ -1194,7 +1206,8 @@
             "eventId": 0,
             "nsiId": 0,
             "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72"
-          }
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"

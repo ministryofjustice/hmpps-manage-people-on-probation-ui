@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import AddNotePage from '../../pages/appointmentOutcomes/add-note.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -19,6 +20,8 @@ import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-anot
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
+import { dateWithYear } from '../../../server/utils'
+import { AppointmentSessionSelection } from '../../../server/models/Appointments'
 
 const crn = 'X000001'
 let manageAppointmentPage: ManageAppointmentPage
@@ -29,6 +32,7 @@ let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
 let checkYourAnswersPage: AppointmentCheckYourAnswersPage
 let confirmationPage: AppointmentConfirmationPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
+const expectedDate = dateWithYear(DateTime.now().toFormat('yyyy-MM-dd'))
 
 const loadNextAppointmentPage = (): void => {
   cy.task('stubAppointment', { isFuture: false })
@@ -64,7 +68,15 @@ const completeRescheduleJourney = () => {
   })
 }
 
-const completeNextAppointment = ({ type = 'KEEP_TYPE', dateInPast = false }): void => {
+const completeNextAppointment = ({
+  type = 'KEEP_TYPE',
+  dateInPast = false,
+  sensitivityIsLocked = false,
+}: {
+  type?: AppointmentSessionSelection
+  dateInPast?: boolean
+  sensitivityIsLocked?: boolean
+} = {}): void => {
   if (type === 'KEEP_TYPE') {
     arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     arrangeAnotherAppointmentPage.getSubmitBtn().click()
@@ -79,10 +91,10 @@ const completeNextAppointment = ({ type = 'KEEP_TYPE', dateInPast = false }): vo
     }
     if (!dateInPast) {
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: uuid, index: 1 })
-      completeSupportingInformationPage({ crnOverride: crn, uuidOveride: uuid })
+      completeSupportingInformationPage({ crnOverride: crn, uuidOveride: uuid, sensitivityIsLocked })
     } else {
       completeOutcome()
-      completeAddNotePage({ crnOverride: crn, idOverride: uuid })
+      completeAddNotePage({ crnOverride: crn, idOverride: uuid, sensitivityIsLocked })
     }
     checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
     checkYourAnswersPage.getSubmitBtn().click()
@@ -112,7 +124,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         confirmationPage.checkPageTitle('Past appointment arranged')
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
-          .should('contain.text', 'You can now finish logging the outcome for 3 Way Meeting (NS) on 20 May 2026')
+          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}`)
         cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       })
@@ -126,12 +138,12 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         nextAppointmentPage = new NextAppointmentPage()
         cy.get(`.govuk-radios__input[value=CHANGE_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
-        completeNextAppointment({ type: 'CHANGE_TYPE', dateInPast: false })
+        completeNextAppointment({ type: 'CHANGE_TYPE', dateInPast: false, sensitivityIsLocked: true })
         confirmationPage = new AppointmentConfirmationPage()
         confirmationPage.checkPageTitle('Appointment arranged')
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
-          .should('contain.text', 'You can now finish logging the outcome for 3 Way Meeting (NS) on 20 May 2026')
+          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}`)
         cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       })

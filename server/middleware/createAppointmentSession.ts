@@ -1,14 +1,14 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
 import { isoToDateTime, setDataValue } from '../utils'
-import { AppointmentOutcomeType, AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
+import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
-import { type OutcomeCode, outcomeMap } from '../properties/appointment-outcomes'
+import { persistOutcomeAndAction } from './appointment-outcomes/persistOutcomeAndAction'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
-export const createAppointmentSession = (req: Request, res: AppResponse, next?: NextFunction) => {
-  const { appointment } = res.locals.personAppointment
+export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
+  const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
   let appointmentSession: AppointmentSession = {
@@ -52,8 +52,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     let date = ''
     let start = ''
     let end = ''
-    let sensitivity: YesNo | undefined
-    let sensitivityLocked: boolean | undefined
+    let sensitivity: YesNo | undefined = null
+    let sensitivityLocked: boolean | undefined = null
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -116,22 +116,9 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next?: 
     appointmentSession.smsOptIn = null
   }
 
-  // Hydrate the logged outcome 👇
-
-  const outcome = appointment?.outcome
-  let outcomeType: AppointmentOutcomeType | null = null
-  let outcomeCode: OutcomeCode | null = null
+  const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
   if (outcome) {
-    const contactOutcome = Object.entries(outcomeMap).find(
-      ([_key, { description }]) => description.toLowerCase() === outcome.toLowerCase(),
-    )
-    outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
-    outcomeCode = contactOutcome?.[1]?.code || null
-  }
-  appointmentSession.outcome = {
-    ...appointmentSession.outcome,
-    outcomeType,
-    outcomeCode,
+    appointmentSession.outcome = outcome
   }
 
   res.locals.appointmentSession = appointmentSession

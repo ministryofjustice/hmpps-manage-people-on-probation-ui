@@ -22,9 +22,7 @@ export const checkPopHeader = ({
       cy.get('[data-qa="tierValue"]').should('contain.text', appointments ? 'A3' : 'B2')
       cy.get('[data-qa="tierLink"]').should('not.exist')
     }
-    cy.get(`[data-predictor-badge]`)
-      .eq(0)
-      .get('[data-test-id=nameAndBand')
+    cy.get('[data-test-id=nameAndBand')
       .should('contain.text', 'RSR')
       .should('contain.text', 'LOW')
       .get('[data-test-id=score')
@@ -32,9 +30,7 @@ export const checkPopHeader = ({
       .get('[data-test-id=staticOrDynamic')
       .should('contain.text', 'Dynamic')
   } else {
-    cy.get(`[data-predictor-badge]`)
-      .eq(0)
-      .get('[data-test-id=nameAndBand')
+    cy.get('[data-test-id=nameAndBand')
       .should('contain.text', 'Combined serious reoffending predictor')
       .should('contain.text', 'LOW')
       .get('[data-test-id=score')

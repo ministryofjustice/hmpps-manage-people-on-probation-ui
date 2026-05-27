@@ -1912,7 +1912,6 @@ describe('checkInsController', () => {
       await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
 
       expect(postReviewNoteSpy).toHaveBeenCalled()
-      expect(getProbationPractitionerSpy).toHaveBeenCalled()
       expect(redirectSpy).toHaveBeenCalledWith(req.url)
     })
 
@@ -1958,7 +1957,6 @@ describe('checkInsController', () => {
       await controllers.checkIns.postReviewCheckIn(hmppsAuthClient)(req, res)
 
       expect(postReviewSpy).toHaveBeenCalled()
-      expect(getProbationPractitionerSpy).toHaveBeenCalled()
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
     })
 

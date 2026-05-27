@@ -102,9 +102,6 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         }
       }
       let redirect = baseOutcomeUrl
-      if (change) {
-        redirect = change
-      }
       /* Arrange or reschedule appointment journey */
       if (uuid) {
         redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
@@ -117,6 +114,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (contactId && appointmentSession?.linkedContactId) {
         redirect = `${baseOutcomeUrl}/check-your-answers`
       }
+      if (change) redirect = change
       return res.redirect(redirect)
     }
   },
