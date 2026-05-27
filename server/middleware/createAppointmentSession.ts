@@ -3,10 +3,12 @@ import { AppResponse } from '../models/Locals'
 import { isoToDateTime, setDataValue } from '../utils'
 import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
+import { persistOutcomeAndAction } from './appointment-outcomes/persistOutcomeAndAction'
+
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
 export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
-  const { appointment } = res.locals.personAppointment
+  const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
   let appointmentSession: AppointmentSession = {
@@ -50,8 +52,8 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     let date = ''
     let start = ''
     let end = ''
-    let sensitivity: YesNo | undefined
-    let sensitivityLocked: boolean | undefined
+    let sensitivity: YesNo | undefined = null
+    let sensitivityLocked: boolean | undefined = null
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -59,7 +61,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       ;({ time: end } = isoToDateTime(appointment.endDateTime))
     }
     const externalReference = appointment?.externalReference || ''
-    const enforcementAction = appointment?.enforcementAction || null
     if (!eventId) {
       type = ''
     }
@@ -94,7 +95,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       username: res.locals.user.username,
       uuid: '',
       externalReference,
-      enforcementAction,
       sensitivity,
       sensitivityLocked,
     }
@@ -114,6 +114,11 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       appointmentSession.user.name = appointment.officer.name
     }
     appointmentSession.smsOptIn = null
+  }
+
+  const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
+  if (outcome) {
+    appointmentSession.outcome = outcome
   }
 
   res.locals.appointmentSession = appointmentSession

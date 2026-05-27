@@ -115,6 +115,35 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     )
   })
 
+  it('should reuse existing id, add the linkedContactId and redirect to check answers when apptType is RESCHEDULE and in outcome journey', () => {
+    const { req: request, res: response } = setup()
+    const crn2 = request.params.crn
+    request.params.id = 'APPT123'
+    request.params.contactId = 'C9876'
+    request.url = '/outcome/next-appointment'
+    const redirectSpy2 = jest.spyOn(response, 'redirect')
+
+    const expectedCloneReschedule = {
+      ...expectedClone,
+      uuid: request.params.id,
+      linkedContactId: 'C9876',
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
+    }
+
+    cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)
+
+    expect(mockedSetDataValue).toHaveBeenCalledWith(
+      request.session.data,
+      ['appointments', crn2, request.params.id],
+      expectedCloneReschedule,
+    )
+    expect(redirectSpy2).toHaveBeenCalledWith(
+      `/case/${crn2}/arrange-appointment/${request.params.id}/check-your-answers`,
+    )
+  })
+
   it('should lock sensitivity if reschedule set as sensitive', () => {
     mockedGetDataValue.mockReturnValueOnce('Yes')
     const { req: request, res: response } = setup()

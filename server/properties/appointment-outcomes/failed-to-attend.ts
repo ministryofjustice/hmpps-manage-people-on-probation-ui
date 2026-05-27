@@ -1,7 +1,7 @@
 import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 
-export const failedToAttendOptions = (name: string): Option<AppointmentEnforcementAction>[] => [
+export const failedToAttendOptions = (name: string = ''): Option<AppointmentEnforcementAction>[] => [
   {
     value: 'SEND_LETTER',
     text: 'Send a letter',

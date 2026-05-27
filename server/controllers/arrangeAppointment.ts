@@ -4,6 +4,7 @@ import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
   dateIsInPast,
+  dateWithYear,
   getDataValue,
   getPersonLevelTypes,
   isNumericString,
@@ -616,8 +617,9 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         user: attending,
         smsOptIn,
         rescheduleAppointment,
+        linkedContactId,
       } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-      const smsSent = smsOptIn?.includes('YES')
+      const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
       if (attending.username.toUpperCase() !== res.locals.user.username) {
@@ -636,7 +638,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         }
       }
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
-      const { isOutLookEventFailed, isEnglishNotificationFailed, isWelshNotificationFailed } = data
+      const { isOutLookEventFailed = null, isEnglishNotificationFailed = null, isWelshNotificationFailed = null } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
       delete req.session.data.isEnglishNotificationFailed
@@ -652,11 +654,21 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         }
         res.locals.contactResponse.content = outcomes
       }
+      let linkedAppointment = null
+      if (res?.locals?.flags?.enableNonCompliance && linkedContactId) {
+        const { start, type: typeCode } = getDataValue<AppointmentSession>(data, ['appointments', crn, linkedContactId])
+        linkedAppointment = {
+          contactId: linkedContactId,
+          date: dateWithYear(start),
+          type: res.locals.appointmentTypes.find((type: any) => type.code === typeCode)?.description || null,
+        }
+      }
       return res.render(`pages/arrange-appointment/confirmation`, {
         crn,
         backendId,
         isOutLookEventFailed,
         attendingName,
+        linkedAppointment,
         url,
         isInPast,
         appointmentType,
@@ -668,16 +680,20 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   postConfirmation: () => {
     return async (req, res) => {
-      const { data } = req.session
       const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
+      const { _linkedContactId } = req.body
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+      if (res?.locals?.flags?.enableNonCompliance && _linkedContactId) {
+        return res.redirect(
+          `/case/${crn}/appointments/appointment/${_linkedContactId}/outcome/check-your-answers?back=${url}`,
+        )
       }
       return res.redirect(`/case/${crn}?back=${url}`)
     }
   },
-
   getArrangeAnotherAppointment: () => {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)

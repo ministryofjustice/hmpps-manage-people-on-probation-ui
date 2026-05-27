@@ -68,9 +68,10 @@ describe('/middleware/appointment-outcomes/getEnforcementActionOptions', () => {
         expect.objectContaining({ value: 'YOT_OM_NOTIFIED' }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
         expect.objectContaining({ value: 'WITHDRAWAL_OF_WARNING' }),
+        expect.objectContaining({ value: 'DECISION_PENDING_RESPONSE' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(20)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(21)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

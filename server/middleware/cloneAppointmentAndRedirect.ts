@@ -1,38 +1,53 @@
 import { Request } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, AppointmentSessionSelection } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { getDataValue, setDataValue } from '../utils'
 
-export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession, apptType?: string) => {
+export const cloneAppointmentAndRedirect = (
+  appointmentToClone: AppointmentSession = {},
+  apptType: AppointmentSessionSelection = 'KEEP_TYPE',
+) => {
   return (req: Request, res: AppResponse): void => {
-    let uuid = uuidv4()
     const { data } = req.session
     const { crn, id, contactId } = req.params as Record<string, string>
-    // for next-appointment of type: 'KEEP_TYPE'
+    const uuid = apptType === 'RESCHEDULE' ? id : uuidv4()
+    const { url } = req
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
-    let isSensitive
-    if (apptType === 'RESCHEDULE') {
-      uuid = id
-      isSensitive = getDataValue(data, ['appointments', crn, uuid, 'rescheduleAppointment', 'sensitivity'])
-      redirectURL = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+
+    if (apptType === 'CHANGE_TYPE') {
+      redirectURL = `/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`
     }
-    const clonedAppt: AppointmentSession = {
+
+    let clonedAppt: AppointmentSession = {
       ...appointmentToClone,
       uuid,
       date: '',
       start: '',
       end: '',
       notes: null,
-      sensitivity: isSensitive === 'Yes' ? isSensitive : appointmentToClone.sensitivity,
-      sensitivityLocked: appointmentToClone.sensitivity === 'Yes' || isSensitive === 'Yes',
     }
+
+    if (req.url.includes('/outcome/next-appointment')) {
+      clonedAppt.linkedContactId = contactId
+    }
+
+    clonedAppt.sensitivity = appointmentToClone?.sensitivity || null
+
     if (apptType === 'RESCHEDULE') {
-      clonedAppt.rescheduleAppointment = {
-        contactId,
-        ...(appointmentToClone?.rescheduleAppointment || {}),
+      clonedAppt = {
+        ...clonedAppt,
+        sensitivity: getDataValue(data, ['appointments', crn, uuid, 'rescheduleAppointment', 'sensitivity']) || null,
+        rescheduleAppointment: {
+          contactId,
+          ...(appointmentToClone?.rescheduleAppointment || {}),
+        },
       }
+      redirectURL = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
     }
+
+    clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
+
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)
   }

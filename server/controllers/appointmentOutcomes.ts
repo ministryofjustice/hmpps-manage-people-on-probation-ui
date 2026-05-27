@@ -79,7 +79,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, id, uuid, contactId, baseOutcomeUrl } = res.locals.appointmentOutcome
+      const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl, appointmentSession } =
+        res.locals.appointmentOutcome
       const { change } = req.query as Record<string, string>
       const { notes, sensitive } = req.body
       if (!isValidParams) {
@@ -99,15 +100,28 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
           })
         }
       }
-      const path = contactId ? baseOutcomeUrl : `/case/${crn}/arrange-appointment/${id}`
-      const redirect = `${path}/check-your-answers`
-      return res.redirect(change ?? redirect)
+      let redirect = baseOutcomeUrl
+
+      /* Arrange or reschedule appointment journey */
+      if (uuid) {
+        redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      }
+      /* Manage appointment journey with no next appointment arranged */
+      if (contactId && !appointmentSession?.linkedContactId) {
+        redirect = `${baseOutcomeUrl}/next-appointment`
+      }
+      /* Manage appointment journey with next appointment arranged */
+      if (contactId && appointmentSession?.linkedContactId) {
+        redirect = `${baseOutcomeUrl}/check-your-answers`
+      }
+      if (change) redirect = change
+      return res.redirect(redirect)
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {
     return async (req, res) => {
       const url = encodeURIComponent(req.url)
-      res.render('pages/appointment-outcomes/check-your-answers', { url })
+      return res.render('pages/appointment-outcomes/check-your-answers', { url })
     }
   },
   postCheckYourAnswers: _hmppsAuthClient => {

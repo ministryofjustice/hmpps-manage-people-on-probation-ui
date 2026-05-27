@@ -39,6 +39,7 @@ const baseModel: TestModel = {
   },
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {
+    documents: [],
     personSummary: {
       name: {
         forename: 'Terry',

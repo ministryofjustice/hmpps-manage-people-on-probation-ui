@@ -48,12 +48,30 @@ export type OutcomeCode = 'ATTC' | 'AFTC' | 'ATSH' | 'AFDA' | 'AAM11' | 'UAAB' |
 
 export const outcomeMap: OutcomeMap = {
   ATTENDED_COMPLIED: { code: 'ATTC', description: 'Attended - Complied' },
-  ATTENDED_FAILED_TO_COMPLY: { code: 'AFTC', description: 'Attended - Failed To Comply' },
-  ATTENDED_SENT_HOME_BEHAVIOUR: { code: 'ATSH', description: 'Attended - Sent Home (behaviour)' },
-  ATTENDED_SENT_HOME_SERVICE_ISSUES: { code: 'AFDA', description: 'Attended - FTC Deemed Acceptable' },
-  ACCEPTABLE_ABSENCE: { code: 'AAM11', description: 'Acceptable - Critical  Communications - no breach' },
-  UNACCEPTABLE_ABSENCE: { code: 'UAAB', description: 'Unacceptable Absence' },
-  FAILED_TO_ATTEND: { code: 'AFTA', description: 'Failed To Attend' },
+  ATTENDED_FAILED_TO_COMPLY: {
+    code: 'AFTC',
+    description: 'Attended - Failed To Comply',
+  },
+  ATTENDED_SENT_HOME_BEHAVIOUR: {
+    code: 'ATSH',
+    description: 'Attended - Sent Home (behaviour)',
+  },
+  ATTENDED_SENT_HOME_SERVICE_ISSUES: {
+    code: 'AFDA',
+    description: 'Attended - FTC Deemed Acceptable',
+  },
+  ACCEPTABLE_ABSENCE: {
+    code: 'AAM11',
+    description: 'Acceptable - Critical  Communications - no breach',
+  },
+  UNACCEPTABLE_ABSENCE: {
+    code: 'UAAB',
+    description: 'Unacceptable Absence',
+  },
+  FAILED_TO_ATTEND: {
+    code: 'AFTA',
+    description: 'Failed To Attend',
+  },
 }
 
 export const enforcementActionMap: EnforcementActionMap = {

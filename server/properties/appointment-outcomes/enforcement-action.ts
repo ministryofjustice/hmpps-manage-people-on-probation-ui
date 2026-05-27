@@ -1,7 +1,7 @@
 import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 
-export const enforcementActionOptions = (name: string): Option<AppointmentEnforcementAction | ''>[] => [
+export const enforcementActionOptions = (name: string = ''): Option<AppointmentEnforcementAction | ''>[] => [
   {
     value: '',
     text: 'Select enforcement action',
@@ -81,5 +81,9 @@ export const enforcementActionOptions = (name: string): Option<AppointmentEnforc
   {
     value: 'WITHDRAWAL_OF_WARNING',
     text: 'Withdrawal of warning',
+  },
+  {
+    value: 'DECISION_PENDING_RESPONSE',
+    text: 'Decision pending response',
   },
 ]

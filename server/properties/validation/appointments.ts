@@ -187,7 +187,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select whether or not you wanted to arrange the next appointment',
+          msg: 'Select if you want to arrange the next appointment',
           log: 'Next appointment type not selected',
         },
       ],

@@ -1,7 +1,12 @@
 import { appointmentId } from '../appointments/imports/common'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../server/models/Appointments'
-import { completeAction, completeAddNotePage, completeOutcome } from '../appointments/utils'
+import {
+  completeAction,
+  completeAddNotePage,
+  completeNextAppointmentPage,
+  completeOutcome,
+} from '../appointments/utils'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
 
 let manageAppointmentPage: ManageAppointmentPage
@@ -22,7 +27,7 @@ const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null }: Props = {}):
   manageAppointmentPage.getTaskLink(1).click()
   completeOutcome({ outcome, action })
   completeAddNotePage({ journey: 'MANAGE', crnOverride: crn })
-  // 👉 will need to complete next supervision appointment page(s) here when added 👈
+  completeNextAppointmentPage()
 }
 
 const checkSummary = ({
@@ -221,7 +226,7 @@ const checkPage = () => {
   })
 
   describe('User updates the notes by clicking the change link', () => {
-    it('should render the page with updates notes', () => {
+    it('should render the page with updated notes', () => {
       const value = 'Some changed notes'
       loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
@@ -239,7 +244,27 @@ const checkPage = () => {
       checkYourAnswersOutcomePage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'No')
     })
   })
-  // 👉 add tests for change documents and next appointment here 👈
+
+  describe('User updates the next appointment by clicking the change link', () => {
+    it('should render the page with updated next appointment and persist original appointment', () => {
+      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
+      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+      checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
+      completeNextAppointmentPage({ value: 'KEEP_TYPE' })
+      checkYourAnswersOutcomePage
+        .getSummaryListRow(1)
+        .find('.govuk-summary-list__value')
+        .should(
+          'contain.text',
+          'Appointment: Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024.',
+        )
+      checkYourAnswersOutcomePage
+        .getSummaryListRow(7)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
+    })
+  })
+  // 👉 add tests for change documents here 👈
 }
 
 describe('Check your answers - outcomes', () => {

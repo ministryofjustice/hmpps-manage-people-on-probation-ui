@@ -58,7 +58,7 @@ export const checkUpdateDateTime = ({
       dateTimePage.getSubmitBtn().click()
       if (!inPast && page instanceof ArrangeAnotherAppointmentPage) {
         completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
-        completeSupportingInformationPage(true, '', pageUuid)
+        completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
       }
       if (inPast) {
         if (enableNonCompliance) {
