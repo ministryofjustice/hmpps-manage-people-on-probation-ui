@@ -9,30 +9,29 @@ export const getBreach = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
     const selectedSentence = getDataValue(req.session.data, ['appointments', crn, id, 'eventId'])
 
     const sentences = req.session.data.sentences?.[crn]
-    try {
-      if (Number.isFinite(Number(selectedSentence)) && sentences && res.locals.flags.enableNonCompliance) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        const compliance = await masClient.getPersonCompliance(crn)
+    res.locals.appointmentOutcome.breachWarning = null
 
-        const sentence = sentences.find(({ id: sentenceId }) => String(sentenceId) === String(selectedSentence))
-        const foundSentence = sentence
-          ? (compliance.currentSentences.find(
-              currentSentence =>
-                currentSentence.activeBreach && String(currentSentence.eventNumber) === String(sentence.eventNumber),
-            ) ?? null)
-          : null
+    if (sentences && selectedSentence) {
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const compliance = await masClient.getPersonCompliance(crn)
 
-        res.locals.appointmentOutcome.breachWarning = foundSentence
-          ? { order: sentence.order.description, breachDate: foundSentence.activeBreach.startDate }
-          : null
-      } else {
-        res.locals.appointmentOutcome.breachWarning = null
+      // eslint-disable-next-line eqeqeq
+      const sentence = sentences.find(s => s.id == selectedSentence)
+
+      const currentSentence = compliance.currentSentences.find(
+        // eslint-disable-next-line eqeqeq
+        s => s?.activeBreach && s?.eventNumber == sentence?.eventNumber,
+      )
+
+      if (currentSentence?.activeBreach) {
+        res.locals.appointmentOutcome.breachWarning = {
+          order: sentence?.order?.description,
+          breachDate: currentSentence.activeBreach.startDate,
+        }
       }
-    } catch (error) {
-      res.locals.appointmentOutcome.breachWarning = null
-    } finally {
-      next()
     }
+
+    return next()
   }
 }
