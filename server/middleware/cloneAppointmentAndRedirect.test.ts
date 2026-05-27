@@ -79,7 +79,6 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     start: '',
     end: '',
     uuid,
-    // linkedContactId: 'C9876',
     sensitivityLocked: false,
   }
 

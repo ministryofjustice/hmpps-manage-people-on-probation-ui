@@ -131,61 +131,61 @@
       {% endif %}
     </div>
     {% if not linkedAppointment %}
-      <div class="govuk-grid
-    <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
-        <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
-        <p class="govuk-!-margin-bottom-0">You can:</p>
-        <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
-          <li>
-            <a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
+          <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
+          <p class="govuk-!-margin-bottom-0">You can:</p>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
+            <li>
+              <a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
                         arrange another appointment
                     </a>
-          </li>
-          {% if contactResponse.content.length > 0 %}
-            <li>
-              {% if contactResponse.content.length == 1 %}
-                <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
+            </li>
+            {% if contactResponse.content.length > 0 %}
+              <li>
+                {% if contactResponse.content.length == 1 %}
+                  <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
         log appointment outcome for {{ contactResponse.content[0].date | dayOfWeek + ' ' + contactResponse.content[0].date | dateWithYear }}
-                </a>
-              {% endif %}
-              {% if contactResponse.content.length > 1 %}
-                <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
+                  </a>
+                {% endif %}
+                {% if contactResponse.content.length > 1 %}
+                  <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
         log outcomes for {{ contactResponse.content.length }} appointments
           </a>
-              {% endif %}
-            </li>
-          {% endif %}
-        </ul>
+                {% endif %}
+              </li>
+            {% endif %}
+          </ul>
+        </div>
       </div>
-    </div>
-    <form method="post" autocomplete="off" action="{{ paths.current  }}">
-      <div class="govuk-button-group">
-        {{ govukButton({
+      <form method="post" autocomplete="off" action="{{ paths.current  }}">
+        <div class="govuk-button-group">
+          {{ govukButton({
       html: buttonText,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-        <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
+          <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
       Return to all cases
     </a>
-      </div>
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-    </form>
-  {% else %}
-    <div class="govuk-grid-column-two-thirds" data-qa="logAppointmentOutcome">
-      <p class="govuk-body">You can now finish logging the outcome for {{ linkedAppointment.type }} on {{ linkedAppointment.date }}</p>
-      <form method="post" autocomplete="off" action="{{ paths.current }}">
-        <div class="govuk-button-group">
-          {{ govukButton({
+        </div>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      </form>
+    {% else %}
+      <div class="govuk-grid-column-two-thirds" data-qa="logAppointmentOutcome">
+        <p class="govuk-body">You can now finish logging the outcome for {{ linkedAppointment.type }} on {{ linkedAppointment.date }}</p>
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+          <div class="govuk-button-group">
+            {{ govukButton({
       html: 'Return to log appointment outcome',
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-          <input type="hidden" name="_linkedContactId" value="{{ linkedAppointment.contactId }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-        </form>
-      </div>
-    {% endif %}
-  {% endblock %}
+            <input type="hidden" name="_linkedContactId" value="{{ linkedAppointment.contactId }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          </form>
+        </div>
+      {% endif %}
+    {% endblock %}

@@ -845,7 +845,7 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliace enabled', async () => {
+    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance enabled', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -865,7 +865,7 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliace disabled', async () => {
+    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance disabled', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {

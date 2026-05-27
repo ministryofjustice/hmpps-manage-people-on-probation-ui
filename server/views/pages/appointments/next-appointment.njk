@@ -7,7 +7,7 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block afterHeading %}
-  {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personSummary.name.forename + '’s' + sentence + '.' %}
+  {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personAppointment.personSummary.name.forename + '’s' + sentence + '.' %}
   {% if nextAppointment.appointment %}
     {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithYear + " with " + personAppointment.personSummary.name.forename + " " + personAppointment.personSummary.name.surname + " for their " + sentence %}
   {% endif %}

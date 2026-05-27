@@ -1,9 +1,8 @@
 import { Request, NextFunction } from 'express'
 import { AppResponse } from '../models/Locals'
 import { isoToDateTime, setDataValue } from '../utils'
-import { AppointmentOutcomeType, AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
+import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
-import { type OutcomeCode, outcomeMap } from '../properties/appointment-outcomes'
 import { persistOutcomeAndAction } from './appointment-outcomes/persistOutcomeAndAction'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
@@ -117,7 +116,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     appointmentSession.smsOptIn = null
   }
 
-  // persist the logged outcome and action 👇
   const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
   if (outcome) {
     appointmentSession.outcome = outcome
