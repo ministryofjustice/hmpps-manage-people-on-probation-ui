@@ -4,6 +4,7 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
+import { existsInEMDI } from '../middleware/existsInEMDI'
 import { checkAuditMessage } from './testutils'
 import {
   mockAppResponse,
@@ -20,6 +21,8 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/interventionsApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
+jest.mock('../middleware/checkLocationMonitoring')
+jest.mock('../middleware/existsInEMDI')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
@@ -64,6 +67,9 @@ const getSentenceLicenceConditionNoteSpy = jest
 const getSentenceRequirementNoteSpy = jest
   .spyOn(MasApiClient.prototype, 'getSentenceRequirementNote')
   .mockImplementation(() => Promise.resolve(mockRequirementNote))
+
+const existsInEMDISpy = existsInEMDI as jest.Mock
+
 describe('riskController', () => {
   const req = httpMocks.createRequest({
     params: {
@@ -84,19 +90,41 @@ describe('riskController', () => {
       jest.clearAllMocks()
     })
     describe('getSentence', () => {
-      beforeEach(async () => {
+      afterEach(() => {
+        delete res.locals.locationMonitoringUri
+      })
+      it('should request the page data from the api', async () => {
         res.locals.flags = { enableEMDISentencesShowGPSData: true }
+
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
-      })
-      checkAuditMessage(res, 'VIEW_MAS_SENTENCE', uuidv4(), crn, 'CRN')
-      it('should request the page data from the api', () => {
+
         expect(getSentenceDetailsSpy).toHaveBeenCalledWith(crn, '?activeSentence=true&number=1')
-      })
-      it('should render the sentence page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/sentence', {
           sentenceDetails: mockSentenceDetails,
           crn,
         })
+      })
+
+      it('should call existsInEMDI if location monitoring data is present', async () => {
+        res.locals.flags = { enableEMDISentencesShowGPSData: true }
+
+        existsInEMDISpy.mockResolvedValue('http://emdi-uri')
+        await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
+
+        expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
+        expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
+        expect(renderSpy).toHaveBeenCalledWith('pages/sentence', {
+          sentenceDetails: mockSentenceDetails,
+          crn,
+        })
+      })
+
+      it('should NOT call existsInEMDI if flag is disabled', async () => {
+        res.locals.flags = { enableEMDISentencesShowGPSData: false }
+        await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
+
+        expect(existsInEMDISpy).not.toHaveBeenCalled()
+        expect(res.locals.locationMonitoringUri).toBeUndefined()
       })
     })
     describe('getProbationHistory', () => {

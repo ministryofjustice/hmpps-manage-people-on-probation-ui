@@ -6,7 +6,7 @@ context('Sentence', () => {
     cy.task('resetMocks')
   })
   it('Sentence page is rendered', () => {
-    cy.visit('/case/X000001/sentence')
+    cy.visit('/case/X000001/sentence?number=3')
     const page = Page.verifyOnPage(SentencePage)
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Caroline Wolff')
@@ -157,6 +157,13 @@ context('Sentence', () => {
     page
       .getRowData('sentence', 'courtDocuments', 'Value')
       .within(() => cy.get('ul > li').eq(2).should('contain.text', 'Unavailable'))
+
+    page
+      .getCardHeader('sentence')
+      .within(() =>
+        cy.get('.govuk-summary-list__value').eq(6).should('contain.text', 'View GPS location monitoring data'),
+      )
+    page.getElementData('licencesEMDILink').should('exist')
   })
 
   it('Sentence page is rendered with date of death recorded warning', () => {
@@ -206,6 +213,15 @@ context('Sentence', () => {
     page
       .getCardHeader('sentence')
       .within(() => cy.get('.govuk-summary-list__value').eq(3).should('contain.text', '1 November 2024'))
+    page
+      .getCardHeader('sentence')
+      .within(() =>
+        cy
+          .get('.govuk-summary-list__value')
+          .eq(6)
+          .should('contain.text', 'Location Monitoring(GPS Tagging) - Monitored Appointment'),
+      )
+    page.getElementData('requirementsEMDILink').should('exist')
   })
 
   it('Sentence page is rendered with probation history information', () => {

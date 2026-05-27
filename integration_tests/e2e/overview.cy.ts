@@ -53,6 +53,9 @@ context('Overview', () => {
       )
     page.getRowData('sentence2', 'order', 'Value').should('contain.text', 'ORA Community Order')
     page.getRowData('sentence2', 'requirements', 'Value').should('contain.text', '10 of 10 RAR days completed')
+    page
+      .getRowData('sentence2', 'requirements', 'Value')
+      .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
     page.getCardHeader('sentence3').should('contain.text', '12 month Community order')
     page
       .getRowData('sentence3', 'mainOffence', 'Value')
@@ -137,6 +140,14 @@ context('Overview', () => {
         const recentCase = JSON.parse(JSON.stringify(result))
         expect(expected, recentCase)
       })
+  })
+
+  it('Overview page is rendered with licence conditions', () => {
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page
+      .getRowData('sentence3', 'licenceConditions', 'Value')
+      .should('contain.text', 'Location Monitoring View GPS location monitoring data')
   })
   it('Overview page is rendered with OGRS4 risk predictor scores', () => {
     cy.task('stubPredictorScoresOGRS4')

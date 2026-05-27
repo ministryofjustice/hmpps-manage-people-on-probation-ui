@@ -524,7 +524,7 @@
           {% if loop.first %}
             <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
           {% endif %}
-          {% if flags.enableEMDIOverviewShowGPSData %}
+          {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
                 {% set hasLocationMonitoring = sentence.licenceConditions | checkLocationMonitoring(sentence.requirements) %}
           {% endif %}
           {{ sentence.order.description }}<br/>
@@ -537,17 +537,17 @@
         {% set requirements %}
          {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              {{ sentence.rarDescription }} <br/>
-             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}">View(GPS tagging) Trail Monitoring data</a>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
          {% elif sentence.rarDescription %}
             {{ sentence.rarDescription }}
-        {% else %}
+        {% elif not  hasLocationMonitoring.hasLicenceConditionsLMData %}
                 No requirements details
                 {% endif %}
         {% endset %}
         {% set licences %}
            {% if hasLocationMonitoring.hasLicenceConditionsLMData  %}
                 {% set showLicenceRow = true %}
-               Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}">View GPS location monitoring data</a>
+               Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="licencesEMDILink">View GPS location monitoring data</a>
                 {% endif %}
             {% endset %}
         {% set mainOffence %}
@@ -577,10 +577,10 @@
               {
                 key: { html: '<span data-qa="requirementsLabel">Requirements</span>' },
                 value: { html: '<span data-qa="requirementsValue">' + requirements + '</span>' }
-              },
+              } if not  showLicenceRow ,
               {
-                key: { html: '<span data-qa="requirementsLabel">Licence conditions</span>' },
-                 value: { html: '<span data-qa="requirementsValue">' + licences + '</span>' }
+                key: { html: '<span data-qa="licenceConditionsLabel">Licence conditions</span>' },
+                 value: { html: '<span data-qa="licenceConditionsValue">' + licences + '</span>' }
               } if flags.enableEMDIOverviewShowGPSData and showLicenceRow
             ]
           }) }}
