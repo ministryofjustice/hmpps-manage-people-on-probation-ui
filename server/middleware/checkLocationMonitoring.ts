@@ -17,5 +17,5 @@ export const checkLocationMonitoring = (
   return { hasLicenceConditionsLMData, hasRequirementsLMData }
 }
 
-export const checkLocationMonitoringString = (description: string): boolean =>
+export const checkLocationMonitoringString = (description: string | null | undefined): boolean | undefined =>
   description?.toLowerCase().includes('location monitoring')

@@ -515,8 +515,8 @@
 
     {% set numberOfSentences = overview.sentences.length %}
     {% if numberOfSentences > 0 %}
-        {% set hasLocationMonitoring = {} %}
         {% for sentence in overview.sentences %}
+        {% set hasLocationMonitoring = {} %}
         {% set sentenceHtml %}
         {% set order %}
         {% set showLicenceRow = false %}
@@ -538,8 +538,10 @@
          {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              {{ sentence.rarDescription }} <br/>
              Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
-         {% elif sentence.rarDescription %}
+         {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
             {{ sentence.rarDescription }}
+         {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
         {% elif not  hasLocationMonitoring.hasLicenceConditionsLMData %}
                 No requirements details
                 {% endif %}
