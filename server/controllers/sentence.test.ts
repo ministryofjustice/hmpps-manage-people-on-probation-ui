@@ -90,15 +90,18 @@ describe('sentenceController', () => {
       jest.clearAllMocks()
     })
     describe('getSentence', () => {
+      beforeEach(async () => {
+        res.locals.flags = { enableEMDISentencesShowGPSData: true }
+        await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
+      })
       afterEach(() => {
         delete res.locals.locationMonitoringUri
       })
-      it('should request the page data from the api', async () => {
-        res.locals.flags = { enableEMDISentencesShowGPSData: true }
-
-        await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
-
+      checkAuditMessage(res, 'VIEW_MAS_SENTENCE', uuidv4(), crn, 'CRN')
+      it('should request the page data from the api', () => {
         expect(getSentenceDetailsSpy).toHaveBeenCalledWith(crn, '?activeSentence=true&number=1')
+      })
+      it('should render the sentence page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/sentence', {
           sentenceDetails: mockSentenceDetails,
           crn,
@@ -118,11 +121,17 @@ describe('sentenceController', () => {
           crn,
         })
       })
+    })
 
-      it('should NOT call existsInEMDI if flag is disabled', async () => {
+    describe('getSentence when enableEMDISentencesShowGPSData flag is disabled', () => {
+      beforeEach(async () => {
         res.locals.flags = { enableEMDISentencesShowGPSData: false }
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
-
+      })
+      afterEach(() => {
+        delete res.locals.locationMonitoringUri
+      })
+      it('should NOT call existsInEMDI if flag is disabled', async () => {
         expect(existsInEMDISpy).not.toHaveBeenCalled()
         expect(res.locals.locationMonitoringUri).toBeUndefined()
       })

@@ -2,7 +2,7 @@ import config from '../config'
 import RestClient from './restClient'
 
 export interface PersonExistsResponse {
-  uri: string
+  uri?: string
 }
 
 export default class EMDIClient extends RestClient {

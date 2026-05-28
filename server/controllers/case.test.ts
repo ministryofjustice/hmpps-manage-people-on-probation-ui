@@ -49,12 +49,6 @@ jest.mock('../data/hmppsAuthClient', () => {
 })
 jest.mock('../data/eSupervisionClient')
 jest.mock('../middleware/existsInEMDI')
-jest.mock('../middleware/getCheckinOffenderDetails', () => ({
-  getCheckinOffenderDetails: jest.fn(() => jest.fn(() => Promise.resolve())),
-}))
-jest.mock('../middleware/getCheckinUpcomingDetails', () => ({
-  getUpcomingCheckinDetails: jest.fn(() => jest.fn(() => Promise.resolve())),
-}))
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
