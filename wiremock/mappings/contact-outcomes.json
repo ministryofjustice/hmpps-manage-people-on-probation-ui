@@ -88,7 +88,11 @@
               "code": "CO05",
               "description": "Acceptable Absence - Professional Judgement Decision"
             },
-            { "code": "EM01", "description": "Acceptable Failure" }
+            {
+              "code": "CO10",
+              "description": "Acceptable Failure - None in following 12 months",
+              "enforcementActions": []
+            }
           ]
         },
         "headers": {
