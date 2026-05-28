@@ -20,7 +20,7 @@ import {
   getNotePrepend,
   getOutcomeProps,
   getOutcomeSummary,
-  setContactOutcomes,
+  getContactOutcomes,
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -154,7 +154,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getAppointment(hmppsAuthClient),
     checkAnswers,
     getOutcomeProps,
-    setContactOutcomes(hmppsAuthClient),
+    getContactOutcomes(hmppsAuthClient),
     getNotePrepend,
     getOutcomeSummary,
   )

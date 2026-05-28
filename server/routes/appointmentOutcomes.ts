@@ -34,7 +34,7 @@ import {
   resetSelectedActions,
   getBreach,
   getComplianceData,
-  setContactOutcomes,
+  getContactOutcomes,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -72,7 +72,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
-    setContactOutcomes(hmppsAuthClient),
+    getContactOutcomes(hmppsAuthClient),
   )
 
   /* get outcome props for all outcome routes 👇 */

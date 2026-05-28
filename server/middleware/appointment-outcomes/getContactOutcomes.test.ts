@@ -31,7 +31,7 @@ getDataValueSpy.mockImplementation(() => ({ outcome, type }))
 
 const nextSpy = jest.fn()
 
-const mockEnforcementActions: ContactEnforcementAction[] = [
+const mockContactEnforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'IBR', description: null, defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
@@ -46,7 +46,7 @@ const mockContactOutcomes: ContactOutcome[] = [
   {
     code: 'AFTC',
     description: 'Attended - Failed To Comply',
-    enforcementActions: mockEnforcementActions,
+    enforcementActions: mockContactEnforcementActions,
   },
 ]
 
@@ -90,14 +90,22 @@ describe('/middleware/appointment-outcomes/getContactOutcomes', () => {
   })
   it('should set the data if manage journey', async () => {
     const req = buildRequest()
-    const result = await getContactOutcomes(type, hmppsAuthClient)(req, res)
+    await getContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
     expect(getContactOutcomesSpy).toHaveBeenCalledWith(type)
-    expect(result).toStrictEqual(mockContactOutcomes)
+    expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId])
+    expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId, 'outcome'], {
+      ...outcome,
+      contactOutcomes: mockContactOutcomes,
+    })
   })
   it('should set the data if arrange journey', async () => {
     const req = buildRequest({ _contactId: null, _id: id })
-    const result = await getContactOutcomes(type, hmppsAuthClient)(req, res)
+    await getContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
+    expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id])
     expect(getContactOutcomesSpy).toHaveBeenCalledWith(type)
-    expect(result).toStrictEqual(mockContactOutcomes)
+    expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'outcome'], {
+      ...outcome,
+      contactOutcomes: mockContactOutcomes,
+    })
   })
 })

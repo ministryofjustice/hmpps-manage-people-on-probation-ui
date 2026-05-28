@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { setContactOutcomes } from './getContactOutcomes'
+import { getContactOutcomes } from './getContactOutcomes'
 import { getDataValue, setDataValue } from '../../utils'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
@@ -84,13 +84,13 @@ const buildRequest = ({
 
 const res = mockAppResponse()
 
-describe('/middleware/appointment-outcomes/setContactOutcomes', () => {
+describe('/middleware/appointment-outcomes/getContactOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
   it('should set the data if manage journey', async () => {
     const req = buildRequest()
-    await setContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
+    await getContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
     expect(getContactOutcomesSpy).toHaveBeenCalledWith(type)
     expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId])
     expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId, 'outcome'], {
@@ -100,7 +100,7 @@ describe('/middleware/appointment-outcomes/setContactOutcomes', () => {
   })
   it('should set the data if arrange journey', async () => {
     const req = buildRequest({ _contactId: null, _id: id })
-    await setContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
+    await getContactOutcomes(hmppsAuthClient)(req, res, nextSpy)
     expect(getDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id])
     expect(getContactOutcomesSpy).toHaveBeenCalledWith(type)
     expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'outcome'], {
