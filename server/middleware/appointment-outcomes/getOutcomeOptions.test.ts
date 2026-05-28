@@ -3,7 +3,7 @@ import httpMocks from 'node-mocks-http'
 import { getOutcomeOptions } from './getOutcomeOptions'
 import { mockAppResponse } from '../../controllers/mocks'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
-import { ContactOutcomes } from '../../data/model/schedule'
+import { ContactOutcome } from '../../data/model/schedule'
 import { validOutcomeOptions } from '../../utils'
 import { outcomeOptions } from '../../properties/appointment-outcomes'
 
@@ -21,14 +21,16 @@ const end = '10:00'
 const now = DateTime.now()
 const futureDate = now.plus({ day: 1 }).toFormat('yyyy-MM-dd')
 
-const contactOutcomes: ContactOutcomes[] = [
+const contactOutcomes: ContactOutcome[] = [
   {
     code: 'ATTC',
     description: 'Attended - Complied',
+    enforcementActions: [],
   },
   {
     code: 'AFTC',
     description: 'Attended - Failed To Comply',
+    enforcementActions: [],
   },
 ]
 

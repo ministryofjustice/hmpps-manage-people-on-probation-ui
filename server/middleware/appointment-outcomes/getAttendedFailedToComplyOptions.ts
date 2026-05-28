@@ -18,7 +18,7 @@ export const getAttendedFailedToComplyOptions: Route<void> = (_req, res, next) =
   }
 
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactEnforcementActions,
+    appointmentSession.outcome.contactOutcomes,
     attendedFailedToComplyOptions(type),
   )
   if (isProbationPractitioner) {

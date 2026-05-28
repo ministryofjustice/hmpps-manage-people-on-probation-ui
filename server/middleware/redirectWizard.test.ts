@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { redirectWizard } from './redirectWizard'
-import { AppointmentSession, EnforcementActionPage } from '../models/Appointments'
+import { AppointmentSession, EnforcementActionPage, OutcomePage } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { CheckinUserDetails } from '../models/ESupervision'
 
@@ -136,7 +136,6 @@ describe('/middleware/redirectWizard - appointments', () => {
   describe('type is required, and it is available in the session appointment', () => {
     const req = buildRequest()
     beforeEach(() => {
-      // mockedGetDataValue.mockReturnValue('type')
       redirectWizard([{ path: 'type' }])(req, res, nextSpy)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
@@ -153,7 +152,7 @@ describe('/middleware/redirectWizard - manage appointment', () => {
     jest.clearAllMocks()
   })
 
-  const enforcementActionPaths: ['outcome', EnforcementActionPage][] = [
+  const enforcementActionPaths: ['outcome', EnforcementActionPage | OutcomePage][] = [
     ['outcome', 'attendedFailedToComply'],
     ['outcome', 'acceptableAbsence'],
     ['outcome', 'unacceptableAbsence'],

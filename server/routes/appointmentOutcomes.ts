@@ -29,16 +29,16 @@ import {
   saveMappedCode,
   getUpdateEnforcementActionOptions,
   getCurrentEnforcementAction,
-  getContactOutcomes,
   getOutcomeSummary,
   getNotePrepend,
   resetSelectedActions,
   getBreach,
   getComplianceData,
+  setContactOutcomes,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
-import { handleEnforcementActionRedirect } from '../middleware/appointment-outcomes/handleEnforcementActionRedirect'
+import { handleOutcomePageRedirect } from '../middleware/appointment-outcomes/handleOutcomePageRedirect'
 import { EnforcementActionPage, enforcementActionPageKeys } from '../models/Appointments'
 
 const enforcementActionDataPaths: ['outcome', EnforcementActionPage][] = enforcementActionPageKeys.map(key => [
@@ -72,7 +72,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
-    getContactOutcomes(hmppsAuthClient),
+    setContactOutcomes(hmppsAuthClient),
   )
 
   /* get outcome props for all outcome routes 👇 */
@@ -146,7 +146,25 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* save the mapped outcome and action code 👇 */
 
   router.post([arrangeBasePath, manageBasePath], saveMappedCode('OUTCOME'))
-  router.post([`${arrangeBasePath}/*path`, `${manageBasePath}/*path`], saveMappedCode('ACTION'))
+
+  router.post(
+    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
+    saveMappedCode('ACCEPTABLE_ABSENCE_OUTCOME'),
+  )
+
+  router.post(
+    [
+      `${arrangeBasePath}/attended-failed-to-comply`,
+      `${manageBasePath}/attended-failed-to-comply`,
+      `${arrangeBasePath}/unacceptable-absence`,
+      `${manageBasePath}/unacceptable-absence`,
+      `${arrangeBasePath}/failed-to-attend`,
+      `${manageBasePath}/failed-to-attend`,
+      `${arrangeBasePath}/enforcement-action`,
+      `${manageBasePath}/enforcement-action`,
+    ],
+    saveMappedCode('ACTION'),
+  )
 
   /* Outcome index 👇 */
 
@@ -185,7 +203,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
-    handleEnforcementActionRedirect('attendedFailedToComply'),
+    handleOutcomePageRedirect('attendedFailedToComply'),
   )
 
   /* Acceptable absence 👇 */
@@ -197,7 +215,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    handleEnforcementActionRedirect('acceptableAbsence'),
+    handleOutcomePageRedirect('acceptableAbsence'),
   )
 
   /* Uncceptable absence 👇 */
@@ -209,7 +227,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
-    handleEnforcementActionRedirect('unacceptableAbsence'),
+    handleOutcomePageRedirect('unacceptableAbsence'),
   )
 
   /* Failed to attend 👇 */
@@ -221,7 +239,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    handleEnforcementActionRedirect('failedToAttend'),
+    handleOutcomePageRedirect('failedToAttend'),
   )
 
   /* Other enforcement action 👇 */
@@ -233,7 +251,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
-    handleEnforcementActionRedirect('otherEnforcementAction'),
+    handleOutcomePageRedirect('otherEnforcementAction'),
   )
 
   /* Initiate breach or recall 👇 */
@@ -251,7 +269,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
-    handleEnforcementActionRedirect('breachNSICreatedBy'),
+    handleOutcomePageRedirect('breachNSICreatedBy'),
   )
 
   /* Send a letter 👇 */
@@ -263,7 +281,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
-    handleEnforcementActionRedirect('letterType'),
+    handleOutcomePageRedirect('letterType'),
   )
 
   /* Update enforcement action 👇 */
@@ -275,7 +293,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
-    handleEnforcementActionRedirect('updateEnforcementAction'),
+    handleOutcomePageRedirect('updateEnforcementAction'),
   )
 
   /* Add note page in arrange journey (no file upload) 👇 */

@@ -7,7 +7,7 @@ import { persistOutcomeAndAction } from './appointment-outcomes/persistOutcomeAn
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
-export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
+export const createAppointmentSession = async (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
   const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
@@ -116,7 +116,11 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     appointmentSession.smsOptIn = null
   }
 
-  const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
+  const outcome = persistOutcomeAndAction({
+    outcome: appointment?.outcome,
+    actionCode: enforcementAction?.code,
+  })
+
   if (outcome) {
     appointmentSession.outcome = outcome
   }

@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Request } from 'express'
-import { get } from 'lodash'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes, setDataValue, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'

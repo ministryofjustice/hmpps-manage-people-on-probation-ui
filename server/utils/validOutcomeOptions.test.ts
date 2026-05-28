@@ -1,21 +1,28 @@
-import { ContactEnforcementActions, ContactOutcomes } from '../data/model/schedule'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
+import { ContactOutcome } from '../data/model/schedule'
+import {
+  AcceptableAbsenceOutcomeType,
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+} from '../models/Appointments'
 import { Option } from '../models/Option'
 import { validOutcomeOptions, validEnforcementActionOptions } from './validOutcomeOptions'
 
 describe('utils/validOutcomeOptions', () => {
-  let contactOutcomes: ContactOutcomes[] = [
+  let contactOutcomes: ContactOutcome[] = [
     {
       code: 'ATTC',
       description: 'Attended - Complied',
+      enforcementActions: [],
     },
     {
       code: 'AFTC',
       description: 'Attended - Failed To Comply',
+      enforcementActions: [],
     },
     {
       code: 'ATSH',
       description: 'Attended - Sent Home (behaviour)',
+      enforcementActions: [],
     },
   ]
   const outcomeOptions: Option<AppointmentOutcomeType>[] = [
@@ -50,11 +57,105 @@ describe('utils/validOutcomeOptions', () => {
   })
 })
 
+/*
+describe('utils/validAcceptableAbsenceOutcomeOptions', () => {
+  let contactOutcomes: ContactOutcome[] = [
+    {
+      code: 'AACL',
+      description: 'Acceptable Absence - Court/Legal',
+      enforcementActions: [],
+    },
+    {
+      code: 'AAEM',
+      description: 'Acceptable Absence - Employment',
+      enforcementActions: [],
+    },
+    {
+      code: 'AAFC',
+      description: 'Acceptable Absence - Family/ Childcare',
+      enforcementActions: [],
+    },
+    {
+      code: 'AAHO',
+      description: 'Acceptable Absence - Holiday',
+      enforcementActions: [],
+    },
+    {
+      code: 'AAME',
+      description: 'Acceptable Absence - Medical',
+      enforcementActions: [],
+    },
+  ]
+
+  const acceptableAbsenceOutcomeOptions: Option<AcceptableAbsenceOutcomeType>[] = [
+    {
+      value: 'ACCEPTABLE_ABSENCE_COURT_LEGAL',
+      text: 'Court / legal',
+    },
+    {
+      value: 'ACCEPTABLE_ABSENCE_EMPLOYMENT',
+      text: 'Employment',
+    },
+    {
+      value: 'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE',
+      text: 'Family / childcare',
+    },
+    {
+      value: 'ACCEPTABLE_ABSENCE_HOLIDAY',
+      text: 'Holiday',
+    },
+    {
+      value: 'ACCEPTABLE_ABSENCE_MEDICAL',
+      text: 'Medical',
+    },
+  ]
+  it('should return all the acceptable absence outcome options', () => {
+    const validOptions = validAcceptableAbsenceOutcomeOptions(contactOutcomes, acceptableAbsenceOutcomeOptions)
+    expect(validOptions).toStrictEqual(acceptableAbsenceOutcomeOptions)
+  })
+  it('should return only the valid acceptable absence outcome options', () => {
+    contactOutcomes = [...contactOutcomes.filter(item => item.code !== 'AAFC')]
+    const validOptions = validAcceptableAbsenceOutcomeOptions(contactOutcomes, acceptableAbsenceOutcomeOptions)
+    expect(validOptions).toEqual([
+      ...acceptableAbsenceOutcomeOptions.slice(0, 2),
+      ...acceptableAbsenceOutcomeOptions.slice(3),
+    ])
+  })
+})
+  */
+
 describe('utils/validEnforcementActionOptions', () => {
-  let contactEnforcementActions: ContactEnforcementActions[] = [
-    { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
-    { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
-    { code: 'LCL', description: 'Licence Compliance Letter Sent', defaultResponsePeriodDays: 7 },
+  let contactOutcomes: ContactOutcome[] = [
+    {
+      code: 'AACL',
+      description: 'Acceptable Absence - Court/Legal',
+      enforcementActions: [
+        { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+        { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
+      ],
+    },
+    {
+      code: 'AAEM',
+      description: 'Acceptable Absence - Employment',
+      enforcementActions: [
+        { code: 'LCL', description: 'Licence Compliance Letter Sent', defaultResponsePeriodDays: 7 },
+      ],
+    },
+    {
+      code: 'AAFC',
+      description: 'Acceptable Absence - Family/ Childcare',
+      enforcementActions: [],
+    },
+    {
+      code: 'AAHO',
+      description: 'Acceptable Absence - Holiday',
+      enforcementActions: [],
+    },
+    {
+      code: 'AAME',
+      description: 'Acceptable Absence - Medical',
+      enforcementActions: [],
+    },
   ]
 
   const enforcementActionOptions: Option<AppointmentEnforcementAction | ''>[] = [
@@ -88,12 +189,17 @@ describe('utils/validEnforcementActionOptions', () => {
   ]
 
   it('should return all the enforcement action options', () => {
-    const validOptions = validEnforcementActionOptions(contactEnforcementActions, enforcementActionOptions)
+    const validOptions = validEnforcementActionOptions(contactOutcomes, enforcementActionOptions)
     expect(validOptions).toStrictEqual(enforcementActionOptions)
   })
   it('should return only the valid enforcement action options', () => {
-    contactEnforcementActions = [...contactEnforcementActions.filter(item => item.code !== 'LCL')]
-    const validOptions = validEnforcementActionOptions(contactEnforcementActions, enforcementActionOptions)
+    contactOutcomes = contactOutcomes.reduce((acc, outcome, i) => {
+      return [
+        ...acc,
+        { ...outcome, enforcementActions: outcome.enforcementActions.filter(action => action.code !== 'LCL') },
+      ]
+    }, [])
+    const validOptions = validEnforcementActionOptions(contactOutcomes, enforcementActionOptions)
     expect(validOptions).toEqual([...enforcementActionOptions.slice(0, 3), ...enforcementActionOptions.slice(4)])
   })
 })

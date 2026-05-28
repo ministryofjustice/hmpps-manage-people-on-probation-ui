@@ -15,7 +15,7 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   let filteredLetterTypeOptions: Option<EnforcementActionLetterType>[]
 
   const letterTypeOptions = validEnforcementActionOptions<EnforcementActionLetterType>(
-    appointmentSession.outcome.contactEnforcementActions,
+    appointmentSession.outcome.contactOutcomes,
     _letterTypeOptions,
   )
 
