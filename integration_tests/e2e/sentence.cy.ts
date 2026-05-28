@@ -166,6 +166,20 @@ context('Sentence', () => {
     page.getElementData('licencesEMDILink').should('exist')
   })
 
+  it('Sentence page is rendered without location monitoring info when EMDI API returns http 404 error', () => {
+    cy.task('stubEMDIPeopleExists404Response')
+    cy.visit('/case/X000001/sentence?number=3')
+    const page = Page.verifyOnPage(SentencePage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+  })
+
+  it('Sentence page is rendered without location monitoring info when EMDI API returns http 500 error', () => {
+    cy.task('stubEMDIPeopleExists500Response')
+    cy.visit('/case/X000001/sentence?number=3')
+    const page = Page.verifyOnPage(SentencePage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+  })
+
   it('Sentence page is rendered with date of death recorded warning', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001/sentence')
