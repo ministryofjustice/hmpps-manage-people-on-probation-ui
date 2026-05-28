@@ -1,4 +1,8 @@
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../../server/models/Appointments'
+import {
+  AcceptableAbsenceOutcomeType,
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+} from '../../../../server/models/Appointments'
 import AcceptableAbsencePage from '../../../pages/appointmentOutcomes/acceptable-absence.page'
 import AttendedFailedToComplyPage from '../../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import FailedToAttendPage from '../../../pages/appointmentOutcomes/failed-to-attend.page'
@@ -35,14 +39,17 @@ const map: Map = {
   FAILED_TO_ATTEND: FailedToAttendPage,
 }
 
-const isValidOutcome = (outcome: AppointmentOutcomeType): outcome is ValidOutcome => {
+const isValidOutcome = (outcome: AppointmentOutcomeType | AcceptableAbsenceOutcomeType): outcome is ValidOutcome => {
   return Object.hasOwn(map, outcome)
 }
 
 export const completeOutcome = ({
   outcome = 'ATTENDED_COMPLIED',
   action = null,
-}: { outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}) => {
+}: {
+  outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
+  action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+} = {}) => {
   const outcomePage = new OutcomePage()
   uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=${outcome}]`).click()
@@ -55,23 +62,29 @@ export const completeOutcome = ({
 export const completeAction = ({
   outcome = 'ATTENDED_COMPLIED',
   action = null,
-}: { outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}) => {
+}: {
+  outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
+  action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+} = {}) => {
   if (action && isValidOutcome(outcome)) {
     let breachPage: InitiateBreachOrRecallPage
     let sendLetterPage: SendLetterPage
     const page = new map[outcome]()
     cy.get(`.govuk-radios__input[value=${action}]`).click()
     page.getSubmitBtn().click()
-    const actions: AppointmentEnforcementAction[] = [
+    const actions: (AppointmentEnforcementAction | AcceptableAbsenceOutcomeType)[] = [
       'BREACH_RECALL_INITIATED',
       'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       'SEND_LETTER',
     ]
-    const breachActions: AppointmentEnforcementAction[] = [
+    const breachActions: (AppointmentEnforcementAction | AcceptableAbsenceOutcomeType)[] = [
       'BREACH_RECALL_INITIATED',
       'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
     ]
-    const letterActions: AppointmentEnforcementAction[] = ['BREACH_RECALL_INITIATED_AND_SEND_LETTER', 'SEND_LETTER']
+    const letterActions: (AppointmentEnforcementAction | AcceptableAbsenceOutcomeType)[] = [
+      'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      'SEND_LETTER',
+    ]
     if (actions.includes(action)) {
       if (breachActions.includes(action)) {
         breachPage = new InitiateBreachOrRecallPage()

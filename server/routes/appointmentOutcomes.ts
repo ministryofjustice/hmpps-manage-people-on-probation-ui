@@ -162,6 +162,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${manageBasePath}/failed-to-attend`,
       `${arrangeBasePath}/enforcement-action`,
       `${manageBasePath}/enforcement-action`,
+      `${arrangeBasePath}/initiate-breach-or-recall`,
+      `${manageBasePath}/initiate-breach-or-recall`,
+      `${arrangeBasePath}/send-letter`,
+      `${manageBasePath}/send-letter`,
     ],
     saveMappedCode('ACTION'),
   )

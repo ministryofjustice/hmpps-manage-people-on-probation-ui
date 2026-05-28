@@ -1,6 +1,10 @@
 import { appointmentId } from '../appointments/imports/common'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../server/models/Appointments'
+import {
+  AcceptableAbsenceOutcomeType,
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+} from '../../../server/models/Appointments'
 import {
   completeAction,
   completeAddNotePage,
@@ -15,9 +19,9 @@ let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
 const crn = 'X000001'
 
 interface Props {
-  outcome?: AppointmentOutcomeType
+  outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
   outcomeText?: string
-  action?: AppointmentEnforcementAction
+  action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
   actionText?: string
 }
 

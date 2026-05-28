@@ -51,7 +51,6 @@ export const saveMappedCode = (type: 'OUTCOME' | 'ACCEPTABLE_ABSENCE_OUTCOME' | 
       }
       if (value) {
         const { data } = req.session
-        // console.log(`SAVE ${type} CODE:`, value)
         setDataValue(data, ['appointments', crn, id, 'outcome', codeKey], value)
       }
     }

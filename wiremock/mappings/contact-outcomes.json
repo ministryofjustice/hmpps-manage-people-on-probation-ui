@@ -55,6 +55,11 @@
               "enforcementActions": []
             },
             {
+              "code": "ATSS",
+              "description": "Attended - Sent Home (service issues)",
+              "enforcementActions": []
+            },
+            {
               "code": "AFDA",
               "description": "Attended - FTC Deemed Acceptable",
               "enforcementActions": []

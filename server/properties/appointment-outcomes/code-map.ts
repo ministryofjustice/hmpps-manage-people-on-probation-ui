@@ -69,7 +69,7 @@ export const outcomeMap: OutcomeMap = {
   },
   ATTENDED_SENT_HOME_SERVICE_ISSUES: {
     code: 'ATSS',
-    description: 'Attended - FTC Deemed Acceptable',
+    description: 'Attended - Sent Home (service issues)',
   },
   UNACCEPTABLE_ABSENCE: {
     code: 'UAAB',
