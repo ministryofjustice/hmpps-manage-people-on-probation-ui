@@ -17,7 +17,13 @@ import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate
 import AddNotePage from '../../pages/appointments/add-note.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import { ExpectedOption, Journey, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
+import {
+  ExpectedOption,
+  Journey,
+  checkBreachWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+} from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -147,6 +153,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       journey,
     })
   })
+
+  checkBreachWarningBanner(loadPage, { Page: FailedToAttendPage })
 }
 
 describe('Failed to attend', () => {
