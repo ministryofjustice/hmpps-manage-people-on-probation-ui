@@ -7,6 +7,25 @@ export interface PersonCompliance {
   currentSentences: SentenceCompliance[]
 }
 
+export interface ContactType {
+  code: string
+  description: string
+}
+
+export interface NonComplianceContact {
+  contactId: number
+  eventNumber: string
+  eventId: number
+  type: ContactType
+  date: string
+}
+
+export interface NonComplianceHistoryResponse {
+  acceptableAbsence: NonComplianceContact[]
+  unacceptableAbsence: NonComplianceContact[]
+  attendedButDidNotComply: NonComplianceContact[]
+}
+
 export interface SentenceCompliance {
   eventNumber: string
   activity: ActivityCount

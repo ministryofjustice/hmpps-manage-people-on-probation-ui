@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { Activity, PersonAppointmentEnforcementAction } from '../../data/model/schedule'
+import { Activity } from '../../data/model/schedule'
 import { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
 import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
@@ -9,6 +9,7 @@ import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidU
 import { Sentence } from '../../data/model/sentenceDetails'
 import { AppointmentOutcomeSentence } from '../../models/Locals'
 import { Document } from '../../data/model/personalDetails'
+import { renderError } from '../renderError'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
@@ -35,6 +36,11 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     if (name) {
       ;[officerForename, officerSurname] = name.split(' ')
     }
+
+    if (!appointmentSession) {
+      return renderError(404)(req, res)
+    }
+
     const startDateTime = DateTime.fromISO(`${appointmentSession.date}T${appointmentSession.start}`, {
       zone: 'Europe/London',
     }).toISO({ suppressMilliseconds: true })

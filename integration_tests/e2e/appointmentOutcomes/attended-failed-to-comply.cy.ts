@@ -159,6 +159,42 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   })
 
   checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
+
+  describe('breach warning banner', () => {
+    it('should show when breach is active and enableNonCompliance is enabled', () => {
+      cy.task('stubBreachCompliance')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+      attendedFailedToComplyPage.getBreachWarning().should('exist')
+    })
+
+    it('should not show when there is no active breach', () => {
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+      attendedFailedToComplyPage.getBreachWarning().should('not.exist')
+    })
+  })
+
+  describe('compliance info panel', () => {
+    it('should show the correct compliance information panel when using fallback fields', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      // Note: stubBreachCompliance in wiremock/stubs/compliance.ts uses failureToComplyCount: 2 and breachesOnCurrentOrderCount: 1
+      // and eventNumber: '12345'.
+      // We need to make sure the loadPage uses the same eventNumber or it might use compliance.currentSentences[0]
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      // Panel 3 (multiple counts of non-compliance and previous breach)
+      // failureToComplyCount: 2 (mapped to failureToComplyInLast12MonthsCount)
+      // breachesOnCurrentOrderCount: 1 (mapped to priorBreachesOnCurrentOrderCount)
+      cy.get('[data-qa="alert-panel"]').should(
+        'contain.text',
+        'Alton has had multiple counts of non-compliance in the past 12 months.',
+      )
+      cy.get('[data-qa="alert-panel"]').should('contain.text', 'Alton has breached this sentence before.')
+    })
+  })
 }
 
 describe('Attended but failed to comply', () => {

@@ -34,6 +34,7 @@ import {
   getNotePrepend,
   resetSelectedActions,
   getBreach,
+  getComplianceData,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -102,6 +103,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${manageBasePath}/unacceptable-absence`,
     ],
     getAttendedFailedToComplyOptions,
+    getComplianceData(hmppsAuthClient),
   )
 
   router.all(

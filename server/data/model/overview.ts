@@ -1,5 +1,6 @@
 import { Mappa } from './risk'
 import { Name, PersonalCircumstance } from './personalDetails'
+import { NonComplianceHistoryResponse } from './compliance'
 
 export interface Overview {
   absencesWithoutEvidence: number
@@ -97,8 +98,10 @@ export interface ActivityCount {
 export interface Compliance {
   currentBreaches: number
   priorBreachesOnCurrentOrderCount: number
+  failureToComplyInLast12MonthsCount?: number
   failureToComplyInLast12Months: number
   breachStarted: boolean
   breachesOnCurrentOrderCount: number
   failureToComplyCount: number
+  nonCompliance?: NonComplianceHistoryResponse
 }

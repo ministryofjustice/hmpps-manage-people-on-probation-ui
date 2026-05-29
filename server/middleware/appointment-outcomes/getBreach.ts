@@ -2,6 +2,7 @@ import { Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
 import { getDataValue } from '../../utils'
+import { buildCompliance } from './buildCompliance'
 
 export const getBreach = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -14,7 +15,10 @@ export const getBreach = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
     if (sentences && selectedSentence) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
+
       const compliance = await masClient.getPersonCompliance(crn)
+      const nonCompliance = await masClient.getPersonNonCompliance(crn)
+
       const sentence = sentences.find(s => s.id && s.id.toString() === selectedSentence)
 
       const currentSentence = compliance.currentSentences.find(
@@ -26,6 +30,12 @@ export const getBreach = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
           order: sentence.order.description,
           breachDate: currentSentence.activeBreach.startDate,
         }
+
+        res.locals.appointmentOutcome.compliance = buildCompliance(
+          currentSentence,
+          nonCompliance,
+          res.locals.appointmentOutcome.compliance,
+        )
       }
     }
 
