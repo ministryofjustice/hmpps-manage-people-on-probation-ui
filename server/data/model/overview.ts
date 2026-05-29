@@ -1,6 +1,5 @@
 import { Mappa } from './risk'
 import { Name, PersonalCircumstance } from './personalDetails'
-import { LicenceCondition, Requirement } from './sentenceDetails'
 
 export interface Overview {
   absencesWithoutEvidence: number
