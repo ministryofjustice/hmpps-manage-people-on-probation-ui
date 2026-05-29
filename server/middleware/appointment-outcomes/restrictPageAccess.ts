@@ -11,7 +11,7 @@ interface RestrictionRule {
 type Any = '*'
 
 interface RestrictionRuleOption {
-  'outcome.outcomeType'?: AppointmentOutcomeType
+  'outcome.outcomeType'?: AppointmentOutcomeType | Any
   'outcome.attendedFailedToComply'?: AppointmentEnforcementAction | Any
   'outcome.acceptableAbsence'?: AppointmentEnforcementAction | Any
   'outcome.unacceptableAbsence'?: AppointmentEnforcementAction | Any
@@ -20,6 +20,7 @@ interface RestrictionRuleOption {
   'outcome.breachNSICreatedBy'?: Any
   'outcome.letterType'?: Any
   'outcome.nextAppointment'?: Any
+  'outcome.updateEnforcementAction'?: AppointmentEnforcementAction | Any
   notes?: Any
   nextAppointment?: Any
 }
@@ -39,7 +40,7 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
   const originUrl = uuid ? `${baseUrl}/sentence` : `${baseUrl}/manage`
   const outcomeUrl = `${baseUrl}/outcome`
 
-  if (!appointmentSession?.type || !appointmentSession?.eventId || !appointmentSession?.date) {
+  if (!appointmentSession?.date) {
     return res.redirect(originUrl)
   }
 
@@ -114,19 +115,58 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
       'outcome.otherEnforcementAction': any,
     },
     { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.failedToAttend': 'SEND_LETTER', 'outcome.letterType': any },
-    { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.failedToAttend': 'DECISION_PENDING_RESPONSE' },
+    {
+      'outcome.outcomeType': 'FAILED_TO_ATTEND',
+      'outcome.failedToAttend': 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+    },
     {
       'outcome.outcomeType': 'FAILED_TO_ATTEND',
       'outcome.failedToAttend': 'DIFFERENT_ACTION',
       'outcome.otherEnforcementAction': any,
     },
     { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.failedToAttend': 'REFER_TO_OFFENDER_MANAGER' },
+    {
+      'outcome.outcomeType': any,
+      'outcome.updateEnforcementAction': 'BREACH_RECALL_INITIATED',
+      'outcome.breachNSICreatedBy': any,
+    },
+    {
+      'outcome.outcomeType': any,
+      'outcome.updateEnforcementAction': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      'outcome.letterType': any,
+    },
+    {
+      'outcome.outcomeType': any,
+      'outcome.updateEnforcementAction': 'SEND_ANOTHER_LETTER',
+      'outcome.letterType': any,
+    },
+    {
+      'outcome.outcomeType': any,
+      'outcome.updateEnforcementAction': 'SEND_LETTER',
+      'outcome.letterType': any,
+    },
+    {
+      'outcome.outcomeType': any,
+      'outcome.updateEnforcementAction': 'DIFFERENT_ACTION',
+      'outcome.otherEnforcementAction': any,
+    },
+    {
+      'outcome.outcomeType': any,
+      'outcome.otherEnforcementAction': any,
+    },
+    {
+      'outcome.outcomeType': any,
+      'outcome.updateEnforcementAction': any,
+    },
   ]
 
   const rules: RestrictionRule[] = [
     {
       url: 'attended-failed-to-comply',
-      required: { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY' },
+      options: [
+        { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY' },
+        { 'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR' },
+      ],
     },
     {
       url: 'acceptable-absence',
@@ -144,8 +184,20 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
       url: 'enforcement-action',
       options: [
         { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.attendedFailedToComply': 'DIFFERENT_ACTION' },
+        { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.attendedFailedToComply': 'NO_FURTHER_ACTION' },
+        { 'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR', 'outcome.attendedFailedToComply': 'DIFFERENT_ACTION' },
+        {
+          'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR',
+          'outcome.attendedFailedToComply': 'NO_FURTHER_ACTION',
+        },
         { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.unacceptableAbsence': 'DIFFERENT_ACTION' },
+        { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.unacceptableAbsence': 'NO_FURTHER_ACTION' },
         { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.failedToAttend': 'DIFFERENT_ACTION' },
+        { 'outcome.outcomeType': any, 'outcome.otherEnforcementAction': any },
+        {
+          'outcome.outcomeType': any,
+          'outcome.updateEnforcementAction': 'DIFFERENT_ACTION',
+        },
       ],
     },
     {
@@ -155,7 +207,39 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
           'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
           'outcome.attendedFailedToComply': 'BREACH_RECALL_INITIATED',
         },
+        {
+          'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+          'outcome.attendedFailedToComply': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        },
+        {
+          'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR',
+          'outcome.attendedFailedToComply': 'BREACH_RECALL_INITIATED',
+        },
+        {
+          'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR',
+          'outcome.attendedFailedToComply': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        },
+        {
+          'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+          'outcome.attendedFailedToComply': 'BREACH_RECALL_INITIATED',
+        },
+        {
+          'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+          'outcome.attendedFailedToComply': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        },
         { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.unacceptableAbsence': 'BREACH_RECALL_INITIATED' },
+        {
+          'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+          'outcome.unacceptableAbsence': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        },
+        {
+          'outcome.outcomeType': any,
+          'outcome.updateEnforcementAction': 'BREACH_RECALL_INITIATED',
+        },
+        {
+          'outcome.outcomeType': any,
+          'outcome.updateEnforcementAction': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        },
       ],
     },
     {
@@ -166,8 +250,24 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
           'outcome.attendedFailedToComply': 'SEND_LETTER',
         },
         {
+          'outcome.outcomeType': any,
+          'outcome.updateEnforcementAction': 'SEND_ANOTHER_LETTER',
+        },
+        {
+          'outcome.outcomeType': any,
+          'outcome.updateEnforcementAction': 'SEND_LETTER',
+        },
+        {
+          'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR',
+          'outcome.attendedFailedToComply': 'SEND_LETTER',
+        },
+        {
           'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
           'outcome.unacceptableAbsence': 'SEND_LETTER',
+        },
+        {
+          'outcome.outcomeType': 'FAILED_TO_ATTEND',
+          'outcome.failedToAttend': 'SEND_LETTER',
         },
         {
           'outcome.outcomeType': 'FAILED_TO_ATTEND',
@@ -184,6 +284,7 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
       options: [
         { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.attendedFailedToComply': any },
         { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.letterType': any },
+        { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.otherEnforcementAction': any },
         { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.unacceptableAbsence': any },
         { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.letterType': any },
         { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.failedToAttend': any },
@@ -197,8 +298,7 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
     },
     {
       url: 'check-your-answers',
-      required: { notes: any, 'outcome.nextAppointment': any },
-      options: allOptions,
+      options: [...allOptions, { 'outcome.outcomeType': any }],
     },
   ]
 
@@ -222,6 +322,7 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
       }
       if (!isInvalidOption) {
         return false
+        break
       }
     }
     return true
@@ -239,7 +340,6 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
       }
     }
   }
-
   if (restricted) {
     return res.redirect(outcomeUrl)
   }

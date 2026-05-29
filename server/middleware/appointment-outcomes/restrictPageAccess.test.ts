@@ -86,7 +86,7 @@ describe('middleware/appointment-outcomes/restrictPageAccess', () => {
     })
 
     it('should redirect to the manage appointment page if manage journey', () => {
-      const appointment: Partial<AppointmentSession> = { type: '' }
+      const appointment: Partial<AppointmentSession> = { date: '' }
       const req = buildRequest({ _contactId: contactId, appointment })
       restrictPageAccess(req, res, nextSpy)
       expect(redirectSpy).toHaveBeenCalledWith(expectedOriginRedirectUrl.manage)
@@ -127,6 +127,7 @@ describe('middleware/appointment-outcomes/restrictPageAccess', () => {
 
   describe('Other enforcement action', () => {
     const url = '/outcome/enforcement-action'
+
     it('should redirect to the outcome page if non of the options criteria are met', () => {
       const outcome: Partial<AppointmentSessionOutcome> = {
         outcomeType: 'ACCEPTABLE_ABSENCE',
@@ -249,6 +250,16 @@ describe('middleware/appointment-outcomes/restrictPageAccess', () => {
         letterType: 'FIRST_WARNING_LETTER_SENT',
       }
       const req = buildRequest({ _uuid: uuid, outcome, url })
+      restrictPageAccess(req, res, nextSpy)
+      expect(redirectSpy).not.toHaveBeenCalled()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+    it('should call next() if one of the option criteria is met **', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+        otherEnforcementAction: 'DECISION_PENDING_RESPONSE',
+      }
+      const req = buildRequest({ _contactId: contactId, outcome, url })
       restrictPageAccess(req, res, nextSpy)
       expect(redirectSpy).not.toHaveBeenCalled()
       expect(nextSpy).toHaveBeenCalledTimes(1)
