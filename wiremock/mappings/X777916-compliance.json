@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/compliance/X777916",
+        "urlPathPattern": "/mas/compliance/X777916",
         "method": "GET"
       },
       "response": {

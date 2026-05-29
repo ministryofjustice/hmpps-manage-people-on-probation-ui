@@ -13,7 +13,7 @@ import {
 } from '../appointments/utils'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
-import { ExpectedOption, Journey, checkOptions } from './imports'
+import { ExpectedOption, Journey, checkOptions, checkBreachWarningBanner } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -195,6 +195,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage = new AddNotePage()
     addNotePage.checkOnPage()
   })
+
+  checkBreachWarningBanner(loadPage, { Page: InitiateBreachOrRecallPage })
 }
 
 describe('Initiate a breach or recall', () => {

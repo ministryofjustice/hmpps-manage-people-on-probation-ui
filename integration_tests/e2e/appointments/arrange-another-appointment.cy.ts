@@ -28,7 +28,7 @@ const loadPage = ({
   }
   cy.visit(`/case/${_crn}/appointments/appointment/6/next-appointment`)
   const nextAppointmentPage = new NextAppointmentPage()
-  nextAppointmentPage.getRadio('option', 1).click()
+  nextAppointmentPage.getRadio('anotherAppointment', 1).click()
   nextAppointmentPage.getSubmitBtn().click()
 }
 

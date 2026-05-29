@@ -24,7 +24,7 @@ const loadPage = ({ urlCRN = crn, typeOptionIndex = 1, enableNonCompliance = tru
   if (!enableNonCompliance) {
     cy.task('stubDisableNonCompliance')
   }
-  completeSentencePage(1, '', urlCRN)
+  completeSentencePage({ eventIndex: 1, crnOverride: urlCRN })
   completeTypePage(typeOptionIndex)
 }
 

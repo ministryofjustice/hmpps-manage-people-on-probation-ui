@@ -18,7 +18,7 @@ export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeA
     getUuid().then(pageUuid => {
       completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
-      completeSupportingInformationPage(true, '', pageUuid)
+      completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
     })
   }
   page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned telephone contact (NS)')

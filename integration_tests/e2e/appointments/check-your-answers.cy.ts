@@ -46,7 +46,7 @@ const loadPage = ({
   if (!enableNonCompliance) {
     cy.task('stubDisableNonCompliance')
   }
-  completeSentencePage(sentenceOptionIndex, '')
+  completeSentencePage({ eventIndex: sentenceOptionIndex })
   completeTypePage(typeOptionIndex, hasVisor)
   completeLocationDateTimePage({ dateInPast })
   if (!dateInPast && textMessageFeatureFlag) {
@@ -58,7 +58,7 @@ const loadPage = ({
       page.getElementInput('mobileNumber').clear().type('07783889300')
       cy.get('[data-qa=submitBtn]').click()
     }
-    completeSupportingInformationPage(notes)
+    completeSupportingInformationPage({ notes })
   }
   if (dateInPast) {
     if (!enableNonCompliance) {
@@ -70,7 +70,7 @@ const loadPage = ({
     completeAddNotePage()
   }
   if (!dateInPast && !textMessageFeatureFlag) {
-    completeSupportingInformationPage(notes)
+    completeSupportingInformationPage({ notes })
   }
 }
 

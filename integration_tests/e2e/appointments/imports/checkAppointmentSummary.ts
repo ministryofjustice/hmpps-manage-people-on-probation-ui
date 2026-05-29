@@ -141,6 +141,6 @@ export const checkAppointmentSummary = ({
     page
       .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 8 : 7) + index)
       .find('.govuk-summary-list__value')
-      .should('contain.text', reschedule || anotherAppointment ? 'Not entered' : 'Yes')
+      .should('contain.text', reschedule || anotherAppointment ? 'No' : 'Yes')
   }
 }

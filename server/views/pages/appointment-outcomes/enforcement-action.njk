@@ -1,10 +1,10 @@
-{% extends "../_form.njk" %}
+{% extends "../_appointment-outcome-form.njk" %}
 {% set backLink = appointmentOutcome.backLink %}
 {% block afterHeading %}
   {% if appointmentOutcome.currentEnforcementAction %}
     {{ govukInsetText({
   html: "The current enforcement status is: " + govukTag({
-          text: appointmentOutcome.currentEnforcementAction.text,
+          text: appointmentOutcome.currentEnforcementAction.description,
           classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
         })
 }) }}

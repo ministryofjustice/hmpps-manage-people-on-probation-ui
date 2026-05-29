@@ -1,31 +1,58 @@
+import { DateTime } from 'luxon'
 import { Route } from '../../@types'
 import { enforcementActionMap } from '../../properties/appointment-outcomes'
 import { Activity } from '../../data/model/schedule'
 import { AppointmentEnforcementAction } from '../../models/Appointments'
-import { AppointmentOutcomeProps, TagColour } from '../../models/Locals'
+import { AppointmentOutcomeProps, CurrentEnforcementAction, TagColour } from '../../models/Locals'
+import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
+import { dateWithYear } from '../../utils'
 
 type Map = { [K in AppointmentEnforcementAction]?: TagColour }
 
 export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void => {
-  const { appointment } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
-  let action: AppointmentEnforcementAction
+  const { forename, baseOutcomeUrl, appointmentSession } = res.locals
+    .appointmentOutcome as AppointmentOutcomeProps<Activity>
   let tagColour: TagColour = 'YELLOW'
-  let text = ''
-  if (appointment?.action) {
-    text = appointment.action
-    action =
-      (Object.entries(enforcementActionMap).find(
-        ([_key, { description }]) => description?.toLowerCase() === (appointment as Activity).action.toLowerCase(),
-      )?.[0] as AppointmentEnforcementAction) || null
+  let currentEnforcementAction: CurrentEnforcementAction = null
+  let evidenceDueDate: string = null
+  let evidenceWarning: string = null
+  const { enforcementAction = null } = res.locals.personAppointment
+  if (enforcementAction) {
+    const { description = '', responseByDate = null } = enforcementAction
+    let action: AppointmentEnforcementAction = null
+    if (enforcementAction.code) {
+      action =
+        (Object.entries(enforcementActionMap).find(
+          ([_key, { code }]) => code === enforcementAction.code,
+        )?.[0] as AppointmentEnforcementAction) || null
+    }
+    if (responseByDate) {
+      evidenceDueDate = dateWithYear(responseByDate)
+      const date = DateTime.fromISO(responseByDate).startOf('day')
+      const today = DateTime.now().startOf('day')
+      const daysBetween = Math.max(0, Math.ceil(date.diff(today, 'days').days))
+      evidenceWarning = `${forename} has until ${DateTime.fromISO(responseByDate).toFormat('d MMMM')} to submit evidence (${daysBetween} day${daysBetween !== 1 ? 's' : ''} remaining)`
+    }
+    const map: Map = {
+      NO_FURTHER_ACTION: 'GREEN',
+      REFER_TO_OFFENDER_MANAGER: 'PURPLE',
+      WITHDRAWAL_OF_WARNING: 'GREEN',
+    }
+    if (map?.[action]) {
+      tagColour = map[action]
+    }
+    const outcomeType = appointmentSession?.outcome?.outcomeType
+    const link = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)?.[outcomeType] : baseOutcomeUrl
+    currentEnforcementAction = {
+      description,
+      action,
+      code: enforcementAction?.code,
+      tagColour,
+      link,
+      evidenceDueDate,
+      evidenceWarning,
+    }
   }
-  const map: Map = {
-    NO_FURTHER_ACTION: 'GREEN',
-    REFER_TO_OFFENDER_MANAGER: 'PURPLE',
-    WITHDRAWAL_OF_WARNING: 'GREEN',
-  }
-  if (map?.[action]) {
-    tagColour = map[action]
-  }
-  res.locals.appointmentOutcome.currentEnforcementAction = action ? { action, text, tagColour } : null
+  res.locals.appointmentOutcome.currentEnforcementAction = currentEnforcementAction
   return next()
 }

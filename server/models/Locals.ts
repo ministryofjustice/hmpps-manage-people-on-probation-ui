@@ -1,6 +1,6 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
-import { PersonalDetails } from '../data/model/personalDetails'
+import { Document, PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
@@ -174,12 +174,17 @@ export interface AppointmentOutcomeSentence {
   length: number | null
 }
 
+export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
+
 export interface AppointmentOutcomeEnforcementAction {
   responseByDate?: string
   responseByDays?: number
 }
 
-export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE'
+export interface BreachWarning {
+  order: string
+  breachDate: string
+}
 
 export interface OutcomeSummary {
   appointmentDetails: string
@@ -193,10 +198,27 @@ export interface OutcomeSummary {
   enforcementActionChangeLink?: string
 }
 
+export interface CurrentOutcome {
+  status: string
+  reason: string
+  tagColour: TagColour
+}
+
+export interface CurrentEnforcementAction {
+  action: AppointmentEnforcementAction
+  code?: string
+  description: string
+  tagColour: TagColour
+  link?: string
+  evidenceDueDate?: string
+  evidenceWarning?: string
+}
+
 export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
   appointment: TAppointment
+  documents: Document[]
   crn: string
   uuid: string | undefined
   contactId: string | undefined
@@ -218,12 +240,13 @@ export interface AppointmentOutcomeProps<TAppointment> {
   letterSentByOptions?: Option<EnforcementActionCreatedBy>[]
   letterTypeOptions?: Option<EnforcementActionLetterType>[]
   sentence?: AppointmentOutcomeSentence
-  enforcementAction?: AppointmentOutcomeEnforcementAction
   isProbationPractitioner?: boolean
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
-  currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
+  currentEnforcementAction?: CurrentEnforcementAction
+  currentOutcome?: CurrentOutcome
+  breachWarning?: BreachWarning | null
   notePrepend?: string
   summary?: OutcomeSummary
 }

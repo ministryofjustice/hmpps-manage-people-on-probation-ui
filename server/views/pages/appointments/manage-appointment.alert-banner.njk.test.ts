@@ -44,6 +44,7 @@ const baseModel: TestModel = {
         surname: 'Jones',
       },
     } as PersonSummary,
+    documents: [],
     appointment: {
       id: appointmentId,
       eventNumber: '7654321',

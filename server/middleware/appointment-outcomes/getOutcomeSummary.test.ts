@@ -36,6 +36,7 @@ const mockAppointmentOutcome = ({
   id: contactId,
   isInPast: true,
   isValidParams: true,
+  documents: [],
   reqUrl: '/req/url',
   baseUrl: '/base/url',
   baseOutcomeUrl: '/base/outcome/url',

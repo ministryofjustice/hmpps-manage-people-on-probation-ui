@@ -750,9 +750,11 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       await postCheckinInComplete(hmppsAuthClient)(req, res)
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
+      const activeId = res.locals?.offenderCheckinsByCRNResponse?.uuid
       const userDetails: CheckinUserDetails = {
         ...savedUserDetails,
-        uuid: id,
+        uuid: activeId,
         interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
         displayCommsOption:
           savedUserDetails.preferredComs === 'EMAIL' ? savedUserDetails.checkInEmail : savedUserDetails.checkInMobile,
@@ -763,7 +765,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const isFutureCheckinDate = checkInDate > today
 
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
-      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails, isFutureCheckinDate })
+      return res.render('pages/check-in/confirmation.njk', { crn, id, activeId, userDetails, isFutureCheckinDate })
     }
   },
 

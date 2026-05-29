@@ -39,9 +39,11 @@ describe('Create next appointment', () => {
     checkPopHeader()
   })
   it('should display the options', () => {
-    nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another planned office visit (NS)')
-    nextAppointmentPage.getRadioLabel('option', 2).should('contain.text', 'Yes - another appointment type')
-    nextAppointmentPage.getRadioLabel('option', 3).should('contain.text', 'No')
+    nextAppointmentPage
+      .getRadioLabel('anotherAppointment', 1)
+      .should('contain.text', 'Yes - another planned office visit (NS)')
+    nextAppointmentPage.getRadioLabel('anotherAppointment', 2).should('contain.text', 'Yes - another appointment type')
+    nextAppointmentPage.getRadioLabel('anotherAppointment', 3).should('contain.text', 'No')
   })
   it('should return to manage page when backLink selected', () => {
     nextAppointmentPage.getBackLink().click()
@@ -57,7 +59,7 @@ describe('Create next appointment', () => {
   })
 
   it('should return to manage if no selected', () => {
-    nextAppointmentPage.getRadio('option', 3).click()
+    nextAppointmentPage.getRadio('anotherAppointment', 3).click()
     nextAppointmentPage.getSubmitBtn().click()
     const manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with George Parker')
@@ -69,7 +71,7 @@ describe('Create next appointment', () => {
       cy.task('stubAppointmentNoEventId')
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('option', 1).click()
+      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
@@ -111,7 +113,7 @@ describe('Create next appointment', () => {
       cy.task('stubAppointmentNoType')
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('option', 1).click()
+      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
@@ -155,7 +157,7 @@ describe('Create next appointment', () => {
       cy.task('stubAppointmentNoLocation')
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('option', 1).click()
+      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
@@ -200,7 +202,7 @@ describe('Create next appointment', () => {
       cy.task('stubAppointmentPersonLevel')
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('option', 1).click()
+      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
@@ -249,7 +251,7 @@ describe('Create next appointment', () => {
     beforeEach(() => {
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('option', 2).click()
+      nextAppointmentPage.getRadio('anotherAppointment', 2).click()
       nextAppointmentPage.getSubmitBtn().click()
     })
     it('should redirect to the sentence/person page', () => {

@@ -9,7 +9,7 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import { checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
+import { checkBreachWarningBanner, checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let updateEnforcementActionPage: UpdateEnforcementActionPage
@@ -25,6 +25,7 @@ const loadPage = ({
   enforcementAction?: AppointmentEnforcementAction
 } = {}): void => {
   const action = enforcementActionMap?.[enforcementAction]?.description || null
+  const code = enforcementActionMap?.[enforcementAction]?.code || null
   cy.task('stubAppointment', {
     eventId: 2501192724,
     isFuture: false,
@@ -33,13 +34,18 @@ const loadPage = ({
     notes: false,
     acceptableAbsence,
     action,
+    outcome: action ? 'Attended - Failed To Comply' : null,
+    enforcementAction: {
+      code,
+      description: action,
+    },
   })
   if (sentenceType !== 'COMMUNITY') {
     cy.task('stubSentences', { sentenceType })
   }
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
   manageAppointmentPage = new ManageAppointmentPage()
-  manageAppointmentPage.getTaskLink(1).click()
+  manageAppointmentPage.getTaskLink(2).click()
 }
 
 type RedirectPages = SendLetterPage | AddNotePage | EnforcementActionPage
@@ -334,6 +340,8 @@ const checkPage = () => {
       cy.get(`#appointments-${crn}-${appointmentId}-outcome-updateEnforcementAction-error`).should('contain.text', msg)
     })
   })
+
+  checkBreachWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
 }
 
 describe('Update enforcement action', () => {

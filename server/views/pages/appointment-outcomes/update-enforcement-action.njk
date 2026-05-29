@@ -1,4 +1,4 @@
-{% extends "../_form.njk" %}
+{% extends "../_appointment-outcome-form.njk" %}
 {% set outcome = 'acceptable absence' if appointmentOutcome.appointment.acceptableAbsence == true else 
   'failure to comply' %}
 {% set title = 'Update enforcement action for ' + appointmentOutcome.forename + '’s ' + outcome %}
@@ -8,7 +8,7 @@
   {% if appointmentOutcome.currentEnforcementAction %}
     {{ govukInsetText({
   html: "The current enforcement status is: " + govukTag({
-          text: appointmentOutcome.currentEnforcementAction.text,
+          text: appointmentOutcome.currentEnforcementAction.description,
           classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
         })
 }) }}

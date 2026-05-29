@@ -122,11 +122,13 @@ const createMockRequest = ({
   dataSession,
   appointmentSession,
   appointmentBody,
+  appointments,
   query,
 }: {
   request?: Record<string, string>
   dataSession?: Data
   appointmentSession?: AppointmentSession
+  appointments?: { [K: string]: AppointmentSession }
   appointmentBody?: Record<string, string> | Record<string, Record<string, string>>
   query?: Record<string, string>
 } = {}): httpMocks.MockRequest<any> => ({
@@ -151,6 +153,7 @@ const createMockRequest = ({
             ...(req?.session?.data?.appointments?.[crn]?.[uuid] || {}),
             ...(appointmentSession || {}),
           },
+          ...(appointments || {}),
         },
       },
       ...(dataSession || {}),
@@ -186,7 +189,13 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         surname: 'Wolff',
       },
     },
-    flags: { enableMAN2344: true, enableSensitivityRemoved: true },
+    appointmentTypes: [
+      {
+        code: 'A1',
+        description: 'Planned Office Meeting',
+      },
+    ],
+    flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: true },
     ...(localsResponse || {}),
   })
 
@@ -793,7 +802,7 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the future', async () => {
+    it('should reset the outcome recorded session value if original date was in the future - non compliance enabled', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -809,11 +818,34 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
+        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
+        null,
+      )
+    })
+    it('should reset the outcome recorded session value if original date was in the future - non compliance disabled', async () => {
+      const mockReq = createMockRequest({
+        query: { change },
+        appointmentSession: {
+          date: '2029-07-07',
+          temp: {
+            date: tomorrow,
+            isInPast: false,
+          },
+        },
+      })
+      const mockRes = createMockResponse({
+        flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: false },
+      })
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
         ['appointments', crn, uuid, 'outcomeRecorded'],
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date', async () => {
+    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance enabled', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -827,6 +859,29 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
+        null,
+      )
+    })
+    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance disabled', async () => {
+      const mockReq = createMockRequest({
+        query: { change },
+        appointmentSession: {
+          date: '2025-07-08',
+          temp: {
+            date: '2025-07-07',
+            isInPast: true,
+          },
+        },
+      })
+      const mockRes = createMockResponse({
+        flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: false },
+      })
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'outcomeRecorded'],
@@ -1124,10 +1179,11 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: null,
-        isEnglishNotificationFailed: undefined,
-        isWelshNotificationFailed: undefined,
+        isEnglishNotificationFailed: null,
+        isWelshNotificationFailed: null,
         smsSent: true,
         attendingName: 'First’s',
+        linkedAppointment: null,
         url: '',
       })
     })
@@ -1146,6 +1202,47 @@ describe('controllers/arrangeAppointment', () => {
         appointmentType: 'RESCHEDULE',
         attendingName: 'First’s',
         url: encodeURIComponent('/reschedule/url'),
+        linkedAppointment: null,
+        isEnglishNotificationFailed: null,
+        isWelshNotificationFailed: null,
+        smsSent: null,
+      })
+    })
+    it('should render the reschedule appointment confirmation page if next appointment has been arranged', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: {
+          backendId: 1234,
+          user: { username: '' },
+          rescheduleAppointment: { contactId: '1234' },
+          linkedContactId: '1234',
+        },
+        appointments: {
+          '1234': {
+            eventId: '10',
+            start: '2026-05-23',
+            type: 'A1',
+          },
+        },
+        dataSession: { isOutLookEventFailed: false },
+        request: { url: '/reschedule/url' },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
+        crn,
+        isInPast: false,
+        backendId: 1234,
+        isOutLookEventFailed: false,
+        appointmentType: 'RESCHEDULE',
+        attendingName: 'First’s',
+        url: encodeURIComponent('/reschedule/url'),
+        linkedAppointment: {
+          contactId: '1234',
+          date: '23 May 2026',
+          type: 'Planned Office Meeting',
+        },
+        isEnglishNotificationFailed: null,
+        isWelshNotificationFailed: null,
+        smsSent: null,
       })
     })
   })
