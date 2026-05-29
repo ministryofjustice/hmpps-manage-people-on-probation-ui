@@ -105,6 +105,7 @@ generic-service:
     SENTENCE_PLAN_LINK: 'https://sentence-plan.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_LINK_V2: 'https://arns-assessment-platform.hmpps.service.justice.gov.uk/access/sentence-plan/crn'
     E_SUPERVISION_API_URL: 'https://esupervision-api.hmpps.service.justice.gov.uk'
+    EMDI_API_URL: 'https://electronic-monitoring-data-insights-api.hmpps.service.justice.gov.uk'
     ESUPERVISION_GUIDANCE_LINK: 'https://probation-check-in.hmpps.service.justice.gov.uk'
     CHAR_COUNT: 12000
     ENVIRONMENT_NAME: PRODUCTION

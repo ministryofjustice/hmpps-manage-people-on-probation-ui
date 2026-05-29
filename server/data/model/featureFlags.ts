@@ -25,4 +25,6 @@ export class FeatureFlags {
   enableStopCheckinSensitiveFlag?: boolean = undefined
   enableShowMatchWithConcern?: boolean = undefined
   enableFurtherActionsDeprecation?: boolean = undefined
+  enableEMDISentencesShowGPSData?: boolean = undefined
+  enableEMDIOverviewShowGPSData?: boolean = undefined
 }

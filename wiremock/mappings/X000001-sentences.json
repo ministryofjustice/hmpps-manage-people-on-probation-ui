@@ -337,6 +337,11 @@
                     "hasNoteBeenTruncated": false
                   }
                 ]
+              },
+              {
+                "id": 4,
+                "description": "Location Monitoring(GPS Tagging) - Monitored Appointment",
+                "active": true
               }
             ],
             "courtDocuments": [],
@@ -504,6 +509,11 @@
                     "hasNoteBeenTruncated": false
                   }
                 ]
+              },
+              {
+                "id": 2500841296,
+                "mainDescription": "Licence - Location Monitoring (GPS Tagging)",
+                "active": true
               }
             ]
           }
