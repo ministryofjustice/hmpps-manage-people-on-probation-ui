@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/emdi/people/exists/.*",
+        "urlPathPattern": "/emdi/people/exists/X000001",
         "method": "GET"
       },
       "response": {
@@ -13,6 +13,26 @@
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
         }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/emdi/people/exists/X777916",
+        "method": "GET"
+      },
+      "response": {
+        "status": 404,
+        "jsonBody": {}
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/emdi/people/exists/X000002",
+        "method": "GET"
+      },
+      "response": {
+        "status": 500,
+        "jsonBody": {}
       }
     }
   ]

@@ -2,6 +2,8 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
+import { LicenceCondition, Requirement } from '../data/model/sentenceDetails'
+import { checkLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
 
 const routes = [
@@ -47,7 +49,16 @@ const sentenceController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const sentenceDetails = await masClient.getSentenceDetails(crn, queryParam)
       if (res.locals.flags.enableEMDISentencesShowGPSData) {
-        res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
+        const licenceConditions: LicenceCondition[] = sentenceDetails.sentence?.licenceConditions
+        const requirements: Requirement[] = sentenceDetails.sentence?.requirements
+        const hasLocationMonitoring: {
+          hasLicenceConditionsLMData?: boolean
+          hasRequirementsLMData?: boolean
+        } = checkLocationMonitoring(licenceConditions, requirements)
+
+        if (hasLocationMonitoring?.hasLicenceConditionsLMData || hasLocationMonitoring?.hasRequirementsLMData) {
+          res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
+        }
       }
       return res.render('pages/sentence', {
         sentenceDetails,

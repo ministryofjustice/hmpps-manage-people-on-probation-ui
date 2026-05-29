@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas/sentence/X777916",
+        "urlPathPattern": "/mas/sentence/X000002",
         "queryParameters": {
           "activeSentence": {
             "equalTo": "true"
@@ -17,7 +17,7 @@
               "forename": "Wendell",
               "surname": "Dooley"
             },
-            "crn": "X777916",
+            "crn": "X000002",
             "dateOfBirth": "2001-02-14"
           },
           "sentenceSummaryList": [

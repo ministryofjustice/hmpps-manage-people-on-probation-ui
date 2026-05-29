@@ -15,9 +15,6 @@ import {
 } from './mocks'
 import { Overview } from '../data/model/overview'
 import { Needs } from '../data/model/risk'
-import { existsInEMDI } from '../middleware/existsInEMDI'
-import { getCheckinOffenderDetails } from '../middleware'
-import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
 import { checkAuditMessage } from './testutils'
 import {
   AddressType,
@@ -48,7 +45,6 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/eSupervisionClient')
-jest.mock('../middleware/existsInEMDI')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -116,10 +112,6 @@ jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
-
-const existsInEMDISpy = existsInEMDI as jest.Mock
-const getCheckinOffenderDetailsSpy = getCheckinOffenderDetails as jest.Mock
-const getUpcomingCheckinDetailsSpy = getUpcomingCheckinDetails as jest.Mock
 
 const res = mockAppResponse({
   flags: {
@@ -246,34 +238,6 @@ describe('caseController', () => {
       )
     })
   })
-
-  describe('getCase - enableEMDIOverviewShowGPSData flag enabled', () => {
-    const req = httpMocks.createRequest({
-      params: { crn },
-      url: '/caseload/appointments/upcoming',
-      session: {
-        data: {
-          personalDetails: {
-            [crn]: mockPersonalDetails,
-          },
-        },
-      },
-    })
-    beforeEach(async () => {
-      res.locals.flags = { enableEMDIOverviewShowGPSData: true, enableOutcomesV1: true }
-      existsInEMDISpy.mockResolvedValue('http://emdi/person/exists')
-      await controllers.case.getCase(hmppsAuthClient)(req, res)
-    })
-    afterEach(() => {
-      res.locals.flags = { enableOutcomesV1: true }
-    })
-
-    it('should call existsInEMDI and set locationMonitoringUri', () => {
-      expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
-      expect(res.locals.locationMonitoringUri).toEqual('http://emdi/person/exists')
-    })
-  })
-
   it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {
     jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockResolvedValueOnce({} as any)
 

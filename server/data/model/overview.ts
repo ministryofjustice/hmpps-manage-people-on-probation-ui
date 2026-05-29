@@ -24,8 +24,6 @@ export interface Sentence {
   mainOffence: Offence
   order?: Order
   rarDescription?: string
-  licenceConditions?: LicenceCondition[]
-  requirements?: Requirement[]
 }
 
 export interface Rar {
