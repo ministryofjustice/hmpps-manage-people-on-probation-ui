@@ -8,6 +8,7 @@ import { getBreach } from './getBreach'
 
 const mockGetSystemClientToken = jest.fn()
 const mockGetPersonCompliance = jest.fn()
+const mockGetPersonNonCompliance = jest.fn()
 
 jest.mock('../../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => ({
@@ -18,6 +19,7 @@ jest.mock('../../data/hmppsAuthClient', () => {
 jest.mock('../../data/masApiClient', () => {
   return jest.fn().mockImplementation(() => ({
     getPersonCompliance: mockGetPersonCompliance,
+    getPersonNonCompliance: mockGetPersonNonCompliance,
   }))
 })
 
@@ -43,11 +45,12 @@ const mockBreachSentenceCompliance: SentenceCompliance = {
   },
   compliance: {
     currentBreaches: 1,
-    priorBreachesOnCurrentOrderCount: 0,
-    failureToComplyInLast12Months: 0,
+    priorBreachesOnCurrentOrderCount: 1,
+    failureToComplyInLast12Months: 2,
     breachStarted: true,
     breachesOnCurrentOrderCount: 1,
-    failureToComplyCount: 0,
+    failureToComplyCount: 2,
+    failureToComplyInLast12MonthsCount: 2,
   },
   mainOffence: {
     code: 'OFF001',
@@ -99,6 +102,11 @@ describe('/middleware/appointment-outcomes/getBreach', () => {
     next = jest.fn()
     mockGetSystemClientToken.mockResolvedValue('token-1')
     mockGetPersonCompliance.mockResolvedValue(personComplianceFixture())
+    mockGetPersonNonCompliance.mockResolvedValue({
+      unacceptableAbsence: [],
+      acceptableAbsence: [],
+      attendedButDidNotComply: [],
+    })
   })
 
   it('should set breach to matching SentenceCompliance when sentence ID matches and has an active breach with matching event number', async () => {
@@ -107,6 +115,8 @@ describe('/middleware/appointment-outcomes/getBreach', () => {
     await getBreach(mockedHmppsAuthClient)(req, res, next)
 
     expect(res.locals.appointmentOutcome.breachWarning).toEqual({ order: 'Community Order', breachDate: '2024-01-01' })
+    expect(res.locals.appointmentOutcome.compliance.failureToComplyInLast12MonthsCount).toEqual(2)
+    expect(res.locals.appointmentOutcome.compliance.priorBreachesOnCurrentOrderCount).toEqual(1)
     expect(next).toHaveBeenCalledTimes(1)
   })
 

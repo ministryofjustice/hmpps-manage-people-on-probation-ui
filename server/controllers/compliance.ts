@@ -21,12 +21,14 @@ const complianceController: Controller<typeof routes, void> = {
       })
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
-      const [personCompliance, tierCalculation] = await Promise.all([
+      const [personCompliance, nonCompliance, tierCalculation] = await Promise.all([
         masClient.getPersonCompliance(crn),
+        masClient.getPersonNonCompliance(crn),
         tierClient.getCalculationDetails(crn),
       ])
       return res.render('pages/compliance', {
         personCompliance,
+        nonCompliance,
         tierCalculation,
         crn,
       })

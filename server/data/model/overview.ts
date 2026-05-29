@@ -97,6 +97,7 @@ export interface ActivityCount {
 export interface Compliance {
   currentBreaches: number
   priorBreachesOnCurrentOrderCount: number
+  failureToComplyInLast12MonthsCount: number
   failureToComplyInLast12Months: number
   breachStarted: boolean
   breachesOnCurrentOrderCount: number

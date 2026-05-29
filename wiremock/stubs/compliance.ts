@@ -54,6 +54,40 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
     },
   })
 
+const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: `/mas/compliance/non-compliance-detail/${crn}`,
+      method: 'GET',
+      queryParameters: {
+        months: { equalTo: '12' },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        acceptableAbsence: [],
+        unacceptableAbsence: [
+          {
+            contactId: 123456,
+            eventNumber: '1',
+            eventId: 1,
+            type: {
+              code: 'NS',
+              description: 'Planned Office Visit (NS)',
+            },
+            date: '2026-01-18',
+          },
+        ],
+        attendedButDidNotComply: [],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubBreachCompliance,
+  stubNonComplianceHistory,
 }

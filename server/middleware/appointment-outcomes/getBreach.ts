@@ -14,20 +14,43 @@ export const getBreach = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
     if (sentences && selectedSentence) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const compliance = await masClient.getPersonCompliance(crn)
+      const [compliance, nonCompliance] = await Promise.all([
+        masClient.getPersonCompliance(crn),
+        masClient.getPersonNonCompliance(crn),
+      ])
 
       // eslint-disable-next-line eqeqeq
       const sentence = sentences.find(s => s.id == selectedSentence)
 
-      const currentSentence = compliance.currentSentences.find(
-        // eslint-disable-next-line eqeqeq
-        s => s?.activeBreach && s?.eventNumber == sentence?.eventNumber,
-      )
+      const currentSentence = sentence
+        ? compliance.currentSentences.find(
+            // eslint-disable-next-line eqeqeq
+            s => s?.eventNumber == sentence?.eventNumber,
+          )
+        : compliance.currentSentences[0]
 
-      if (currentSentence?.activeBreach) {
-        res.locals.appointmentOutcome.breachWarning = {
-          order: sentence?.order?.description,
-          breachDate: currentSentence.activeBreach.startDate,
+      if (currentSentence) {
+        if (
+          currentSentence.activeBreach &&
+          (currentSentence.eventNumber === sentence?.eventNumber || !selectedSentence)
+        ) {
+          res.locals.appointmentOutcome.breachWarning = {
+            order: sentence?.order?.description || sentences[0]?.order?.description,
+            breachDate: currentSentence.activeBreach.startDate,
+          }
+        }
+
+        res.locals.appointmentOutcome.compliance = {
+          ...res.locals.appointmentOutcome.compliance,
+          ...currentSentence.compliance,
+          failureToComplyInLast12MonthsCount:
+            currentSentence.compliance.failureToComplyInLast12MonthsCount ??
+            currentSentence.compliance.failureToComplyCount ??
+            currentSentence.compliance.failureToComplyInLast12Months,
+          priorBreachesOnCurrentOrderCount:
+            currentSentence.compliance.priorBreachesOnCurrentOrderCount ??
+            currentSentence.compliance.breachesOnCurrentOrderCount,
+          nonCompliance,
         }
       }
     }
