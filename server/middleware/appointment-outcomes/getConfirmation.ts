@@ -5,6 +5,7 @@ import { dateWithYear, dayOfWeek } from '../../utils'
 import { to12HourTimeCompact } from '../../utils/to12HourTimeCompact'
 import { enforcementActionMap } from '../../properties/appointment-outcomes'
 import type { OutcomeConfirmationAction, OutcomeConfirmation, AppointmentOutcomeProps } from '../../models/Locals'
+import config from '../../config'
 
 export const getConfirmation: Route<void> = (req, res, next): void => {
   const appointmentOutcome = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
@@ -64,7 +65,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
       if (sentenceType === 'CUSTODY') {
         actions.push({
           text: 'use the Consider a recall service',
-          href: 'https://sign-in.hmpps.service.justice.gov.uk/auth/sign-in?redirect_uri=https://consider-a-recall.hmpps.service.justice.gov.uk/sign-in/callback',
+          href: `${config.apis.hmppsAuth.url}?redirect_uri=${config.recall.link}/sign-in/callback`,
           external: true,
         })
       }

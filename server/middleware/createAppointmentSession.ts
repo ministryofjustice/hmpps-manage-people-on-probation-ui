@@ -10,7 +10,12 @@ const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'N
 export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
-  const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
+  const outcomeJourney = req.url.includes('outcome/next-appointment')
+  const nextAppointmentSelection = outcomeJourney
+    ? req?.body?.appointments?.[crn]?.[contactId]?.outcome?.nextAppointment
+    : req?.body?.nextAppointment
+  const selection: AppointmentSessionSelection = nextAppointmentSelection || 'KEEP_TYPE'
+
   let appointmentSession: AppointmentSession = {
     eventId: '',
     username: res.locals.user.username,

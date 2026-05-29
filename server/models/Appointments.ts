@@ -120,6 +120,7 @@ export interface AppointmentSessionOutcome {
   updateEnforcementAction?: AppointmentEnforcementAction
   contactOutcomes?: ContactOutcomes[]
   contactEnforcementActions?: ContactEnforcementActions[]
+  nextAppointment?: AppointmentSessionSelection
 }
 
 export interface AppointmentSessionUser {
@@ -328,6 +329,7 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
+  outcomeJourney?: boolean
   options?:
     | Option<AppointmentOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]

@@ -666,7 +666,8 @@ describe('controllers/appointments', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointments/next-appointment', {
         personAppointment: mockPersonAppointment,
         crn,
-        contactId,
+        id: contactId,
+        outcomeJourney: false,
       })
     })
   })
