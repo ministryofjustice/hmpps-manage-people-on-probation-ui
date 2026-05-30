@@ -89,8 +89,8 @@
     {% endif %}
     {% if appointmentOutcome.notePrepend %}
         {{ govukInsetText({
-        classes: "govuk-!-margin-0 guidance-panel",
-        html: '<p class="govuk-body">Manage people on probation will automatically add this update:<br>' + appointmentOutcome.notePrepend + '</p>'
+        classes: "guidance-panel govuk-!-margin-bottom-6",
+        html: '<p class="govuk-body">Manage people on probation will automatically add this update:<br>' + appointmentOutcome.notePrepend | replace('\n', '<br>') | safe   + '</p>'
             }) }}
     {% endif %}
     {{ govukButton({

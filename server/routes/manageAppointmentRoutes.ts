@@ -49,6 +49,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     getSentences(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getOutcomeProps,
+    getNotePrepend,
   )
 
   router.get(
@@ -61,7 +62,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     multerErrorHandler('fileUpload'),
     parseMultipartBody,
     validate.appointmentOutcomes,
-    getNotePrepend,
     autoStoreSessionData(hmppsAuthClient),
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
