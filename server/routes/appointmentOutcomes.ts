@@ -35,6 +35,7 @@ import {
   getNotePrepend,
   resetSelectedActions,
   restrictPageAccess,
+  getBreach,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -78,6 +79,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     getOutcomeProps,
     getBackLink,
+    getBreach(hmppsAuthClient),
   )
 
   /* get readable enforcement action from current appointment 👇 */

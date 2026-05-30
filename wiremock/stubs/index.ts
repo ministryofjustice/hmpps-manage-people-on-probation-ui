@@ -23,6 +23,8 @@ import overdueOutcomes from './overdueOutcomes'
 import sentences from './sentences'
 import enforcementActions from './enforcementActions'
 import relatedContacts from './relatedContacts'
+import compliance from './compliance'
+import emdi from './emdi'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -50,6 +52,8 @@ export default {
   ...sentences,
   ...enforcementActions,
   ...relatedContacts,
+  ...compliance,
+  ...emdi,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({
       request: {

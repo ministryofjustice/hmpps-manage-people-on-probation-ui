@@ -9,7 +9,7 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import { checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
+import { checkBreachWarningBanner, checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let updateEnforcementActionPage: UpdateEnforcementActionPage
@@ -340,6 +340,8 @@ const checkPage = () => {
       cy.get(`#appointments-${crn}-${appointmentId}-outcome-updateEnforcementAction-error`).should('contain.text', msg)
     })
   })
+
+  checkBreachWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
 }
 
 describe('Update enforcement action', () => {

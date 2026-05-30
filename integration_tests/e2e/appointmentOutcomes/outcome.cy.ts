@@ -18,7 +18,13 @@ import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend
 import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
-import { ExpectedOption, Journey, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
+import {
+  ExpectedOption,
+  Journey,
+  checkBreachWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+} from './imports'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
 let manageAppointmentPage: ManageAppointmentPage
@@ -239,6 +245,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       outcomePage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
+
+  checkBreachWarningBanner(loadPage, { Page: OutcomePage })
 }
 
 describe('Appointment outcome', () => {

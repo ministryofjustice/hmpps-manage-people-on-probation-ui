@@ -8,6 +8,7 @@ export interface PersonCompliance {
 }
 
 export interface SentenceCompliance {
+  eventNumber: string
   activity: ActivityCount
   compliance: Compliance
   mainOffence: Offence

@@ -166,6 +166,7 @@ interface Locals {
   feedbackEmail?: string
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
+  locationMonitoringUri?: string
 }
 
 export interface AppointmentOutcomeSentence {
@@ -174,6 +175,16 @@ export interface AppointmentOutcomeSentence {
 }
 
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
+
+export interface AppointmentOutcomeEnforcementAction {
+  responseByDate?: string
+  responseByDays?: number
+}
+
+export interface BreachWarning {
+  order: string
+  breachDate: string
+}
 
 export interface OutcomeSummary {
   appointmentDetails: string
@@ -249,6 +260,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   sendLetter?: boolean
   currentEnforcementAction?: CurrentEnforcementAction
   currentOutcome?: CurrentOutcome
+  breachWarning?: BreachWarning | null
   notePrepend?: string
   summary?: OutcomeSummary
   confirmation?: OutcomeConfirmation

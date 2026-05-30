@@ -12,7 +12,7 @@ import {
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
-import { ExpectedOption, Journey, checkOptions } from './imports'
+import { ExpectedOption, Journey, checkBreachWarningBanner, checkOptions } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -173,6 +173,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage = new AddNotePage()
     addNotePage.checkOnPage()
   })
+
+  checkBreachWarningBanner(loadPage, { Page: SendLetterPage })
 }
 
 describe('Send a letter', () => {

@@ -275,6 +275,28 @@
               "updatedAt": "2026-05-20T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
+            },
+            {
+              "key": "enableEMDISentencesShowGPSData",
+              "name": "enableEMDISentencesShowGPSData",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-05-18T12:00:00.000000Z",
+              "updatedAt": "2026-05-18T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableEMDIOverviewShowGPSData",
+              "name": "enableEMDIOverviewShowGPSData",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-05-18T12:00:00.000000Z",
+              "updatedAt": "2026-05-18T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }
