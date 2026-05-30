@@ -44,7 +44,6 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
       const redirect = `${map[outcomeType]}${change ? `?change=${change}` : ''}`
-      console.log(redirect)
       return res.redirect(redirect)
     }
   },
