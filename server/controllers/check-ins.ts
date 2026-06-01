@@ -683,8 +683,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (checkIn?.riskManagementFeedback) {
         risk = checkIn.riskManagementFeedback === 'yes'
       }
-      const enableFurtherActionsDeprecation = res.locals.flags?.enableFurtherActionsDeprecation === true
-      const reviewNotes = enableFurtherActionsDeprecation ? checkIn?.notes : checkIn?.furtherActions
+      const reviewNotes = checkIn?.notes
       const review: ESupervisionReview = {
         reviewedBy: practitionerUsername,
         manualIdCheck: checkIn?.manualIdCheck,
@@ -1055,8 +1054,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
-      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id, isSensitiveNotesEnabled })
+      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
     }
   },
 
@@ -1364,19 +1362,15 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const reasonData = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])
 
-      const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
-
       let isSensitive = false
-      if (isSensitiveNotesEnabled) {
-        const sensitiveData = getDataValue(req.session.data, [
-          'esupervision',
-          crn,
-          id,
-          'manageCheckin',
-          'stopCheckinSensitive',
-        ])
-        isSensitive = sensitiveData === 'true'
-      }
+      const sensitiveData = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'manageCheckin',
+        'stopCheckinSensitive',
+      ])
+      isSensitive = sensitiveData === 'true'
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupervisionClient = new ESupervisionClient(token)
@@ -1402,10 +1396,6 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
       return res.render('pages/check-in/questions/instructions.njk', { crn, back, id, data: req.session.data })
     }
   },
@@ -1426,11 +1416,6 @@ const checkInsController: Controller<typeof routes, void> = {
       const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_ADD_QUESTIONS', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
-
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
@@ -1574,10 +1559,6 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
       return res.render('pages/check-in/questions/preview/feeling.njk', {
         crn,
         back,
@@ -1594,10 +1575,6 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
       return res.render('pages/check-in/questions/preview/support.njk', {
         crn,
         back,
@@ -1613,10 +1590,6 @@ const checkInsController: Controller<typeof routes, void> = {
       const { back } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_LIST_CHECK_IN_LIST_QUESTIONS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const eSupClient = new ESupervisionClient(token)
@@ -1681,10 +1654,6 @@ const checkInsController: Controller<typeof routes, void> = {
       const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_EDIT', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
@@ -1750,10 +1719,6 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id, templateId } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_SELECT', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
       const questionTemplateAndInputs =
@@ -1771,12 +1736,6 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id, questionId } = req.params as Record<string, string>
       const { data } = req.session
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_DELETE', crn, SubjectType.CRN)
-
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
-
       if (data.esupervision?.[crn]?.[id]?.manageQuestions?.questionTemplateAndInputs?.[questionId]) {
         delete data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[questionId]
       }

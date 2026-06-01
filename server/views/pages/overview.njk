@@ -200,18 +200,12 @@
   {% if nextCheckin.status === 'VERIFIED' %}
     {% set checkinLinkText = 'View all online check in details' %}
     {% set checkinHrefLink = manageCheckinLink %}
-    {% if flags.enableShowNextCheckinDate === true %}
-          {% set checkinLabel = 'Next check in due' %}
-          
-          {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
-              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
-          {% else %}
-              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
-          {% endif %}
-      {% else %}
-          {% set checkinLabel = 'First check in due' %}
-          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
-      {% endif %}
+    {% set checkinLabel = 'Next check in due' %}
+    {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
+        {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
+    {% else %}
+        {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+    {% endif %}
     {{ govukSummaryList({
                 rows: [
                     {

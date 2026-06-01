@@ -169,23 +169,13 @@
    <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">What action are you taking after reviewing this check in? (optional)</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
-            {% if flags.enableFurtherActionsDeprecation === true %}
-                {{ govukCharacterCount({
-                    rows: '10',
-                    maxlength: maxCharCount,
-                    formGroup: {
-                        attributes: { "data-qa": "notes"}
-                    }
-                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'notes'])) }}
-            {% else %}
-                {{ govukCharacterCount({
-                    rows: '10',
-                    maxlength: maxCharCount,
-                    formGroup: {
-                        attributes: { "data-qa": "notes"}
-                    }
-                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'furtherActions'])) }}
-            {% endif %}
+            {{ govukCharacterCount({
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'notes'])) }}
 
             {{ govukRadios({
                 fieldset: {

@@ -22,22 +22,10 @@ export interface ESupervisionValidationArgs {
   editCheckInMobile?: string
   change?: string
   stopCheckIn?: string
-  isSensitiveNotesEnabled?: boolean
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const {
-    crn,
-    id,
-    page,
-    checkInEmail,
-    checkInMobile,
-    editCheckInEmail,
-    editCheckInMobile,
-    change,
-    stopCheckIn,
-    isSensitiveNotesEnabled = false,
-  } = args
+  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change, stopCheckIn } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][eligibility]`]: {
       optional: page !== 'eligibility-check',
@@ -247,7 +235,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][manageCheckin][stopCheckinSensitive]`]: {
-      optional: page !== 'stop-checkin' || !isSensitiveNotesEnabled,
+      optional: page !== 'stop-checkin',
       checks: [
         {
           validator: isNotEmpty,
