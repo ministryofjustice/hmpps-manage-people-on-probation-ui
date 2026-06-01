@@ -683,8 +683,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (checkIn?.riskManagementFeedback) {
         risk = checkIn.riskManagementFeedback === 'yes'
       }
-      const enableFurtherActionsDeprecation = res.locals.flags?.enableFurtherActionsDeprecation === true
-      const reviewNotes = enableFurtherActionsDeprecation ? checkIn?.notes : checkIn?.furtherActions
+      const reviewNotes = checkIn?.notes
       const review: ESupervisionReview = {
         reviewedBy: practitionerUsername,
         manualIdCheck: checkIn?.manualIdCheck,

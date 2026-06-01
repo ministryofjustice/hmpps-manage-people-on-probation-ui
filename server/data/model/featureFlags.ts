@@ -20,7 +20,6 @@ export class FeatureFlags {
   enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
   enableShowMatchWithConcern?: boolean = undefined
-  enableFurtherActionsDeprecation?: boolean = undefined
   enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
 }
