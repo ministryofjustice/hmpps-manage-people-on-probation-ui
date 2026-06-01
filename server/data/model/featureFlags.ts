@@ -19,7 +19,6 @@ export class FeatureFlags {
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
-  enableShowNextCheckinDate?: boolean = undefined
   enableShowMatchWithConcern?: boolean = undefined
   enableFurtherActionsDeprecation?: boolean = undefined
   enableEMDISentencesShowGPSData?: boolean = undefined
