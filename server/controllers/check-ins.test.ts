@@ -136,7 +136,6 @@ describe('checkInsController', () => {
     jest.useRealTimers()
     res.locals.flags = {
       ...res.locals.flags,
-      enableESupervisionCustomQuestions: true,
     }
   })
 

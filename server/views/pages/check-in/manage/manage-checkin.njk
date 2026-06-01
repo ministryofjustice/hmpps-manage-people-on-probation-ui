@@ -39,7 +39,6 @@
 
 {% block pageContent %}
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
-      {% if flags.enableESupervisionCustomQuestions === true %}
           {% set checkinLabel = 'Next check in' %}
           {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
               {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
@@ -47,10 +46,6 @@
               {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
           {% endif %}
           
-      {% else %}
-          {% set checkinLabel = 'First check in' %}
-          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
-      {% endif %}
         <div class="moj-button-group__item">
             <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
         </div>
@@ -62,7 +57,6 @@
                 <a href="{{ restartCheckinLink }}" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
             </div>
     {% endif %}
-    {% if flags.enableESupervisionCustomQuestions === true %}
         {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
         {% set rows = [
             {
@@ -99,7 +93,6 @@
                 } if showChange and canEditQuestions
             }) }}
         {% endif %}
-    {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}

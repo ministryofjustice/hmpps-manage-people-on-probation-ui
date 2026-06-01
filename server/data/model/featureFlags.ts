@@ -10,7 +10,6 @@ export class FeatureFlags {
   enableOGRS4?: boolean = undefined
   enableOGRS4SummaryCardDetail?: boolean = undefined
   enableCalendarEvents?: boolean = undefined
-  enableESupervisionCustomQuestions?: boolean = undefined
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSentencePlanUrl?: boolean = undefined
