@@ -186,7 +186,7 @@
           "sentences": [
             {
               "id": 2501192724,
-              "eventNumber": "12345",
+              "eventNumber": "1234567",
               "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
@@ -251,12 +251,17 @@
                   "imposedReleasedDate": "2023-09-26",
                   "licenceConditionNotes": [],
                   "active": false
+                },
+                {
+                  "id": 170,
+                  "mainDescription": "Location Monitoring(GPS Tagging) - Monitored Appointment",
+                  "active": true
                 }
               ]
             },
             {
               "id": 2501192725,
-              "eventNumber": "5678",
+              "eventNumber": "7654321",
               "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
@@ -305,6 +310,11 @@
                   "lengthUnitValue": "Hours",
                   "notes": "unpaid work notes",
                   "active": false
+                },
+                {
+                  "id": 170,
+                  "description": "Location Monitoring(GPS Tagging) - Monitored Appointment",
+                  "active": true
                 }
               ]
             },

@@ -4,8 +4,13 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { filterContacts } from '../middleware/filterContacts'
-import { getCheckinOffenderDetails } from '../middleware'
+import { getCheckinOffenderDetails, getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
+import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
+import { checkLocationMonitoring, hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
+import { existsInEMDI } from '../middleware/existsInEMDI'
+import Sentences from '../../wiremock/stubs/sentences'
+import sentence from './sentence'
 
 const routes = ['getCase'] as const
 
@@ -42,6 +47,15 @@ const caseController: Controller<typeof routes, void> = {
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
+      if (res.locals.flags.enableEMDIOverviewShowGPSData) {
+        await getSentences(hmppsAuthClient)(req, res, () => {})
+        const hasLicenceConditions = (res.locals?.sentences || []).some(item =>
+          hasLocationMonitoring(item?.licenceConditions, item?.requirements),
+        )
+        if (hasLicenceConditions) {
+          res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
+        }
+      }
       return res.render('pages/overview', {
         overview,
         needs,
