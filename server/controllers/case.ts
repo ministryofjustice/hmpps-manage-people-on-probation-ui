@@ -6,11 +6,8 @@ import MasApiClient from '../data/masApiClient'
 import { filterContacts } from '../middleware/filterContacts'
 import { getCheckinOffenderDetails, getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
-import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
-import { checkLocationMonitoring, hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
+import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
-import Sentences from '../../wiremock/stubs/sentences'
-import sentence from './sentence'
 
 const routes = ['getCase'] as const
 
