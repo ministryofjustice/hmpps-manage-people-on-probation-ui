@@ -51,20 +51,16 @@
           {% set checkinLabel = 'First check in' %}
           {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
       {% endif %}
-        {% if flags.enableManageCheckins === true %}
-            <div class="moj-button-group__item">
-                <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
-            </div>
-        {% endif %}
+        <div class="moj-button-group__item">
+            <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
+        </div>
     {% endif %}
     {% if offenderCheckinsByCRNResponse.status === 'INACTIVE' %}
         {% set checkinLabel = 'Next check in due' %}
         {% set checkinText = 'Check ins stopped' %}
-        {% if flags.enableManageCheckins === true %}
             <div class="moj-button-group__item">
                 <a href="{{ restartCheckinLink }}" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
             </div>
-        {% endif %}
     {% endif %}
     {% if flags.enableESupervisionCustomQuestions === true %}
         {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
