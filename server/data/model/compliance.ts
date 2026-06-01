@@ -1,29 +1,21 @@
 import { PersonSummary } from './personalDetails'
-import { ActivityCount, Compliance, Offence, Order, PreviousOrders } from './overview'
+import {
+  ActivityCount,
+  Compliance,
+  ContactType,
+  NonComplianceContact,
+  NonComplianceHistoryResponse,
+  Offence,
+  Order,
+  PreviousOrders,
+} from './overview'
+
+export { ContactType, NonComplianceContact, NonComplianceHistoryResponse }
 
 export interface PersonCompliance {
   personSummary: PersonSummary
   previousOrders: PreviousOrders
   currentSentences: SentenceCompliance[]
-}
-
-export interface ContactType {
-  code: string
-  description: string
-}
-
-export interface NonComplianceContact {
-  contactId: number
-  eventNumber: string
-  eventId: number
-  type: ContactType
-  date: string
-}
-
-export interface NonComplianceHistoryResponse {
-  acceptableAbsence: NonComplianceContact[]
-  unacceptableAbsence: NonComplianceContact[]
-  attendedButDidNotComply: NonComplianceContact[]
 }
 
 export interface SentenceCompliance {
