@@ -30,6 +30,8 @@ import {
   PersonAppointment,
   PersonSchedule,
 } from '../data/model/schedule'
+import { Compliance } from '../data/model/overview'
+import { NonComplianceHistoryResponse } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
@@ -249,6 +251,10 @@ export interface AppointmentOutcomeProps<TAppointment> {
   breachWarning?: BreachWarning | null
   notePrepend?: string
   summary?: OutcomeSummary
+  compliance?: Compliance & {
+    failureToComplyInLast12MonthsCount?: number
+    nonCompliance?: NonComplianceHistoryResponse
+  }
 }
 
 export interface AppResponse extends Response {

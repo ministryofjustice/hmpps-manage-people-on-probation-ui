@@ -25,7 +25,7 @@ import {
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
 import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
-import { PersonCompliance } from './model/compliance'
+import { NonComplianceHistoryResponse, PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
 import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
@@ -377,7 +377,21 @@ export default class MasApiClient extends RestClient {
   }
 
   async getPersonCompliance(crn: string, months: number = 12): Promise<PersonCompliance> {
-    return this.get({ path: `/compliance/${crn}?months=${months}`, handle404: false })
+    const complianceResponse: PersonCompliance = await this.get({
+      path: `/compliance/${crn}?months=${months}`,
+      handle404: false,
+    })
+
+    return complianceResponse
+  }
+
+  async getPersonNonCompliance(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
+    const nonComplianceResponse: NonComplianceHistoryResponse = await this.get({
+      path: `/compliance/non-compliance-detail/${crn}?months=${months}`,
+      handle404: false,
+    })
+
+    return nonComplianceResponse
   }
 
   async postAppointments(crn: string, body: AppointmentRequestBody): Promise<AppointmentsPostResponse> {
