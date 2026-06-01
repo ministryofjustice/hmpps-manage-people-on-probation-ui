@@ -8,7 +8,7 @@
     showTitleAsHeading: true,
     dismissible: false,
     attributes: { "data-qa": "breach-warning" },
-    text: 'The breach for '+ appointmentOutcome.breachWarning.order + ' was initiated on ' + appointmentOutcome.breachWarning.breachDate | dateWithYear
+    text: 'The breach for '+ appointmentOutcome.breachWarning.order + ' was initiated on ' + appointmentOutcome.breachWarning.breachDate | dateWithYear + '.'
   }) }}
   {% endif %}
 {% endblock %}

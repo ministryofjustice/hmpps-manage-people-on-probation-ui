@@ -864,7 +864,6 @@ describe('validates stop checkin reason', () => {
     crn,
     id,
     page: 'stop-checkin',
-    isSensitiveNotesEnabled: true,
   }
   const spec = eSuperVisionValidation(args)
   it('should return the correct validation errors', () => {
@@ -903,7 +902,6 @@ describe('validates stop checkin sensitive flag', () => {
     crn,
     id,
     page: 'stop-checkin',
-    isSensitiveNotesEnabled: true,
   }
   const spec = eSuperVisionValidation(args)
   it('should return the correct validation errors', () => {

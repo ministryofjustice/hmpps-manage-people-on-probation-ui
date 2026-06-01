@@ -93,4 +93,64 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
     expect(res.locals.appointmentOutcome.options).toHaveLength(6)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
+  it('should call next when appointmentOutcome does not exist', () => {
+    const res = mockAppResponse({})
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(validEnforcementActionOptionsSpy).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should call next when contactEnforcementActions does not exist', () => {
+    const res = mockAppResponse({
+      appointmentOutcome: {
+        sentence: { type: 'COMMUNITY' },
+        isProbationPractitioner: false,
+        appointmentSession: {
+          outcome: {},
+        },
+      },
+    })
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(validEnforcementActionOptionsSpy).not.toHaveBeenCalled()
+    expect(res.locals.appointmentOutcome.options).toBeUndefined()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove REFER_TO_OFFENDER_MANAGER when user is a probation practitioner', () => {
+    const res = buildResponse({
+      sentenceType: 'COMMUNITY',
+      isProbationPractitioner: true,
+    })
+
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('COMMUNITY'))
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.options).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' })]),
+    )
+
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should retain REFER_TO_OFFENDER_MANAGER when user is not a probation practitioner', () => {
+    const res = buildResponse({
+      sentenceType: 'COMMUNITY',
+      isProbationPractitioner: false,
+    })
+
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('COMMUNITY'))
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.options).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' })]),
+    )
+
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
 })

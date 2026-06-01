@@ -1,5 +1,16 @@
 import { PersonSummary } from './personalDetails'
-import { ActivityCount, Compliance, Offence, Order, PreviousOrders } from './overview'
+import {
+  ActivityCount,
+  Compliance,
+  ContactType,
+  NonComplianceContact,
+  NonComplianceHistoryResponse,
+  Offence,
+  Order,
+  PreviousOrders,
+} from './overview'
+
+export { ContactType, NonComplianceContact, NonComplianceHistoryResponse }
 
 export interface PersonCompliance {
   personSummary: PersonSummary

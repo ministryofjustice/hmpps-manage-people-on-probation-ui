@@ -27,12 +27,6 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
       if (log.logEntryType === 'OFFENDER_CHECKIN_NOT_SUBMITTED') {
         checkInResponse.missedCheckinComment = log.notes
       }
-      if (
-        res.locals.flags?.enableFurtherActionsDeprecation !== true &&
-        log.logEntryType === 'OFFENDER_CHECKIN_REVIEW_SUBMITTED'
-      ) {
-        checkInResponse.furtherActions = log.notes
-      }
       if (log.logEntryType === 'OFFENDER_CHECKIN_ANNOTATED') {
         const note = {
           id: i,
