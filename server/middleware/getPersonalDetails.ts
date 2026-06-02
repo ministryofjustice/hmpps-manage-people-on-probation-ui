@@ -53,11 +53,12 @@ export const getPersonalDetails = (
         try {
           const planResult = await arnsAssessmentPlatformClient.getSentencePlanByCrn(crn, username)
           if (planResult?.hasAgreedPlan) {
-            sentencePlan.showLink = !!res.locals?.flags?.enableSentencePlan
-            sentencePlan.lastUpdatedDate = sentencePlan.showLink ? planResult.lastUpdatedDate : ''
-            if (sentencePlan.showLink && !popInUsersCaseload) {
+            sentencePlan.lastUpdatedDate = planResult.lastUpdatedDate
+            if (!popInUsersCaseload) {
               sentencePlan.showText = true
               sentencePlan.showLink = false
+            } else {
+              sentencePlan.showLink = true
             }
           }
         } catch (error) {

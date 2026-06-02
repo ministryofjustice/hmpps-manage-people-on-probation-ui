@@ -20,17 +20,6 @@ const getArnsStub = (
       },
       flags: [
         {
-          key: 'enableSentencePlan',
-          name: 'enableSentencePlan',
-          description: '',
-          enabled: sentencePlan,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as string[],
-          rollouts: [] as string[],
-        },
-        {
           key: 'enableSanIndicator',
           name: 'enableSanIndicator',
           description: '',
@@ -38,8 +27,8 @@ const getArnsStub = (
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
+          rules: [] as string[],
+          rollouts: [] as string[],
         },
         {
           key: 'enableOGRS4SummaryCardDetail',

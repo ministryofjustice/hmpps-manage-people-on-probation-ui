@@ -425,31 +425,6 @@ context('Risk', () => {
     const sentencePlanText = true
     checkRiskPageView({ page, sanIndicator, sentencePlanLink, sentencePlanText })
   })
-
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.task('stubNoSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    const sanIndicator = true
-    const sentencePlanLink = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
-  })
-
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
-    cy.task('stubNoSentencePlanAndSanIndicator')
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    const sanIndicator = false
-    const sentencePlanLink = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
-  })
-
   it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data', () => {
     cy.task('stubPredictorScoresOGRS4')
     cy.visit('/case/X000001/risk')

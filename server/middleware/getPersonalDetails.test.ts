@@ -115,9 +115,7 @@ const getRes = () =>
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     },
     redirect: jest.fn().mockReturnThis(),
   }) as unknown as AppResponse
@@ -147,9 +145,9 @@ const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {
   const mockPersonalDetails: PersonalDetailsSession = {
     overview: overview(crn),
     sentencePlan: {
-      lastUpdatedDate,
+      lastUpdatedDate: mockSentencePlanResult.lastUpdatedDate,
       showLink: false,
-      showText: false,
+      showText: true,
     },
     risks: mockRisks,
     tierCalculation: mockTierCalculation,
@@ -192,9 +190,7 @@ describe('/middleware/getPersonalDetails', () => {
             username: 'user-1',
             roles: ['SENTENCE_PLAN'],
           },
-          flags: {
-            enableSentencePlan: false,
-          },
+          flags: {},
         },
         redirect: jest.fn().mockReturnThis(),
       } as unknown as AppResponse
@@ -250,9 +246,7 @@ describe('/middleware/getPersonalDetails', () => {
             username: 'user-1',
             roles: ['SENTENCE_PLAN'],
           },
-          flags: {
-            enableSentencePlan: false,
-          },
+          flags: {},
         },
         redirect: jest.fn().mockReturnThis(),
       } as unknown as AppResponse
@@ -299,10 +293,7 @@ describe('/middleware/getPersonalDetails', () => {
           username: 'user-1',
           roles: [],
         },
-        flags: {
-          enableSentencePlan: true,
-        },
-      },
+      flags: {},
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
     jest
@@ -310,29 +301,6 @@ describe('/middleware/getPersonalDetails', () => {
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(getSentencePlanByCrnSpy).not.toHaveBeenCalled()
-  })
-
-  it('should set the correct sentence plan local variaibles if sentence plan feature flag is disabled', async () => {
-    req = getReq()
-    res = mockAppResponse({
-      user: {
-        username: 'user-1',
-        roles: ['SENTENCE_PLAN'],
-      },
-      flags: {
-        enableSentencePlan: false,
-      },
-    })
-
-    jest
-      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
-    expect(res.locals.sentencePlan).toStrictEqual({
-      showLink: false,
-      showText: false,
-      lastUpdatedDate: '',
-    })
   })
 
   it('should set the correct sentence plan local variables if user has SENTENCE_PLAN role, pop has AGREED sentence plan and pop not in caseload', async () => {
@@ -343,9 +311,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     })
     jest
       .spyOn(MasApiClient.prototype, 'searchUserCaseload')
@@ -368,9 +334,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: [],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     })
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
@@ -408,9 +372,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
@@ -445,9 +407,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
@@ -486,9 +446,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
@@ -511,9 +469,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: [],
       },
-      flags: {
-        enableSentencePlan: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
