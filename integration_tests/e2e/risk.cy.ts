@@ -392,16 +392,6 @@ context('Risk', () => {
     checkRiskPageView({ page, sanIndicator, sentencePlanUrlEnabled: false })
   })
 
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and san indicator feature flag is disabled', () => {
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubNoSanIndicator')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    checkRiskPageView({ page })
-  })
-
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
     cy.task('stubSentencePlanDraft')
     cy.task('stubUserCaseloadSearch')
@@ -434,18 +424,6 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    const sentencePlanLink = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
-  })
-
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
-    cy.task('stubNoSentencePlanAndSanIndicator')
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    const sanIndicator = false
     const sentencePlanLink = false
     checkRiskPageView({ page, sanIndicator, sentencePlanLink })
   })

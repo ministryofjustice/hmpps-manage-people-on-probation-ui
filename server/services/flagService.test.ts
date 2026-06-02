@@ -32,7 +32,7 @@ jest.mock('../config', () => {
 jest.mock('../data/model/featureFlags', () => ({
   FeatureFlags: jest.fn().mockImplementation(() => ({
     enableSentencePlan: undefined,
-    enableSanIndicator: undefined,
+    enableDeliusClient: undefined,
     enableESupervisionCheckins: undefined,
   })),
 }))
@@ -57,7 +57,7 @@ describe('FlagService', () => {
         },
         {
           booleanEvaluationResponse: {
-            flagKey: 'enableSanIndicator',
+            flagKey: 'enableDeliusClient',
             enabled: false,
           },
         },
@@ -102,7 +102,7 @@ describe('FlagService', () => {
           context: { email },
         }),
         expect.objectContaining({
-          flagKey: 'enableSanIndicator',
+          flagKey: 'enableDeliusClient',
           entityId: email,
           context: { email },
         }),
@@ -126,14 +126,14 @@ describe('FlagService', () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
     expect(await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })).toStrictEqual({
       enableSentencePlan: false,
-      enableSanIndicator: false,
+      enableDeliusClient: false,
       enableESupervisionCheckins: true,
     })
   })
@@ -153,20 +153,20 @@ describe('FlagService', () => {
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
     expect(result.enableSentencePlan).toBe(false)
-    expect(result.enableSanIndicator).toBe(true)
+    expect(result.enableDeliusClient).toBe(true)
   })
   it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
       ],
     })
 
@@ -193,7 +193,7 @@ describe('FlagService', () => {
   it('returns feature flags based on evaluation results', async () => {
     expect(await service.getFlags({ email: undefined })).toStrictEqual({
       enableSentencePlan: true,
-      enableSanIndicator: false,
+      enableDeliusClient: false,
       enableESupervisionCheckins: false,
     })
   })
@@ -218,7 +218,7 @@ describe('FlagService', () => {
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
@@ -226,7 +226,7 @@ describe('FlagService', () => {
     const result = await service.getFlags({ email })
 
     expect(result.enableSentencePlan).toBe(false)
-    expect(result.enableSanIndicator).toBe(true)
+    expect(result.enableDeliusClient).toBe(true)
     expect(result.enableESupervisionCheckins).toBe(true)
 
     expect(Sentry.captureException).toHaveBeenCalledWith(
@@ -252,7 +252,7 @@ describe('FlagService', () => {
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
       ],
     })
 

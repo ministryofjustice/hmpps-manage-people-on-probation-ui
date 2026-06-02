@@ -45,8 +45,7 @@
             {% if sentencePlan.showLink or sentencePlan.showText %}
                 <h3 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="pageSubHeading">Risk</h3>
             {% endif %}
-            {% if (not sanIndicator and lastUpdatedDate) 
-                or not flags.enableSanIndicator %}
+            {% if (not sanIndicator and lastUpdatedDate)  %}
                 <div class="govuk-inset-text govuk-!-margin-top-0">{{ lastUpdatedDate }}</div>
                 {% endif%}
             {% endif %}
