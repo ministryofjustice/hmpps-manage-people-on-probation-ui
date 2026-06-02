@@ -274,9 +274,9 @@ const checkRiskPageView = ({
       .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
-    page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
-    page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
-    page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
+    page.getElementData('identifiedNeedsValue').should('contain.text', 'Relationships')
+    page.getElementData('notIdentifiedNeedsValue').should('contain.text', 'Accommodation')
+    page.getElementData('unansweredNeedsValue').should('contain.text', 'Thinking and Behaviour')
     page.getInsetText().should('contain.text', 'Last updated: 24 January 2024')
     // page.getElementData('osp').should('exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
