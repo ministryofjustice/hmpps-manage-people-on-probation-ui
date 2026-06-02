@@ -19,10 +19,14 @@ export const getBreach = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       const compliance = await masClient.getPersonCompliance(crn)
       const nonCompliance = await masClient.getPersonNonCompliance(crn)
 
-      const sentence = sentences.find(s => s.id && s.id.toString() === selectedSentence)
+      const sentence = sentences.find(s => s.id && s.id.toString() === selectedSentence.toString())
 
       const currentSentence = compliance.currentSentences.find(
-        s => s.activeBreach && s.eventNumber && sentence?.eventNumber && s.eventNumber === sentence.eventNumber,
+        s =>
+          s.activeBreach &&
+          s.eventNumber &&
+          sentence?.eventNumber &&
+          s.eventNumber.toString() === sentence.eventNumber.toString(),
       )
 
       if (currentSentence?.activeBreach && sentence?.order?.description && currentSentence?.activeBreach?.startDate) {
