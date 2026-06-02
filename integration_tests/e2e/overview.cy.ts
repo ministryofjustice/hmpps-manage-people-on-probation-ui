@@ -221,4 +221,39 @@ context('Overview', () => {
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
   })
+
+  it('Overview page should not be rendered with licence conditions when EMDI API responds with 404', () => {
+    cy.task('stubEMDIPeopleExists404Response', 'X778160')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page should not be rendered with licence conditions when EMDI API responds with 500', () => {
+    cy.task('stubEMDIPeopleExists500Response', 'X778160')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page should not be rendered with licence conditions when flag is disabled', () => {
+    cy.task('stubDisableMDIOverviewShowGPSData')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page is rendered with licence conditions', () => {
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page
+      .getRowData('sentence1234567', 'licenceConditions', 'Value')
+      .should('contain.text', 'Location Monitoring View GPS location monitoring data')
+    page
+      .getRowData('sentence7654321', 'requirements', 'Value')
+      .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
+  })
 })

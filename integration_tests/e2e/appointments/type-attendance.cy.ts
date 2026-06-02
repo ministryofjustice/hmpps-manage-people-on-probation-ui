@@ -216,7 +216,7 @@ describe('Arrange an appointment', () => {
         sentencePage.checkOnPage()
       })
       it('should persist the sentence selection', () => {
-        sentencePage.getRadio('sentences', 1).should('be.checked')
+        sentencePage.getRadio('sentences', 3).should('be.checked')
       })
     })
   })
