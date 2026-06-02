@@ -7,7 +7,6 @@ export class FeatureFlags {
   enableCompliancePage?: boolean = undefined
   enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableOGRS4?: boolean = undefined
   enableOGRS4SummaryCardDetail?: boolean = undefined
   enableCalendarEvents?: boolean = undefined
   enableMAN2344?: boolean = undefined

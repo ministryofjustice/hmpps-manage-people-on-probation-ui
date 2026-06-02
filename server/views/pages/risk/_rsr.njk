@@ -1,60 +1,46 @@
-{% if flags.enableOGRS4 %}
-    {% set band_ogrs4 = riskData
-        .assessments[0]
-        .combinedSeriousReoffendingPredictor
-        .band %}
-    {% set band_ogrs3 = riskData
-        .assessments[0]
-        .rsr
-        .band %}
-    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" else 
-        false %}
-    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
-        false %}
+{% set band_ogrs4 = riskData
+    .assessments[0]
+    .combinedSeriousReoffendingPredictor
+    .band %}
+{% set band_ogrs3 = riskData
+    .assessments[0]
+    .rsr
+    .band %}
+{% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" else 
+    false %}
+{% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+    false %}
 
-    {% if showOGRS4 %}
-        <section data-qa="combinedSeriousReoffendingPredictor">
-        {% if flags.enableOGRS4SummaryCardDetail %}
-            <div class="arns-summary-card-expanded-badge-spacing">
-                {{ expandedPredictorBadge({
-                    data: riskData,
-                    predictor: "combinedSeriousReoffendingPredictor",
-                    excludeDate: true,
-                    fixedWidth: false
-                }) }}
-            </div>
-        {% else %}
-            {{ predictorScale({
+{% if showOGRS4 %}
+    <section data-qa="combinedSeriousReoffendingPredictor">
+    {% if flags.enableOGRS4SummaryCardDetail %}
+        <div class="arns-summary-card-expanded-badge-spacing">
+            {{ expandedPredictorBadge({
                 data: riskData,
                 predictor: "combinedSeriousReoffendingPredictor",
                 excludeDate: true,
-                headingLevel: 4,
-                headingClass: "xs"
+                fixedWidth: false
             }) }}
-        {% endif %}
-        </section>
+        </div>
+    {% else %}
+        {{ predictorScale({
+            data: riskData,
+            predictor: "combinedSeriousReoffendingPredictor",
+            excludeDate: true,
+            headingLevel: 4,
+            headingClass: "xs"
+        }) }}
     {% endif %}
-    {% if showOGRS3 %}
-        <section data-qa="rsr">
-            {{ predictorScale({
-                data: riskData,
-                predictor: "rsr",
-                excludeDate: true,
-                headingLevel: 4,
-                headingClass: "xs"
-            }) }}
-        </section>
-    {% endif %}
-{% else %}
-    {% if predictorScores.scores.RSR.score %}
-        <section data-qa="rsr">
-            <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
-        RSR (risk of serious recidivism)
-    </h {{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
-            <div aria-hidden="true">
-                {{ predictorScore(predictorScores.scores.RSR) }}
-            </div>
-            <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.RSR.score }}%</div>
-        </section>
-    {% endif %}
+    </section>
+{% endif %}
+{% if showOGRS3 %}
+    <section data-qa="rsr">
+        {{ predictorScale({
+            data: riskData,
+            predictor: "rsr",
+            excludeDate: true,
+            headingLevel: 4,
+            headingClass: "xs"
+        }) }}
+    </section>
 {% endif %}

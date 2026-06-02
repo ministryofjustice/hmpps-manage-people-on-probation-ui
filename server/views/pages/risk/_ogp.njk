@@ -1,79 +1,51 @@
-{% if flags.enableOGRS4 %}
-    {% set band_ogrs4 = riskData
-        .assessments[0]
-        .allReoffendingPredictor
-        .band %}
-    {% set isDynamic = true if riskData
-        .assessments[0]
-        .allReoffendingPredictor
-        .staticOrDynamic == "Dynamic" else 
-            false %}
-    {% set band_ogrs3 = riskData
-        .assessments[0]
-        .ogp
-        .band %}
-    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" and isDynamic == true else 
+{% set band_ogrs4 = riskData
+    .assessments[0]
+    .allReoffendingPredictor
+    .band %}
+{% set isDynamic = true if riskData
+    .assessments[0]
+    .allReoffendingPredictor
+    .staticOrDynamic == "Dynamic" else 
         false %}
-    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
-        false %}
+{% set band_ogrs3 = riskData
+    .assessments[0]
+    .ogp
+    .band %}
+{% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" and isDynamic == true else 
+    false %}
+{% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+    false %}
 
-    {% if showOGRS4 %}
-        <section data-qa="allReoffendingPredictor">
-            {% if flags.enableOGRS4SummaryCardDetail %}
-                <div class="arns-summary-card-expanded-badge-spacing">
-                    {{ expandedPredictorBadge({
-                        data: riskData,
-                        predictor: "allReoffendingPredictor",
-                        excludeDate: true,
-                        fixedWidth: false
-                    }) }}
-                </div>
-            {% else %}
-                {{ predictorScale({
+{% if showOGRS4 %}
+    <section data-qa="allReoffendingPredictor">
+        {% if flags.enableOGRS4SummaryCardDetail %}
+            <div class="arns-summary-card-expanded-badge-spacing">
+                {{ expandedPredictorBadge({
                     data: riskData,
                     predictor: "allReoffendingPredictor",
                     excludeDate: true,
-                    headingLevel: 4,
-                    headingClass: "xs"
+                    fixedWidth: false
                 }) }}
-            {% endif %}
-        </section>
-    {% endif %}
-    {% if showOGRS3 %}
-        <section data-qa="ogp">
+            </div>
+        {% else %}
             {{ predictorScale({
                 data: riskData,
-                predictor: "ogp",
+                predictor: "allReoffendingPredictor",
                 excludeDate: true,
                 headingLevel: 4,
                 headingClass: "xs"
             }) }}
-        </section>
-    {% endif %}
-{% else %}
-    {% if predictorScores.scores.OGP.level %}
-        <section data-qa="ogp">
-            <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OGP score">
-        OGP (OASys general predictor score)
-    </h{{ scoresHeadingLevel | default('3') }}>
-            <div class="govuk-grid-row  govuk-!-margin-bottom-4">
-                <div class="govuk-grid-column-full">
-                    <div class="flex-mobile">
-                        <div class='flex__item-one-third-mobile'>
-                            <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h3>
-                            <div class='govuk-body' data-qa='ogp-1yr'>{{ predictorScores.scores.OGP.oneYear }}%</div>
-                        </div>
-                        <div class='flex__item-one-third-mobile'>
-                            <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h3>
-                            <div class='govuk-body' data-qa='ogp-2yr'>{{ predictorScores.scores.OGP.twoYears }}%</div>
-                        </div>
-                        <div class='flex__item-one-third-mobile'>
-                            <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h3>
-                            <div class='govuk-body' data-qa='ogp-level'>{{ riskLevelLabel(predictorScores.scores.OGP.level) }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    {% endif %}
+        {% endif %}
+    </section>
+{% endif %}
+{% if showOGRS3 %}
+    <section data-qa="ogp">
+        {{ predictorScale({
+            data: riskData,
+            predictor: "ogp",
+            excludeDate: true,
+            headingLevel: 4,
+            headingClass: "xs"
+        }) }}
+    </section>
 {% endif %}

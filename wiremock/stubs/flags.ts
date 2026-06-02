@@ -42,17 +42,6 @@ const getArnsStub = (
           rollouts: [],
         },
         {
-          key: 'enableOGRS4',
-          name: 'enableOGRS4',
-          description: '',
-          enabled: ogrs4,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
           key: 'enableOGRS4SummaryCardDetail',
           name: 'enableOGRS4SummaryCardDetail',
           description: '',
@@ -272,17 +261,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
             rollouts: [],
           },
           {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableOGRS4SummaryCardDetail',
             name: 'enableOGRS4SummaryCardDetail',
             description: '',
@@ -313,20 +291,7 @@ const stubDisableOGRS4 = (): SuperAgentRequest =>
         namespace: {
           key: 'manage-people-on-probation-ui',
         },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-02-26T12:00:00.000000Z',
-            updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
+        flags: [...flags.mappings[0].response.jsonBody.flags],
       },
       headers: {
         'Content-Type': 'application/json',
