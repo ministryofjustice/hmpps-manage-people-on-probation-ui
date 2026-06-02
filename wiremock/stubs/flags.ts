@@ -268,26 +268,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
     },
   })
 
-const stubDisableOGRS4 = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [...flags.mappings[0].response.jsonBody.flags],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
 const stubDisableNonCompliance = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -493,7 +473,6 @@ export default {
   stubDisableSmsReminders,
   stubDisableCompliancePage,
   stubDisableTierLink,
-  stubDisableOGRS4,
   stubDisableNonCompliance,
   stubEnableDeepLinks,
   stubDisableSentencePlanUrl,

@@ -39,7 +39,6 @@ const riskController: Controller<typeof routes, void> = {
       })
       const arnsClient = new ArnsApiClient(token)
 
-      // remove predictors below with migration to ARNS predictor timeline component
       const timeline: TimelineItem[] = []
       const [needs, sanIndicatorResponse] = await Promise.all([
         arnsClient.getNeeds(crn),
