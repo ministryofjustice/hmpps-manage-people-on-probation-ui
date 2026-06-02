@@ -531,7 +531,7 @@ const stubEnableShowMatchWithConcern = (): SuperAgentRequest =>
     },
   })
 
-const stubDisableMDIOverviewShowGPSData = (): SuperAgentRequest =>
+const stubDisableEMDIOverviewShowGPSData = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
@@ -580,5 +580,5 @@ export default {
   stubDisableESupervisionCheckins,
   stubDisableHomePageOutcome,
   stubEnableShowMatchWithConcern,
-  stubDisableMDIOverviewShowGPSData,
+  stubDisableEMDIOverviewShowGPSData,
 }

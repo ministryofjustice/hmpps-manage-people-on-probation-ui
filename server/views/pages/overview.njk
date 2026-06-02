@@ -510,7 +510,7 @@
     {% set numberOfSentences = overview.sentences.length %}
     {% if numberOfSentences > 0 %}
         {% for sentence in overview.sentences %}
-        {% set hasLocationMonitoring = {} %}
+        {% set hasLocationMonitoring = { hasLicenceConditionsLMData: false, hasRequirementsLMData: false } %}
         {% set sentenceHtml %}
         {% set order %}
         {% set showLicenceRow = false %}
@@ -521,7 +521,7 @@
           {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
                 {% set hasLocationMonitoring = sentence.eventNumber | checkLocationMonitoringByEventNumber(sentences) %}
           {% endif %}
-          {{ sentence.order.description }} eventNumber: {{ sentence.eventNumber }} , hasRequirementsLMData : {{ hasLocationMonitoring.hasRequirementsLMData }}, hasLicenceConditionsLMData: {{ hasLocationMonitoring.hasLicenceConditionsLMData }}<br/>
+          {{ sentence.order.description }} <br/>
                     From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br/>
           {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
                     {% else %}
@@ -536,7 +536,7 @@
             {{ sentence.rarDescription }}
          {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
-        {% elif not  hasLocationMonitoring.hasLicenceConditionsLMData %}
+        {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
                 No requirements details
                 {% endif %}
         {% endset %}

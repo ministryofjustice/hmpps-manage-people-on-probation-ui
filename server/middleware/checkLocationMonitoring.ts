@@ -32,13 +32,7 @@ export const hasLocationMonitoring = (
   licenceConditions: LicenceCondition[] | null | undefined,
   requirements: Requirement[] | null | undefined,
 ): boolean => {
-  const hasLicenceConditionsLMData = (licenceConditions || []).some(item =>
-    item.mainDescription?.toLowerCase().includes('location monitoring'),
-  )
-  const hasRequirementsLMData = (requirements || []).some(item =>
-    item.description?.toLowerCase().includes('location monitoring'),
-  )
-
+  const { hasLicenceConditionsLMData, hasRequirementsLMData } = checkLocationMonitoring(licenceConditions, requirements)
   return hasLicenceConditionsLMData || hasRequirementsLMData
 }
 

@@ -173,7 +173,7 @@ context('Overview', () => {
     page.assertRiskTags()
   })
   it('Risk information and tier is not provided due to 500 from ARNS and TIER', () => {
-    cy.task('stubDisableMDIOverviewShowGPSData')
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X000002')
     const page = Page.verifyOnPage(OverviewPage)
     page.headerCrn().should('contain.text', 'X000002')
@@ -201,7 +201,7 @@ context('Overview', () => {
     page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
   })
   it('Overview page with pre-sentence is rendered', () => {
-    cy.task('stubDisableMDIOverviewShowGPSData')
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X777916')
     const page = Page.verifyOnPage(OverviewPage)
     page.getCardHeader('sentence11').should('contain.text', 'Pre-Sentence')
@@ -216,7 +216,7 @@ context('Overview', () => {
   })
 
   it('Overview page with risk to probation staff is rendered', () => {
-    cy.task('stubDisableMDIOverviewShowGPSData')
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X777916', { failOnStatusCode: false })
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
@@ -239,7 +239,7 @@ context('Overview', () => {
   })
 
   it('Overview page should not be rendered with licence conditions when flag is disabled', () => {
-    cy.task('stubDisableMDIOverviewShowGPSData')
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X778160')
     const page = Page.verifyOnPage(OverviewPage)
     page.getElementData('licencesEMDILink').should('not.exist')
