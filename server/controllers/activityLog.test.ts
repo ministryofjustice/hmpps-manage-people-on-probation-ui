@@ -7,7 +7,6 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import { mockTierCalculation, mockActivities, mockAppResponse, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { getPersonAppointment } from '../middleware'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -373,6 +372,77 @@ describe('/controllers/activityLogController', () => {
       expect(reqWithUploadFailed.flash).toHaveBeenCalledWith('contactUpdated', 'uploadFailed')
       expect(redirectSpy).toHaveBeenCalledWith('/case/X000001/activity/1234')
       expect(redirectSpy.mock.calls[0][0]).not.toContain('uploadFailed')
+    })
+  })
+
+  describe('redirectToActivityLog', () => {
+    it('should store keywords, compliance and crn in session and redirect to activity log', async () => {
+      const request = httpMocks.createRequest({
+        params: { crn },
+        query: {
+          keywords: 'appointment',
+          compliance: 'acceptable absence',
+        },
+        session: {},
+      })
+
+      const response = mockAppResponse({})
+      const redirectSpy = jest.spyOn(response, 'redirect')
+
+      await controllers.activityLog.redirectToActivityLog(hmppsAuthClient)(request, response)
+
+      expect(request.session.activityLogFilters).toEqual({
+        keywords: 'appointment',
+        compliance: 'acceptable absence',
+        crn,
+      })
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/activity-log`)
+    })
+
+    it('should default keywords to empty string and compliance to empty array when not provided', async () => {
+      const request = httpMocks.createRequest({
+        params: { crn },
+        query: {},
+        session: {},
+      })
+
+      const response = mockAppResponse({})
+      const redirectSpy = jest.spyOn(response, 'redirect')
+
+      await controllers.activityLog.redirectToActivityLog(hmppsAuthClient)(request, response)
+
+      expect(request.session.activityLogFilters).toEqual({
+        keywords: '',
+        compliance: {},
+        crn,
+      })
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/activity-log`)
+    })
+
+    it('should preserve compliance array values when multiple filters are supplied', async () => {
+      const request = httpMocks.createRequest({
+        params: { crn },
+        query: {
+          keywords: '',
+          compliance: ['acceptable absence', 'not complied'],
+        },
+        session: {},
+      })
+
+      const response = mockAppResponse({})
+      const redirectSpy = jest.spyOn(response, 'redirect')
+
+      await controllers.activityLog.redirectToActivityLog(hmppsAuthClient)(request, response)
+
+      expect(request.session.activityLogFilters).toEqual({
+        keywords: '',
+        compliance: ['acceptable absence', 'not complied'],
+        crn,
+      })
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/activity-log`)
     })
   })
 })

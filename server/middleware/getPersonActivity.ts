@@ -29,11 +29,21 @@ export const getPersonActivity = async (
     }
   }
 
+  let complianceArray: string[]
+
+  if (Array.isArray(compliance)) {
+    complianceArray = compliance
+  } else if (compliance) {
+    complianceArray = [compliance]
+  } else {
+    complianceArray = []
+  }
+
   const body: ActivityLogRequestBody = {
     keywords,
     dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
-    filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
+    filters: complianceArray,
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }

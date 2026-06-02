@@ -175,7 +175,7 @@ describe('/middleware/getPersonActivity', () => {
       keywords: filterVals.keywords,
       dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
-      filters: ['complied', 'notComplied'],
+      filters: ['complied', 'not complied'],
       includeSystemGenerated: false,
       typeCodes: APPOINTMENTS_CODES,
     }

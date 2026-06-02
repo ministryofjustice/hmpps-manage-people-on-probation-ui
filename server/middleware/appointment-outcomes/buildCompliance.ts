@@ -15,5 +15,6 @@ export const buildCompliance = (
   priorBreachesOnCurrentOrderCount:
     currentSentence.compliance.priorBreachesOnCurrentOrderCount ??
     currentSentence.compliance.breachesOnCurrentOrderCount,
+  acceptableAbsenceCount: currentSentence.activity.acceptableAbsenceCount,
   nonCompliance,
 })

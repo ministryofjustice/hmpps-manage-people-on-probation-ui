@@ -187,4 +187,53 @@ describe('Acceptable absence', () => {
   describe('Reschedule appointment journey', () => {
     checkPage({ journey: 'RESCHEDULE' })
   })
+
+  describe('Alert banner', () => {
+    it('should display alert panel when person has multiple acceptable absences', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      acceptableAbsencePage = new AcceptableAbsencePage()
+      cy.get('[data-qa="alert-panel"]').should('exist')
+      cy.get('.moj-ticket-panel__content--blue').should(
+        'contain.text',
+        'has had multiple acceptable absences in the past 12 months',
+      )
+    })
+
+    it('should have a link to activity log in the alert panel', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      acceptableAbsencePage = new AcceptableAbsencePage()
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .should('have.attr', 'href')
+          .and('include', `/case/${crn}/activitylog`)
+          .and('include', 'compliance=complied')
+      })
+    })
+
+    it('should navigate to activity log with acceptable absence filter when link is clicked', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      acceptableAbsencePage = new AcceptableAbsencePage()
+
+      // Click the link in the alert panel
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .should('have.attr', 'target', '_blank')
+          .invoke('attr', 'href')
+          .then(href => {
+            cy.visit(href)
+          })
+      })
+
+      cy.url().should('include', '/activity-log')
+
+      // Verify the "acceptable absence" filter is present in the compliance filters section
+      cy.get('.moj-filter__selected').within(() => {
+        cy.get('h3').should('contain.text', 'Compliance filters')
+        cy.get('.moj-filter-tags li').should('contain.text', 'complied')
+      })
+    })
+  })
 })
