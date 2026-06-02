@@ -359,7 +359,8 @@ context('Risk', () => {
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    checkRiskPageView({ page })
+    const sanIndicator = false
+    checkRiskPageView({ page, sanIndicator })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
@@ -415,7 +416,7 @@ context('Risk', () => {
     const sentencePlanText = true
     checkRiskPageView({ page, sanIndicator, sentencePlanLink, sentencePlanText })
   })
-  
+
   it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data', () => {
     cy.task('stubPredictorScoresOGRS4')
     cy.visit('/case/X000001/risk')

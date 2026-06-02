@@ -1,13 +1,7 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (
-  sentencePlan = true,
-  sanIndicator = true,
-  ogrs4 = true,
-  ogrs4SummaryCardDetail = false,
-  sentencePlanUrl = true,
-) => ({
+const getArnsStub = (ogrs4 = true, ogrs4SummaryCardDetail = false, sentencePlanUrl = true) => ({
   request: {
     urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
     method: 'GET',
@@ -27,8 +21,8 @@ const getArnsStub = (
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
+          rules: [] as string[],
+          rollouts: [] as string[],
         },
         {
           key: 'enableOGRS4SummaryCardDetail',
@@ -61,16 +55,7 @@ const getArnsStub = (
 })
 
 const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false, true, true))
-
-const stubNoSentencePlan = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, true))
-
-const stubNoSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true, false))
-
-const stubNoSentencePlanAndSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false))
+  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true, true))
 
 const stubEnableESuperVision = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
@@ -510,9 +495,6 @@ const stubEnableShowMatchWithConcern = (): SuperAgentRequest =>
   })
 
 export default {
-  stubNoSentencePlan,
-  stubNoSanIndicator,
-  stubNoSentencePlanAndSanIndicator,
   stubEnableESuperVision,
   stubDisableSmsReminders,
   stubDisableCompliancePage,
