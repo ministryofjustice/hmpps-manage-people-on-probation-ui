@@ -118,7 +118,6 @@ const mockAppointment: AppointmentSession = {
 }
 
 const mockFlags = {
-  enableOutlookEvent: true,
   enableSmsReminders: true,
 }
 
