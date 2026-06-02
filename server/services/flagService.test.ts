@@ -31,8 +31,8 @@ jest.mock('../config', () => {
 
 jest.mock('../data/model/featureFlags', () => ({
   FeatureFlags: jest.fn().mockImplementation(() => ({
-    enableSentencePlan: undefined,
     enableDeliusClient: undefined,
+    enableNonCompliance: undefined,
     enableESupervisionCheckins: undefined,
   })),
 }))
@@ -51,7 +51,7 @@ describe('FlagService', () => {
       responses: [
         {
           booleanEvaluationResponse: {
-            flagKey: 'enableSentencePlan',
+            flagKey: 'enableNonCompliance',
             enabled: true,
           },
         },
@@ -97,7 +97,7 @@ describe('FlagService', () => {
     expect(requests).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          flagKey: 'enableSentencePlan',
+          flagKey: 'enableNonCompliance',
           entityId: email,
           context: { email },
         }),
@@ -119,21 +119,21 @@ describe('FlagService', () => {
       ]),
     )
     expect(requests).toHaveLength(4)
-    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableSentencePlan')).toHaveLength(1)
+    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableNonCompliance')).toHaveLength(1)
     expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(2)
   })
   it('resolves a PDU-gated flag to true if any pduCode evaluation is enabled', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
     expect(await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })).toStrictEqual({
-      enableSentencePlan: false,
       enableDeliusClient: false,
+      enableNonCompliance: false,
       enableESupervisionCheckins: true,
     })
   })
@@ -151,22 +151,22 @@ describe('FlagService', () => {
   it('fails closed for non-PDU-gated flags with unexpected response count', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
-    expect(result.enableSentencePlan).toBe(false)
     expect(result.enableDeliusClient).toBe(true)
+    expect(result.enableNonCompliance).toBe(false)
   })
   it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
       ],
     })
 
@@ -184,7 +184,7 @@ describe('FlagService', () => {
     expect(mockEvaluateBatch).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({
-          entityId: 'enableSentencePlan',
+          entityId: 'enableNonCompliance',
           context: {},
         }),
       ]),
@@ -192,8 +192,8 @@ describe('FlagService', () => {
   })
   it('returns feature flags based on evaluation results', async () => {
     expect(await service.getFlags({ email: undefined })).toStrictEqual({
-      enableSentencePlan: true,
       enableDeliusClient: false,
+      enableNonCompliance: true,
       enableESupervisionCheckins: false,
     })
   })
@@ -213,29 +213,29 @@ describe('FlagService', () => {
     )
   })
 
-  it('captures message in Sentry when enableSentencePlan flag has unexpected response count', async () => {
+  it('captures message in Sentry when enableNonCompliance flag has unexpected response count', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
-    expect(result.enableSentencePlan).toBe(false)
     expect(result.enableDeliusClient).toBe(true)
+    expect(result.enableNonCompliance).toBe(false)
     expect(result.enableESupervisionCheckins).toBe(true)
 
     expect(Sentry.captureException).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining('Expected exactly 1 response for flag enableSentencePlan, got 2'),
+        message: expect.stringContaining('Expected exactly 1 response for flag enableNonCompliance, got 2'),
       }),
       expect.objectContaining({
         tags: {
-          flag: 'enableSentencePlan',
+          flag: 'enableNonCompliance',
           service: 'FlagService',
         },
         extra: {
@@ -250,15 +250,15 @@ describe('FlagService', () => {
 
     mockEvaluateBatch.mockReturnValue({
       responses: [
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
-    expect(result.enableSentencePlan).toBe(false)
+    expect(result.enableNonCompliance).toBe(false)
 
     expect(Sentry.getClient).toHaveBeenCalled()
 
