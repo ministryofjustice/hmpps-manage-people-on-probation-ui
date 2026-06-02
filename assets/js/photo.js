@@ -61,7 +61,7 @@ const capturePhoto = async v => {
       videoContainer.appendChild(canvas)
 
       if (takePhotoButton) {
-        takePhotoButton.removeAttribute('disabled')
+        takePhotoButton.setAttribute('data-ready', 'true')
         takePhotoButton.addEventListener('click', async () => {
           context.drawImage(video, 0, 0, w, h)
           const dataUrl = canvas.toDataURL(IMAGE_CONTENT_TYPE)
