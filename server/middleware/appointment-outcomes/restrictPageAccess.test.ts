@@ -296,8 +296,7 @@ describe('middleware/appointment-outcomes/restrictPageAccess', () => {
     const url = '/outcome/check-your-answers'
     it('should redirect to the outcome page if non of the options criteria are met', () => {
       const outcome: Partial<AppointmentSessionOutcome> = {
-        outcomeType: 'UNACCEPTABLE_ABSENCE',
-        unacceptableAbsence: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        outcomeType: undefined,
       }
       const req = buildRequest({ _contactId: contactId, outcome, url })
       restrictPageAccess(req, res, nextSpy)
