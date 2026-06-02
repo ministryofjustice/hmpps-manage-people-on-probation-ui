@@ -293,7 +293,7 @@ describe('/middleware/getPersonalDetails', () => {
           username: 'user-1',
           roles: [],
         },
-      flags: {},
+      },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
     jest
