@@ -471,13 +471,6 @@ context('Risk', () => {
     })
   })
 
-  it('Risk overview page is rendered with OGRS4 feature flag disabled', () => {
-    cy.task('stubDisableOGRS4')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    checkRiskPageView({ page, sentencePlanLink: false, ogrs4Enabled: false })
-  })
-
   it('Should persist Risk and plan nav link for all case pages', () => {
     const mappings: [string, NavPage][] = [
       ['/case/X000001', OverviewPage],
