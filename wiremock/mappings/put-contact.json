@@ -1,0 +1,16 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/contact/.*",
+        "method": "PUT"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

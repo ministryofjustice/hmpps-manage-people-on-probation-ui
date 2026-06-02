@@ -147,11 +147,9 @@ export interface AppointmentSession {
   nsiId?: string
   notes?: string
   sensitivity?: YesNo
-  backendId?: number
   enforcementAction?: EnforcementAction
   outcomeRecorded?: YesNo
   contactId?: string
-  linkedContactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions

@@ -12,12 +12,20 @@ import { Document } from '../../data/model/personalDetails'
 import { renderError } from '../renderError'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
-  const { crn, id: uuid, contactId } = req.params as Record<string, string>
-  const id = uuid || contactId
+  const { crn, id: uuid } = req.params as Record<string, string>
+  let { contactId } = req.params as Record<string, string>
+  let id = uuid || contactId
+  const data = req?.session?.data
+  const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
+  const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+  // override contact id with response contact id if exists
+  if (responseContactId) {
+    id = responseContactId
+    contactId = responseContactId
+  }
   const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
   const isValidParams = isValidCrn(crn) && isValidId
   const path = ['appointments', crn, id]
-  const data = req?.session?.data
   const appointmentSession = getDataValue<AppointmentSession>(data, path) || null
   let appointment: AttendedCompliedAppointment | Activity
   let documents: Document[] = []
@@ -27,7 +35,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const baseOutcomeUrl = `${baseUrl}/outcome`
   const completedUrl = uuid ? `${baseUrl}/check-your-answers` : `${baseUrl}/manage`
   if (contactId) {
-    ;({ appointment, documents = [] } = res.locals.personAppointment)
+    appointment = res.locals?.personAppointment?.appointment || null
+    documents = res.locals?.personAppointment?.documents || []
   } else {
     const description = res?.locals?.appointment?.type?.description
     const name = res?.locals?.appointment?.attending?.name
@@ -82,7 +91,11 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const sendLetter = [attendedFailedToComply, unacceptableAbsence, failedToAttend].some(
     value => value === 'SEND_LETTER',
   )
-  const appointmentHintText = `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
+  const appointmentHintText =
+    appointment?.type && appointment?.officer?.name && appointment?.startDateTime
+      ? `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
+      : null
+
   const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
   const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
   res.locals.appointmentOutcome = {
@@ -106,6 +119,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     appointmentHintText,
     sendBreachOrRecallLetter,
     sendLetter,
+    responseContactId,
+    linkedContactId,
   }
   return next()
 }

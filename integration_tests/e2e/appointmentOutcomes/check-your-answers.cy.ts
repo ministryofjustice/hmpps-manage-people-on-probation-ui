@@ -8,6 +8,7 @@ import {
   completeOutcome,
 } from '../appointments/utils'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
+import { Journey } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
@@ -251,13 +252,12 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
+      // const appointmentType = journey === 'RESCHEDULE' ? `3 Way Meeting (NS)` : `Planned Office Visit (NS)`
+      const appointmentType = `Planned Office Visit (NS)`
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
-        .should(
-          'contain.text',
-          'Appointment: Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024.',
-        )
+        .should('contain.text', `Appointment: ${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
       checkYourAnswersOutcomePage
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
@@ -271,6 +271,7 @@ describe('Check your answers - outcomes', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Manage appointment journey', () => {
     checkPage()
   })

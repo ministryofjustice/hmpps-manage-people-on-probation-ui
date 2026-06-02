@@ -11,8 +11,12 @@ export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Pr
     const data = req?.session?.data
     if (data) {
       const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+      const responseContactId = getDataValue<string>(data, ['temp', crn, 'responseContactId'])
       if (!contactId && appointment?.rescheduleAppointment?.contactId) {
         ;({ contactId } = appointment.rescheduleAppointment)
+      }
+      if (!contactId && responseContactId) {
+        contactId = responseContactId
       }
     }
     if (contactId && crn) {

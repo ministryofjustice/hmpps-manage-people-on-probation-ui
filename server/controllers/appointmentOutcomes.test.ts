@@ -43,7 +43,7 @@ jest.mock('../utils', () => {
   return {
     ...actualUtils,
     setDataValue: jest.fn(),
-    getDataValue: jest.fn(),
+    // getDataValue: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -58,7 +58,7 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
+// const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
 
@@ -96,10 +96,14 @@ const mockReq = ({
   request = {},
   type = 'ATTENDED_COMPLIED',
   enforcementAction = {},
+  linkedContactId = null,
+  responseContactId = null,
 }: {
   request?: Record<string, any>
   type?: AppointmentOutcomeType
   enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
+  linkedContactId?: string
+  responseContactId?: string
 } = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: { crn: 'R000101' },
@@ -113,6 +117,12 @@ const mockReq = ({
                 ...enforcementAction,
               },
             },
+          },
+        },
+        temp: {
+          [crn]: {
+            linkedContactId,
+            responseContactId,
           },
         },
       },
@@ -158,7 +168,7 @@ const checkOutcomeRedirects = (expectedOptions: AppointmentOutcomeType[]): void 
     const req = mockReq()
     const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { outcomeType: option } } } })
     const spy = jest.spyOn(res, 'redirect')
-    mockGetDataValue.mockReturnValueOnce(option)
+    // mockGetDataValue.mockReturnValueOnce(option)
     controllers.appointmentOutcomes.postOutcome()(req, res)
     expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
   })
@@ -235,6 +245,20 @@ describe('controllers/appointmentOutcomes', () => {
         errorMessages: null,
         uploadedFiles: [],
         maxCharCount: 12000,
+      })
+    })
+
+    it('should render the check your answers page when getCheckYourAnswers is called', async () => {
+      const req = mockReq({
+        request: {
+          url: `/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`,
+        },
+      })
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      await controllers.appointmentOutcomes.getCheckYourAnswers()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/check-your-answers', {
+        url: encodeURIComponent(req.url),
       })
     })
 
@@ -352,18 +376,24 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/next-appointment`)
     })
     it('should redirect to the check your answers page if manage journey and next appointment arranged', async () => {
-      const req = mockReq()
+      const req = mockReq({ linkedContactId: contactId })
       const res = mockRes({
         appointmentOutcome: {
           uuid: undefined,
           contactId,
           id: contactId,
-          appointmentSession: { linkedContactId: '123' },
         },
       })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
+    })
+    it('should redirect to the confirmation page when postCheckYourAnswers is called', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/confirmation`)
     })
   })
 })

@@ -255,6 +255,8 @@ export interface AppointmentOutcomeProps<TAppointment> {
     failureToComplyInLast12MonthsCount?: number
     nonCompliance?: NonComplianceHistoryResponse
   }
+  responseContactId?: string
+  linkedContactId?: string
 }
 
 export interface AppResponse extends Response {

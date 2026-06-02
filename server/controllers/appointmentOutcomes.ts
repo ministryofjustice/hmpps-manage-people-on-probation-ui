@@ -6,6 +6,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
+import { getDataValue } from '../utils'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -79,10 +80,10 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl, appointmentSession } =
-        res.locals.appointmentOutcome
+      const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl } = res.locals.appointmentOutcome
       const { change } = req.query as Record<string, string>
       const { notes, sensitive } = req.body
+      const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
@@ -107,11 +108,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
       }
       /* Manage appointment journey with no next appointment arranged */
-      if (contactId && !appointmentSession?.linkedContactId) {
+      if (contactId && !linkedContactId) {
         redirect = `${baseOutcomeUrl}/next-appointment`
       }
       /* Manage appointment journey with next appointment arranged */
-      if (contactId && appointmentSession?.linkedContactId) {
+      if (contactId && linkedContactId) {
         redirect = `${baseOutcomeUrl}/check-your-answers`
       }
       if (change) redirect = change
@@ -126,8 +127,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postCheckYourAnswers: _hmppsAuthClient => {
     return async (_req, res) => {
-      const { id, crn } = res.locals.appointmentOutcome
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/confirmation`)
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => async (_req, res) =>
