@@ -544,7 +544,7 @@ const stubDisableEMDIOverviewShowGPSData = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => f.key !== 'enableEMDIOverviewShowGPSData'),
           {
             key: 'enableEMDIOverviewShowGPSData',
             name: 'enableEMDIOverviewShowGPSData',

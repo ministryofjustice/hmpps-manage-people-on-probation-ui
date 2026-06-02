@@ -19,7 +19,7 @@ export const checkLocationMonitoring = (
 
 export const checkLocationMonitoringByEventNumber = (
   eventNumber: string,
-  sentences: Sentence[],
+  sentences: Sentence[] | null | undefined,
 ): {
   hasLicenceConditionsLMData: boolean
   hasRequirementsLMData: boolean

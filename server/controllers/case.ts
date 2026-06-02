@@ -46,10 +46,10 @@ const caseController: Controller<typeof routes, void> = {
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
       if (res.locals.flags.enableEMDIOverviewShowGPSData) {
         await getSentences(hmppsAuthClient)(req, res, () => {})
-        const hasLicenceConditions = (res.locals?.sentences || []).some(item =>
+        const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
           hasLocationMonitoring(item?.licenceConditions, item?.requirements),
         )
-        if (hasLicenceConditions) {
+        if (hasLocationMonitoringData) {
           res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
         }
       }
