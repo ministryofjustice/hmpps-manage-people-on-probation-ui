@@ -119,7 +119,6 @@ const mockAppointment: AppointmentSession = {
 
 const mockFlags = {
   enableOutlookEvent: true,
-  enableCalendarEvents: true,
   enableSmsReminders: true,
 }
 
@@ -300,18 +299,6 @@ describe('middleware/postRescheduleAppointments', () => {
       const mockRes = mockAppResponse({
         ...mockLocals,
         user: { ...mockLocals.user, email: null },
-        flags: { enableCalendarEvents: true },
-      })
-      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
-      expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
-      expect(req.session.data.isOutLookEventFailed).toEqual(true)
-    })
-    it('should not create outlook event if calendar events feature flag is disabled', async () => {
-      const [req] = buildRequest()
-      const mockRes = mockAppResponse({
-        ...mockLocals,
-        user: { ...mockLocals.user, email: null },
-        flags: { enableCalendarEvents: false },
       })
       await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
       expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
@@ -322,7 +309,6 @@ describe('middleware/postRescheduleAppointments', () => {
       const mockRes = mockAppResponse({
         ...mockLocals,
         user: { ...mockLocals.user, email: null },
-        flags: { enableCalendarEvents: true },
       })
       jest
         .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')
