@@ -48,7 +48,6 @@ export const saveMappedCode = (type: 'OUTCOME' | 'ACTION'): Route<Promise<void>>
       }
       if (value) {
         const { data } = req.session
-        // console.log(`SAVE ${type} CODE:`, value)
         setDataValue(data, ['appointments', crn, id, 'outcome', codeKey], value)
       }
     }
