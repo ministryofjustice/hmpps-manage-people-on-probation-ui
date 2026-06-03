@@ -66,9 +66,9 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       // do a required value check only if in manage journey (as not posting the appointment first) 👇
 
       if (!uuid) {
-        const redirect = findUncompleted({ forceValidation: true })(req, res)
-        if (redirect) {
-          return res.redirect(`${redirect}?validation=true`)
+        const uncompleted = findUncompleted({ forceValidation: true })(req, res)
+        if (uncompleted?.includes('?change')) {
+          return res.redirect(uncompleted)
         }
       }
 

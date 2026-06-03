@@ -51,10 +51,12 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* restrict page access if required session data is not present 👇  */
 
+  /*
   router.get(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     restrictPageAccess,
   )
+    */
 
   /* get person appointment and create appointment session only in manage routes 👇 */
 

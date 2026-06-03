@@ -6,7 +6,8 @@ import { Route } from '../@types'
 
 export const findUncompleted = ({ forceValidation = false } = {}): Route<string | null> => {
   return (req, res) => {
-    const { crn, id } = req.params as Record<string, string>
+    const { crn, id: uuid, contactId } = req.params as Record<string, string>
+    const id = uuid || contactId
     const { change } = req.query as Record<string, string>
     const changeUrl = change ? encodeURIComponent(change) : req.url
     const data = req?.session?.data ?? {}
