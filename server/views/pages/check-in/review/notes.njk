@@ -207,8 +207,14 @@
                 ]
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'sensitiveContact'])) }}
 
-            <h2 class="govuk-heading-m">Did this information help you to manage their risk? (optional)</h2>
             {{ govukRadios({
+                name: "helpToManageTheirRisk",
+                fieldset: {
+                    legend: {
+                    text: "Did this information help you to manage their risk? (optional)",
+                    classes: "govuk-fieldset__legend--m"
+                    }
+                },
                 hint: {
                     text: 'We only use this to understand more about the value of online check ins.'
                 },
