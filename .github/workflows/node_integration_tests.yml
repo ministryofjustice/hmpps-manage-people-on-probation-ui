@@ -75,7 +75,7 @@ jobs:
           sleep 5
 
           # Get list of specs for this shard
-          SPECS=$(node scripts/cypress-shard.js ${{ matrix.shard }} 5)
+          SPECS=$(node .github/scripts/cypress-shard.js ${{ matrix.shard }} 5)
 
           echo "Running shard ${{ matrix.shard }}/5"
           echo "$SPECS"
