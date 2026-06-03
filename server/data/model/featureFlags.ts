@@ -1,7 +1,6 @@
 /* eslint-disable lines-between-class-members */
 export class FeatureFlags {
   [index: string]: boolean
-  enableSanIndicator?: boolean = undefined
   enableSmsReminders?: boolean = undefined
   enableCompliancePage?: boolean = undefined
   enableManageContacts?: boolean = undefined

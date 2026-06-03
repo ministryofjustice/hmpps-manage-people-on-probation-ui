@@ -31,8 +31,8 @@ jest.mock('../config', () => {
 
 jest.mock('../data/model/featureFlags', () => ({
   FeatureFlags: jest.fn().mockImplementation(() => ({
+    enableDeliusClient: undefined,
     enableNonCompliance: undefined,
-    enableSanIndicator: undefined,
     enableESupervisionCheckins: undefined,
   })),
 }))
@@ -57,7 +57,7 @@ describe('FlagService', () => {
         },
         {
           booleanEvaluationResponse: {
-            flagKey: 'enableSanIndicator',
+            flagKey: 'enableDeliusClient',
             enabled: false,
           },
         },
@@ -102,7 +102,7 @@ describe('FlagService', () => {
           context: { email },
         }),
         expect.objectContaining({
-          flagKey: 'enableSanIndicator',
+          flagKey: 'enableDeliusClient',
           entityId: email,
           context: { email },
         }),
@@ -125,15 +125,15 @@ describe('FlagService', () => {
   it('resolves a PDU-gated flag to true if any pduCode evaluation is enabled', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
     expect(await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })).toStrictEqual({
+      enableDeliusClient: false,
       enableNonCompliance: false,
-      enableSanIndicator: false,
       enableESupervisionCheckins: true,
     })
   })
@@ -151,22 +151,22 @@ describe('FlagService', () => {
   it('fails closed for non-PDU-gated flags with unexpected response count', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
+    expect(result.enableDeliusClient).toBe(true)
     expect(result.enableNonCompliance).toBe(false)
-    expect(result.enableSanIndicator).toBe(true)
   })
   it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
       ],
     })
 
@@ -192,8 +192,8 @@ describe('FlagService', () => {
   })
   it('returns feature flags based on evaluation results', async () => {
     expect(await service.getFlags({ email: undefined })).toStrictEqual({
+      enableDeliusClient: false,
       enableNonCompliance: true,
-      enableSanIndicator: false,
       enableESupervisionCheckins: false,
     })
   })
@@ -216,17 +216,17 @@ describe('FlagService', () => {
   it('captures message in Sentry when enableNonCompliance flag has unexpected response count', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
+    expect(result.enableDeliusClient).toBe(true)
     expect(result.enableNonCompliance).toBe(false)
-    expect(result.enableSanIndicator).toBe(true)
     expect(result.enableESupervisionCheckins).toBe(true)
 
     expect(Sentry.captureException).toHaveBeenCalledWith(
@@ -250,9 +250,9 @@ describe('FlagService', () => {
 
     mockEvaluateBatch.mockReturnValue({
       responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
       ],
     })
 
