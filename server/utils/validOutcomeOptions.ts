@@ -12,7 +12,7 @@ export const validOutcomeOptions = (
   options: Option<AppointmentOutcomeType>[],
 ): Option<AppointmentOutcomeType>[] => {
   const ignore: AppointmentOutcomeType[] = ['WILL_BE_RESCHEDULED']
-  if (!contactOutcomes) {
+  if (!contactOutcomes?.length) {
     return options
   }
   return options.filter(
