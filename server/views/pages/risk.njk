@@ -41,9 +41,9 @@
 {% endset %}
 
 {% set notIdentifiedNeeds %}
-{% if needs.identifiedNeeds.length %}
+{% if needs.notIdentifiedNeeds.length %}
     <ul class="govuk-list">
-        {% for need in needs.identifiedNeeds %}
+        {% for need in needs.notIdentifiedNeeds %}
             <li>
                 {{ need.name }}
             </li>

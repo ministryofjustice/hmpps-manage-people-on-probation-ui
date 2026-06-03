@@ -275,7 +275,7 @@ const checkRiskPageView = ({
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
     page.getElementData('identifiedNeedsValue').should('contain.text', 'Relationships')
-    page.getElementData('notIdentifiedNeedsValue').should('contain.text', 'Accommodation')
+    page.getElementData('notIdentifiedNeedsValue').should('contain.text', 'Emotional wellbeing')
     page.getElementData('unansweredNeedsValue').should('contain.text', 'Thinking and Behaviour')
     page.getInsetText().should('contain.text', 'Last updated: 24 January 2024')
     // page.getElementData('osp').should('exist')

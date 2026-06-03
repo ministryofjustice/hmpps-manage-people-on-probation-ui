@@ -98,8 +98,6 @@ context('Overview', () => {
       .should('contain.text', 'Alcohol Misuse')
     cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(1).should('contain.text', 'No need identified')
     cy.get('[data-qa="criminogenicNeedsValue"]').find('ul').eq(1).should('contain.text', 'Emotional wellbeing')
-    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(1).should('contain.text', 'No need identified')
-    cy.get('[data-qa="criminogenicNeedsValue"]').find('ul').eq(1).should('contain.text', 'Emotional wellbeing')
 
     cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(2).should('contain.text', 'Not enough information provided')
     cy.get('[data-qa="criminogenicNeedsValue"]')
