@@ -36,7 +36,7 @@ export const validEnforcementActionOptions = <
     'DIFFERENT_ACTION',
   ]
 
-  if (!contactEnforcementActions) {
+  if (!contactEnforcementActions?.length) {
     return options
   }
   return options.filter(
