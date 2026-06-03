@@ -18,11 +18,14 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const data = req?.session?.data
   const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
   const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
-  // override contact id with response contact id if exists
+
+  // override contact id with response contact id if exists 👇
+
   if (responseContactId) {
     id = responseContactId
     contactId = responseContactId
   }
+
   const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
   const isValidParams = isValidCrn(crn) && isValidId
   const path = ['appointments', crn, id]

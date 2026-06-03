@@ -40,10 +40,15 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
       const response: AppointmentsPostResponse = await postAppointments(hmppsAuthClient)(req, res)
       responseContactId = response.appointments[response.appointments.length - 1].id
     }
+
+    // add the responseContactId to session 👇
+
     setDataValue<Data, string>(data, ['temp', crn, 'responseContactId'], String(responseContactId))
-    // clone the appointment and reference by responseContactId, then delete appointment referenced by uuid
+
+    // clone the appointment and reference by responseContactId 👇
+
     setDataValue<Data, AppointmentSession>(data, ['appointments', crn, String(responseContactId)], appointment)
-    // delete req.session.data.appointments[crn][id]
+
     return next()
   }
 }

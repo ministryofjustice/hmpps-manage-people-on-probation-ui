@@ -1,7 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import controllers from '.'
-import { getDataValue } from '../utils'
 import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
@@ -43,7 +42,6 @@ jest.mock('../utils', () => {
   return {
     ...actualUtils,
     setDataValue: jest.fn(),
-    // getDataValue: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -58,10 +56,8 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
-// const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
 const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
-
 const baseUrl = '/crn/X000001/appointments/appointment/1234'
 const baseOutcomeUrl = '/case/X000001/appointments/appointment/1234/outcome'
 const completedUrl = `/completed/route`
@@ -168,7 +164,6 @@ const checkOutcomeRedirects = (expectedOptions: AppointmentOutcomeType[]): void 
     const req = mockReq()
     const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { outcomeType: option } } } })
     const spy = jest.spyOn(res, 'redirect')
-    // mockGetDataValue.mockReturnValueOnce(option)
     controllers.appointmentOutcomes.postOutcome()(req, res)
     expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
   })

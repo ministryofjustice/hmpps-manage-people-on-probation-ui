@@ -3,7 +3,7 @@ import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
 import { PutContactRequest } from '../../data/model/schedule'
 import { AppointmentOutcomeType } from '../../models/Appointments'
-import { handleQuotes, setDataValue } from '../../utils'
+import { handleQuotes } from '../../utils'
 import { findUncompleted } from '../findUncompleted'
 import { renderError } from '../renderError'
 
@@ -13,7 +13,6 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
   return async (req, res, next) => {
     const {
       appointmentSession,
-      crn,
       notePrepend,
       contactId,
       uuid,
@@ -25,9 +24,11 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
     /*
      only send request if putting outcome for arranged/rescheduled appt in the past or 
-     managed appointment in past or future
+     managed appointment in past or future 👇
      */
+
     const validRequest = (contactId && responseContactId && isInPast) || (contactId && !responseContactId)
+
     if (res.locals.flags.enableNonCompliance && validRequest) {
       if (!isValidParams) {
         return renderError(404)(req, res)
@@ -55,7 +56,9 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         alert,
         sensitive,
       }
+
       // if outcome but no action, check the outcome type does not require an associated action 👇
+
       if (outcomeCode && !enforcementActionCode && outcomeType && !outcomeOnly.includes(outcomeType)) {
         return res.redirect(`${baseOutcomeUrl}?validation=true`)
       }

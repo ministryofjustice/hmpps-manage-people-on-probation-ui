@@ -8,6 +8,7 @@ import { findUncompleted } from '../findUncompleted'
 import MasApiClient from '../../data/masApiClient'
 import { PutContactRequest } from '../../data/model/schedule'
 import TokenStore from '../../data/tokenStore/redisTokenStore'
+import { AppointmentOutcomeProps } from '../../models/Locals'
 
 const id = '304bddc2-cfa5-4a33-92e2-ee31fc93d627'
 const contactId = '1234'
@@ -94,9 +95,11 @@ const buildResponse = ({
   appointment,
   outcome,
   isValidParams = true,
+  appointmentOutcome = {},
 }: {
   appointment?: Partial<AppointmentSession>
   outcome?: Partial<AppointmentSessionOutcome>
+  appointmentOutcome?: Partial<AppointmentOutcomeProps<any>>
   isValidParams?: boolean
 } = {}): httpMocks.MockRequest<any> => {
   const locals = {
@@ -111,6 +114,7 @@ const buildResponse = ({
       notePrepend,
       baseOutcomeUrl,
       isValidParams,
+      ...appointmentOutcome,
     },
   }
   return mockAppResponse(locals)
@@ -122,7 +126,22 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-
+  it('should only call next() if arranged appointment is in the future', async () => {
+    const appointmentOutcome: Partial<AppointmentOutcomeProps<any>> = { responseContactId: '1234', isInPast: false }
+    const req = buildRequest()
+    const res = buildResponse({ appointmentOutcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    expect(putContactSpy).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should only call next() if manage appointment but contactId is undefined', async () => {
+    const appointmentOutcome: Partial<AppointmentOutcomeProps<any>> = { contactId: undefined }
+    const req = buildRequest()
+    const res = buildResponse({ appointmentOutcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    expect(putContactSpy).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
   it('should return a 400 error if invalid crn', async () => {
     const req = buildRequest()
     const res = buildResponse({ isValidParams: false })

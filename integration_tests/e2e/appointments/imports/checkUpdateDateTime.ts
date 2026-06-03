@@ -73,7 +73,6 @@ export const checkUpdateDateTime = ({
       } else {
         page.checkOnPage()
       }
-
       page
         .getSummaryListRow(5)
         .find('.govuk-summary-list__value li:nth-child(1)')
