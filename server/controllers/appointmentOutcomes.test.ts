@@ -10,6 +10,7 @@ import { isSuccessfulUpload } from './appointments'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
+import { setDataValue } from '../utils'
 
 const crn = 'X000001'
 const id = '1234'
@@ -57,6 +58,7 @@ jest.mock('./arrangeAppointment', () => ({
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
+const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
 const baseUrl = '/crn/X000001/appointments/appointment/1234'
 const baseOutcomeUrl = '/case/X000001/appointments/appointment/1234/outcome'
@@ -389,6 +391,16 @@ describe('controllers/appointmentOutcomes', () => {
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/confirmation`)
+      expect(setDataValueSpy).not.toHaveBeenCalled()
+    })
+    it('should redirect to the confirmation page and reset linkedContactId value when postCheckYourAnswers is called', async () => {
+      const appointmentOutcome: Partial<AppointmentOutcomeProps<Activity>> = { linkedContactId: '1234' }
+      const req = mockReq()
+      const res = mockRes({ appointmentOutcome })
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/confirmation`)
+      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['temp', crn, 'linkedContactId'], null)
     })
   })
 })

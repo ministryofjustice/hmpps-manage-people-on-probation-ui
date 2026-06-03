@@ -6,7 +6,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
-import { getDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -126,9 +126,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   postCheckYourAnswers: _hmppsAuthClient => {
-    return async (_req, res) => {
-      const { baseOutcomeUrl } = res.locals.appointmentOutcome
-      // 👉 PUT request here to update outcome
+    return async (req, res) => {
+      const { baseOutcomeUrl, crn, linkedContactId } = res.locals.appointmentOutcome
+      if (linkedContactId) {
+        setDataValue(req.session.data, ['temp', crn, 'linkedContactId'], null)
+      }
       return res.redirect(`${baseOutcomeUrl}/confirmation`)
     }
   },
