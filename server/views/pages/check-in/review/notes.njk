@@ -167,9 +167,12 @@
 </div>
 <div class="govuk-grid-row">
    <div class="govuk-grid-column-two-thirds">
-        <h2 class="govuk-heading-m">What action are you taking after reviewing this check in? (optional)</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
+                label: {
+                    text: "What action are you taking after reviewing this check in? (optional)",
+                    classes: "govuk-label--m"
+                },
                 rows: '10',
                 maxlength: maxCharCount,
                 formGroup: {

@@ -32,9 +32,12 @@
             {% endif %}
             {% endblock %}
 
-            <h2 class="govuk-heading-m">Why did {{ checkIn.personalDetails.name.forename }} not complete their check in?</h2>
             <form method="post" autocomplete="off" action="{{ paths.current  }}">
                 {{ govukCharacterCount({
+                    label: {
+                        text: "Why did " + checkIn.personalDetails.name.forename + " not complete their check in?",
+                        classes: "govuk-label--m"
+                    },
                     hint: {
                         text: "For example, the person did not have access to a device."
                     },
