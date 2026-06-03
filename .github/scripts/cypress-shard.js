@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const glob = require('glob')
 
 const shard = Number(process.argv[2])
