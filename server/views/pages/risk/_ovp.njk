@@ -13,24 +13,14 @@
 
 {% if showOGRS4 %}
   <section data-qa="violentReoffendingPredictor">
-    {% if flags.enableOGRS4SummaryCardDetail %}
-      <div class="arns-summary-card-expanded-badge-spacing">
-        {{ expandedPredictorBadge({
-            data: riskData,
-            predictor: "violentReoffendingPredictor",
-            excludeDate: true,
-            fixedWidth: false
-          }) }}
-      </div>
-    {% else %}
-      {{ predictorScale({
-        data: riskData,
-        predictor: "violentReoffendingPredictor",
-        excludeDate: true,
-        headingLevel: 4,
-        headingClass: "xs"
-      }) }}
-    {% endif %}
+    <div class="arns-summary-card-expanded-badge-spacing">
+      {{ expandedPredictorBadge({
+          data: riskData,
+          predictor: "violentReoffendingPredictor",
+          excludeDate: true,
+          fixedWidth: false
+        }) }}
+    </div>
   </section>
 {% endif %}
 {% if showOGRS3 %}

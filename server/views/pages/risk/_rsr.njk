@@ -13,7 +13,6 @@
 
 {% if showOGRS4 %}
     <section data-qa="combinedSeriousReoffendingPredictor">
-    {% if flags.enableOGRS4SummaryCardDetail %}
         <div class="arns-summary-card-expanded-badge-spacing">
             {{ expandedPredictorBadge({
                 data: riskData,
@@ -22,15 +21,6 @@
                 fixedWidth: false
             }) }}
         </div>
-    {% else %}
-        {{ predictorScale({
-            data: riskData,
-            predictor: "combinedSeriousReoffendingPredictor",
-            excludeDate: true,
-            headingLevel: 4,
-            headingClass: "xs"
-        }) }}
-    {% endif %}
     </section>
 {% endif %}
 {% if showOGRS3 %}

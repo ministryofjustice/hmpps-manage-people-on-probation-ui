@@ -7,16 +7,16 @@
             {{ govukSummaryList({
                 rows: [
                     {
-                        key: { html: '<span data-qa="highScoringNeedsLabel">High-scoring areas from the assessment</span>' },
-                        value: { html: '<span data-qa="highScoringNeedsValue">' + highScoringNeeds + '</span>' if needs else '<span data-qa="highScoringNeedsValue">Not provided</span>' }
+                        key: { html: '<span data-qa="identifiedNeedsLabel">Need identified</span>' },
+                        value: { html: '<span data-qa="identifiedNeedsValue">' + identifiedNeeds + '</span>' if needs else '<span data-qa="identifiedNeedsValue">Not provided</span>' }
                     },
                     {
-                        key: { html: '<span data-qa="lowScoringNeedsLabel">Low-scoring areas from the assessment</span>' },
-                        value: { html: '<span data-qa="lowScoringNeedsValue">' + lowScoringNeeds + '</span>' if needs else '<span data-qa="lowScoringNeedsValue">Not provided</span>' }
+                        key: { html: '<span data-qa="notIdentifiedNeedsLabel">No need identified</span>' },
+                        value: { html: '<span data-qa="notIdentifiedNeedsValue">' + notIdentifiedNeeds + '</span>' if needs else '<span data-qa="notIdentifiedNeedsValue">Not provided</span>' }
                     },
                     {
-                        key: { html: '<span data-qa="noScoreNeedsLabel">Areas without a need score</span>' },
-                        value: { html: '<span data-qa="noScoreNeedsValue">' + noScoreNeeds + '</span>' if needs else '<span data-qa="noScoreNeedsValue">Not provided</span>' }
+                        key: { html: '<span data-qa="unansweredNeedsLabel">Not enough information provided</span>' },
+                        value: { html: '<span data-qa="unansweredNeedsValue">' + unansweredNeeds + '</span>' if needs else '<span data-qa="unansweredNeedsValue">Not provided</span>' }
                     }
                 ]
             }) }}

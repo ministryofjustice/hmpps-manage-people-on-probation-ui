@@ -33,5 +33,5 @@
   headingLevel: scoresHeadingLevel | default('3'),
   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
   html: scaleContent,
-  actions: detailsPageLink if ogrs4Version and flags.enableOGRS4SummaryCardDetail else null
+  actions: detailsPageLink if ogrs4Version else null
 }) }}

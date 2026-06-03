@@ -56,6 +56,43 @@
                 "scheduled": 2,
                 "totalDays": 16
               }
+            },
+            {
+              "additionalOffences": [],
+              "eventNumber": "1234567",
+              "mainOffence": {
+                "code": "18502",
+                "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831"
+              },
+              "order": {
+                "description": "12 month Community order",
+                "endDate": "2024-12-01",
+                "startDate": "2023-12-01"
+              },
+              "rarDescription": "16 of 20 RAR days completed"
+            },
+            {
+              "additionalOffences": [
+                {
+                  "code": "9087",
+                  "description": "Burglary - 9087"
+                },
+                {
+                  "code": "9876",
+                  "description": "Arson - 9876"
+                }
+              ],
+              "eventNumber": "7654321",
+              "mainOffence": {
+                "code": "18502",
+                "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
+              },
+              "order": {
+                "description": "ORA Community Order",
+                "endDate": "2024-09-01",
+                "startDate": "2020-03-02"
+              },
+              "rarDescription": "10 of 10 RAR days completed"
             }
           ],
           "activity": {

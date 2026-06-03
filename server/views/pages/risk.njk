@@ -13,9 +13,6 @@
 {% set headerDob = personRisks.personSummary.dateOfBirth %}
 {% set headerGender = personRisks.personSummary.gender %}
 {% set hasRiskAssessment = risks.assessedOn %}
-{% set highScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
-{% set lowScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
-{% set withoutScore = needs.notIdentifiedNeeds %}
 {% if risks.assessedOn %}
     {% set lastUpdatedDate = 'Last updated: ' + risks.assessedOn | dateWithYear %}
 {% endif %}
@@ -29,10 +26,10 @@
     {% set scoresHeadingClass = 's' %}
 {% endif %}
 
-{% set highScoringNeeds %}
-{% if highScoring.length > 0 %}
+{% set identifiedNeeds %}
+{% if needs.identifiedNeeds.length %}
     <ul class="govuk-list">
-        {% for need in highScoring %}
+        {% for need in needs.identifiedNeeds %}
             <li>
                 {{ need.name }}
             </li>
@@ -43,10 +40,10 @@
     {% endif %}
 {% endset %}
 
-{% set lowScoringNeeds %}
-{% if lowScoring.length > 0 %}
+{% set notIdentifiedNeeds %}
+{% if needs.notIdentifiedNeeds.length %}
     <ul class="govuk-list">
-        {% for need in lowScoring %}
+        {% for need in needs.notIdentifiedNeeds %}
             <li>
                 {{ need.name }}
             </li>
@@ -57,10 +54,10 @@
     {% endif %}
 {% endset %}
 
-{% set noScoreNeeds %}
-{% if withoutScore.length > 0 %}
+{% set unansweredNeeds %}
+{% if needs.unansweredNeeds.length %}
     <ul class="govuk-list">
-        {% for need in withoutScore %}
+        {% for need in needs.unansweredNeeds %}
             <li>
                 {{ need.name }}
             </li>

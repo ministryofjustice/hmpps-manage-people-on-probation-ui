@@ -69,6 +69,7 @@ context('Record an outcome', () => {
         .should('contain.text', 'Tuesday 21 February 2023 from 9:15am to 9:30am')
     })
     it('should reset filter when first visiting page from new case', () => {
+      cy.task('stubDisableEMDIOverviewShowGPSData')
       loadPage()
       cy.get('input#outcomesFilter').should('be.checked')
       cy.get('input#outcomesFilter-3').click()
