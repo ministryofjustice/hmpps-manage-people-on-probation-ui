@@ -170,7 +170,7 @@
     "passport-oauth2": "^1.8.0",
     "postcode-validator": "^3.10.15",
     "prom-client": "^15.1.3",
-    "redis": "5.12.1",
+    "redis": "6.0.0",
     "slugify": "^1.6.9",
     "superagent": "^10.2.2",
     "timepicker": "^1.14.1",
