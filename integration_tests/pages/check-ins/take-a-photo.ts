@@ -6,4 +6,6 @@ export default class TakeAPhotoPage extends Page {
   }
 
   getBackLink = (): PageElement => cy.get('.govuk-back-link')
+
+  getSubmitBtn = (): PageElement => cy.get('[data-qa="submit-btn"]').should('have.attr', 'data-camera-ready', 'true')
 }
