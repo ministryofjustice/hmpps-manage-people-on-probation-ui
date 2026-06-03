@@ -295,6 +295,9 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
   )
 
+  router.all(`${arrangeBasePath}/add-note`, getNotePrepend)
+  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
   router.get(
     `${manageBasePath}/confirmation`,
     getOverdueOutcomes(hmppsAuthClient),
