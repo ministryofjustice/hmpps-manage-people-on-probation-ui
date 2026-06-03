@@ -13,15 +13,35 @@ permissions:
   contents: read
 
 jobs:
+  install_dependencies:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+    strategy:
+            fail-fast: false
+            matrix:
+              containers: [0, 1, 2, 3, 4]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install Packages
+        uses: actions/setup-node@v6
+        with: 
+          node-version-file: ${{ inputs.node_version_file }}
+        run: npm install
+      - run: npx cypress run --env allure=false --spec $(node cypress-parallel.js ${{ matrix.containers }} 5) --browser chrome
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: npm_unit_test_artifacts
+          path: |
+            test_results/
+
   integration_test:
     name: Run the integration tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
-    - name: Use Node.js ${{ inputs.node_version_file }}
-      uses: actions/setup-node@v6
-      with:
-        node-version-file: ${{ inputs.node_version_file }}
     - name: download artifacts
       uses: actions/download-artifact@v8
       with:
