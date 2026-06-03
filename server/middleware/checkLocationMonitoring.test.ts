@@ -1,5 +1,10 @@
-import { checkLocationMonitoring, checkLocationMonitoringString } from './checkLocationMonitoring'
-import { LicenceCondition, Requirement } from '../data/model/sentenceDetails'
+import {
+  checkLocationMonitoring,
+  checkLocationMonitoringByEventNumber,
+  hasLocationMonitoring,
+  checkLocationMonitoringString,
+} from './checkLocationMonitoring'
+import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
 
 describe('checkLocationMonitoring', () => {
   it('should return true for hasLicenceConditionsLMData when a licence condition contains "location monitoring"', () => {
@@ -100,5 +105,81 @@ describe('checkLocationMonitoringString', () => {
 
   it('should handle empty string', () => {
     expect(checkLocationMonitoringString('')).toBe(false)
+  })
+})
+
+describe('checkLocationMonitoringByEventNumber', () => {
+  const sentences = [
+    {
+      eventNumber: '1',
+      licenceConditions: [{ mainDescription: 'Location Monitoring - GPS' }],
+      requirements: [],
+    },
+    {
+      eventNumber: '2',
+      licenceConditions: [],
+      requirements: [{ description: 'Location Monitoring - Curfew' }],
+    },
+    {
+      eventNumber: '3',
+      licenceConditions: [{ mainDescription: 'Regular condition' }],
+      requirements: [{ description: 'Regular requirement' }],
+    },
+  ] as unknown as Sentence[]
+
+  it('should return true for licence conditions when event matches and has LM data', () => {
+    const result = checkLocationMonitoringByEventNumber('1', sentences)
+    expect(result.hasLicenceConditionsLMData).toBe(true)
+    expect(result.hasRequirementsLMData).toBe(false)
+  })
+
+  it('should return true for requirements when event matches and has LM data', () => {
+    const result = checkLocationMonitoringByEventNumber('2', sentences)
+    expect(result.hasLicenceConditionsLMData).toBe(false)
+    expect(result.hasRequirementsLMData).toBe(true)
+  })
+
+  it('should return false when event matches but has no LM data', () => {
+    const result = checkLocationMonitoringByEventNumber('3', sentences)
+    expect(result.hasLicenceConditionsLMData).toBe(false)
+    expect(result.hasRequirementsLMData).toBe(false)
+  })
+
+  it('should return false when event number does not match', () => {
+    const result = checkLocationMonitoringByEventNumber('4', sentences)
+    expect(result.hasLicenceConditionsLMData).toBe(false)
+    expect(result.hasRequirementsLMData).toBe(false)
+  })
+})
+
+describe('hasLocationMonitoring', () => {
+  it('should return true if licence conditions have location monitoring', () => {
+    const licenceConditions = [{ mainDescription: 'Location Monitoring' }] as any
+    const result = hasLocationMonitoring(licenceConditions, [])
+    expect(result).toBe(true)
+  })
+
+  it('should return true if requirements have location monitoring', () => {
+    const requirements = [{ description: 'Location Monitoring' }] as any
+    const result = hasLocationMonitoring([], requirements)
+    expect(result).toBe(true)
+  })
+
+  it('should return true if both have location monitoring', () => {
+    const licenceConditions = [{ mainDescription: 'Location Monitoring' }] as any
+    const requirements = [{ description: 'Location Monitoring' }] as any
+    const result = hasLocationMonitoring(licenceConditions, requirements)
+    expect(result).toBe(true)
+  })
+
+  it('should return false if neither have location monitoring', () => {
+    const licenceConditions = [{ mainDescription: 'Regular' }] as any
+    const requirements = [{ description: 'Regular' }] as any
+    const result = hasLocationMonitoring(licenceConditions, requirements)
+    expect(result).toBe(false)
+  })
+
+  it('should handle null or undefined inputs', () => {
+    expect(hasLocationMonitoring(null, undefined)).toBe(false)
   })
 })

@@ -1,10 +1,10 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const stubEMDIPeopleExists500Response = (): SuperAgentRequest =>
+const stubEMDIPeopleExists500Response = (crn: string = 'X000001'): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     priority: 1,
     request: {
-      urlPathPattern: '/emdi/people/exists/X000001',
+      urlPathPattern: `/emdi/people/exists/${crn}`,
       method: 'GET',
     },
     response: {
@@ -16,11 +16,11 @@ const stubEMDIPeopleExists500Response = (): SuperAgentRequest =>
     },
   })
 
-const stubEMDIPeopleExists404Response = (): SuperAgentRequest =>
+const stubEMDIPeopleExists404Response = (crn: string = 'X000001'): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     priority: 1,
     request: {
-      urlPathPattern: '/emdi/people/exists/X000001',
+      urlPathPattern: `/emdi/people/exists/${crn}`,
       method: 'GET',
     },
     response: {

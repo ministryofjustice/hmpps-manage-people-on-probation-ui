@@ -174,6 +174,7 @@ context('Overview', () => {
     page.assertRiskTags()
   })
   it('Risk information and tier is not provided due to 500 from ARNS and TIER', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X000002')
     const page = Page.verifyOnPage(OverviewPage)
     page.headerCrn().should('contain.text', 'X000002')
@@ -201,6 +202,7 @@ context('Overview', () => {
     page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
   })
   it('Overview page with pre-sentence is rendered', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X777916')
     const page = Page.verifyOnPage(OverviewPage)
     page.getCardHeader('sentence11').should('contain.text', 'Pre-Sentence')
@@ -215,8 +217,44 @@ context('Overview', () => {
   })
 
   it('Overview page with risk to probation staff is rendered', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X777916', { failOnStatusCode: false })
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
+  })
+
+  it('Overview page should not be rendered with licence conditions when EMDI API responds with 404', () => {
+    cy.task('stubEMDIPeopleExists404Response', 'X778160')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page should not be rendered with licence conditions when EMDI API responds with 500', () => {
+    cy.task('stubEMDIPeopleExists500Response', 'X778160')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page should not be rendered with licence conditions when flag is disabled', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page is rendered with licence conditions', () => {
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page
+      .getRowData('sentence1234567', 'licenceConditions', 'Value')
+      .should('contain.text', 'Location Monitoring View GPS location monitoring data')
+    page
+      .getRowData('sentence7654321', 'requirements', 'Value')
+      .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
   })
 })

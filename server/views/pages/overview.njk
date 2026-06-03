@@ -506,14 +506,19 @@
 
     {% set numberOfSentences = overview.sentences.length %}
     {% if numberOfSentences > 0 %}
-      {% for sentence in overview.sentences %}
+        {% for sentence in overview.sentences %}
+        {% set hasLocationMonitoring = { hasLicenceConditionsLMData: false, hasRequirementsLMData: false } %}
         {% set sentenceHtml %}
         {% set order %}
+        {% set showLicenceRow = false %}
         {% if sentence.order %}
           {% if loop.first %}
             <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
           {% endif %}
-          {{ sentence.order.description }}<br/>
+          {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
+                {% set hasLocationMonitoring = sentence.eventNumber | checkLocationMonitoringByEventNumber(sentences) %}
+          {% endif %}
+          {{ sentence.order.description }} <br/>
                     From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br/>
           {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
                     {% else %}
@@ -521,12 +526,23 @@
                 {% endif %}
         {% endset %}
         {% set requirements %}
-        {% if sentence.rarDescription %}
-          {{ sentence.rarDescription }}
-        {% else %}
+         {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+             {{ sentence.rarDescription }} <br/>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+         {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+            {{ sentence.rarDescription }}
+         {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+        {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
                 No requirements details
                 {% endif %}
         {% endset %}
+        {% set licences %}
+           {% if hasLocationMonitoring.hasLicenceConditionsLMData  %}
+                {% set showLicenceRow = true %}
+               Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="licencesEMDILink">View GPS location monitoring data</a>
+                {% endif %}
+            {% endset %}
         {% set mainOffence %}
         {% if loop.first %}
           <input type="hidden" id="mainOffence" name="mainOffence" value="{{ sentence.mainOffence.description }}">
@@ -554,7 +570,11 @@
               {
                 key: { html: '<span data-qa="requirementsLabel">Requirements</span>' },
                 value: { html: '<span data-qa="requirementsValue">' + requirements + '</span>' }
-              }
+              } if not  showLicenceRow ,
+              {
+                key: { html: '<span data-qa="licenceConditionsLabel">Licence conditions</span>' },
+                 value: { html: '<span data-qa="licenceConditionsValue">' + licences + '</span>' }
+              } if flags.enableEMDIOverviewShowGPSData and showLicenceRow
             ]
           }) }}
           {% endset %}

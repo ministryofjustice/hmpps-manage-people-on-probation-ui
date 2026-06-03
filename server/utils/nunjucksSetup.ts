@@ -88,7 +88,11 @@ import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
 import { to12HourTimeWithMinutes, toIso12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
 import { to12HourTimeCompact } from './to12HourTimeCompact'
-import { checkLocationMonitoring, checkLocationMonitoringString } from '../middleware/checkLocationMonitoring'
+import {
+  checkLocationMonitoring,
+  checkLocationMonitoringByEventNumber,
+  checkLocationMonitoringString,
+} from '../middleware/checkLocationMonitoring'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -219,6 +223,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('toIso12HourTimeWithMinutes', toIso12HourTimeWithMinutes)
   njkEnv.addFilter('checkLocationMonitoring', checkLocationMonitoring)
   njkEnv.addFilter('checkLocationMonitoringString', checkLocationMonitoringString)
+  njkEnv.addFilter('checkLocationMonitoringByEventNumber', checkLocationMonitoringByEventNumber)
 
   arnsNunjucksSetup(njkEnv)
 }
