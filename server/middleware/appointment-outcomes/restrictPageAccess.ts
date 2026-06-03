@@ -72,7 +72,6 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
       }
     }
   }
-  }
   if (restricted) {
     return res.redirect(outcomeUrl)
   }
