@@ -46,10 +46,18 @@ jobs:
     secrets: inherit
   # generic node integration tests using wiremock - feel free to override with local tests if required
   node_integration_tests:
-    name: node integration tests
+    name: node integration tests (${{ matrix.node_index }}/${{ matrix.node_total }})
+    strategy:
+      fail-fast: false
+      matrix:
+        node_index: [1, 2, 3, 4, 5]
+        node_total: [5]
     uses: ./.github/workflows/node_integration_tests.yml # WORKFLOW_VERSION
     needs: [node_unit_tests]
     secrets: inherit
+    with:
+      node_index: ${{ matrix.node_index }}
+      node_total: ${{ matrix.node_total }}
   sonarcloud:
     name: SonarCloud
     uses: ./.github/workflows/sonarqube.yml

@@ -8,19 +8,23 @@ on:
         required: false
         type: string
         default: ".nvmrc"
+      node_index:
+        description: "1-based index of this parallel node"
+        required: true
+        type: number
+      node_total:
+        description: "Total number of parallel nodes"
+        required: false
+        type: number
+        default: 1
 
 permissions:
   contents: read
 
 jobs:
   integration_test:
-    name: Run integration tests (${{ matrix.node_index }}/${{ matrix.node_total }})
+    name: Run integration tests (${{ inputs.node_index }}/${{ inputs.node_total }})
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node_index: [1, 2, 3, 4, 5]
-        node_total: [5]
     steps:
     - uses: actions/checkout@v6
     - name: Use Node.js ${{ inputs.node_version_file }}
@@ -64,8 +68,8 @@ jobs:
       id: integration-tests
       shell: bash
       env:
-        NODE_INDEX: ${{ matrix.node_index }}
-        NODE_TOTAL: ${{ matrix.node_total }}
+        NODE_INDEX: ${{ inputs.node_index }}
+        NODE_TOTAL: ${{ inputs.node_total }}
       run: |
         nohup npm run start-feature &
         sleep 5
@@ -81,13 +85,13 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: coverage_artifacts_${{ matrix.node_index }}
+        name: coverage_artifacts_${{ inputs.node_index }}
         path: coverage/
     - name: upload the test results
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: cypress_results_${{ matrix.node_index }}
+        name: cypress_results_${{ inputs.node_index }}
         path: test_results/
     - name: fail the action if the tests failed
       if: ${{ steps.integration-tests.outcome == 'failure' }}
