@@ -8,9 +8,6 @@
 {% set headerCRN = crn %}
 {% set headerDob = personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
-{% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
-{% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
-{% set withoutScore = needs.notIdentifiedNeeds %}
 {% set veryHighRiskLevel = groupByLevel("VERY HIGH", personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
@@ -22,33 +19,33 @@
 {% set personForename = overview.personalDetails.name.forename %}
 
 {% set criminogenicNeedsHtml %}
-{% if needs.identifiedNeeds.length %}
+{% if needs.identifiedNeeds.length or needs.notIdentifiedNeeds.length or needs.unansweredNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-    {% if severeScoring.length > 0 %}
-      <dt class="govuk-!-font-weight-bold">Severe</dt>
+    {% if needs.identifiedNeeds.length %}
+      <dt class="govuk-!-font-weight-bold">Need identified</dt>
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list">
-          {% for need in severeScoring %}
+          {% for need in needs.identifiedNeeds %}
             <li>{{ need.name }}</li>
           {% endfor %}
         </ul>
       </dd>
     {% endif %}
-    {% if standardScoring.length > 0 %}
-      <dt class="govuk-!-font-weight-bold">Standard</dt>
+    {% if needs.notIdentifiedNeeds.length %}
+      <dt class="govuk-!-font-weight-bold">No need identified</dt>
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list">
-          {% for need in standardScoring %}
+          {% for need in needs.notIdentifiedNeeds %}
             <li>{{ need.name }}</li>
           {% endfor %}
         </ul>
       </dd>
     {% endif %}
-    {% if withoutScore.length %}
-      <dt class="govuk-!-font-weight-bold">Areas without a need score</dt>
+    {% if needs.unansweredNeeds.length%}
+      <dt class="govuk-!-font-weight-bold">Not enough information provided</dt>
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list govuk-!-margin-bottom-0">
-          {% for need in withoutScore %}
+          {% for need in needs.unansweredNeeds %}
             <li>{{ need.name }}</li>
           {% endfor %}
         </ul>
