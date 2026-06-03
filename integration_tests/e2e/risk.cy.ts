@@ -417,13 +417,6 @@ context('Risk', () => {
     checkRiskPageView({ page, sanIndicator, sentencePlanLink, sentencePlanText })
   })
 
-  it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data', () => {
-    cy.task('stubPredictorScoresOGRS4')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    checkRiskPageView({ page, sentencePlanLink: false, ogrs4: true })
-  })
-
   it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data and expanded badge', () => {
     cy.task('stubPredictorScoresOGRS4')
     cy.task('stubOgrs4SummaryCardEnabled')

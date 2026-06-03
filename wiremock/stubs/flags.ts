@@ -1,7 +1,7 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (ogrs4 = true, ogrs4SummaryCardDetail = false, sentencePlanUrl = true) => ({
+const getArnsStub = (ogrs4 = true, sentencePlanUrl = true) => ({
   request: {
     urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
     method: 'GET',
@@ -25,17 +25,6 @@ const getArnsStub = (ogrs4 = true, ogrs4SummaryCardDetail = false, sentencePlanU
           rollouts: [] as string[],
         },
         {
-          key: 'enableOGRS4SummaryCardDetail',
-          name: 'enableOGRS4SummaryCardDetail',
-          description: '',
-          enabled: ogrs4SummaryCardDetail,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
           key: 'enableSentencePlanUrl',
           name: 'enableSentencePlanUrl',
           description: '',
@@ -55,7 +44,7 @@ const getArnsStub = (ogrs4 = true, ogrs4SummaryCardDetail = false, sentencePlanU
 })
 
 const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true, true))
+  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true))
 
 const stubEnableESuperVision = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
@@ -239,17 +228,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
             name: 'enableOGRS4',
             description: '',
             enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableOGRS4SummaryCardDetail',
-            name: 'enableOGRS4SummaryCardDetail',
-            description: '',
-            enabled: false,
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2025-01-13T15:28:37.920581Z',
             updatedAt: '2025-01-13T17:06:39.269084Z',
