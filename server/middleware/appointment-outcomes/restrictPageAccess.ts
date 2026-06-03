@@ -45,10 +45,7 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
     for (const rule of rules) {
       let isInvalidRule = false
       for (const [key, value] of Object.entries(rule) as [keyof PageAccessRuleItem, string][]) {
-        if (checkRequiredValue(key, value)) {
-          isInvalidRule = true
-          break
-        }
+        isInvalidRule = checkRequiredValue(key, value)
       }
       if (!isInvalidRule) {
         return false
