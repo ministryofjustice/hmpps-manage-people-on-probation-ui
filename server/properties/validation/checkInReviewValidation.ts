@@ -30,7 +30,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select yes if the person in the video is the correct person',
+          msg: 'Select if the person in the check in image is the right person',
           log: 'Manual identity verification not completed',
         },
       ],
