@@ -15,7 +15,7 @@ permissions:
 jobs:
   integration_test:
     #name: Integration tests (${{ matrix.shard }}/5)
-    name: Integration tests
+    name: Run the integration tests
     runs-on: ubuntu-latest
 
     strategy:
