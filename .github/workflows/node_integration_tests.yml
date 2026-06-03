@@ -27,7 +27,9 @@ jobs:
         uses: actions/setup-node@v6
         with: 
           node-version-file: ${{ inputs.node_version_file }}
-        run: npm install
+        shell: bash
+        run: |
+          npm run setup
       - run: npx cypress run --env allure=false --spec $(node cypress-parallel.js ${{ matrix.containers }} 5) --browser chrome
 
       - name: Upload a Build Artifact
