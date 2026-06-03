@@ -13,9 +13,12 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           pattern: coverage_artifacts_*
-          merge-multiple: true
-          path: |
-            coverage/
+          merge-multiple: false
+          path: coverage-artifacts/
+      - name: merge lcov reports
+        run: |
+          mkdir -p coverage
+          find coverage-artifacts -name 'lcov.info' -exec cat {} \; > coverage/lcov.info
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v8
         env:

@@ -22,8 +22,8 @@ permissions:
   contents: read
 
 jobs:
-  integration_test:
-    name: Run integration tests (${{ inputs.node_index }}/${{ inputs.node_total }})
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -31,26 +31,41 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version-file: ${{ inputs.node_version_file }}
-    - name: download artifacts
-      uses: actions/download-artifact@v8
-      with:
-        name: npm_build_artifacts
-    - name: restore cache
-      id: restore-cache
-      uses: actions/cache/restore@v5
-      env: 
+    - name: Cache node modules
+      id: cache
+      uses: actions/cache@v5
+      env:
         cache-name: node-modules
       with:
         path: |
           ./node_modules
           ~/.cache/Cypress
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-    - name: install dependencies
-      if: steps.restore-cache.outputs.cache-hit != 'true'
+    - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
-      run: |
-        npm run setup
-    - name: download the artifacts
+      run: npm run setup
+
+  integration_test:
+    name: Run integration tests (${{ inputs.node_index }}/${{ inputs.node_total }})
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Use Node.js ${{ inputs.node_version_file }}
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: ${{ inputs.node_version_file }}
+    - name: Restore cache
+      uses: actions/cache/restore@v5
+      env:
+        cache-name: node-modules
+      with:
+        path: |
+          ./node_modules
+          ~/.cache/Cypress
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Download build artifacts
       uses: actions/download-artifact@v8
       with:
         name: npm_build_artifacts
@@ -58,13 +73,12 @@ jobs:
           build/
           dist/
           assets/stylesheets/
-    - name: download the test artifacts
+    - name: Download unit test artifacts
       uses: actions/download-artifact@v8
       with:
         name: npm_unit_test_artifacts
-        path: |
-          test_results/
-    - name: Prepare and run integration tests
+        path: test_results/
+    - name: Run integration tests
       id: integration-tests
       shell: bash
       env:
@@ -72,30 +86,65 @@ jobs:
         NODE_TOTAL: ${{ inputs.node_total }}
       run: |
         nohup npm run start-feature &
-        sleep 5
+        until curl -sf http://localhost:3007/health > /dev/null; do sleep 1; done
         npm run int-test-parallel
-      # continue-on-error: true
-      # replacing the above with if: always()
-    - name: Merge unit and integration test coverage reports
-      if: always()
-      shell: bash
-      run: |
-        npm run coverage-report
-    - name: upload the coverage test artifacts
+    - name: Upload cypress coverage
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: coverage_artifacts_${{ inputs.node_index }}
-        path: coverage/
-    - name: upload the test results
+        name: cypress_coverage_${{ inputs.node_index }}
+        path: cypress_coverage/
+        overwrite: true
+    - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v7
       with:
         name: cypress_results_${{ inputs.node_index }}
         path: test_results/
-    - name: fail the action if the tests failed
+        overwrite: true
+    - name: Fail if tests failed
       if: ${{ steps.integration-tests.outcome == 'failure' }}
       uses: actions/github-script@v9
       with:
         script: |
-            core.setFailed('Integration tests failed')
+          core.setFailed('Integration tests failed')
+
+  write_report:
+    name: Write coverage report (${{ inputs.node_index }}/${{ inputs.node_total }})
+    needs: integration_test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Use Node.js ${{ inputs.node_version_file }}
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: ${{ inputs.node_version_file }}
+    - name: Restore cache
+      uses: actions/cache/restore@v5
+      env:
+        cache-name: node-modules
+      with:
+        path: |
+          ./node_modules
+          ~/.cache/Cypress
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Download unit test artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: npm_unit_test_artifacts
+        path: test_results/
+    - name: Download cypress coverage
+      uses: actions/download-artifact@v8
+      with:
+        name: cypress_coverage_${{ inputs.node_index }}
+        path: cypress_coverage/
+    - name: Merge unit and integration test coverage reports
+      shell: bash
+      run: npm run coverage-report
+    - name: Upload coverage artifacts
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage_artifacts_${{ inputs.node_index }}
+        path: coverage/
+        overwrite: true

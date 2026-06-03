@@ -9,7 +9,7 @@ const NODE_TOTAL = Number(process.argv[3] || 1)
 const TEST_FOLDER = './integration_tests/e2e'
 
 function getSpecFiles() {
-  const allSpecFiles = traverse(TEST_FOLDER)
+  const allSpecFiles = traverse(TEST_FOLDER).filter(file => file && file.endsWith('.cy.ts'))
   return allSpecFiles.sort().filter((_, index) => index % NODE_TOTAL === NODE_INDEX - 1)
 }
 
