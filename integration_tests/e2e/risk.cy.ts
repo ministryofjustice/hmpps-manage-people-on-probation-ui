@@ -274,9 +274,9 @@ const checkRiskPageView = ({
       .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
-    page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
-    page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
-    page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
+    page.getElementData('identifiedNeedsValue').should('contain.text', 'Relationships')
+    page.getElementData('notIdentifiedNeedsValue').should('contain.text', 'Emotional wellbeing')
+    page.getElementData('unansweredNeedsValue').should('contain.text', 'Thinking and Behaviour')
     page.getInsetText().should('contain.text', 'Last updated: 24 January 2024')
     // page.getElementData('osp').should('exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
@@ -359,7 +359,8 @@ context('Risk', () => {
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    checkRiskPageView({ page })
+    const sanIndicator = false
+    checkRiskPageView({ page, sanIndicator })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
@@ -392,16 +393,6 @@ context('Risk', () => {
     checkRiskPageView({ page, sanIndicator, sentencePlanUrlEnabled: false })
   })
 
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and san indicator feature flag is disabled', () => {
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubNoSanIndicator')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    checkRiskPageView({ page })
-  })
-
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
     cy.task('stubSentencePlanDraft')
     cy.task('stubUserCaseloadSearch')
@@ -424,37 +415,6 @@ context('Risk', () => {
     const sentencePlanLink = false
     const sentencePlanText = true
     checkRiskPageView({ page, sanIndicator, sentencePlanLink, sentencePlanText })
-  })
-
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.task('stubNoSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    const sanIndicator = true
-    const sentencePlanLink = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
-  })
-
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
-    cy.task('stubNoSentencePlanAndSanIndicator')
-    cy.task('stubSanIndicatorTrue')
-    cy.task('stubUserCaseloadSearch')
-    cy.task('stubAuthSentencePlan')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    const sanIndicator = false
-    const sentencePlanLink = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
-  })
-
-  it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data', () => {
-    cy.task('stubPredictorScoresOGRS4')
-    cy.visit('/case/X000001/risk')
-    const page = new RiskPage()
-    checkRiskPageView({ page, sentencePlanLink: false, ogrs4: true })
   })
 
   it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data and expanded badge', () => {

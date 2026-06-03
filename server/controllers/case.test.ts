@@ -5,6 +5,9 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
+import { existsInEMDI } from '../middleware/existsInEMDI'
+import { getSentences } from '../middleware'
+import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import {
   mockAppResponse,
   mockTierCalculation,
@@ -45,6 +48,9 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/eSupervisionClient')
+jest.mock('../middleware/existsInEMDI')
+jest.mock('../middleware/getSentences')
+jest.mock('../middleware/checkLocationMonitoring')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -112,6 +118,10 @@ jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
+
+const getSentencesSpy = getSentences as jest.Mock
+const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
+const existsInEMDISpy = existsInEMDI as jest.Mock
 
 const res = mockAppResponse({
   flags: {
@@ -326,5 +336,67 @@ describe('caseController', () => {
       },
     })
     await expect(controllers.case.getCase(hmppsAuthClient)(req, res)).rejects.toThrow('API failure')
+  })
+
+  describe('getCase - GPS data logic (EMDI)', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    beforeEach(() => {
+      res.locals.flags = { enableEMDIOverviewShowGPSData: true, enableOutcomesV1: true }
+      res.locals.user = { username: 'test-user', authSource: 'nomis', token: 'token-1' }
+      getSentencesSpy.mockImplementation(() => (r: any, s: any, next: any) => {
+        const { locals } = s
+        locals.sentences = [{ licenceConditions: [], requirements: [] }]
+        next()
+      })
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+      res.locals.flags = { enableOutcomesV1: true }
+      delete res.locals.locationMonitoringUri
+      delete res.locals.sentences
+    })
+
+    it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present', async () => {
+      hasLocationMonitoringSpy.mockReturnValue(true)
+      existsInEMDISpy.mockResolvedValue('http://emdi-uri')
+
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+      expect(getSentencesSpy).toHaveBeenCalled()
+      expect(hasLocationMonitoringSpy).toHaveBeenCalled()
+      expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
+      expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
+    })
+
+    it('should call getSentences but NOT existsInEMDI when flag is enabled but NO location monitoring is present', async () => {
+      hasLocationMonitoringSpy.mockReturnValue(false)
+
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+      expect(getSentencesSpy).toHaveBeenCalled()
+      expect(hasLocationMonitoringSpy).toHaveBeenCalled()
+      expect(existsInEMDISpy).not.toHaveBeenCalled()
+      expect(res.locals.locationMonitoringUri).toBeUndefined()
+    })
+
+    it('should NOT call getSentences when flag is disabled', async () => {
+      res.locals.flags.enableEMDIOverviewShowGPSData = false
+
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+      expect(getSentencesSpy).not.toHaveBeenCalled()
+      expect(existsInEMDISpy).not.toHaveBeenCalled()
+    })
   })
 })

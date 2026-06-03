@@ -318,4 +318,55 @@ describe('/middleware/appointment-outcomes/getBreach', () => {
 
     expect(res.locals.appointmentOutcome.breachWarning).toBeNull()
   })
+
+  describe('type coercion: s.id vs selectedSentence', () => {
+    const matchedBreachWarning = { order: 'Community Order', breachDate: '2024-01-01' }
+
+    it.each`
+      sessionSentenceId | selectedId   | expectedBreachWarning
+      ${1}              | ${'1'}       | ${matchedBreachWarning}
+      ${'1'}            | ${1}         | ${matchedBreachWarning}
+      ${'1'}            | ${'1'}       | ${matchedBreachWarning}
+      ${1}              | ${1}         | ${matchedBreachWarning}
+      ${undefined}      | ${undefined} | ${null}
+      ${null}           | ${null}      | ${null}
+    `(
+      'sets breachWarning to $expectedBreachWarning when session id is $sessionSentenceId and eventId is selectedId',
+      async ({ sessionSentenceId, selectedId, expectedBreachWarning }) => {
+        req.session.data.sentences[crn][0].id = sessionSentenceId
+        req.session.data.appointments[crn][id].eventId = selectedId
+        mockGetPersonCompliance.mockResolvedValue(personComplianceFixture([mockBreachSentenceCompliance]))
+
+        await getBreach(mockedHmppsAuthClient)(req, res, next)
+
+        expect(res.locals.appointmentOutcome.breachWarning).toEqual(expectedBreachWarning)
+      },
+    )
+  })
+
+  describe('type coercion: s.eventNumber vs sentence.eventNumber', () => {
+    const matchedBreachWarning = { order: 'Community Order', breachDate: '2024-01-01' }
+
+    it.each`
+      complianceEventNumber | sessionEventNumber | expectedBreachWarning
+      ${1}                  | ${'1'}             | ${matchedBreachWarning}
+      ${'1'}                | ${1}               | ${matchedBreachWarning}
+      ${1}                  | ${1}               | ${matchedBreachWarning}
+      ${'1'}                | ${'1'}             | ${matchedBreachWarning}
+      ${undefined}          | ${undefined}       | ${null}
+      ${null}               | ${null}            | ${null}
+    `(
+      'sets breachWarning to $expectedBreachWarning when compliance eventNumber is $complianceEventNumber and session eventNumber is $sessionEventNumber',
+      async ({ complianceEventNumber, sessionEventNumber, expectedBreachWarning }) => {
+        req.session.data.sentences[crn][0].eventNumber = sessionEventNumber
+        mockGetPersonCompliance.mockResolvedValue(
+          personComplianceFixture([{ ...mockBreachSentenceCompliance, eventNumber: complianceEventNumber }]),
+        )
+
+        await getBreach(mockedHmppsAuthClient)(req, res, next)
+
+        expect(res.locals.appointmentOutcome.breachWarning).toEqual(expectedBreachWarning)
+      },
+    )
+  })
 })

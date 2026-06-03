@@ -9,12 +9,12 @@ import {
   createAppointmentSession,
   getAppointmentTypes,
   getSentences,
-  redirectWizard,
   getPersonalDetails,
   getNextComAppointment,
   getAppointment,
   getUserProviders,
   forceValidation,
+  getOverdueOutcomes,
 } from '../middleware'
 
 import {
@@ -32,8 +32,10 @@ import {
   getCurrentEnforcementAction,
   getContactOutcomes,
   getOutcomeSummary,
+  getConfirmation,
   getNotePrepend,
   resetSelectedActions,
+  restrictPageAccess,
   getBreach,
   getComplianceData,
   handlePutOutcome,
@@ -41,17 +43,18 @@ import {
 
 import validate from '../middleware/validation/index'
 import { handleEnforcementActionRedirect } from '../middleware/appointment-outcomes/handleEnforcementActionRedirect'
-import { EnforcementActionPage, enforcementActionPageKeys } from '../models/Appointments'
-
-const enforcementActionDataPaths: ['outcome', EnforcementActionPage][] = enforcementActionPageKeys.map(key => [
-  'outcome',
-  key,
-])
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const arrangeBasePath = '/case/:crn/arrange-appointment/:id/outcome'
   const manageBasePath = '/case/:crn/appointments/appointment/:contactId/outcome'
+
+  /* restrict page access if required session data is not present 👇  */
+
+  router.get(
+    [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
+    restrictPageAccess,
+  )
 
   /* get person appointment and create appointment session only in manage routes 👇 */
 
@@ -65,10 +68,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* create appointment session in manage journey 👇 */
 
   router.get([manageBasePath, `${manageBasePath}/update-enforcement-action`], createAppointmentSession)
-
-  /* redirect page if required session data is not present 👇  */
-
-  router.get(arrangeBasePath, redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: 'date' }]))
 
   /* get the contact outcomes and enforcement actions from api 👇 */
 
@@ -186,7 +185,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     handleEnforcementActionRedirect('attendedFailedToComply'),
   )
 
@@ -194,7 +192,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     controllers.appointmentOutcomes.getAcceptableAbsence(),
   )
   router.post(
@@ -206,7 +203,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     controllers.appointmentOutcomes.getUnacceptableAbsence(),
   )
   router.post(
@@ -218,7 +214,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     controllers.appointmentOutcomes.getFailedToAttend(),
   )
   router.post(
@@ -230,7 +225,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }]),
     controllers.appointmentOutcomes.getEnforcementAction(),
   )
   router.post(
@@ -242,13 +236,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
-    redirectWizard([
-      { path: ['outcome', 'outcomeType'] },
-      {
-        path: enforcementActionDataPaths,
-        value: ['BREACH_RECALL_INITIATED', 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'],
-      },
-    ]),
     controllers.appointmentOutcomes.getInitiateBreachOrRecall(),
   )
   router.post(
@@ -260,7 +247,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }, { path: enforcementActionDataPaths }]), // 👈 Can only match that any enforcement action has been logged
     controllers.appointmentOutcomes.getSendLetter(),
   )
   router.post(
@@ -272,7 +258,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
-    redirectWizard([{ path: ['outcome', 'outcomeType'] }, { path: enforcementActionDataPaths }]),
     controllers.appointmentOutcomes.getUpdateEnforcementAction(),
   )
   router.post(
@@ -300,7 +285,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.post(
     `${manageBasePath}/next-appointment`,
-    validate.appointments,
+    validate.appointmentOutcomes,
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
 
@@ -317,7 +302,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
   )
 
-  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
-
-  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
+  router.get(
+    `${manageBasePath}/confirmation`,
+    getOverdueOutcomes(hmppsAuthClient),
+    getConfirmation,
+    controllers.appointmentOutcomes.getConfirmation(hmppsAuthClient),
+  )
 }

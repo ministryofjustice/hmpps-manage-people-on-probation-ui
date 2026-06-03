@@ -66,7 +66,7 @@ export const postRescheduleAppointments = (
     const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
-    if (email && res.locals.flags.enableCalendarEvents) {
+    if (email) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)

@@ -17,6 +17,21 @@
     },
     {
       "request": {
+        "urlPathPattern": "/emdi/people/exists/X778160",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uri": "https://emdi-people-gps-loc"
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/emdi/people/exists/X777916",
         "method": "GET"
       },

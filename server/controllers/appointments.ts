@@ -14,13 +14,8 @@ import {
   getDataValue,
   canRescheduleAppointment,
 } from '../utils'
-import {
-  renderError,
-  cloneAppointmentAndRedirect,
-  getCheckinOffenderDetails,
-  createAppointmentSession,
-} from '../middleware'
-import { AppointmentPatch } from '../models/Appointments'
+import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
+import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
 
@@ -353,7 +348,8 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params as Record<string, string>
+      const { crn, contactId, id: uuid } = req.params as Record<string, string>
+      const id = uuid || contactId
       const { data } = req.session
       let { back } = req.query
       if (back) {
@@ -371,12 +367,14 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const outcomeJourney = req.url.includes('outcome/next-appointment')
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
+        id,
         back,
-        contactId,
+        outcomeJourney,
       })
     }
   },
@@ -385,10 +383,13 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { body, session } = req
       const { crn, contactId, id: uuid } = req.params as Record<string, string>
       const id = uuid || contactId
+      const outcomeJourney = req.url.includes('/outcome/next-appointment')
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
-      const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
+      const nextAppointment = !outcomeJourney
+        ? (body.nextAppointment as AppointmentSessionSelection)
+        : (body.appointments[crn][id].outcome.nextAppointment as AppointmentSessionSelection)
       const currentAppointment = getDataValue(session.data, ['appointments', crn, id])
       if (nextAppointment !== 'NO') {
         return cloneAppointmentAndRedirect(currentAppointment, nextAppointment)(req, res)

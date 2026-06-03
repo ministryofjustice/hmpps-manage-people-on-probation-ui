@@ -3,24 +3,11 @@
 {% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.type %}
 {% set sentence = appointment.appointmentFor.sentence %}
 {% set backLink = back if back else 
-  '/case/' + crn + '/appointments/appointment/' + contactId + '/manage/' %}
+  '/case/' + crn + '/appointments/appointment/' + id + '/manage/' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% block afterHeading %}
-  {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personAppointment.personSummary.name.forename + '’s' + sentence + '.' %}
-  {% if nextAppointment.appointment %}
-    {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithYear + " with " + personAppointment.personSummary.name.forename + " " + personAppointment.personSummary.name.surname + " for their " + sentence %}
-  {% endif %}
-  {{ govukInsetText({
-    html: nextAppointmentText
-  }) }}
-{% endblock %}
-{% block form %}
-
-  {{ govukRadios({
-    name: "nextAppointment",
-    id: "nextAppointment",
-    formGroup: {
+{% set config = {
+   formGroup: {
       attributes: {
         'data-qa': 'anotherAppointment'
       } 
@@ -50,6 +37,23 @@
         value: "NO",
         checked: body.nextAppointment == "NO"
     }] 
-  }) }}
+} %}
+{% if not outcomeJourney %}
+  {% set config = config | merge({id: "nextAppointment", idPrefix: "nextAppointment", name: "nextAppointment"}) %}
+{% endif %}
+{% if outcomeJourney %}
+  {% set config = config | decorateFormAttributes(['appointments', crn, id, 'outcome', 'nextAppointment']) %}
+{% endif %}
 
+{% block afterHeading %}
+  {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personAppointment.personSummary.name.forename + '’s' + sentence + '.' %}
+  {% if nextAppointment.appointment %}
+    {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithYear + " with " + personAppointment.personSummary.name.forename + " " + personAppointment.personSummary.name.surname + " for their " + sentence %}
+  {% endif %}
+  {{ govukInsetText({
+    html: nextAppointmentText
+  }) }}
+{% endblock %}
+{% block form %}
+  {{ govukRadios(config) }}
 {% endblock %}
