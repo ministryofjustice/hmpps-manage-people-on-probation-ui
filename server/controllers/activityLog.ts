@@ -90,13 +90,16 @@ const activityLogController: Controller<typeof routes, void> = {
       const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       if (req.query?.showSuccessBanner) {
-        req.flash('contactUpdated', 'success')
+        req.flash('contactUpdated', req.query?.uploadFailed === 'true' ? 'uploadFailed' : 'success')
         const cleanParams = new URLSearchParams(req.query as Record<string, string>)
         cleanParams.delete('showSuccessBanner')
+        cleanParams.delete('uploadFailed')
         const cleanQuery = cleanParams.toString()
         return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
       }
-      const showSuccessBanner = !!req.flash('contactUpdated')?.[0]
+      const contactUpdatedFlash = req.flash('contactUpdated')?.[0]
+      const showSuccessBanner = !!contactUpdatedFlash
+      const uploadFailed = contactUpdatedFlash === 'uploadFailed'
 
       let { url } = req
       url = encodeURIComponent(url)
@@ -128,6 +131,7 @@ const activityLogController: Controller<typeof routes, void> = {
         url,
         isActivityLog,
         showSuccessBanner,
+        uploadFailed,
       })
     }
   },
