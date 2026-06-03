@@ -59,7 +59,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/type-attendance',
-    redirectWizard([{ path: 'eventId' }]),
+    redirectWizard(['eventId']),
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getDefaultUser(hmppsAuthClient),
@@ -77,7 +77,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
-    redirectWizard([{ path: 'eventId' }]),
+    redirectWizard(['eventId']),
     getUserOptions(hmppsAuthClient),
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
@@ -92,7 +92,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
   router.get(
     '/case/:crn/arrange-appointment/:id/location-date-time',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }]),
+    redirectWizard(['eventId', 'type']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getPersonRiskFlags(hmppsAuthClient),
     controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
@@ -108,7 +108,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location-not-in-list',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }]),
+    redirectWizard(['eventId', 'type']),
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
@@ -116,7 +116,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/attended-complied',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: 'date' }]),
+    redirectWizard(['eventId', 'type', 'date']),
     controllers.arrangeAppointments.getAttendedComplied(),
   )
 
@@ -130,7 +130,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/supporting-information',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: ['user', 'locationCode'] }]),
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getSupportingInformation(),
   )
 
@@ -142,7 +142,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.postSupportingInformation(),
   )
 
-  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', redirectWizard([{ path: 'eventId' }]))
+  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', redirectWizard(['eventId']))
 
   router.get(
     [
@@ -172,7 +172,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: ['user', 'locationCode'] }]),
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
     getOverdueOutcomes(hmppsAuthClient),
     controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
   )
@@ -188,13 +188,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.all(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
-    redirectWizard([
-      { path: 'eventId' },
-      { path: 'type' },
-      { path: 'date' },
-      { path: 'start' },
-      { path: ['user', 'locationCode'] },
-    ]),
+    redirectWizard(['eventId', 'type', 'date', 'start', ['user', 'locationCode']]),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getSmsPreview(hmppsAuthClient),
     getSmsConfirmationOptions,
@@ -225,7 +219,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.all(
     '/case/:crn/arrange-appointment/:id/add-note',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: 'date' }, { path: 'outcomeRecorded' }]),
+    redirectWizard(['eventId', 'type', 'date', 'outcomeRecorded']),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getAppointment(hmppsAuthClient),
     getOutcomeProps,

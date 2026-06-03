@@ -1,9 +1,11 @@
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, EnforcementActionPage } from '../../models/Appointments'
 
 export type OutcomeMap = {
   [K in AppointmentOutcomeType]?: {
     code: OutcomeCode
     description?: string
+    options?: AppointmentEnforcementAction[]
+    pageKey?: EnforcementActionPage
   }
 }
 

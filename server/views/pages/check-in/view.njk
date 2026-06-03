@@ -85,9 +85,12 @@
             {% endif %}
         </dl>
 
-        <h2 class="govuk-heading-m">Add further information</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
+                label: {
+                    text: "Add further information",
+                    classes: "govuk-label--m"
+                },
                 rows: '10',
                 maxlength: maxCharCount,
                 formGroup: {

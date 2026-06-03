@@ -100,8 +100,8 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
-          redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
-          RedirectPage: AttendedFailedToComplyPage,
+          redirectPageTitle: 'Add a note',
+          RedirectPage: AddNotePage,
         },
       )
     }

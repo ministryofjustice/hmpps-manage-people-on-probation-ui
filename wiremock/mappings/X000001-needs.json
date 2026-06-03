@@ -50,7 +50,15 @@
               "riskOfHarm": true,
               "riskOfReoffending": true,
               "severity": "STANDARD"
-            },
+            }
+          ],
+          "notIdentifiedNeeds": [
+            {
+              "section": "EMO_WELLBEING",
+              "name": "Emotional wellbeing"
+            }
+          ],
+          "unansweredNeeds": [
             {
               "section": "THINKING_AND_BEHAVIOUR",
               "name": "Thinking and Behaviour",
@@ -66,13 +74,6 @@
               "severity": "STANDARD"
             }
           ],
-          "notIdentifiedNeeds": [
-            {
-              "section": "EMO_WELLBEING",
-              "name": "Emotional wellbeing"
-            }
-          ],
-          "unansweredNeeds": [],
           "assessedOn": "2023-07-26T11:29:10"
         },
         "headers": {

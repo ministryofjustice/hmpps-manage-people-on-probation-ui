@@ -5,7 +5,7 @@ export default configureAllowedScripts({
     // Needed by esbuild for watching files during development
     'node_modules/@parcel/watcher@2.5.6': 'ALLOW',
     // Needed to interface with Sentry for app monitoring
-    'node_modules/@sentry/cli@3.4.3': 'ALLOW',
+    'node_modules/@sentry/cli@3.5.0': 'ALLOW',
     // Provides capabilities for integration testing
     'node_modules/cypress@15.16.0': 'ALLOW',
     // Provides native integration, supporting ability to write dtrace probes for bunyan

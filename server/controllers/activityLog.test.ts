@@ -260,6 +260,7 @@ describe('/controllers/activityLogController', () => {
         'pages/appointments/appointment',
         expect.objectContaining({
           showSuccessBanner: true,
+          uploadFailed: false,
         }),
       )
     })
@@ -289,6 +290,7 @@ describe('/controllers/activityLogController', () => {
         'pages/appointments/appointment',
         expect.objectContaining({
           showSuccessBanner: false,
+          uploadFailed: false,
         }),
       )
     })
@@ -324,7 +326,53 @@ describe('/controllers/activityLogController', () => {
         isActivityLog: true,
         url: '',
         showSuccessBanner: false,
+        uploadFailed: false,
       })
+    })
+
+    it('should render the activity page with uploadFailed true when flash is uploadFailed', async () => {
+      const reqWithUploadFailed = httpMocks.createRequest({
+        params: { crn, id },
+        query: { view: 'default' },
+        session: {},
+      })
+
+      reqWithUploadFailed.flash = jest.fn().mockImplementation((key: string) => {
+        if (key === 'contactUpdated') return ['uploadFailed']
+        return []
+      })
+
+      const resWithUploadFailed = mockAppResponse({ filters: {}, flags: {} })
+      const renderSpyWithUploadFailed = jest.spyOn(resWithUploadFailed, 'render')
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(reqWithUploadFailed, resWithUploadFailed)
+
+      expect(renderSpyWithUploadFailed).toHaveBeenCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          showSuccessBanner: true,
+          uploadFailed: true,
+        }),
+      )
+    })
+
+    it('should store uploadFailed in flash and redirect to clean URL when uploadFailed is in query', async () => {
+      const reqWithUploadFailed = httpMocks.createRequest({
+        params: { crn, id },
+        path: `/case/${crn}/activity/${id}`,
+        query: { showSuccessBanner: 'true', uploadFailed: 'true' },
+        session: {},
+      })
+
+      reqWithUploadFailed.flash = jest.fn()
+
+      const redirectSpy = jest.spyOn(res, 'redirect')
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(reqWithUploadFailed, res)
+
+      expect(reqWithUploadFailed.flash).toHaveBeenCalledWith('contactUpdated', 'uploadFailed')
+      expect(redirectSpy).toHaveBeenCalledWith('/case/X000001/activity/1234')
+      expect(redirectSpy.mock.calls[0][0]).not.toContain('uploadFailed')
     })
   })
 })
