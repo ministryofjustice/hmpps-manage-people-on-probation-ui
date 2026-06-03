@@ -49,10 +49,7 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: npm_build_artifacts
-        path: |
-          build/
-          dist/
-          assets/stylesheets/
+        path: .
     - name: Download unit test artifacts
       uses: actions/download-artifact@v8
       with:
