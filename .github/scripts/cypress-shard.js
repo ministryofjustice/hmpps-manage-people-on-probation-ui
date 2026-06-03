@@ -7,5 +7,4 @@ const totalShards = Number(process.argv[3])
 const specs = glob.sync('integration_tests/e2e/**/*.cy.ts').sort()
 
 const shardSpecs = specs.filter((_, index) => index % totalShards === shard - 1)
-
-console.log(shardSpecs.join(','))
+process.stdout.write(shardSpecs.join(','))
