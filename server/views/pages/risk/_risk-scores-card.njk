@@ -2,7 +2,7 @@
   {% include "./_rsr.njk" %}
   {% include "./_ogrs.njk" %}
   {% include "./_ogp.njk" %}
-  {% if not sanIndicator or not flags.enableSanIndicator %}
+  {% if not sanIndicator %}
     {% if flags.enableOGRS4 %}
       {% include "./_ospdc.njk" %}
       {% include "./_ospiic.njk" %}

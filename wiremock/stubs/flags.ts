@@ -1,7 +1,7 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (sanIndicator = true, ogrs4 = true, sentencePlanUrl = true) => ({
+const getArnsStub = (ogrs4 = true, sentencePlanUrl = true) => ({
   request: {
     urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
     method: 'GET',
@@ -14,17 +14,6 @@ const getArnsStub = (sanIndicator = true, ogrs4 = true, sentencePlanUrl = true) 
       },
       flags: [
         {
-          key: 'enableSanIndicator',
-          name: 'enableSanIndicator',
-          description: '',
-          enabled: sanIndicator,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as string[],
-          rollouts: [] as string[],
-        },
-        {
           key: 'enableOGRS4',
           name: 'enableOGRS4',
           description: '',
@@ -32,8 +21,8 @@ const getArnsStub = (sanIndicator = true, ogrs4 = true, sentencePlanUrl = true) 
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
+          rules: [] as string[],
+          rollouts: [] as string[],
         },
         {
           key: 'enableSentencePlanUrl',
@@ -55,10 +44,7 @@ const getArnsStub = (sanIndicator = true, ogrs4 = true, sentencePlanUrl = true) 
 })
 
 const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, true))
-
-const stubNoSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false))
+  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true))
 
 const stubEnableESuperVision = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
@@ -487,7 +473,6 @@ const stubEnableShowMatchWithConcern = (): SuperAgentRequest =>
   })
 
 export default {
-  stubNoSanIndicator,
   stubEnableESuperVision,
   stubDisableSmsReminders,
   stubDisableCompliancePage,
