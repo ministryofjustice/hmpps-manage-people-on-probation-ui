@@ -13,37 +13,20 @@ permissions:
   contents: read
 
 jobs:
-  install_dependencies:
-    name: Install dependencies
+  integration_test:
+    name: Run integration tests (${{ matrix.node_index }}/${{ matrix.node_total }})
     runs-on: ubuntu-latest
     strategy:
-            fail-fast: false
-            matrix:
-              containers: [0, 1, 2, 3, 4]
-    steps:  
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Install Packages
-      uses: actions/setup-node@v6
-      with: 
-        node-version-file: ${{ inputs.node_version_file }}
-      shell: bash
-      run: |
-        npm run setup
-    - run: npx cypress run --env allure=false --spec $(node cypress-parallel.js ${{ matrix.containers }} 5) --browser chrome
-
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v7
-      if: always()
-      with:
-        name: npm_unit_test_artifacts
-        path: |
-          test_results/
-
-  integration_test:
-    name: Run the integration tests
-    runs-on: ubuntu-latest
+      fail-fast: false
+      matrix:
+        node_index: [0, 1, 2, 3, 4]
+        node_total: [5]
     steps:
+    - uses: actions/checkout@v6
+    - name: Use Node.js ${{ inputs.node_version_file }}
+      uses: actions/setup-node@v6
+      with:
+        node-version-file: ${{ inputs.node_version_file }}
     - name: download artifacts
       uses: actions/download-artifact@v8
       with:
@@ -80,10 +63,13 @@ jobs:
     - name: Prepare and run integration tests
       id: integration-tests
       shell: bash
+      env:
+        NODE_INDEX: ${{ matrix.node_index }}
+        NODE_TOTAL: ${{ matrix.node_total }}
       run: |
         nohup npm run start-feature &
         sleep 5
-        npm run int-test
+        npm run int-test-parallel
       # continue-on-error: true
       # replacing the above with if: always()
     - name: Merge unit and integration test coverage reports
@@ -95,13 +81,13 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: coverage_artifacts
+        name: coverage_artifacts_${{ matrix.node_index }}
         path: coverage/
     - name: upload the test results
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: cypress_results
+        name: cypress_results_${{ matrix.node_index }}
         path: test_results/
     - name: fail the action if the tests failed
       if: ${{ steps.integration-tests.outcome == 'failure' }}
