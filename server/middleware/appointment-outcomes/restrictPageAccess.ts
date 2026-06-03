@@ -61,13 +61,17 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
     if (url.includes(`outcome/${rule.url}`)) {
       if (rule?.required) {
         for (const [key, value] of Object.entries(rule.required) as [keyof PageAccessRuleItem, string][]) {
-          restricted = checkRequiredValue(key, value)
+          if (checkRequiredValue(key, value)) {
+            restricted = true
+            break
+          }
         }
       }
       if (rule?.oneRequired && !restricted) {
         restricted = checkPageAccessRules(rule.oneRequired)
       }
     }
+  }
   }
   if (restricted) {
     return res.redirect(outcomeUrl)
