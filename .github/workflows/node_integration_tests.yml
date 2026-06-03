@@ -83,11 +83,12 @@ jobs:
           # Run Cypress using base npm script + overridden spec
           npm run int-test -- --spec "$SPECS"
 
-      - name: Merge unit and integration test coverage reports
+      - name: Upload Cypress coverage
         if: always()
-        shell: bash
-        run: |
-          npm run coverage-report
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress_coverage_${{ matrix.shard }}
+          path: cypress_coverage/
 
       - name: Upload coverage artifacts
         if: always()
