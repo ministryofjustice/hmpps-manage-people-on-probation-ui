@@ -32,13 +32,11 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
   const checkRequiredValue = (key: keyof PageAccessRuleItem, value: string): boolean => {
     const keys = key.split('.')
     const sessionValue = getDataValue(data, [...path, ...keys])
-    const hasValue = sessionValue !== undefined && sessionValue !== null && sessionValue !== ''
-
-    if (value === anyValue) {
-      return !hasValue
+    let isInvalid = sessionValue === undefined
+    if (value !== anyValue) {
+      isInvalid = sessionValue !== value
     }
-
-    return sessionValue !== value
+    return isInvalid
   }
 
   const checkPageAccessRules = (rules: PageAccessRuleItem[]): boolean => {
