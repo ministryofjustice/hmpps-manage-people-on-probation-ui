@@ -22,33 +22,8 @@ permissions:
   contents: read
 
 jobs:
-  setup:
-    name: Setup
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v6
-    - name: Use Node.js ${{ inputs.node_version_file }}
-      uses: actions/setup-node@v6
-      with:
-        node-version-file: ${{ inputs.node_version_file }}
-    - name: Cache node modules
-      id: cache
-      uses: actions/cache@v5
-      env:
-        cache-name: node-modules
-      with:
-        path: |
-          ./node_modules
-          ~/.cache/Cypress
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-    - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
-      shell: bash
-      run: npm run setup
-
   integration_test:
     name: Run integration tests (${{ inputs.node_index }}/${{ inputs.node_total }})
-    needs: setup
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -57,6 +32,7 @@ jobs:
       with:
         node-version-file: ${{ inputs.node_version_file }}
     - name: Restore cache
+      id: restore-cache
       uses: actions/cache/restore@v5
       env:
         cache-name: node-modules
@@ -65,6 +41,10 @@ jobs:
           ./node_modules
           ~/.cache/Cypress
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Install dependencies
+      if: steps.restore-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm run setup
     - name: Download build artifacts
       uses: actions/download-artifact@v8
       with:
@@ -121,6 +101,7 @@ jobs:
       with:
         node-version-file: ${{ inputs.node_version_file }}
     - name: Restore cache
+      id: restore-cache
       uses: actions/cache/restore@v5
       env:
         cache-name: node-modules
@@ -129,6 +110,10 @@ jobs:
           ./node_modules
           ~/.cache/Cypress
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Install dependencies
+      if: steps.restore-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: npm run setup
     - name: Download unit test artifacts
       uses: actions/download-artifact@v8
       with:

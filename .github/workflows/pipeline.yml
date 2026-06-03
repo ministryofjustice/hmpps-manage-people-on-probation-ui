@@ -50,8 +50,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_index: [1, 2, 3, 4, 5]
-        node_total: [5]
+        node_index: [1, 2, 3, 4, 5, 6]
+        node_total: [6]
     uses: ./.github/workflows/node_integration_tests.yml # WORKFLOW_VERSION
     needs: [node_unit_tests]
     secrets: inherit
