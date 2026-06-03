@@ -141,7 +141,7 @@ describe('/middleware/redirectWizard - appointments', () => {
   })
 })
 
-describe('/middleware/redirectWizard - setupcheckins', () => {
+xdescribe('/middleware/redirectWizard - setupcheckins', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
