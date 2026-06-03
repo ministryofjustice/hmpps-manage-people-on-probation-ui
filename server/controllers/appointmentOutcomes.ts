@@ -22,6 +22,7 @@ export const appointmentOutcomeRequests = [
   'getInitiateBreachOrRecall',
   'getSendLetter',
   'getUpdateEnforcementAction',
+  'getConfirmation',
 ] as const
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
@@ -101,7 +102,6 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         }
       }
       let redirect = baseOutcomeUrl
-
       /* Arrange or reschedule appointment journey */
       if (uuid) {
         redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
@@ -126,8 +126,14 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   },
   postCheckYourAnswers: _hmppsAuthClient => {
     return async (_req, res) => {
-      const { id, crn } = res.locals.appointmentOutcome
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+      const { id, crn, baseOutcomeUrl } = res.locals.appointmentOutcome
+      // 👉 PUT request here to update outcome
+      return res.redirect(`${baseOutcomeUrl}/confirmation`)
+    }
+  },
+  getConfirmation: _hmppsAuthClient => {
+    return async (_req, res) => {
+      return res.render('pages/appointment-outcomes/confirmation')
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => async (_req, res) =>

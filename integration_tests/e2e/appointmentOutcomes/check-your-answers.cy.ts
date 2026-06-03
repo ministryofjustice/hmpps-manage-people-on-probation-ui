@@ -113,8 +113,6 @@ const checkPage = () => {
       {
         outcome: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
         outcomeText: 'Attended - sent home (service issues)',
-        action: 'NO_FURTHER_ACTION',
-        actionText: 'No further action',
       },
     ]
     outcomes.forEach(({ outcome, outcomeText, action, actionText }) => {
