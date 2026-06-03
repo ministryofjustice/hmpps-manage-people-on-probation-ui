@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_index: [0, 1, 2, 3, 4]
+        node_index: [1, 2, 3, 4, 5]
         node_total: [5]
     steps:
     - uses: actions/checkout@v6

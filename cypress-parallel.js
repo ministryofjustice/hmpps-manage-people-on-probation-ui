@@ -10,8 +10,7 @@ const TEST_FOLDER = './integration_tests/e2e'
 
 function getSpecFiles() {
   const allSpecFiles = traverse(TEST_FOLDER)
-  const node_index = NODE_INDEX + 1
-  return allSpecFiles.sort().filter((_, index) => index % NODE_TOTAL === node_index - 1)
+  return allSpecFiles.sort().filter((_, index) => index % NODE_TOTAL === NODE_INDEX - 1)
 }
 
 console.log(getSpecFiles().join(','))
