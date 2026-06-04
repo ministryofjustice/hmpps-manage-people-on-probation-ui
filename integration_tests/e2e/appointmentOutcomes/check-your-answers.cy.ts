@@ -249,7 +249,6 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
-      // const appointmentType = journey === 'RESCHEDULE' ? `3 Way Meeting (NS)` : `Planned Office Visit (NS)`
       const appointmentType = `Planned Office Visit (NS)`
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
@@ -261,7 +260,6 @@ const checkPage = () => {
         .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
     })
   })
-  // 👉 add tests for change documents here 👈
 }
 
 describe('Check your answers - outcomes', () => {
