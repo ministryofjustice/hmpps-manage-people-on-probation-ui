@@ -78,7 +78,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
 
     const documents = appointment?.documents?.length ? appointment.documents.map(document => document.name) : null
 
-    const enforcementAction = getSelectedEnforcementActions()
     const outcome = getSelectedOutcome()
 
     summary = {
@@ -91,6 +90,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     }
 
     if (attendedFailedToComply || unacceptableAbsence || failedToAttend || letterType) {
+      const enforcementAction = getSelectedEnforcementActions()
       summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : enforcementAction
       summary.enforcementActionChangeLink = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
       if (evidenceDueDate) {

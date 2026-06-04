@@ -10,11 +10,11 @@ export const getMappedOutcome = <T>({
 }: {
   code?: string
   description?: string
-} = {}): MappedOutcome<T> => {
+} = {}): MappedOutcome<T> | null => {
   if (!code && !description) return null
   const isMatch = (item: OutcomeProps) =>
     code ? item.code === code : item.description.toLowerCase() === description.toLowerCase()
-  const mappedOutcome: MappedOutcome<T> =
+  const mappedOutcome: MappedOutcome<T> | null =
     (Object.entries(outcomeMap).find(([_key, item]) => isMatch(item)) as MappedOutcome<T>) || null
   return mappedOutcome
 }

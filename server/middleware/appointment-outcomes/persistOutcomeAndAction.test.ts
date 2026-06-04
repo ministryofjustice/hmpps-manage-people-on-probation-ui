@@ -75,7 +75,7 @@ jest.mock('./getContactOutcomes')
 
 const mockedGetContactOutcomes = jest.mocked(getContactOutcomes)
 
-mockedGetContactOutcomes.mockReturnValue(jest.fn().mockResolvedValue(mockContactOutcomes))
+mockedGetContactOutcomes.mockReturnValue(jest.fn().mockReturnValue(mockContactOutcomes))
 
 describe('middleware/appointment-outcome/persistOutcomeAndAction', () => {
   it('should return null if no outcome logged', async () => {

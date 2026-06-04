@@ -12,7 +12,7 @@ import {
   EnforcementActionCode,
   AcceptableAbsenceOutcomeCode,
 } from '../../properties/appointment-outcomes'
-import { getDataValue, setDataValue } from '../../utils'
+import { setDataValue } from '../../utils'
 
 export const saveMappedCode = (type: 'OUTCOME' | 'ACCEPTABLE_ABSENCE_OUTCOME' | 'ACTION'): Route<Promise<void>> => {
   return async (req, res, next) => {

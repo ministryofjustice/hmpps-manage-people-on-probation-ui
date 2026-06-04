@@ -79,19 +79,21 @@
               "description": "Failed To Attend",
               "enforcementActions": []
             },
-            { "code": "AACL", "description": "Acceptable Absence - Court/Legal" },
-            { "code": "AAEM", "description": "Acceptable Absence - Employment" },
+            { "code": "AACL", "description": "Acceptable Absence - Court/Legal", "enforcementActions": [] },
+            { "code": "AAEM", "description": "Acceptable Absence - Employment", "enforcementActions": [] },
             {
               "code": "AAFC",
-              "description": "Acceptable Absence - Family/Childcare"
+              "description": "Acceptable Absence - Family/Childcare",
+              "enforcementActions": []
             },
-            { "code": "AAHO", "description": "Acceptable Absence - Holiday" },
-            { "code": "AAME", "description": "Acceptable Absence - Medical" },
-            { "code": "AARC", "description": "Acceptable Absence - RIC" },
-            { "code": "AARE", "description": "Acceptable Absence - Religious" },
+            { "code": "AAHO", "description": "Acceptable Absence - Holiday", "enforcementActions": [] },
+            { "code": "AAME", "description": "Acceptable Absence - Medical", "enforcementActions": [] },
+            { "code": "AARC", "description": "Acceptable Absence - RIC", "enforcementActions": [] },
+            { "code": "AARE", "description": "Acceptable Absence - Religious", "enforcementActions": [] },
             {
               "code": "CO05",
-              "description": "Acceptable Absence - Professional Judgement Decision"
+              "description": "Acceptable Absence - Professional Judgement Decision",
+              "enforcementActions": []
             },
             {
               "code": "CO10",

@@ -6,5 +6,5 @@ export const getContactEnforcementActions = (contactOutcomes: ContactOutcome[] =
       return [...acc, ...outcome.enforcementActions]
     }
     return acc
-  }, [])
+  }, [] as ContactEnforcementAction[])
 }

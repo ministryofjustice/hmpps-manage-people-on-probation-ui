@@ -167,6 +167,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${manageBasePath}/initiate-breach-or-recall`,
       `${arrangeBasePath}/send-letter`,
       `${manageBasePath}/send-letter`,
+      `${manageBasePath}/update-enforcement-action`,
     ],
     saveMappedCode('ACTION'),
   )
@@ -279,13 +280,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* Update enforcement action 👇 */
 
   router.get(
-    [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
+    `${manageBasePath}/update-enforcement-action`,
     controllers.appointmentOutcomes.getUpdateEnforcementAction(),
   )
-  router.post(
-    [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
-    handleOutcomePageRedirect('updateEnforcementAction'),
-  )
+  router.post(`${manageBasePath}/update-enforcement-action`, handleOutcomePageRedirect('updateEnforcementAction'))
 
   /* Add note page in arrange journey (no file upload) 👇 */
 

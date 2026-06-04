@@ -38,11 +38,11 @@ const optionsMap: OptionsMap = {
 }
 
 export const persistOutcomeAndAction = ({
-  outcome,
+  outcome = null,
   actionCode = null,
 }: {
-  outcome: string
-  actionCode?: EnforcementActionCode
+  outcome: string | null
+  actionCode?: EnforcementActionCode | null
 }): AppointmentSessionOutcome => {
   let outcomeType: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
   let outcomeCode: OutcomeCode | AcceptableAbsenceOutcomeCode
