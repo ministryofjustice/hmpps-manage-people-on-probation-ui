@@ -79,7 +79,7 @@ describe('Check your answers then confirm the appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
-  /*
+
   describe('Appointment date is in the future', () => {
     it('should render the page', () => {
       loadPage()
@@ -186,7 +186,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
     })
   })
-*/
+
   describe('Appointment date is in the past - non compliance disabled', () => {
     const cyaPage = new AppointmentCheckYourAnswersPage()
     beforeEach(() => {
