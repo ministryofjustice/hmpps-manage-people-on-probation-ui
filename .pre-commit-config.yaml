@@ -14,8 +14,6 @@ repos:
           GITLEAKS_IGNORE_FILE: ./.gitleaks/.gitleaksignore
 
   - repo: local
-    env:
-      NODE_ENV: dev
     hooks:
       - id: lint
         name: linting code
