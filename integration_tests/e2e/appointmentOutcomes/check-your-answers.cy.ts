@@ -249,26 +249,24 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
+      const appointmentType = `Planned Office Visit (NS)`
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
-        .should(
-          'contain.text',
-          'Appointment: Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024.',
-        )
+        .should('contain.text', `Appointment: ${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
       checkYourAnswersOutcomePage
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
     })
   })
-  // 👉 add tests for change documents here 👈
 }
 
 describe('Check your answers - outcomes', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Manage appointment journey', () => {
     checkPage()
   })

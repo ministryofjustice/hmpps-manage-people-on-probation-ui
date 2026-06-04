@@ -13,6 +13,7 @@ import {
   getNextComAppointment,
   getAppointment,
   getUserProviders,
+  forceValidation,
   getOverdueOutcomes,
 } from '../middleware'
 
@@ -37,6 +38,7 @@ import {
   restrictPageAccess,
   getBreach,
   getComplianceData,
+  handlePutOutcome,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -149,7 +151,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Outcome index 👇 */
 
-  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
+  router.get([arrangeBasePath, manageBasePath], forceValidation, controllers.appointmentOutcomes.getOutcome())
   router.post([arrangeBasePath, manageBasePath], resetSelectedActions(), controllers.appointmentOutcomes.postOutcome())
 
   /* Attended - failed to comply 👇 */
@@ -265,7 +267,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Add note page in arrange journey (no file upload) 👇 */
 
-  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+  router.get(
+    `${arrangeBasePath}/add-note`,
+    forceValidation,
+    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
+  )
   router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
 
   router.all(
@@ -284,14 +290,15 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
 
   router.get(
-    [`${arrangeBasePath}/check-your-answers`, `${manageBasePath}/check-your-answers`],
+    `${manageBasePath}/check-your-answers`,
     getNextComAppointment(hmppsAuthClient),
     getNotePrepend,
     getOutcomeSummary,
     controllers.appointmentOutcomes.getCheckYourAnswers(hmppsAuthClient),
   )
   router.post(
-    [`${arrangeBasePath}/check-your-answers`, `${manageBasePath}/check-your-answers`],
+    `${manageBasePath}/check-your-answers`,
+    handlePutOutcome(hmppsAuthClient),
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
   )
 

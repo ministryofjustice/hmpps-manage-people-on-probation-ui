@@ -241,7 +241,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
           setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
           redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
           if (change) {
-            redirect = findUncompleted(req, res)
+            redirect = findUncompleted()(req, res)
           }
         }
         res.redirect(redirect)

@@ -14,7 +14,7 @@ import { dateWithDayAndWithoutYear, shortTime } from '../../utils'
 export interface AppointmentsValidationArgs {
   crn: string
   id: string
-  page: string
+  page?: string
   visor?: boolean
   contactId?: string
   notes?: string

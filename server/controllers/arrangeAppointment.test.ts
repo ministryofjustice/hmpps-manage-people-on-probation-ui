@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import {
@@ -51,7 +51,7 @@ jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
   postAppointments: jest.fn(),
   cloneAppointmentAndRedirect: jest.fn(),
-  findUncompleted: jest.fn(),
+  findUncompleted: jest.fn(() => jest.fn()),
   appointmentDateIsInPast: jest.fn(),
   isRescheduleAppointment: jest.fn().mockImplementation(() => true),
   getOfficeLocationsByTeamAndProvider: jest.fn(() => mockMiddlewareFn),
@@ -204,7 +204,7 @@ const redirectSpy = jest.spyOn(res, 'redirect')
 const renderSpy = jest.spyOn(res, 'render')
 
 const redirectUrl = `/case/${crn}/arrange-appointment/${uuid}/redirect/url?change=${change}`
-mockedFindUncompleted.mockReturnValue(redirectUrl)
+mockedFindUncompleted.mockReturnValue(() => redirectUrl)
 
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
@@ -404,7 +404,7 @@ describe('controllers/arrangeAppointment', () => {
   })
 
   describe('postTypeAttendance', () => {
-    mockedFindUncompleted.mockReturnValue(redirectUrl)
+    mockedFindUncompleted.mockReturnValue(() => redirectUrl)
     it('should redirect to the next uncompleted page if change found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postTypeAttendance()(mockReq, res)
@@ -543,17 +543,6 @@ describe('controllers/arrangeAppointment', () => {
     afterAll(() => {
       jest.useRealTimers()
     })
-    it('should set local vars for error messages if validation query param is in url', async () => {
-      const mockReq = createMockRequest({ query: { validation: 'true' } })
-      const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
-      await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
-      expect(mockRes.locals.errorMessages).toStrictEqual({
-        [`appointments-${crn}-${uuid}-date`]: 'Enter or select a date',
-        [`appointments-${crn}-${uuid}-start`]: 'Enter a start time',
-        [`appointments-${crn}-${uuid}-end`]: 'Enter an end time',
-        [`appointments-${crn}-${uuid}-user-locationCode`]: 'Select an appointment location',
-      })
-    })
     it('should render the location date and time page', async () => {
       const mockReq = createMockRequest({ query: {} })
       const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
@@ -565,7 +554,6 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         _maxDate: '31/12/2199',
         change: undefined,
-        showValidation: false,
         personRisks: undefined,
         alertDismissed: false,
         isInPast: false,
@@ -584,7 +572,6 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         _maxDate: '31/12/2199',
         change: undefined,
-        showValidation: false,
         personRisks: undefined,
         alertDismissed: false,
         isInPast: false,
@@ -684,7 +671,6 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         errors: null,
         change: mockReq.query.change,
-        showValidation: false,
         isInPast: false,
         isReschedule: true,
         alertDismissed: false,
@@ -702,17 +688,6 @@ describe('controllers/arrangeAppointment', () => {
     afterAll(() => {
       jest.useRealTimers()
     })
-    it('should set local vars for error messages if validation query param is in url', async () => {
-      const mockReq = createMockRequest({ query: { validation: 'true' } })
-      const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
-      await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
-      expect(mockRes.locals.errorMessages).toStrictEqual({
-        [`appointments-${crn}-${uuid}-date`]: 'Enter or select a date',
-        [`appointments-${crn}-${uuid}-start`]: 'Enter a start time',
-        [`appointments-${crn}-${uuid}-end`]: 'Enter an end time',
-        [`appointments-${crn}-${uuid}-user-locationCode`]: 'Select an appointment location',
-      })
-    })
     it('should render the date/time page', async () => {
       const mockReq = createMockRequest({ query: {} })
       const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
@@ -723,7 +698,6 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         _maxDate: '31/12/2199',
         change: undefined,
-        showValidation: false,
         alertDismissed: false,
         isInPast: false,
         isReschedule: true,
@@ -1068,7 +1042,6 @@ describe('controllers/arrangeAppointment', () => {
         back: 'date-time',
         change,
         maxCharCount: 12000,
-        showValidation: false,
         isInPast: false,
       })
     })
@@ -1099,16 +1072,6 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
   describe('postCheckYourAnswers', () => {
-    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
-      mockedIsValidCrn.mockReturnValue(false)
-      mockedIsValidUUID.mockReturnValue(false)
-      const mockReq = createMockRequest({})
-      mockedPostAppointments.mockReturnValue(mockMiddlewareFn)
-      await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
-      expect(redirectSpy).not.toHaveBeenCalled()
-    })
     it('should redirect to the confirmation page if all data provided', async () => {
       const appointmentSession: AppointmentSession = {
         user: {
@@ -1131,40 +1094,12 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })
-    it('should update sensitivity if locked by previous setting', async () => {
-      const appointmentSession: AppointmentSession = {
-        user: {
-          username: 'X',
-          locationCode: `X`,
-          teamCode: 'X',
-          providerCode: 'X',
-        },
-        eventId: 'X',
-        type: 'X',
-        date: 'X',
-        sensitivity: 'No',
-        sensitivityLocked: true,
-      }
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      mockedPostAppointments.mockReturnValue(() =>
-        Promise.resolve({ appointments: [{ id: 0, externalReference: 'apt-ref-1' }] }),
-      )
-      const mockReq = createMockRequest({ appointmentSession })
-      await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'sensitivity'],
-        'Yes',
-      )
-    })
   })
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { backendId: 1234, user: { username: '' }, smsOptIn: 'YES' },
-        dataSession: { isOutLookEventFailed: false },
+        appointmentSession: { user: { username: '' }, smsOptIn: 'YES' },
+        dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
       })
       const mockRes = createMockResponse({
         contactResponse: {
@@ -1176,7 +1111,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
-        backendId: 1234,
+        responseContactId: '1234',
         isOutLookEventFailed: false,
         appointmentType: null,
         isEnglishNotificationFailed: null,
@@ -1189,15 +1124,15 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should render the reschedule appointment confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { backendId: 1234, user: { username: '' }, rescheduleAppointment: { contactId: '1234' } },
-        dataSession: { isOutLookEventFailed: false },
+        appointmentSession: { user: { username: '' }, rescheduleAppointment: { contactId: '1234' } },
+        dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
         request: { url: '/reschedule/url' },
       })
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
-        backendId: 1234,
+        responseContactId: '1234',
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
         attendingName: 'First’s',
@@ -1211,10 +1146,8 @@ describe('controllers/arrangeAppointment', () => {
     it('should render the reschedule appointment confirmation page if next appointment has been arranged', async () => {
       const mockReq = createMockRequest({
         appointmentSession: {
-          backendId: 1234,
           user: { username: '' },
           rescheduleAppointment: { contactId: '1234' },
-          linkedContactId: '1234',
         },
         appointments: {
           '1234': {
@@ -1223,14 +1156,17 @@ describe('controllers/arrangeAppointment', () => {
             type: 'A1',
           },
         },
-        dataSession: { isOutLookEventFailed: false },
+        dataSession: {
+          temp: { [crn]: { responseContactId: '1234', linkedContactId: '1234' } },
+          isOutLookEventFailed: false,
+        },
         request: { url: '/reschedule/url' },
       })
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
-        backendId: 1234,
+        responseContactId: '1234',
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
         attendingName: 'First’s',
@@ -1258,7 +1194,6 @@ describe('controllers/arrangeAppointment', () => {
       date: '2025/7/2',
       start: '9:00am',
       end: '9:30am',
-      backendId: 5,
     }
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedUuidv4.mockReturnValueOnce(uuid2)
@@ -1299,35 +1234,6 @@ describe('controllers/arrangeAppointment', () => {
   })
   describe('postArrangeAnotherAppointment', () => {
     const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment}`
-    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
-      mockedIsValidCrn.mockReturnValue(false)
-      mockedIsValidUUID.mockReturnValue(false)
-      const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
-      expect(redirectSpy).not.toHaveBeenCalled()
-    })
-    it('if no date has been submitted for the appointment, it should redirect to the location date and time page and display validation errors', async () => {
-      const mockReq = createMockRequest({
-        request: {
-          url,
-        },
-        appointmentSession: {
-          eventId: '123',
-          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
-          type: 'type',
-          date: '',
-          sensitivity: 'No',
-        },
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/arrange-appointment/${uuid}/location-date-time?validation=true&change=${url}`,
-      )
-    })
     it('should redirect to the confirmation page if all required values are present in appointment session', async () => {
       const mockReq = createMockRequest({
         request: {

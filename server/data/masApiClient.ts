@@ -8,6 +8,7 @@ import {
   LinkedContactResponse,
   PersonAppointment,
   Schedule,
+  PutContactRequest,
 } from './model/schedule'
 import {
   AddressOverview,
@@ -154,6 +155,11 @@ export default class MasApiClient extends RestClient {
   async getContactOutcomes(typeCode: string, outcomeCode?: string): Promise<ContactOutcomesResponse> {
     const path = `/contact/types/${typeCode}/outcomes${outcomeCode ? `/${outcomeCode}` : ''}`
     return this.get({ path })
+  }
+
+  async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
+    const path = `/contact/${contactId}`
+    return this.put({ data: body, path })
   }
 
   async getPersonalDetails(crn: string): Promise<PersonalDetails | null> {
