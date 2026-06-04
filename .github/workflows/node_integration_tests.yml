@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           nohup npm run start-feature &
-          sleep 6
+          sleep 5
 
           # Get list of specs for this shard
           SPECS=$(node .github/scripts/cypress-shard.js ${{ matrix.shard }} 6)

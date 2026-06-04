@@ -64,7 +64,7 @@ const checkRiskPageView = ({
         page.getElementData('viewRiskPredictorScoreDetails').should('exist')
         page
           .getElementData('combinedSeriousReoffendingPredictor')
-          .get('[data-expanded-predictor-badge="Combined serious reoffending predictor LOW"]')
+          .get('[data-expanded-predictor-badge="Combined serious reoffending predictor LOWwww"]')
           .get('[data-test-id="name"]')
           .should('contain.text', 'Combined serious reoffending predictor')
         page
