@@ -8,7 +8,6 @@ import {
   completeOutcome,
 } from '../appointments/utils'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
-import { Journey } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage

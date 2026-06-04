@@ -1,6 +1,5 @@
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
-import { PersonAppointment } from '../data/model/schedule'
 import { AppointmentSession, RescheduleAppointmentResponse, AppointmentsPostResponse } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { isValidCrn, isValidUUID, getDataValue, setDataValue } from '../utils'
@@ -12,11 +11,11 @@ import { renderError } from './renderError'
 export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { data } = req.session
-    const { crn, id, contactId } = req.params as Record<string, string>
-    if (!isValidCrn(crn) || !isValidUUID(id)) {
+    const { crn, id: uuid, contactId } = req.params as Record<string, string>
+    if (!isValidCrn(crn) || !isValidUUID(uuid)) {
       return renderError(404)(req, res)
     }
-
+    const id = uuid || contactId
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     const sensitivityLocked = appointment?.sensitivityLocked
     const rescheduleAppointment = appointment?.rescheduleAppointment
@@ -32,10 +31,8 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
     }
 
     if (rescheduleAppointment?.contactId) {
-      const response: RescheduleAppointmentResponse | PersonAppointment = await postRescheduleAppointments(
-        hmppsAuthClient,
-      )(req, res)
-      responseContactId = 'id' in response ? response.id : Number(contactId)
+      const response: RescheduleAppointmentResponse = await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      responseContactId = response.id
     } else {
       const response: AppointmentsPostResponse = await postAppointments(hmppsAuthClient)(req, res)
       responseContactId = response.appointments[response.appointments.length - 1].id

@@ -1,4 +1,3 @@
-import { Request, Response } from 'express'
 import { getDataValue } from '../utils'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { AppointmentSession } from '../models/Appointments'
@@ -9,7 +8,7 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const id = uuid || contactId
     const { change } = req.query as Record<string, string>
-    const changeUrl = change ? encodeURIComponent(change) : req.url
+    const changeUrl = change ? encodeURIComponent(change) : encodeURIComponent(req.url)
     const data = req?.session?.data ?? {}
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     const dateInPast = appointmentDateIsInPast(req)

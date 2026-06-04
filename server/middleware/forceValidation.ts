@@ -51,7 +51,7 @@ export const forceValidation = (req: Request, res: Response, next: NextFunction)
         [errorKey(key)]: msg,
       }
     }
-    if (['/supporting-information', '/add-note'].includes(url)) {
+    if (['/supporting-information', '/add-note'].some(pageUrl => reqUrl.includes(pageUrl))) {
       const key = `[appointments][${crn}][${id}][sensitivity]`
       const { msg } = appointmentsValidation(args)[key].checks[0]
       errorMessages = {
