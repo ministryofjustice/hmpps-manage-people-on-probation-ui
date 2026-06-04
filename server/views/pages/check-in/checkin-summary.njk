@@ -12,8 +12,6 @@
 {% set sendLinkLabel = "How does " + case.name.forename + " want us to send a link to the service?"  %}
 {% set photoOptopionLabel = "How do you want to take a photo of " + case.name.forename + "?"  %}
 {% set photoPersonLabel = "Photo of " + case.name.forename %}
-{% set name = "Image of " + case.name.forename + " added for identification" %}
-{% set photo = "<div class='es-uploaded-image es-uploaded-image--small' data-person='{{ name }}'></div>" %}
 {% set confirmEndUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/confirm-end' %}
 {% set changeDateUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/date-frequency?cya=true' %}
 {% set contactPreUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/contact-preference?cya=true' %}
@@ -166,7 +164,7 @@
             } },
             { key:
                 { html:  photoPersonLabel },
-                value: { html: '<div class="es-uploaded-image" data-person="' + name + '">&nbsp;</div>' },
+                value: { html: '<div class="es-uploaded-image" data-person="' + case.name.forename + '">&nbsp;</div>' },
                 actions: {
                 items: [ {
                     href: photoUrl,
