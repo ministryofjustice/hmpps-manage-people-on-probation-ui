@@ -408,9 +408,6 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes()
       const renderSpy = jest.spyOn(res, 'render')
 
-      // No selected sentence
-      mockGetDataValue.mockReturnValueOnce(null)
-
       const getPersonComplianceSpy = jest.spyOn(MasApiClient.prototype, 'getPersonCompliance')
       const getPersonNonComplianceSpy = jest.spyOn(MasApiClient.prototype, 'getPersonNonCompliance')
 
