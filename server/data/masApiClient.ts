@@ -86,7 +86,8 @@ export default class MasApiClient extends RestClient {
 
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
     const queryParam = `?sentenceNumber=${sentenceNumber}`
-    return this.get({ path: `/overview/${crn}${queryParam}`, handle404: false })
+    const overview: Overview | null = (await this.get({ path: `/overview/${crn}${queryParam}`, handle404: false })) as Overview | null
+    return overview
   }
 
   async getOverdueOutcomes(crn: string): Promise<ContactResponse | null> {
