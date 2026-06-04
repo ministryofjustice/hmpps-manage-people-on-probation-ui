@@ -65,9 +65,7 @@ export interface Requirement {
   id: number
   description: string
   code: string
-  active: boolean
 }
-
 export interface Nsi {
   id: number
   description: string
@@ -89,7 +87,6 @@ export interface LicenceCondition {
   id: number
   mainDescription: string
   code: string
-  active: boolean
 }
 
 export interface ProbationHistory {

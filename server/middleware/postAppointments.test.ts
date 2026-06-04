@@ -60,8 +60,8 @@ const mockSentences: Sentence[] = [
       endDate: '2023-12-01',
       length: '2',
     },
-    licenceConditions: [{ id: 12345, mainDescription: '12 month Community order' }],
-    requirements: [{ id: 12345, description: '12 month Community order' }],
+    licenceConditions: [{ id: 12345, mainDescription: '12 month Community order', code: 'R' }],
+    requirements: [{ id: 12345, description: '12 month Community order', code: 'R' }],
     nsis: [],
     offenceDetails: {
       eventNumber: '1234',
