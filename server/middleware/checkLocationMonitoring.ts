@@ -1,5 +1,7 @@
 import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
 
+const GPS_TAGGING_CODES: string[] = ['RM59', 'EM01']
+
 export const checkLocationMonitoring = (
   licenceConditions: LicenceCondition[] | null | undefined,
   requirements: Requirement[] | null | undefined,
@@ -7,12 +9,8 @@ export const checkLocationMonitoring = (
   hasLicenceConditionsLMData: boolean
   hasRequirementsLMData: boolean
 } => {
-  const hasLicenceConditionsLMData = (licenceConditions || []).some(item =>
-    item.mainDescription?.toLowerCase().includes('location monitoring'),
-  )
-  const hasRequirementsLMData = (requirements || []).some(item =>
-    item.description?.toLowerCase().includes('location monitoring'),
-  )
+  const hasLicenceConditionsLMData = (licenceConditions || []).some(item => item.code === 'EM01')
+  const hasRequirementsLMData = (requirements || []).some(item => item.code === 'RM59')
 
   return { hasLicenceConditionsLMData, hasRequirementsLMData }
 }
@@ -36,5 +34,5 @@ export const hasLocationMonitoring = (
   return hasLicenceConditionsLMData || hasRequirementsLMData
 }
 
-export const checkLocationMonitoringString = (description: string | null | undefined): boolean | undefined =>
-  description?.toLowerCase().includes('location monitoring')
+export const checkLocationMonitoringCode = (code: string | null | undefined): boolean | undefined =>
+  GPS_TAGGING_CODES.includes(code)

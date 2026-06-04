@@ -91,7 +91,7 @@ import { to12HourTimeCompact } from './to12HourTimeCompact'
 import {
   checkLocationMonitoring,
   checkLocationMonitoringByEventNumber,
-  checkLocationMonitoringString,
+  checkLocationMonitoringCode,
 } from '../middleware/checkLocationMonitoring'
 
 export default function nunjucksSetup(
@@ -222,7 +222,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   njkEnv.addFilter('toIso12HourTimeWithMinutes', toIso12HourTimeWithMinutes)
   njkEnv.addFilter('checkLocationMonitoring', checkLocationMonitoring)
-  njkEnv.addFilter('checkLocationMonitoringString', checkLocationMonitoringString)
+  njkEnv.addFilter('checkLocationMonitoringCode', checkLocationMonitoringCode)
   njkEnv.addFilter('checkLocationMonitoringByEventNumber', checkLocationMonitoringByEventNumber)
 
   arnsNunjucksSetup(njkEnv)
