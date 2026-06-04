@@ -159,7 +159,7 @@
                 <dt class="govuk-summary-list__key">{{"System ID and liveness check result" if checkIn.livenessEnabled else "System ID check result"}}</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>
             </div>
-            {% if checkIn.manualIdCheck != "MATCH" %}
+            {% if flags.enableShowMatchWithConcern === true and checkIn.manualIdCheck != "MATCH" %}
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
                     <dd class="govuk-summary-list__value">
@@ -171,7 +171,7 @@
                     </dd>
                 </div>
             {% endif %}
-            {% if checkIn.manualIdCheck == "NO_MATCH" %}
+            {% if flags.enableShowMatchWithConcern === true and checkIn.manualIdCheck == "NO_MATCH" %}
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Image from check in</dt>
                     <dd class="govuk-summary-list__value">
