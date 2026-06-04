@@ -4,10 +4,10 @@ on:
   workflow_call:
     inputs:
       node_version_file:
-        description: 'Passed to setup-node action to specify where to source the version of node from'
+        description: "Passed to setup-node action to specify where to source the version of node from"
         required: false
         type: string
-        default: '.nvmrc'
+        default: ".nvmrc"
 
 permissions:
   contents: read
@@ -16,25 +16,20 @@ jobs:
   integration_test:
     name: Integration tests (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4, 5, 6]
-
     steps:
       - uses: actions/checkout@v6
-
       - name: Use Node.js ${{ inputs.node_version_file }}
         uses: actions/setup-node@v6
         with:
           node-version-file: ${{ inputs.node_version_file }}
-
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
           name: npm_build_artifacts
-
       - name: Restore cache
         id: restore-cache
         uses: actions/cache/restore@v5
@@ -45,12 +40,10 @@ jobs:
             ./node_modules
             ~/.cache/Cypress
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install dependencies
         if: steps.restore-cache.outputs.cache-hit != 'true'
         shell: bash
         run: npm run setup
-
       - name: Download build outputs
         uses: actions/download-artifact@v8
         with:
@@ -59,44 +52,36 @@ jobs:
             build/
             dist/
             assets/stylesheets/
-
       - name: Download test artifacts
         uses: actions/download-artifact@v8
         with:
           name: npm_unit_test_artifacts
           path: |
             test_results/
-
       - name: Prepare and run integration tests
         id: integration-tests
         shell: bash
         run: |
           nohup npm run start-feature &
           sleep 5
-
           # Get list of specs for this shard
           SPECS=$(node .github/scripts/cypress-shard.js ${{ matrix.shard }} 6)
-
           echo "Running shard ${{ matrix.shard }}/6"
           echo "$SPECS"
-
           # Run Cypress using base npm script + overridden spec
-          npm run int-test -- --spec "$SPECS"
-
+          npm run int-test-ci -- --spec "$SPECS"
       - name: Upload Cypress coverage
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: cypress_coverage_${{ matrix.shard }}
           path: cypress_coverage/
-
       - name: Upload Cypress results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: cypress_results_${{ matrix.shard }}
           path: test_results/
-
       - name: Fail workflow if tests failed
         if: ${{ steps.integration-tests.outcome == 'failure' }}
         uses: actions/github-script@v9
