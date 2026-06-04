@@ -16,8 +16,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
   let summary: OutcomeSummary
   if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome) {
     const {
-      sentence: { type: sentenceType },
-      forename,
       notePrepend,
       appointmentHintText,
       baseOutcomeUrl,
@@ -49,12 +47,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       ;({ type, startDateTime, endDateTime } = nextAppt)
       nextAppointment = `${type} on ${dateWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
     }
-    // const allEnforcementActionOptions: Option<AppointmentEnforcementAction | AcceptableAbsenceOutcomeType | ''>[] = [
-    //   ...attendedFailedToComplyOptions(sentenceType),
-    //   ...failedToAttendOptions(forename),
-    //   ...enforcementActionOptions(forename),
-    //   ...letterTypeOptions,
-    // ]
 
     const noOutcome = 'No outcome'
     const noAction = 'No enforcement action'
