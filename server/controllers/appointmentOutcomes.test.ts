@@ -1,7 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import controllers from '.'
-import { getDataValue } from '../utils'
 import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
@@ -11,6 +10,7 @@ import { isSuccessfulUpload } from './appointments'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
+import { setDataValue } from '../utils'
 
 const crn = 'X000001'
 const id = '1234'
@@ -43,7 +43,6 @@ jest.mock('../utils', () => {
   return {
     ...actualUtils,
     setDataValue: jest.fn(),
-    getDataValue: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -58,10 +57,9 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const isSuccessfulUploadSpy = isSuccessfulUpload as jest.MockedFunction<typeof isSuccessfulUpload>
+const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
-
 const baseUrl = '/crn/X000001/appointments/appointment/1234'
 const baseOutcomeUrl = '/case/X000001/appointments/appointment/1234/outcome'
 const completedUrl = `/completed/route`
@@ -96,10 +94,14 @@ const mockReq = ({
   request = {},
   type = 'ATTENDED_COMPLIED',
   enforcementAction = {},
+  linkedContactId = null,
+  responseContactId = null,
 }: {
   request?: Record<string, any>
   type?: AppointmentOutcomeType
   enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
+  linkedContactId?: string
+  responseContactId?: string
 } = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: { crn: 'R000101' },
@@ -113,6 +115,12 @@ const mockReq = ({
                 ...enforcementAction,
               },
             },
+          },
+        },
+        temp: {
+          [crn]: {
+            linkedContactId,
+            responseContactId,
           },
         },
       },
@@ -133,7 +141,7 @@ const expectedRedirect: ExpectedRedirect = {
   ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
   ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
   ATTENDED_SENT_HOME_BEHAVIOUR: `${baseOutcomeUrl}/attended-failed-to-comply`,
-  ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,
+  ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/add-note`,
   ACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/acceptable-absence`,
   UNACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/unacceptable-absence`,
   FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
@@ -158,7 +166,6 @@ const checkOutcomeRedirects = (expectedOptions: AppointmentOutcomeType[]): void 
     const req = mockReq()
     const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { outcomeType: option } } } })
     const spy = jest.spyOn(res, 'redirect')
-    mockGetDataValue.mockReturnValueOnce(option)
     controllers.appointmentOutcomes.postOutcome()(req, res)
     expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
   })
@@ -235,6 +242,20 @@ describe('controllers/appointmentOutcomes', () => {
         errorMessages: null,
         uploadedFiles: [],
         maxCharCount: 12000,
+      })
+    })
+
+    it('should render the check your answers page when getCheckYourAnswers is called', async () => {
+      const req = mockReq({
+        request: {
+          url: `/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`,
+        },
+      })
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      await controllers.appointmentOutcomes.getCheckYourAnswers()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/check-your-answers', {
+        url: encodeURIComponent(req.url),
       })
     })
 
@@ -352,18 +373,34 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/next-appointment`)
     })
     it('should redirect to the check your answers page if manage journey and next appointment arranged', async () => {
-      const req = mockReq()
+      const req = mockReq({ linkedContactId: contactId })
       const res = mockRes({
         appointmentOutcome: {
           uuid: undefined,
           contactId,
           id: contactId,
-          appointmentSession: { linkedContactId: '123' },
         },
       })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
+    })
+    it('should redirect to the confirmation page when postCheckYourAnswers is called', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/confirmation`)
+      expect(setDataValueSpy).not.toHaveBeenCalled()
+    })
+    it('should redirect to the confirmation page and reset linkedContactId value when postCheckYourAnswers is called', async () => {
+      const appointmentOutcome: Partial<AppointmentOutcomeProps<Activity>> = { linkedContactId: '1234' }
+      const req = mockReq()
+      const res = mockRes({ appointmentOutcome })
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/confirmation`)
+      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['temp', crn, 'linkedContactId'], null)
     })
   })
 })

@@ -195,6 +195,20 @@ export interface OutcomeSummary {
   enforcementActionChangeLink?: string
 }
 
+export interface OutcomeConfirmationAction {
+  text: string
+  href: string
+  external?: boolean
+}
+
+export interface OutcomeConfirmation {
+  title: string
+  type: string
+  date: string
+  text: string[]
+  actions: OutcomeConfirmationAction[]
+}
+
 export interface CurrentOutcome {
   status: string
   reason: string
@@ -246,10 +260,13 @@ export interface AppointmentOutcomeProps<TAppointment> {
   breachWarning?: BreachWarning | null
   notePrepend?: string
   summary?: OutcomeSummary
+  confirmation?: OutcomeConfirmation
   compliance?: Compliance & {
     failureToComplyInLast12MonthsCount?: number
     nonCompliance?: NonComplianceHistoryResponse
   }
+  responseContactId?: string
+  linkedContactId?: string
 }
 
 export interface AppResponse extends Response {

@@ -6,10 +6,8 @@ import { ParsedQs } from 'qs'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
 import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
-import { mockTierCalculation, mockRisks, mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
+import { mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
 import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
@@ -668,7 +666,8 @@ describe('controllers/appointments', () => {
       expect(spy).toHaveBeenCalledWith('pages/appointments/next-appointment', {
         personAppointment: mockPersonAppointment,
         crn,
-        contactId,
+        id: contactId,
+        outcomeJourney: false,
       })
     })
   })

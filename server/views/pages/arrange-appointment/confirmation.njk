@@ -26,11 +26,10 @@
     from
     {{ appointment.start | to12HourTimeCompact}}
     to
-    {{ appointment.end | to12HourTimeCompact}}</span>
-{% endfor %}
+    {{ appointment.end | to12HourTimeCompact}}</span>{% endfor %}
 {% set cases = "/case/" %}
 {% set overViewLink = "/case/" + crn %}
-{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment?back=" + url %}
+{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + responseContactId + "/next-appointment?back=" + url %}
 {% endset %}
 
 {% set panelHtml %}

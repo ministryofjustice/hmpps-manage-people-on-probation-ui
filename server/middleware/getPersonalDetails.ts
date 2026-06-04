@@ -38,25 +38,14 @@ export const getPersonalDetails = (
       const tierClient = new TierApiClient(token)
       const arnsAssessmentPlatformClient = new ArnsAssessmentPlatformApiClient(token)
       const authOptions = asUser(res.locals.user.token)
-      if (res?.locals?.flags?.enableOGRS4) {
-        ;[overview, risks, tierCalculation, userCaseload, riskData, probationPractitioner] = await Promise.all([
-          masClient.getPersonalDetails(crn),
-          arnsClient.getRisks(crn),
-          tierClient.getCalculationDetails(crn),
-          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-          arnsComponents.getRiskData(authOptions, 'crn', crn),
-          masClient.getProbationPractitioner(crn),
-        ])
-      } else {
-        ;[overview, risks, tierCalculation, userCaseload, predictors, probationPractitioner] = await Promise.all([
-          masClient.getPersonalDetails(crn),
-          arnsClient.getRisks(crn),
-          tierClient.getCalculationDetails(crn),
-          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-          arnsClient.getPredictorsAll(crn),
-          masClient.getProbationPractitioner(crn),
-        ])
-      }
+      ;[overview, risks, tierCalculation, userCaseload, riskData, probationPractitioner] = await Promise.all([
+        masClient.getPersonalDetails(crn),
+        arnsClient.getRisks(crn),
+        tierClient.getCalculationDetails(crn),
+        masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
+        arnsComponents.getRiskData(authOptions, 'crn', crn),
+        masClient.getProbationPractitioner(crn),
+      ])
 
       const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
       sentencePlan = { showLink: false, showText: false, lastUpdatedDate: '' }
@@ -76,55 +65,29 @@ export const getPersonalDetails = (
           logger.error(error, 'Failed to connect to Assessment Platform API.')
         }
       }
-      if (res?.locals?.flags?.enableOGRS4) {
-        req.session.data = {
-          ...(req?.session?.data ?? {}),
-          personalDetails: {
-            ...(req?.session?.data?.personalDetails ?? {}),
-            [crn]: {
-              overview,
-              sentencePlan,
-              risks,
-              tierCalculation,
-              riskData,
-              probationPractitioner,
-            },
+      req.session.data = {
+        ...(req?.session?.data ?? {}),
+        personalDetails: {
+          ...(req?.session?.data?.personalDetails ?? {}),
+          [crn]: {
+            overview,
+            sentencePlan,
+            risks,
+            tierCalculation,
+            riskData,
+            probationPractitioner,
           },
-        }
-      } else {
-        req.session.data = {
-          ...(req?.session?.data ?? {}),
-          personalDetails: {
-            ...(req?.session?.data?.personalDetails ?? {}),
-            [crn]: {
-              overview,
-              sentencePlan,
-              risks,
-              tierCalculation,
-              predictors,
-              probationPractitioner,
-            },
-          },
-        }
+        },
       }
     } else {
-      // eslint-disable-next-line no-lonely-if
-      if (res?.locals?.flags?.enableOGRS4) {
-        ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
-      } else {
-        ;({ overview, sentencePlan, risks, tierCalculation, predictors } = req.session.data.personalDetails[crn])
-      }
+      ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
     res.locals.tierCalculation = tierCalculation
     res.locals.risksWidget = toRoshWidget(risks)
     res.locals.risks = risks
-    if (res?.locals?.flags?.enableOGRS4) {
-      res.locals.riskData = riskData
-    } else {
-      res.locals.predictorScores = toPredictors(predictors)
-    }
+    res.locals.riskData = riskData
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth

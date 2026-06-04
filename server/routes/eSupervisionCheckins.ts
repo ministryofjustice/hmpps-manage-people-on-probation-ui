@@ -59,7 +59,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/spo-approval', [
-    redirectWizard([{ path: 'eligibility' }, { path: 'eligibilityChoice' }], 'setupcheckins'),
+    redirectWizard(['eligibility', 'eligibilityChoice'], 'setupcheckins'),
     controllers.checkIns.getSPOApprovalPage(hmppsAuthClient),
   ])
   router.post(
@@ -71,7 +71,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/date-frequency', [
-    redirectWizard([{ path: 'id' }], 'setupcheckins'),
+    redirectWizard(['id'], 'setupcheckins'),
     controllers.checkIns.getDateFrequencyPage(hmppsAuthClient),
   ])
   router.post(
@@ -83,7 +83,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/contact-preference', [
-    redirectWizard([{ path: 'date' }, { path: 'interval' }], 'setupcheckins'),
+    redirectWizard(['date', 'interval'], 'setupcheckins'),
     controllers.checkIns.getContactPreferencePage(hmppsAuthClient),
   ])
   router.post(
@@ -95,7 +95,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/edit-contact-preference', [
-    redirectWizard([{ path: 'date' }, { path: 'interval' }], 'setupcheckins'),
+    redirectWizard(['date', 'interval'], 'setupcheckins'),
     controllers.checkIns.getEditContactPrePage(hmppsAuthClient),
   ])
   router.post(
@@ -106,7 +106,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/photo-options', [
-    redirectWizard([{ path: 'preferredComs' }], 'setupcheckins'),
+    redirectWizard(['preferredComs'], 'setupcheckins'),
     controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient),
   ])
   router.post(
@@ -117,7 +117,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/take-a-photo', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    redirectWizard(['photoUploadOption'], 'setupcheckins'),
     controllers.checkIns.getTakePhotoPage(hmppsAuthClient),
   ])
   router.post(
@@ -127,7 +127,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/upload-a-photo', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    redirectWizard(['photoUploadOption'], 'setupcheckins'),
     controllers.checkIns.getUploadPhotoPage(hmppsAuthClient),
   ])
   router.post(
@@ -138,7 +138,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/photo-rules', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    redirectWizard(['photoUploadOption'], 'setupcheckins'),
     controllers.checkIns.getPhotoRulesPage(hmppsAuthClient),
   ])
   router.post(
@@ -148,7 +148,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postPhotoRulesPage(hmppsAuthClient),
   )
   router.get('/case/:crn/appointments/:id/check-in/checkin-summary', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    redirectWizard(['photoUploadOption'], 'setupcheckins'),
     controllers.checkIns.getCheckinSummaryPage(hmppsAuthClient),
   ])
 

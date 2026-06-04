@@ -2,6 +2,7 @@ import {
   AcceptableAbsenceOutcomeType,
   AppointmentEnforcementAction,
   AppointmentOutcomeType,
+  EnforcementActionCreatedBy,
 } from '../../../../server/models/Appointments'
 import AcceptableAbsencePage from '../../../pages/appointmentOutcomes/acceptable-absence.page'
 import AttendedFailedToComplyPage from '../../../pages/appointmentOutcomes/attended-failed-to-comply.page'
@@ -46,25 +47,29 @@ const isValidOutcome = (outcome: AppointmentOutcomeType | AcceptableAbsenceOutco
 export const completeOutcome = ({
   outcome = 'ATTENDED_COMPLIED',
   action = null,
+  letterSentBy = 'USER',
 }: {
   outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
   action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+  letterSentBy?: EnforcementActionCreatedBy
 } = {}) => {
   const outcomePage = new OutcomePage()
   uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=${outcome}]`).click()
   outcomePage.getSubmitBtn().click()
   if (action) {
-    completeAction({ outcome, action })
+    completeAction({ outcome, action, letterSentBy })
   }
 }
 
 export const completeAction = ({
   outcome = 'ATTENDED_COMPLIED',
   action = null,
+  letterSentBy = 'USER',
 }: {
   outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
   action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+  letterSentBy?: EnforcementActionCreatedBy
 } = {}) => {
   if (action && isValidOutcome(outcome)) {
     let breachPage: InitiateBreachOrRecallPage
@@ -95,7 +100,7 @@ export const completeAction = ({
           action === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
             ? 'LICENCE_COMPLIANCE_LETTER_SENT'
             : 'FIRST_WARNING_LETTER_SENT'
-        cy.get('[data-qa=letterSentBy]').find(`.govuk-radios__input[value=USER]`).click()
+        cy.get('[data-qa=letterSentBy]').find(`.govuk-radios__input[value=${letterSentBy}]`).click()
         cy.get('[data-qa=letterType]').find(`.govuk-radios__input[value=${letterValue}]`).click()
       }
       if (breachActions.includes(action)) {

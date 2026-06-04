@@ -7,16 +7,16 @@
             {{ govukSummaryList({
                 rows: [
                     {
-                        key: { html: '<span data-qa="highScoringNeedsLabel">High-scoring areas from the assessment</span>' },
-                        value: { html: '<span data-qa="highScoringNeedsValue">' + highScoringNeeds + '</span>' if needs else '<span data-qa="highScoringNeedsValue">Not provided</span>' }
+                        key: { html: '<span data-qa="identifiedNeedsLabel">Need identified</span>' },
+                        value: { html: '<span data-qa="identifiedNeedsValue">' + identifiedNeeds + '</span>' if needs else '<span data-qa="identifiedNeedsValue">Not provided</span>' }
                     },
                     {
-                        key: { html: '<span data-qa="lowScoringNeedsLabel">Low-scoring areas from the assessment</span>' },
-                        value: { html: '<span data-qa="lowScoringNeedsValue">' + lowScoringNeeds + '</span>' if needs else '<span data-qa="lowScoringNeedsValue">Not provided</span>' }
+                        key: { html: '<span data-qa="notIdentifiedNeedsLabel">No need identified</span>' },
+                        value: { html: '<span data-qa="notIdentifiedNeedsValue">' + notIdentifiedNeeds + '</span>' if needs else '<span data-qa="notIdentifiedNeedsValue">Not provided</span>' }
                     },
                     {
-                        key: { html: '<span data-qa="noScoreNeedsLabel">Areas without a need score</span>' },
-                        value: { html: '<span data-qa="noScoreNeedsValue">' + noScoreNeeds + '</span>' if needs else '<span data-qa="noScoreNeedsValue">Not provided</span>' }
+                        key: { html: '<span data-qa="unansweredNeedsLabel">Not enough information provided</span>' },
+                        value: { html: '<span data-qa="unansweredNeedsValue">' + unansweredNeeds + '</span>' if needs else '<span data-qa="unansweredNeedsValue">Not provided</span>' }
                     }
                 ]
             }) }}
@@ -44,31 +44,7 @@
     {% include './_rosh.njk' %}
     {% include './_mappa.njk' %}
     <div data-qa="oasysScoreHistory">
-        {% if flags.enableOGRS4 %}
-            {{ predictorTimeline({ data: riskData }) }}
-        {% else %}
-            <div class="govuk-body predictor-timeline__heading">
-                <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
-                {% if riskData.httpStatus !== 200 and caseSummary.roshHistory.error %}
-                    <p class='govuk-body' data-qa='timeline-missing'>ROSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
-                {% elif riskData.httpStatus !== 200 %}
-                    <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
-                {% elif caseSummary.roshHistory.error %}
-                    <p class='govuk-body' data-qa='rosh-history-missing'>Historical ROSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
-                {% endif %}
-                {% if timeline.length %}
-                    <div>
-                        <button type='button' data-js="predictor-timeline__toggle-all" class="reset-button link-button govuk-link">Open all<span class='govuk-visually-hidden'> scores in timeline</span>
-                        </button>
-                    </div>
-                {% else %}
-                    <p class='govuk-body' data-qa='rosh-history-missing'>No risk scores have been recorded</p>
-                {% endif %}
-            </div>
-            {% if timeline.length %}
-                {{ predictorTimelineV1(timeline, 'x') }}
-            {% endif %}
-        {% endif %}
+        {{ predictorTimeline({ data: riskData }) }}
     </div>
     {% include './_sentence-plan.njk' %}
 </div>

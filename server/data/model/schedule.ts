@@ -1,6 +1,6 @@
 import { Name, PersonSummary, Document, Address } from './personalDetails'
 import { Note } from './note'
-import { EnforcementActionCode } from '../../properties/appointment-outcomes'
+import { EnforcementActionCode, OutcomeCode } from '../../properties/appointment-outcomes'
 
 export interface Schedule {
   personSummary: PersonSummary
@@ -89,6 +89,16 @@ export interface ContactEnforcementAction {
 
 export interface ContactOutcomesResponse {
   outcomes: ContactOutcome[]
+}
+
+export interface PutContactRequest {
+  date: string
+  time: string
+  outcomeCode: OutcomeCode
+  enforcementActionCode?: EnforcementActionCode
+  notes?: string
+  alert: boolean
+  sensitive: boolean
 }
 
 export interface Activity {

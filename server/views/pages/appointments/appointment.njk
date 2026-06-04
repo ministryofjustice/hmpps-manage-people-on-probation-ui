@@ -47,13 +47,24 @@
 
 {% block content %}
 
-{{ mojBanner({
-      type: 'success',
-      html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact updated</h2>',
-      classes: 'govuk-!-margin-bottom-2',
-      attributes: { "data-qa": "contactUpdated"},
-      iconFallbackText: 'Success'
-  }) if showSuccessBanner and flags.enableManageContacts == true }}
+{% if showSuccessBanner and flags.enableManageContacts == true %}
+  {% if uploadFailed %}
+    {{ mojBanner({
+        type: 'warning',
+        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">The contact was updated but the files did not upload</h2><p class="govuk-body">You can try to upload the files by updating the contact and adding them again.</p>',
+        classes: 'govuk-!-margin-bottom-2',
+        attributes: { "data-qa": "uploadFailed" }
+    }) }}
+  {% else %}
+    {{ mojBanner({
+        type: 'success',
+        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact updated</h2>',
+        classes: 'govuk-!-margin-bottom-2',
+        attributes: { "data-qa": "contactUpdated" },
+        iconFallbackText: 'Success'
+    }) }}
+  {% endif %}
+{% endif %}
 
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}

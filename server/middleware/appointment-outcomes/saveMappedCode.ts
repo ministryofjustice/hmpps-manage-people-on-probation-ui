@@ -17,7 +17,9 @@ import { getDataValue, setDataValue } from '../../utils'
 export const saveMappedCode = (type: 'OUTCOME' | 'ACCEPTABLE_ABSENCE_OUTCOME' | 'ACTION'): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn, id, appointmentSession, reqUrl } = res.locals.appointmentOutcome
-    if (!['/add-note', '/next-appointment', '/check-your-answers'].some(url => reqUrl?.includes(url))) {
+    if (
+      !['/add-note', '/next-appointment', '/check-your-answers', '/confirmation'].some(url => reqUrl?.includes(url))
+    ) {
       const body = req.body as Record<string, any>
       let codeKey: keyof AppointmentSessionOutcome
       let code: OutcomeCode | AcceptableAbsenceOutcomeCode | EnforcementActionCode = null

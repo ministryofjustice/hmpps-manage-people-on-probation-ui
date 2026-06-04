@@ -23,7 +23,7 @@ export const handleOutcomePageRedirect = (pageKey: EnforcementActionPage | Outco
     if (redirect) {
       redirect = `${redirect}${change ? `?change=${encodeURIComponent(change)}` : ''}`
     } else if (change) {
-      redirect = change.includes('/outcome') ? change : findUncompleted(req, res)
+      redirect = change.includes('/outcome') ? change : findUncompleted()(req, res)
     } else {
       redirect = `${baseOutcomeUrl}/add-note`
     }

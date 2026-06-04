@@ -1,88 +1,6 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (
-  sentencePlan = true,
-  sanIndicator = true,
-  ogrs4 = true,
-  ogrs4SummaryCardDetail = false,
-  sentencePlanUrl = true,
-) => ({
-  request: {
-    urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-    method: 'GET',
-  },
-  response: {
-    status: 200,
-    jsonBody: {
-      namespace: {
-        key: 'manage-people-on-probation-ui',
-      },
-      flags: [
-        {
-          key: 'enableSanIndicator',
-          name: 'enableSanIndicator',
-          description: '',
-          enabled: sanIndicator,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as string[],
-          rollouts: [] as string[],
-        },
-        {
-          key: 'enableOGRS4',
-          name: 'enableOGRS4',
-          description: '',
-          enabled: ogrs4,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
-          key: 'enableOGRS4SummaryCardDetail',
-          name: 'enableOGRS4SummaryCardDetail',
-          description: '',
-          enabled: ogrs4SummaryCardDetail,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
-          key: 'enableSentencePlanUrl',
-          name: 'enableSentencePlanUrl',
-          description: '',
-          enabled: sentencePlanUrl,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-      ],
-    },
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  },
-})
-
-const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false, true, true))
-
-const stubNoSentencePlan = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, true))
-
-const stubNoSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true, false))
-
-const stubNoSentencePlanAndSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false))
-
 const stubEnableESuperVision = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -257,61 +175,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2025-01-13T15:28:37.920581Z',
             updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableOGRS4SummaryCardDetail',
-            name: 'enableOGRS4SummaryCardDetail',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubDisableOGRS4 = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-02-26T12:00:00.000000Z',
-            updatedAt: '2026-02-26T12:00:00.000000Z',
             rules: [],
             rollouts: [],
           },
@@ -520,20 +383,49 @@ const stubEnableShowMatchWithConcern = (): SuperAgentRequest =>
     },
   })
 
+const stubDisableEMDIOverviewShowGPSData = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => f.key !== 'enableEMDIOverviewShowGPSData'),
+          {
+            key: 'enableEMDIOverviewShowGPSData',
+            name: 'enableEMDIOverviewShowGPSData',
+            description: '',
+            enabled: false,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-04-10T12:00:00.000000Z',
+            updatedAt: '2026-04-10T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
-  stubNoSentencePlan,
-  stubNoSanIndicator,
-  stubNoSentencePlanAndSanIndicator,
   stubEnableESuperVision,
   stubDisableSmsReminders,
   stubDisableCompliancePage,
   stubDisableTierLink,
-  stubDisableOGRS4,
   stubDisableNonCompliance,
   stubEnableDeepLinks,
   stubDisableSentencePlanUrl,
-  stubOgrs4SummaryCardEnabled,
   stubDisableESupervisionCheckins,
   stubDisableHomePageOutcome,
   stubEnableShowMatchWithConcern,
+  stubDisableEMDIOverviewShowGPSData,
 }

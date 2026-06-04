@@ -32,7 +32,12 @@ export const validEnforcementActionOptions = <
   contactOutcomes: ContactOutcome[],
   options: Option<TOption | ''>[],
 ): Option<TOption | ''>[] => {
-  const ignore: AppointmentEnforcementAction[] = ['NO_FURTHER_ACTION']
+  const ignore: AppointmentEnforcementAction[] = [
+    'SEND_LETTER',
+    'SEND_ANOTHER_LETTER',
+    'NO_FURTHER_ACTION',
+    'DIFFERENT_ACTION',
+  ]
 
   if (!contactOutcomes?.length) {
     return options

@@ -25,6 +25,12 @@ export interface Data {
   isOutLookEventFailed?: any
   isEnglishNotificationFailed?: boolean
   isWelshNotificationFailed?: boolean
+  temp?: {
+    [crn: string]: {
+      linkedContactId?: string
+      responseContactId?: string
+    }
+  }
   appointments?: {
     [crn: string]: {
       [id: string]: AppointmentSession

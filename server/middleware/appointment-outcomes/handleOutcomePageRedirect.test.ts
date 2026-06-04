@@ -9,7 +9,7 @@ const change = '/path/to/check-your-answers'
 const incompleteRedirect = '/path/to/incomplete/page'
 
 jest.mock('../findUncompleted', () => ({
-  findUncompleted: jest.fn(() => incompleteRedirect),
+  findUncompleted: jest.fn(() => jest.fn(() => incompleteRedirect)),
 }))
 
 const buildResponse = (outcome: Partial<AppointmentSessionOutcome>): AppResponse => {

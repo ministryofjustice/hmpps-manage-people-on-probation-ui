@@ -12,14 +12,13 @@ import {
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { EventResponse, RescheduleEventRequest, SmsPreviewRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { PersonAppointment } from '../data/model/schedule'
 import { buildCaseLink } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
-): Route<Promise<RescheduleAppointmentResponse | PersonAppointment>> => {
+): Route<Promise<RescheduleAppointmentResponse>> => {
   return async (req, res) => {
     const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -67,7 +66,7 @@ export const postRescheduleAppointments = (
     const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
-    if (email && res.locals.flags.enableCalendarEvents) {
+    if (email) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)

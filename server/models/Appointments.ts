@@ -134,6 +134,8 @@ export interface AppointmentSessionOutcome {
   letterType?: AppointmentEnforcementAction
   updateEnforcementAction?: AppointmentEnforcementAction
   contactOutcomes?: ContactOutcome[]
+  contactEnforcementActions?: ContactEnforcementAction[]
+  nextAppointment?: AppointmentSessionSelection
 }
 
 export interface AppointmentSessionUser {
@@ -161,11 +163,9 @@ export interface AppointmentSession {
   nsiId?: string
   notes?: string
   sensitivity?: YesNo
-  backendId?: number
   enforcementAction?: EnforcementAction
   outcomeRecorded?: YesNo
   contactId?: string
-  linkedContactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions
@@ -342,6 +342,7 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
+  outcomeJourney?: boolean
   options?:
     | Option<AppointmentOutcomeType>[]
     | Option<AcceptableAbsenceOutcomeType>[]
