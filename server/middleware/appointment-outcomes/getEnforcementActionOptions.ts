@@ -6,7 +6,7 @@ import { validEnforcementActionOptions } from '../../utils'
 export const getEnforcementActionOptions: Route<void> = (_req, res, next) => {
   const { forename, appointmentSession } = res.locals.appointmentOutcome
   const options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactOutcomes,
+    appointmentSession?.outcome?.contactOutcomes,
     enforcementActionOptions(forename),
   )
   res.locals.appointmentOutcome.options = options

@@ -110,24 +110,6 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should call next when contactEnforcementActions does not exist', () => {
-    const res = mockAppResponse({
-      appointmentOutcome: {
-        sentence: { type: 'COMMUNITY' },
-        isProbationPractitioner: false,
-        appointmentSession: {
-          outcome: {},
-        },
-      },
-    })
-
-    getAttendedFailedToComplyOptions(req, res, nextSpy)
-
-    expect(validEnforcementActionOptionsSpy).not.toHaveBeenCalled()
-    expect(res.locals.appointmentOutcome.options).toBeUndefined()
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-
   it('should remove REFER_TO_OFFENDER_MANAGER when user is a probation practitioner', () => {
     const res = buildResponse({
       sentenceType: 'COMMUNITY',

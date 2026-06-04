@@ -5,7 +5,10 @@ import { validOutcomeOptions } from '../../utils'
 
 export const getOutcomeOptions: Route<void> = (_req, res, next) => {
   const { isInPast, appointmentSession } = res.locals.appointmentOutcome
-  let options = validOutcomeOptions<AppointmentOutcomeType>(appointmentSession.outcome.contactOutcomes, outcomeOptions)
+  let options = validOutcomeOptions<AppointmentOutcomeType>(
+    appointmentSession?.outcome?.contactOutcomes,
+    outcomeOptions,
+  )
   if (isInPast && appointmentSession?.type && !['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
     options = options.filter(option => !['WILL_BE_RESCHEDULED'].includes(option.value))
   }

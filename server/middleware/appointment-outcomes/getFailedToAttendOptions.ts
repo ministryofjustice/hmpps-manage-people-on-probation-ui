@@ -6,7 +6,7 @@ import { validEnforcementActionOptions } from '../../utils'
 export const getFailedToAttendOptions: Route<void> = (_req, res, next) => {
   const { forename, isProbationPractitioner, appointmentSession } = res.locals.appointmentOutcome
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactOutcomes,
+    appointmentSession?.outcome?.contactOutcomes,
     failedToAttendOptions(forename),
   )
   if (isProbationPractitioner) {

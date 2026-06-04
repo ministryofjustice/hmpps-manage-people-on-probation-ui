@@ -10,7 +10,7 @@ export const getAcceptableAbsenceOptions: Route<void> = (_req, res, next) => {
   } = res.locals.appointmentOutcome
 
   let options = validOutcomeOptions<AcceptableAbsenceOutcomeType>(
-    appointmentSession.outcome.contactOutcomes,
+    appointmentSession?.outcome?.contactOutcomes,
     acceptableAbsenceOptions,
   )
   if (length <= 24) {
