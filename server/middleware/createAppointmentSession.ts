@@ -121,7 +121,11 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     appointmentSession.smsOptIn = null
   }
 
-  const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
+  const outcome = persistOutcomeAndAction({
+    outcome: appointment?.outcome,
+    actionCode: enforcementAction?.code,
+  })
+
   if (outcome) {
     appointmentSession.outcome = outcome
   }
@@ -130,8 +134,5 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)
   }
-  if (next) {
-    return next()
-  }
-  return null
+  return next()
 }

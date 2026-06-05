@@ -1,7 +1,7 @@
-import { Route } from '../../@types'
-import { AppointmentEnforcementAction } from '../../models/Appointments'
+import type { Route } from '../../@types'
+import type { AcceptableAbsenceOutcomeType } from '../../models/Appointments'
 import { acceptableAbsenceOptions } from '../../properties/appointment-outcomes'
-import { validEnforcementActionOptions } from '../../utils'
+import { validOutcomeOptions } from '../../utils'
 
 export const getAcceptableAbsenceOptions: Route<void> = (_req, res, next) => {
   const {
@@ -9,8 +9,8 @@ export const getAcceptableAbsenceOptions: Route<void> = (_req, res, next) => {
     appointmentSession,
   } = res.locals.appointmentOutcome
 
-  let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactEnforcementActions,
+  let options = validOutcomeOptions<AcceptableAbsenceOutcomeType>(
+    appointmentSession?.outcome?.contactOutcomes,
     acceptableAbsenceOptions,
   )
   if (length <= 24) {

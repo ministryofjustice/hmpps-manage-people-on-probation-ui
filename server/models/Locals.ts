@@ -17,19 +17,14 @@ import {
   EnforcementActionLetterType,
   EnforcementActionCreatedBy,
   ProbationDeliveryUnit,
+  AcceptableAbsenceOutcomeType,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import {
-  Activity,
-  ContactEnforcementActions,
-  ContactOutcomes,
-  PersonAppointment,
-  PersonSchedule,
-} from '../data/model/schedule'
+import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { Compliance } from '../data/model/overview'
 import { NonComplianceHistoryResponse } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
@@ -247,10 +242,10 @@ export interface AppointmentOutcomeProps<TAppointment> {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  outcomes?: ContactOutcomes[]
-  enforcementActions?: ContactEnforcementActions[]
+  outcomes?: ContactOutcome[]
   options?:
     | Option<AppointmentOutcomeType>[]
+    | Option<AcceptableAbsenceOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
   letterSentByOptions?: Option<EnforcementActionCreatedBy>[]

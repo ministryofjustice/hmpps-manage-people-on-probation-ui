@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { getOutcomeSummary } from './getOutcomeSummary'
 import { mockAppResponse } from '../../controllers/mocks'
 import { AppointmentOutcomeProps, OutcomeSummary, type AppResponse } from '../../models/Locals'
-import { Activity } from '../../data/model/schedule'
+import { Activity, ContactEnforcementAction, ContactOutcome } from '../../data/model/schedule'
 import { AppointmentSessionOutcome } from '../../models/Appointments'
 
 const crn = 'X000001'
@@ -17,6 +17,42 @@ const mockAppointment = ({ appointment = {} } = {}): Activity => ({
   endDateTime: '2026-05-15T12:36:24.050Z',
   ...appointment,
 })
+
+const mockEnforcementActions: ContactEnforcementAction[] = [
+  {
+    code: 'NFA',
+    description: 'No Further Action',
+  },
+  {
+    code: 'IBR',
+    description: 'Breach / Recall Initiated',
+  },
+  {
+    code: 'EA02',
+    description: 'First Warning Letter Sent',
+    defaultResponsePeriodDays: 7,
+  },
+]
+
+const mockContactOutcomes: ContactOutcome[] = [
+  {
+    code: 'ATTC',
+    description: 'Attended - Complied',
+    enforcementActions: [],
+  },
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed To Comply',
+    enforcementActions: mockEnforcementActions,
+  },
+  {
+    code: 'AFTA',
+    description: 'Failed To Attend',
+    enforcementActions: mockEnforcementActions,
+  },
+  { code: 'AAHO', description: 'Acceptable Absence - Holiday', enforcementActions: [] },
+  { code: 'AAME', description: 'Acceptable Absence - Medical', enforcementActions: [] },
+]
 
 const mockAppointmentOutcome = ({
   outcome = {},
@@ -51,7 +87,7 @@ const mockAppointmentOutcome = ({
       outcomeType: 'ATTENDED_COMPLIED',
       outcomeCode: 'ATTC',
       enforcementActionCode: [],
-      contactEnforcementActions: [],
+      contactOutcomes: mockContactOutcomes,
       attendedFailedToComply: null,
       acceptableAbsence: null,
       unacceptableAbsence: null,
@@ -156,9 +192,15 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       letterSentBy: 'CASE_ADMIN',
       letterType: 'BREACH_LETTER_SENT',
       enforcementActionCode: ['IBR', 'EA08'],
-      contactEnforcementActions: [
-        { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
-        { code: 'EA08', description: 'Breach Letter Sent', defaultResponsePeriodDays: 14 },
+      contactOutcomes: [
+        {
+          code: 'AFTC',
+          description: 'Attended - Failed To Comply',
+          enforcementActions: [
+            { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+            { code: 'EA08', description: 'Breach Letter Sent', defaultResponsePeriodDays: 14 },
+          ],
+        },
       ],
     }
     const res = buildResponse({ outcome })
@@ -203,17 +245,17 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
       nextAppointment: 'No next appointment',
+      evidenceDueDate: '22 May 2026',
       documents: ['FILE1', 'FILE2'],
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
   })
 
-  it('should create the correct summary if outcome is acceptable absence and action has been selected', () => {
+  it('should create the correct summary if outcome is acceptable absence - holiday', () => {
     const outcome: AppointmentSessionOutcome = {
       outcomeType: 'ACCEPTABLE_ABSENCE',
-      outcomeCode: 'AAM11',
+      outcomeCode: 'AAHO',
       acceptableAbsence: 'ACCEPTABLE_ABSENCE_HOLIDAY',
-      enforcementActionCode: ['AAHO'],
     }
     const res = buildResponse({ outcome, nextAppointment: mockAppointment(), notes: null })
     getOutcomeSummary(req, res, nextSpy)

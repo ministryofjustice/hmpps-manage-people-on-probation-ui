@@ -2,6 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { saveMappedCode } from './saveMappedCode'
 import { mockAppResponse } from '../../controllers/mocks'
 import {
+  AcceptableAbsenceOutcomeType,
   AppointmentEnforcementAction,
   AppointmentOutcomeType,
   AppointmentSessionOutcome,
@@ -24,10 +25,10 @@ const id = '12345'
 
 const buildRequest = ({
   outcomeType = 'ACCEPTABLE_ABSENCE',
-  enforcementAction = {},
+  pages = {},
 }: {
   outcomeType?: AppointmentOutcomeType
-  enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
+  pages?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType }
 } = {}): httpMocks.MockRequest<any> => {
   const body = {
     appointments: {
@@ -35,7 +36,7 @@ const buildRequest = ({
         [id]: {
           outcome: {
             outcomeType,
-            ...enforcementAction,
+            ...pages,
           },
         },
       },
@@ -107,10 +108,23 @@ describe('middleware/appointment-outcomes/saveMappedCode', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
+  describe('Save mapped code for ACCEPTABLE_ABSENCE_OUTCOME', () => {
+    it('should save the acceptable absence outcome code if selected option is map key', () => {
+      const req = buildRequest({ pages: { acceptableAbsence: 'ACCEPTABLE_ABSENCE_HOLIDAY' } })
+      const res = buildResponse({ reqUrl: '/outcome/acceptable-absence' })
+      saveMappedCode('ACCEPTABLE_ABSENCE_OUTCOME')(req, res, nextSpy)
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['appointments', crn, id, 'outcome', 'outcomeCode'],
+        'AAHO',
+      )
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+  })
 
   describe('Save mapped code for ACTION', () => {
     it('should not save the action code if selected option is not a map key', () => {
-      const req = buildRequest({ enforcementAction: { failedToAttend: 'SEND_LETTER' } })
+      const req = buildRequest({ pages: { failedToAttend: 'SEND_LETTER' } })
       const res = buildResponse({ reqUrl: '/outcome/failed-to-attend' })
       saveMappedCode('ACTION')(req, res, nextSpy)
       expect(mockSetDataValue).not.toHaveBeenCalled()
@@ -118,7 +132,7 @@ describe('middleware/appointment-outcomes/saveMappedCode', () => {
     })
     it('should save the action code as new array if selected option is map key', () => {
       const req = buildRequest({
-        enforcementAction: { unacceptableAbsence: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' },
+        pages: { unacceptableAbsence: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' },
       })
       const res = buildResponse({ reqUrl: '/outcome/unacceptable-absence' })
       saveMappedCode('ACTION')(req, res, nextSpy)
@@ -131,7 +145,7 @@ describe('middleware/appointment-outcomes/saveMappedCode', () => {
     })
     it('should append the action code to the array if selected option is map key and action session exists', () => {
       const req = buildRequest({
-        enforcementAction: { letterType: 'LICENCE_COMPLIANCE_LETTER_SENT' },
+        pages: { letterType: 'LICENCE_COMPLIANCE_LETTER_SENT' },
       })
       const res = buildResponse({ enforcementActionCode: ['IBR'], reqUrl: '/outcome/initiate-breach-or-recall' })
       saveMappedCode('ACTION')(req, res, nextSpy)

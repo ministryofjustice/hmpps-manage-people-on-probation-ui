@@ -64,7 +64,6 @@ describe('middleware/appointment-outcomes/resetSelectedActions', () => {
     resetSelectedActions()(req, res, nextSpy)
     const keys: EnforcementActionPage[] = [
       'attendedFailedToComply',
-      'acceptableAbsence',
       'unacceptableAbsence',
       'failedToAttend',
       'otherEnforcementAction',
@@ -76,12 +75,7 @@ describe('middleware/appointment-outcomes/resetSelectedActions', () => {
     keys.forEach((key, i) => {
       expect(setDataValueSpy).toHaveBeenNthCalledWith(i + 1, req.session.data, [...expectedPath, key], null)
     })
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      10,
-      req.session.data,
-      [...expectedPath, 'enforcementActionCode'],
-      [],
-    )
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(9, req.session.data, [...expectedPath, 'enforcementActionCode'], [])
   })
 
   it('should reset the selected breach and letter actions only', () => {
