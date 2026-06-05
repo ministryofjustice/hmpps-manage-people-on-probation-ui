@@ -55,13 +55,20 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Is the person in the image from the check in {{ checkIn.personalDetails.name.forename }}?</dt>
-                <dd class="govuk-summary-list__value">{{"Yes" if checkIn.manualIdCheck == "MATCH" else "No"}}</dd>
-                <dd class="govuk-summary-list__actions">
-                    {% if checkIn.manualIdCheck == "MATCH" %}
-                        {{ govukTag({ text: "Identity confirmed", classes: "govuk-tag govuk-tag--green" }) }}
+                <dd class="govuk-summary-list__value">
+                    {% if checkIn.manualIdCheck == "NO_MATCH" %}
+                        {{ "No, it is not " + checkIn.personalDetails.name.forename }}
+                    {% elif checkIn.manualIdCheck == "MATCH_WITH_CONCERN" %}
+                        {{ "Yes, and there is a visible concern" }}
+                    {% else %}
+                        {{ "Yes, and there is nothing concerning" }}
                     {% endif %}
+                </dd>
+                <dd class="govuk-summary-list__actions">
                     {% if checkIn.manualIdCheck == "NO_MATCH" %}
                         {{ govukTag({ text: "Identity not confirmed", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% else %}
+                        {{ govukTag({ text: "Identity confirmed", classes: "govuk-tag govuk-tag--green" }) }}
                     {% endif %}
                 </dd>
             </div>
@@ -152,30 +159,34 @@
                 <dt class="govuk-summary-list__key">{{"System ID and liveness check result" if checkIn.livenessEnabled else "System ID check result"}}</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>
             </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
-                <dd class="govuk-summary-list__value">
-                    <img
-                    src="{{ "/assets/images/placeholder.png" if checkIn.photoUrl == null else checkIn.photoUrl }}"
-                    class="es-profile-image es-profile-image--small"
-                    alt="Profile image of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
-                    crossorigin />
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image from check in</dt>
-                <dd class="govuk-summary-list__value">
-                    {% if checkIn.snapshotUrl %}
+            {% if flags.enableShowMatchWithConcern === true and checkIn.manualIdCheck != "MATCH" %}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
+                    <dd class="govuk-summary-list__value">
                         <img
-                        src="{{ checkIn.snapshotUrl }}"
+                        src="{{ "/assets/images/placeholder.png" if checkIn.photoUrl == null else checkIn.photoUrl }}"
                         class="es-profile-image es-profile-image--small"
-                        alt="Image from identity check of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                        alt="Profile image of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                         crossorigin />
-                    {% else %}
-                    <span>No image available</span>
-                    {% endif %}
-                </dd>
-            </div>
+                    </dd>
+                </div>
+            {% endif %}
+            {% if flags.enableShowMatchWithConcern === true and checkIn.manualIdCheck == "NO_MATCH" %}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Image from check in</dt>
+                    <dd class="govuk-summary-list__value">
+                        {% if checkIn.snapshotUrl %}
+                            <img
+                            src="{{ checkIn.snapshotUrl }}"
+                            class="es-profile-image es-profile-image--small"
+                            alt="Image from identity check of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                            crossorigin />
+                        {% else %}
+                        <span>No image available</span>
+                        {% endif %}
+                    </dd>
+                </div>
+            {% endif %}
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
                     How {{ checkIn.personalDetails.name.forename }} has been feeling
