@@ -1,4 +1,5 @@
 import {
+  AcceptableAbsenceOutcomeType,
   AppointmentEnforcementAction,
   AppointmentOutcomeType,
   EnforcementActionCreatedBy,
@@ -20,7 +21,7 @@ let overviewPage: OverviewPage
 
 interface Props {
   outcome?: AppointmentOutcomeType
-  action?: AppointmentEnforcementAction
+  action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
   letterSentBy?: EnforcementActionCreatedBy
 }
 
@@ -40,7 +41,10 @@ const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null, letterSentBy =
 
 const checkPage = () => {
   describe('Outcome is Attended and complied, Attended but sent home due to service issues or Acceptable absence', () => {
-    const outcomes: { outcomeType: AppointmentOutcomeType; action?: AppointmentEnforcementAction }[] = [
+    const outcomes: {
+      outcomeType: AppointmentOutcomeType
+      action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+    }[] = [
       { outcomeType: 'ATTENDED_COMPLIED' },
       { outcomeType: 'ATTENDED_SENT_HOME_SERVICE_ISSUES', action: 'NO_FURTHER_ACTION' },
       { outcomeType: 'ACCEPTABLE_ABSENCE', action: 'ACCEPTABLE_ABSENCE_HOLIDAY' },
