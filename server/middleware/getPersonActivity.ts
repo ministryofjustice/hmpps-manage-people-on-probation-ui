@@ -33,7 +33,7 @@ export const getPersonActivity = async (
     const complianceArray: string[] = []
 
     if (compliance && Array.isArray(compliance)) {
-      compliance.map(option => complianceArray.push(toCamelCase(option)))
+      compliance.forEach(option => complianceArray.push(toCamelCase(option)))
     } else if (compliance && typeof compliance === 'string') {
       complianceArray.push(compliance)
     }
