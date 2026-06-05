@@ -44,8 +44,8 @@ context('Cases', () => {
     checkColumnHeading(page, 0, 'Name / CRN', 'nameOrCrn', 'case')
     checkColumnHeading(page, 1, 'DOB / Age', 'dob', 'case')
     checkColumnHeading(page, 2, 'Sentence', 'sentence', 'case')
-    checkColumnHeading(page, 3, 'Last contact', 'lastContact', 'case')
-    checkColumnHeading(page, 4, 'Next contact', 'nextContact', 'case', 'ascending')
+    checkColumnHeading(page, 3, 'Last Appointment', 'lastContact', 'case')
+    checkColumnHeading(page, 4, 'Next Appointment', 'nextContact', 'case', 'ascending')
     page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', 'X778160')
     page.getRowData('myCases', 'dob', 'Value1').should('contain.text', '25 Sep 1975')
     page.getRowData('myCases', 'nameOrCrn', 'Value4').should('contain.text', 'Restricted access')
@@ -63,7 +63,7 @@ context('Cases', () => {
     page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
   })
 
-  const sortableColumns = ['Name / CRN', 'DOB / Age', 'Sentence', 'Last contact', 'Next contact']
+  const sortableColumns = ['Name / CRN', 'DOB / Age', 'Sentence', 'Last Appointment', 'Next Appointment']
   for (let i = 0; i < sortableColumns.length; i += 1) {
     it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i - 1]} sort button is clicked`, () => {
       cy.visit('/case')

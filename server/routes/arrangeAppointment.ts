@@ -19,10 +19,10 @@ import {
   forceValidation,
 } from '../middleware'
 import {
-  getContactOutcomes,
   getNotePrepend,
   getOutcomeProps,
   getOutcomeSummary,
+  getContactOutcomes,
   handlePutOutcome,
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'

@@ -3,7 +3,7 @@ import { getContactOutcomes } from './getContactOutcomes'
 import { getDataValue, setDataValue } from '../../utils'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
-import { ContactEnforcementActions, ContactOutcomes, ContactOutcomesResponse } from '../../data/model/schedule'
+import { ContactEnforcementAction, ContactOutcome, ContactOutcomesResponse } from '../../data/model/schedule'
 import { mockAppResponse } from '../../controllers/mocks'
 
 const crn = 'X000001'
@@ -31,26 +31,27 @@ getDataValueSpy.mockImplementation(() => ({ outcome, type }))
 
 const nextSpy = jest.fn()
 
-const mockContactOutcomes: ContactOutcomes[] = [
-  {
-    code: 'ATTC',
-    description: 'Attended - Complied',
-  },
-  {
-    code: 'AFTC',
-    description: 'Attended - Failed To Comply',
-  },
-]
-
-const mockContactEnforcementActions: ContactEnforcementActions[] = [
+const mockContactEnforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'IBR', description: null, defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
 ]
 
+const mockContactOutcomes: ContactOutcome[] = [
+  {
+    code: 'ATTC',
+    description: 'Attended - Complied',
+    enforcementActions: [],
+  },
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed To Comply',
+    enforcementActions: mockContactEnforcementActions,
+  },
+]
+
 const mockOutcomes: ContactOutcomesResponse = {
   outcomes: mockContactOutcomes,
-  enforcementActions: mockContactEnforcementActions,
 }
 
 const getContactOutcomesSpy = jest
@@ -95,7 +96,6 @@ describe('/middleware/appointment-outcomes/getContactOutcomes', () => {
     expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, contactId, 'outcome'], {
       ...outcome,
       contactOutcomes: mockContactOutcomes,
-      contactEnforcementActions: mockContactEnforcementActions,
     })
   })
   it('should set the data if arrange journey', async () => {
@@ -106,7 +106,6 @@ describe('/middleware/appointment-outcomes/getContactOutcomes', () => {
     expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'outcome'], {
       ...outcome,
       contactOutcomes: mockContactOutcomes,
-      contactEnforcementActions: mockContactEnforcementActions,
     })
   })
 })

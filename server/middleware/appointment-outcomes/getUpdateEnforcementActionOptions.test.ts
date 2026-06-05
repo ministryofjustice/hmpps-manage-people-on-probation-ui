@@ -3,14 +3,22 @@ import { mockAppResponse } from '../../controllers/mocks'
 import { getUpdateEnforcementActionOptions } from './getUpdateEnforcementActionOptions'
 import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { SentenceType } from '../../data/model/sentenceDetails'
-import { ContactEnforcementActions } from '../../data/model/schedule'
+import { ContactOutcome, ContactEnforcementAction } from '../../data/model/schedule'
 import { updateEnforcementActionOptions } from '../../properties/appointment-outcomes'
 import { validEnforcementActionOptions } from '../../utils'
 
-const contactEnforcementActions: ContactEnforcementActions[] = [
+const enforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
   { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
+
+const contactOutcomes: ContactOutcome[] = [
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed to Comply',
+    enforcementActions,
+  },
 ]
 
 const buildResponse = ({
@@ -36,7 +44,7 @@ const buildResponse = ({
       },
       appointmentSession: {
         outcome: {
-          contactEnforcementActions,
+          contactOutcomes,
         },
       },
     },
@@ -61,7 +69,7 @@ describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', ()
     validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
     getUpdateEnforcementActionOptions(req, res, nextSpy)
     expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
-      contactEnforcementActions,
+      contactOutcomes,
       updateEnforcementActionOptions('COMMUNITY'),
     )
     expect(res.locals.appointmentOutcome.options).toEqual(
