@@ -190,6 +190,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       time: start,
       outcomeCode,
       alert: true,
+      notes: '',
       sensitive: true,
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
