@@ -536,8 +536,8 @@ export default class MasApiClient extends RestClient {
   }
 
   async getUserAlertsCount(): Promise<number> {
-    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true })
-    return response.totalResults
+    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true, handle500: true })
+    return response?.totalResults ? response.totalResults : -1
   }
 
   async clearAlerts(alertIds: number[]) {
