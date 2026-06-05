@@ -27,7 +27,6 @@ const nextSpy = jest.fn()
 const getUserAlertsCountSpy = jest.spyOn(MasApiClient.prototype, 'getUserAlertsCount')
 
 describe('/middleware/getUserAlertsCount', () => {
-
   beforeEach(() => {
     jest.clearAllMocks()
     getUserAlertsCountSpy.mockImplementation(() => Promise.resolve(1))
@@ -46,11 +45,10 @@ describe('/middleware/getUserAlertsCount', () => {
     expect(res.locals.alertsCount).toEqual('99+')
   })
 
-    it('should assign the alerts count to -1 if the API fails', async () => {
+  it('should assign the alerts count to -1 if the API fails', async () => {
     getUserAlertsCountSpy.mockImplementationOnce(() => Promise.resolve(-1))
     await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalled()
     expect(res.locals.alertsCount).toEqual('-1')
   })
-  
 })
