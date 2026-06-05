@@ -207,7 +207,7 @@ context('Overview', () => {
     const page = Page.verifyOnPage(OverviewPage)
     page.getCardHeader('sentence11').should('contain.text', 'Pre-Sentence')
     page.getRowData('sentence11', 'order', 'Value').should('contain.text', 'No order details')
-    page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'No requirements details')
+    page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'Details not available')
   })
 
   it('Overview page with medium risk to staff is rendered', () => {

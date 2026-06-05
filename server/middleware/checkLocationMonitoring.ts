@@ -1,6 +1,8 @@
 import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
 
-const GPS_TAGGING_CODES: string[] = ['RM59', 'EM01']
+export const LICENCE_GPS_TAGGING_CODE: string = 'EM01'
+export const REQUIREMENT_GPS_TAGGING_CODE: string = 'RM59'
+const GPS_TAGGING_CODES: string[] = [LICENCE_GPS_TAGGING_CODE, REQUIREMENT_GPS_TAGGING_CODE]
 
 export const checkLocationMonitoring = (
   licenceConditions: LicenceCondition[] | null | undefined,
@@ -9,8 +11,8 @@ export const checkLocationMonitoring = (
   hasLicenceConditionsLMData: boolean
   hasRequirementsLMData: boolean
 } => {
-  const hasLicenceConditionsLMData = (licenceConditions || []).some(item => item.code === 'EM01')
-  const hasRequirementsLMData = (requirements || []).some(item => item.code === 'RM59')
+  const hasLicenceConditionsLMData = (licenceConditions || []).some(item => item.code === LICENCE_GPS_TAGGING_CODE)
+  const hasRequirementsLMData = (requirements || []).some(item => item.code === REQUIREMENT_GPS_TAGGING_CODE)
 
   return { hasLicenceConditionsLMData, hasRequirementsLMData }
 }
@@ -34,5 +36,5 @@ export const hasLocationMonitoring = (
   return hasLicenceConditionsLMData || hasRequirementsLMData
 }
 
-export const checkLocationMonitoringCode = (code: string | null | undefined): boolean | undefined =>
-  GPS_TAGGING_CODES.includes(code)
+export const checkLocationMonitoringCode = (code: string | null | undefined): boolean =>
+  !!code && GPS_TAGGING_CODES.includes(code)

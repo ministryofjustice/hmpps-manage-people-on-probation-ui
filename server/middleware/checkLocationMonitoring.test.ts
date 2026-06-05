@@ -3,13 +3,15 @@ import {
   checkLocationMonitoringByEventNumber,
   hasLocationMonitoring,
   checkLocationMonitoringCode,
+  LICENCE_GPS_TAGGING_CODE,
+  REQUIREMENT_GPS_TAGGING_CODE,
 } from './checkLocationMonitoring'
 import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
 
 describe('checkLocationMonitoring', () => {
   it('should return true for hasLicenceConditionsLMData when a licence condition has valid LM code', () => {
     const licenceConditions = [
-      { id: 1, mainDescription: 'This is a Location Monitoring condition', code: 'EM01' },
+      { id: 1, mainDescription: 'This is a Location Monitoring condition', code: LICENCE_GPS_TAGGING_CODE },
     ] as LicenceCondition[]
     const requirements = [] as Requirement[]
 
@@ -21,7 +23,9 @@ describe('checkLocationMonitoring', () => {
 
   it('should return true for hasRequirementsLMData when a requirement has valid LM code', () => {
     const licenceConditions = [] as LicenceCondition[]
-    const requirements = [{ id: 1, description: 'Requirement with Location Monitoring', code: 'RM59' }] as Requirement[]
+    const requirements = [
+      { id: 1, description: 'Requirement with Location Monitoring', code: REQUIREMENT_GPS_TAGGING_CODE },
+    ] as Requirement[]
 
     const result = checkLocationMonitoring(licenceConditions, requirements)
 
@@ -30,8 +34,12 @@ describe('checkLocationMonitoring', () => {
   })
 
   it('should return true for both when both contain valid LM codes', () => {
-    const licenceConditions = [{ id: 1, mainDescription: 'Location Monitoring', code: 'EM01' }] as LicenceCondition[]
-    const requirements = [{ id: 1, description: 'Location Monitoring', code: 'RM59' }] as Requirement[]
+    const licenceConditions = [
+      { id: 1, mainDescription: 'Location Monitoring', code: LICENCE_GPS_TAGGING_CODE },
+    ] as LicenceCondition[]
+    const requirements = [
+      { id: 1, description: 'Location Monitoring', code: REQUIREMENT_GPS_TAGGING_CODE },
+    ] as Requirement[]
 
     const result = checkLocationMonitoring(licenceConditions, requirements)
 
@@ -75,8 +83,9 @@ describe('checkLocationMonitoring', () => {
 })
 
 describe('checkLocationMonitoringCode', () => {
-  it('should return true when code contains "EM01"', () => {
-    expect(checkLocationMonitoringCode('EM01')).toBe(true)
+  it('should return true when code contains "EM01" or "RM59', () => {
+    expect(checkLocationMonitoringCode(LICENCE_GPS_TAGGING_CODE)).toBe(true)
+    expect(checkLocationMonitoringCode(REQUIREMENT_GPS_TAGGING_CODE)).toBe(true)
   })
 
   it('should return false when code does not contain "EM01"', () => {
@@ -97,13 +106,13 @@ describe('checkLocationMonitoringByEventNumber', () => {
   const sentences = [
     {
       eventNumber: '1',
-      licenceConditions: [{ mainDescription: 'Location Monitoring - GPS', code: 'EM01' }],
+      licenceConditions: [{ mainDescription: 'Location Monitoring - GPS', code: LICENCE_GPS_TAGGING_CODE }],
       requirements: [],
     },
     {
       eventNumber: '2',
       licenceConditions: [],
-      requirements: [{ description: 'Location Monitoring - Curfew', code: 'RM59' }],
+      requirements: [{ description: 'Location Monitoring - Curfew', code: REQUIREMENT_GPS_TAGGING_CODE }],
     },
     {
       eventNumber: '3',
@@ -139,7 +148,7 @@ describe('checkLocationMonitoringByEventNumber', () => {
 
 describe('hasLocationMonitoring', () => {
   it('should return true if licence conditions have location monitoring code', () => {
-    const licenceConditions = [{ mainDescription: 'Location Monitoring', code: 'EM01' }] as any
+    const licenceConditions = [{ mainDescription: 'Location Monitoring', code: LICENCE_GPS_TAGGING_CODE }] as any
     const result = hasLocationMonitoring(licenceConditions, [])
     expect(result).toBe(true)
   })
@@ -151,7 +160,7 @@ describe('hasLocationMonitoring', () => {
   })
 
   it('should return true if both have location monitoring code', () => {
-    const licenceConditions = [{ mainDescription: 'Location Monitoring', code: 'EM01' }] as any
+    const licenceConditions = [{ mainDescription: 'Location Monitoring', code: LICENCE_GPS_TAGGING_CODE }] as any
     const requirements = [{ description: 'Location Monitoring', code: 'RM59' }] as any
     const result = hasLocationMonitoring(licenceConditions, requirements)
     expect(result).toBe(true)
