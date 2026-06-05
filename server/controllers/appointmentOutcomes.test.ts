@@ -402,5 +402,20 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/confirmation`)
       expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['temp', crn, 'linkedContactId'], null)
     })
+
+    it('should render acceptable-absence without calling MAS when no selected sentence is present', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const renderSpy = jest.spyOn(res, 'render')
+
+      const getPersonComplianceSpy = jest.spyOn(MasApiClient.prototype, 'getPersonCompliance')
+      const getPersonNonComplianceSpy = jest.spyOn(MasApiClient.prototype, 'getPersonNonCompliance')
+
+      await controllers.appointmentOutcomes.getAcceptableAbsence(hmppsAuthClient)(req, res)
+
+      expect(getPersonComplianceSpy).not.toHaveBeenCalled()
+      expect(getPersonNonComplianceSpy).not.toHaveBeenCalled()
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
+    })
   })
 })

@@ -6,7 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
-const routes = ['getOrPostActivityLog', 'getActivity'] as const
+const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -24,6 +24,21 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 }
 
 const activityLogController: Controller<typeof routes, void> = {
+  redirectToActivityLog: _ => {
+    return async (req, res) => {
+      const { keywords = '', compliance = {} } = req.query
+      const { crn } = req.params as Record<string, string>
+
+      req.session.activityLogFilters = {
+        keywords,
+        compliance,
+        crn,
+      }
+
+      return res.redirect(`/case/${crn}/activity-log`)
+    }
+  },
+
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { params } = req
@@ -66,7 +81,6 @@ const activityLogController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-
       const baseUrl = req.url.split('?')[0]
       return res.render('pages/contact-log', {
         personActivity,

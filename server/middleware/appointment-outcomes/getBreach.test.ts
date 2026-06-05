@@ -31,6 +31,7 @@ const selectedSentenceId = '1'
 const mockBreachSentenceCompliance: SentenceCompliance = {
   eventNumber: '1',
   activity: {
+    acceptableAbsenceCount: 0,
     unacceptableAbsenceCount: 0,
     attendedButDidNotComplyCount: 0,
     outcomeNotRecordedCount: 0,

@@ -11,6 +11,7 @@ const buildSentenceCompliance = (complianceOverrides = {}): SentenceCompliance =
   ({
     eventNumber: '1',
     activity: {
+      acceptableAbsenceCount: 3,
       unacceptableAbsenceCount: 0,
       attendedButDidNotComplyCount: 0,
       outcomeNotRecordedCount: 0,
@@ -53,6 +54,7 @@ describe('buildCompliance', () => {
       ...currentSentence.compliance,
       failureToComplyInLast12MonthsCount: 3,
       priorBreachesOnCurrentOrderCount: 2,
+      acceptableAbsenceCount: 3,
       nonCompliance,
     })
   })

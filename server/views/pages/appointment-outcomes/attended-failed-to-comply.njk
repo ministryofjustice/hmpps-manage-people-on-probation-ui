@@ -28,7 +28,7 @@
       attributes: { "data-qa": "alert-panel" },
       items: [{
         html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.forename + ' has had multiple counts of non-compliance in the past 12 months.</h2>
-               <p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/activity-log?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank">View a list of ' + appointmentOutcome.forename + '’s non-compliance (opens in new tab).</a></p>',
+               <p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank">View a list of ' + appointmentOutcome.forename + '’s non-compliance (opens in new tab).</a></p>',
         classes: "moj-ticket-panel__content--red"
       }]
     }) }}
@@ -40,7 +40,7 @@
         html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.forename + ' has had multiple counts of non-compliance in the past 12 months.</h2>
                <p class="govuk-body">' + appointmentOutcome.forename + ' has breached this sentence before. You can:</p>
                <ul class="govuk-list govuk-list--bullet">
-                 <li>You should consider initiating a breach. <a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/activity-log?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank">view ' + appointmentOutcome.forename + '’s failures to comply (opens in new tab)</a></li>
+                 <li><a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank">view ' + appointmentOutcome.forename + '’s failures to comply (opens in new tab)</a></li>
                  <li><a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/compliance" target="_blank">view ' + appointmentOutcome.forename + '’s previous breach information (opens in new tab)</a></li>
                </ul>',
         classes: "moj-ticket-panel__content--red"

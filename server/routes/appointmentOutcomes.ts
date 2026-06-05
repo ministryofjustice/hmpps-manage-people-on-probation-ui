@@ -110,6 +110,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.all(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     getAcceptableAbsenceOptions,
+    getComplianceData(hmppsAuthClient),
   )
 
   router.all([`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`], getFailedToAttendOptions)

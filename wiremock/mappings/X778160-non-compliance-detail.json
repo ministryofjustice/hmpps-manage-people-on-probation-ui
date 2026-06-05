@@ -8,7 +8,18 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "acceptableAbsence": [],
+          "acceptableAbsence": [
+            {
+              "contactId": 1234567,
+              "eventNumber": "4",
+              "eventId": 4,
+              "type": {
+                "code": "NS",
+                "description": "Planned Office Visit (NS)"
+              },
+              "date": "2024-05-19"
+            }
+          ],
           "unacceptableAbsence": [
             {
               "contactId": 123456,
