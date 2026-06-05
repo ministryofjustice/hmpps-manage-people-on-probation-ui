@@ -1,9 +1,13 @@
 import { type Name } from '../data/model/personalDetails'
-import type { EnforcementAction, Activity, ContactOutcomes, ContactEnforcementActions } from '../data/model/schedule'
+import type { EnforcementAction, Activity, ContactOutcome, ContactEnforcementAction } from '../data/model/schedule'
 import { type Errors } from './Errors'
 import type { SmsPreviewSession, SmsOptInOptions } from '../data/model/OutlookEvent'
 import { type Option } from './Option'
-import type { OutcomeCode, EnforcementActionCode } from '../properties/appointment-outcomes/code-map'
+import type {
+  OutcomeCode,
+  EnforcementActionCode,
+  AcceptableAbsenceOutcomeCode,
+} from '../properties/appointment-outcomes/code-map'
 
 export type YesNo = '' | 'Yes' | 'No'
 
@@ -23,6 +27,20 @@ export const appointmentOutcomeTypes = [
 ] as const
 
 export type AppointmentOutcomeType = (typeof appointmentOutcomeTypes)[number]
+
+export const acceptableAbsenceOutcomeTypes = [
+  'ACCEPTABLE_ABSENCE_COURT_LEGAL',
+  'ACCEPTABLE_ABSENCE_EMPLOYMENT',
+  'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE',
+  'ACCEPTABLE_ABSENCE_HOLIDAY',
+  'ACCEPTABLE_ABSENCE_MEDICAL',
+  'ACCEPTABLE_ABSENCE_RELIGIOUS',
+  'ACCEPTABLE_ABSENCE_RIC',
+  'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION',
+  'ACCEPTABLE_FAILURE',
+] as const
+
+export type AcceptableAbsenceOutcomeType = (typeof acceptableAbsenceOutcomeTypes)[number]
 
 export const breachEnforcementActions = [
   'BREACH_REQUESTED',
@@ -53,15 +71,6 @@ export const appointmentEnforcementActions = [
   'REFER_TO_OFFENDER_MANAGER',
   'NO_FURTHER_ACTION',
   'DIFFERENT_ACTION',
-  'ACCEPTABLE_ABSENCE_COURT_LEGAL',
-  'ACCEPTABLE_ABSENCE_EMPLOYMENT',
-  'ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE',
-  'ACCEPTABLE_ABSENCE_HOLIDAY',
-  'ACCEPTABLE_ABSENCE_MEDICAL',
-  'ACCEPTABLE_ABSENCE_RELIGIOUS',
-  'ACCEPTABLE_ABSENCE_RIC',
-  'ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION',
-  'ACCEPTABLE_FAILURE',
   'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
   'DECISION_PENDING_RESPONSE',
   'SEND_CONFIRMATION_OF_BREACH',
@@ -91,9 +100,15 @@ export const isEnforcementActionPageKey = (value: string): value is EnforcementA
   return enforcementActionPageKeys.includes(value as EnforcementActionPage)
 }
 
+export const outcomePageKeys = [
+  'outcomeType',
+  'acceptableAbsence',
+] as const satisfies readonly (keyof AppointmentSessionOutcome)[]
+
+export type OutcomePage = (typeof outcomePageKeys)[number]
+
 export const enforcementActionPageKeys = [
   'attendedFailedToComply',
-  'acceptableAbsence',
   'unacceptableAbsence',
   'failedToAttend',
   'otherEnforcementAction',
@@ -107,10 +122,10 @@ export type EnforcementActionPage = (typeof enforcementActionPageKeys)[number]
 
 export interface AppointmentSessionOutcome {
   outcomeType?: AppointmentOutcomeType
-  outcomeCode?: OutcomeCode
+  outcomeCode?: OutcomeCode | AcceptableAbsenceOutcomeCode
   enforcementActionCode?: EnforcementActionCode[]
   attendedFailedToComply?: AppointmentEnforcementAction
-  acceptableAbsence?: AppointmentEnforcementAction
+  acceptableAbsence?: AcceptableAbsenceOutcomeType
   unacceptableAbsence?: AppointmentEnforcementAction
   failedToAttend?: AppointmentEnforcementAction
   otherEnforcementAction?: AppointmentEnforcementAction
@@ -118,8 +133,8 @@ export interface AppointmentSessionOutcome {
   letterSentBy?: EnforcementActionCreatedBy
   letterType?: AppointmentEnforcementAction
   updateEnforcementAction?: AppointmentEnforcementAction
-  contactOutcomes?: ContactOutcomes[]
-  contactEnforcementActions?: ContactEnforcementActions[]
+  contactOutcomes?: ContactOutcome[]
+  contactEnforcementActions?: ContactEnforcementAction[]
   nextAppointment?: AppointmentSessionSelection
 }
 
@@ -148,11 +163,9 @@ export interface AppointmentSession {
   nsiId?: string
   notes?: string
   sensitivity?: YesNo
-  backendId?: number
   enforcementAction?: EnforcementAction
   outcomeRecorded?: YesNo
   contactId?: string
-  linkedContactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions
@@ -332,6 +345,7 @@ export interface LocalParams {
   outcomeJourney?: boolean
   options?:
     | Option<AppointmentOutcomeType>[]
+    | Option<AcceptableAbsenceOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
   isSensitive?: boolean

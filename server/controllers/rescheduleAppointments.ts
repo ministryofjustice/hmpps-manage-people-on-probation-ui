@@ -39,19 +39,9 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         delete req.session.body
       }
 
-      const { validation } = req.query
-      const showValidation = validation === 'true'
       const { crn, id, contactId } = req.params as Record<string, string>
       await sendAuditMessage(res, 'ADD_MAS_RESCHEDULE_APPOINTMENT', crn, SubjectType.CRN)
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-sensitivity`]: 'Select if appointment includes sensitive information',
-          [`appointments-${crn}-${id}-rescheduleAppointment-reason`]:
-            'Explain why this appointment is being rescheduled',
-          [`appointments-${crn}-${id}-rescheduleAppointment-whoNeedsToReschedule`]:
-            'Select who is rescheduling this appointment',
-        }
-      }
+
       const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
 
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
@@ -65,7 +55,6 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         body,
         uploadedFiles,
         id,
-        showValidation,
         errorMessages,
         isSensitive,
       })

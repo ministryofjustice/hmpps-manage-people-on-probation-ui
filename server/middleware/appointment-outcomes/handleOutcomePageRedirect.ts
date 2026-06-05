@@ -1,12 +1,12 @@
 import { Route } from '../../@types'
-import { EnforcementActionPage, AppointmentEnforcementAction } from '../../models/Appointments'
+import { EnforcementActionPage, AppointmentEnforcementAction, OutcomePage } from '../../models/Appointments'
 import { findUncompleted } from '../findUncompleted'
 
 type EnforcementRedirectMap = {
   [K in AppointmentEnforcementAction]?: string
 }
 
-export const handleEnforcementActionRedirect = (pageKey: EnforcementActionPage): Route<void> => {
+export const handleOutcomePageRedirect = (pageKey: EnforcementActionPage | OutcomePage): Route<void> => {
   return (req, res) => {
     const { baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
     const { change: _change } = req.query as Record<string, string>
@@ -23,7 +23,7 @@ export const handleEnforcementActionRedirect = (pageKey: EnforcementActionPage):
     if (redirect) {
       redirect = `${redirect}${change ? `?change=${encodeURIComponent(change)}` : ''}`
     } else if (change) {
-      redirect = change.includes('/outcome') ? change : findUncompleted(req, res)
+      redirect = change.includes('/outcome') ? change : findUncompleted()(req, res)
     } else {
       redirect = `${baseOutcomeUrl}/add-note`
     }

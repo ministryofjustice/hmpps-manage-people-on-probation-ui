@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { handleEnforcementActionRedirect } from './handleEnforcementActionRedirect'
+import { handleOutcomePageRedirect } from './handleOutcomePageRedirect'
 import { type AppointmentSessionOutcome } from '../../models/Appointments'
 import { type AppResponse } from '../../models/Locals'
 import { mockAppResponse } from '../../controllers/mocks'
@@ -9,7 +9,7 @@ const change = '/path/to/check-your-answers'
 const incompleteRedirect = '/path/to/incomplete/page'
 
 jest.mock('../findUncompleted', () => ({
-  findUncompleted: jest.fn(() => incompleteRedirect),
+  findUncompleted: jest.fn(() => jest.fn(() => incompleteRedirect)),
 }))
 
 const buildResponse = (outcome: Partial<AppointmentSessionOutcome>): AppResponse => {
@@ -24,7 +24,7 @@ const buildResponse = (outcome: Partial<AppointmentSessionOutcome>): AppResponse
   return mockAppResponse(locals)
 }
 
-describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () => {
+describe('middleware/appointment-outcomes/handleOutcomePageRedirect', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -35,7 +35,7 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     }
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
-    handleEnforcementActionRedirect('attendedFailedToComply')(req, res)
+    handleOutcomePageRedirect('attendedFailedToComply')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/send-letter`)
   })
   it('should redirect to the initiate breach or recall page with change url query', () => {
@@ -45,7 +45,7 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     }
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
-    handleEnforcementActionRedirect('unacceptableAbsence')(req, res)
+    handleOutcomePageRedirect('unacceptableAbsence')(req, res)
     const expectedRedirectUrl = `${baseOutcomeUrl}/initiate-breach-or-recall?change=${encodeURIComponent(change)}`
     expect(redirectSpy).toHaveBeenCalledWith(expectedRedirectUrl)
   })
@@ -56,7 +56,7 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     }
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
-    handleEnforcementActionRedirect('failedToAttend')(req, res)
+    handleOutcomePageRedirect('failedToAttend')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/enforcement-action`)
   })
   it('should redirect to the change query url if no secondary action and change url query contains /outcome', () => {
@@ -67,7 +67,7 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     }
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
-    handleEnforcementActionRedirect('acceptableAbsence')(req, res)
+    handleOutcomePageRedirect('acceptableAbsence')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(outcomeChangeUrl)
   })
   it('should redirect to the next incomplete page if no secondary action and change url query does not contain /outcome', () => {
@@ -77,7 +77,7 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     }
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
-    handleEnforcementActionRedirect('acceptableAbsence')(req, res)
+    handleOutcomePageRedirect('acceptableAbsence')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(incompleteRedirect)
   })
   it('should redirect to the add note page if no secondary action and no change url query', () => {
@@ -87,7 +87,7 @@ describe('middleware/appointment-outcomes/handleEnforcementActionRedirect', () =
     }
     const res = buildResponse(outcome)
     const redirectSpy = jest.spyOn(res, 'redirect')
-    handleEnforcementActionRedirect('otherEnforcementAction')(req, res)
+    handleOutcomePageRedirect('otherEnforcementAction')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
   })
 })

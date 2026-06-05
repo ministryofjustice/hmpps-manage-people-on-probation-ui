@@ -1,19 +1,25 @@
-import { AppointmentEnforcementAction, AppointmentOutcomeType, EnforcementActionPage } from '../../models/Appointments'
+import {
+  AcceptableAbsenceOutcomeType,
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+} from '../../models/Appointments'
+
+export interface OutcomeProps {
+  code: OutcomeCode | AcceptableAbsenceOutcomeCode
+  description?: string
+}
+
+export interface ActionProps {
+  code: EnforcementActionCode
+  description?: string
+}
 
 export type OutcomeMap = {
-  [K in AppointmentOutcomeType]?: {
-    code: OutcomeCode
-    description?: string
-    options?: AppointmentEnforcementAction[]
-    pageKey?: EnforcementActionPage
-  }
+  [K in AppointmentOutcomeType | AcceptableAbsenceOutcomeType]?: OutcomeProps
 }
 
 export type EnforcementActionMap = {
-  [K in AppointmentEnforcementAction]?: {
-    code: EnforcementActionCode
-    description?: string
-  }
+  [K in AppointmentEnforcementAction]?: ActionProps
 }
 
 export type EnforcementActionCode =
@@ -35,18 +41,21 @@ export type EnforcementActionCode =
   | 'EA06'
   | 'EA13'
   | 'EA07'
+  | 'EM01'
+  | 'C173'
+
+export type OutcomeCode = 'ATTC' | 'AFTC' | 'ATSH' | 'ATSS' | 'AAM11' | 'UAAB' | 'AFTA'
+
+export type AcceptableAbsenceOutcomeCode =
   | 'AACL'
   | 'AAEM'
   | 'AAFC'
   | 'AAHO'
   | 'AAME'
-  | 'AARC'
   | 'AARE'
+  | 'AARC'
   | 'CO05'
-  | 'EM01'
-  | 'C173'
-
-export type OutcomeCode = 'ATTC' | 'AFTC' | 'ATSH' | 'AFDA' | 'AAM11' | 'UAAB' | 'AFTA'
+  | 'CO10'
 
 export const outcomeMap: OutcomeMap = {
   ATTENDED_COMPLIED: { code: 'ATTC', description: 'Attended - Complied' },
@@ -59,12 +68,8 @@ export const outcomeMap: OutcomeMap = {
     description: 'Attended - Sent Home (behaviour)',
   },
   ATTENDED_SENT_HOME_SERVICE_ISSUES: {
-    code: 'AFDA',
-    description: 'Attended - FTC Deemed Acceptable',
-  },
-  ACCEPTABLE_ABSENCE: {
-    code: 'AAM11',
-    description: 'Acceptable - Critical  Communications - no breach',
+    code: 'ATSS',
+    description: 'Attended - Sent Home (service issues)',
   },
   UNACCEPTABLE_ABSENCE: {
     code: 'UAAB',
@@ -74,6 +79,39 @@ export const outcomeMap: OutcomeMap = {
     code: 'AFTA',
     description: 'Failed To Attend',
   },
+  ACCEPTABLE_ABSENCE_COURT_LEGAL: {
+    code: 'AACL',
+    description: 'Acceptable Absence - Court / Legal',
+  },
+  ACCEPTABLE_ABSENCE_EMPLOYMENT: {
+    code: 'AAEM',
+    description: 'Acceptable Absence - Employment',
+  },
+  ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE: {
+    code: 'AAFC',
+    description: 'Acceptable Absence - Family / Childcare',
+  },
+  ACCEPTABLE_ABSENCE_HOLIDAY: {
+    code: 'AAHO',
+    description: 'Acceptable Absence - Holiday',
+  },
+  ACCEPTABLE_ABSENCE_MEDICAL: {
+    code: 'AAME',
+    description: 'Acceptable Absence - Medical',
+  },
+  ACCEPTABLE_ABSENCE_RELIGIOUS: {
+    code: 'AARE',
+    description: 'Acceptable Absence - Religious',
+  },
+  ACCEPTABLE_ABSENCE_RIC: {
+    code: 'AARC',
+    description: 'Acceptable Absence - RIC',
+  },
+  ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION: {
+    code: 'CO05',
+    description: 'Acceptable Absence - Professional Judgement Decision',
+  },
+  ACCEPTABLE_FAILURE: { code: 'CO10', description: 'Acceptable Failure - None in following 12 months' },
 }
 
 export const enforcementActionMap: EnforcementActionMap = {
@@ -101,16 +139,4 @@ export const enforcementActionMap: EnforcementActionMap = {
   DECISION_PENDING_RESPONSE: { code: 'C173', description: 'Breach Action - Decision Pending Response' },
   YOT_OM_NOTIFIED: { code: 'EA13', description: 'YOT OM Notified' },
   WITHDRAWAL_OF_WARNING: { code: 'EA07', description: 'Withdrawal of Warning' },
-  ACCEPTABLE_ABSENCE_COURT_LEGAL: { code: 'AACL', description: 'Acceptable Absence - Court/Legal' },
-  ACCEPTABLE_ABSENCE_EMPLOYMENT: { code: 'AAEM', description: 'Acceptable Absence - Employment' },
-  ACCEPTABLE_ABSENCE_FAMILY_CHILDCARE: { code: 'AAFC', description: 'Acceptable Absence - Family/Childcare' },
-  ACCEPTABLE_ABSENCE_HOLIDAY: { code: 'AAHO', description: 'Acceptable Absence - Holiday' },
-  ACCEPTABLE_ABSENCE_MEDICAL: { code: 'AAME', description: 'Acceptable Absence - Medical' },
-  ACCEPTABLE_ABSENCE_RIC: { code: 'AARC', description: 'Acceptable Absence - RIC' },
-  ACCEPTABLE_ABSENCE_RELIGIOUS: { code: 'AARE', description: 'Acceptable Absence - Religious' },
-  ACCEPTABLE_ABSENCE_PROFESSIONAL_JUDGEMENT_DECISION: {
-    code: 'CO05',
-    description: 'Acceptable Absence - Professional Judgement Decision',
-  },
-  ACCEPTABLE_FAILURE: { code: 'EM01', description: 'Acceptable Failure' },
 }

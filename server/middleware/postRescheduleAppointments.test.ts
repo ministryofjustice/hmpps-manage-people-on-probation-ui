@@ -12,7 +12,6 @@ import {
   MasUserDetails,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
-import { PersonAppointment } from '../data/model/schedule'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { EventResponse, SmsOptInOptions } from '../data/model/OutlookEvent'
 import { LocalsUser } from '../models/Locals'
@@ -236,9 +235,9 @@ describe('middleware/postRescheduleAppointments', () => {
       notes,
       rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
     } = mockAppointmentSession
-    let returnedResponse: PersonAppointment
+    let returnedResponse: RescheduleAppointmentResponse
     beforeEach(async () => {
-      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as PersonAppointment
+      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
     })
     it('should send a reschedule appointment request to the api', () => {
       const expectedBody = {

@@ -41,6 +41,9 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
               breachesOnCurrentOrderCount: 1,
               failureToComplyCount: 2,
             },
+            activity: {
+              acceptableAbsenceCount: 3,
+            },
             mainOffence: {
               code: '18502',
               description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',

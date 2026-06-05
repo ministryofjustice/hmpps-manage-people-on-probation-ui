@@ -27,7 +27,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   }
 
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactEnforcementActions,
+    appointmentSession?.outcome?.contactOutcomes,
     updateEnforcementActionOptions(sentenceType),
   )
 

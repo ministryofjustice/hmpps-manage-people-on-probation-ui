@@ -49,6 +49,7 @@ describe('/middleware/appointment-outcomes/getComplianceData', () => {
         {
           eventNumber: '1',
           compliance: { failureToComplyCount: 1, breachesOnCurrentOrderCount: 0 },
+          activity: { acceptableAbsenceCount: 2 },
         },
       ],
     }
@@ -72,6 +73,7 @@ describe('/middleware/appointment-outcomes/getComplianceData', () => {
       priorBreachesOnCurrentOrderCount: 0,
       failureToComplyCount: 1,
       breachesOnCurrentOrderCount: 0,
+      acceptableAbsenceCount: 2,
       nonCompliance: nonComplianceData,
     })
     expect(nextSpy).toHaveBeenCalled()

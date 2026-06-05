@@ -4,7 +4,7 @@ export interface ActivityLogFilters {
   keywords: string
   dateFrom: string
   dateTo: string
-  compliance: Array<string>
+  compliance: Array<string> | string
   category: string[]
   clearFilterKey?: string
   clearFilterValue?: string

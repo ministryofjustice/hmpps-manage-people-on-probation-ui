@@ -126,7 +126,6 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     const expectedCloneReschedule = {
       ...expectedClone,
       uuid: request.params.id,
-      linkedContactId: 'C9876',
       rescheduleAppointment: {
         contactId: 'C9876',
       },
@@ -134,7 +133,14 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
 
     cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)
 
-    expect(mockedSetDataValue).toHaveBeenCalledWith(
+    expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+      1,
+      request.session.data,
+      ['temp', crn2, 'linkedContactId'],
+      'C9876',
+    )
+    expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+      2,
       request.session.data,
       ['appointments', crn2, request.params.id],
       expectedCloneReschedule,

@@ -29,11 +29,23 @@ export const getPersonActivity = async (
     }
   }
 
+  const formatCompliance = (): Array<string> => {
+    const complianceArray: string[] = []
+
+    if (compliance && Array.isArray(compliance)) {
+      compliance.forEach(option => complianceArray.push(toCamelCase(option)))
+    } else if (compliance && typeof compliance === 'string') {
+      complianceArray.push(compliance)
+    }
+
+    return complianceArray
+  }
+
   const body: ActivityLogRequestBody = {
     keywords,
     dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
-    filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
+    filters: formatCompliance(),
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
