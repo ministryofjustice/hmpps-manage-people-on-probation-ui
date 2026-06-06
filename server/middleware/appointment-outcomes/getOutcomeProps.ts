@@ -66,6 +66,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     }
   }
   const isInPast = appointmentDateIsInPast(req)
+  /*
   const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
   const eventId = appointmentSession?.eventId
   const appointmentSentence: Sentence = eventId
@@ -82,8 +83,11 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const sentence: AppointmentOutcomeSentence = {
     type: appointmentSentence?.sentenceType,
     length: sentenceLength,
+    eventId: appointmentSentence.id,
+    eventNumber: appointmentSentence?.eventNumber || null,
+    order: appointmentSentence?.order?.description,
   }
-
+*/
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
   const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
   const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction
@@ -117,7 +121,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     baseOutcomeUrl,
     completedUrl,
     appointmentSession,
-    sentence,
+    // sentence,
     isProbationPractitioner,
     appointmentHintText,
     sendBreachOrRecallLetter,

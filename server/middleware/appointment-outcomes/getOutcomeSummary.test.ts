@@ -4,6 +4,7 @@ import { mockAppResponse } from '../../controllers/mocks'
 import { AppointmentOutcomeProps, OutcomeSummary, type AppResponse } from '../../models/Locals'
 import { Activity, ContactEnforcementAction, ContactOutcome } from '../../data/model/schedule'
 import { AppointmentSessionOutcome } from '../../models/Appointments'
+import { Compliance } from '../../data/model/overview'
 
 const crn = 'X000001'
 const contactId = '12345'
@@ -63,7 +64,7 @@ const mockAppointmentOutcome = ({
   notes?: string
   appointment?: Activity
 } = {}): AppointmentOutcomeProps<Activity> => ({
-  sentence: { type: 'COMMUNITY', length: 12 },
+  sentence: { type: 'COMMUNITY', length: 12, eventId: 123, order: '', compliance: {} as Compliance },
   forename: 'James',
   surname: 'Morrison',
   crn,

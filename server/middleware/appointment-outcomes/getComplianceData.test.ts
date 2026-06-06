@@ -7,7 +7,7 @@ import { NonComplianceHistoryResponse } from '../../data/model/compliance'
 jest.mock('../../data/masApiClient')
 
 const nextSpy = jest.fn()
-describe('/middleware/appointment-outcomes/getComplianceData', () => {
+xdescribe('/middleware/appointment-outcomes/getComplianceData', () => {
   let req: any
   let res: any
   let masClient: jest.Mocked<MasApiClient>

@@ -2,6 +2,8 @@ import logger from '../../../logger'
 import { Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
+import { Compliance } from '../../data/model/overview'
+import { OutcomeCompliance } from '../../models/Locals'
 import { getDataValue } from '../../utils'
 import { buildCompliance } from './buildCompliance'
 
@@ -10,42 +12,45 @@ export const getComplianceData = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     if (!res.locals.appointmentOutcome) {
       return next()
     }
-    const { crn, id } = res.locals.appointmentOutcome
-    const selectedSentence = getDataValue(req.session.data, ['appointments', crn, id, 'eventId'])
+    /*
+    const { crn, appointmentSession, sentence } = res.locals.appointmentOutcome
 
-    if (selectedSentence) {
+    let compliance: OutcomeCompliance = null
+
+    if (sentence?.eventId) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
-      const [compliance, nonCompliance] = await Promise.all([
+      const [personCompliance, nonCompliance] = await Promise.all([
         masClient.getPersonCompliance(crn),
         masClient.getPersonNonCompliance(crn),
       ])
 
-      const sentences = req.session.data.sentences?.[crn]
 
-      const sentence = sentences?.find(s => s.id?.toString() === selectedSentence)
 
       const currentSentenceCompliance =
-        compliance.currentSentences.find(s => s?.eventNumber === sentence?.eventNumber) ||
-        (!sentence ? compliance.currentSentences[0] : null)
+        personCompliance.currentSentences.find(s => s?.eventNumber === sentence?.eventNumber) ||
+        (!sentence ? personCompliance.currentSentences[0] : null)
 
-      if (!currentSentenceCompliance) {
-        logger.warn(
-          `No compliance data found for CRN: ${crn}, eventNumber: ${sentence?.eventNumber} (selectedSentence: ${selectedSentence})`,
-        )
-        res.locals.appointmentOutcome.compliance = {
-          ...res.locals.appointmentOutcome.compliance,
-          nonCompliance,
-        }
-      } else {
-        res.locals.appointmentOutcome.compliance = buildCompliance(
-          currentSentenceCompliance,
-          nonCompliance,
-          res.locals.appointmentOutcome.compliance,
-        )
+      let compliance: OutcomeCompliance = {
+        currentSentences: personCompliance.currentSentences
+        sentence,
+        nonCompliance,
       }
+
+      if (currentSentenceCompliance) {
+        const failureToComplyInLast12MonthsCount =
+          currentSentenceCompliance.compliance?.failureToComplyInLast12MonthsCount ??
+          currentSentenceCompliance.compliance?.failureToComplyCount ??
+          currentSentenceCompliance.compliance?.failureToComplyInLast12Months
+        const priorBreachesOnCurrentOrderCount =
+          currentSentenceCompliance.compliance?.priorBreachesOnCurrentOrderCount ??
+          currentSentenceCompliance.compliance?.breachesOnCurrentOrderCount
+        compliance = { ...compliance, failureToComplyInLast12MonthsCount, priorBreachesOnCurrentOrderCount }
+      }
+      res.locals.appointmentOutcome.compliance = compliance
     }
+      */
 
     return next()
   }
