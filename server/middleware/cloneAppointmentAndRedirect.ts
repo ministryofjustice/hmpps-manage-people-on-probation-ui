@@ -32,7 +32,9 @@ export const cloneAppointmentAndRedirect = (
     if (apptType === 'RESCHEDULE') {
       clonedAppt = {
         ...clonedAppt,
-        sensitivity: getDataValue(data, ['appointments', crn, uuid, 'rescheduleAppointment', 'sensitivity']) || clonedAppt.sensitivity,
+        sensitivity:
+          getDataValue(data, ['appointments', crn, uuid, 'rescheduleAppointment', 'sensitivity']) ||
+          clonedAppt.sensitivity,
         rescheduleAppointment: {
           contactId,
           ...(appointmentToClone?.rescheduleAppointment || {}),
