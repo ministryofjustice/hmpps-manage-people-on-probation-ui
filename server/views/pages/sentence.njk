@@ -141,7 +141,7 @@
                 {% set licenceConditions %}
                 {% for licenceCondition in sentence.licenceConditions %}
                     {% set notes = '' %}
-                    {% set hasLicenceLM = licenceCondition.mainDescription | checkLocationMonitoringString %}
+                    {% set hasLicenceLM = licenceCondition.code | checkLocationMonitoringCode %}
                     {% for lcNote in licenceCondition.licenceConditionNotes %}
                         {% set notes = notes.concat(appNote(lcNote, "/case/" + crn + "/sentence/licence-condition/" + licenceCondition.id + "/note/" + lcNote.id)) %}
                     {% endfor %}
@@ -182,7 +182,7 @@
                 {% set hasRequirements = sentence.requirements and sentence.requirements.length > 0 %}
                 {% set requirements %}
                 {% for requirement in sentence.requirements %}
-                    {% set hasRequirementLM = requirement.description | checkLocationMonitoringString %}
+                    {% set hasRequirementLM = requirement.code | checkLocationMonitoringCode %}
                     {% set reqSummary = requirement.description %}
                     {% set reqNotes = '' %}
                     {% for reqNote in requirement.requirementNotes %}

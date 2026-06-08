@@ -534,7 +534,7 @@
          {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
         {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
-                No requirements details
+                    Details not available
                 {% endif %}
         {% endset %}
         {% set licences %}
