@@ -8,7 +8,7 @@ const stubSentences = ({
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: '/mas/sentences/X778160',
+      urlPathPattern: `/mas/sentences/${crn}`,
       method: 'GET',
       queryParameters: {
         includeRarRequirements: {
@@ -210,7 +210,7 @@ const stubSingleSentence = ({
             sentenceType,
             mainOffence: {
               code: '18502',
-              description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
+              description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831*****',
             },
             order: {
               description: '12 month Community order',

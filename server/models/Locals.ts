@@ -192,6 +192,12 @@ export interface BreachOrRecallWarning {
   type: WarningType
 }
 
+export interface OutcomeTicket {
+  title: string
+  html: string
+  type?: 'RED' | 'BLUE'
+}
+
 export interface OutcomeSummary {
   appointmentDetails: string
   outcome: string
@@ -275,6 +281,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   currentEnforcementAction?: CurrentEnforcementAction
   currentOutcome?: CurrentOutcome
   breachOrRecallWarning?: BreachOrRecallWarning | null
+  ticket?: OutcomeTicket
   notePrepend?: string
   summary?: OutcomeSummary
   confirmation?: OutcomeConfirmation

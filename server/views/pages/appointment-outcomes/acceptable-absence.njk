@@ -2,7 +2,31 @@
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
+  {% set compliance = appointmentOutcome.compliance %}
+
+  {% if compliance.acceptableAbsenceCount > 1 %}
+    {{ mojTicketPanel({
+      attributes: { "data-qa": "alert-panel" },
+      items: [{
+        html:
+        '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' +
+        appointmentOutcome.forename +
+        ' has had multiple acceptable absences in the past 12 months</h2>' +
+        '<p class="govuk-body">' +
+        'You can view a ' +
+        '<a class="govuk-link" ' +
+        'href="/case/' + appointmentOutcome.crn + '/activitylog/redirect?keywords=&compliance=complied&submit=true&view=&page=0" ' +
+        'target="_blank">' +
+        'list of ' + appointmentOutcome.forename + '\'s acceptable absences (opens in new tab)' +
+        '</a>' +
+        '</p>',
+        classes: "moj-ticket-panel__content--blue"
+      }]
+    }) }}
+  {% endif %}
+
   {{ govukRadios({
+    name: "enforcementAction",
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">Why was ' + appointmentOutcome.forename + '’s absence acceptable?</span>',

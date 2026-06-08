@@ -20,7 +20,7 @@ import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-a
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
+  checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
 } from './imports'
@@ -154,7 +154,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: FailedToAttendPage })
+  checkBreachOrRecallWarningBanner(loadPage, { Page: FailedToAttendPage })
 }
 
 describe('Failed to attend', () => {

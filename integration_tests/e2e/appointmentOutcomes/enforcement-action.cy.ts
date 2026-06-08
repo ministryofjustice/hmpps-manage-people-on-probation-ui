@@ -13,7 +13,7 @@ import {
 } from '../appointments/utils'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import { checkBreachWarningBanner, Journey } from './imports'
+import { checkBreachOrRecallWarningBanner, Journey } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -97,7 +97,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage.checkOnPage()
   })
 
-  checkBreachWarningBanner(loadPage, { Page: EnforcementActionPage })
+  checkBreachOrRecallWarningBanner(loadPage, { Page: EnforcementActionPage })
 }
 
 describe('Enforcement action', () => {

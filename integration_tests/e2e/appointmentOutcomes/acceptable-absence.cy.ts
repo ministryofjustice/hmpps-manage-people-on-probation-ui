@@ -17,12 +17,13 @@ import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-a
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
+  checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
 } from './imports'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import { SentenceType } from '../../../server/data/model/sentenceDetails'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -32,9 +33,10 @@ let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 const loadPage = ({
   journey = 'MANAGE',
   sentenceLength = 25,
-}: { journey?: Journey; sentenceLength?: number } = {}): void => {
+  sentenceType = 'COMMUNITY',
+}: { journey?: Journey; sentenceLength?: number; sentenceType?: SentenceType } = {}): void => {
   const endDate = sentenceLength === 12 ? '2024-12-01' : '2027-01-01'
-  cy.task('stubSentences', { endDate })
+  cy.task('stubSentences', { endDate, sentenceType })
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
@@ -171,11 +173,11 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: AcceptableAbsencePage })
+  checkBreachOrRecallWarningBanner(loadPage, { Page: AcceptableAbsencePage })
 }
 
 describe('Acceptable absence', () => {
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
   describe('Manage appointment journey', () => {

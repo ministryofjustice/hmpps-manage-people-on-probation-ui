@@ -51,21 +51,53 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
   })
 }
 
-export const checkBreachWarningBanner = <TArgs extends Record<string, any>>(
+export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, any>>(
   loadPageFunc: (args: any) => void,
   args: TArgs = {} as TArgs,
 ): void => {
-  describe('breach warning banner', () => {
-    it('should show when there is a breach', () => {
-      cy.task('stubBreachCompliance')
+  describe('Breach warning banner', () => {
+    it('should show when sentence type is COMMUNITY and there is an active breach', () => {
+      cy.task('stubCompliance')
       loadPageFunc(args)
       const page = new args.Page()
-      page.getBreachWarning().should('exist')
+      page.getBreachOrRecallWarning().find('h2').should('contain.text', 'There is a live breach for this sentence')
+      page
+        .getBreachOrRecallWarning()
+        .find('span')
+        .should('contain.text', 'The breach for 12 month community order was initiated on 15 January 2024.')
     })
-    it('should not show when there is no active breach', () => {
+    it('should not show when sentence type is COMMUNITY and there is no active breach', () => {
+      cy.task('stubAppointment', { eventId: '2501192724', type: 'COMMUNITY' })
+      cy.task('stubCompliance', { activeBreach: false })
       loadPageFunc(args)
       const page = new args.Page()
-      page.getBreachWarning().should('not.exist')
+      page.getBreachOrRecallWarning().should('not.exist')
+    })
+  })
+
+  describe('Recall warning banner', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+    })
+    it('should show when sentence type is CUSTODY and there is an active recall', () => {
+      cy.task('stubCompliance', { activeBreach: false, activeRecall: true })
+      loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
+      const page = new args.Page()
+      page
+        .getBreachOrRecallWarning({ type: 'recall' })
+        .find('h2')
+        .should('contain.text', 'There is a live recall for this sentence')
+      page
+        .getBreachOrRecallWarning({ type: 'recall' })
+        .find('span')
+        .should('contain.text', 'The recall for 12 month community order was initiated on 15 January 2024.')
+    })
+    it('should not show when sentence type is CUSTODY and there is no active recall', () => {
+      cy.task('stubAppointment', { eventId: '2501192724', type: 'COMMUNITY' })
+      cy.task('stubCompliance', { activeBreach: false, activeRecall: false })
+      loadPageFunc(args)
+      const page = new args.Page()
+      page.getBreachOrRecallWarning({ type: 'recall' }).should('not.exist')
     })
   })
 }

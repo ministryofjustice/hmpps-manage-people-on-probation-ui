@@ -21,7 +21,7 @@ import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appoi
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
+  checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
 } from './imports'
@@ -246,7 +246,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: OutcomePage })
+  checkBreachOrRecallWarningBanner(loadPage, { Page: OutcomePage })
 }
 
 describe('Appointment outcome', () => {

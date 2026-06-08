@@ -1,6 +1,10 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
+const stubCompliance = ({
+  crn = 'X778160',
+  activeBreach = true,
+  activeRecall = false,
+}: { crn?: string; activeBreach?: boolean; activeRecall?: boolean } = {}): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: `/mas/compliance/${crn}`,
@@ -26,10 +30,18 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
         currentSentences: [
           {
             eventNumber: '12345',
-            activeBreach: {
-              startDate: '2024-01-15',
-              status: 'Breach initiated',
-            },
+            activeBreach: activeBreach
+              ? {
+                  startDate: '2024-01-15',
+                  status: 'Breach initiated',
+                }
+              : null,
+            activeRecall: activeRecall
+              ? {
+                  startDate: '2024-01-15',
+                  status: 'Recall initiated',
+                }
+              : null,
             order: {
               description: '12 month Community order',
               startDate: '2023-12-01',
@@ -88,6 +100,6 @@ const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =
   })
 
 export default {
-  stubBreachCompliance,
+  stubCompliance,
   stubNonComplianceHistory,
 }

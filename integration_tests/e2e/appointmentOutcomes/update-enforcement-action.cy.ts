@@ -9,7 +9,12 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import { checkBreachWarningBanner, checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
+import {
+  checkBreachOrRecallWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+  ExpectedOption,
+} from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let updateEnforcementActionPage: UpdateEnforcementActionPage
@@ -341,7 +346,7 @@ const checkPage = () => {
     })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
+  checkBreachOrRecallWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
 }
 
 describe('Update enforcement action', () => {

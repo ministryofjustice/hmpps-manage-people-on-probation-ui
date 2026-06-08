@@ -5,10 +5,20 @@
     {{ mojAlert({
     variant: "warning",
     title: appointmentOutcome.breachOrRecallWarning.title,
-    showTitleAsHeading: false,
+    showTitleAsHeading: true,
     dismissible: false,
     attributes: { "data-qa": appointmentOutcome.breachOrRecallWarning.type | lower + "-warning" },
-    text: appointmentOutcome.breachOrRecallWarning.text
+    html: '<span>' + appointmentOutcome.breachOrRecallWarning.text + '</span>'
   }) }}
+  {% endif %}
+  {% if appointmentOutcome.ticket %}
+    {% set type = appointmentOutcome.ticket.type | lower | default('red') %}
+    {{ mojTicketPanel({
+      attributes: { "data-qa": "alert-panel" },
+      items: [{
+        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.ticket.title + '</h2>' + appointmentOutcome.ticket.html | safe,      
+        classes: "moj-ticket-panel__content--" + type
+      }]
+    }) }}
   {% endif %}
 {% endblock %}

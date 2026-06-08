@@ -40,6 +40,8 @@ import {
   getContactOutcomes,
   handlePutOutcome,
   getOutcomeSentence,
+  getFailedToAttendTicket,
+  getTicket,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -106,6 +108,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${manageBasePath}/unacceptable-absence`,
     ],
     getAttendedFailedToComplyOptions,
+    getTicket(hmppsAuthClient),
     getComplianceData(hmppsAuthClient),
   )
 
@@ -114,7 +117,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAcceptableAbsenceOptions,
   )
 
-  router.all([`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`], getFailedToAttendOptions)
+  router.all(
+    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
+    getFailedToAttendOptions,
+    getFailedToAttendTicket,
+  )
 
   router.all(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
