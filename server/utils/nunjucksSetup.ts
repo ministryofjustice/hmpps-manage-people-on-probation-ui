@@ -94,7 +94,6 @@ import {
   checkLocationMonitoringByEventNumber,
   checkLocationMonitoringString,
 } from '../middleware/checkLocationMonitoring'
-import logger from '../../logger'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -118,19 +117,10 @@ export default function nunjucksSetup(
     })
   }
 
-  type RequestContext = {
-    decorateFormAttributes: ReturnType<typeof decorateFormAttributes>
-  }
-
-  const requestContext = new AsyncLocalStorage<RequestContext>()
+  const requestContext = new AsyncLocalStorage<{ req: Request; res: AppResponse }>()
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
-    requestContext.run(
-      {
-        decorateFormAttributes: decorateFormAttributes(req, res),
-      },
-      next,
-    )
+    requestContext.run({ req, res }, next)
   })
 
   const njkEnv = nunjucks.configure(
@@ -194,12 +184,10 @@ export default function nunjucksSetup(
     const ctx = requestContext.getStore()
 
     if (!ctx) {
-      const error = new Error('decorateFormAttributes called without request context')
-      logger.error(error)
-      throw error
+      return obj
     }
 
-    return ctx.decorateFormAttributes(obj, sections)
+    return decorateFormAttributes(ctx.req, ctx.res)(obj, sections)
   })
 
   njkEnv.addFilter('dateWithYearShortMonthAndTime', dateWithYearShortMonthAndTime)
