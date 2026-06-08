@@ -36,7 +36,6 @@ import {
   resetSelectedActions,
   restrictPageAccess,
   getBreachOrRecallWarning,
-  getComplianceData,
   getContactOutcomes,
   handlePutOutcome,
   getOutcomeSentence,
@@ -109,7 +108,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     ],
     getAttendedFailedToComplyOptions,
     getTicket(hmppsAuthClient),
-    getComplianceData(hmppsAuthClient),
   )
 
   router.all(
