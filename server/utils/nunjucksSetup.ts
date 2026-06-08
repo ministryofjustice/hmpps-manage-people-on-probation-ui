@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
+import { AsyncLocalStorage } from 'node:async_hooks'
 import nunjucks from 'nunjucks'
 
 import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
@@ -107,17 +108,20 @@ export default function nunjucksSetup(
   app.locals.environmentName = config.environmentName
   app.locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
 
-  // Cachebusting version string
   if (production) {
-    // Version only changes with new commits
     app.locals.version = applicationInfo.gitShortHash
   } else {
-    // Version changes every request
     app.use((_req, res: AppResponse, next) => {
       res.locals.version = Date.now().toString()
       return next()
     })
   }
+
+  const requestContext = new AsyncLocalStorage<{ req: Request; res: AppResponse }>()
+
+  app.use((req: Request, res: AppResponse, next: NextFunction) => {
+    requestContext.run({ req, res }, next)
+  })
 
   const njkEnv = nunjucks.configure(
     [
@@ -135,6 +139,7 @@ export default function nunjucksSetup(
       express: app,
     },
   )
+
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('dateWithYear', dateWithYear)
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
@@ -173,12 +178,16 @@ export default function nunjucksSetup(
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
   njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
-  njkEnv.addFilter('isArray', (str: string | string[]) => {
-    return Array.isArray(str)
-  })
-  app.use((req: Request, res: AppResponse, next: NextFunction) => {
-    njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
-    return next()
+  njkEnv.addFilter('isArray', (str: string | string[]) => Array.isArray(str))
+
+  njkEnv.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
+    const ctx = requestContext.getStore()
+
+    if (!ctx) {
+      return obj
+    }
+
+    return decorateFormAttributes(ctx.req, ctx.res)(obj, sections)
   })
 
   njkEnv.addFilter('dateWithYearShortMonthAndTime', dateWithYearShortMonthAndTime)
