@@ -220,7 +220,7 @@ it('does not use another overlapping request when that request has no session', 
     .query({ reqId: 'B' })
     .then(response => response)
 
-  const [resA, resB] = await Promise.all([reqAPromise, reqBPromise])
+  const [resA] = await Promise.all([reqAPromise, reqBPromise])
 
   // With the fixed implementation, A keeps its own request context and succeeds.
   expect(resA.status).toBe(200)
