@@ -23,9 +23,9 @@ const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 49,
     eventNumber: '1234567',
-    sentenceType: 'CUSTODY',
     order: {
       description: 'Pre-Sentence',
+      sentenceType: 'CUSTODY',
       startDate: '2025-05-31',
       endDate,
     },
@@ -36,9 +36,9 @@ const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 48,
     eventNumber: '7654321',
-    sentenceType: 'COMMUNITY',
     order: {
       description: 'Pre-Sentence',
+      sentenceType: 'COMMUNITY',
       startDate: '2025-05-31',
       endDate,
     },
