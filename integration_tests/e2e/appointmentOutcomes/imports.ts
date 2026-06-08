@@ -1,3 +1,8 @@
+import { DateTime } from 'luxon'
+import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
+import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
+import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
+import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
 import Page from '../../pages/page'
 
 export interface ExpectedOption<TPage extends Page> {
@@ -81,6 +86,7 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
     })
     it('should show when sentence type is CUSTODY and there is an active recall', () => {
       cy.task('stubCompliance', { activeBreach: false, activeRecall: true })
+      cy.task('stubSentences', { sentenceType: 'CUSTODY' })
       loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
       const page = new args.Page()
       page
@@ -99,5 +105,88 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
       const page = new args.Page()
       page.getBreachOrRecallWarning({ type: 'recall' }).should('not.exist')
     })
+  })
+}
+
+export const checkTicketPanel = <TArgs extends Record<string, any>>(
+  loadPageFunc: (args: any) => void,
+  PageClass:
+    | typeof AttendedFailedToComplyPage
+    | typeof UnacceptableAbsencePage
+    | typeof FailedToAttendPage
+    | typeof AcceptableAbsencePage,
+  args?: TArgs,
+) => {
+  describe('Ticket panel', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+    })
+    const page = new PageClass()
+    if (page instanceof AttendedFailedToComplyPage || page instanceof UnacceptableAbsencePage) {
+      it('should not display the ticket panel if no FTC counts', () => {
+        cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 0 })
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0 })
+        loadPageFunc({ ...args })
+        page.getTicketPanel().should('not.exist')
+      })
+      it('should display the ticket panel if one previous FTC and no previous breach', () => {
+        cy.task('stubPersonNonComplianceDetail')
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0 })
+        loadPageFunc({ ...args })
+        page
+          .getTicketPanel()
+          .should('contain.text', 'This is Alton’s second count of non-compliance in the past 12 months')
+      })
+      it('should display the ticket panel if more than one previous FTC and no previous breach', () => {
+        cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0 })
+        loadPageFunc({ ...args })
+        page
+          .getTicketPanel()
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'You should consider initiating a breach')
+      })
+      it('should display the ticket panel if more than one previous FTC and previous breach', () => {
+        cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
+        cy.task('stubCompliance')
+        loadPageFunc({ ...args })
+
+        page
+          .getTicketPanel()
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'Alton has breached this sentence before')
+      })
+    }
+    if (page instanceof AcceptableAbsencePage) {
+      it('should not display the ticket panel if no acceptable absence counts', () => {
+        cy.task('stubPersonNonComplianceDetail')
+        cy.task('stubCompliance')
+        loadPageFunc({ ...args })
+        page.getTicketPanel().should('not.exist')
+      })
+      it('should display the ticket panel if more than on acceptable absence count', () => {
+        cy.task('stubPersonNonComplianceDetail', { acceptableAbsenceCount: 2 })
+        cy.task('stubCompliance')
+        loadPageFunc({ ...args })
+        page.getTicketPanel().should('contain.text', 'Alton has had multiple acceptable absences in the past 12 months')
+      })
+    }
+    if (page instanceof FailedToAttendPage) {
+      it('should not display the ticket panel if no acceptable absence counts', () => {
+        cy.task('stubContactOutcomes', { matchedResponsePeriodDays: false })
+        loadPageFunc({ ...args })
+        page.getTicketPanel().should('not.exist')
+      })
+      it('should display the ticket panel if more than one previous FTC and previous breach', () => {
+        const startDateTime = DateTime.now().minus({ days: 2 })
+        const startDateTimeISO = startDateTime.toISO()
+        const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
+        cy.task('stubContactOutcomes')
+        loadPageFunc({ ...args, startDateTime: startDateTimeISO })
+        page
+          .getTicketPanel()
+          .should('contain.text', `Alton has until ${expectedDate} to submit evidence (5 days remaining)`)
+      })
+    }
   })
 }

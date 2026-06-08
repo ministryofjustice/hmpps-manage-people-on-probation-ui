@@ -1,14 +1,16 @@
+import { DateTime } from 'luxon'
 import { type Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
 import { type OutcomeTicket } from '../../models/Locals'
+import { dateWithYear } from '../../utils'
 
 export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (_req, res, next) => {
     let ticket: OutcomeTicket | null = null
     const {
       forename,
-      sentence: { compliance },
+      sentence: { compliance, order },
       crn,
       reqUrl,
     } = res.locals.appointmentOutcome
@@ -25,7 +27,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       // one previous FTC, no previous breach 👇
 
       if (failureToComplyContacts?.length === 1 && compliance.priorBreachesOnCurrentOrderCount === 0) {
-        const { contactId } = failureToComplyContacts.at(0)
+        const { contactId, date } = failureToComplyContacts.at(0)
         ticket = {
           title: `This is ${forename}’s second count of non-compliance in the past 12 months`,
           html: `
@@ -33,9 +35,9 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
           <p class="govuk-body govuk-!-margin-bottom-2">${forename} also failed to comply with:</p>
           <ul class="govuk-list govuk-list--bullet">
             <li>
-              <a class="govuk-link" href="/case/${crn}/appointments/appointment/${contactId}/manage" target="_blank" rel="noopener noreferrer"> (opens in new tab)</a>
+              <a class="govuk-link" href="/case/${crn}/appointments/appointment/${contactId}/manage" target="_blank" rel="noopener noreferrer">${dateWithYear(date)}: ${order} (opens in new tab)</a>
             </li>
-          </ul>')
+          </ul>
           `,
           type: 'RED',
         }
@@ -46,7 +48,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       if (failureToComplyContacts?.length > 1 && compliance.priorBreachesOnCurrentOrderCount === 0) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months.`,
-          html: `<p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>',`,
+          html: `<p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>`,
           type: 'RED',
         }
       }
@@ -65,7 +67,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
             <li>
               <a class="govuk-link" href="/case/${crn}/compliance" target="_blank" rel="noopener noreferrer">view ${forename}’s previous breach information (opens in new tab)</a>
             </li>
-          </ul>',
+          </ul>
           `,
           type: 'RED',
         }

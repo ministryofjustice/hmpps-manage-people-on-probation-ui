@@ -26,7 +26,6 @@ export const getOutcomeSentence = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const personCompliance = await masClient.getPersonCompliance(crn)
-
     const currentSentenceCompliance =
       personCompliance.currentSentences.find(s => s?.eventNumber === appointmentSentence?.eventNumber) || null
     const type = appointmentSentence?.order?.sentenceType || null

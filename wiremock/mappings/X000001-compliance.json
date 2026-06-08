@@ -88,6 +88,25 @@
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               }
+            },
+            {
+              "eventNumber": "12345",
+              "breachesOnCurrentOrderCount": 2,
+              "mainOffence": {
+                "code": "18502",
+                "description": "(Another main offence - 18502)"
+              },
+              "compliance": {
+                "currentBreaches": 0,
+                "breachStarted": false,
+                "breachesOnCurrentOrderCount": 0,
+                "failureToComplyCount": 0
+              },
+              "order": {
+                "description": "ORA Community Order",
+                "endDate": "2024-09-01",
+                "startDate": "2020-03-02"
+              }
             }
           ]
         },

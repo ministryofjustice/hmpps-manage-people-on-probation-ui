@@ -175,7 +175,7 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.type = 'Planned Doorstep Contact (NS)'
   }
   mapping.response.jsonBody.appointment.deliusManaged = deliusManaged
-  if (isFuture) {
+  if (isFuture && !startDateTime) {
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
 

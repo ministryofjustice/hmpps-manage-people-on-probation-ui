@@ -14,7 +14,7 @@
   {% if appointmentOutcome.ticket %}
     {% set type = appointmentOutcome.ticket.type | lower | default('red') %}
     {{ mojTicketPanel({
-      attributes: { "data-qa": "alert-panel" },
+      attributes: { "data-qa": "ticket-panel" },
       items: [{
         html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.ticket.title + '</h2>' + appointmentOutcome.ticket.html | safe,      
         classes: "moj-ticket-panel__content--" + type

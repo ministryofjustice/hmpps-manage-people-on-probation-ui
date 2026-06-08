@@ -20,6 +20,7 @@ import {
   checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
+  checkTicketPanel,
 } from './imports'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -172,8 +173,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })
   })
-
   checkBreachOrRecallWarningBanner(loadPage, { Page: AcceptableAbsencePage })
+  checkTicketPanel(loadPage, AcceptableAbsencePage)
 }
 
 describe('Acceptable absence', () => {

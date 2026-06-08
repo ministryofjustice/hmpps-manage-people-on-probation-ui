@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import FailedToAttendPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
+import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 import {
@@ -23,7 +23,9 @@ import {
   checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
+  checkTicketPanel,
 } from './imports'
+import { type SentenceType } from '../../../server/data/model/sentenceDetails'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -38,14 +40,24 @@ interface Args {
   journey?: Journey
   isProbationPractitioner?: boolean
   enforcementActionResponseByDate?: string
+  sentenceType?: SentenceType
+  startDateTime?: string
 }
 
 const loadPage = ({
   journey = 'MANAGE',
   isProbationPractitioner = false,
   enforcementActionResponseByDate = responseByDate,
+  sentenceType = 'COMMUNITY',
+  startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
 }: Args = {}): void => {
-  cy.task('stubAppointment', { eventId: '2501192724', isFuture: false, enforcementActionResponseByDate })
+  cy.task('stubAppointment', {
+    eventId: '2501192724',
+    isFuture: false,
+    enforcementActionResponseByDate,
+    sentenceType,
+    startDateTime,
+  })
   if (isProbationPractitioner) {
     cy.task('stubProbationPractitioner', { username: 'USER1' })
   }
@@ -155,6 +167,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   })
 
   checkBreachOrRecallWarningBanner(loadPage, { Page: FailedToAttendPage })
+  checkTicketPanel(loadPage, FailedToAttendPage)
 }
 
 describe('Failed to attend', () => {

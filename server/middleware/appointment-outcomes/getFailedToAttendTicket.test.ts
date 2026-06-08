@@ -45,13 +45,15 @@ const mockOptions: Option<AppointmentEnforcementAction>[] = [
 
 const buildResponse = ({
   matchingResponsePeriodDays = true,
+  isInPast = false,
 }: {
-  options?: Option<AppointmentEnforcementAction>[]
   matchingResponsePeriodDays?: boolean
+  isInPast?: boolean
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
       forename,
+      isInPast,
       options: mockOptions,
       appointmentSession: {
         date: '2026-06-03',
@@ -70,6 +72,11 @@ const nextSpy = jest.fn()
 describe('middleware/appointment-outcomes/getFailedToAttendTicket', () => {
   it('should not assign a ticket if not all enforcement actions have same response period value', () => {
     const res = buildResponse({ matchingResponsePeriodDays: false })
+    getFailedToAttendTicket(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.ticket).toBeNull()
+  })
+  it('should not assign a ticket if appointment date is in the past', () => {
+    const res = buildResponse({ matchingResponsePeriodDays: false, isInPast: true })
     getFailedToAttendTicket(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.ticket).toBeNull()
   })

@@ -9,14 +9,15 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
   let ticket: OutcomeTicket | null = null
   const {
     forename,
+    // isInPast,
     appointmentSession: {
       date: appointmentDate,
       outcome: { contactOutcomes },
     },
     options,
   } = res.locals.appointmentOutcome
+  // if (!isInPast) {
   const enforcementActions = contactOutcomes.find(contactOutcome => contactOutcome.code === 'AFTA')?.enforcementActions
-
   const actionOptionValues = options
     .filter(option => option?.value)
     .map(option => option.value) as AppointmentEnforcementAction[]
@@ -32,7 +33,7 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
         action?.defaultResponsePeriodDays &&
         action.defaultResponsePeriodDays === enforcementActions?.[0]?.defaultResponsePeriodDays,
     )
-    ? enforcementActions.at(0).defaultResponsePeriodDays
+    ? enforcementActions?.at(0)?.defaultResponsePeriodDays
     : null
 
   if (responsePeriodDays) {
@@ -43,6 +44,7 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
       html: `<p class="govuk-body">This appointment has been marked as failed to attend until evidence is provided. It will be added to the NDelius Enforcement Diary.</p>`,
     }
   }
+  // }
 
   res.locals.appointmentOutcome.ticket = ticket
   return next()

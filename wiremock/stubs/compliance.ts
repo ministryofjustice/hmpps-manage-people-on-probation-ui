@@ -1,10 +1,30 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { NonComplianceContact } from '../../server/data/model/overview'
+
+const nonComplianceContact: NonComplianceContact = {
+  contactId: 123456,
+  eventNumber: '1',
+  eventId: 1,
+  type: {
+    code: 'NS',
+    description: 'Planned Office Visit (NS)',
+  },
+  date: '2026-01-18',
+}
 
 const stubCompliance = ({
   crn = 'X778160',
   activeBreach = true,
   activeRecall = false,
-}: { crn?: string; activeBreach?: boolean; activeRecall?: boolean } = {}): SuperAgentRequest =>
+  priorBreachesOnCurrentOrderCount = 1,
+  eventNumber = '12345',
+}: {
+  crn?: string
+  activeBreach?: boolean
+  activeRecall?: boolean
+  priorBreachesOnCurrentOrderCount?: number
+  eventNumber?: string
+} = {}): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: `/mas/compliance/${crn}`,
@@ -29,7 +49,7 @@ const stubCompliance = ({
         },
         currentSentences: [
           {
-            eventNumber: '12345',
+            eventNumber,
             activeBreach: activeBreach
               ? {
                   startDate: '2024-01-15',
@@ -50,7 +70,8 @@ const stubCompliance = ({
             compliance: {
               currentBreaches: 1,
               breachStarted: true,
-              breachesOnCurrentOrderCount: 1,
+              breachesOnCurrentOrderCount: 0,
+              priorBreachesOnCurrentOrderCount,
               failureToComplyCount: 2,
             },
             mainOffence: {
@@ -66,8 +87,21 @@ const stubCompliance = ({
     },
   })
 
-const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
+const stubPersonNonComplianceDetail = ({
+  crn = 'X778160',
+  acceptableAbsenceCount = 0,
+  unacceptableAbsenceCount = 1,
+  attendedButDidNotComplyCount = 0,
+} = {}): SuperAgentRequest => {
+  const acceptableAbsence =
+    acceptableAbsenceCount > 0 ? Array.from({ length: acceptableAbsenceCount }).map(_i => nonComplianceContact) : []
+  const unacceptableAbsence =
+    unacceptableAbsenceCount > 0 ? Array.from({ length: unacceptableAbsenceCount }).map(_i => nonComplianceContact) : []
+  const attendedButDidNotComply =
+    attendedButDidNotComplyCount > 0
+      ? Array.from({ length: attendedButDidNotComplyCount }).map(_i => nonComplianceContact)
+      : []
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: `/mas/compliance/non-compliance-detail/${crn}`,
       method: 'GET',
@@ -78,28 +112,18 @@ const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =
     response: {
       status: 200,
       jsonBody: {
-        acceptableAbsence: [],
-        unacceptableAbsence: [
-          {
-            contactId: 123456,
-            eventNumber: '1',
-            eventId: 1,
-            type: {
-              code: 'NS',
-              description: 'Planned Office Visit (NS)',
-            },
-            date: '2026-01-18',
-          },
-        ],
-        attendedButDidNotComply: [],
+        acceptableAbsence,
+        unacceptableAbsence,
+        attendedButDidNotComply,
       },
       headers: {
         'Content-Type': 'application/json',
       },
     },
   })
+}
 
 export default {
   stubCompliance,
-  stubNonComplianceHistory,
+  stubPersonNonComplianceDetail,
 }

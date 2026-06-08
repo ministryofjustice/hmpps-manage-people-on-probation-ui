@@ -77,6 +77,8 @@ export default abstract class Page {
   getBreachOrRecallWarning = ({ type = 'breach' }: { type?: 'breach' | 'recall' } = {}): PageElement =>
     cy.get(`[data-qa="${type}-warning"]`)
 
+  getTicketPanel = (): PageElement => cy.get(`[data-qa="ticket-panel"]`)
+
   getRowDataIndex = (cardName: string, rowName: string, type: string, index: number): PageElement => {
     return cy
       .get(`[data-qa=${cardName}Card]`)
