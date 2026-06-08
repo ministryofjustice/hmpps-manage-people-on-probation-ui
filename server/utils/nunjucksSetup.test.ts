@@ -83,8 +83,6 @@ describe('utils/nunjucksSetup', () => {
   })
 
   it('falls back to the undecorated object when decorateFormAttributes is called without request context', () => {
-    nunjucksSetup(app, mockAppInfo, mockServices)
-
     const njkEnv = app.get('nunjucksEnv')
 
     const html = njkEnv.renderString(
