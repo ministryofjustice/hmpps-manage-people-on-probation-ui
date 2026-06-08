@@ -96,8 +96,8 @@ export interface PutContactRequest {
   time: string
   outcomeCode: OutcomeCode | AcceptableAbsenceOutcomeCode
   enforcementActionCode?: EnforcementActionCode
-  notes?: string
-  alert: boolean
+  notes: string
+  alert?: boolean
   sensitive: boolean
 }
 

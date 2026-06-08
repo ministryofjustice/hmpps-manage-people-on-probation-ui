@@ -38,8 +38,10 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const outcomeType = appointmentSession?.outcome?.outcomeType
       const outcomeCode = appointmentSession?.outcome?.outcomeCode
       const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
-      let notes = appointmentSession?.notes || null
-      const alert = true
+      let notes = appointmentSession?.notes || ''
+      if (notes && notePrepend) {
+        notes = `${notePrepend}\n${notes}`
+      }
       const sensitive = appointmentSession?.sensitivity === 'Yes'
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -53,7 +55,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         date,
         time,
         outcomeCode,
-        alert,
+        notes: handleQuotes(notes),
         sensitive,
       }
 
@@ -72,14 +74,6 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         }
       }
 
-      // if notes and prepend value exists, add it to the notes value 👇
-
-      if (notes) {
-        if (notePrepend) {
-          notes = `${notePrepend}\n${notes}`
-        }
-        request.notes = handleQuotes(notes)
-      }
       const putRequests: PutContactPromise[] = []
       if (enforcementActionCode?.length) {
         enforcementActionCode.forEach(code => {
