@@ -2,6 +2,11 @@ import nunjucksSetup from './nunjucksSetup'
 import { appWithAllRoutes } from '../routes/testutils/appSetup'
 import { ApplicationInfo } from '../applicationInfo'
 import type { Services } from '../services' // Import Services type
+import logger from '../../logger'
+
+jest.mock('../../logger', () => ({
+  warn: jest.fn(),
+}))
 
 const mockTechnicalUpdatesService = {
   getLatestTechnicalUpdateHeading: jest.fn(() => 'Mock Technical Update Heading'),
@@ -75,5 +80,22 @@ describe('utils/nunjucksSetup', () => {
     const njkEnv = app.get('nunjucksEnv')
     expect(njkEnv.globals.lastTechnicalUpdate).toEqual('Mock Technical Update Heading')
     expect(mockTechnicalUpdatesService.getLatestTechnicalUpdateHeading).toHaveBeenCalled()
+  })
+
+  it('falls back to the undecorated object when decorateFormAttributes is called without request context', () => {
+    nunjucksSetup(app, mockAppInfo, mockServices)
+
+    const njkEnv = app.get('nunjucksEnv')
+
+    const html = njkEnv.renderString(
+      `
+      {% set cfg = { value: 'original-value' } | decorateFormAttributes(['appointments', 'CRN1', 'ID1', 'date']) %}
+      {{ cfg.value }}
+    `,
+      {},
+    )
+
+    expect(html.trim()).toEqual('original-value')
+    expect(logger.warn).toHaveBeenCalledWith('decorateFormAttributes called without request context')
   })
 })

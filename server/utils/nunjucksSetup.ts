@@ -94,6 +94,7 @@ import {
   checkLocationMonitoringByEventNumber,
   checkLocationMonitoringString,
 } from '../middleware/checkLocationMonitoring'
+import logger from '../../logger'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -183,7 +184,11 @@ export default function nunjucksSetup(
   njkEnv.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
     const ctx = requestContext.getStore()
 
+    // Some render paths (for example tests or non-request rendering) may not
+    // have an AsyncLocalStorage context. Fall back to the undecorated object and
+    // log for investigation.
     if (!ctx) {
+      logger.warn('decorateFormAttributes called without request context')
       return obj
     }
 
