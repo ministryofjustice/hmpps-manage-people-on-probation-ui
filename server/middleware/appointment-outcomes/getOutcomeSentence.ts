@@ -29,7 +29,7 @@ export const getOutcomeSentence = (hmppsAuthClient: HmppsAuthClient): Route<Prom
 
     const currentSentenceCompliance =
       personCompliance.currentSentences.find(s => s?.eventNumber === appointmentSentence?.eventNumber) || null
-    const type = appointmentSentence?.sentenceType || null
+    const type = appointmentSentence?.order?.sentenceType || null
     const sentence: AppointmentOutcomeSentence = {
       type,
       length: sentenceLength,
