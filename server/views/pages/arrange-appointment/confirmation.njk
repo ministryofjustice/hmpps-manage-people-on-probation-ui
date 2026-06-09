@@ -26,11 +26,10 @@
     from
     {{ appointment.start | to12HourTimeCompact}}
     to
-    {{ appointment.end | to12HourTimeCompact}}</span>
-{% endfor %}
+    {{ appointment.end | to12HourTimeCompact}}</span>{% endfor %}
 {% set cases = "/case/" %}
 {% set overViewLink = "/case/" + crn %}
-{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment?back=" + url %}
+{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + responseContactId + "/next-appointment?back=" + url %}
 {% endset %}
 
 {% set panelHtml %}
@@ -55,8 +54,8 @@
         {% if smsSent %}
           {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
             <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.</p>
-            {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
-              {{ mojAlert({
+          {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
+            {{ mojAlert({
               variant: "warning",
               title: "We could not send a confirmation text message to " + case.name.forename,
               showTitleAsHeading: true,
@@ -68,7 +67,7 @@
             }) }}
 
           {% elif isWelshNotificationFailed and not isEnglishNotificationFailed %}
-          {{ mojAlert({
+            {{ mojAlert({
             variant: "information",
             title: "We could not send a confirmation text message to " + case.name.forename + " in Welsh",
             showTitleAsHeading: true,
@@ -130,44 +129,62 @@
         <p class="govuk-body">The appointment has been {% if appointmentType == 'RESCHEDULE' %}updated on{% else %}added to{% endif %} the NDelius contact log and officer diary.</p>
       {% endif %}
     </div>
-    <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
-      <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
-      <p class="govuk-!-margin-bottom-0">You can:</p>
-      <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
-        <li>
-          <a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
+    {% if not linkedAppointment %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
+          <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
+          <p class="govuk-!-margin-bottom-0">You can:</p>
+          <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
+            <li>
+              <a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
                         arrange another appointment
                     </a>
-        </li>
-        {% if contactResponse.content.length > 0 %}
-          <li>
-            {% if contactResponse.content.length == 1 %}
-              <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
+            </li>
+            {% if contactResponse.content.length > 0 %}
+              <li>
+                {% if contactResponse.content.length == 1 %}
+                  <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
         log appointment outcome for {{ contactResponse.content[0].date | dayOfWeek + ' ' + contactResponse.content[0].date | dateWithYear }}
-              </a>
-            {% endif %}
-            {% if contactResponse.content.length > 1 %}
-              <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
+                  </a>
+                {% endif %}
+                {% if contactResponse.content.length > 1 %}
+                  <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
         log outcomes for {{ contactResponse.content.length }} appointments
           </a>
+                {% endif %}
+              </li>
             {% endif %}
-          </li>
-        {% endif %}
-      </ul>
-    </div>
-  </div>
-  <form method="post" autocomplete="off" action="{{ paths.current  }}">
-    <div class="govuk-button-group">
-      {{ govukButton({
+          </ul>
+        </div>
+      </div>
+      <form method="post" autocomplete="off" action="{{ paths.current  }}">
+        <div class="govuk-button-group">
+          {{ govukButton({
       html: buttonText,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-      <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
+          <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
       Return to all cases
     </a>
-    </div>
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-  </form>
-{% endblock %}
+        </div>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      </form>
+    {% else %}
+      <div class="govuk-grid-column-two-thirds" data-qa="logAppointmentOutcome">
+        <p class="govuk-body">You can now finish logging the outcome for {{ linkedAppointment.type }} on {{ linkedAppointment.date }}</p>
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+          <div class="govuk-button-group">
+            {{ govukButton({
+      html: 'Return to log appointment outcome',
+      attributes: {
+        'data-qa': 'submit-btn'
+      }
+    }) }}
+            <input type="hidden" name="_linkedContactId" value="{{ linkedAppointment.contactId }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          </form>
+        </div>
+      {% endif %}
+    {% endblock %}

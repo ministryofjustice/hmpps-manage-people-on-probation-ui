@@ -60,8 +60,8 @@ const mockSentences: Sentence[] = [
       endDate: '2023-12-01',
       length: '2',
     },
-    licenceConditions: [{ id: 12345, mainDescription: '12 month Community order' }],
-    requirements: [{ id: 12345, description: '12 month Community order' }],
+    licenceConditions: [{ id: 12345, mainDescription: '12 month Community order', code: 'R' }],
+    requirements: [{ id: 12345, description: '12 month Community order', code: 'R' }],
     nsis: [],
     offenceDetails: {
       eventNumber: '1234',
@@ -282,7 +282,7 @@ const mockCase: Partial<PersonalDetails> = {
 const res = mockAppResponse({
   case: mockCase,
   user: mockUser,
-  flags: { enableCalendarEvents: true, enableMAN2344: true, enableSmsReminders: true },
+  flags: { enableMAN2344: true, enableSmsReminders: true },
 })
 
 const postAppointmentsSpy = jest
@@ -428,7 +428,7 @@ describe('/middleware/postAppointments', () => {
       const mockRes = mockAppResponse({
         case: mockCase,
         user: { ...mockUser, email: null },
-        flags: { enableCalendarEvents: true, enableMAN2344: true, enableSmsReminders: true },
+        flags: { enableMAN2344: true, enableSmsReminders: true },
       })
       beforeEach(async () => {
         await postAppointments(hmppsAuthClient)(mockReq, mockRes)

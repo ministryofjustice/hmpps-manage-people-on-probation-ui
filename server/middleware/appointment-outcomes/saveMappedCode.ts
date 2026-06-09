@@ -1,5 +1,6 @@
 import { Route } from '../../@types'
 import {
+  AcceptableAbsenceOutcomeType,
   AppointmentEnforcementAction,
   AppointmentOutcomeType,
   AppointmentSessionOutcome,
@@ -9,19 +10,25 @@ import {
   enforcementActionMap,
   OutcomeCode,
   EnforcementActionCode,
+  AcceptableAbsenceOutcomeCode,
 } from '../../properties/appointment-outcomes'
 import { setDataValue } from '../../utils'
 
-export const saveMappedCode = (type: 'OUTCOME' | 'ACTION'): Route<Promise<void>> => {
+export const saveMappedCode = (type: 'OUTCOME' | 'ACCEPTABLE_ABSENCE_OUTCOME' | 'ACTION'): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn, id, appointmentSession, reqUrl } = res.locals.appointmentOutcome
-    if (!reqUrl.includes('/add-note')) {
+    if (
+      !['/add-note', '/next-appointment', '/check-your-answers', '/confirmation'].some(url => reqUrl?.includes(url))
+    ) {
       const body = req.body as Record<string, any>
       let codeKey: keyof AppointmentSessionOutcome
-      let code: OutcomeCode | EnforcementActionCode = null
+      let code: OutcomeCode | AcceptableAbsenceOutcomeCode | EnforcementActionCode = null
       let value: string | string[] = null
-      if (type === 'OUTCOME') {
-        const selectedValue = body.appointments[crn][id].outcome.outcomeType as AppointmentOutcomeType
+      if (['OUTCOME', 'ACCEPTABLE_ABSENCE_OUTCOME'].includes(type)) {
+        const selectedValue =
+          type === 'OUTCOME'
+            ? (body.appointments[crn][id].outcome.outcomeType as AppointmentOutcomeType)
+            : (body.appointments[crn][id].outcome.acceptableAbsence as AcceptableAbsenceOutcomeType)
         code = outcomeMap?.[selectedValue]?.code
         codeKey = 'outcomeCode'
         if (code) {
@@ -46,7 +53,6 @@ export const saveMappedCode = (type: 'OUTCOME' | 'ACTION'): Route<Promise<void>>
       }
       if (value) {
         const { data } = req.session
-        // console.log(`SAVE ${type} CODE:`, value)
         setDataValue(data, ['appointments', crn, id, 'outcome', codeKey], value)
       }
     }

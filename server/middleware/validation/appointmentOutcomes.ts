@@ -6,12 +6,19 @@ import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
-  const { crn, id, isInPast, baseOutcomeUrl, reqUrl, sendBreachOrRecallLetter } = res.locals.appointmentOutcome
+  const {
+    crn,
+    id: uuid,
+    contactId,
+    isInPast,
+    baseOutcomeUrl,
+    reqUrl,
+    sendBreachOrRecallLetter,
+  } = res.locals.appointmentOutcome
   const { maxCharCount } = config
-
+  const id = uuid || contactId
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
-
-  let localParams: LocalParams = { crn, id }
+  let localParams: LocalParams = { crn, id, outcomeJourney: true }
   if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
     localParams = { ...localParams, maxCharCount: maxCharCount as number }
   }
@@ -66,7 +73,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/acceptable-absence`,
           msg: 'Select why their absence was acceptable',
-          log: 'Acceptable absence enforcement action not selected',
+          log: 'Acceptable absence reason not selected',
         }),
       ),
     }
@@ -203,6 +210,22 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateNextAppointment = (): void => {
+    if (!reqUrl.includes(`${baseOutcomeUrl}/next-appointment`)) return
+    render = 'pages/appointments/next-appointment'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/next-appointment`,
+        }),
+      ),
+    }
+  }
+
   validateOutcome()
   validateAttendedFailedToComply()
   validateAcceptableAbsence()
@@ -213,6 +236,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateSendLetter()
   validateUpdateEnforcementAction()
   validateAddNote()
+  validateNextAppointment()
 
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages

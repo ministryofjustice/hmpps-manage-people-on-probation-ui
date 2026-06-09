@@ -46,19 +46,6 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, ar
   )
 
   router.get(
-    '/case/:crn/appointments/reschedule/:contactId/:id/check-your-answers',
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    controllers.rescheduleAppointments.getRescheduleCheckYourAnswer(hmppsAuthClient),
-  )
-
-  router.post(
-    '/case/:crn/appointments/reschedule/:contactId/:id/check-your-answers',
-    getPersonAppointment(hmppsAuthClient),
-    controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient),
-  )
-
-  router.get(
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
     getOverdueOutcomes(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),

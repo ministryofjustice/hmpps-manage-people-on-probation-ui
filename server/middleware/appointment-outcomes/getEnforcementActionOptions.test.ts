@@ -1,14 +1,22 @@
 import httpMocks from 'node-mocks-http'
 import { mockAppResponse } from '../../controllers/mocks'
 import { getEnforcementActionOptions } from './getEnforcementActionOptions'
-import { ContactEnforcementActions } from '../../data/model/schedule'
+import { ContactEnforcementAction, ContactOutcome } from '../../data/model/schedule'
 import { enforcementActionOptions } from '../../properties/appointment-outcomes'
 import { validEnforcementActionOptions } from '../../utils'
 
-const contactEnforcementActions: ContactEnforcementActions[] = [
+const enforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
   { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
+
+const contactOutcomes: ContactOutcome[] = [
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed to Comply',
+    enforcementActions,
+  },
 ]
 
 const buildResponse = (): httpMocks.MockResponse<any> => {
@@ -17,7 +25,7 @@ const buildResponse = (): httpMocks.MockResponse<any> => {
       forename: 'Alton',
       appointmentSession: {
         outcome: {
-          contactEnforcementActions,
+          contactOutcomes,
         },
       },
     },
@@ -39,10 +47,7 @@ describe('/middleware/appointment-outcomes/getEnforcementActionOptions', () => {
   it('should define the correct options', () => {
     const res = buildResponse()
     getEnforcementActionOptions(req, res, nextSpy)
-    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
-      contactEnforcementActions,
-      enforcementActionOptions('Alton'),
-    )
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactOutcomes, enforcementActionOptions('Alton'))
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ text: 'Select enforcement action', value: '' }),
@@ -68,9 +73,10 @@ describe('/middleware/appointment-outcomes/getEnforcementActionOptions', () => {
         expect.objectContaining({ value: 'YOT_OM_NOTIFIED' }),
         expect.objectContaining({ value: 'NO_FURTHER_ACTION' }),
         expect.objectContaining({ value: 'WITHDRAWAL_OF_WARNING' }),
+        expect.objectContaining({ value: 'DECISION_PENDING_RESPONSE' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(20)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(21)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

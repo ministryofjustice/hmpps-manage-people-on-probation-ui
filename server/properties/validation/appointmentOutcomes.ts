@@ -139,6 +139,16 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
         },
       ],
     },
+    [`[appointments][${crn}][${id}][outcome][nextAppointment]`]: {
+      optional: page !== 'outcome/next-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if you want to arrange the next appointment',
+          log: 'Next appointment type not selected',
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][outcome][complied]`]: {
       optional: page !== `outcome/attended-complied`,
       checks: [

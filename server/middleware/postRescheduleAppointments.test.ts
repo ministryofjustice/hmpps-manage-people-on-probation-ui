@@ -12,7 +12,6 @@ import {
   MasUserDetails,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
-import { PersonAppointment } from '../data/model/schedule'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { EventResponse, SmsOptInOptions } from '../data/model/OutlookEvent'
 import { LocalsUser } from '../models/Locals'
@@ -97,6 +96,7 @@ const mockAppointment: AppointmentSession = {
   sensitivity: 'Yes',
   visorReport: 'No',
   rescheduleAppointment: {
+    contactId: '12345',
     reason: 'Reschedule reason',
     whoNeedsToReschedule: 'SERVICE',
     sensitivity: 'No',
@@ -117,8 +117,6 @@ const mockAppointment: AppointmentSession = {
 }
 
 const mockFlags = {
-  enableOutlookEvent: true,
-  enableCalendarEvents: true,
   enableSmsReminders: true,
 }
 
@@ -237,9 +235,9 @@ describe('middleware/postRescheduleAppointments', () => {
       notes,
       rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
     } = mockAppointmentSession
-    let returnedResponse: PersonAppointment
+    let returnedResponse: RescheduleAppointmentResponse
     beforeEach(async () => {
-      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as PersonAppointment
+      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
     })
     it('should send a reschedule appointment request to the api', () => {
       const expectedBody = {
@@ -299,18 +297,6 @@ describe('middleware/postRescheduleAppointments', () => {
       const mockRes = mockAppResponse({
         ...mockLocals,
         user: { ...mockLocals.user, email: null },
-        flags: { enableCalendarEvents: true },
-      })
-      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
-      expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
-      expect(req.session.data.isOutLookEventFailed).toEqual(true)
-    })
-    it('should not create outlook event if calendar events feature flag is disabled', async () => {
-      const [req] = buildRequest()
-      const mockRes = mockAppResponse({
-        ...mockLocals,
-        user: { ...mockLocals.user, email: null },
-        flags: { enableCalendarEvents: false },
       })
       await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
       expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
@@ -321,7 +307,6 @@ describe('middleware/postRescheduleAppointments', () => {
       const mockRes = mockAppResponse({
         ...mockLocals,
         user: { ...mockLocals.user, email: null },
-        flags: { enableCalendarEvents: true },
       })
       jest
         .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')

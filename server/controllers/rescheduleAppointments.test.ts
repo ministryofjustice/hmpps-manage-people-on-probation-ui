@@ -90,7 +90,6 @@ describe('rescheduleAppointmentController', () => {
           crn,
           contactId,
           id,
-          showValidation: false,
         }),
       )
       checkSendAuditMessage(res, 'ADD_MAS_RESCHEDULE_APPOINTMENT', crn, SubjectType.CRN)
@@ -118,7 +117,6 @@ describe('rescheduleAppointmentController', () => {
           uploadedFiles,
           errorMessages,
           body,
-          showValidation: true,
         }),
       )
       expect(req.session.cache.uploadedFiles).toBeUndefined()
@@ -153,38 +151,6 @@ describe('rescheduleAppointmentController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-    })
-  })
-
-  describe('getRescheduleCheckYourAnswer', () => {
-    it('should render the check your answers page', async () => {
-      mockedAppointmentDateIsInPast.mockReturnValue(true)
-      const req = httpMocks.createRequest({
-        params: { crn, id, contactId },
-        url: '/some-url',
-        session: {
-          data: {
-            appointments: {
-              [crn]: {
-                [id]: {
-                  sensitivityLocked: false,
-                },
-              },
-            },
-          },
-        },
-      })
-
-      await rescheduleAppointmentController.getRescheduleCheckYourAnswer(null)(req, res, null)
-
-      expect(renderSpy).toHaveBeenCalledWith('pages/reschedule/check-your-answers', {
-        crn,
-        id,
-        contactId,
-        url: '/some-url',
-        isInPast: true,
-      })
-      checkSendAuditMessage(res, 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE', crn, SubjectType.CRN)
     })
   })
 })

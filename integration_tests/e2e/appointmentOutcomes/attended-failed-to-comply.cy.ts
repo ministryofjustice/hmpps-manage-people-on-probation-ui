@@ -9,12 +9,19 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  uncheckAllRadios,
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import { ExpectedOption, Journey, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
+import {
+  ExpectedOption,
+  Journey,
+  checkBreachWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+} from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -28,11 +35,6 @@ const loadPage = ({
   sentenceType = 'COMMUNITY',
   isProbationPractitioner = false,
 }: { journey?: Journey; sentenceType?: SentenceType; isProbationPractitioner?: boolean } = {}): void => {
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (isProbationPractitioner) {
     cy.task('stubProbationPractitioner', { username: 'USER1' })
@@ -51,7 +53,7 @@ const loadPage = ({
     completeLocationDateTimePage({ dateInPast: true })
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
@@ -59,6 +61,7 @@ const loadPage = ({
     })
   }
   outcomePage = new OutcomePage()
+  uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=ATTENDED_SENT_HOME_BEHAVIOUR]`).click()
   outcomePage.getSubmitBtn().click()
 }
@@ -142,6 +145,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select an action for this failure to comply'
     loadPage({ journey })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+    uncheckAllRadios()
     attendedFailedToComplyPage.getSubmitBtn().click()
     attendedFailedToComplyPage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
@@ -152,6 +156,114 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AttendedFailedToComplyPage, journey })
+  })
+
+  checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
+
+  describe('breach warning banner', () => {
+    it('should show when breach is active and enableNonCompliance is enabled', () => {
+      cy.task('stubBreachCompliance')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+      attendedFailedToComplyPage.getBreachWarning().should('exist')
+    })
+
+    it('should not show when there is no active breach', () => {
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+      attendedFailedToComplyPage.getBreachWarning().should('not.exist')
+    })
+  })
+
+  describe('compliance info panel', () => {
+    it('should show the correct compliance information panel when using fallback fields', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      // Note: stubBreachCompliance in wiremock/stubs/compliance.ts uses failureToComplyCount: 2 and breachesOnCurrentOrderCount: 1
+      // and eventNumber: '12345'.
+      // We need to make sure the loadPage uses the same eventNumber or it might use compliance.currentSentences[0]
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      // Panel 3 (multiple counts of non-compliance and previous breach)
+      // failureToComplyCount: 2 (mapped to failureToComplyInLast12MonthsCount)
+      // breachesOnCurrentOrderCount: 1 (mapped to priorBreachesOnCurrentOrderCount)
+      cy.get('[data-qa="alert-panel"]').should(
+        'contain.text',
+        'Alton has had multiple counts of non-compliance in the past 12 months.',
+      )
+      cy.get('[data-qa="alert-panel"]').should('contain.text', 'Alton has breached this sentence before.')
+    })
+    it('should display links to activity log with not-complied filter and compliance page', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      // Check the alert panel contains both links
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        // Check first link - activity log with not-complied filter
+        cy.get('a')
+          .eq(0)
+          .should('have.text', 'view Alton’s failures to comply (opens in new tab)')
+          .should('have.attr', 'href')
+          .and('include', `/case/${crn}/activitylog/redirect`)
+          .and('include', 'compliance=not+complied')
+
+        // Check second link - compliance page
+        cy.get('a')
+          .eq(1)
+          .should('have.text', 'view Alton’s previous breach information (opens in new tab)')
+          .should('have.attr', 'href')
+          .and('include', `/case/${crn}/compliance`)
+      })
+    })
+
+    it('should navigate to activity log with not-complied filter when first link is clicked', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      // Click the first link (activity log)
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .eq(0)
+          .invoke('attr', 'href')
+          .then(href => {
+            cy.visit(href)
+          })
+      })
+
+      // Verify the URL contains /activitylog/redirect
+      cy.url().should('include', `${crn}/activity-log`)
+
+      // Verify "not complied" filter is present
+      cy.get('.moj-filter__selected').within(() => {
+        cy.get('h3').should('contain.text', 'Compliance filters')
+        cy.get('.moj-filter-tags li').should('contain.text', 'not complied')
+      })
+    })
+
+    it('should navigate to compliance page when second link is clicked', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      // Click the second link (compliance page)
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .eq(1)
+          .invoke('attr', 'href')
+          .then(href => {
+            cy.visit(href)
+          })
+      })
+
+      // Verify the URL contains /compliance
+      cy.url().should('include', '/compliance')
+    })
   })
 }
 

@@ -1,17 +1,10 @@
 /* eslint-disable lines-between-class-members */
 export class FeatureFlags {
   [index: string]: boolean
-  enableSentencePlan?: boolean = undefined
-  enableSanIndicator?: boolean = undefined
   enableSmsReminders?: boolean = undefined
-  enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
   enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableOGRS4?: boolean = undefined
-  enableOGRS4SummaryCardDetail?: boolean = undefined
-  enableCalendarEvents?: boolean = undefined
-  enableESupervisionCustomQuestions?: boolean = undefined
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSentencePlanUrl?: boolean = undefined
@@ -21,6 +14,7 @@ export class FeatureFlags {
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
-  enableShowNextCheckinDate?: boolean = undefined
-  enableStopCheckinSensitiveFlag?: boolean = undefined
+  enableShowMatchWithConcern?: boolean = undefined
+  enableEMDISentencesShowGPSData?: boolean = undefined
+  enableEMDIOverviewShowGPSData?: boolean = undefined
 }

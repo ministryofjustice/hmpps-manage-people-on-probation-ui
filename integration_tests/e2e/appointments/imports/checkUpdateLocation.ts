@@ -23,9 +23,13 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   if (!(page instanceof AppointmentCheckYourAnswersPage)) {
     getUuid().then(pageUuid => {
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
-      completeSupportingInformationPage(true, '', pageUuid)
+      completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
     })
   }
-  page.checkOnPage()
+  if (page instanceof AppointmentCheckYourAnswersPage) {
+    page.checkPageTitle('Check your answers then confirm the appointment')
+  } else {
+    page.checkOnPage()
+  }
   page.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', '102 Petty France')
 }

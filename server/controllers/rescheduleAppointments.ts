@@ -1,17 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
-import { getDataValue, isValidCrn, isValidUUID } from '../utils'
+import { isValidCrn, isValidUUID } from '../utils'
 
-import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = [
-  'redirectToRescheduleAppointment',
-  'getRescheduleAppointment',
-  'postRescheduleAppointment',
-  'getRescheduleCheckYourAnswer',
-] as const
+const routes = ['redirectToRescheduleAppointment', 'getRescheduleAppointment', 'postRescheduleAppointment'] as const
 
 const rescheduleAppointmentController: Controller<typeof routes, void> = {
   redirectToRescheduleAppointment: () => {
@@ -44,19 +39,9 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         delete req.session.body
       }
 
-      const { validation } = req.query
-      const showValidation = validation === 'true'
       const { crn, id, contactId } = req.params as Record<string, string>
       await sendAuditMessage(res, 'ADD_MAS_RESCHEDULE_APPOINTMENT', crn, SubjectType.CRN)
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-sensitivity`]: 'Select if appointment includes sensitive information',
-          [`appointments-${crn}-${id}-rescheduleAppointment-reason`]:
-            'Explain why this appointment is being rescheduled',
-          [`appointments-${crn}-${id}-rescheduleAppointment-whoNeedsToReschedule`]:
-            'Select who is rescheduling this appointment',
-        }
-      }
+
       const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
 
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
@@ -70,7 +55,6 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         body,
         uploadedFiles,
         id,
-        showValidation,
         errorMessages,
         isSensitive,
       })
@@ -84,24 +68,6 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       }
       const { appointmentSession } = res.locals
       return cloneAppointmentAndRedirect(appointmentSession, 'RESCHEDULE')(req, res)
-    }
-  },
-  getRescheduleCheckYourAnswer: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id, contactId } = req.params as Record<string, string>
-      const { data } = req.session
-      const isInPast = appointmentDateIsInPast(req)
-      const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
-      await sendAuditMessage(res, 'VIEW_MAS_CHANGE_APPOINTMENT_DETAILS_AND_RESCHEDULE', crn, SubjectType.CRN)
-      const { url } = req
-      res.render('pages/reschedule/check-your-answers', {
-        crn,
-        id,
-        contactId,
-        url,
-        isInPast,
-        sensitivityLocked,
-      })
     }
   },
 }

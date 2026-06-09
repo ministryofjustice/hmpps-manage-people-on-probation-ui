@@ -1,99 +1,6 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (
-  sentencePlan = true,
-  sanIndicator = true,
-  ogrs4 = true,
-  ogrs4SummaryCardDetail = false,
-  sentencePlanUrl = true,
-) => ({
-  request: {
-    urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-    method: 'GET',
-  },
-  response: {
-    status: 200,
-    jsonBody: {
-      namespace: {
-        key: 'manage-people-on-probation-ui',
-      },
-      flags: [
-        {
-          key: 'enableSentencePlan',
-          name: 'enableSentencePlan',
-          description: '',
-          enabled: sentencePlan,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as string[],
-          rollouts: [] as string[],
-        },
-        {
-          key: 'enableSanIndicator',
-          name: 'enableSanIndicator',
-          description: '',
-          enabled: sanIndicator,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
-          key: 'enableOGRS4',
-          name: 'enableOGRS4',
-          description: '',
-          enabled: ogrs4,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
-          key: 'enableOGRS4SummaryCardDetail',
-          name: 'enableOGRS4SummaryCardDetail',
-          description: '',
-          enabled: ogrs4SummaryCardDetail,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-        {
-          key: 'enableSentencePlanUrl',
-          name: 'enableSentencePlanUrl',
-          description: '',
-          enabled: sentencePlanUrl,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-      ],
-    },
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  },
-})
-
-const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false, true, true))
-
-const stubNoSentencePlan = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, true))
-
-const stubNoSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true, false))
-
-const stubNoSentencePlanAndSanIndicator = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false))
-
 const stubEnableESuperVision = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -110,17 +17,6 @@ const stubEnableESuperVision = (): SuperAgentRequest =>
           {
             key: 'enableESuperVision',
             name: 'enableESuperVision',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableManageCheckins',
-            name: 'enableManageCheckins',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -282,28 +178,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
             rules: [],
             rollouts: [],
           },
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableOGRS4SummaryCardDetail',
-            name: 'enableOGRS4SummaryCardDetail',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
         ],
       },
       headers: {
@@ -312,40 +186,7 @@ const stubDisableTierLink = (): SuperAgentRequest =>
     },
   })
 
-const stubDisableOGRS4 = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-02-26T12:00:00.000000Z',
-            updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubEnableNonCompliance = (): SuperAgentRequest =>
+const stubDisableNonCompliance = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
@@ -363,64 +204,10 @@ const stubEnableNonCompliance = (): SuperAgentRequest =>
             key: 'enableNonCompliance',
             name: 'enableNonCompliance',
             description: '',
-            enabled: true,
+            enabled: false,
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2026-02-26T12:00:00.000000Z',
             updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubEnableESupervisionCustomQuestions = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          {
-            key: 'enableESupervisionCustomQuestions',
-            name: 'enableESupervisionCustomQuestions',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-03-26T12:00:00.000000Z',
-            updatedAt: '2026-03-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableESupervisionCheckins',
-            name: 'enableESupervisionCheckins',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-04-16T12:00:00.000000Z',
-            updatedAt: '2026-04-16T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableShowNextCheckinDate',
-            name: 'enableShowNextCheckinDate',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-05-18T12:00:00.000000Z',
-            updatedAt: '2026-05-18T12:00:00.000000Z',
             rules: [],
             rollouts: [],
           },
@@ -564,7 +351,7 @@ const stubDisableESupervisionCheckins = (): SuperAgentRequest =>
     },
   })
 
-const stubEnableShowNextCheckinDate = (): SuperAgentRequest =>
+const stubEnableShowMatchWithConcern = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
@@ -578,8 +365,8 @@ const stubEnableShowNextCheckinDate = (): SuperAgentRequest =>
         },
         flags: [
           {
-            key: 'enableShowNextCheckinDate',
-            name: 'enableShowNextCheckinDate',
+            key: 'enableShowMatchWithConcern',
+            name: 'enableShowMatchWithConcern',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -596,7 +383,7 @@ const stubEnableShowNextCheckinDate = (): SuperAgentRequest =>
     },
   })
 
-const stubEnableStopCheckinSensitiveFlag = (): SuperAgentRequest =>
+const stubDisableEMDIOverviewShowGPSData = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
@@ -609,36 +396,15 @@ const stubEnableStopCheckinSensitiveFlag = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => f.key !== 'enableEMDIOverviewShowGPSData'),
           {
-            key: 'enableESupervisionCheckins',
-            name: 'enableESupervisionCheckins',
+            key: 'enableEMDIOverviewShowGPSData',
+            name: 'enableEMDIOverviewShowGPSData',
             description: '',
-            enabled: true,
+            enabled: false,
             type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-04-16T12:00:00.000000Z',
-            updatedAt: '2026-04-16T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableManageCheckins',
-            name: 'enableManageCheckins',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableStopCheckinSensitiveFlag',
-            name: 'enableStopCheckinSensitiveFlag',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-05-18T12:00:00.000000Z',
-            updatedAt: '2026-05-18T12:00:00.000000Z',
+            createdAt: '2026-04-10T12:00:00.000000Z',
+            updatedAt: '2026-04-10T12:00:00.000000Z',
             rules: [],
             rollouts: [],
           },
@@ -651,21 +417,15 @@ const stubEnableStopCheckinSensitiveFlag = (): SuperAgentRequest =>
   })
 
 export default {
-  stubNoSentencePlan,
-  stubNoSanIndicator,
-  stubNoSentencePlanAndSanIndicator,
   stubEnableESuperVision,
   stubDisableSmsReminders,
   stubDisableCompliancePage,
   stubDisableTierLink,
-  stubDisableOGRS4,
-  stubEnableESupervisionCustomQuestions,
-  stubEnableNonCompliance,
+  stubDisableNonCompliance,
   stubEnableDeepLinks,
   stubDisableSentencePlanUrl,
-  stubOgrs4SummaryCardEnabled,
   stubDisableESupervisionCheckins,
   stubDisableHomePageOutcome,
-  stubEnableShowNextCheckinDate,
-  stubEnableStopCheckinSensitiveFlag,
+  stubEnableShowMatchWithConcern,
+  stubDisableEMDIOverviewShowGPSData,
 }

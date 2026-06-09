@@ -432,7 +432,6 @@ describe('Test eSuperVision validation', () => {
       }
       const req = makeReq({ url: manageStopCheckinsUrl, body: { esupervision }, session: { data: { esupervision } } })
       const res = makeRes()
-      res.locals.flags = { enableStopCheckinSensitiveFlag: true }
       validation.eSuperVision(req, res, next)
       expect(res.render).toHaveBeenCalled()
     })

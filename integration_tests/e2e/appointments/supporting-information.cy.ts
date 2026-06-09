@@ -11,7 +11,7 @@ import {
 
 const loadPage = (_crn = crn) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage(1, '', _crn)
+  completeSentencePage({ eventIndex: 1, crnOverride: _crn })
   completeTypePage()
   completeLocationDateTimePage({ crnOverride: _crn })
   completeTextMessageConfirmationPage({ _crn, _uuid: uuid, index: 1 })
@@ -79,7 +79,7 @@ describe('Add supporting information (optional)', () => {
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
     appointmentNotePage.getSubmitBtn().click()
     const checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
-    checkYourAnswersPage.checkOnPage()
+    checkYourAnswersPage.checkPageTitle('Check your answers')
   })
   it('should check for correct text', () => {
     cy.get('[data-qa="visorReport"]').should(

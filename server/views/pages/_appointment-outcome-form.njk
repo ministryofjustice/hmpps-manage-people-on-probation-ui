@@ -1,0 +1,14 @@
+{% extends "pages/_form.njk" %}
+ 
+{% block beforeHeading %}
+  {% if appointmentOutcome.breachWarning %}
+    {{ mojAlert({
+    variant: "warning",
+    title: "There is a live breach for this sentence",
+    showTitleAsHeading: true,
+    dismissible: false,
+    attributes: { "data-qa": "breach-warning" },
+    text: 'The breach for '+ appointmentOutcome.breachWarning.order + ' was initiated on ' + appointmentOutcome.breachWarning.breachDate | dateWithYear + '.'
+  }) }}
+  {% endif %}
+{% endblock %}

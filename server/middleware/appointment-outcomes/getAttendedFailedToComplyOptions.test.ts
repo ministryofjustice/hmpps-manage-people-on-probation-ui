@@ -1,14 +1,22 @@
 import httpMocks from 'node-mocks-http'
 import { getAttendedFailedToComplyOptions } from './getAttendedFailedToComplyOptions'
 import { mockAppResponse } from '../../controllers/mocks'
-import { ContactEnforcementActions } from '../../data/model/schedule'
+import { ContactEnforcementAction, ContactOutcome } from '../../data/model/schedule'
 import { validEnforcementActionOptions } from '../../utils'
 import { attendedFailedToComplyOptions } from '../../properties/appointment-outcomes'
 
-const contactEnforcementActions: ContactEnforcementActions[] = [
+const enforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
   { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
+
+const contactOutcomes: ContactOutcome[] = [
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed to Comply',
+    enforcementActions,
+  },
 ]
 
 const nextSpy = jest.fn()
@@ -23,7 +31,7 @@ const buildResponse = ({
       isProbationPractitioner,
       appointmentSession: {
         outcome: {
-          contactEnforcementActions,
+          contactOutcomes,
         },
       },
     },
@@ -49,7 +57,7 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
     validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('COMMUNITY'))
     getAttendedFailedToComplyOptions(req, res, nextSpy)
     expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
-      contactEnforcementActions,
+      contactOutcomes,
       attendedFailedToComplyOptions('COMMUNITY'),
     )
     expect(res.locals.appointmentOutcome.options).toEqual(
@@ -74,7 +82,7 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
     validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('CUSTODY'))
     getAttendedFailedToComplyOptions(req, res, nextSpy)
     expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
-      contactEnforcementActions,
+      contactOutcomes,
       attendedFailedToComplyOptions('CUSTODY'),
     )
     expect(res.locals.appointmentOutcome.options).toEqual(
@@ -91,6 +99,48 @@ describe('/middleware/appointment-outcomes/getAttendedFailedToComplyOptions', ()
       ]),
     )
     expect(res.locals.appointmentOutcome.options).toHaveLength(6)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should call next when appointmentOutcome does not exist', () => {
+    const res = mockAppResponse({})
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(validEnforcementActionOptionsSpy).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should remove REFER_TO_OFFENDER_MANAGER when user is a probation practitioner', () => {
+    const res = buildResponse({
+      sentenceType: 'COMMUNITY',
+      isProbationPractitioner: true,
+    })
+
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('COMMUNITY'))
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.options).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' })]),
+    )
+
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should retain REFER_TO_OFFENDER_MANAGER when user is not a probation practitioner', () => {
+    const res = buildResponse({
+      sentenceType: 'COMMUNITY',
+      isProbationPractitioner: false,
+    })
+
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(attendedFailedToComplyOptions('COMMUNITY'))
+
+    getAttendedFailedToComplyOptions(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.options).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: 'REFER_TO_OFFENDER_MANAGER' })]),
+    )
+
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

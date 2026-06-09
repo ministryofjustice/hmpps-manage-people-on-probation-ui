@@ -7,6 +7,7 @@ import {
   checkAlertBanner,
   checkRescheduleLink,
   checkLogOutcomeAction,
+  checkEnforcementAction,
 } from './imports'
 import { crn, appointmentId, loadPage } from './imports/common'
 
@@ -14,6 +15,7 @@ let manageAppointmentPage: ManageAppointmentPage
 
 const appointmentActions = (enableNonCompliance = true) => {
   checkLogOutcomeAction(enableNonCompliance)
+  checkEnforcementAction(enableNonCompliance)
   checkAppointmentNotesAction()
   if (enableNonCompliance) {
     checkUploadDocumentsAction()
@@ -28,7 +30,7 @@ const appointmentDetails = (enableNonCompliance = true) => {
 
   describe('Delius managed appointment type, no outcome', () => {
     beforeEach(() => {
-      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: false })
+      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: false, eventId: '2501192724' })
       loadPage()
     })
     checkAppointmentDetails({
@@ -39,7 +41,7 @@ const appointmentDetails = (enableNonCompliance = true) => {
   })
   describe('Delius managed appointment type, complied', () => {
     beforeEach(() => {
-      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, hasComplied: true })
+      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, hasComplied: true, eventId: '2501192724' })
       loadPage()
     })
     checkAppointmentDetails({
@@ -51,7 +53,14 @@ const appointmentDetails = (enableNonCompliance = true) => {
   })
   describe('Delius managed appointment, acceptable absence', () => {
     beforeEach(() => {
-      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, acceptableAbsence: true })
+      cy.task('stubAppointment', {
+        deliusManaged: true,
+        hasOutcome: true,
+        acceptableAbsence: true,
+        wasAbsent: true,
+        hasComplied: true,
+        eventId: '2501192724',
+      })
       loadPage()
     })
     checkAppointmentDetails({
@@ -64,7 +73,14 @@ const appointmentDetails = (enableNonCompliance = true) => {
   })
   describe('Delius managed appointment, unacceptable absence', () => {
     beforeEach(() => {
-      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, acceptableAbsence: false })
+      cy.task('stubAppointment', {
+        deliusManaged: true,
+        hasOutcome: true,
+        acceptableAbsence: false,
+        hasComplied: false,
+        wasAbsent: true,
+        eventId: '2501192724',
+      })
       loadPage()
     })
     checkAppointmentDetails({
@@ -116,20 +132,20 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
-        cy.task('stubEnableNonCompliance')
         loadPage()
       })
       appointmentActions()
     })
     describe('enableNonCompliance feature flag is disabled', () => {
       beforeEach(() => {
+        cy.task('stubDisableNonCompliance')
         loadPage()
       })
       appointmentActions(false)
     })
     describe('Appointment type is NDelius managed', () => {
       beforeEach(() => {
-        cy.task('stubAppointment', { deliusManaged: true })
+        cy.task('stubAppointment', { deliusManaged: true, eventId: '2501192724' })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -147,7 +163,6 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
-        cy.task('stubEnableNonCompliance')
         loadPage()
       })
       appointmentDetails()
@@ -155,6 +170,7 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is disabled', () => {
       beforeEach(() => {
+        cy.task('stubDisableNonCompliance')
         loadPage()
       })
       appointmentDetails(false)
@@ -164,7 +180,11 @@ describe('Manage an appointment', () => {
       describe('drug test appointment type', () => {
         beforeEach(() => {
           cy.task('stubEnableDeepLinks')
-          cy.task('stubAppointment', { deliusManaged: true, contactType: 'Drug Test Appointment (NS)' })
+          cy.task('stubAppointment', {
+            deliusManaged: true,
+            contactType: 'Drug Test Appointment (NS)',
+            eventId: '2501192724',
+          })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -188,7 +208,11 @@ describe('Manage an appointment', () => {
       describe('CP/UPW appointment type', () => {
         beforeEach(() => {
           cy.task('stubEnableDeepLinks')
-          cy.task('stubAppointment', { deliusManaged: true, contactType: 'CP/UPW - Appointment/Attendance (NS)' })
+          cy.task('stubAppointment', {
+            deliusManaged: true,
+            contactType: 'CP/UPW - Appointment/Attendance (NS)',
+            eventId: '2501192724',
+          })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })

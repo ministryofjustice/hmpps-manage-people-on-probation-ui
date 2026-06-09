@@ -1,10 +1,26 @@
 import { Name, PersonSummary, Document, Address } from './personalDetails'
 import { Note } from './note'
+import { AcceptableAbsenceOutcomeCode, EnforcementActionCode, OutcomeCode } from '../../properties/appointment-outcomes'
 
 export interface Schedule {
   personSummary: PersonSummary
   personSchedule: PersonSchedule
 }
+
+export type LinkedContactResponse = LinkedContact[]
+
+export interface LinkedContact {
+  contactId: number
+  contactTypeDescription: string
+  contactDate: string
+  createdBy: CreatedBy
+}
+export interface CreatedBy {
+  forename: string
+  middleName?: string
+  surname: string
+}
+
 export interface EnforcementContactsResponse {
   size: number
   page: number
@@ -59,18 +75,30 @@ export interface EnforcementAction {
   responseByDate: string
 }
 
-export interface ContactOutcomes {
+export interface ContactOutcome {
   code: string
   description: string
+  enforcementActions: ContactEnforcementAction[]
 }
 
-export interface ContactEnforcementActions extends ContactOutcomes {
+export interface ContactEnforcementAction {
+  code: EnforcementActionCode
+  description: string
   defaultResponsePeriodDays?: number
 }
 
 export interface ContactOutcomesResponse {
-  outcomes: ContactOutcomes[]
-  enforcementActions?: ContactEnforcementActions[]
+  outcomes: ContactOutcome[]
+}
+
+export interface PutContactRequest {
+  date: string
+  time: string
+  outcomeCode: OutcomeCode | AcceptableAbsenceOutcomeCode
+  enforcementActionCode?: EnforcementActionCode
+  notes: string
+  alert?: boolean
+  sensitive: boolean
 }
 
 export interface Activity {
@@ -129,7 +157,15 @@ export interface Activity {
   externalReference?: string
 }
 
+export interface PersonAppointmentEnforcementAction {
+  code?: EnforcementActionCode
+  description?: string
+  responseByDate?: string
+}
+
 export interface PersonAppointment {
   personSummary: PersonSummary
   appointment: Activity
+  documents: Document[]
+  enforcementAction?: PersonAppointmentEnforcementAction
 }

@@ -7,6 +7,12 @@
 {% set headerCRN = crn %}
 {% set headerDob = sentenceDetails.personSummary.dateOfBirth %}
 {% set headerGender = sentenceDetails.personSummary.gender %}
+{% set licencesEMDILink %}
+    <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="licencesEMDILink">View GPS location monitoring data</a>
+{% endset %}
+{% set requirementsEMDILink %}
+    <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+{% endset %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -135,6 +141,7 @@
                 {% set licenceConditions %}
                 {% for licenceCondition in sentence.licenceConditions %}
                     {% set notes = '' %}
+                    {% set hasLicenceLM = licenceCondition.code | checkLocationMonitoringCode %}
                     {% for lcNote in licenceCondition.licenceConditionNotes %}
                         {% set notes = notes.concat(appNote(lcNote, "/case/" + crn + "/sentence/licence-condition/" + licenceCondition.id + "/note/" + lcNote.id)) %}
                     {% endfor %}
@@ -156,7 +163,11 @@
                                   {
                                       key: { text: 'Notes' },
                                       value: { html: notes }
-                                  }
+                                  },
+                                  {
+                                      key: { text: 'GPS Data' },
+                                      value: { html: licencesEMDILink | safe }
+                                  } if flags.enableEMDISentencesShowGPSData and locationMonitoringUri and hasLicenceLM
                               ]
                           }) }}
                     {% endset %}
@@ -171,6 +182,7 @@
                 {% set hasRequirements = sentence.requirements and sentence.requirements.length > 0 %}
                 {% set requirements %}
                 {% for requirement in sentence.requirements %}
+                    {% set hasRequirementLM = requirement.code | checkLocationMonitoringCode %}
                     {% set reqSummary = requirement.description %}
                     {% set reqNotes = '' %}
                     {% for reqNote in requirement.requirementNotes %}
@@ -215,7 +227,11 @@
                                   {
                                       key: { text: 'Notes' },
                                       value: { html: reqNotes }
-                                  }
+                                  },
+                                  {
+                                      key: { text: 'GPS Data' },
+                                      value: { html: requirementsEMDILink | safe }
+                                  } if flags.enableEMDISentencesShowGPSData and locationMonitoringUri and hasRequirementLM
                               ]
                           }) }}
                     {% endset %}

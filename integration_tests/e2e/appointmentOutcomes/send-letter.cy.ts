@@ -12,7 +12,7 @@ import {
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
-import { ExpectedOption, Journey, checkOptions } from './imports'
+import { ExpectedOption, Journey, checkBreachWarningBanner, checkOptions } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -29,15 +29,10 @@ const loadPage = ({
   journey = 'MANAGE',
   sentenceType = 'COMMUNITY',
 }: { journey?: Journey; sentenceType?: SentenceType } = {}): void => {
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (sentenceType !== 'COMMUNITY') {
     cy.task('stubSentences', { sentenceType })
   }
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
@@ -49,7 +44,7 @@ const loadPage = ({
     completeLocationDateTimePage({ dateInPast: true })
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
@@ -178,6 +173,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage = new AddNotePage()
     addNotePage.checkOnPage()
   })
+
+  checkBreachWarningBanner(loadPage, { Page: SendLetterPage })
 }
 
 describe('Send a letter', () => {

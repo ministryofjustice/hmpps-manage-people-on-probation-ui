@@ -13,7 +13,7 @@ const welsh = `Annwyl Stuart,<br><br>Mae gennych apwyntiad yn Cardiff Probation 
 
 const loadPage = () => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage(1, '', crn)
+  completeSentencePage({ eventIndex: 1, crnOverride: crn })
   completeTypePage()
   completeLocationDateTimePage({ crnOverride: crn })
 }

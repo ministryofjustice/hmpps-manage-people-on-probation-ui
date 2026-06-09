@@ -8,9 +8,6 @@
 {% set headerCRN = crn %}
 {% set headerDob = personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
-{% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
-{% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
-{% set withoutScore = needs.notIdentifiedNeeds %}
 {% set veryHighRiskLevel = groupByLevel("VERY HIGH", personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
@@ -22,33 +19,33 @@
 {% set personForename = overview.personalDetails.name.forename %}
 
 {% set criminogenicNeedsHtml %}
-{% if needs.identifiedNeeds.length %}
+{% if needs.identifiedNeeds.length or needs.notIdentifiedNeeds.length or needs.unansweredNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-    {% if severeScoring.length > 0 %}
-      <dt class="govuk-!-font-weight-bold">Severe</dt>
+    {% if needs.identifiedNeeds.length %}
+      <dt class="govuk-!-font-weight-bold">Need identified</dt>
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list">
-          {% for need in severeScoring %}
+          {% for need in needs.identifiedNeeds %}
             <li>{{ need.name }}</li>
           {% endfor %}
         </ul>
       </dd>
     {% endif %}
-    {% if standardScoring.length > 0 %}
-      <dt class="govuk-!-font-weight-bold">Standard</dt>
+    {% if needs.notIdentifiedNeeds.length %}
+      <dt class="govuk-!-font-weight-bold">No need identified</dt>
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list">
-          {% for need in standardScoring %}
+          {% for need in needs.notIdentifiedNeeds %}
             <li>{{ need.name }}</li>
           {% endfor %}
         </ul>
       </dd>
     {% endif %}
-    {% if withoutScore.length %}
-      <dt class="govuk-!-font-weight-bold">Areas without a need score</dt>
+    {% if needs.unansweredNeeds.length%}
+      <dt class="govuk-!-font-weight-bold">Not enough information provided</dt>
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list govuk-!-margin-bottom-0">
-          {% for need in withoutScore %}
+          {% for need in needs.unansweredNeeds %}
             <li>{{ need.name }}</li>
           {% endfor %}
         </ul>
@@ -200,18 +197,12 @@
   {% if nextCheckin.status === 'VERIFIED' %}
     {% set checkinLinkText = 'View all online check in details' %}
     {% set checkinHrefLink = manageCheckinLink %}
-    {% if flags.enableShowNextCheckinDate === true %}
-          {% set checkinLabel = 'Next check in due' %}
-          
-          {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
-              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
-          {% else %}
-              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
-          {% endif %}
-      {% else %}
-          {% set checkinLabel = 'First check in due' %}
-          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
-      {% endif %}
+    {% set checkinLabel = 'Next check in due' %}
+    {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
+        {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
+    {% else %}
+        {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+    {% endif %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -515,14 +506,19 @@
 
     {% set numberOfSentences = overview.sentences.length %}
     {% if numberOfSentences > 0 %}
-      {% for sentence in overview.sentences %}
+        {% for sentence in overview.sentences %}
+        {% set hasLocationMonitoring = { hasLicenceConditionsLMData: false, hasRequirementsLMData: false } %}
         {% set sentenceHtml %}
         {% set order %}
+        {% set showLicenceRow = false %}
         {% if sentence.order %}
           {% if loop.first %}
             <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
           {% endif %}
-          {{ sentence.order.description }}<br/>
+          {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
+                {% set hasLocationMonitoring = sentence.eventNumber | checkLocationMonitoringByEventNumber(sentences) %}
+          {% endif %}
+          {{ sentence.order.description }} <br/>
                     From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br/>
           {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
                     {% else %}
@@ -530,12 +526,23 @@
                 {% endif %}
         {% endset %}
         {% set requirements %}
-        {% if sentence.rarDescription %}
-          {{ sentence.rarDescription }}
-        {% else %}
-                No requirements details
+         {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+             {{ sentence.rarDescription }} <br/>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+         {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+            {{ sentence.rarDescription }}
+         {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+        {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+                    Details not available
                 {% endif %}
         {% endset %}
+        {% set licences %}
+           {% if hasLocationMonitoring.hasLicenceConditionsLMData  %}
+                {% set showLicenceRow = true %}
+               Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="licencesEMDILink">View GPS location monitoring data</a>
+                {% endif %}
+            {% endset %}
         {% set mainOffence %}
         {% if loop.first %}
           <input type="hidden" id="mainOffence" name="mainOffence" value="{{ sentence.mainOffence.description }}">
@@ -563,7 +570,11 @@
               {
                 key: { html: '<span data-qa="requirementsLabel">Requirements</span>' },
                 value: { html: '<span data-qa="requirementsValue">' + requirements + '</span>' }
-              }
+              } if not  showLicenceRow ,
+              {
+                key: { html: '<span data-qa="licenceConditionsLabel">Licence conditions</span>' },
+                 value: { html: '<span data-qa="licenceConditionsValue">' + licences + '</span>' }
+              } if flags.enableEMDIOverviewShowGPSData and showLicenceRow
             ]
           }) }}
           {% endset %}

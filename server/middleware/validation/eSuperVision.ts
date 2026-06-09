@@ -26,8 +26,6 @@ const eSuperVision: Route<void> = (req, res, next) => {
     'manageCheckin',
     'editCheckInEmail',
   ])
-  // ESUPERVISION FEATURE FLAG
-  const isSensitiveNotesEnabled = res.locals.flags?.enableStopCheckinSensitiveFlag === true
 
   const { back = '', cya = '' } = req.query as Record<string, string>
   const localParams: LocalParams = {
@@ -95,6 +93,20 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateDateFrequency = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
       render = `pages/check-in/date-frequency`
+      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
+      let backUrl: string
+      if (cya) {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityChoice === 'replacement-contact') {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/spo-approval`
+      } else if (eligibilityArray.includes('eligibility-none')) {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+      } else {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+      }
+      res.locals.backLink = backUrl
       errorMessages = validateWithSpec(
         req,
         eSuperVisionValidation({
@@ -213,7 +225,6 @@ const eSuperVision: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'stop-checkin',
-          isSensitiveNotesEnabled,
         }),
       )
     }
@@ -334,7 +345,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateEditQuestion()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    return res.render(render, { errorMessages, isSensitiveNotesEnabled, ...localParams })
+    return res.render(render, { errorMessages, ...localParams })
   }
   return next()
 }

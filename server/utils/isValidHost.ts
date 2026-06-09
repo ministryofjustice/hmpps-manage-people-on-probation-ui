@@ -13,6 +13,7 @@ export const isValidHost = (host: string): boolean => {
     process.env.SUPERVISION_API_URL,
     process.env.PROBATION_FRONTEND_COMPONENTS_API_URL,
     process.env.E_SUPERVISION_API_URL,
+    process.env.EMDI_API_URL,
     'http://localhost:8100',
     'http://localhost:9091',
     'http://localhost:8080/api',

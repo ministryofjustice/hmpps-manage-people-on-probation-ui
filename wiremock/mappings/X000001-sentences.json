@@ -23,9 +23,9 @@
             {
               "id": 49,
               "eventNumber": "1234567",
-              "sentenceType": "PRE_SENTENCE",
               "order": {
-                "description": "Pre-Sentence"
+                "description": "Pre-Sentence",
+                "sentenceType": "PRE_SENTENCE"
               },
               "nsis": [],
               "licenceConditions": [],
@@ -34,9 +34,9 @@
             {
               "id": 48,
               "eventNumber": "7654321",
-              "sentenceType": "COMMUNITY",
               "order": {
                 "description": "Default Sentence Type (12 Months)",
+                "sentenceType": "COMMUNITY",
                 "startDate": "2025-05-31"
               },
               "nsis": [
@@ -119,9 +119,9 @@
             {
               "id": 49,
               "eventNumber": "1234567",
-              "sentenceType": "COMMUNITY",
               "order": {
-                "description": "Pre-Sentence"
+                "description": "Pre-Sentence",
+                "sentenceType": "COMMUNITY"
               },
               "nsis": [],
               "licenceConditions": [],
@@ -130,9 +130,9 @@
             {
               "id": 48,
               "eventNumber": "7654321",
-              "sentenceType": "COMMUNITY",
               "order": {
                 "description": "Default Sentence Type (12 Months)",
+                "sentenceType": "COMMUNITY",
                 "startDate": "2025-05-31"
               },
               "nsis": [
@@ -337,6 +337,12 @@
                     "hasNoteBeenTruncated": false
                   }
                 ]
+              },
+              {
+                "id": 4,
+                "description": "Location Monitoring(GPS Tagging) - Monitored Appointment",
+                "code": "RM59",
+                "active": true
               }
             ],
             "courtDocuments": [],
@@ -504,6 +510,12 @@
                     "hasNoteBeenTruncated": false
                   }
                 ]
+              },
+              {
+                "id": 2500841296,
+                "code": "EM01",
+                "mainDescription": "Licence - Location Monitoring (GPS Tagging)",
+                "active": true
               }
             ]
           }

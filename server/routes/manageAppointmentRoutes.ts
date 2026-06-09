@@ -9,6 +9,7 @@ import {
   getAppointmentTypes,
   getSentences,
   parseMultipartBody,
+  forceValidation,
 } from '../middleware'
 import { getNotePrepend, getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
@@ -49,10 +50,12 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     getSentences(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getOutcomeProps,
+    getNotePrepend,
   )
 
   router.get(
     '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    forceValidation,
     controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
   )
 
@@ -61,7 +64,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     multerErrorHandler('fileUpload'),
     parseMultipartBody,
     validate.appointmentOutcomes,
-    getNotePrepend,
     autoStoreSessionData(hmppsAuthClient),
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )

@@ -157,6 +157,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         notes: notes ?? null,
         sensitivity: sensitivityLocked ? 'Yes' : (sensitivity ?? null),
         outcomeRecorded: outcomeRecorded ?? null,
+        isReschedule: rescheduleAppointment?.contactId !== undefined,
       }
     }
     res.locals.appointment = appointment

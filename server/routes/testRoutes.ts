@@ -18,10 +18,5 @@ export default function testRoutes(router: Router) {
     return res.sendStatus(200)
   })
 
-  router.post('/__test/clear-session', (req, res) => {
-    res.clearCookie('connect.sid')
-    delete req.session.data
-    return res.sendStatus(200)
-  })
   return router
 }

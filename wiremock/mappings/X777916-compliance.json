@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/compliance/X777916",
+        "urlPathPattern": "/mas/compliance/X777916",
         "method": "GET"
       },
       "response": {
@@ -36,6 +36,7 @@
             {
               "eventNumber": "3",
               "activity": {
+                "acceptableAbsenceCount": 2,
                 "unacceptableAbsenceCount": 1,
                 "attendedButDidNotComplyCount": 1,
                 "outcomeNotRecordedCount": 3,

@@ -1,0 +1,54 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "url": "/mas/compliance/non-compliance-detail/X000001?months=12",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "acceptableAbsence": [
+            {
+              "contactId": 1234567,
+              "eventNumber": "4",
+              "eventId": 4,
+              "type": {
+                "code": "NS",
+                "description": "Planned Office Visit (NS)"
+              },
+              "date": "2024-05-19"
+            }
+          ],
+          "unacceptableAbsence": [
+            {
+              "contactId": 123456,
+              "eventNumber": "3",
+              "eventId": 3,
+              "type": {
+                "code": "NS",
+                "description": "Planned Home Visit (NS)"
+              },
+              "date": "2024-05-18"
+            }
+          ],
+          "attendedButDidNotComply": [
+            {
+              "contactId": 123456,
+              "eventNumber": "4",
+              "eventId": 4,
+              "type": {
+                "code": "NS",
+                "description": "Planned Home Visit (NS)"
+              },
+              "date": "2024-05-18"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

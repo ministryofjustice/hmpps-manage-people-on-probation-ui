@@ -12,16 +12,15 @@ import {
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { EventResponse, RescheduleEventRequest, SmsPreviewRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { PersonAppointment } from '../data/model/schedule'
 import { buildCaseLink } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
-): Route<Promise<RescheduleAppointmentResponse | PersonAppointment>> => {
+): Route<Promise<RescheduleAppointmentResponse>> => {
   return async (req, res) => {
-    const { crn, id: uuid, contactId } = req.params as Record<string, string>
+    const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
@@ -39,11 +38,11 @@ export const postRescheduleAppointments = (
       rescheduleAppointment,
       outcomeRecorded,
       smsOptIn,
+      user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
-    const selectedTeam = getDataValue(data, ['appointments', crn, uuid, 'user', 'teamCode'])
-    const selectedLocation = getDataValue(data, ['appointments', crn, uuid, 'user', 'locationCode'])
-    const staffCode = getDataValue(data, ['appointments', crn, uuid, 'user', 'staffCode'])
+
     const isInPast = appointmentDateIsInPast(req)
+    const { contactId } = rescheduleAppointment
     const body: RescheduleAppointmentRequestBody = {
       date,
       startTime: start,
@@ -67,7 +66,7 @@ export const postRescheduleAppointments = (
     const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
-    if (email && res.locals.flags.enableCalendarEvents) {
+    if (email) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)

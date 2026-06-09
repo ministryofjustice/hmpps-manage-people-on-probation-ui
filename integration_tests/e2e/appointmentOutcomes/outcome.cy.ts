@@ -10,6 +10,7 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  uncheckAllRadios,
 } from '../appointments/utils'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
@@ -17,7 +18,13 @@ import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend
 import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
-import { ExpectedOption, Journey, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
+import {
+  ExpectedOption,
+  Journey,
+  checkBreachWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+} from './imports'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
 let manageAppointmentPage: ManageAppointmentPage
@@ -40,28 +47,26 @@ interface Args {
 }
 
 const loadPage = ({ journey = 'MANAGE', dateInPast = false, inOffice = true, id = appointmentId }: Args = {}) => {
-  cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { isFuture: dateInPast === false, eventId: 2501192724, inOffice })
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
   if (journey === 'ARRANGE') {
     completeSentencePage()
     completeTypePage(inOffice ? 1 : 2)
     completeLocationDateTimePage({ dateInPast })
+    uncheckAllRadios()
   }
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${id}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getTaskLink(1).click()
+    uncheckAllRadios()
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
       completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid })
+      uncheckAllRadios()
     })
   }
 }
@@ -95,8 +100,8 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
-          redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
-          RedirectPage: AttendedFailedToComplyPage,
+          redirectPageTitle: 'Add a note',
+          RedirectPage: AddNotePage,
         },
       )
     }
@@ -240,6 +245,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       outcomePage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
+
+  checkBreachWarningBanner(loadPage, { Page: OutcomePage })
 }
 
 describe('Appointment outcome', () => {

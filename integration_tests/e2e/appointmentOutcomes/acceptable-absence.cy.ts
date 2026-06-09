@@ -8,12 +8,19 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  uncheckAllRadios,
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import { ExpectedOption, Journey, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
+import {
+  ExpectedOption,
+  Journey,
+  checkBreachWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+} from './imports'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -27,13 +34,8 @@ const loadPage = ({
   sentenceLength = 25,
 }: { journey?: Journey; sentenceLength?: number } = {}): void => {
   const endDate = sentenceLength === 12 ? '2024-12-01' : '2027-01-01'
-  cy.task('stubEnableNonCompliance')
   cy.task('stubSentences', { endDate })
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
@@ -45,7 +47,7 @@ const loadPage = ({
     completeLocationDateTimePage({ dateInPast: true })
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
@@ -53,6 +55,7 @@ const loadPage = ({
     })
   }
   outcomePage = new OutcomePage()
+  uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=ACCEPTABLE_ABSENCE]`).click()
   outcomePage.getSubmitBtn().click()
 }
@@ -154,6 +157,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const msg = 'Select why their absence was acceptable'
     loadPage({ journey })
     acceptableAbsencePage = new AcceptableAbsencePage()
+    uncheckAllRadios()
     acceptableAbsencePage.getSubmitBtn().click()
     acceptableAbsencePage.checkErrorSummaryBox([msg])
     getUuid(3).then(uuid => {
@@ -161,16 +165,16 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
     })
   })
+
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })
   })
+
+  checkBreachWarningBanner(loadPage, { Page: AcceptableAbsencePage })
 }
 
 describe('Acceptable absence', () => {
-  before(() => {
-    cy.request('POST', '/__test/clear-session')
-  })
   afterEach(() => {
     cy.task('resetMocks')
   })
@@ -182,5 +186,54 @@ describe('Acceptable absence', () => {
   })
   describe('Reschedule appointment journey', () => {
     checkPage({ journey: 'RESCHEDULE' })
+  })
+
+  describe('Alert banner', () => {
+    it('should display alert panel when person has multiple acceptable absences', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      acceptableAbsencePage = new AcceptableAbsencePage()
+      cy.get('[data-qa="alert-panel"]').should('exist')
+      cy.get('.moj-ticket-panel__content--blue').should(
+        'contain.text',
+        'has had multiple acceptable absences in the past 12 months',
+      )
+    })
+
+    it('should have a link to activity log in the alert panel', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      acceptableAbsencePage = new AcceptableAbsencePage()
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .should('have.attr', 'href')
+          .and('include', `/case/${crn}/activitylog`)
+          .and('include', 'compliance=complied')
+      })
+    })
+
+    it('should navigate to activity log with acceptable absence filter when link is clicked', () => {
+      cy.task('stubBreachCompliance')
+      loadPage()
+      acceptableAbsencePage = new AcceptableAbsencePage()
+
+      // Click the link in the alert panel
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .should('have.attr', 'target', '_blank')
+          .invoke('attr', 'href')
+          .then(href => {
+            cy.visit(href)
+          })
+      })
+
+      cy.url().should('include', '/activity-log')
+
+      // Verify the "acceptable absence" filter is present in the compliance filters section
+      cy.get('.moj-filter__selected').within(() => {
+        cy.get('h3').should('contain.text', 'Compliance filters')
+        cy.get('.moj-filter-tags li').should('contain.text', 'complied')
+      })
+    })
   })
 })

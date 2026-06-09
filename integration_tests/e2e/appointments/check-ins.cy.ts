@@ -40,7 +40,6 @@ const loadPage = () => {
   cy.task('resetMocks')
   cy.visit(`/case/X000001/appointments`)
   cy.task('stubGetQuestionsTemplates')
-  cy.task('stubEnableESupervisionCustomQuestions')
 }
 
 const clickNextDayButton = () => {
@@ -865,7 +864,6 @@ context('check-ins error scenario ', () => {
 context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
@@ -888,7 +886,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
@@ -908,7 +905,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should show checkin details', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
@@ -1015,7 +1011,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to stop check in', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableStopCheckinSensitiveFlag')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
@@ -1034,7 +1029,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to stop and restart online check ins', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableStopCheckinSensitiveFlag')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
 
     const restartDatePage = new RestartDateFrequencyPage()
@@ -1073,7 +1067,6 @@ context('check-ins overview and manage pages', () => {
 context('check-ins add questions pages', () => {
   it('should allow a user to start the add questions to online check ins journey', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
     cy.task('stubAssignQuestions')
@@ -1086,7 +1079,6 @@ context('check-ins add questions pages', () => {
 
   it('should allow a user to view the default questions preview pages', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
@@ -1115,7 +1107,6 @@ context('check-ins add questions pages', () => {
 
   it('should show the "Add question" button for additional custom questions', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
@@ -1127,7 +1118,6 @@ context('check-ins add questions pages', () => {
 
   it('should show the "Save questions" button', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
@@ -1139,7 +1129,6 @@ context('check-ins add questions pages', () => {
 
   it('should show the "cancel and go back" button ', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
@@ -1151,7 +1140,6 @@ context('check-ins add questions pages', () => {
 
   it('should trigger validation errors when trying to save a blank custom question', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
@@ -1172,7 +1160,6 @@ context('check-ins add questions pages', () => {
 
   it('should allow a user to add, edit, and delete a custom question', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')
@@ -1216,7 +1203,6 @@ context('check-ins add questions pages', () => {
 
   it('should enforce the maximum limit of 3 custom questions', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
     cy.task('stubGetUpcomingCheckinQuestions')
     cy.task('stubGetUpcomingCheckinQuestionItems')

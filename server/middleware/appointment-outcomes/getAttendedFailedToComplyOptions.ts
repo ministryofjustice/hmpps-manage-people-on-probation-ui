@@ -4,6 +4,9 @@ import { attendedFailedToComplyOptions } from '../../properties/appointment-outc
 import { validEnforcementActionOptions } from '../../utils'
 
 export const getAttendedFailedToComplyOptions: Route<void> = (_req, res, next) => {
+  if (!res.locals.appointmentOutcome) {
+    return next()
+  }
   const {
     sentence: { type },
     isProbationPractitioner,
@@ -11,7 +14,7 @@ export const getAttendedFailedToComplyOptions: Route<void> = (_req, res, next) =
   } = res.locals.appointmentOutcome
 
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactEnforcementActions,
+    appointmentSession?.outcome?.contactOutcomes,
     attendedFailedToComplyOptions(type),
   )
   if (isProbationPractitioner) {

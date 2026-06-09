@@ -25,7 +25,11 @@ export const checkUpdateTextMessageConfirmation = (
         page.getElementInput('mobileNumber').clear().type('07703123456')
         cy.get('[data-qa=submitBtn]').click()
       }
-      page.checkOnPage()
+      if (page instanceof AppointmentCheckYourAnswersPage) {
+        page.checkPageTitle('Check your answers then confirm the appointment')
+      } else {
+        page.checkOnPage()
+      }
       if (updateMobileNumber) {
         page
           .getSummaryListRow(6)

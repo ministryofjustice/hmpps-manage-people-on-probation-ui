@@ -86,24 +86,25 @@ context('Overview', () => {
       .should('contain.text', 'Last updated (NDelius): 8 October 2024')
     page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'Cat 2/Level 3')
     page.getRowData('risk', 'criminogenicNeeds', 'Label').should('contain.text', 'Criminogenic needs')
-    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(0).should('contain.text', 'Severe')
+    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(0).should('contain.text', 'Need identified')
     cy.get('[data-qa="criminogenicNeedsValue"]')
       .find('ul')
       .eq(0)
       .should('contain.text', 'Relationships')
       .should('contain.text', 'Lifestyle and Associates')
-      .should('contain.text', 'Thinking and Behaviour')
-    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(1).should('contain.text', 'Standard')
-    cy.get('[data-qa="criminogenicNeedsValue"]')
-      .find('ul')
-      .eq(1)
       .should('contain.text', 'Accommodation')
       .should('contain.text', 'Education, Training and Employability')
       .should('contain.text', 'Drug Misuse')
       .should('contain.text', 'Alcohol Misuse')
+    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(1).should('contain.text', 'No need identified')
+    cy.get('[data-qa="criminogenicNeedsValue"]').find('ul').eq(1).should('contain.text', 'Emotional wellbeing')
+
+    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(2).should('contain.text', 'Not enough information provided')
+    cy.get('[data-qa="criminogenicNeedsValue"]')
+      .find('ul')
+      .eq(2)
+      .should('contain.text', 'Thinking and Behaviour')
       .should('contain.text', 'Attitudes')
-    cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(2).should('contain.text', 'Areas without a need score')
-    cy.get('[data-qa="criminogenicNeedsValue"]').find('ul').eq(2).should('contain.text', 'Emotional wellbeing')
 
     page.getRowData('risk', 'riskFlags', 'Label').should('contain.text', 'NDelius risk flags')
     cy.get('[data-qa="riskFlagsValue"] dt')
@@ -173,6 +174,7 @@ context('Overview', () => {
     page.assertRiskTags()
   })
   it('Risk information and tier is not provided due to 500 from ARNS and TIER', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X000002')
     const page = Page.verifyOnPage(OverviewPage)
     page.headerCrn().should('contain.text', 'X000002')
@@ -200,11 +202,12 @@ context('Overview', () => {
     page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
   })
   it('Overview page with pre-sentence is rendered', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X777916')
     const page = Page.verifyOnPage(OverviewPage)
     page.getCardHeader('sentence11').should('contain.text', 'Pre-Sentence')
     page.getRowData('sentence11', 'order', 'Value').should('contain.text', 'No order details')
-    page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'No requirements details')
+    page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'Details not available')
   })
 
   it('Overview page with medium risk to staff is rendered', () => {
@@ -214,8 +217,44 @@ context('Overview', () => {
   })
 
   it('Overview page with risk to probation staff is rendered', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X777916', { failOnStatusCode: false })
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
+  })
+
+  it('Overview page should not be rendered with licence conditions when EMDI API responds with 404', () => {
+    cy.task('stubEMDIPeopleExists404Response', 'X778160')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page should not be rendered with licence conditions when EMDI API responds with 500', () => {
+    cy.task('stubEMDIPeopleExists500Response', 'X778160')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page should not be rendered with licence conditions when flag is disabled', () => {
+    cy.task('stubDisableEMDIOverviewShowGPSData')
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  })
+
+  it('Overview page is rendered with licence conditions', () => {
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page
+      .getRowData('sentence1234567', 'licenceConditions', 'Value')
+      .should('contain.text', 'Location Monitoring View GPS location monitoring data')
+    page
+      .getRowData('sentence7654321', 'requirements', 'Value')
+      .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
   })
 })

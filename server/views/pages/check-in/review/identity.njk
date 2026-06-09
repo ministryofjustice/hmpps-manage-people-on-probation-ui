@@ -44,7 +44,7 @@
             </div>
         </dl>
 
-        <h2 class="govuk-heading-m">Review and confirm identity</h2>
+        <h3 class="govuk-heading-m">Review and confirm identity</h3>
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="identitySummary">
             <div class="govuk-summary-list__row">
@@ -83,29 +83,62 @@
         </dl>
 
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
-            {{ govukRadios({
-                fieldset: {
-                    legend: {
-                        text: 'Is the person in the image from the check in ' + checkIn.personalDetails.name.forename + '?',
-                        classes: "govuk-label--m govuk-!-font-weight-bold"
-                    }
-                },
-                formGroup: {
-                    attributes: {
-                        'data-qa': 'confirmIdentity'
-                    }
-                },
-                items: [
-                    {
-                        value: "MATCH",
-                        text: "Yes"
+            {% if flags.enableShowMatchWithConcern === true %}
+                {{ govukRadios({
+                    fieldset: {
+                        legend: {
+                            text: 'Is the person in the image from the check in ' + checkIn.personalDetails.name.forename + '?',
+                            classes: "govuk-label--m govuk-!-font-weight-bold"
+                        }
                     },
-                    {
-                        value: "NO_MATCH",
-                        text: "No"
-                    }
-                ]
-            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'manualIdCheck'])) }}
+                    hint: {
+                        text: 'We will only save the image if it isn’t the person, or there is anything of concern, for example, evidence of crime or physical injury.'
+                    },
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'confirmIdentity'
+                        }
+                    },
+                    items: [
+                        {
+                            value: "MATCH",
+                            text: "Yes, and there is nothing concerning"
+                        },
+                        {
+                            value: "MATCH_WITH_CONCERN",
+                            text: "Yes, and there is a visible concern"
+                        },
+                        {
+                            value: "NO_MATCH",
+                            text: "No, it is not " + checkIn.personalDetails.name.forename
+                        }
+                    ]
+                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'manualIdCheck'])) }}
+            {% else %}
+                {{ govukRadios({
+                    fieldset: {
+                        legend: {
+                            text: 'Is the person in the image from the check in ' + checkIn.personalDetails.name.forename + '?',
+                            classes: "govuk-label--m govuk-!-font-weight-bold"
+                        }
+                    },
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'confirmIdentity'
+                        }
+                    },
+                    items: [
+                        {
+                            value: "MATCH",
+                            text: "Yes"
+                        },
+                        {
+                            value: "NO_MATCH",
+                            text: "No"
+                        }
+                    ]
+                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'manualIdCheck'])) }}
+            {% endif %}
 
             <div class="govuk-button-group">
                 {{ govukButton({

@@ -233,7 +233,7 @@ describe('masApiClient', () => {
         '/risk-flags/X000001/1/risk-removal-note/2',
         () => masApiClient.getPersonRiskRemovalFlagSingleNote('X000001', '1', '2'),
       ],
-      ['getPersonCompliance', '/compliance/X000001', () => masApiClient.getPersonCompliance('X000001')],
+      ['getPersonCompliance', '/compliance/X000001?months=12', () => masApiClient.getPersonCompliance('X000001')],
       [
         'postAppointments',
         '/appointment/X000001',

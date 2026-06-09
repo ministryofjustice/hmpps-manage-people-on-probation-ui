@@ -22,14 +22,10 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
       reviewDueDate = reviewDueDate.toFormat('d MMMM yyyy')
       checkInResponse.reviewDueDate = reviewDueDate.toString()
     }
-
     for (let i = 0; i < checkInResponse.checkinLogs.logs.length; i += 1) {
       const log = checkInResponse.checkinLogs.logs[i]
       if (log.logEntryType === 'OFFENDER_CHECKIN_NOT_SUBMITTED') {
         checkInResponse.missedCheckinComment = log.notes
-      }
-      if (log.logEntryType === 'OFFENDER_CHECKIN_REVIEW_SUBMITTED') {
-        checkInResponse.furtherActions = log.notes
       }
       if (log.logEntryType === 'OFFENDER_CHECKIN_ANNOTATED') {
         const note = {

@@ -1,14 +1,22 @@
 import httpMocks from 'node-mocks-http'
 import { getFailedToAttendOptions } from './getFailedToAttendOptions'
 import { mockAppResponse } from '../../controllers/mocks'
-import { ContactEnforcementActions } from '../../data/model/schedule'
+import { ContactOutcome, ContactEnforcementAction } from '../../data/model/schedule'
 import { validEnforcementActionOptions } from '../../utils'
 import { failedToAttendOptions } from '../../properties/appointment-outcomes'
 
-const contactEnforcementActions: ContactEnforcementActions[] = [
+const enforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
   { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
+]
+
+const contactOutcomes: ContactOutcome[] = [
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed to Comply',
+    enforcementActions,
+  },
 ]
 
 const nextSpy = jest.fn()
@@ -20,7 +28,7 @@ const buildResponse = ({ isProbationPractitioner = false } = {}): httpMocks.Mock
       isProbationPractitioner,
       appointmentSession: {
         outcome: {
-          contactEnforcementActions,
+          contactOutcomes,
         },
       },
     },
@@ -44,10 +52,7 @@ describe('/middleware/appointment-outcomes/getFailedToAttendOptions', () => {
   it('should return the correct options if user is not probation practitioner', () => {
     const res = buildResponse()
     getFailedToAttendOptions(req, res, nextSpy)
-    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(
-      contactEnforcementActions,
-      failedToAttendOptions('Anton'),
-    )
+    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactOutcomes, failedToAttendOptions('Anton'))
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),

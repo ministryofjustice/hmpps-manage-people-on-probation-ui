@@ -2,7 +2,14 @@ import { Response } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
-import { EnforcementContactsResponse, ContactOutcomesResponse, PersonAppointment, Schedule } from './model/schedule'
+import {
+  EnforcementContactsResponse,
+  ContactOutcomesResponse,
+  LinkedContactResponse,
+  PersonAppointment,
+  Schedule,
+  PutContactRequest,
+} from './model/schedule'
 import {
   AddressOverview,
   AddressOverviewSummary,
@@ -19,7 +26,7 @@ import {
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
 import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
-import { PersonCompliance } from './model/compliance'
+import { NonComplianceHistoryResponse, PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
 import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
@@ -148,6 +155,11 @@ export default class MasApiClient extends RestClient {
   async getContactOutcomes(typeCode: string, outcomeCode?: string): Promise<ContactOutcomesResponse> {
     const path = `/contact/types/${typeCode}/outcomes${outcomeCode ? `/${outcomeCode}` : ''}`
     return this.get({ path })
+  }
+
+  async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
+    const path = `/contact/${contactId}`
+    return this.put({ data: body, path })
   }
 
   async getPersonalDetails(crn: string): Promise<PersonalDetails | null> {
@@ -370,8 +382,22 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/risk-flags/${crn}/${id}/risk-removal-note/${noteId}`, handle404: false })
   }
 
-  async getPersonCompliance(crn: string): Promise<PersonCompliance> {
-    return this.get({ path: `/compliance/${crn}`, handle404: false })
+  async getPersonCompliance(crn: string, months: number = 12): Promise<PersonCompliance> {
+    const complianceResponse: PersonCompliance = await this.get({
+      path: `/compliance/${crn}?months=${months}`,
+      handle404: false,
+    })
+
+    return complianceResponse
+  }
+
+  async getPersonNonCompliance(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
+    const nonComplianceResponse: NonComplianceHistoryResponse = await this.get({
+      path: `/compliance/non-compliance-detail/${crn}?months=${months}`,
+      handle404: false,
+    })
+
+    return nonComplianceResponse
   }
 
   async postAppointments(crn: string, body: AppointmentRequestBody): Promise<AppointmentsPostResponse> {
@@ -516,8 +542,8 @@ export default class MasApiClient extends RestClient {
   }
 
   async getUserAlertsCount(): Promise<number> {
-    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true })
-    return response.totalResults
+    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true, handle500: true })
+    return response?.totalResults ? response.totalResults : -1
   }
 
   async clearAlerts(alertIds: number[]) {
@@ -531,8 +557,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 
-  async getBreachRecallInformation(crn: string): Promise<string> {
-    const response: string = await this.get({ path: `/breachRecall`, handle404: true })
-    return response
+  async getRelatedContacts(crn: string, appointmentId: string): Promise<LinkedContactResponse> {
+    return (await this.get({
+      path: `/schedule/${crn}/appointment/${appointmentId}/linked-contacts`,
+      handle404: false,
+    })) as LinkedContactResponse
   }
 }

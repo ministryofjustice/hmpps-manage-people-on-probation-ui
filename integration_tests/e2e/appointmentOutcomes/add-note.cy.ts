@@ -10,26 +10,25 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  completeOutcome,
 } from '../appointments/utils'
-import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
-import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../server/models/Appointments'
 
 let addNotePage: AddNotePage
 let manageAppointmentPage: ManageAppointmentPage
-let outcomePage: OutcomePage
-let attendedFailedToComplyPage: AttendedFailedToComplyPage
 let checkYourAnswersPage: RescheduleCheckYourAnswerPage
+let nextAppointmentPage: NextAppointmentPage
 
 type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
 
-const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
+const loadPage = ({
+  journey = 'MANAGE',
+  outcome = 'ATTENDED_SENT_HOME_BEHAVIOUR',
+  action = 'NO_FURTHER_ACTION',
+}: { journey?: Journey; outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}): void => {
   const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:3007/__test/clear-session',
-  })
-  cy.task('stubEnableNonCompliance')
   if (journey === 'ARRANGE') {
     completeSentencePage()
     completeTypePage()
@@ -41,19 +40,14 @@ const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
     manageAppointmentPage.getTaskLink(1).click()
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage(true, crn)
+    completeRescheduleAppointmentPage({ crn })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
       completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid, crnOverride: crn })
     })
   }
-  outcomePage = new OutcomePage()
-  cy.get(`.govuk-radios__input[value=ATTENDED_SENT_HOME_BEHAVIOUR]`).click()
-  outcomePage.getSubmitBtn().click()
-  attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).click()
-  attendedFailedToComplyPage.getSubmitBtn().click()
+  completeOutcome({ outcome, action })
   addNotePage = new AddNotePage()
 }
 
@@ -106,6 +100,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', '')
       if (journey === 'MANAGE') {
         cy.get('label[for="fileUpload"]').should('contain.text', 'Upload a file (optional)')
+        cy.get('.guidance-panel').should('not.exist')
       }
     })
   })
@@ -143,7 +138,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
       addNotePage.getSubmitBtn().click()
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkOnPage()
+      cyaPage.checkPageTitle('Check your answers')
     })
   }
   if (journey === 'MANAGE') {
@@ -164,17 +159,39 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
         addNotePage.getSubmitBtn().click()
         cy.wait('@submit')
-        const cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkOnPage()
-        // cy.url().should('include', '/manage')
+        nextAppointmentPage = new NextAppointmentPage()
+        nextAppointmentPage.checkPageTitle(`Eula’s next supervision appointment`)
       })
+    })
+    it('should display the prepended note inset text if breach action', () => {
+      loadPage({ journey, action: 'BREACH_RECALL_INITIATED' })
+      cy.get('.guidance-panel')
+        .should('be.visible')
+        .should('be.visible')
+        .should('contain.text', 'Manage people on probation will automatically add this update:')
+        .should('contain.text', 'I will initiate the breach')
+    })
+    it('should display the prepended note inset text if letter action', () => {
+      loadPage({ journey, action: 'SEND_LETTER' })
+      cy.get('.guidance-panel')
+        .should('be.visible')
+        .should('contain.text', 'Manage people on probation will automatically add this update:')
+        .should('contain.text', 'I will send a first warning letter')
+    })
+    it('should display the prepended note inset text if breach and letter action', () => {
+      loadPage({ journey, action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
+      cy.get('.guidance-panel')
+        .should('be.visible')
+        .should('contain.text', 'Manage people on probation will automatically add this update:')
+        .should('contain.text', 'I will initiate the breach')
+        .should('contain.text', 'I will send a licence compliance letter')
     })
   }
   it('submits successfully with no notes or upload and sensitivity selected', () => {
     loadPage({ journey })
     addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
     addNotePage.getSubmitBtn().click()
-    checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
+    nextAppointmentPage = new NextAppointmentPage()
   })
 }
 

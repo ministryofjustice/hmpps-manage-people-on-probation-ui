@@ -136,7 +136,6 @@ describe('checkInsController', () => {
     jest.useRealTimers()
     res.locals.flags = {
       ...res.locals.flags,
-      enableESupervisionCustomQuestions: true,
     }
   })
 
@@ -1110,6 +1109,7 @@ describe('checkInsController', () => {
     it('renders confirmation with computed displayCommsOption and displayDay', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
+      const activeId = uuid
 
       const data = {
         esupervision: {
@@ -1132,6 +1132,16 @@ describe('checkInsController', () => {
         session: { data },
       })
 
+      const mockResponse = {
+        crn,
+        uuid,
+        status: 'VERIFIED',
+        firstCheckin: '2/7/2026',
+        checkinInterval: 'WEEKLY',
+        contactPreference: 'EMAIL',
+      }
+      getOffenderCheckinsByCRNSpy.mockResolvedValueOnce({ ...mockResponse, uuid: activeId } as any)
+
       await controllers.checkIns.getConfirmationPage(hmppsAuthClient)(req, res)
       checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalled()
@@ -1139,7 +1149,7 @@ describe('checkInsController', () => {
       expect(template).toBe('pages/check-in/confirmation.njk')
       expect(context.crn).toBe(crn)
       expect(context.id).toBe(uuid)
-      expect(context.userDetails.uuid).toBe(uuid)
+      expect(context.userDetails.uuid).toBe(activeId)
       expect(context.userDetails.interval).toBe('Every week')
       expect(context.userDetails.displayCommsOption).toBe('person@example.com')
       expect(context.userDetails.displayDay).toBe('Wednesday')
@@ -2640,7 +2650,6 @@ describe('checkInsController', () => {
         },
       }
       const req = baseReq(data)
-      res.locals.flags = { enableStopCheckinSensitiveFlag: true }
       await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
 
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')

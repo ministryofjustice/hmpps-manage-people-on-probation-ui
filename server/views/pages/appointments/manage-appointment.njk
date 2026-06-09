@@ -20,7 +20,7 @@
 {% endif %}
 {% if flags.enableNonCompliance and appointment.hasOutcome %}
   {% set outcomeLabel = 'Change appointment outcome' %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action' %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
 
 {% if appointment.location.officeName %}
@@ -93,6 +93,15 @@
   {% set outcomeTagColour = 'green' %}
   {% set compliedTagColor = 'blue' %}
 {% endif %}
+
+{% set outcomeHint = null %}
+{% if not flags.enableNonCompliance and not appointment.isInPast %}
+  {% set outcomeHint = "You cannot log an attended and complied outcome until the appointment has happened." %}
+{% endif %}
+{% if flags.enableNonCompliance and appointmentOutcome.currentOutcome.reason %}
+  {% set outcomeHint = appointmentOutcome.currentOutcome.reason %}
+{% endif %}
+
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
   {% set alert = "You must log an outcome and should add notes to this appointment." %}
 {% endif %}
@@ -130,7 +139,7 @@
     <hr class="govuk-section-break--l">
   {% endif %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-two-thirds">
       <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
@@ -140,6 +149,17 @@
   text: alert,
   attributes: {
     'data-qa': 'appointmentAlert'
+  }
+}) }}
+      {% endif %}
+      {% if appointmentOutcome.currentEnforcementAction.evidenceWarning and not appointment.deliusManaged %}
+        {{ mojAlert({
+  variant: "warning",
+  showTitleAsHeading: true,
+  dismissible: false,
+  text: appointmentOutcome.currentEnforcementAction.evidenceWarning,
+  attributes: {
+    'data-qa': 'evidenceWarning'
   }
 }) }}
       {% endif %}
@@ -168,16 +188,31 @@
         html: '<span>' + outcomeLabel + '</span>'
       },
       hint: {
-        text: "You cannot log an attended and complied outcome until the appointment has happened."
-      } if not flags.enableNonCompliance and not appointment.isInPast,
+        text: outcomeHint
+      } if outcomeHint,
       href: outcomeLink,
       status: {
         tag: {
-          text: compliedStatus,
-          classes: "govuk-tag--" + compliedTagColor
+          text: compliedStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
+          classes: "govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
         }
       }
     },
+    {
+      title: {
+        html: '<span>Change enforcement action</span>'
+      },
+      hint: {
+        text: "Evidence due date: " + appointmentOutcome.currentEnforcementAction.evidenceDueDate
+      } if appointmentOutcome.currentEnforcementAction.evidenceDueDate,
+      href: '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action',
+      status: {
+        tag: {
+          text: appointmentOutcome.currentEnforcementAction.description,
+          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
+        }
+      }
+    } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action,
     {
       title: {
         text: "Add appointment notes"
@@ -225,7 +260,7 @@
         </section>
       {% endif %}
       <section data-qa="appointmentDetails">
-        <h3 class="govuk-heading-m">Appointment details</h3>
+          <h3 class="govuk-heading-m">Appointment details</h3>
         {% if not appointment.deliusManaged %}
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
         {% else %}
@@ -249,8 +284,8 @@
     },
     value: {
       html: govukTag({
-          text: outcomeStatus,
-          classes: "govuk-tag--" + outcomeTagColour
+          text: outcomeStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
+          classes: "govuk-tag--" + (outcomeTagColour if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
         })
       }
     } if (outcomeStatus and appointment.deliusManaged),
@@ -380,7 +415,7 @@
       key: {
         text: "Appointment notes"
       },
-     value: { html: '<span data-qa="notesValue">' + notes + '</span>' if notes else 'No notes' },
+      value: { html: '<span data-qa="notesValue">' + notes + '</span>' if notes else 'No notes' },
       actions: {
         items: [
           {
@@ -467,6 +502,26 @@
         </section>
       {% endif %}
       <p class="govuk-body-s" data-qa="lastUpdated">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <section data-qa="relatedContacts">
+        <h3 class="govuk-heading-m">Related contacts</h3>
+        {% if relatedContacts.length > 0 %}
+          <ul class="govuk-list">
+            {% for contact in relatedContacts %}
+              <li class="govuk-!-margin-bottom-4">
+                <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, contact.contactId) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">{{ contact.contactTypeDescription }}</a><br>
+                <span class="govuk-body-s govuk-hint">
+  Created by {{ contact.createdBy.forename[0] }}.{{ contact.createdBy.surname }}
+  on {{ contact.contactDate | dateWithYear }}
+</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="govuk-body">No related contacts</p>
+        {% endif %}
+      </section>
     </div>
   </div>
 {% endblock %}

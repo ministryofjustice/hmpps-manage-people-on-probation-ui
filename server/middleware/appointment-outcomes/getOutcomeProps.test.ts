@@ -23,9 +23,9 @@ const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 49,
     eventNumber: '1234567',
-    sentenceType: 'CUSTODY',
     order: {
       description: 'Pre-Sentence',
+      sentenceType: 'CUSTODY',
       startDate: '2025-05-31',
       endDate,
     },
@@ -36,9 +36,9 @@ const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 48,
     eventNumber: '7654321',
-    sentenceType: 'COMMUNITY',
     order: {
       description: 'Pre-Sentence',
+      sentenceType: 'COMMUNITY',
       startDate: '2025-05-31',
       endDate,
     },
@@ -47,6 +47,9 @@ const mockSentences = (endDate: string): Sentence[] => [
     requirements: [],
   },
 ]
+jest.mock('../renderError', () => ({
+  renderError: jest.fn(),
+}))
 
 const buildRequest = ({
   params = {},
@@ -249,5 +252,77 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
       )
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
+  })
+
+  it('should set sentence length to null when sentence dates are missing', () => {
+    const req = buildRequest({ params: { contactId: undefined } })
+
+    req.session.data.sentences[crn][0].order.startDate = null
+    req.session.data.sentences[crn][0].order.endDate = null
+
+    const res = buildResponse()
+
+    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+
+    getOutcomeProps(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.sentence).toEqual({
+      type: 'COMMUNITY',
+      length: 12,
+    })
+  })
+
+  it('should set sentence values to null when no matching sentence exists', () => {
+    const req = buildRequest({
+      params: { contactId: undefined },
+      eventId: '99999',
+    })
+
+    const res = buildResponse()
+
+    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+
+    getOutcomeProps(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.sentence).toEqual({
+      type: undefined,
+      length: null,
+    })
+  })
+
+  it('should set sendLetter to true when failedToAttend is SEND_LETTER', () => {
+    const req = buildRequest({ params: { contactId: undefined } })
+
+    req.session.data.appointments[crn][uuid].outcome = {
+      failedToAttend: 'SEND_LETTER',
+    }
+
+    const res = buildResponse()
+
+    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+
+    getOutcomeProps(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.sendLetter).toBe(true)
+  })
+
+  it('should set sendBreachOrRecallLetter to true when outcome contains BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
+    const req = buildRequest({ params: { contactId: undefined } })
+
+    req.session.data.appointments[crn][uuid].outcome = {
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+    }
+
+    const res = buildResponse()
+
+    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+
+    getOutcomeProps(req, res, nextSpy)
+
+    expect(res.locals.appointmentOutcome.sendBreachOrRecallLetter).toBe(true)
   })
 })

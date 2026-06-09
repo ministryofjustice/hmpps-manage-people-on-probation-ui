@@ -1,6 +1,6 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
-import { PersonalDetails } from '../data/model/personalDetails'
+import { Document, PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
@@ -17,19 +17,16 @@ import {
   EnforcementActionLetterType,
   EnforcementActionCreatedBy,
   ProbationDeliveryUnit,
+  AcceptableAbsenceOutcomeType,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import {
-  Activity,
-  ContactEnforcementActions,
-  ContactOutcomes,
-  PersonAppointment,
-  PersonSchedule,
-} from '../data/model/schedule'
+import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
+import { Compliance } from '../data/model/overview'
+import { NonComplianceHistoryResponse } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
@@ -74,6 +71,7 @@ export interface AppointmentLocals {
   notes?: string
   sensitivity?: string
   outcomeRecorded?: string
+  isReschedule?: boolean
 }
 
 export interface LocalsUser {
@@ -165,6 +163,7 @@ interface Locals {
   feedbackEmail?: string
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
+  locationMonitoringUri?: string
 }
 
 export interface AppointmentOutcomeSentence {
@@ -172,17 +171,65 @@ export interface AppointmentOutcomeSentence {
   length: number | null
 }
 
+export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
+
 export interface AppointmentOutcomeEnforcementAction {
   responseByDate?: string
   responseByDays?: number
 }
 
-export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE'
+export interface BreachWarning {
+  order: string
+  breachDate: string
+}
+
+export interface OutcomeSummary {
+  appointmentDetails: string
+  outcome: string
+  enforcementAction?: string
+  evidenceDueDate?: string
+  notes: string
+  sensitivity: string
+  documents?: string[]
+  nextAppointment?: string
+  enforcementActionChangeLink?: string
+}
+
+export interface OutcomeConfirmationAction {
+  text: string
+  href: string
+  external?: boolean
+}
+
+export interface OutcomeConfirmation {
+  title: string
+  type: string
+  date: string
+  text: string[]
+  actions: OutcomeConfirmationAction[]
+}
+
+export interface CurrentOutcome {
+  status: string
+  reason: string
+  tagColour: TagColour
+}
+
+export interface CurrentEnforcementAction {
+  action: AppointmentEnforcementAction
+  code?: string
+  description: string
+  tagColour: TagColour
+  link?: string
+  evidenceDueDate?: string
+  evidenceWarning?: string
+}
 
 export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
   appointment: TAppointment
+  documents: Document[]
   crn: string
   uuid: string | undefined
   contactId: string | undefined
@@ -195,22 +242,31 @@ export interface AppointmentOutcomeProps<TAppointment> {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  outcomes?: ContactOutcomes[]
-  enforcementActions?: ContactEnforcementActions[]
+  outcomes?: ContactOutcome[]
   options?:
     | Option<AppointmentOutcomeType>[]
+    | Option<AcceptableAbsenceOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
   letterSentByOptions?: Option<EnforcementActionCreatedBy>[]
   letterTypeOptions?: Option<EnforcementActionLetterType>[]
   sentence?: AppointmentOutcomeSentence
-  enforcementAction?: AppointmentOutcomeEnforcementAction
   isProbationPractitioner?: boolean
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
-  currentEnforcementAction?: { action: AppointmentEnforcementAction; text: string; tagColour: TagColour }
+  currentEnforcementAction?: CurrentEnforcementAction
+  currentOutcome?: CurrentOutcome
+  breachWarning?: BreachWarning | null
   notePrepend?: string
+  summary?: OutcomeSummary
+  confirmation?: OutcomeConfirmation
+  compliance?: Compliance & {
+    failureToComplyInLast12MonthsCount?: number
+    nonCompliance?: NonComplianceHistoryResponse
+  }
+  responseContactId?: string
+  linkedContactId?: string
 }
 
 export interface AppResponse extends Response {

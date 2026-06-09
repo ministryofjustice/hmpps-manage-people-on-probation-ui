@@ -1,4 +1,5 @@
 export * from './checkLogOutcomeAction'
+export * from './checkEnforcementAction'
 export * from './checkAppointmentNotesAction'
 export * from './checkArrangeNextAppointmentAction'
 export * from './checkAlertBanner'

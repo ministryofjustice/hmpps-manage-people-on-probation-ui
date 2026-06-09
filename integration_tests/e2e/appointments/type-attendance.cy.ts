@@ -26,7 +26,7 @@ const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 
 const loadPage = (_crn = crn) => {
   cy.visit(`/case/${_crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage(1, '', _crn)
+  completeSentencePage({ eventIndex: 1, crnOverride: _crn })
 }
 
 describe('Arrange an appointment', () => {
@@ -88,6 +88,7 @@ describe('Arrange an appointment', () => {
 
       describe('enableNonCompliance flag', () => {
         it('should display the bullet point for non-compliance if enableNonCompliance is false', () => {
+          cy.task('stubDisableNonCompliance')
           loadPage()
           typePage = Page.verifyOnPage(AppointmentTypePage)
           typePage
@@ -99,7 +100,6 @@ describe('Arrange an appointment', () => {
         })
 
         it('should not display the bullet point for non-compliance if enableNonCompliance is true', () => {
-          cy.task('stubEnableNonCompliance')
           loadPage()
           typePage = Page.verifyOnPage(AppointmentTypePage)
           typePage
