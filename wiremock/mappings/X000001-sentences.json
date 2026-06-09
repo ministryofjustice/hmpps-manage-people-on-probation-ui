@@ -22,6 +22,70 @@
           "sentences": [
             {
               "id": 49,
+              "eventNumber": "1234567",
+              "order": {
+                "description": "Pre-Sentence",
+                "sentenceType": "PRE_SENTENCE"
+              },
+              "nsis": [],
+              "licenceConditions": [],
+              "requirements": []
+            },
+            {
+              "id": 48,
+              "eventNumber": "7654321",
+              "order": {
+                "description": "Default Sentence Type (12 Months)",
+                "sentenceType": "COMMUNITY",
+                "startDate": "2025-05-31"
+              },
+              "nsis": [
+                {
+                  "id": 162,
+                  "description": "BRE description"
+                },
+                {
+                  "id": 163,
+                  "description": "OPD1 description (OPD1 subtype)"
+                }
+              ],
+              "licenceConditions": [
+                {
+                  "id": 166,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 167,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 168,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 169,
+                  "mainDescription": "lic cond main",
+                  "active": false
+                }
+              ],
+              "requirements": [
+                {
+                  "id": 80,
+                  "description": "2 of 12 RAR days completed",
+                  "active": true
+                },
+                {
+                  "id": 83,
+                  "description": "Unpaid Work - Intensive",
+                  "active": false
+                }
+              ]
+            },
+            {
+              "id": 50,
               "eventNumber": "2",
               "order": {
                 "description": "Pre-Sentence",
@@ -39,11 +103,11 @@
               ]
             },
             {
-              "id": 48,
+              "id": 51,
               "eventNumber": "3",
               "order": {
                 "description": "Default Sentence Type (12 Months)",
-                "sentenceType": "COMMUNITY",
+                "sentenceType": "COMMUNITY1",
                 "startDate": "2025-05-31"
               },
               "nsis": [

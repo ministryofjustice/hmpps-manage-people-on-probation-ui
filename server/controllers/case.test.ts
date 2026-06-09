@@ -118,6 +118,12 @@ jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
+const getSentencesMasSpy = jest.spyOn(MasApiClient.prototype, 'getSentences').mockImplementation(() =>
+  Promise.resolve({
+    personSummary: { name: overview.name, crn, dateOfBirth: overview.dateOfBirth },
+    sentences: [],
+  }),
+)
 
 const getSentencesSpy = getSentences as jest.Mock
 const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
@@ -353,11 +359,10 @@ describe('caseController', () => {
     beforeEach(() => {
       res.locals.flags = { enableEMDIOverviewShowGPSData: true, enableOutcomesV1: true }
       res.locals.user = { username: 'test-user', authSource: 'nomis', token: 'token-1' }
-      getSentencesSpy.mockImplementation(() => (r: any, s: any, next: any) => {
-        const { locals } = s
-        locals.sentences = [{ licenceConditions: [], requirements: [] }]
-        next()
-      })
+      getSentencesMasSpy.mockResolvedValue({
+        personSummary: { name: overview.name, crn, dateOfBirth: overview.dateOfBirth },
+        sentences: [{ licenceConditions: [], requirements: [] }],
+      } as any)
     })
 
     afterEach(() => {
@@ -373,7 +378,7 @@ describe('caseController', () => {
 
       await controllers.case.getCase(hmppsAuthClient)(req, res)
 
-      expect(getSentencesSpy).toHaveBeenCalled()
+      expect(getSentencesMasSpy).toHaveBeenCalledWith(crn)
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
       expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
@@ -384,7 +389,7 @@ describe('caseController', () => {
 
       await controllers.case.getCase(hmppsAuthClient)(req, res)
 
-      expect(getSentencesSpy).toHaveBeenCalled()
+      expect(getSentencesMasSpy).toHaveBeenCalledWith(crn)
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
       expect(res.locals.locationMonitoringUri).toBeUndefined()
@@ -395,7 +400,7 @@ describe('caseController', () => {
 
       await controllers.case.getCase(hmppsAuthClient)(req, res)
 
-      expect(getSentencesSpy).not.toHaveBeenCalled()
+      expect(getSentencesMasSpy).not.toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
     })
   })

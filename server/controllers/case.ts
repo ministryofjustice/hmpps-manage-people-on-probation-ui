@@ -8,6 +8,7 @@ import { getCheckinOffenderDetails, getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
+import { Sentences } from '../data/model/sentenceDetails'
 
 const routes = ['getCase'] as const
 
@@ -45,7 +46,8 @@ const caseController: Controller<typeof routes, void> = {
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
       if (res.locals.flags.enableEMDIOverviewShowGPSData) {
-        await getSentences(hmppsAuthClient)(req, res, () => {})
+        const response: Sentences = await masClient.getSentences(crn)
+        res.locals.sentences = response.sentences
         const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
           hasLocationMonitoring(item?.licenceConditions, item?.requirements),
         )
