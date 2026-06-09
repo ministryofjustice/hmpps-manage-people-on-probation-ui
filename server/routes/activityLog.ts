@@ -15,4 +15,5 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
   )
 
   router.get('/case/:crn/activity/:id', controllers.activityLog.getActivity(hmppsAuthClient))
+  router.get(`/case/:crn/activitylog/redirect`, controllers.activityLog.redirectToActivityLog(hmppsAuthClient))
 }
