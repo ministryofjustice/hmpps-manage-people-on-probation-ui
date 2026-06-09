@@ -19,7 +19,7 @@
           "disabilities": [
             {
               "disabilityId": 0,
-              "description": "Dyslexia",
+              "description": "Other (specifiy)",
               "disabilityNotes": [
                 {
                   "id": 0,
@@ -39,7 +39,8 @@
               "lastUpdatedBy": {
                 "forename": "Paul",
                 "surname": "Smith"
-              }
+              },
+              "condition": "Dyslexia"
             },
             {
               "disabilityId": 1,
@@ -76,7 +77,7 @@
           },
           "disability": {
             "disabilityId": 0,
-            "description": "Dyslexia",
+            "description": "Condition Unknown",
             "disabilityNote": {
               "id": 0,
               "createdBy": "Tom Brady",

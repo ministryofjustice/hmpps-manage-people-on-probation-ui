@@ -37,7 +37,7 @@ context('Contact', () => {
     page.assertTextAtElementAtIndex('[class=govuk-summary-list__key]', 3, 'Date added')
     page.assertTextAtElementAtIndex('[class=govuk-summary-list__key]', 4, 'Notes')
 
-    page.assertTextAtElementAtIndex('[class=govuk-summary-list__value]', 0, 'Dyslexia')
+    page.assertTextAtElementAtIndex('[class=govuk-summary-list__value]', 0, 'Condition Unknown')
     page.assertTextAtElementAtIndex('[class=govuk-summary-list__value]', 1, '3 April 2021')
     page.assertTextAtElementAtIndex('[class=govuk-summary-list__value]', 2, 'Tom Brady')
     page.assertTextAtElementAtIndex('[class=govuk-summary-list__value]', 3, '30 October 2024')
