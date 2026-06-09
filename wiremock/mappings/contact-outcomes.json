@@ -77,7 +77,14 @@
             {
               "code": "AFTA",
               "description": "Failed To Attend",
-              "enforcementActions": []
+              "enforcementActions": [
+                { "code": "ROM", "description": "Refer to Offender Manager", "defaultResponsePeriodDays": 7 },
+                {
+                  "code": "EA12",
+                  "description": "Decision Pending Response from Person on Probation",
+                  "defaultResponsePeriodDays": 7
+                }
+              ]
             },
             { "code": "AACL", "description": "Acceptable Absence - Court/Legal", "enforcementActions": [] },
             { "code": "AAEM", "description": "Acceptable Absence - Employment", "enforcementActions": [] },

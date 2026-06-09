@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import FailedToAttendPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
+import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 import {
@@ -20,10 +20,12 @@ import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-a
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
+  checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
+  checkTicketPanel,
 } from './imports'
+import { type SentenceType } from '../../../server/data/model/sentenceDetails'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -38,14 +40,24 @@ interface Args {
   journey?: Journey
   isProbationPractitioner?: boolean
   enforcementActionResponseByDate?: string
+  sentenceType?: SentenceType
+  startDateTime?: string
 }
 
 const loadPage = ({
   journey = 'MANAGE',
   isProbationPractitioner = false,
   enforcementActionResponseByDate = responseByDate,
+  sentenceType = 'COMMUNITY',
+  startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
 }: Args = {}): void => {
-  cy.task('stubAppointment', { eventId: '2501192724', isFuture: false, enforcementActionResponseByDate })
+  cy.task('stubAppointment', {
+    eventId: '2501192724',
+    isFuture: false,
+    enforcementActionResponseByDate,
+    sentenceType,
+    startDateTime,
+  })
   if (isProbationPractitioner) {
     cy.task('stubProbationPractitioner', { username: 'USER1' })
   }
@@ -148,13 +160,11 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   })
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, {
-      Page: FailedToAttendPage,
-      journey,
-    })
+    checkOptionRedirectsToCorrectPage(options, loadPage, FailedToAttendPage, { journey })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: FailedToAttendPage })
+  checkBreachOrRecallWarningBanner(loadPage, FailedToAttendPage)
+  checkTicketPanel(loadPage, FailedToAttendPage)
 }
 
 describe('Failed to attend', () => {

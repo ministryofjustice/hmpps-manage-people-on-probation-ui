@@ -24,6 +24,7 @@ import sentences from './sentences'
 import enforcementActions from './enforcementActions'
 import relatedContacts from './relatedContacts'
 import compliance from './compliance'
+import contactOutcomes from './contactOutcomes'
 import emdi from './emdi'
 
 export default {
@@ -53,6 +54,7 @@ export default {
   ...enforcementActions,
   ...relatedContacts,
   ...compliance,
+  ...contactOutcomes,
   ...emdi,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({

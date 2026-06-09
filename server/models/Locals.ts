@@ -26,7 +26,7 @@ import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { Compliance } from '../data/model/overview'
-import { NonComplianceHistoryResponse } from '../data/model/compliance'
+import { BreachOrRecall, SentenceCompliance } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
@@ -167,20 +167,35 @@ interface Locals {
 }
 
 export interface AppointmentOutcomeSentence {
-  type: SentenceType
+  type: SentenceType | null
   length: number | null
+  eventId: number | null
+  eventNumber?: string | null
+  order: string | null
+  activeBreach?: BreachOrRecall | null
+  activeRecall?: BreachOrRecall | null
+  compliance: Compliance | null
 }
 
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'
+
+export type WarningType = 'BREACH' | 'RECALL'
 
 export interface AppointmentOutcomeEnforcementAction {
   responseByDate?: string
   responseByDays?: number
 }
 
-export interface BreachWarning {
-  order: string
-  breachDate: string
+export interface BreachOrRecallWarning {
+  title: string
+  text: string
+  type: WarningType
+}
+
+export interface OutcomeTicket {
+  title: string
+  html: string
+  type?: 'RED' | 'BLUE'
 }
 
 export interface OutcomeSummary {
@@ -225,6 +240,14 @@ export interface CurrentEnforcementAction {
   evidenceWarning?: string
 }
 
+export interface OutcomeCompliance {
+  currentSentences?: SentenceCompliance[]
+  // sentence:
+  // failureToComplyInLast12MonthsCount?: number
+  // priorBreachesOnCurrentOrderCount?: number
+  // nonCompliance?: NonComplianceHistoryResponse
+}
+
 export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
@@ -257,14 +280,12 @@ export interface AppointmentOutcomeProps<TAppointment> {
   sendLetter?: boolean
   currentEnforcementAction?: CurrentEnforcementAction
   currentOutcome?: CurrentOutcome
-  breachWarning?: BreachWarning | null
+  breachOrRecallWarning?: BreachOrRecallWarning | null
+  ticket?: OutcomeTicket
   notePrepend?: string
   summary?: OutcomeSummary
   confirmation?: OutcomeConfirmation
-  compliance?: Compliance & {
-    failureToComplyInLast12MonthsCount?: number
-    nonCompliance?: NonComplianceHistoryResponse
-  }
+  compliance?: OutcomeCompliance
   responseContactId?: string
   linkedContactId?: string
 }

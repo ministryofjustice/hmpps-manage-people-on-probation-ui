@@ -176,10 +176,6 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
           appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
-          sentence: {
-            type: 'COMMUNITY',
-            length: 12,
-          },
           isProbationPractitioner: false,
         }),
       )
@@ -210,10 +206,6 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
           appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
-          sentence: {
-            type: 'CUSTODY',
-            length: 24,
-          },
           isProbationPractitioner: true,
         }),
       )
@@ -243,52 +235,10 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           completedUrl: `/case/${crn}/appointments/appointment/${contactId}/manage`,
           appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
           appointmentSession: req.session.data.appointments[crn][contactId],
-          sentence: {
-            type: 'COMMUNITY',
-            length: 12,
-          },
           isProbationPractitioner: false,
         }),
       )
       expect(nextSpy).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  it('should set sentence length to null when sentence dates are missing', () => {
-    const req = buildRequest({ params: { contactId: undefined } })
-
-    req.session.data.sentences[crn][0].order.startDate = null
-    req.session.data.sentences[crn][0].order.endDate = null
-
-    const res = buildResponse()
-
-    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
-    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-
-    getOutcomeProps(req, res, nextSpy)
-
-    expect(res.locals.appointmentOutcome.sentence).toEqual({
-      type: 'COMMUNITY',
-      length: 12,
-    })
-  })
-
-  it('should set sentence values to null when no matching sentence exists', () => {
-    const req = buildRequest({
-      params: { contactId: undefined },
-      eventId: '99999',
-    })
-
-    const res = buildResponse()
-
-    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
-    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-
-    getOutcomeProps(req, res, nextSpy)
-
-    expect(res.locals.appointmentOutcome.sentence).toEqual({
-      type: undefined,
-      length: null,
     })
   })
 
