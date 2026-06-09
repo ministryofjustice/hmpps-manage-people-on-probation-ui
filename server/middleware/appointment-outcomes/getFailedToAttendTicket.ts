@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
-import { Route } from '../../@types'
-import { AppointmentEnforcementAction } from '../../models/Appointments'
+import { type Route } from '../../@types'
+import { type AppointmentEnforcementAction } from '../../models/Appointments'
 import { enforcementActionMap } from '../../properties/appointment-outcomes'
 import { type OutcomeTicket } from '../../models/Locals'
 import { dateWithYear } from '../../utils'
@@ -15,8 +15,9 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
     },
     options,
   } = res.locals.appointmentOutcome
-  const enforcementActions = contactOutcomes.find(contactOutcome => contactOutcome.code === 'AFTA')?.enforcementActions
-  const actionOptionValues = options
+  const enforcementActions =
+    contactOutcomes.find(contactOutcome => contactOutcome.code === 'AFTA')?.enforcementActions ?? []
+  const actionOptionValues = (options ?? [])
     .filter(option => option?.value)
     .map(option => option.value) as AppointmentEnforcementAction[]
 
@@ -24,15 +25,12 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
     .filter(([key]) => actionOptionValues.includes(key as AppointmentEnforcementAction))
     .map(([_key, { code }]) => code)
 
-  const responsePeriodDays = enforcementActions
-    .filter(action => actionOptionCodes.includes(action.code))
-    .every(
-      action =>
-        action?.defaultResponsePeriodDays &&
-        action.defaultResponsePeriodDays === enforcementActions?.[0]?.defaultResponsePeriodDays,
-    )
-    ? enforcementActions?.at(0)?.defaultResponsePeriodDays
-    : null
+  const filteredActions = enforcementActions.filter(action => actionOptionCodes.includes(action.code))
+  const responsePeriodDays =
+    filteredActions.length > 0 &&
+    filteredActions.every(a => a.defaultResponsePeriodDays === filteredActions[0].defaultResponsePeriodDays)
+      ? (filteredActions[0].defaultResponsePeriodDays ?? null)
+      : null
   if (responsePeriodDays) {
     const responseByDate = DateTime.fromISO(appointmentDate).plus({ days: responsePeriodDays })
     const daysLeftToRespond = Math.ceil(responseByDate.startOf('day').diff(DateTime.now().startOf('day'), 'days').days)

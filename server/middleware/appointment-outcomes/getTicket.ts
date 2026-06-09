@@ -7,12 +7,12 @@ import { dateWithYear } from '../../utils'
 export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (_req, res, next) => {
     let ticket: OutcomeTicket | null = null
-    const {
-      forename,
-      sentence: { compliance, order },
-      crn,
-      reqUrl,
-    } = res.locals.appointmentOutcome
+    const { forename, sentence, crn, reqUrl } = res.locals.appointmentOutcome
+    if (!sentence) {
+      res.locals.appointmentOutcome.ticket = null
+      return next()
+    }
+    const { compliance, order } = sentence
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const { acceptableAbsence, unacceptableAbsence, attendedButDidNotComply } =

@@ -167,14 +167,14 @@ interface Locals {
 }
 
 export interface AppointmentOutcomeSentence {
-  type: SentenceType
+  type: SentenceType | null
   length: number | null
-  eventId: number
+  eventId: number | null
   eventNumber?: string | null
-  order: string
+  order: string | null
   activeBreach?: BreachOrRecall | null
   activeRecall?: BreachOrRecall | null
-  compliance: Compliance
+  compliance: Compliance | null
 }
 
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'

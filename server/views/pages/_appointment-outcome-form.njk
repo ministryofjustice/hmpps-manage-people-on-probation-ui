@@ -12,11 +12,11 @@
   }) }}
   {% endif %}
   {% if appointmentOutcome.ticket %}
-    {% set type = appointmentOutcome.ticket.type | lower | default('red') %}
+    {% set type = (appointmentOutcome.ticket.type | default('RED')) | lower %}
     {{ mojTicketPanel({
       attributes: { "data-qa": "ticket-panel" },
       items: [{
-        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.ticket.title + '</h2>' + appointmentOutcome.ticket.html | safe,      
+       html: ('<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.ticket.title + '</h2>' + appointmentOutcome.ticket.html) | safe,     
         classes: "moj-ticket-panel__content--" + type
       }]
     }) }}

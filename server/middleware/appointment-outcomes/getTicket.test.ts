@@ -95,7 +95,7 @@ describe('middleware/appointment-outcomes/getTicket', () => {
           }),
         )
       })
-      it('should assign the correct ticlet if more than one previous FTC, no previous breach', async () => {
+      it('should assign the correct ticket if more than one previous FTC, no previous breach', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
         getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
@@ -110,7 +110,7 @@ describe('middleware/appointment-outcomes/getTicket', () => {
           }),
         )
       })
-      it('should assign the correct ticlet if more than one previous FTC, previous breach', async () => {
+      it('should assign the correct ticket if more than one previous FTC, previous breach', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
         getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
