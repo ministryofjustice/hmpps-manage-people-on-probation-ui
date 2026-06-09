@@ -215,6 +215,7 @@ export interface Disability {
   disabilityNote?: Note
   lastUpdated: string
   lastUpdatedBy: Name
+  condition?: string
 }
 
 export interface ProfessionalContact {
