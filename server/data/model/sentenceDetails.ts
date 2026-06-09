@@ -56,6 +56,7 @@ export interface Offence {
 
 export interface Order {
   description: string
+  sentenceType?: SentenceType
   startDate: string
   endDate: string
   length?: string
