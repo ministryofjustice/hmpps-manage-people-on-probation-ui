@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import { type Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
@@ -26,7 +25,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
 
       // one previous FTC, no previous breach 👇
 
-      if (failureToComplyContacts?.length === 1 && compliance.priorBreachesOnCurrentOrderCount === 0) {
+      if (failureToComplyContacts?.length === 1 && compliance?.priorBreachesOnCurrentOrderCount === 0) {
         const { contactId, date } = failureToComplyContacts.at(0)
         ticket = {
           title: `This is ${forename}’s second count of non-compliance in the past 12 months`,
@@ -45,7 +44,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
 
       // more than one previous FTC, no previous breach 👇
 
-      if (failureToComplyContacts?.length > 1 && compliance.priorBreachesOnCurrentOrderCount === 0) {
+      if (failureToComplyContacts?.length > 1 && compliance?.priorBreachesOnCurrentOrderCount === 0) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months.`,
           html: `<p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>`,
@@ -55,7 +54,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
 
       // more than one previous FTC, previous breach
 
-      if (failureToComplyContacts?.length > 1 && compliance.priorBreachesOnCurrentOrderCount > 0) {
+      if (failureToComplyContacts?.length > 1 && compliance?.priorBreachesOnCurrentOrderCount > 0) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months.`,
           html: `
