@@ -11,7 +11,7 @@ export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<vo
     if (!req?.session?.data?.sentences?.[crn]) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const includeRarRequirements = false
+      const includeRarRequirements = true
       const response: Sentences = await masClient.getSentences(crn, number, includeRarRequirements)
       sentences = response.sentences
       req.session.data = {

@@ -78,7 +78,7 @@ describe('/middleware/getSentences', () => {
       await getSentences(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should request the sentences from the api', () => {
-      expect(spy).toHaveBeenCalledWith(crn, number, false)
+      expect(spy).toHaveBeenCalledWith(crn, number, true)
     })
     it('should add the api response to the session', () => {
       expect(req.session.data.sentences).toEqual({

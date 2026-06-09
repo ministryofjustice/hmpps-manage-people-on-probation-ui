@@ -1,6 +1,7 @@
 import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
 
 export const LICENCE_GPS_TAGGING_CODE: string = 'EM01'
+export const RAR_DESCRIPTION_CODE: string = 'F'
 export const REQUIREMENT_GPS_TAGGING_CODE: string = 'RM59'
 const GPS_TAGGING_CODES: string[] = [LICENCE_GPS_TAGGING_CODE, REQUIREMENT_GPS_TAGGING_CODE]
 
@@ -26,6 +27,14 @@ export const checkLocationMonitoringByEventNumber = (
 } => {
   const sentenceByEventNumber = sentences?.find(f => f.eventNumber === eventNumber)
   return checkLocationMonitoring(sentenceByEventNumber?.licenceConditions, sentenceByEventNumber?.requirements)
+}
+
+export const checkRarDescriptionByEventNumber = (
+  eventNumber: string,
+  sentences: Sentence[] | null | undefined,
+): string | null | undefined => {
+  const requirements = sentences?.find(f => f.eventNumber === eventNumber)?.requirements
+  return (requirements || []).find(item => item.code === RAR_DESCRIPTION_CODE)?.description
 }
 
 export const hasLocationMonitoring = (
