@@ -35,10 +35,12 @@ import {
   getNotePrepend,
   resetSelectedActions,
   restrictPageAccess,
-  getBreach,
-  getComplianceData,
+  getBreachOrRecallWarning,
   getContactOutcomes,
   handlePutOutcome,
+  getOutcomeSentence,
+  getFailedToAttendTicket,
+  getTicket,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -81,8 +83,9 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.all(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     getOutcomeProps,
+    getOutcomeSentence(hmppsAuthClient),
     getBackLink,
-    getBreach(hmppsAuthClient),
+    getBreachOrRecallWarning,
   )
 
   /* get readable enforcement action from current appointment 👇 */
@@ -104,16 +107,20 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${manageBasePath}/unacceptable-absence`,
     ],
     getAttendedFailedToComplyOptions,
-    getComplianceData(hmppsAuthClient),
+    getTicket(hmppsAuthClient),
   )
 
   router.all(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     getAcceptableAbsenceOptions,
-    getComplianceData(hmppsAuthClient),
+    getTicket(hmppsAuthClient),
   )
 
-  router.all([`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`], getFailedToAttendOptions)
+  router.all(
+    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
+    getFailedToAttendOptions,
+    getFailedToAttendTicket,
+  )
 
   router.all(
     [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],

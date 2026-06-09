@@ -391,7 +391,7 @@ export default class MasApiClient extends RestClient {
     return complianceResponse
   }
 
-  async getPersonNonCompliance(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
+  async getPersonNonComplianceDetail(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
     const nonComplianceResponse: NonComplianceHistoryResponse = await this.get({
       path: `/compliance/non-compliance-detail/${crn}?months=${months}`,
       handle404: false,

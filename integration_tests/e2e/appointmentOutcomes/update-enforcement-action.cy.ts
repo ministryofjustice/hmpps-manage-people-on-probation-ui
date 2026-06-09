@@ -9,7 +9,12 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import { checkBreachWarningBanner, checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
+import {
+  checkBreachOrRecallWarningBanner,
+  checkOptionRedirectsToCorrectPage,
+  checkOptions,
+  ExpectedOption,
+} from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let updateEnforcementActionPage: UpdateEnforcementActionPage
@@ -222,8 +227,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         action: enforcementAction,
         sentenceType: 'COMMUNITY',
       })
@@ -242,8 +246,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         enforcementAction,
         sentenceType: 'COMMUNITY',
       })
@@ -262,8 +265,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         enforcementAction,
         sentenceType: 'CUSTODY',
       })
@@ -287,8 +289,7 @@ const checkPage = () => {
         checkOptions(options)
       })
       it('should redirect to the correct page when an option is selected', () => {
-        checkOptionRedirectsToCorrectPage(options, loadPage, {
-          Page: UpdateEnforcementActionPage,
+        checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
           enforcementAction: action,
           sentenceType,
         })
@@ -323,8 +324,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         acceptableAbsence,
       })
     })
@@ -341,7 +341,7 @@ const checkPage = () => {
     })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
+  checkBreachOrRecallWarningBanner(loadPage, UpdateEnforcementActionPage)
 }
 
 describe('Update enforcement action', () => {

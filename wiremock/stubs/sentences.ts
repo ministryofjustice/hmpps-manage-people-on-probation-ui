@@ -8,7 +8,7 @@ const stubSentences = ({
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: '/mas/sentences/X778160',
+      urlPathPattern: `/mas/sentences/${crn}`,
       method: 'GET',
       queryParameters: {
         includeRarRequirements: {
