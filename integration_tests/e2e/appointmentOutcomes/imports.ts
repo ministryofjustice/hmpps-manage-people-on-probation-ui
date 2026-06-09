@@ -267,7 +267,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args, startDateTime: startDateTimeISO })
         page.getTicketPanel().should('not.exist')
       })
-      it('should display the ticket panel if more than one previous FTC and previous breach', () => {
+      it('should display the ticket panel if all action option response period days values match and response by date is in the future or today', () => {
         const startDateTime = DateTime.now().minus({ days: 2 })
         const startDateTimeISO = startDateTime.toISO()
         const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
