@@ -29,15 +29,23 @@ export const getPersonActivity = async (
     }
   }
 
-  let complianceArray: string[] = []
-  if (compliance) {
-    complianceArray = Array.isArray(compliance) ? compliance : [compliance]
+  const formatCompliance = (): Array<string> => {
+    const complianceArray: string[] = []
+
+    if (compliance && Array.isArray(compliance)) {
+      compliance.forEach(option => complianceArray.push(toCamelCase(option)))
+    } else if (compliance && typeof compliance === 'string') {
+      complianceArray.push(compliance)
+    }
+
+    return complianceArray
   }
+
   const body: ActivityLogRequestBody = {
     keywords,
     dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
-    filters: complianceArray,
+    filters: formatCompliance(),
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
