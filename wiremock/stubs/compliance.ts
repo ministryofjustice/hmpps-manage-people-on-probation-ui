@@ -40,9 +40,12 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
               breachStarted: true,
               breachesOnCurrentOrderCount: 1,
               failureToComplyCount: 2,
+              failureToComplyInLast12MonthsCount: 2,
             },
             activity: {
               acceptableAbsenceCount: 3,
+              unacceptableAbsenceCount: 5,
+              attendedButDidNotComplyCount: 2,
             },
             mainOffence: {
               code: '18502',
@@ -72,7 +75,7 @@ const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =
         acceptableAbsence: [],
         unacceptableAbsence: [
           {
-            contactId: 123456,
+            contactId: 12345,
             eventNumber: '1',
             eventId: 1,
             type: {

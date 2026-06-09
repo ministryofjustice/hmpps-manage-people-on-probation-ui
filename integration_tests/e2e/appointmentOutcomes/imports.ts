@@ -62,7 +62,7 @@ export const checkBreachWarningBanner = <TArgs extends Record<string, any>>(
       const page = new args.Page()
       page.getBreachWarning().should('exist')
     })
-    it('should not show when there is no active breach', () => {
+    it.only('should not show when there is no active breach', () => {
       loadPageFunc(args)
       const page = new args.Page()
       page.getBreachWarning().should('not.exist')

@@ -89,6 +89,44 @@
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               }
+            },
+            {
+              "eventNumber": "12345",
+              "activity": {
+                "acceptableAbsenceCount": 2,
+                "unacceptableAbsenceCount": 1,
+                "attendedButDidNotComplyCount": 1,
+                "outcomeNotRecordedCount": 3,
+                "waitingForEvidenceCount": 1,
+                "rescheduledCount": 1,
+                "absentCount": 1,
+                "rescheduledByStaffCount": 1,
+                "rescheduledByPersonOnProbationCount": 1,
+                "lettersCount": 1,
+                "nationalStandardAppointmentsCount": 1,
+                "compliedAppointmentsCount": 2
+              },
+              "compliance": {
+                "currentBreaches": 0,
+                "breachStarted": true,
+                "breachesOnCurrentOrderCount": 2,
+                "failureToComplyCount": 2
+              },
+              "mainOffence": {
+                "code": "18502",
+                "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
+              },
+              "order": {
+                "description": "ORA Community Order",
+                "endDate": "2024-09-01",
+                "startDate": "2020-03-02"
+              },
+              "activeBreach": {
+                "startDate": "2020-03-02",
+                "status": "An active breach status"
+              },
+              "rarDescription": "12 of 15 RAR days completed",
+              "rarCategory": "RAR Category"
             }
           ]
         },

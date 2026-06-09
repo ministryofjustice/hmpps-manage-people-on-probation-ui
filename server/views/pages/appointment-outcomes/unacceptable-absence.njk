@@ -3,6 +3,52 @@
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
+
+  {% set compliance = appointmentOutcome.compliance %}
+  {% set nonCompliance = compliance.nonCompliance %}
+  {% set unacceptableAbsences = nonCompliance.unacceptableAbsence %}
+
+  {% if compliance.failureToComplyInLast12MonthsCount == 1 and compliance.priorBreachesOnCurrentOrderCount == 0 %}
+    {# Panel 1 #}
+    {{ mojTicketPanel({
+      attributes: { "data-qa": "alert-panel" },
+      items: [{
+        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">This is ' + appointmentOutcome.forename + '’s second count of non-compliance in the past 12 months</h2>
+               <p class="govuk-body">You should consider initiating a breach.</p>' +
+        (('<p class="govuk-body">' + appointmentOutcome.forename + ' also failed to comply with:</p>
+               <ul class="govuk-list govuk-list--bullet">
+                 <li><a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/appointments/appointment/' + unacceptableAbsences[0].contactId + '/manage" target="_blank">' + (unacceptableAbsences[0].date | dateWithDayAndWithYear) + ': ' + unacceptableAbsences[0].type.description + ' (opens in new tab)</a></li>
+               </ul>') if unacceptableAbsences.length > 0),
+        classes: "moj-ticket-panel__content--red"
+      }]
+    }) }}
+    {% elif compliance.failureToComplyInLast12MonthsCount > 1 and compliance.priorBreachesOnCurrentOrderCount == 0 %}
+    {# Panel 2 #}
+    {{ mojTicketPanel({
+      attributes: { "data-qa": "alert-panel" },
+      items: [{
+        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.forename + ' has had multiple counts of non-compliance in the past 12 months.</h2>
+               <p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank">View a list of ' + appointmentOutcome.forename + '’s non-compliance (opens in new tab).</a></p>',
+        classes: "moj-ticket-panel__content--red"
+      }]
+    }) }}
+    {% elif compliance.failureToComplyInLast12MonthsCount > 1 and compliance.priorBreachesOnCurrentOrderCount > 0 %}
+    {# Panel 3 #}
+    {{ mojTicketPanel({
+      attributes: { "data-qa": "alert-panel" },
+      items: [{
+        html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.forename + ' has had multiple counts of non-compliance in the past 12 months.</h2>
+               <p class="govuk-body">' + appointmentOutcome.forename + ' has breached this sentence before. You can:</p>
+               <ul class="govuk-list govuk-list--bullet">
+                 <li><a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank">view ' + appointmentOutcome.forename + '’s failures to comply (opens in new tab)</a></li>
+                 <li><a class="govuk-link" href="/case/' + appointmentOutcome.crn + '/compliance" target="_blank">view ' + appointmentOutcome.forename + '’s previous breach information (opens in new tab)</a></li>
+               </ul>',
+        classes: "moj-ticket-panel__content--red"
+      }]
+    }) }}
+  {% endif %}
+
+
   {{ govukRadios({
     name: "enforcementAction",
     fieldset: {

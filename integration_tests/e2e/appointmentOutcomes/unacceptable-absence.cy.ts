@@ -157,8 +157,85 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AttendedFailedToComplyPage, journey })
   })
-
   checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
+
+  describe('compliance info panel', () => {
+    it('should show the correct compliance information panel when using fallback fields', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      cy.get('[data-qa="alert-panel"]').should(
+        'contain.text',
+        'Alton has had multiple counts of non-compliance in the past 12 months.',
+      )
+      cy.get('[data-qa="alert-panel"]').should('contain.text', 'Alton has breached this sentence before.')
+    })
+
+    it('should display links to activity log with not-complied filter and compliance page', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .eq(0)
+          .should('have.text', "view Alton’s failures to comply (opens in new tab)")
+          .should('have.attr', 'href')
+          .and('include', `/case/${crn}/activitylog/redirect`)
+          .and('include', 'compliance=not+complied')
+
+        cy.get('a')
+          .eq(1)
+          .should('have.text', "view Alton’s previous breach information (opens in new tab)")
+          .should('have.attr', 'href')
+          .and('include', `/case/${crn}/compliance`)
+      })
+    })
+
+    it('should navigate to activity log with not-complied filter when first link is clicked', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .eq(0)
+          .invoke('attr', 'href')
+          .then(href => {
+            cy.visit(href)
+          })
+      })
+
+      cy.url().should('include', `${crn}/activity-log`)
+
+      cy.get('.moj-filter__selected').within(() => {
+        cy.get('h3').should('contain.text', 'Compliance filters')
+        cy.get('.moj-filter-tags li').should('contain.text', 'not complied')
+      })
+    })
+
+    it('should navigate to compliance page when second link is clicked', () => {
+      cy.task('stubBreachCompliance')
+      cy.task('stubNonComplianceHistory')
+      loadPage({ journey })
+      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+
+      cy.get('[data-qa="alert-panel"]').within(() => {
+        cy.get('a')
+          .eq(1)
+          .invoke('attr', 'href')
+          .then(href => {
+            cy.visit(href)
+          })
+      })
+
+      cy.url().should('include', '/compliance')
+    })
+  })
 }
 
 describe('Unacceptable absence', () => {
