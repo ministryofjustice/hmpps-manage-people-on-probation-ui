@@ -325,7 +325,8 @@
                 {
                   "id": 170,
                   "mainDescription": "Location Monitoring(GPS Tagging) - Monitored Appointment",
-                  "active": true
+                  "active": true,
+                  "code": "EM01"
                 }
               ]
             },
@@ -454,7 +455,8 @@
                 {
                   "id": 170,
                   "description": "Location Monitoring(GPS Tagging) - Monitored Appointment",
-                  "active": true
+                  "active": true,
+                  "code": "RM59"
                 }
               ]
             },

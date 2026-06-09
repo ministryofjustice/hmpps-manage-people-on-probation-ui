@@ -36,6 +36,7 @@
             {
               "eventNumber": "3",
               "activity": {
+                "acceptableAbsenceCount": 2,
                 "unacceptableAbsenceCount": 1,
                 "attendedButDidNotComplyCount": 1,
                 "outcomeNotRecordedCount": 3,
