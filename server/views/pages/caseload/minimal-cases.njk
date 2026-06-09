@@ -109,16 +109,10 @@
 
       {% set rows = [] %}
       {% for case in caseload.caseload %}
-        {% set fullName %}
-        {% if case.limitedAccess === true %}
-          <span class="govuk-link--text-colour govuk-link--no-visited-state">Restricted access</span>
-        {% else %}
-          {{ case.caseName.surname }}, {{ case.caseName.forename }}
-        {% endif %}
-        {% endset %}
         {% set crn %}
         {{ case.crn }}
         {% endset %}
+
         {% set sentenceHtml %}
         {% if case.limitedAccess === true %}
                     Restricted
@@ -152,13 +146,26 @@
         {% endif %}
         {% endset %}
 
+        {% set caseHtml %}
+          <a data-ai-id = "myCasesPersonNameLink" class="govuk-!-font-weight-bold" href="/case/{{ case.crn }}">
+          {% if case.limitedAccess === true %}
+            <span class="govuk-link--text-colour govuk-link--no-visited-state">Restricted access</span>
+          {% else %}
+            {{ case.caseName.surname }}, {{ case.caseName.forename }}
+          {% endif %}
+          </a></br>
+          <span class="govuk-!-font-weight-bold secondary-text">{{ crn }}</span></br>
+          {% if case.dob %}
+            <span class="secondary-text">{{ case.dob | dateWithYear }} (Age {{ case.dob | yearsSince }})</span>
+          {% else %}
+            <span class="secondary-text">Restricted</span>
+          {% endif %}
+        {% endset %}
+
         {% set rows = (rows.push(
                  [
-                   { html: "<a data-ai-id = 'myCasesPersonNameLink' class='govuk-!-font-weight-bold' href='/case/" + case.crn + "'>" + fullName + "</a></br><span class='govuk-!-font-weight-bold secondary-text'>" + crn + "</span>",
+                   { html: caseHtml,
                      attributes: { 'data-qa': 'nameOrCrnValue' + loop.index} },
-                   { html: case.dob | dateWithYearShortMonth  + "</br><span class='secondary-text'>Age " + case.dob | yearsSince + "</span>" if case.dob else "Restricted",
-                     attributes: { 'data-qa': 'dobValue' + loop.index }
-                   },
                    { html: sentenceHtml,
                      attributes: { 'data-qa': 'sentenceValue' + loop.index }
                    },
@@ -183,13 +190,8 @@
              captionClasses: 'govuk-visually-hidden',
              head: [
                  {
-                     html: "Name / CRN",
+                     html: "Cases",
                      attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'data-sort-name': 'nameOrCrn', 'data-sort-action': 'case'}
-                 },
-                 {
-                     html: "DOB / Age",
-                     attributes: {'aria-sort': setSortOrder('dob', caseload.sortedBy) , 'col-name': 'dob', 'data-qa': 'dob', 'data-sort-name': 'dob',  'data-sort-action': 'case' },
-                     classes: "nowrap"
                  },
                  {
                      text: "Sentence",
