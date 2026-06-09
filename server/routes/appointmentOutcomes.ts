@@ -227,6 +227,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.get(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
+    getComplianceData(hmppsAuthClient),
     controllers.appointmentOutcomes.getUnacceptableAbsence(),
   )
   router.post(

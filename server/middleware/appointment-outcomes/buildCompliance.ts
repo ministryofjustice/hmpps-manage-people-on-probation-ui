@@ -11,7 +11,8 @@ export const buildCompliance = (
   failureToComplyInLast12MonthsCount:
     currentSentence.compliance.failureToComplyInLast12MonthsCount ??
     currentSentence.compliance.failureToComplyCount ??
-    currentSentence.compliance.failureToComplyInLast12Months,
+    currentSentence.compliance.failureToComplyInLast12Months ??
+    0,
   priorBreachesOnCurrentOrderCount:
     currentSentence.compliance.priorBreachesOnCurrentOrderCount ??
     currentSentence.compliance.breachesOnCurrentOrderCount,
