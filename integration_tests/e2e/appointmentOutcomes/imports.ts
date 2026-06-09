@@ -234,7 +234,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args })
         page.getTicketPanel().should('not.exist')
       })
-      it('should display the ticket panel if more than on acceptable absence count', () => {
+      it('should display the ticket panel if more than one acceptable absence count', () => {
         cy.task('stubPersonNonComplianceDetail', { acceptableAbsenceCount: 2 })
         cy.task('stubCompliance')
         loadPageFunc({ ...args })

@@ -209,7 +209,7 @@ const stubSingleSentence = ({
             eventNumber: '12345',
             mainOffence: {
               code: '18502',
-              description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831*****',
+              description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
             },
             order: {
               description: '12 month Community order',
