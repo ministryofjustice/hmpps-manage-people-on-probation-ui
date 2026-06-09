@@ -157,6 +157,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AttendedFailedToComplyPage, journey })
   })
+  checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
 
   describe('compliance info panel', () => {
     it('should show the correct compliance information panel when using fallback fields', () => {
@@ -181,14 +182,14 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.get('[data-qa="alert-panel"]').within(() => {
         cy.get('a')
           .eq(0)
-          .should('have.text', "view Alton's failures to comply (opens in new tab)")
+          .should('have.text', "view Alton’s failures to comply (opens in new tab)")
           .should('have.attr', 'href')
           .and('include', `/case/${crn}/activitylog/redirect`)
           .and('include', 'compliance=not+complied')
 
         cy.get('a')
           .eq(1)
-          .should('have.text', "view Alton's previous breach information (opens in new tab)")
+          .should('have.text', "view Alton’s previous breach information (opens in new tab)")
           .should('have.attr', 'href')
           .and('include', `/case/${crn}/compliance`)
       })
@@ -235,8 +236,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.url().should('include', '/compliance')
     })
   })
-
-  checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
 }
 
 describe('Unacceptable absence', () => {
