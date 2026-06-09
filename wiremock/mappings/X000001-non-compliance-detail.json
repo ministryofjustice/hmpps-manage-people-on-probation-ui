@@ -11,7 +11,7 @@
           "acceptableAbsence": [],
           "unacceptableAbsence": [
             {
-              "contactId": 123456,
+              "contactId": 6,
               "eventNumber": "3",
               "eventId": 3,
               "type": {
@@ -23,7 +23,7 @@
           ],
           "attendedButDidNotComply": [
             {
-              "contactId": 123456,
+              "contactId": 6,
               "eventNumber": "4",
               "eventId": 4,
               "type": {

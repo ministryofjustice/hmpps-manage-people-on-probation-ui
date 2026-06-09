@@ -2,7 +2,7 @@ import superagent, { SuperAgentRequest } from 'superagent'
 import { NonComplianceContact } from '../../server/data/model/overview'
 
 const nonComplianceContact: NonComplianceContact = {
-  contactId: 123456,
+  contactId: 6,
   eventNumber: '1',
   eventId: 1,
   type: {

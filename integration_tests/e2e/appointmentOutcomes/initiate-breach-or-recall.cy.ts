@@ -196,7 +196,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage.checkOnPage()
   })
 
-  checkBreachOrRecallWarningBanner(loadPage, { Page: InitiateBreachOrRecallPage })
+  checkBreachOrRecallWarningBanner(loadPage, InitiateBreachOrRecallPage)
 }
 
 describe('Initiate a breach or recall', () => {

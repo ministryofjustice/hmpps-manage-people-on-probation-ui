@@ -171,9 +171,9 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
 
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AcceptableAbsencePage, journey })
+    checkOptionRedirectsToCorrectPage(options, loadPage, AcceptableAbsencePage, { journey })
   })
-  checkBreachOrRecallWarningBanner(loadPage, { Page: AcceptableAbsencePage })
+  checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage)
   checkTicketPanel(loadPage, AcceptableAbsencePage)
 }
 

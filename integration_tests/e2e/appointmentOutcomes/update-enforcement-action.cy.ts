@@ -227,8 +227,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         action: enforcementAction,
         sentenceType: 'COMMUNITY',
       })
@@ -247,8 +246,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         enforcementAction,
         sentenceType: 'COMMUNITY',
       })
@@ -267,8 +265,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         enforcementAction,
         sentenceType: 'CUSTODY',
       })
@@ -292,8 +289,7 @@ const checkPage = () => {
         checkOptions(options)
       })
       it('should redirect to the correct page when an option is selected', () => {
-        checkOptionRedirectsToCorrectPage(options, loadPage, {
-          Page: UpdateEnforcementActionPage,
+        checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
           enforcementAction: action,
           sentenceType,
         })
@@ -328,8 +324,7 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, UpdateEnforcementActionPage, {
         acceptableAbsence,
       })
     })
@@ -346,7 +341,7 @@ const checkPage = () => {
     })
   })
 
-  checkBreachOrRecallWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
+  checkBreachOrRecallWarningBanner(loadPage, UpdateEnforcementActionPage)
 }
 
 describe('Update enforcement action', () => {

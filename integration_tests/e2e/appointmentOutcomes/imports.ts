@@ -4,6 +4,12 @@ import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
 import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
 import Page from '../../pages/page'
+import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
+import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
+import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
+import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
+import UpdateEnforcementActionPage from '../../pages/appointmentOutcomes/update-enforcement-action.page'
+import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 
 export interface ExpectedOption<TPage extends Page> {
   value: string
@@ -41,14 +47,23 @@ export const checkOptions = <TPage extends Page>(options: ExpectedOption<TPage>[
   })
 }
 
+type RedirectPage =
+  | typeof AcceptableAbsencePage
+  | typeof AttendedFailedToComplyPage
+  | typeof FailedToAttendPage
+  | typeof OutcomePage
+  | typeof UnacceptableAbsencePage
+  | typeof UpdateEnforcementActionPage
+
 export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs extends Record<string, any>>(
   options: ExpectedOption<TPage>[],
   loadPageFunc: (args: any) => void,
-  args: TArgs = {} as TArgs,
+  PageClass: RedirectPage,
+  args: TArgs,
 ): void => {
   options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
     loadPageFunc(args)
-    const outcomePage = new args.Page()
+    const outcomePage = new PageClass()
     cy.get(`.govuk-radios__input[value=${value}]`).click()
     outcomePage.getSubmitBtn().click()
     const page = new RedirectPage()
@@ -56,15 +71,26 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
   })
 }
 
+type WarningBannerPage =
+  | typeof OutcomePage
+  | typeof AttendedFailedToComplyPage
+  | typeof AcceptableAbsencePage
+  | typeof UnacceptableAbsencePage
+  | typeof FailedToAttendPage
+  | typeof EnforcementActionPage
+  | typeof InitiateBreachOrRecallPage
+  | typeof SendLetterPage
+
 export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, any>>(
   loadPageFunc: (args: any) => void,
+  PageClass: WarningBannerPage,
   args: TArgs = {} as TArgs,
 ): void => {
   describe('Breach warning banner', () => {
     it('should show when sentence type is COMMUNITY and there is an active breach', () => {
       cy.task('stubCompliance')
       loadPageFunc(args)
-      const page = new args.Page()
+      const page = new PageClass()
       page.getBreachOrRecallWarning().find('h2').should('contain.text', 'There is a live breach for this sentence')
       page
         .getBreachOrRecallWarning()
@@ -75,7 +101,7 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
       cy.task('stubAppointment', { eventId: '2501192724', type: 'COMMUNITY' })
       cy.task('stubCompliance', { activeBreach: false })
       loadPageFunc(args)
-      const page = new args.Page()
+      const page = new PageClass()
       page.getBreachOrRecallWarning().should('not.exist')
     })
   })
@@ -88,7 +114,7 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
       cy.task('stubCompliance', { activeBreach: false, activeRecall: true })
       cy.task('stubSentences', { sentenceType: 'CUSTODY' })
       loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
-      const page = new args.Page()
+      const page = new PageClass()
       page
         .getBreachOrRecallWarning({ type: 'recall' })
         .find('h2')
@@ -102,7 +128,7 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
       cy.task('stubAppointment', { eventId: '2501192724', type: 'COMMUNITY' })
       cy.task('stubCompliance', { activeBreach: false, activeRecall: false })
       loadPageFunc(args)
-      const page = new args.Page()
+      const page = new PageClass()
       page.getBreachOrRecallWarning({ type: 'recall' }).should('not.exist')
     })
   })
@@ -136,6 +162,16 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         page
           .getTicketPanel()
           .should('contain.text', 'This is Alton’s second count of non-compliance in the past 12 months')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', '18 January 2026: 12 month Community order (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const managePage = new ManageAppointmentPage()
+        managePage.checkPageTitle('Manage 3 way meeting (NS) with Terry Jones')
       })
       it('should display the ticket panel if more than one previous FTC and no previous breach', () => {
         cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
@@ -145,6 +181,15 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
           .getTicketPanel()
           .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
           .should('contain.text', 'You should consider initiating a breach')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', 'View a list of Alton’s non-compliance (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        cy.pause()
       })
       it('should display the ticket panel if more than one previous FTC and previous breach', () => {
         cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
@@ -172,9 +217,16 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
       })
     }
     if (page instanceof FailedToAttendPage) {
-      it('should not display the ticket panel if no acceptable absence counts', () => {
+      it('should not display the ticket panel action option response period days values do not all match', () => {
         cy.task('stubContactOutcomes', { matchedResponsePeriodDays: false })
         loadPageFunc({ ...args })
+        page.getTicketPanel().should('not.exist')
+      })
+      it('should not display the ticket panel if evidence response by date is in the past', () => {
+        const startDateTime = DateTime.now().minus({ days: 10 })
+        const startDateTimeISO = startDateTime.toISO()
+        cy.task('stubContactOutcomes')
+        loadPageFunc({ ...args, startDateTime: startDateTimeISO })
         page.getTicketPanel().should('not.exist')
       })
       it('should display the ticket panel if more than one previous FTC and previous breach', () => {

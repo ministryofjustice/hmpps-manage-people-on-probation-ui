@@ -45,18 +45,18 @@ const mockOptions: Option<AppointmentEnforcementAction>[] = [
 
 const buildResponse = ({
   matchingResponsePeriodDays = true,
-  isInPast = false,
+  date = '2026-06-03',
 }: {
   matchingResponsePeriodDays?: boolean
-  isInPast?: boolean
+  date?: string
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
       forename,
-      isInPast,
+
       options: mockOptions,
       appointmentSession: {
-        date: '2026-06-03',
+        date,
         outcome: {
           contactOutcomes: mockContactOutcomes({ matchingResponsePeriodDays }),
         },
@@ -75,8 +75,8 @@ describe('middleware/appointment-outcomes/getFailedToAttendTicket', () => {
     getFailedToAttendTicket(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.ticket).toBeNull()
   })
-  it('should not assign a ticket if appointment date is in the past', () => {
-    const res = buildResponse({ matchingResponsePeriodDays: false, isInPast: true })
+  it('should not assign a ticket if response by date is in the past', () => {
+    const res = buildResponse({ matchingResponsePeriodDays: true, date: '2026-05-20' })
     getFailedToAttendTicket(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.ticket).toBeNull()
   })
