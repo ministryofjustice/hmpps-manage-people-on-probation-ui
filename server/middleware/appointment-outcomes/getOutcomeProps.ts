@@ -80,7 +80,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     sentenceLength = end.diff(start, 'months').months
   }
   const sentence: AppointmentOutcomeSentence = {
-    type: appointmentSentence?.sentenceType,
+    type: appointmentSentence?.order?.sentenceType,
     length: sentenceLength,
   }
 
