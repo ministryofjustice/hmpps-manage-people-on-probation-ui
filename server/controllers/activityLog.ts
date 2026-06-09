@@ -26,11 +26,11 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 const activityLogController: Controller<typeof routes, void> = {
   redirectToActivityLog: () => {
     return async (req, res) => {
-      const { keywords = '', compliance = {} } = req.query
+      const { keywords = '', compliance = [] } = req.query
       const { crn } = req.params as Record<string, string>
       req.session.activityLogFilters = {
         keywords,
-        compliance,
+        compliance: Array.isArray(compliance) ? compliance : [compliance],
         crn,
       }
       return res.redirect(`/case/${crn}/activity-log`)

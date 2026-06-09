@@ -10,6 +10,8 @@ import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 import UpdateEnforcementActionPage from '../../pages/appointmentOutcomes/update-enforcement-action.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
+import ActivityLogPage from '../../pages/activityLog'
+import CompliancePage from '../../pages/compliance'
 
 export interface ExpectedOption<TPage extends Page> {
   value: string
@@ -144,7 +146,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
   args?: TArgs,
 ) => {
   describe('Ticket panel', () => {
-    beforeEach(() => {
+    afterEach(() => {
       cy.task('resetMocks')
     })
     const page = new PageClass()
@@ -189,17 +191,40 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
           .should('have.attr', 'target', '_blank')
           .invoke('removeAttr', 'target')
           .click()
-        cy.pause()
+        const contactsPage = new ActivityLogPage()
+        contactsPage.getSelectedFilterTags().eq(0).should('contain.text', 'Not complied')
+        contactsPage.getComplianceFilter(3).should('be.checked')
       })
       it('should display the ticket panel if more than one previous FTC and previous breach', () => {
         cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
         cy.task('stubCompliance')
         loadPageFunc({ ...args })
-
         page
           .getTicketPanel()
           .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
           .should('contain.text', 'Alton has breached this sentence before')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', 'view Alton’s failures to comply (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const contactsPage = new ActivityLogPage()
+        contactsPage.getSelectedFilterTags().eq(0).should('contain.text', 'Not complied')
+        contactsPage.getComplianceFilter(3).should('be.checked')
+        loadPageFunc({ ...args })
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(1)
+          .should('contain.text', 'view Alton’s previous breach information (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const compliancePage = new CompliancePage()
+        compliancePage.checkPageTitle('Compliance')
       })
     }
     if (page instanceof AcceptableAbsencePage) {
@@ -214,6 +239,19 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         cy.task('stubCompliance')
         loadPageFunc({ ...args })
         page.getTicketPanel().should('contain.text', 'Alton has had multiple acceptable absences in the past 12 months')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', 'list of Alton’s acceptable absences (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const contactsPage = new ActivityLogPage()
+        contactsPage.getSelectedFilterTags().eq(0).should('contain.text', 'acceptable absence')
+        contactsPage.getSelectedFilterTags().eq(1).should('contain.text', 'Complied')
+        contactsPage.getComplianceFilter(2).should('be.checked')
+        contactsPage.getKeywordsInput().should('have.value', 'acceptable absence')
       })
     }
     if (page instanceof FailedToAttendPage) {

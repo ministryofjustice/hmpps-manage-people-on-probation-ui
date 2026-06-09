@@ -79,7 +79,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
     if (reqUrl.endsWith('acceptable-absence') && acceptableAbsence?.length > 1) {
       ticket = {
         title: `${forename} has had multiple acceptable absences in the past 12 months`,
-        html: `<p class="govuk-body">You can view a <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">list of ${forename}'s acceptable absences (opens in new tab)</a>.`,
+        html: `<p class="govuk-body">You can view a <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=acceptable+absence&compliance=complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">list of ${forename}’s acceptable absences (opens in new tab)</a>.`,
         type: 'BLUE',
       }
     }
