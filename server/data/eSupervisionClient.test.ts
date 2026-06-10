@@ -87,6 +87,7 @@ describe('ESupervisionClient', () => {
         createdAt: '2024-01-02T11:00:00Z',
       }
       const contentType = 'image/jpeg'
+      const sha256 = 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg='
       const response = {
         url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
         contentType,
@@ -94,13 +95,13 @@ describe('ESupervisionClient', () => {
       }
 
       fakeESupervisionApi
-        .post(`/v2/offender_setup/${offenderSetup.uuid}/upload_location`)
+        .post(`/v2/offender_setup/${offenderSetup.uuid}/upload_location`, { sha256 })
         .query({ 'content-type': contentType })
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .matchHeader('content-type', 'application/json')
         .reply(200, response)
 
-      const output = await client.getProfilePhotoUploadLocation(offenderSetup as any, contentType)
+      const output = await client.getProfilePhotoUploadLocation(offenderSetup as any, contentType, sha256)
       expect(output).toEqual(response)
     })
 
@@ -112,7 +113,7 @@ describe('ESupervisionClient', () => {
         createdAt: '2024-01-02T11:00:00Z',
       }
       const contentType = 'image/jpeg'
-      const sha256 = 'b'.repeat(64)
+      const sha256 = 'JsObCYHBZSL+IbLAd4dLfHXkD2bN84Qq3xLqEAi/0Lw='
       const response = {
         url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
         contentType,

@@ -16,6 +16,8 @@ describe('postCheckInDetails', () => {
   const setupUuid = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
   const username = 'user-1'
   const token = 'system-token'
+  // A valid base64-encoded SHA-256 digest (44 chars, single '=' pad), as the browser sends.
+  const validSha256 = 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg='
 
   const baseCase = {
     name: { forename: 'John', surname: 'Doe' },
@@ -36,6 +38,7 @@ describe('postCheckInDetails', () => {
 
     const req: any = {
       params: { crn, id: setupUuid },
+      body: { contentSha256: validSha256 },
       session: {
         data: {
           esupervision: {
@@ -102,13 +105,14 @@ describe('postCheckInDetails', () => {
     expect(typeof calledWith.startedAt).toBe('string')
     expect(calledWith.contactPreference).toBe('EMAIL')
 
-    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', undefined)
+    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', validSha256)
     expect(result).toEqual({ setup, uploadLocation })
   })
 
   it('forwards req.body.contentSha256 to getProfilePhotoUploadLocation', async () => {
     const { req, res } = buildReqRes()
-    req.body = { contentSha256: 'a'.repeat(64) }
+    const contentSha256 = 'JsObCYHBZSL+IbLAd4dLfHXkD2bN84Qq3xLqEAi/0Lw='
+    req.body = { contentSha256 }
 
     jest.spyOn(MasApiClient.prototype, 'getProbationPractitioner').mockResolvedValue({ username: 'pp-user' } as any)
 
@@ -120,7 +124,28 @@ describe('postCheckInDetails', () => {
 
     await postCheckInDetails(hmppsAuthClient)(req, res)
 
-    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', 'a'.repeat(64))
+    expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', contentSha256)
+  })
+
+  it.each([
+    ['missing', undefined],
+    ['empty', ''],
+    ['whitespace only', '   '],
+    ['not a string', 123],
+  ])('throws 400 and does no work when contentSha256 is %s', async (_label, contentSha256) => {
+    const { req, res } = buildReqRes()
+    req.body = { contentSha256 }
+
+    const getProbationPractitioner = jest.spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+    const postOffenderSetup = jest.spyOn(ESupervisionClient.prototype, 'postOffenderSetup')
+    const getProfilePhotoUploadLocation = jest.spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation')
+
+    await expect(postCheckInDetails(hmppsAuthClient)(req, res)).rejects.toMatchObject({
+      data: { status: 400 },
+    })
+    expect(getProbationPractitioner).not.toHaveBeenCalled()
+    expect(postOffenderSetup).not.toHaveBeenCalled()
+    expect(getProfilePhotoUploadLocation).not.toHaveBeenCalled()
   })
 
   it('falls back to res.locals.user.username when MAS practitioner username missing', async () => {
