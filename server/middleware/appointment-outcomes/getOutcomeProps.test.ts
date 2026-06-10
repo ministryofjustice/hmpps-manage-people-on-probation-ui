@@ -210,6 +210,34 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
         }),
       )
     })
+
+    it('should set the probation practitioner as true if logged in username matches PP username but case format is different', () => {
+      const req = buildRequest({ params: { contactId: undefined }, eventId: '49', sentenceEndDate: '2027-05-31' })
+      const res = buildResponse({ username: 'deborahfern' })
+      mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+      jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+      getOutcomeProps(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome).toEqual(
+        expect.objectContaining({
+          forename,
+          surname,
+          appointment: res.locals.personAppointment.appointment,
+          crn,
+          uuid,
+          contactId: undefined,
+          id: uuid,
+          isValidParams: true,
+          isInPast: true,
+          reqUrl: url,
+          baseUrl: `/case/${crn}/arrange-appointment/${uuid}`,
+          baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
+          completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
+          appointmentSession: req.session.data.appointments[crn][uuid],
+          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          isProbationPractitioner: true,
+        }),
+      )
+    })
   })
   describe('Manage appointment journey', () => {
     it('should add the correct values to res.locals.appointmentOutcome', () => {
