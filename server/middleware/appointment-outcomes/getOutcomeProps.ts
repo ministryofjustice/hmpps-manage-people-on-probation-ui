@@ -1,13 +1,14 @@
 import { DateTime } from 'luxon'
-import { Activity } from '../../data/model/schedule'
-import { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
+import { type Activity } from '../../data/model/schedule'
+import type { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
 import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
-import { Route } from '../../@types'
+import { type Route } from '../../@types'
 import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../../utils'
-import { Document } from '../../data/model/personalDetails'
+import { type Document } from '../../data/model/personalDetails'
 import { renderError } from '../renderError'
+import { type ProbationPractitioner } from '../../models/CaseDetail'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid } = req.params as Record<string, string>
@@ -79,8 +80,14 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
       ? `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
       : null
 
-  const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
-  const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
+  const probationPractitioner = getDataValue<ProbationPractitioner>(data, [
+    'personalDetails',
+    crn,
+    'probationPractitioner',
+  ])
+  const isProbationPractitioner =
+    probationPractitioner?.username &&
+    probationPractitioner.username.toLowerCase() === res.locals.user.username.toLowerCase()
   res.locals.appointmentOutcome = {
     forename,
     surname,
