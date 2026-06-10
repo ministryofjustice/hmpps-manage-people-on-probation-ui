@@ -130,7 +130,6 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
-      console.log(personAppointment)
       const isUpdatableContact = MpopUpdatableContacts.some(contact => contact.description === personAppointment?.appointment?.type)
       if (isUpdatableContact) {
         personAppointment.appointment.isUpdatableContact = true;
