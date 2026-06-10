@@ -38,6 +38,7 @@ export const postRescheduleAppointments = (
       rescheduleAppointment,
       outcomeRecorded,
       smsOptIn,
+      outcome,
       user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
@@ -50,7 +51,6 @@ export const postRescheduleAppointments = (
       staffCode,
       teamCode: selectedTeam,
       locationCode: selectedLocation,
-      outcomeRecorded: outcomeRecorded === 'Yes',
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       sendToVisor: visorReport === 'Yes',
@@ -58,6 +58,11 @@ export const postRescheduleAppointments = (
       reasonIsSensitive: rescheduleAppointment.sensitivity === 'Yes',
       uuid,
       isInFuture: isInPast === false,
+    }
+    if (res.locals.flags?.enableNonCompliance && outcome?.outcomeCode) {
+      body.outcomeRecorded = true
+    } else if (outcomeRecorded) {
+      body.outcomeRecorded = outcomeRecorded === 'Yes'
     }
     if (rescheduleAppointment?.reason) {
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)

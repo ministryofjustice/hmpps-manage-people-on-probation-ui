@@ -16,7 +16,7 @@ import {
 import { PersonalDetails } from '../data/model/personalDetails'
 import { OutlookEventRequestBody, OutlookEventResponse, SmsEventRequest } from '../data/model/OutlookEvent'
 import { mockAppResponse } from '../controllers/mocks'
-import { LocalsUser } from '../models/Locals'
+import { AppResponse, LocalsUser } from '../models/Locals'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -223,6 +223,7 @@ const mockAppointmentsPostResponse: AppointmentsPostResponse = {
 
 const checkOutlookEventRequest = (smsRequest = false, firstName = mockUser.firstName) => {
   const { date, start } = mockAppointment
+  const res = buildResponse()
   const smsEventRequest: SmsEventRequest = {
     firstName,
     mobileNumber: res.locals.case.mobileNumber,
@@ -279,12 +280,18 @@ const mockCase: Partial<PersonalDetails> = {
   mobileNumber: '07700900000',
 }
 
-const res = mockAppResponse({
-  case: mockCase,
-  user: mockUser,
-  flags: { enableMAN2344: true, enableSmsReminders: true },
-})
-
+const buildResponse = ({
+  locals = {},
+  flags = {},
+}: { locals?: Record<string, any>; flags?: Record<string, boolean> } = {}): AppResponse => {
+  const localsRes = {
+    case: mockCase,
+    user: mockUser,
+    flags: { enableMAN2344: true, enableSmsReminders: true, enableNonCompliance: false, ...flags },
+    ...locals,
+  }
+  return mockAppResponse(localsRes)
+}
 const postAppointmentsSpy = jest
   .spyOn(MasApiClient.prototype, 'postAppointments')
   .mockResolvedValue(mockAppointmentsPostResponse)
@@ -303,6 +310,7 @@ describe('/middleware/postAppointments', () => {
     })
     it('should add eventId to the request body if value in appointment session is not PERSON_LEVEL_CONTACT', async () => {
       const mockReq = createMockReq(mockAppointment)
+      const res = buildResponse()
       const response = await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody()
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
@@ -314,6 +322,7 @@ describe('/middleware/postAppointments', () => {
         eventId: 'PERSON_LEVEL_CONTACT',
       }
       const mockReq = createMockReq(appointment)
+      const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ eventId: undefined })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
@@ -324,6 +333,7 @@ describe('/middleware/postAppointments', () => {
         requirementId: undefined,
       }
       const mockReq = createMockReq(appointment)
+      const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ requirementId: undefined })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
@@ -335,26 +345,33 @@ describe('/middleware/postAppointments', () => {
         licenceConditionId: undefined,
       }
       const mockReq = createMockReq(appointment)
+      const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ licenceConditionId: undefined })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
-    it(`should not add outcomeRecorded to the request body if appointment session value is not 'Yes'`, async () => {
+
+    it(`should add outcomeRecorded to the request body if outcome recorded - Non Compliance enabled`, async () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
-        outcomeRecorded: undefined,
+        outcome: {
+          outcomeCode: 'ATTC',
+        },
       }
       const mockReq = createMockReq(appointment)
+      const res = buildResponse({ flags: { enableNonCompliance: true } })
       await postAppointments(hmppsAuthClient)(mockReq, res)
-      const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: undefined })
+      const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: true })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
+
     it('should not add nsiId to the request body if value is not in appointment session', async () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         nsiId: undefined,
       }
       const mockReq = createMockReq(appointment)
+      const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ nsiId: undefined })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
@@ -368,6 +385,7 @@ describe('/middleware/postAppointments', () => {
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)
         const mockReq = createMockReq(mockAppointment)
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         checkOutlookEventRequest()
       })
@@ -390,6 +408,7 @@ describe('/middleware/postAppointments', () => {
             preview: { englishSmsPreview: '', welshSmsPreview: '' },
           },
         })
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         const smsRequest = true
         checkOutlookEventRequest(smsRequest, popFirstName)
@@ -415,6 +434,7 @@ describe('/middleware/postAppointments', () => {
             },
           },
         })
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
@@ -425,13 +445,11 @@ describe('/middleware/postAppointments', () => {
         user: { ...mockAppointment.user, email: null },
         smsOptIn: 'YES',
       })
-      const mockRes = mockAppResponse({
-        case: mockCase,
-        user: { ...mockUser, email: null },
-        flags: { enableMAN2344: true, enableSmsReminders: true },
-      })
+      const locals = { user: { ...mockUser, email: null as string } }
+      const res = buildResponse({ locals })
+
       beforeEach(async () => {
-        await postAppointments(hmppsAuthClient)(mockReq, mockRes)
+        await postAppointments(hmppsAuthClient)(mockReq, res)
       })
       it('should not send the request', () => {
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
@@ -473,6 +491,7 @@ describe('/middleware/postAppointments', () => {
             },
           },
         })
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isEnglishNotificationFailed).toEqual(true)
       })
@@ -504,6 +523,7 @@ describe('/middleware/postAppointments', () => {
             },
           },
         })
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isWelshNotificationFailed).toEqual(true)
       })
@@ -535,6 +555,7 @@ describe('/middleware/postAppointments', () => {
             },
           },
         })
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isEnglishNotificationFailed).toEqual(undefined)
       })
@@ -566,6 +587,7 @@ describe('/middleware/postAppointments', () => {
             },
           },
         })
+        const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isWelshNotificationFailed).toEqual(undefined)
       })
