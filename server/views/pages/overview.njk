@@ -511,6 +511,7 @@
         {% set sentenceHtml %}
         {% set order %}
         {% set showLicenceRow = false %}
+        {% set rarDescription = null %}
         {% if sentence.order %}
           {% if loop.first %}
             <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">

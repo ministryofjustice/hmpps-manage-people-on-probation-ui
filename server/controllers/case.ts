@@ -46,7 +46,7 @@ const caseController: Controller<typeof routes, void> = {
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
       let sentences: Sentence[]
-      if (res.locals.flags.enableEMDIOverviewShowGPSData) {
+      if (res.locals.flags.enableEMDIOverviewShowGPSData === true) {
         if (!req?.session?.data?.sentencesWithRarDescription?.[crn]) {
           const response: Sentences = await masClient.getSentences(crn)
           sentences = response.sentences
