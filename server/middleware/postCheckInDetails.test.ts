@@ -78,7 +78,7 @@ describe('postCheckInDetails', () => {
     jest.spyOn(MasApiClient.prototype, 'getProbationPractitioner').mockResolvedValue({ username: 'pp-user' } as any)
 
     const setup = { uuid: setupUuid }
-    const uploadLocation = { url: 'http://upload', contentType: 'image/jpeg', duration: 'PT5M' }
+    const uploadLocation = { locationInfo: { url: 'http://upload', method: 'PUT' } }
 
     const postOffenderSetup = jest
       .spyOn(ESupervisionClient.prototype, 'postOffenderSetup')
@@ -120,7 +120,7 @@ describe('postCheckInDetails', () => {
     jest.spyOn(ESupervisionClient.prototype, 'postOffenderSetup').mockResolvedValue(setup as any)
     const getProfilePhotoUploadLocation = jest
       .spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation')
-      .mockResolvedValue({ url: 'http://upload', contentType: 'image/jpeg', duration: 'PT5M' } as any)
+      .mockResolvedValue({ locationInfo: { url: 'http://upload', method: 'PUT' } } as any)
 
     await postCheckInDetails(hmppsAuthClient)(req, res)
 
@@ -160,9 +160,7 @@ describe('postCheckInDetails', () => {
     const getProfilePhotoUploadLocation = jest
       .spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation')
       .mockResolvedValue({
-        url: 'http://localhost:9091/esupervision/fake-s3-upload',
-        contentType: 'image/jpeg',
-        duration: '5',
+        locationInfo: { url: 'http://localhost:9091/esupervision/fake-s3-upload', method: 'PUT' },
       } as any)
 
     const handler = postCheckInDetails(hmppsAuthClient)

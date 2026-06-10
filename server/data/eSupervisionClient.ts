@@ -13,7 +13,7 @@ import {
   ESupervisionReview,
   EsupervisionUpcomingQuestionItemsResponse,
   EsupervisionUpcomingQuestionsResponse,
-  LocationInfo,
+  UploadLocationResponse,
   OffenderCheckinsByCRNResponse,
   OffenderInfo,
   OffenderSetup,
@@ -40,7 +40,7 @@ export default class ESupervisionClient extends RestClient {
     offenderSetup: OffenderSetup,
     photoContentType: string,
     contentSha256Base64: string,
-  ): Promise<LocationInfo> {
+  ): Promise<UploadLocationResponse> {
     return this.post({
       path: `/v2/offender_setup/${offenderSetup.uuid}/upload_location`,
       query: { 'content-type': photoContentType },

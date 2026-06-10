@@ -89,9 +89,10 @@ describe('ESupervisionClient', () => {
       const contentType = 'image/jpeg'
       const sha256 = 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg='
       const response = {
-        url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
-        contentType,
-        duration: 'PT5M',
+        locationInfo: {
+          url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
+          method: 'PUT',
+        },
       }
 
       fakeESupervisionApi
@@ -115,10 +116,11 @@ describe('ESupervisionClient', () => {
       const contentType = 'image/jpeg'
       const sha256 = 'JsObCYHBZSL+IbLAd4dLfHXkD2bN84Qq3xLqEAi/0Lw='
       const response = {
-        url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
-        contentType,
-        duration: 'PT5M',
-        requiredHeaders: { 'x-amz-checksum-sha256': 'header-value' },
+        locationInfo: {
+          url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
+          method: 'PUT',
+          requiredHeaders: { 'x-amz-checksum-sha256': 'header-value' },
+        },
       }
 
       fakeESupervisionApi

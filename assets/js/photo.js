@@ -21,10 +21,10 @@ if (hash === '#main-content') {
 }
 
 const IMAGE_CONTENT_TYPE = 'image/jpeg'
-const IMAGE_SESSION_KEY = 'esImageUpload'
+const IMAGE_STORAGE_KEY = 'esImageUpload'
 
 const displayUploadedImage = document.getElementsByClassName('es-uploaded-image')
-const uploadedImageData = localStorage.getItem(IMAGE_SESSION_KEY)
+const uploadedImageData = localStorage.getItem(IMAGE_STORAGE_KEY)
 
 const photoUploadInput = document.getElementById('photoUpload-input')
 const photoContentDisplay = document.getElementById('photoPreview')
@@ -67,7 +67,7 @@ const capturePhoto = async v => {
           const dataUrl = canvas.toDataURL(IMAGE_CONTENT_TYPE)
           const img = document.createElement('img')
           img.src = dataUrl
-          localStorage.setItem(IMAGE_SESSION_KEY, dataUrl)
+          localStorage.setItem(IMAGE_STORAGE_KEY, dataUrl)
           videoContainer.innerHTML = ''
           videoContainer.appendChild(img)
           form.submit()
@@ -127,7 +127,7 @@ if (displayUploadedImage && uploadedImageData) {
 // If registration personal details page, and has 'start' query string is present
 if (document.getElementById('registerPoPStartPage')) {
   const url = new URL(window.location.href)
-  localStorage.removeItem(IMAGE_SESSION_KEY)
+  localStorage.removeItem(IMAGE_STORAGE_KEY)
   window.history.replaceState({}, '', url.pathname)
 }
 
@@ -137,7 +137,7 @@ if (photoUploadInput) {
 }
 
 const handlePhotoSelection = event => {
-  localStorage.removeItem(IMAGE_SESSION_KEY)
+  localStorage.removeItem(IMAGE_STORAGE_KEY)
   const file = event.target.files[0]
   const field = event.target
   photoContentDisplay.textContent = ''
@@ -188,7 +188,7 @@ const handlePhotoSelection = event => {
       const screenshot = canvas.toDataURL(IMAGE_CONTENT_TYPE, 0.8)
 
       // Store the screenshot in localStorage
-      localStorage.setItem(IMAGE_SESSION_KEY, screenshot)
+      localStorage.setItem(IMAGE_STORAGE_KEY, screenshot)
     }
     img.src = reader.result.toString()
 
@@ -254,9 +254,9 @@ if (registerButton) {
       }
       const crn = crnInput.value
       const id = idInput.value
-      const image = localStorage.getItem(IMAGE_SESSION_KEY)
+      const image = localStorage.getItem(IMAGE_STORAGE_KEY)
       if (!image) {
-        console.warn('Image not found in session storage')
+        console.warn('Image not found in local storage')
         return
       }
       const imageBlob = dataUrlToBlob(image)
@@ -308,7 +308,7 @@ if (registerButton) {
         })
       }
       // Success: clear session, set hidden field, and submit form
-      localStorage.removeItem(IMAGE_SESSION_KEY)
+      localStorage.removeItem(IMAGE_STORAGE_KEY)
       document.getElementById('setupId').value = result.setup.uuid
       document.getElementById('completeRegistrationForm').submit()
     } catch (error) {
