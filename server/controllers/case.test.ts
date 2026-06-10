@@ -19,6 +19,7 @@ import {
 import { Overview } from '../data/model/overview'
 import { Needs } from '../data/model/risk'
 import { checkAuditMessage } from './testutils'
+import { Sentence, Sentences } from '../data/model/sentenceDetails'
 import {
   AddressType,
   Circumstances,
@@ -372,7 +373,7 @@ describe('caseController', () => {
       delete res.locals.sentences
     })
 
-    it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present', async () => {
+    it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present and data not in session', async () => {
       hasLocationMonitoringSpy.mockReturnValue(true)
       existsInEMDISpy.mockResolvedValue('http://emdi-uri')
 
@@ -382,6 +383,24 @@ describe('caseController', () => {
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
       expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
+      expect(req.session.data.sentencesWithRarDescription[crn]).toEqual([{ licenceConditions: [], requirements: [] }])
+    })
+
+    it('should use data from session and NOT call getSentences when data is already in session', async () => {
+      const sessionSentences = [{ licenceConditions: [], requirements: [] }] as Sentence[]
+      req.session.data.sentencesWithRarDescription = { [crn]: sessionSentences }
+      hasLocationMonitoringSpy.mockReturnValue(true)
+      existsInEMDISpy.mockResolvedValue('http://emdi-uri')
+
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+      expect(getSentencesMasSpy).not.toHaveBeenCalled()
+      expect(res.locals.sentences).toEqual(sessionSentences)
+      expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
+      expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
+
+      // Cleanup session for other tests
+      delete req.session.data.sentencesWithRarDescription
     })
 
     it('should call getSentences but NOT existsInEMDI when flag is enabled but NO location monitoring is present', async () => {

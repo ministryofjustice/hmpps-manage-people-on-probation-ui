@@ -39,6 +39,9 @@ export interface Data {
   sentences?: {
     [crn: string]: Sentence[]
   }
+  sentencesWithRarDescription?: {
+    [crn: string]: Sentence[]
+  }
   appointmentTypes?: AppointmentType[]
   personalDetails?: {
     [crn: string]: PersonalDetailsSession

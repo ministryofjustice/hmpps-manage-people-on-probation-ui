@@ -107,7 +107,7 @@
               "eventNumber": "3",
               "order": {
                 "description": "Default Sentence Type (12 Months)",
-                "sentenceType": "COMMUNITY1",
+                "sentenceType": "CUSTODY",
                 "startDate": "2025-05-31"
               },
               "nsis": [
@@ -198,7 +198,7 @@
               "eventNumber": "2",
               "order": {
                 "description": "Pre-Sentence",
-                "sentenceType": "COMMUNITY"
+                "sentenceType": "PRE_SENTENCE"
               },
               "nsis": [],
               "licenceConditions": [],

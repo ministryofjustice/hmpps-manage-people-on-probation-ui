@@ -258,7 +258,7 @@ context('Overview', () => {
       .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
   })
 
-  it('Overview page is rendered with RAR description when stubDisableEMDIOverviewShowGPSData flag is disabled', () => {
+  it('Overview page is rendered with RAR description when enableEMDIOverviewShowGPSData flag is disabled', () => {
     cy.task('stubDisableEMDIOverviewShowGPSData')
     cy.visit('/case/X000001')
     const page = Page.verifyOnPage(OverviewPage)
