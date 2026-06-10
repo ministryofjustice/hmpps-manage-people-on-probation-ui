@@ -101,6 +101,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
+          hint: 'For example, the building was unexpectedly closed.',
           redirectPageTitle: 'Add a note',
           RedirectPage: AddNotePage,
         },
