@@ -73,15 +73,12 @@ const activityLogController: Controller<typeof routes, void> = {
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
-      personActivity.activities.forEach(activity => {
-      const isUpdatable = MpopUpdatableContacts.some(
-        contact => contact.description === activity.type
-      );
-
-      if (isUpdatable) {
-        (activity as any).isUpdatableContact = true;
-      }
-    });
+      personActivity.activities = personActivity.activities.map(activity => ({
+        ...activity,
+        isUpdatableContact: MpopUpdatableContacts.some(
+          contact => contact.description === activity.type,
+        ),
+      }));
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG',
