@@ -155,6 +155,7 @@ export interface Activity {
   nsiId?: number
   esupervisionId?: string
   externalReference?: string
+  isUpdatableContact? : boolean
 }
 
 export interface PersonAppointmentEnforcementAction {

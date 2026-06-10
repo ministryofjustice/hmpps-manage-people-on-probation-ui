@@ -5,6 +5,7 @@ import { groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
+import { MpopUpdatableContacts } from '../data/model/mpopUpdatableContacts'
 
 const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
@@ -72,6 +73,15 @@ const activityLogController: Controller<typeof routes, void> = {
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
+      personActivity.activities.forEach(activity => {
+      const isUpdatable = MpopUpdatableContacts.some(
+        contact => contact.description === activity.type
+      );
+
+      if (isUpdatable) {
+        (activity as any).isUpdatableContact = true;
+      }
+    });
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG',
@@ -120,6 +130,14 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
+      console.log(personAppointment)
+      const isUpdatableContact = MpopUpdatableContacts.some(contact => contact.description === personAppointment?.appointment?.type)
+      if (isUpdatableContact) {
+        personAppointment.appointment.isUpdatableContact = true;
+      }
+      else {
+        personAppointment.appointment.isUpdatableContact = false;
+      }
       if (personAppointment.appointment.isAppointment) {
         if (back) {
           return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage?back=${back}`)
