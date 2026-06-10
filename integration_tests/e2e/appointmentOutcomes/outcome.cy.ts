@@ -95,8 +95,8 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
           value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
           text: 'Attended - sent home (behaviour)',
           hint: 'For example, their behaviour was disruptive',
-          redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
-          RedirectPage: AttendedFailedToComplyPage,
+          redirectPageTitle: 'Add a note',
+          RedirectPage: AddNotePage,
         },
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
