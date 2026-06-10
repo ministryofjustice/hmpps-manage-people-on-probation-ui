@@ -1,6 +1,6 @@
 export type UpdateContactType = {
-    code : string,
-    description : string
+  code: string
+  description: string
 }
 
 export const MpopUpdatableContacts: UpdateContactType[] = [
@@ -122,4 +122,4 @@ export const MpopUpdatableContacts: UpdateContactType[] = [
   { code: 'SFRR', description: 'Safeguarding enquiries - response received' },
   { code: 'SFGC', description: 'Safeguarding enquiries requested' },
   { code: 'COUP', description: 'Unplanned contact from person on probation' },
-] 
+]

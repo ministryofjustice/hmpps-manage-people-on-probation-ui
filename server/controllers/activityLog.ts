@@ -75,10 +75,8 @@ const activityLogController: Controller<typeof routes, void> = {
       }
       personActivity.activities = personActivity.activities.map(activity => ({
         ...activity,
-        isUpdatableContact: MpopUpdatableContacts.some(
-          contact => contact.description === activity.type,
-        ),
-      }));
+        isUpdatableContact: MpopUpdatableContacts.some(contact => contact.description === activity.type),
+      }))
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG',
@@ -127,12 +125,13 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
-      const isUpdatableContact = MpopUpdatableContacts.some(contact => contact.description === personAppointment?.appointment?.type)
+      const isUpdatableContact = MpopUpdatableContacts.some(
+        contact => contact.description === personAppointment?.appointment?.type,
+      )
       if (isUpdatableContact) {
-        personAppointment.appointment.isUpdatableContact = true;
-      }
-      else {
-        personAppointment.appointment.isUpdatableContact = false;
+        personAppointment.appointment.isUpdatableContact = true
+      } else {
+        personAppointment.appointment.isUpdatableContact = false
       }
       if (personAppointment.appointment.isAppointment) {
         if (back) {
