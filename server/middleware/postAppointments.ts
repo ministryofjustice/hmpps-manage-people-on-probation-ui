@@ -36,6 +36,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       visorReport,
       outcomeRecorded,
       smsOptIn,
+      outcome,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
     const body: AppointmentRequestBody = {
@@ -61,9 +62,13 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (licenceConditionId) {
       body.licenceConditionId = parseInt(licenceConditionId as string, 10)
     }
-    if (outcomeRecorded) {
+
+    if (res.locals.flags?.enableNonCompliance && outcome?.outcomeCode) {
+      body.outcomeRecorded = true
+    } else if (outcomeRecorded) {
       body.outcomeRecorded = outcomeRecorded === 'Yes'
     }
+
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
