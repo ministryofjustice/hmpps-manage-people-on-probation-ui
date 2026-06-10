@@ -112,6 +112,13 @@
         {% set crn %}
         {{ case.crn }}
         {% endset %}
+        {% set fullName %}
+          {% if case.limitedAccess === true %}
+            <span class="govuk-link--text-colour govuk-link--no-visited-state">Restricted access</span>
+          {% else %}
+            {{ case.caseName.surname }}, {{ case.caseName.forename }}
+          {% endif %}
+        {% endset %}
 
         {% set sentenceHtml %}
         {% if case.limitedAccess === true %}
@@ -164,8 +171,11 @@
 
         {% set rows = (rows.push(
                  [
-                   { html: caseHtml,
+                   { html: caseHtml if flags.enableCaseloadV2 else "<a data-ai-id = 'myCasesPersonNameLink' class='govuk-!-font-weight-bold' href='/case/" + case.crn + "'>" + fullName + "</a></br><span class='govuk-!-font-weight-bold secondary-text'>" + crn + "</span>",
                      attributes: { 'data-qa': 'nameOrCrnValue' + loop.index} },
+                   { html: case.dob | dateWithYearShortMonth  + "</br><span class='secondary-text'>Age " + case.dob | yearsSince + "</span>" if case.dob else "Restricted",
+                     attributes: { 'data-qa': 'dobValue' + loop.index }
+                   } if not flags.enableCaseloadV2,
                    { html: sentenceHtml,
                      attributes: { 'data-qa': 'sentenceValue' + loop.index }
                    },
@@ -190,9 +200,14 @@
              captionClasses: 'govuk-visually-hidden',
              head: [
                  {
-                     html: "Cases",
+                     html: "Cases" if flags.enableCaseloadV2 else "Name / CRN",
                      attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'data-sort-name': 'nameOrCrn', 'data-sort-action': 'case'}
                  },
+                 {
+                     html: "DOB / Age",
+                     attributes: {'aria-sort': setSortOrder('dob', caseload.sortedBy) , 'col-name': 'dob', 'data-qa': 'dob', 'data-sort-name': 'dob',  'data-sort-action': 'case' },
+                     classes: "nowrap"
+                 } if not flags.enableCaseloadV2,
                  {
                      text: "Sentence",
                      attributes: {'aria-sort': setSortOrder('sentence', caseload.sortedBy) , 'col-name': 'sentence', 'data-sort-name': 'sentence', 'data-sort-action': 'case'}
