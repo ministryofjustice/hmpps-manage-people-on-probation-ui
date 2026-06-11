@@ -583,6 +583,13 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           type: res.locals.appointmentTypes.find((type: any) => type.code === typeCode)?.description || null,
         }
       }
+
+      // tidy up current appointment session 👇
+
+      if (req.session.data.appointments?.[crn]?.[id]) {
+        delete req.session.data.appointments[crn][id]
+      }
+
       return res.render(`pages/arrange-appointment/confirmation`, {
         crn,
         responseContactId,

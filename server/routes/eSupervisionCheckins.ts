@@ -2,7 +2,7 @@ import { type Router } from 'express'
 import type { Services } from '../services'
 import controllers from '../controllers'
 import validate from '../middleware/validation'
-import { autoStoreSessionData, redirectWizard, renderError } from '../middleware'
+import { autoStoreSessionData, restrictPageAccess, renderError } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 import { AppResponse } from '../models/Locals'
@@ -59,7 +59,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/spo-approval', [
-    redirectWizard(['eligibility', 'eligibilityChoice'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['eligibility', 'eligibilityChoice'], route: 'setupcheckins' }),
     controllers.checkIns.getSPOApprovalPage(hmppsAuthClient),
   ])
   router.post(
@@ -71,7 +71,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/date-frequency', [
-    redirectWizard(['id'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['id'], route: 'setupcheckins' }),
     controllers.checkIns.getDateFrequencyPage(hmppsAuthClient),
   ])
   router.post(
@@ -83,7 +83,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/contact-preference', [
-    redirectWizard(['date', 'interval'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['date', 'interval'], route: 'setupcheckins' }),
     controllers.checkIns.getContactPreferencePage(hmppsAuthClient),
   ])
   router.post(
@@ -95,7 +95,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/edit-contact-preference', [
-    redirectWizard(['date', 'interval'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['date', 'interval'], route: 'setupcheckins' }),
     controllers.checkIns.getEditContactPrePage(hmppsAuthClient),
   ])
   router.post(
@@ -106,7 +106,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/photo-options', [
-    redirectWizard(['preferredComs'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['preferredComs'], route: 'setupcheckins' }),
     controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient),
   ])
   router.post(
@@ -117,7 +117,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/take-a-photo', [
-    redirectWizard(['photoUploadOption'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getTakePhotoPage(hmppsAuthClient),
   ])
   router.post(
@@ -127,7 +127,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/upload-a-photo', [
-    redirectWizard(['photoUploadOption'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getUploadPhotoPage(hmppsAuthClient),
   ])
   router.post(
@@ -138,7 +138,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/photo-rules', [
-    redirectWizard(['photoUploadOption'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getPhotoRulesPage(hmppsAuthClient),
   ])
   router.post(
@@ -148,7 +148,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postPhotoRulesPage(hmppsAuthClient),
   )
   router.get('/case/:crn/appointments/:id/check-in/checkin-summary', [
-    redirectWizard(['photoUploadOption'], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getCheckinSummaryPage(hmppsAuthClient),
   ])
 
