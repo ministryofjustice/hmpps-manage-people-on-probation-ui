@@ -259,9 +259,7 @@ describe('/controllers/activityLogController', () => {
         },
       })
 
-
       await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
-
 
       expect(renderSpy).toHaveBeenLastCalledWith(
         'pages/appointments/appointment',
@@ -273,17 +271,17 @@ describe('/controllers/activityLogController', () => {
           }),
         }),
       )
-          })
+    })
 
     it('should not mark false for a non MPOP updatable contact', async () => {
       getPersonAppointmentSpy.mockResolvedValue({
-      ...mockPersonAppointment,
-      appointment: {
-      ...mockPersonAppointment.appointment,
-      type: 'Transfer requested',
-      isAppointment: false,
-      },
-    })
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          type: 'Transfer requested',
+          isAppointment: false,
+        },
+      })
 
       await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
 
