@@ -54,7 +54,7 @@ const checkPage = () => {
         loadPage(outcome)
         confirmationPage = new ConfirmationOutcomePage()
         confirmationPage.checkPageTitle('Appointment outcome updated')
-        confirmationPage.getType().should('contain.text', '3 Way Meeting (NS)')
+        confirmationPage.getType().should('contain.text', '3 way meeting (NS)')
         confirmationPage.getDate().should('contain.text', 'Wednesday 21 February 2024 from 10:15am to 10:30am')
         confirmationPage
           .getWhatHappensNextText()

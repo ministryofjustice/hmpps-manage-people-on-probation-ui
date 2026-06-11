@@ -5,7 +5,7 @@
 {% set notStandardForm = true %}
 {% set panelHtml %}
 <div class="govuk-!-font-size-27">
-    <strong>{{ appointmentOutcome.confirmation.type }}</strong><br/>
+    <strong>{{ appointmentOutcome.confirmation.type | toSentenceCase }}</strong><br/>
     <span>{{ appointmentOutcome.confirmation.date }}</span>
 </div>
 {% endset %}
