@@ -93,6 +93,7 @@ import {
   checkLocationMonitoring,
   checkLocationMonitoringByEventNumber,
   checkLocationMonitoringCode,
+  checkRarDescriptionByEventNumber,
 } from '../middleware/checkLocationMonitoring'
 import logger from '../../logger'
 
@@ -238,6 +239,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('checkLocationMonitoring', checkLocationMonitoring)
   njkEnv.addFilter('checkLocationMonitoringCode', checkLocationMonitoringCode)
   njkEnv.addFilter('checkLocationMonitoringByEventNumber', checkLocationMonitoringByEventNumber)
+  njkEnv.addFilter('checkRarDescriptionByEventNumber', checkRarDescriptionByEventNumber)
 
   arnsNunjucksSetup(njkEnv)
 }

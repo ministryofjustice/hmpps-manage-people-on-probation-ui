@@ -8,6 +8,7 @@ import { getCheckinOffenderDetails, getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
+import { Sentence, Sentences } from '../data/model/sentenceDetails'
 
 const routes = ['getCase'] as const
 
@@ -44,8 +45,22 @@ const caseController: Controller<typeof routes, void> = {
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
-      if (res.locals.flags.enableEMDIOverviewShowGPSData) {
-        await getSentences(hmppsAuthClient)(req, res, () => {})
+      let sentences: Sentence[]
+      if (res.locals.flags.enableEMDIOverviewShowGPSData === true) {
+        if (!req?.session?.data?.sentencesWithRarDescription?.[crn]) {
+          const response: Sentences = await masClient.getSentences(crn)
+          sentences = response.sentences
+          req.session.data = {
+            ...(req?.session?.data ?? {}),
+            sentencesWithRarDescription: {
+              ...(req?.session?.data?.sentencesWithRarDescription ?? {}),
+              [crn]: response.sentences,
+            },
+          }
+        } else {
+          sentences = req.session.data.sentencesWithRarDescription[crn]
+        }
+        res.locals.sentences = sentences
         const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
           hasLocationMonitoring(item?.licenceConditions, item?.requirements),
         )

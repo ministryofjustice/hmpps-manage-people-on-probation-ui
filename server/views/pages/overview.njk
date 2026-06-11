@@ -511,14 +511,20 @@
         {% set sentenceHtml %}
         {% set order %}
         {% set showLicenceRow = false %}
+        {% set rarDescription = null %}
         {% if sentence.order %}
           {% if loop.first %}
             <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
           {% endif %}
-          {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
+            {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
                 {% set hasLocationMonitoring = sentence.eventNumber | checkLocationMonitoringByEventNumber(sentences) %}
-          {% endif %}
-          {{ sentence.order.description }} <br/>
+            {% endif %}
+            {% if flags.enableEMDIOverviewShowGPSData %}
+                {% set rarDescription = sentence.eventNumber | checkRarDescriptionByEventNumber(sentences) %}
+            {% else %}
+                {% set rarDescription = sentence.rarDescription %}
+            {% endif %}
+            {{ sentence.order.description }} <br/>
                     From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br/>
           {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
                     {% else %}
@@ -526,14 +532,14 @@
                 {% endif %}
         {% endset %}
         {% set requirements %}
-         {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
-             {{ sentence.rarDescription }} <br/>
+         {% if rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+             {{ rarDescription }} <br/>
              Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
-         {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
-            {{ sentence.rarDescription }}
-         {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+         {% elif rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+            {{ rarDescription }}
+         {% elif not rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
-        {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+        {% elif not rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
                     Details not available
                 {% endif %}
         {% endset %}
