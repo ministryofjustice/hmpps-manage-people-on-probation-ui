@@ -7,6 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import { mockTierCalculation, mockActivities, mockAppResponse, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
+import { MpopUpdatableContacts } from '../data/model/mpopUpdatableContacts'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -228,10 +229,72 @@ describe('/controllers/activityLogController', () => {
   describe('getActivity', () => {
     beforeEach(async () => {
       await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+      
     })
     checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
     it('should request the person appointment note', () => {
       expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+    })
+
+    it('should render the activity page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+        id,
+        back: undefined,
+        queryParams: ['view=default'],
+        isActivityLog: true,
+        url: '',
+        showSuccessBanner: false,
+        uploadFailed: false,
+      })
+    })
+
+    it('should mark an MPOP contact as updatable', async () => {
+
+
+      getPersonAppointmentSpy.mockResolvedValue({
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          type: MpopUpdatableContacts[0].description,
+          isAppointment: false,
+        },
+      })
+      const req = httpMocks.createRequest({
+        params: { crn, id },
+        query: { view: 'default' },
+        session: {},
+      })
+
+      req.flash = jest.fn().mockReturnValue([])
+
+      const res = mockAppResponse({
+        filters: {},
+        flags: {},
+      })
+
+      const renderSpy = jest.spyOn(res, 'render')
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({
+        appointment: {
+          type: MpopUpdatableContacts[0].description,
+          isAppointment: false,
+        },
+      } as any)
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              isUpdatableContact: true,
+            }),
+          }),
+        }),
+      )
     })
 
     it('should render the activity page with showSuccessBanner true when flash exists', async () => {
@@ -315,19 +378,7 @@ describe('/controllers/activityLogController', () => {
       expect(redirectSpy).toHaveBeenCalledWith('/case/X000001/activity/1234')
     })
 
-    it('should render the activity page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
-        personAppointment: mockPersonAppointment,
-        crn,
-        id,
-        back: undefined,
-        queryParams: ['view=default'],
-        isActivityLog: true,
-        url: '',
-        showSuccessBanner: false,
-        uploadFailed: false,
-      })
-    })
+
 
     it('should render the activity page with uploadFailed true when flash is uploadFailed', async () => {
       const reqWithUploadFailed = httpMocks.createRequest({
