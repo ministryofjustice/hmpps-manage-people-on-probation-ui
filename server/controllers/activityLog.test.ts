@@ -229,7 +229,6 @@ describe('/controllers/activityLogController', () => {
   describe('getActivity', () => {
     beforeEach(async () => {
       await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
-      
     })
     checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
     it('should request the person appointment note', () => {
@@ -251,8 +250,6 @@ describe('/controllers/activityLogController', () => {
     })
 
     it('should mark an MPOP contact as updatable', async () => {
-
-
       getPersonAppointmentSpy.mockResolvedValue({
         ...mockPersonAppointment,
         appointment: {
@@ -363,8 +360,6 @@ describe('/controllers/activityLogController', () => {
 
       expect(redirectSpy).toHaveBeenCalledWith('/case/X000001/activity/1234')
     })
-
-
 
     it('should render the activity page with uploadFailed true when flash is uploadFailed', async () => {
       const reqWithUploadFailed = httpMocks.createRequest({
