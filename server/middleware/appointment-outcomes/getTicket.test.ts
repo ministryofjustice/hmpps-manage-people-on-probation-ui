@@ -4,6 +4,7 @@ import { Compliance, NonComplianceContact, NonComplianceHistoryResponse } from '
 import { getTicket } from './getTicket'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
+import { SentenceType } from '../../data/model/sentenceDetails'
 
 const crn = 'X000001'
 const forename = 'Stuart'
@@ -42,15 +43,20 @@ const mockPersonNonComplianceDetailResponse = ({
   acceptableAbsence,
 })
 
-const mockCompliance = (count = 1): Partial<Compliance> => ({
-  priorBreachesOnCurrentOrderCount: count,
+const mockCompliance = ({ breachCount = 1, recallCount = 0 }): Partial<Compliance> => ({
+  priorBreachesOnCurrentOrderCount: breachCount,
+  priorRecallsOnCurrentOrderCount: recallCount,
 })
 
 const buildResponse = ({
   breachCount = 1,
+  recallCount = 0,
+  type = 'COMMUNITY',
   reqUrl = '/outcome/attended-failed-to-comply',
 }: {
   breachCount?: number
+  recallCount?: number
+  type?: SentenceType
   reqUrl?: string
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
@@ -59,7 +65,8 @@ const buildResponse = ({
       forename,
       crn,
       sentence: {
-        compliance: mockCompliance(breachCount),
+        type,
+        compliance: mockCompliance({ breachCount, recallCount }),
       },
     },
   }
@@ -82,7 +89,7 @@ describe('middleware/appointment-outcomes/getTicket', () => {
         await getTicket(hmppsAuthClient)(req, res, nextSpy)
         expect(res.locals.appointmentOutcome.ticket).toBeNull()
       })
-      it('should assign the correct ticket if one previous FTC, no previous breach', async () => {
+      it('should assign the correct ticket if sentence type is COMMUNITY, one previous FTC, no previous breach', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
           mockPersonNonComplianceDetailResponse({ attendedButDidNotComply }),
@@ -92,10 +99,25 @@ describe('middleware/appointment-outcomes/getTicket', () => {
         expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
           expect.objectContaining({
             title: 'This is Stuart’s second count of non-compliance in the past 12 months',
+            html: expect.stringContaining('You should consider initiating a breach'),
           }),
         )
       })
-      it('should assign the correct ticket if more than one previous FTC, no previous breach', async () => {
+      it('should assign the correct ticket if sentence type is CUSTODY, one previous FTC, no previous breach', async () => {
+        const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
+        getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
+          mockPersonNonComplianceDetailResponse({ attendedButDidNotComply }),
+        )
+        const res = buildResponse({ type: 'CUSTODY', recallCount: 0 })
+        await getTicket(hmppsAuthClient)(req, res, nextSpy)
+        expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
+          expect.objectContaining({
+            title: 'This is Stuart’s second count of non-compliance in the past 12 months',
+            html: expect.stringContaining('You should consider initiating a recall'),
+          }),
+        )
+      })
+      it('should assign the correct ticket if sentence type is COMMUNITY, more than one previous FTC, no previous breach', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
         getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
@@ -110,7 +132,22 @@ describe('middleware/appointment-outcomes/getTicket', () => {
           }),
         )
       })
-      it('should assign the correct ticket if more than one previous FTC, previous breach', async () => {
+      it('should assign the correct ticket if sentence type is CUSTODY, more than one previous FTC, no previous recall', async () => {
+        const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
+        const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
+        getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
+          mockPersonNonComplianceDetailResponse({ attendedButDidNotComply, unacceptableAbsence }),
+        )
+        const res = buildResponse({ type: 'CUSTODY' })
+        await getTicket(hmppsAuthClient)(req, res, nextSpy)
+        expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
+          expect.objectContaining({
+            title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
+            html: expect.stringContaining('You should consider initiating a recall'),
+          }),
+        )
+      })
+      it('should assign the correct ticket if sentence type is COMMUNIUTY, more than one previous FTC, previous breach', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
         getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
@@ -122,6 +159,21 @@ describe('middleware/appointment-outcomes/getTicket', () => {
           expect.objectContaining({
             title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
             html: expect.stringContaining('Stuart has breached this sentence before'),
+          }),
+        )
+      })
+      it('should assign the correct ticket if sentence type is CUSTODY, more than one previous FTC, previous recall', async () => {
+        const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
+        const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
+        getPersonNonComplianceDetailSpy.mockResolvedValueOnce(
+          mockPersonNonComplianceDetailResponse({ attendedButDidNotComply, unacceptableAbsence }),
+        )
+        const res = buildResponse({ type: 'CUSTODY', breachCount: 0, recallCount: 1 })
+        await getTicket(hmppsAuthClient)(req, res, nextSpy)
+        expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
+          expect.objectContaining({
+            title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
+            html: expect.stringContaining('Stuart has been recalled before'),
           }),
         )
       })
