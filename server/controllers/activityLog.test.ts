@@ -261,20 +261,6 @@ describe('/controllers/activityLogController', () => {
           isAppointment: false,
         },
       })
-      const req = httpMocks.createRequest({
-        params: { crn, id },
-        query: { view: 'default' },
-        session: {},
-      })
-
-      req.flash = jest.fn().mockReturnValue([])
-
-      const res = mockAppResponse({
-        filters: {},
-        flags: {},
-      })
-
-      const renderSpy = jest.spyOn(res, 'render')
 
       jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({
         appointment: {
