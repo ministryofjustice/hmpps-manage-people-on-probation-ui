@@ -259,21 +259,40 @@ describe('/controllers/activityLogController', () => {
         },
       })
 
-      jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({
-        appointment: {
-          type: MpopUpdatableContacts[0].description,
-          isAppointment: false,
-        },
-      } as any)
 
       await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith(
+
+      expect(renderSpy).toHaveBeenLastCalledWith(
         'pages/appointments/appointment',
         expect.objectContaining({
           personAppointment: expect.objectContaining({
             appointment: expect.objectContaining({
               isUpdatableContact: true,
+            }),
+          }),
+        }),
+      )
+          })
+
+    it('should not mark false for a non MPOP updatable contact', async () => {
+      getPersonAppointmentSpy.mockResolvedValue({
+      ...mockPersonAppointment,
+      appointment: {
+      ...mockPersonAppointment.appointment,
+      type: 'Transfer requested',
+      isAppointment: false,
+      },
+    })
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              isUpdatableContact: false,
             }),
           }),
         }),
