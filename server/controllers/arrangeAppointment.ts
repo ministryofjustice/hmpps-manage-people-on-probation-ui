@@ -554,10 +554,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         }
       }
       const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
-
-      if (responseContactId) {
-        setDataValue(data, ['temp', crn, 'responseContactId'], null)
-      }
       const { isOutLookEventFailed = null, isEnglishNotificationFailed = null, isWelshNotificationFailed = null } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed

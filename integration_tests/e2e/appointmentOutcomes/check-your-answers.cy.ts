@@ -259,7 +259,7 @@ const checkPage = () => {
         .find('.govuk-summary-list__value')
         .should('contain.text', `Appointment: ${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
       checkYourAnswersOutcomePage
-        .getSummaryListRow(7)
+        .getSummaryListRow(5)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
     })
