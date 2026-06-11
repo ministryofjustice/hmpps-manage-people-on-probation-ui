@@ -21,7 +21,7 @@ import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appoi
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
+  checkBreachOrRecallWarningBanner,
   checkOptionRedirectsToCorrectPage,
   checkOptions,
 } from './imports'
@@ -84,7 +84,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
       {
         value: 'ATTENDED_FAILED_TO_COMPLY',
         text: 'Attended - failed to comply',
-        hint: 'For example, their behaviour was disruptive or they did not follow instructions.',
+        hint: 'For example, they did not follow instructions.',
         redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
         RedirectPage: AttendedFailedToComplyPage,
       },
@@ -94,12 +94,14 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
           text: 'Attended - sent home (behaviour)',
+          hint: 'For example, their behaviour was disruptive',
           redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
           RedirectPage: AttendedFailedToComplyPage,
         },
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
+          hint: 'For example, the building was unexpectedly closed.',
           redirectPageTitle: 'Add a note',
           RedirectPage: AddNotePage,
         },
@@ -198,8 +200,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     checkPageTitle({ journey, inOffice: true, dateInPast: true })
     checkOptions(options)
     checkValidationErrors({ journey, inOffice: true, dateInPast: true })
-    checkOptionRedirectsToCorrectPage(options, loadPage, {
-      Page: OutcomePage,
+    checkOptionRedirectsToCorrectPage(options, loadPage, OutcomePage, {
       journey,
       inOffice: true,
       dateInPast: true,
@@ -210,8 +211,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const options = getExpectedOptions({ inOffice: false, dateInPast: true })
     checkPageTitle({ journey, inOffice: false, dateInPast: true })
     checkOptions(options)
-    checkOptionRedirectsToCorrectPage(options, loadPage, {
-      Page: OutcomePage,
+    checkOptionRedirectsToCorrectPage(options, loadPage, OutcomePage, {
       journey,
       inOffice: false,
       dateInPast: true,
@@ -225,8 +225,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       checkPageTitle({ journey, dateInPast: false })
       checkOptions(options)
       checkValidationErrors({ journey, inOffice: true, dateInPast: false })
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: OutcomePage,
+      checkOptionRedirectsToCorrectPage(options, loadPage, OutcomePage, {
         journey,
         inOffice: true,
         dateInPast: false,
@@ -246,7 +245,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: OutcomePage })
+  checkBreachOrRecallWarningBanner(loadPage, OutcomePage)
 }
 
 describe('Appointment outcome', () => {

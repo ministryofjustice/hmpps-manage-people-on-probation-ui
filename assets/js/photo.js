@@ -111,7 +111,7 @@ if (displayUploadedImage && uploadedImageData) {
   if (displayUploadedImage[0]) {
     const img = new Image()
     img.src = uploadedImageData
-    img.alt = `Image of ${displayUploadedImage[0].dataset.person || 'the person'} added for identification`
+    img.alt = `${displayUploadedImage[0].dataset.person || 'the person'} added for identification`
     img.classList.add('es-profile-image')
 
     img.onload = () => {

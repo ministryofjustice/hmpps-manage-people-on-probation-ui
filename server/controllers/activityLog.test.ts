@@ -381,7 +381,7 @@ describe('/controllers/activityLogController', () => {
         params: { crn },
         query: {
           keywords: 'appointment',
-          compliance: 'acceptable absence',
+          compliance: ['acceptable absence'],
         },
         session: {},
       })
@@ -393,7 +393,7 @@ describe('/controllers/activityLogController', () => {
 
       expect(request.session.activityLogFilters).toEqual({
         keywords: 'appointment',
-        compliance: 'acceptable absence',
+        compliance: ['acceptable absence'],
         crn,
       })
 
@@ -414,7 +414,7 @@ describe('/controllers/activityLogController', () => {
 
       expect(request.session.activityLogFilters).toEqual({
         keywords: '',
-        compliance: {},
+        compliance: [],
         crn,
       })
 

@@ -138,6 +138,7 @@
               },
               {
                 "id": 2500841296,
+                "code": "EM01",
                 "mainDescription": "Licence - Location Monitoring (GPS Tagging)",
                 "active": true
               }
@@ -303,7 +304,8 @@
               {
                 "id": 4,
                 "description": "Location Monitoring(GPS Tagging) - Monitored Appointment",
-                "active": true
+                "active": true,
+                "code": "RM59"
               }
             ],
             "courtDocuments": [],
@@ -474,6 +476,7 @@
               },
               {
                 "id": 2500841296,
+                "code": "EM01",
                 "mainDescription": "Licence - Location Monitoring (GPS Tagging)",
                 "active": true
               }

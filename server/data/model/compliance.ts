@@ -24,11 +24,12 @@ export interface SentenceCompliance {
   compliance: Compliance
   mainOffence: Offence
   order: Order
-  activeBreach?: Breach
+  activeBreach?: BreachOrRecall
+  activeRecall?: BreachOrRecall
   rarDescription?: string
 }
 
-export interface Breach {
+export interface BreachOrRecall {
   startDate: string
   status: string
 }

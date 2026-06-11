@@ -10,12 +10,15 @@ export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
     value: 'ATTENDED_FAILED_TO_COMPLY',
     text: 'Attended - failed to comply',
     hint: {
-      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
+      text: 'For example, they did not follow instructions.',
     },
   },
   {
     value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
     text: 'Attended - sent home (behaviour)',
+    hint: {
+      text: 'For example, their behaviour was disruptive.',
+    },
   },
   {
     value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',

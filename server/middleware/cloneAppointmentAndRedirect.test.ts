@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { getDataValue, setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
@@ -150,7 +150,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     )
   })
 
-  it('should lock sensitivity if reschedule set as sensitive', () => {
+  it('should lock sensitivity if set as sensitive when RESCHEDULE', () => {
     mockedGetDataValue.mockReturnValueOnce('Yes')
     const { req: request, res: response } = setup()
     const crn2 = request.params.crn
@@ -169,6 +169,41 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     }
 
     cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)
+
+    expect(mockedSetDataValue).toHaveBeenCalledWith(
+      request.session.data,
+      ['appointments', crn2, request.params.id],
+      expectedCloneReschedule,
+    )
+    expect(redirectSpy2).toHaveBeenCalledWith(
+      `/case/${crn2}/arrange-appointment/${request.params.id}/check-your-answers`,
+    )
+  })
+
+  it('should lock sensitivity if original was sensitive when RESCHEDULE', () => {
+    mockedGetDataValue.mockReturnValueOnce(undefined)
+    const { req: request, res: response } = setup()
+    const crn2 = request.params.crn
+    request.params.id = 'APPT123'
+    request.params.contactId = 'C9876'
+    const redirectSpy2 = jest.spyOn(response, 'redirect')
+
+    const sensitiveAppt = {
+      ...mockAppt,
+      sensitivity: 'Yes' as YesNo,
+    }
+
+    const expectedCloneReschedule = {
+      ...expectedClone,
+      uuid: request.params.id,
+      rescheduleAppointment: {
+        contactId: 'C9876',
+      },
+      sensitivity: 'Yes',
+      sensitivityLocked: true,
+    }
+
+    cloneAppointmentAndRedirect(sensitiveAppt, 'RESCHEDULE')(request, response)
 
     expect(mockedSetDataValue).toHaveBeenCalledWith(
       request.session.data,

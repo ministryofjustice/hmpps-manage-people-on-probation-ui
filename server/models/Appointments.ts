@@ -257,7 +257,7 @@ export interface RescheduleAppointmentRequestBody {
   staffCode?: string
   teamCode?: string
   locationCode?: string
-  outcomeRecorded: boolean
+  outcomeRecorded?: boolean
   notes?: string
   sensitive?: boolean
   sendToVisor?: boolean
