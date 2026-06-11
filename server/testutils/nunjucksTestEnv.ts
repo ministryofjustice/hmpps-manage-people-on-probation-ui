@@ -3,7 +3,9 @@ import path from 'path'
 
 import {
   addressToList,
+  convertToTitleCase,
   dateWithYear,
+  decorateFormAttributes,
   deliusDeepLinkUrl,
   fullName,
   govukTime,
@@ -38,6 +40,8 @@ export const createNunjucksTestEnv = () => {
   env.addFilter('fullName', fullName)
   env.addFilter('govukTime', govukTime)
   env.addFilter('handleQuotes', handleQuotes)
+  env.addFilter('decorateFormAttributes', decorateFormAttributes)
+  env.addFilter('convertToTitleCase', convertToTitleCase)
 
   return env
 }
