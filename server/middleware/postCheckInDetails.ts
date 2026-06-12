@@ -3,15 +3,24 @@ import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/esupervision'
+import { UploadLocationResponse, OffenderInfo, OffenderSetup } from '../data/model/esupervision'
 import logger from '../../logger'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const postCheckInDetails = (
   hmppsAuthClient: HmppsAuthClient,
-): Route<Promise<{ setup: OffenderSetup; uploadLocation: LocationInfo }>> => {
+): Route<Promise<{ setup: OffenderSetup; uploadLocation: UploadLocationResponse }>> => {
   return async (req, res) => {
     const { crn, id } = req.params as Record<string, string>
+    // The browser sends a base64-encoded SHA-256 digest (see assets/js/photo.js sha256Base64).
+    // S3 enforces the matching x-amz-checksum-sha256 on the PUT, so we only guard presence here.
+    const contentSha256 = typeof req.body?.contentSha256 === 'string' ? req.body.contentSha256.trim() : ''
+    if (!contentSha256) {
+      logger.error('Checkin Registration rejected: missing contentSha256')
+      throw Object.assign(new Error('contentSha256 is required'), {
+        data: { status: 400, userMessage: 'contentSha256 is required' },
+      })
+    }
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
     const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
@@ -36,7 +45,11 @@ export const postCheckInDetails = (
     logger.info('Checkin Registration started')
     try {
       const setup: OffenderSetup = await eSupervisionClient.postOffenderSetup(data)
-      const uploadLocation: LocationInfo = await eSupervisionClient.getProfilePhotoUploadLocation(setup, 'image/jpeg')
+      const uploadLocation: UploadLocationResponse = await eSupervisionClient.getProfilePhotoUploadLocation(
+        setup,
+        'image/jpeg',
+        contentSha256,
+      )
       return { setup, uploadLocation }
     } catch (error) {
       const statusCode = error?.data?.status || 500
