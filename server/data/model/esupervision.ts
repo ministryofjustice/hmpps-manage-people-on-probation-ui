@@ -87,8 +87,16 @@ export interface OffenderInfo {
 
 export interface LocationInfo {
   url: string
-  contentType: string
-  duration: string
+  method?: string
+  // Headers the client must echo on the PUT (e.g. x-amz-checksum-sha256) when the URL is content-hash bound.
+  // Absent or null when the URL was issued without hash binding.
+  requiredHeaders?: Record<string, string> | null
+}
+
+// The upload_location endpoint wraps the presigned URL details in a locationInfo envelope.
+// The browser reads uploadLocation.locationInfo (see assets/js/photo.js).
+export interface UploadLocationResponse {
+  locationInfo: LocationInfo
 }
 
 export interface OffenderSetupCompleteResponse {
