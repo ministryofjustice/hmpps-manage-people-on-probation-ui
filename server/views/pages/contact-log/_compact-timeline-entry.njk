@@ -16,7 +16,7 @@
       {% else %}
       <li>
         <a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">
-          {% if flags.enableManageContacts and (entry.displayName or entry.isAppointment == false)%}
+          {% if flags.enableManageContacts and (entry.displayName or entry.isUpdatableContact)%}
             Manage
           {% else %}
             View
