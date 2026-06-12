@@ -49,7 +49,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(1)
     .find('.govuk-summary-list__value')
-    .should('contain.text', `Appointment: ${appointment}`)
+    .should('contain.text', appointment)
   checkYourAnswersOutcomePage
     .getSummaryListRow(2)
     .find('.govuk-summary-list__key')
@@ -257,7 +257,7 @@ const checkPage = () => {
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
-        .should('contain.text', `Appointment: ${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
+        .should('contain.text', `${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
       checkYourAnswersOutcomePage
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
