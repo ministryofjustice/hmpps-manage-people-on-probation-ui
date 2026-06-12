@@ -53,6 +53,7 @@ const caseController: Controller<typeof routes, void> = {
           res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
         }
       }
+
       return res.render('pages/overview', {
         overview,
         needs,

@@ -38,6 +38,7 @@ export const services = () => {
     manageUsersApiClient,
     probationFrontendComponentsApiClient,
     arnsComponents,
+    mpopComponents,
   } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient)
@@ -78,6 +79,7 @@ export const services = () => {
     probationComponentsApiService,
     technicalUpdatesService,
     arnsComponents,
+    mpopComponents,
   }
 }
 
