@@ -13,7 +13,7 @@
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% set shouldShowManageButton =
   flags.enableManageContacts
-  and (appointment.isAppointment == false or appointment.displayName)
+  and (appointment.displayName or appointment.isUpdatableContact)
   and (appointment.type | lower) not in excludedTypes
 %}
 {% block beforeContent %}
