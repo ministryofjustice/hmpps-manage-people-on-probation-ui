@@ -7,6 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import { mockTierCalculation, mockActivities, mockAppResponse, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
+import { MpopUpdatableContacts } from '../data/model/mpopUpdatableContacts'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -234,6 +235,68 @@ describe('/controllers/activityLogController', () => {
       expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
     })
 
+    it('should render the activity page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+        id,
+        back: undefined,
+        queryParams: ['view=default'],
+        isActivityLog: true,
+        url: '',
+        showSuccessBanner: false,
+        uploadFailed: false,
+      })
+    })
+
+    it('should mark an MPOP contact as updatable', async () => {
+      getPersonAppointmentSpy.mockResolvedValue({
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          type: MpopUpdatableContacts[0].description,
+          isAppointment: false,
+        },
+      })
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              isUpdatableContact: true,
+            }),
+          }),
+        }),
+      )
+    })
+
+    it('should not mark false for a non MPOP updatable contact', async () => {
+      getPersonAppointmentSpy.mockResolvedValue({
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          type: 'Transfer requested',
+          isAppointment: false,
+        },
+      })
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              isUpdatableContact: false,
+            }),
+          }),
+        }),
+      )
+    })
+
     it('should render the activity page with showSuccessBanner true when flash exists', async () => {
       const reqWithFlash = httpMocks.createRequest({
         params: { crn, id },
@@ -313,20 +376,6 @@ describe('/controllers/activityLogController', () => {
       expect(reqAfterFlash.flash).toHaveBeenCalledWith('contactUpdated', 'success')
 
       expect(redirectSpy).toHaveBeenCalledWith('/case/X000001/activity/1234')
-    })
-
-    it('should render the activity page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
-        personAppointment: mockPersonAppointment,
-        crn,
-        id,
-        back: undefined,
-        queryParams: ['view=default'],
-        isActivityLog: true,
-        url: '',
-        showSuccessBanner: false,
-        uploadFailed: false,
-      })
     })
 
     it('should render the activity page with uploadFailed true when flash is uploadFailed', async () => {
