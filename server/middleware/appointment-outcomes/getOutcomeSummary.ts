@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
 import {
+  dateWithDayAndWithYear,
   dateWithYear,
   getContactEnforcementActions,
   getMappedActions,
@@ -17,7 +18,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
   if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome) {
     const {
       notePrepend,
-      appointmentHintText,
       baseOutcomeUrl,
       appointmentSession: {
         notes,
@@ -45,7 +45,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     let endDateTime: string
     if (nextAppt) {
       ;({ type, startDateTime, endDateTime } = nextAppt)
-      nextAppointment = `${type} on ${dateWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
+      nextAppointment = `${type} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
     }
 
     const noOutcome = 'No outcome'
@@ -80,8 +80,13 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
 
     const outcome = getSelectedOutcome()
 
+    let appointmentDetails = null
+    if (appointment?.type && appointment?.startDateTime && appointment?.endDateTime) {
+      appointmentDetails = `${appointment.type} on ${dateWithDayAndWithYear(appointment.startDateTime)} at ${govukTime(appointment.startDateTime)} to ${govukTime(appointment.endDateTime)}`
+    }
+
     summary = {
-      appointmentDetails: appointmentHintText,
+      appointmentDetails,
       outcome,
       notes: notes ?? 'No notes',
       sensitivity,
