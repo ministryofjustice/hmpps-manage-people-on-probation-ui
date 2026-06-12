@@ -77,7 +77,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   )
   const appointmentHintText =
     appointment?.type && appointment?.officer?.name && appointment?.startDateTime
-      ? `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
+      ? `${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
       : null
 
   const probationPractitioner = getDataValue<ProbationPractitioner>(data, [
