@@ -11,37 +11,46 @@ type Mapping = {
 interface RedirectInfo {
   dataPath: string[]
   redirectPath: string
+  restartPath: string
   queryParam: string
 }
 
-export const redirectWizard = (
-  requiredValues: (string | string[])[],
-  route: RouteKey = 'appointments',
-): Route<Promise<void>> => {
+type PageRoute = 'appointments' | 'setupcheckins'
+
+export const restrictPageAccess = ({
+  requiredValues = [],
+  route = 'appointments',
+}: { requiredValues?: (string | string[])[]; route?: PageRoute } = {}): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { crn, id } = req.params as Record<string, string>
+
     const mapping: Mapping = {
       appointments: {
         dataPath: ['appointments', crn, id],
         redirectPath: `/case/${crn}/arrange-appointment/${id}/sentence`,
+        restartPath: `/case/${crn}/arrange-appointment/sentence`,
         queryParam: 'change',
       },
       setupcheckins: {
         dataPath: ['esupervision', crn, id, 'checkins'],
         redirectPath: `/case/${crn}/appointments/${id}/check-in/eligibility-check`,
+        restartPath: `/case/${crn}/appointments/check-in/eligibility-check`,
         queryParam: 'cya',
       },
     }
-    const { dataPath, redirectPath, queryParam } = mapping[route]
+    const { dataPath, redirectPath, restartPath, queryParam } = mapping[route]
     const { data } = req.session
+    if (!isValidCrn(crn) || !isValidUUID(id)) {
+      return renderError(404)(req, res)
+    }
+    if (getDataValue(data, [...dataPath]) === undefined) {
+      return res.redirect(restartPath)
+    }
     if (!req.query?.[queryParam]) {
       for (const requiredValue of requiredValues) {
         const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
         const value = getDataValue(data, [...dataPath, ...path])
         if (!value) {
-          if (!isValidCrn(crn) || !isValidUUID(id)) {
-            return renderError(404)(req, res)
-          }
           return res.redirect(redirectPath)
         }
       }
