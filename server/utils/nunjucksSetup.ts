@@ -80,6 +80,7 @@ import {
   dateToLongDate,
   merge,
   dateWithYearTimeFirst,
+  getDataValue,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -191,6 +192,8 @@ export default function nunjucksSetup(
       logger.warn('decorateFormAttributes called without request context')
       return obj
     }
+
+    logger.warn(ctx.req.session.data)
 
     return decorateFormAttributes(ctx.req, ctx.res)(obj, sections)
   })
