@@ -10,13 +10,13 @@ const env = createNunjucksTestEnv()
 const crn = 'X000001'
 const appointmentId = '123456'
 
-type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
+// type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
 
 type TestModel = {
   // Conditions
-  journey: Journey
-  inOffice: boolean
-  dateInPast: boolean
+  // journey: Journey
+  // inOffice: boolean
+  // dateInPast: boolean
   // Outcome
   appointmentOutcome: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   // check POP header
@@ -39,9 +39,6 @@ type TestModel = {
 // }
 
 const baseModel: TestModel = {
-  journey: 'MANAGE',
-  inOffice: false,
-  dateInPast: false,
   appointmentOutcome: {
     crn,
     id: appointmentId,
@@ -72,22 +69,6 @@ const baseModel: TestModel = {
   } as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
   uuid: 'uuid',
   headerPersonName: { forename: 'Alton', surname: 'Berge' },
-  personAppointment: {
-    appointment: {
-      id: '',
-      type: 'TYPE',
-      startDateTime: '21/03/24',
-      officer: {
-        name: { forename: 'Terry', surname: 'Jones' },
-      },
-    },
-    personSummary: {
-      name: { forename: '', surname: '' },
-      crn: '',
-      dateOfBirth: '',
-    },
-    documents: [],
-  },
   crn: 'string',
   backLink: 'string',
 }
@@ -100,14 +81,6 @@ const render = (model = {} as Partial<TestModel>) => {
       ...baseModel.headerPersonName,
       ...model.headerPersonName,
     },
-    personAppointment: {
-      ...baseModel.personAppointment,
-      ...model.personAppointment,
-      appointment: {
-        ...baseModel.personAppointment.appointment,
-        ...model.personAppointment?.appointment,
-      },
-    },
     appointmentOutcome: {
       ...baseModel.appointmentOutcome,
       ...model.appointmentOutcome,
@@ -117,39 +90,51 @@ const render = (model = {} as Partial<TestModel>) => {
 }
 
 describe('Manage appointment journey', () => {
-  // describe('Appointment is in the past and in office', () => {
-  test('should render the page', () => {
-    const $ = render()
+  describe('Appointment is in the past and in office', () => {
+    it('should render the page', () => {
+      const $ = render({
+        appointmentOutcome: {
+          isInPast: true,
+        } as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
+      })
 
-    // check title
-    // console.log($.html())
-    // console.log($('.govuk-fieldset__legend--l').text())
-    // expect($('[data-qa="pageHeading"]').text()).toContain('What was the outcome of this appointment?')
-    // check options
-    // check validation errors
-    // check redirects
+      // check title
+      expect($('[data-qa="pageHeading"]').text()).toContain('What was the outcome of this appointment?')
+      // check options
+      // check validation errors
+      // check redirects
+    })
   })
-  // })
-  // describe('Appointment is in the past and not in office', () => {
-  //   it('should render the page', () => {
-  //     const $ = render()
+  describe('Appointment is in the past and not in office', () => {
+    it('should render the page', () => {
+      const $ = render({
+        appointmentOutcome: {
+          isInPast: true,
+        } as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
+      })
 
-  //     //check title
-  //     expect($('[data-qa="pageHeading"]').text()).toContain('What was the outcome of this appointment?')
-  //     //check options
-  //     //check validation errors
-  //     //check redirects
-  //   })
-  // })
-  // describe('appointment is in the future', () => {
-  //   it('should render the page', () => {
-  //     const $ = render()
+      // check title
+      expect($('[data-qa="pageHeading"]').text()).toContain('What was the outcome of this appointment?')
+      // check options
+      // check validation errors
+      // check redirects
+    })
+  })
+  describe('appointment is in the future', () => {
+    it('should render the page', () => {
+      const $ = render({
+        appointmentOutcome: {
+          isInPast: false,
+        } as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
+      })
 
-  //     //check title
-  //     expect($('[data-qa="pageHeading"]').text()).toContain('Why will ' + convertToTitleCase(baseModel.headerPersonName.forename) + ' not attend this appointment?')
-  //     //check options
-  //     //check validation errors
-  //     //check redirects
-  //   })
-  // })
+      // check title
+      expect($('[data-qa="pageHeading"]').text()).toContain(
+        `Why will ${convertToTitleCase(baseModel.headerPersonName.forename)} not attend this appointment?`,
+      )
+      // check options
+      // check validation errors
+      // check redirects
+    })
+  })
 })
