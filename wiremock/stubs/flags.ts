@@ -416,6 +416,39 @@ const stubDisableEnforcementContacts = (): SuperAgentRequest =>
     },
   })
 
+const stubFeatureFlag = ({ key, enabled }: { key: string; enabled: boolean }): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => f.key !== key),
+          {
+            key,
+            name: key,
+            description: '',
+            enabled,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-04-10T12:00:00.000000Z',
+            updatedAt: '2026-04-10T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubEnableESuperVision,
   stubDisableSmsReminders,
@@ -428,4 +461,5 @@ export default {
   stubEnableShowMatchWithConcern,
   stubDisableEMDIOverviewShowGPSData,
   stubDisableEnforcementContacts,
+  stubFeatureFlag,
 }
