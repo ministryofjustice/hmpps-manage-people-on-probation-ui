@@ -14,16 +14,24 @@
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}
       {% else %}
-      <li>
-        <a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">
-          {% if flags.enableManageContacts and (entry.displayName or entry.isUpdatableContact)%}
-            Manage
-          {% else %}
-            View
-          {% endif %}
-          <span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span>
-        </a>
-      </li>
+      {% if flags.enableEnforcementContacts and (entry.type === 'Alcohol Consumption' or entry.type === 'Critical Communications' or entry.type === 'Unplanned Contact from Person on Probation') %}
+        <li>
+          <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" class="contact-activity__manage-link" data-qa="manage-on-delius-link">
+            Manage on NDelius<span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }} (opens in new tab)</span>
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">
+            {% if flags.enableManageContacts and (entry.displayName or entry.isUpdatableContact) %}
+              Manage
+            {% else %}
+              View
+            {% endif %}
+            <span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span>
+          </a>
+        </li>
+      {% endif %}
     {% endif %}
   </ul>
 {% endset %}
