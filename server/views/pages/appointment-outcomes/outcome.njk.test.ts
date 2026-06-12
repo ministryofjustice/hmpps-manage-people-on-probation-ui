@@ -1,11 +1,10 @@
 import * as cheerio from 'cheerio'
+import httpMocks from 'node-mocks-http'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
 import { Activity, PersonAppointment } from '../../../data/model/schedule'
 import { AttendedCompliedAppointment } from '../../../models/Appointments'
-import { AppointmentOutcomeProps } from '../../../models/Locals'
+import { AppointmentOutcomeProps, AppResponse } from '../../../models/Locals'
 import { convertToTitleCase } from '../../../utils'
-
-const env = createNunjucksTestEnv()
 
 const crn = 'X000001'
 const appointmentId = '123456'
@@ -42,6 +41,8 @@ const baseModel: TestModel = {
   appointmentOutcome: {
     crn,
     id: appointmentId,
+    uuid: appointmentId,
+    contactId: appointmentId,
     breachOrRecallWarning: {
       title: 'title',
       text: 'text',
@@ -86,6 +87,20 @@ const render = (model = {} as Partial<TestModel>) => {
       ...model.appointmentOutcome,
     },
   }
+  const req = httpMocks.createRequest({
+    params: {
+      crn,
+      id: appointmentId,
+      contactId: appointmentId,
+    },
+    session: {
+      data: {},
+    },
+  })
+  const res = httpMocks.createResponse({
+    locals: input,
+  }) as AppResponse
+  const env = createNunjucksTestEnv(req, res)
   return cheerio.load(env.render('pages/appointment-outcomes/outcome.njk', input))
 }
 
@@ -100,6 +115,9 @@ describe('Manage appointment journey', () => {
 
       // check title
       expect($('[data-qa="pageHeading"]').text()).toContain('What was the outcome of this appointment?')
+      expect($(`[id="appointments-${crn}-${appointmentId}-outcome-outcomeType-hint"]`).text()).toContain(
+        baseModel.appointmentOutcome.appointmentHintText,
+      )
       // check options
       // check validation errors
       // check redirects
@@ -115,6 +133,9 @@ describe('Manage appointment journey', () => {
 
       // check title
       expect($('[data-qa="pageHeading"]').text()).toContain('What was the outcome of this appointment?')
+      expect($(`[id="appointments-${crn}-${appointmentId}-outcome-outcomeType-hint"]`).text()).toContain(
+        baseModel.appointmentOutcome.appointmentHintText,
+      )
       // check options
       // check validation errors
       // check redirects
@@ -131,6 +152,9 @@ describe('Manage appointment journey', () => {
       // check title
       expect($('[data-qa="pageHeading"]').text()).toContain(
         `Why will ${convertToTitleCase(baseModel.headerPersonName.forename)} not attend this appointment?`,
+      )
+      expect($(`[id="appointments-${crn}-${appointmentId}-outcome-outcomeType-hint"]`).text()).toContain(
+        baseModel.appointmentOutcome.appointmentHintText,
       )
       // check options
       // check validation errors

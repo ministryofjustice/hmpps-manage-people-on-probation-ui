@@ -1,9 +1,6 @@
 import nunjucks from 'nunjucks'
 import path from 'path'
-
-import { AsyncLocalStorage } from 'async_hooks'
-import { ParamsDictionary, Request } from 'express-serve-static-core'
-import { ParsedQs } from 'qs'
+import { Request } from 'express-serve-static-core'
 import {
   addressToList,
   convertToTitleCase,
@@ -19,9 +16,7 @@ import {
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
 
-const requestContext = new AsyncLocalStorage<{ req: Request; res: AppResponse }>()
-
-export const createNunjucksTestEnv = () => {
+export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   const env = nunjucks.configure(
     [
       path.join(__dirname, '../views'),
@@ -48,20 +43,11 @@ export const createNunjucksTestEnv = () => {
   env.addFilter('govukTime', govukTime)
   env.addFilter('handleQuotes', handleQuotes)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
-    const ctx = requestContext.getStore()
-
-    // Some render paths (for example tests or non-request rendering) may not
-    // have an AsyncLocalStorage context. Fall back to the undecorated object and
-    // log for investigation.
-    if (!ctx) {
+    if (!req || !res) {
       logger.warn('decorateFormAttributes called without request context')
       return obj
     }
-
-    return decorateFormAttributes(
-      ctx.req as unknown as Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
-      ctx.res,
-    )(obj, sections)
+    return decorateFormAttributes(req, res)(obj, sections)
   })
   env.addFilter('convertToTitleCase', convertToTitleCase)
 
