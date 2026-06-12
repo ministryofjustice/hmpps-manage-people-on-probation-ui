@@ -225,9 +225,105 @@ const stubAppointmentDeepLinkWithOutcome = (): SuperAgentRequest =>
     },
   })
 
+const stubActivityLogWithAlcoholConsumption = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/activity/X000001',
+      method: 'POST',
+      queryParameters: {
+        page: { matches: '.*' },
+        size: { equalTo: '25' },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        size: 1,
+        page: 0,
+        totalResults: 1,
+        totalPages: 1,
+        personSummary: {
+          name: { forename: 'Eula', surname: 'Schmeler' },
+          crn: 'X000001',
+          dateOfBirth: '1979-08-18',
+        },
+        activities: [
+          {
+            id: 9999,
+            type: 'Alcohol Consumption',
+            displayName: 'Alcohol consumption',
+            startDateTime: '2024-01-15T10:00:00.000Z',
+            isSensitive: false,
+            hasOutcome: true,
+            wasAbsent: false,
+            isAppointment: false,
+            isCommunication: false,
+            isSystemContact: false,
+            deliusManaged: true,
+            isUpdatableContact: false,
+            appointmentNotes: [],
+            officer: { name: { forename: 'Paul', surname: 'Smith' } },
+            lastUpdated: '2024-01-15',
+            lastUpdatedBy: { forename: 'Paul', surname: 'Smith' },
+          },
+        ],
+      },
+      headers: { 'Content-Type': 'application/json' },
+    },
+  })
+
+const stubActivityLogWithUnplannedContact = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/activity/X000001',
+      method: 'POST',
+      queryParameters: {
+        page: { matches: '.*' },
+        size: { equalTo: '25' },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        size: 1,
+        page: 0,
+        totalResults: 1,
+        totalPages: 1,
+        personSummary: {
+          name: { forename: 'Eula', surname: 'Schmeler' },
+          crn: 'X000001',
+          dateOfBirth: '1979-08-18',
+        },
+        activities: [
+          {
+            id: 9998,
+            type: 'Unplanned Contact from Person on Probation',
+            displayName: 'Unplanned contact from person on probation',
+            startDateTime: '2024-01-15T10:00:00.000Z',
+            isSensitive: false,
+            hasOutcome: true,
+            wasAbsent: false,
+            isAppointment: false,
+            isCommunication: false,
+            isSystemContact: false,
+            deliusManaged: true,
+            isUpdatableContact: false,
+            appointmentNotes: [],
+            officer: { name: { forename: 'Paul', surname: 'Smith' } },
+            lastUpdated: '2024-01-15',
+            lastUpdatedBy: { forename: 'Paul', surname: 'Smith' },
+          },
+        ],
+      },
+      headers: { 'Content-Type': 'application/json' },
+    },
+  })
+
 export default {
   stubAppointmentNoOutcomeWithNote,
   stubAppointmentOutcomeWithNote,
   stubAppointmentOutcomeWithNoNotes,
   stubAppointmentDeepLinkWithOutcome,
+  stubActivityLogWithAlcoholConsumption,
+  stubActivityLogWithUnplannedContact,
 }
