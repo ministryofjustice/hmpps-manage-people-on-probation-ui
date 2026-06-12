@@ -175,7 +175,7 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          appointmentHintText: '3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
           isProbationPractitioner: false,
         }),
       )
@@ -205,7 +205,7 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          appointmentHintText: '3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
           isProbationPractitioner: true,
         }),
       )
@@ -233,7 +233,7 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          appointmentHintText: '3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
           isProbationPractitioner: true,
         }),
       )
@@ -261,7 +261,7 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseUrl: `/case/${crn}/appointments/appointment/${contactId}`,
           baseOutcomeUrl: `/case/${crn}/appointments/appointment/${contactId}/outcome`,
           completedUrl: `/case/${crn}/appointments/appointment/${contactId}/manage`,
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          appointmentHintText: '3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
           appointmentSession: req.session.data.appointments[crn][contactId],
           isProbationPractitioner: false,
         }),
