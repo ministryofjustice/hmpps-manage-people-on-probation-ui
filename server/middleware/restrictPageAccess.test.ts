@@ -1,10 +1,10 @@
 import httpMocks from 'node-mocks-http'
 import { restrictPageAccess } from './restrictPageAccess'
-import { getDataValue, isValidCrn, isValidUUID } from '../utils'
+import { isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { CheckinUserDetails, ESupervisionSession } from '../models/ESupervision'
+import { CheckinUserDetails } from '../models/ESupervision'
 
 const crn = 'X000001'
 const uuid = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
@@ -15,7 +15,6 @@ jest.mock('../utils', () => {
     ...actualUtils,
     isValidCrn: jest.fn(),
     isValidUUID: jest.fn(),
-    // getDataValue: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -27,7 +26,6 @@ jest.mock('./renderError', () => ({
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
-// const mockedGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const mockAppointment: AppointmentSession = {
   user: {
