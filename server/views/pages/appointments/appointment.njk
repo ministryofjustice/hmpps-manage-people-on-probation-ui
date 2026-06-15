@@ -2,11 +2,10 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
-{% set excludedTypes = ['critical communications', 'alcohol consumption', 'unplanned contact'] %}
 {% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set pageTitle = makePageTitle({
   pageHeading: [appointmentDisplayName, 'note']}) %}
-{% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
+{% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else
   '' %}
 {% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
@@ -14,7 +13,7 @@
 {% set shouldShowManageButton =
   flags.enableManageContacts
   and (appointment.displayName or appointment.isUpdatableContact)
-  and (appointment.type | lower) not in excludedTypes
+  and appointment.type not in enforcementContactTypes
 %}
 {% block beforeContent %}
   {% if backLink %}

@@ -24,6 +24,7 @@ import {
   deliusDeepLinkUrl,
   deepLinkContactTypes,
   drugHistoryContactTypes,
+  enforcementContactTypes,
   fromIsoDateToPicker,
   fullName,
   getCurrentRisksToThemselves,
@@ -211,6 +212,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
   njkEnv.addGlobal('deepLinkContactTypes', deepLinkContactTypes)
   njkEnv.addGlobal('drugHistoryContactTypes', drugHistoryContactTypes)
+  njkEnv.addGlobal('enforcementContactTypes', enforcementContactTypes)
   njkEnv.addGlobal('oaSysUrl', oaSysUrl)
   njkEnv.addGlobal('deliusHomepageUrl', deliusHomepageUrl)
   njkEnv.addGlobal('scheduledAppointments', scheduledAppointments)

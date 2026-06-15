@@ -18,4 +18,5 @@ export class FeatureFlags {
   enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
   enableCaseloadV2?: boolean = undefined
+  enableEnforcementContacts?: boolean = undefined
 }
