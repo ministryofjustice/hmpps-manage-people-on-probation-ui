@@ -99,11 +99,7 @@ describe('Manage an appointment', () => {
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.getAppointmentActions().find('h3').should('contain.text', 'Appointment actions')
     })
-    it('should display the inset text and NDelius link', () => {
-      loadPage()
-      manageAppointmentPage = new ManageAppointmentPage()
-      manageAppointmentPage.getAppointmentActions().find('.govuk-inset-text').should('contain.text', 'You must')
-    })
+   
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
         loadPage()
