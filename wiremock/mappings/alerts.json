@@ -6,7 +6,7 @@
         "method": "GET"
       },
       "response": {
-        "status": 200,
+        "status": 500,
         "jsonBody": {
           "content": [
             {

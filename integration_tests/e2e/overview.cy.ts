@@ -188,14 +188,8 @@ context('Overview', () => {
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
 
-    cy.get(`[data-qa=errors]`).should(
-      'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
-    )
-    cy.get(`[data-qa=errors]`).should(
-      'contain.text',
-      'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
-    )
+    cy.get(`[data-qa=errors]`).should('contain.text', 'Risk information from ARNS is currently unavailable.')
+    cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
     page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
     page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
     page.getRowData('risk', 'criminogenicNeeds', 'Value').should('contain.text', 'There is no OASys risk assessment.')
