@@ -17,8 +17,8 @@ case "$ENVIRONMENT" in
     SIGN_IN_URL="https://sign-in.hmpps.service.justice.gov.uk"
     ;;
   *)
-    echo "Unknown environment: $ENVIRONMENT"
-    echo "Usage: $0 [dev|preprod|prod]"
+    echo "Unknown environment: $ENVIRONMENT" >&2
+    echo "Usage: $0 [dev|preprod|prod]" >&2
     exit 1
     ;;
 esac
