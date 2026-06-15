@@ -12,6 +12,12 @@ export const deliusDeepLinkUrl = (component: string, crn: string, contactId?: st
 
 export const drugHistoryContactTypes = ['Drug Test Details', 'Drug Testing Referral', 'Drug Testing Assessment']
 
+export const enforcementContactTypes = [
+  'Alcohol Consumption',
+  'Critical Communications',
+  'Unplanned Contact from Person on Probation',
+]
+
 export const deepLinkContactTypes = [
   'CP/UPW - Appointment/Attendance (NS)',
   'Drug Test (Approved Premises)',
