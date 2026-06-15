@@ -1,7 +1,7 @@
 import { AppointmentOutcomeType } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 
-export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
+export const outcomeOptions = (inPast = true): Option<AppointmentOutcomeType>[] => [
   {
     value: 'ATTENDED_COMPLIED',
     text: 'Attended - complied',
@@ -31,7 +31,7 @@ export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
     value: 'ACCEPTABLE_ABSENCE',
     text: 'Acceptable absence',
     hint: {
-      text: 'They provided an acceptable reason or evidence.',
+      text: inPast ? 'They provided an acceptable reason or evidence.' : null,
     },
   },
   {
