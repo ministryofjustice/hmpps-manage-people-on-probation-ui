@@ -19,10 +19,7 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsUnavailable')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should(
-      'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
-    )
+    cy.get('.govuk-error-summary__list').should('contain.text', 'Risk information from ARNS is currently unavailable.')
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 
@@ -37,10 +34,7 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsServerError')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should(
-      'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
-    )
+    cy.get('.govuk-error-summary__list').should('contain.text', 'Risk information from ARNS is currently unavailable.')
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 

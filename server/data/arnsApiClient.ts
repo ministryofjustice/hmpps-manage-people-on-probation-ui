@@ -38,8 +38,7 @@ export default class ArnsApiClient extends RestClient {
       handle404: true,
       handle500: true,
       handle401: true,
-      errorMessage:
-        'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      errorMessage: 'Risk information from ARNS is currently unavailable.',
     })
   }
 
