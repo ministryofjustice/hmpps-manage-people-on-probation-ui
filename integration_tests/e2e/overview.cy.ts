@@ -188,7 +188,10 @@ context('Overview', () => {
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
 
-    cy.get(`[data-qa=errors]`).should('contain.text', 'Risk information from ARNS is currently unavailable.')
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'Risk information from the Assess risks and needs service is currently unavailable.',
+    )
     cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
     page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
     page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
