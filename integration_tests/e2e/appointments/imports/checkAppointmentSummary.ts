@@ -4,6 +4,7 @@ import ArrangeAnotherAppointmentPage from '../../../pages/appointments/arrange-a
 import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-your-answers.page'
 import { pastDate, startTime, endTime, date } from './common'
 import { to24HourTimeWithMinutes } from '../utils'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../../server/models/Appointments'
 
 interface SummaryProps {
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
@@ -15,6 +16,7 @@ interface SummaryProps {
   summaryHasDate?: boolean
   smsFeatureFlagDisabled?: boolean
   enableNonCompliance?: boolean
+  action?: AppointmentEnforcementAction
 }
 
 export const checkAppointmentSummary = ({
@@ -27,6 +29,7 @@ export const checkAppointmentSummary = ({
   summaryHasDate = true,
   smsFeatureFlagDisabled = false,
   enableNonCompliance = true,
+  action = 'NO_FURTHER_ACTION',
 }: SummaryProps) => {
   const appointmentFor = reschedule ? 'Default Sentence Type (12 Months)' : '12 month Community order'
   let attending = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
@@ -93,7 +96,11 @@ export const checkAppointmentSummary = ({
         .should('contain.text', 'What was the outcome of this appointment?')
       page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Attended - failed to comply')
       page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Enforcement action')
-      page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No further action')
+      const expectedActionHtml =
+        action === 'NO_FURTHER_ACTION'
+          ? 'No further action'
+          : 'I will initiate the breach<br>I will send a licence compliance letter'
+      page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.html', expectedActionHtml)
       page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
       page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
       page.getSummaryListRow(9).find('.govuk-summary-list__key').should('contain.text', 'Notes')

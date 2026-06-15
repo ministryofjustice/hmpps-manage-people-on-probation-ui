@@ -94,7 +94,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       documents,
     }
 
-    if (attendedFailedToComply || unacceptableAbsence || failedToAttend || letterType) {
+    if (attendedFailedToComply || unacceptableAbsence || failedToAttend || letterType || breachNSICreatedBy) {
       const enforcementAction = getSelectedEnforcementActions()
       summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : enforcementAction
       summary.enforcementActionChangeLink = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
