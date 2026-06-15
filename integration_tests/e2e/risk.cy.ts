@@ -526,7 +526,10 @@ context('Risk', () => {
     cy.visit('/case/X000002/risk')
     const page = new RiskDetailPage()
 
-    cy.get(`[data-qa=errors]`).should('contain.text', 'Risk information from ARNS is currently unavailable.')
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'Risk information from the Assess risks and needs service is currently unavailable.',
+    )
     cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
 
     cy.get(`[data-qa=errors]`).should(

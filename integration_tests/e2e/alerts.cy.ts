@@ -19,7 +19,10 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsUnavailable')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should('contain.text', 'Risk information from ARNS is currently unavailable.')
+    cy.get('.govuk-error-summary__list').should(
+      'contain.text',
+      'Risk information from the Assess risks and needs service is currently unavailable.',
+    )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 
@@ -34,7 +37,10 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsServerError')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should('contain.text', 'Risk information from ARNS is currently unavailable.')
+    cy.get('.govuk-error-summary__list').should(
+      'contain.text',
+      'Risk information from the Assess risks and needs service is currently unavailable.',
+    )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 

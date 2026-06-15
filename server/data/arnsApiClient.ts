@@ -38,7 +38,7 @@ export default class ArnsApiClient extends RestClient {
       handle404: true,
       handle500: true,
       handle401: true,
-      errorMessage: 'Risk information from ARNS is currently unavailable.',
+      errorMessage: 'Risk information from the Assess risks and needs service is currently unavailable.',
     })
   }
 
