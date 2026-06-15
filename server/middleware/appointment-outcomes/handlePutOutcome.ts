@@ -75,7 +75,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       }
 
       const putRequests: PutContactPromise[] = []
-      if (enforcementActionCode?.length > 1) {
+      if (enforcementActionCode?.length) {
         enforcementActionCode.forEach(code => {
           const requestWithAction = { ...request, enforcementActionCode: code }
           putRequests.push(masClient.putContact(contactId, requestWithAction))
