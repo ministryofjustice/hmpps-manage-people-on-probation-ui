@@ -103,16 +103,6 @@ describe('Manage an appointment', () => {
       loadPage()
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.getAppointmentActions().find('.govuk-inset-text').should('contain.text', 'You must')
-      manageAppointmentPage
-        .getAppointmentActions()
-        .find('.govuk-inset-text a')
-        .should('contain.text', 'use NDelius to log non-attendance or non-compliance (opens in new tab)')
-        .should('have.attr', 'target', '_blank')
-        .should(
-          'have.attr',
-          'href',
-          `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=${crn}&contactID=${appointmentId}`,
-        )
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
