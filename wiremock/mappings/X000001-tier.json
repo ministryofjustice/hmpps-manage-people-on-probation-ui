@@ -6,7 +6,7 @@
         "method": "GET"
       },
       "response": {
-        "status": 500,
+        "status": 200,
         "jsonBody": {
           "tierScore": "B2",
           "calculationId": "ee1f151f-7417-47f8-9366-2ced6356db37",
