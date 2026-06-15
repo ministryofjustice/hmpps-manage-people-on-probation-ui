@@ -62,17 +62,7 @@
 
 {% block containerStart %}
 {% block beforeContent %}{% endblock %}
-{% if alertsCount === "-1" %}
-  {{ mojAlert({
-    variant: "error",
-    title: "There is a problem",
-    showTitleAsHeading: true,
-    dismissible: false,
-    classes: "govuk-!-margin-bottom-0 govuk-!-margin-top-4",
-    attributes: { "data-qa": "alertErrorAlert" },
-    html: '<span>Alerts are currently unavailable. You can view them in NDelius</span>'
-  }) }}
-{% endif %}
+{% include "./_error-alerts.njk" %}
 {% endblock %}
 
 {% block footer %}
