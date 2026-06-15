@@ -5,6 +5,7 @@ import { AppResponse } from '../models/Locals'
 import { getUserAlertsCount } from './getUserAlertsCount'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from '../controllers/mocks'
+import { UserAlerts } from '../models/Alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient', () => {
@@ -29,7 +30,7 @@ const getUserAlertsCountSpy = jest.spyOn(MasApiClient.prototype, 'getUserAlertsC
 describe('/middleware/getUserAlertsCount', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    getUserAlertsCountSpy.mockImplementation(() => Promise.resolve(1))
+    getUserAlertsCountSpy.mockImplementation(() => Promise.resolve('1'))
   })
 
   it('should assign the alerts count to res.locals.alertsCount', async () => {
@@ -39,16 +40,9 @@ describe('/middleware/getUserAlertsCount', () => {
   })
 
   it('should assign the alerts count to 99+ if the count is 100 or more', async () => {
-    getUserAlertsCountSpy.mockImplementationOnce(() => Promise.resolve(100))
+    getUserAlertsCountSpy.mockImplementationOnce(() => Promise.resolve('99+'))
     await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalled()
     expect(res.locals.alertsCount).toEqual('99+')
-  })
-
-  it('should assign the alerts count to -1 if the API fails', async () => {
-    getUserAlertsCountSpy.mockImplementationOnce(() => Promise.resolve(-1))
-    await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
-    expect(nextSpy).toHaveBeenCalled()
-    expect(res.locals.alertsCount).toEqual('-1')
   })
 })

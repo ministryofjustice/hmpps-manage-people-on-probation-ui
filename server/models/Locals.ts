@@ -36,6 +36,7 @@ import {
   EsupervisionUpcomingQuestionsResponse,
   OffenderCheckinsByCRNResponse,
 } from '../data/model/esupervision'
+import { UserAlerts } from './Alerts'
 
 export interface AppointmentLocals {
   meta: {

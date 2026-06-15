@@ -6,8 +6,7 @@ export const getUserAlertsCount = (hmppsAuthClient: HmppsAuthClient): Route<Prom
   return async (req, res, next) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    const response: number = await masClient.getUserAlertsCount()
-    res.locals.alertsCount = response < 100 ? response.toString() : '99+'
+    res.locals.alertsCount = await masClient.getUserAlertsCount()
     return next()
   }
 }
