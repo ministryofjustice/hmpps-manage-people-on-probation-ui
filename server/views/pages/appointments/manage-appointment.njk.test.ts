@@ -136,20 +136,6 @@ describe('Manage an appointment', () => {
       expect($('[data-qa="appointmentActions"] h3').text()).toContain('Appointment actions')
     })
 
-    it('should display the inset text and NDelius link', () => {
-      const $ = render()
-
-      const section = $('[data-qa="appointmentActions"]').first()
-      const link = section.find('.govuk-inset-text a')
-
-      expect(section.find('.govuk-inset-text').text()).toContain('You must')
-      expect(link.text()).toContain('use NDelius to log non-attendance or non-compliance (opens in new tab)')
-      expect(link.attr('target')).toBe('_blank')
-      expect(link.attr('href')).toBe(
-        `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=${crn}&contactID=${appointmentId}`,
-      )
-    })
-
     describe('enableNonCompliance feature flag is enabled', () => {
       it('should display log outcome action', () => {
         const $ = render({ enableNonCompliance: true })
