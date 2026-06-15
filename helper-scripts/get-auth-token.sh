@@ -24,8 +24,8 @@ case "$ENVIRONMENT" in
 esac
 
 AUTH_STRING=$(
-  kubectl -n "$NAMESPACE" get secrets hmpps-manage-people-on-probation-ui -o json |
-    jq -r '.data | map_values(@base64d) | "\(.SYSTEM_CLIENT_ID):\(.SYSTEM_CLIENT_SECRET)"'
+  kubectl -n "$NAMESPACE" get secret hmpps-manage-people-on-probation-ui -o json |\
+    jq -er '"\(.data.SYSTEM_CLIENT_ID|@base64d):\(.data.SYSTEM_CLIENT_SECRET|@base64d)"'
 )
 
 CLIENT_AUTH=$(printf %s "$AUTH_STRING" | base64 | tr -d '\n')
