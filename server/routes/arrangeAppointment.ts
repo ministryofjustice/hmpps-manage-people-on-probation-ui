@@ -173,8 +173,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getPersonAppointment(hmppsAuthClient),
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
-    getOutcomeSummary,
     getNotePrepend,
+    getOutcomeSummary,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
 
