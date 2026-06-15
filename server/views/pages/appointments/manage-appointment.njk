@@ -174,9 +174,6 @@
       {% if not appointment.deliusManaged %}
         <section data-qa="appointmentActions">
           <h3 class="govuk-heading-m">Appointment actions</h3>
-          {{ govukInsetText({
-  html: 'You must <a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
-}) }}
           {{ govukTaskList({
   idPrefix: "appointment-actions",
   attributes: {
@@ -260,7 +257,7 @@
         </section>
       {% endif %}
       <section data-qa="appointmentDetails">
-          <h3 class="govuk-heading-m">Appointment details</h3>
+        <h3 class="govuk-heading-m">Appointment details</h3>
         {% if not appointment.deliusManaged %}
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
         {% else %}
@@ -514,7 +511,7 @@
                 <span class="govuk-body-s govuk-hint">
   Created by {{ contact.createdBy.forename[0] }}.{{ contact.createdBy.surname }}
   on {{ contact.contactDate | dateWithYear }}
-</span>
+                </span>
               </li>
             {% endfor %}
           </ul>
