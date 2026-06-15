@@ -111,7 +111,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
   options.push({
     value: 'ACCEPTABLE_ABSENCE',
     text: 'Acceptable absence',
-    hint: 'They provided an acceptable reason or evidence.',
+    hint: dateInPast ? 'They provided an acceptable reason or evidence.' : null,
     redirectPageTitle: 'Why was Alton’s absence acceptable?',
     RedirectPage: AcceptableAbsencePage,
   })
