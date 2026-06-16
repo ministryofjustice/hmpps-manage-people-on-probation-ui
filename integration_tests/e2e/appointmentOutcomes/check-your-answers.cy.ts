@@ -40,8 +40,8 @@ const checkSummary = ({
   documents = false,
 }: { outcomeText?: string; actionText?: string[]; documents?: boolean } = {}) => {
   const appointment = documents
-    ? `3 Way Meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am`
-    : 'Planned Office Visit (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am'
+    ? `3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am`
+    : 'planned office visit (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am'
   checkYourAnswersOutcomePage
     .getSummaryListRow(1)
     .find('.govuk-summary-list__key')
@@ -253,7 +253,7 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
-      const appointmentType = `Planned Office Visit (NS)`
+      const appointmentType = `planned office visit (NS)`
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
