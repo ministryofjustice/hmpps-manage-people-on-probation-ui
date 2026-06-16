@@ -12,7 +12,7 @@ jobs:
       - name: download the coverage artifacts
         uses: actions/download-artifact@v8
         with:
-          pattern: coverage_artifacts_*
+          pattern: 'coverage_artifacts_?'
           merge-multiple: true
           path: coverage/
       - name: SonarCloud Scan
