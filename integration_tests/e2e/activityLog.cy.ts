@@ -59,6 +59,16 @@ context('Contacts', () => {
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
 
+  it('should render the update contact button when contact is updatable', () => {
+    cy.visit('/case/X000001/activity/322')
+
+    cy.get('[data-qa="manage-link"]')
+      .should('exist')
+      .and('contain.text', 'Update contact')
+      .invoke('attr', 'href')
+      .should('include', '/case/X000001/322/update-contact')
+  })
+
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
