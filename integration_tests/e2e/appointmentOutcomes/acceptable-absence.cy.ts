@@ -136,6 +136,14 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     acceptableAbsencePage = new AcceptableAbsencePage()
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
     cy.get('legend').should('contain.text', 'Why was Alton’s absence acceptable?')
+    let expectedAppointment = '3 way meeting (NS) with Terry Jones on Wednesday 21 February 2024'
+    if (journey === 'ARRANGE') {
+      expectedAppointment = 'Planned office visit (NS) with Deborah Fern on Monday 15 June 2026'
+    }
+    if (journey === 'RESCHEDULE') {
+      expectedAppointment = '3 way meeting (NS) with Terry Jones on Monday 15 June 2026'
+    }
+    cy.get('.govuk-hint').should('contain.text', `Appointment: ${expectedAppointment}.`)
     const options = getExpectedOptions()
     checkOptions(options)
   })
