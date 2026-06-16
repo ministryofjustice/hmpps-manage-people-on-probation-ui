@@ -1,11 +1,9 @@
 import httpMocks from 'node-mocks-http'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { AppResponse } from '../models/Locals'
 import { getUserAlertsCount } from './getUserAlertsCount'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from '../controllers/mocks'
-import { UserAlerts } from '../models/Alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient', () => {
