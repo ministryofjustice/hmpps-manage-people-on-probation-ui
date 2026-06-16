@@ -5,7 +5,7 @@ import { groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
-import { checkIsUpdatableContact} from '../data/model/mpopUpdatableContacts'
+import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
 
 const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 

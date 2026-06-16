@@ -124,14 +124,7 @@ export const MpopUpdatableContacts: UpdateContactType[] = [
   { code: 'COUP', description: 'Unplanned contact from person on probation' },
 ]
 
-
-const normaliseContactType = (value?: string): string =>
-  (value ?? '')
-    .toLowerCase()
-    .replace(/[\s\-+]/g, '')
+const normaliseContactType = (value?: string): string => (value ?? '').toLowerCase().replace(/[\s\-+]/g, '')
 
 export const checkIsUpdatableContact = (description?: string): boolean =>
-  MpopUpdatableContacts.some(
-    contact =>
-      normaliseContactType(contact.description) === normaliseContactType(description),
-  )
+  MpopUpdatableContacts.some(contact => normaliseContactType(contact.description) === normaliseContactType(description))
