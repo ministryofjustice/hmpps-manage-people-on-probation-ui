@@ -12,9 +12,15 @@ jobs:
       - name: download the coverage artifacts
         uses: actions/download-artifact@v8
         with:
-          name: coverage_artifacts
-          path: |
-            coverage/
+          pattern: cypress_coverage_*
+          merge-multiple: true
+          path: coverage/
+      - name: download the results artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: cypress_results_*
+          merge-multiple: true
+          path: test_results/
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v8
         env:
