@@ -78,6 +78,7 @@ import {
   convertToTitleCase,
   getPersonLevelTypes,
   handleQuotes,
+  formatEnforcementActionNote,
   dateToLongDate,
   merge,
   dateWithYearTimeFirst,
@@ -177,6 +178,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
+  njkEnv.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
   njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)

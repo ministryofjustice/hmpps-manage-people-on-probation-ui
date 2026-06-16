@@ -369,7 +369,7 @@ context('Contacts', () => {
     cy.get('.govuk-table').find('tr').eq(10).click()
     cy.get('.govuk-details__text')
       .find('[class*="govuk-!-font-weight-bold"]')
-      .should('contain.text', 'Enforcement Action:')
+      .should('contain.text', 'Enforcement action:')
   })
 
   it('should not display the outcome field when the activity has no outcome', () => {
