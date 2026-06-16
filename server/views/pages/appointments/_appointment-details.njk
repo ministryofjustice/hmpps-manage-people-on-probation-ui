@@ -64,11 +64,11 @@
       value: { html: '<span data-qa="rarActivityValue">' + appointment.countsTowardsRAR | toYesNo + '</span>' }
     } if not appointment.hasOutcome,
     {
-      key: { html: '<span data-qa="contactNotesLabel">Notes</span>' },
+      key: { html: '<span data-qa="contactNotesLabel">Details</span>' },
       value: { html: '<span data-qa="contactNotesValue">' + notes + '</span>' }
     } if contactHasNotes and not contactHasNote,
     {
-      key: { html: '<span data-qa="contactNoteLabel">Note</span>' },
+      key: { html: '<span data-qa="contactNoteLabel">Details</span>' },
       value: { html: '<span class="govuk-body line-break" data-qa="contactNoteValue">' + appointment.appointmentNote.note + '</span>' }
     } if contactHasNote,
     {
