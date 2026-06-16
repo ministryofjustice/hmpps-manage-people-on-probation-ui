@@ -41,6 +41,7 @@ export const postCheckInDetails = (
       checkinInterval: savedUserDetails.interval,
       startedAt: new Date().toISOString(),
       contactPreference: savedUserDetails.preferredComs,
+      eligibilityChoice: savedUserDetails.eligibilityChoice
     }
     logger.info('Checkin Registration started')
     try {

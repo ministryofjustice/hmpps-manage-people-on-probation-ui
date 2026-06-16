@@ -71,14 +71,14 @@
                 } if errorMessages["esupervision-" + crn + "-" + id + "checkins-eligibilityChoice"],
                 items: [
                     {
-                        value: 'replacement-contact',
+                        value: 'REPLACE_F2F',
                         text: "To replace some face-to-face contact",
-                        checked: currentChoice == 'replacement-contact'
+                        checked: currentChoice == 'REPLACE_F2F'
                     },
                     {
-                        value: 'supplementary-contact',
+                        value: 'SUPPLEMENT_F2F',
                         text: "As well as existing face-to-face contact",
-                        checked: currentChoice == 'supplementary-contact'
+                        checked: currentChoice == 'SUPPLEMENT_F2F'
                     }
                 ]
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibilityChoice'])) }}
