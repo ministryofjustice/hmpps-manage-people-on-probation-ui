@@ -5,7 +5,7 @@ import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { type Route } from '../../@types'
-import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../../utils'
+import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID, toSentenceCase } from '../../utils'
 import { type Document } from '../../data/model/personalDetails'
 import { renderError } from '../renderError'
 import { type ProbationPractitioner } from '../../models/CaseDetail'
@@ -77,7 +77,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   )
   const appointmentHintText =
     appointment?.type && appointment?.officer?.name && appointment?.startDateTime
-      ? `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
+      ? `Appointment: ${toSentenceCase(appointment.type)} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
       : null
 
   const probationPractitioner = getDataValue<ProbationPractitioner>(data, [
