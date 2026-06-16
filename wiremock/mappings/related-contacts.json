@@ -3,7 +3,7 @@
     {
       "request": {
         "method": "GET",
-        "urlPathPattern": "/mas/schedule/X778160/appointment/.*/linked-contacts"
+        "urlPathPattern": "/mas/schedule/.*/appointment/.*/linked-contacts"
       },
       "response": {
         "status": 200,
@@ -33,29 +33,6 @@
             "createdBy": {
               "forename": "Jack",
               "surname": "Smith"
-            }
-          }
-        ],
-        "headers": {
-          "Content-Type": "application/json"
-        }
-      }
-    },
-    {
-      "request": {
-        "method": "GET",
-        "urlPathPattern": "/mas/schedule/X000001/appointment/.*/linked-contacts"
-      },
-      "response": {
-        "status": 200,
-        "jsonBody": [
-          {
-            "contactId": 2510615347,
-            "contactTypeDescription": "Breach Action - Breach Letter Sent",
-            "contactDate": "2026-05-12",
-            "createdBy": {
-              "forename": "James",
-              "surname": "Frost"
             }
           }
         ],
