@@ -123,7 +123,7 @@ const activityLogController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
       const isUpdatableContact = MpopUpdatableContacts.some(
-        contact => contact.description === personAppointment?.appointment?.type,
+        contact => contact.description.toLowerCase() === personAppointment?.appointment?.type?.toLowerCase(),
       )
       if (isUpdatableContact) {
         personAppointment.appointment.isUpdatableContact = true

@@ -62,7 +62,11 @@ context('Contacts', () => {
   it('should render the update contact button when contact is updatable', () => {
     cy.visit('/case/X000001/activity/322')
 
-    cy.get('[data-qa="manage-link"]').should('exist').and('contain.text', 'Update contact').and('have.attr', 'href')
+    cy.get('[data-qa="manage-link"]')
+      .should('exist')
+      .and('contain.text', 'Update contact')
+      .invoke('attr', 'href')
+      .should('include', '/case/X000001/322/update-contact')
   })
 
   it('should render the filter menu', () => {
