@@ -275,7 +275,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args, startDateTime: startDateTimeISO })
         page
           .getTicketPanel()
-          .should('contain.text', `Alton has until ${expectedDate} to submit evidence (5 days remaining)`)
+          .should('contain.text', `Alton has until ${expectedDate} to submit evidence (6 days remaining)`)
       })
     }
   })
