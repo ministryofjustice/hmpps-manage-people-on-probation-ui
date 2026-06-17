@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon'
-import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
 import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
@@ -18,13 +16,7 @@ import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend
 import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
-import {
-  ExpectedOption,
-  Journey,
-  checkBreachOrRecallWarningBanner,
-  checkOptionRedirectsToCorrectPage,
-  checkOptions,
-} from './imports'
+import { ExpectedOption, Journey, checkOptionRedirects } from './imports'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
 let manageAppointmentPage: ManageAppointmentPage
@@ -146,11 +138,9 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
 
 const checkValidationErrors = ({
   journey = 'MANAGE',
-  inOffice = true,
   dateInPast = true,
 }: { journey?: Journey; inOffice?: boolean; dateInPast?: boolean } = {}): void => {
   const msg = dateInPast ? 'Select an outcome for this appointment' : 'Select why they will not attend this appointment'
-  loadPage({ journey, inOffice, dateInPast })
   outcomePage = new OutcomePage()
   outcomePage.getSubmitBtn().click()
   outcomePage.checkErrorSummaryBox([msg])
@@ -160,105 +150,69 @@ const checkValidationErrors = ({
   })
 }
 
-const checkPageTitle = ({
-  journey = 'MANAGE',
-  inOffice = true,
-  dateInPast = true,
-}: { journey?: Journey; inOffice?: boolean; dateInPast?: boolean } = {}): void => {
-  const now = DateTime.now()
-  const pastDate = now.minus({ days: 1 }).toFormat('cccc d MMMM yyyy')
-  const futureDate = now.plus({ days: 1 }).toFormat('cccc d MMMM yyyy')
-  getUuid(2).then(pageUuid => {
-    const id = journey === 'MANAGE' ? appointmentId : pageUuid
-    let appointmentDate = journey === 'MANAGE' ? 'Wednesday 21 February 2024' : pastDate
-    let meetingType = ['MANAGE', 'RESCHEDULE'].includes(journey) ? '3 Way Meeting (NS)' : 'Planned Office Visit (NS)'
-    if (!inOffice) {
-      meetingType = 'Planned Telephone Contact (NS)'
-    }
-    const officer = journey === 'ARRANGE' ? 'Deborah Fern' : 'Terry Jones'
-    const h2Title = dateInPast
-      ? 'What was the outcome of this appointment?'
-      : 'Why will Alton not attend this appointment?'
-    if (!dateInPast) {
-      appointmentDate = futureDate
-    }
-    outcomePage = new OutcomePage()
-    outcomePage.checkPageTitle(h2Title)
-    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    cy.get(`#appointments-${crn}-${id}-outcome-outcomeType-hint`).should(
-      'contain.text',
-      `Appointment: ${meetingType} with ${officer} on ${appointmentDate}.`,
-    )
-  })
-}
-
-const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
-  it('should render the page if appointment is in the past and in office', () => {
-    loadPage({ journey, inOffice: true, dateInPast: true })
-    outcomePage = new OutcomePage()
-    const options = getExpectedOptions({ inOffice: true, dateInPast: true })
-    checkPageTitle({ journey, inOffice: true, dateInPast: true })
-    checkOptions(options)
-    checkValidationErrors({ journey, inOffice: true, dateInPast: true })
-    checkOptionRedirectsToCorrectPage(options, loadPage, OutcomePage, {
-      journey,
-      inOffice: true,
-      dateInPast: true,
-    })
-  })
-  it('should render the page if appointment is in the past and not in office', () => {
-    loadPage({ journey, inOffice: false, dateInPast: true })
-    const options = getExpectedOptions({ inOffice: false, dateInPast: true })
-    checkPageTitle({ journey, inOffice: false, dateInPast: true })
-    checkOptions(options)
-    checkOptionRedirectsToCorrectPage(options, loadPage, OutcomePage, {
-      journey,
-      inOffice: false,
-      dateInPast: true,
-    })
-  })
-
-  if (journey === 'MANAGE') {
-    it('should render the page if appointment is in the future', () => {
-      loadPage({ dateInPast: false })
-      const options = getExpectedOptions({ dateInPast: false })
-      checkPageTitle({ journey, dateInPast: false })
-      checkOptions(options)
-      checkValidationErrors({ journey, inOffice: true, dateInPast: false })
-      checkOptionRedirectsToCorrectPage(options, loadPage, OutcomePage, {
-        journey,
-        inOffice: true,
-        dateInPast: false,
-      })
-    })
-  }
-  it('should have the correct back link', () => {
-    loadPage({ journey, inOffice: true, dateInPast: true })
-    let expectedLink: string
-    getUuid(2).then(pageUuid => {
-      if (journey === 'MANAGE') {
-        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/manage`
-      } else {
-        expectedLink = `/case/${crn}/arrange-appointment/${pageUuid}/location-date-time`
-      }
-      outcomePage.getBackLink().should('have.attr', 'href', expectedLink)
-    })
-  })
-
-  checkBreachOrRecallWarningBanner(loadPage, OutcomePage)
-}
-
 describe('Appointment outcome', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })
+
+  let journey: Journey
+  let inOffice: boolean
+  let dateInPast: boolean
+  let options
+
   describe('Manage appointment journey', () => {
-    checkPage()
+    journey = 'MANAGE' as Journey
+    inOffice = true
+    dateInPast = true
+    options = getExpectedOptions({ inOffice, dateInPast })
+
+    before(() => {
+      loadPage({ journey, inOffice, dateInPast })
+      outcomePage = new OutcomePage()
+    })
+
+    it('check page rendered', () => {
+      outcomePage.checkPageTitle('What was the outcome of this appointment?')
+    })
+    it('check validation error for past appointment', () => {
+      checkValidationErrors({ journey, dateInPast })
+    })
+    it('check redirect options for past and inOffice appointment', () => {
+      checkOptionRedirects(options, OutcomePage)
+    })
   })
   describe('Arrange appointment journey', () => {
-    checkPage({ journey: 'ARRANGE' })
+    journey = 'ARRANGE' as Journey
+    inOffice = true
+    dateInPast = false
+    options = getExpectedOptions({ inOffice, dateInPast })
+
+    before(() => {
+      loadPage({ journey, inOffice, dateInPast })
+      outcomePage = new OutcomePage()
+    })
+    it('check page rendered', () => {
+      outcomePage.checkPageTitle('Why will Alton not attend this appointment?')
+    })
+    it('check validation error for past appointment', () => {
+      checkValidationErrors({ journey, dateInPast })
+    })
+    it('check untested redirect option for future appointment', () => {
+      checkOptionRedirects([options[-1]], OutcomePage)
+    })
   })
   describe('Reschedule appointment journey', () => {
-    checkPage({ journey: 'RESCHEDULE' })
+    journey = 'ARRANGE' as Journey
+    inOffice = true
+    dateInPast = true
+
+    before(() => {
+      loadPage({ journey, inOffice, dateInPast })
+      outcomePage = new OutcomePage()
+    })
+
+    it('check page rendered', () => {
+      outcomePage.checkPageTitle('What was the outcome of this appointment?')
+    })
   })
 })

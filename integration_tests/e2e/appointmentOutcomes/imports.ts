@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { padEnd } from 'lodash'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
@@ -70,6 +71,25 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
     outcomePage.getSubmitBtn().click()
     const page = new RedirectPage()
     page.checkPageTitle(redirectPageTitle)
+  })
+}
+
+// instead of loading page each time this method:
+// - accepts option
+// - submits to redirect
+// - check new page
+// - uses backLink to return to options
+export const checkOptionRedirects = <TPage extends Page>(
+  options: ExpectedOption<TPage>[],
+  PageClass: RedirectPage,
+): void => {
+  options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
+    const outcomePage = new PageClass()
+    cy.get(`.govuk-radios__input[value=${value}]`).click()
+    outcomePage.getSubmitBtn().click()
+    const page = new RedirectPage()
+    page.checkPageTitle(redirectPageTitle)
+    page.getBackLink().click()
   })
 }
 
