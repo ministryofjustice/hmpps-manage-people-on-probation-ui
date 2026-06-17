@@ -34,7 +34,7 @@ describe('postCheckInDetails', () => {
         checkInMobile: '07123456789',
         photoUploadOption: '07123456789',
         preferredComs: 'EMAIL',
-        eligibilityChoice: 'REPLACE_F2F'
+        eligibilityChoice: 'REPLACE_F2F',
       } as const)
 
     const req: any = {
