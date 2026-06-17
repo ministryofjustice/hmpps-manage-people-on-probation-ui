@@ -18,6 +18,7 @@ import AttendedCompliedPage from '../../pages/appointments/attended-complied.pag
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import { ExpectedOption, Journey, checkOptionRedirects } from './imports'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -176,6 +177,11 @@ describe('Appointment outcome', () => {
     it('check redirect options for past and inOffice appointment', () => {
       checkOptionRedirects(options, OutcomePage)
     })
+    it('backLink goes to previous page', () => {
+      outcomePage.getCancelGoBackLink().click()
+      const page = new AppointmentLocationDateTimePage()
+      page.checkOnPage()
+    })
   })
   describe('Manage appointment journey', { testIsolation: false }, () => {
     before(() => {
@@ -197,6 +203,12 @@ describe('Appointment outcome', () => {
     it('check untested redirect option for future appointment', () => {
       checkOptionRedirects(options, OutcomePage)
     })
+    it('backLink goes to previous page', () => {
+      outcomePage.getCancelGoBackLink().click()
+      manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.getTaskLink(1).click()
+      outcomePage.checkPageTitle('Why will Alton not attend this appointment?')
+    })
   })
   describe('Reschedule appointment journey', { testIsolation: false }, () => {
     before(() => {
@@ -210,6 +222,11 @@ describe('Appointment outcome', () => {
 
     it('check page rendered', () => {
       outcomePage.checkPageTitle('What was the outcome of this appointment?')
+    })
+    it('backLink goes to previous page', () => {
+      outcomePage.getCancelGoBackLink().click()
+      const page = new AppointmentLocationDateTimePage()
+      page.checkOnPage()
     })
   })
 })
