@@ -8,6 +8,7 @@ import {
   fullName,
   govukTime,
   handleQuotes,
+  formatEnforcementActionNote,
   toSentenceCase,
   yearsSince,
 } from '../utils'
@@ -38,6 +39,7 @@ export const createNunjucksTestEnv = () => {
   env.addFilter('fullName', fullName)
   env.addFilter('govukTime', govukTime)
   env.addFilter('handleQuotes', handleQuotes)
+  env.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
 
   return env
 }

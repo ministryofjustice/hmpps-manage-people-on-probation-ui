@@ -19,7 +19,7 @@ const mockAppointment = ({ appointment = {} } = {}): Activity => ({
   ...appointment,
 })
 
-const expectedAppointmentDetails = 'Planned Office Visit (NS) on Friday 15 May 2026 at 12pm to 1:30pm'
+const expectedAppointmentDetails = 'Planned office visit (NS) on Friday 15 May 2026 at 12pm to 1:30pm'
 
 const mockEnforcementActions: ContactEnforcementAction[] = [
   {
