@@ -25,6 +25,7 @@ export interface CheckinUserDetails {
   eligibility?: string[]
   eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
   eligibilitySPOApproval?: any
+  rationale?: string
 }
 
 export interface ManageQuestionsSession {

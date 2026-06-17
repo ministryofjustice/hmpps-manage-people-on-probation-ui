@@ -83,6 +83,7 @@ export interface OffenderInfo {
   checkinInterval: string
   contactPreference: string
   startedAt?: string
+  rationale?: string
 }
 
 export interface LocationInfo {

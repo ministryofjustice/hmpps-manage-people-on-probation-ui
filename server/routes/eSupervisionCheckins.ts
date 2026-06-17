@@ -70,6 +70,18 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postSPOApprovalPage(hmppsAuthClient),
   )
 
+  router.get('/case/:crn/appointments/:id/check-in/rationale', [
+    restrictPageAccess({ requiredValues: ['id'], route: 'setupcheckins' }),
+    controllers.checkIns.getRationalePage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/rationale',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    postRedirectWizard(),
+    controllers.checkIns.postRationalePage(hmppsAuthClient),
+  )
+
   router.get('/case/:crn/appointments/:id/check-in/date-frequency', [
     restrictPageAccess({ requiredValues: ['id'], route: 'setupcheckins' }),
     controllers.checkIns.getDateFrequencyPage(hmppsAuthClient),
