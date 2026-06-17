@@ -91,11 +91,6 @@ export const checkOptionRedirects = <TPage extends Page>(
     const page = new RedirectPage()
     page.checkPageTitle(redirectPageTitle)
     cy.go(-1)
-    // try {
-    //   page.getBackLink().click()
-    // } catch {
-    //   cy.go(-1)
-    // }
   })
 }
 
