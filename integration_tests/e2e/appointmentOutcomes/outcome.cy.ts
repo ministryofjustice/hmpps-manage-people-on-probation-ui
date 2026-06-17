@@ -151,7 +151,6 @@ const checkValidationErrors = ({
 }
 
 describe('Appointment outcome', () => {
-  
   let journey: Journey
   let inOffice: boolean
   let dateInPast: boolean
