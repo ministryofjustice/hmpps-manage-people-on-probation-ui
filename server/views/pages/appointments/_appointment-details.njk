@@ -1,9 +1,19 @@
+{% from "_components/document/macro.njk" import appDocument %}
 {% set notes = '' %}
+{% set documentsHtml = '' %}
+ {% set contactHasNote = appointment.isUpdatableContact and appointment.hasOutcome and appointment.appointmentNote %}
+ {% set contactHasNotes = appointment.isUpdatableContact and appointment.hasOutcome and appointment.appointmentNotes.length > 0 %}
  {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
  {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
 {% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
+{% set _docs = appointmentDocuments if appointmentDocuments else appointment.documents %}
+{% if _docs and _docs.length > 0 %}
+  {% for document in _docs %}
+    {% set documentsHtml = documentsHtml.concat(appDocument(document, crn)) %}
+  {% endfor %}
+{% endif %}
 {% if hasNotes or contactHasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
@@ -98,6 +108,10 @@
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
       value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo + '</span>' }
-    } if not appointment.hasOutcome and not appointment.isUpdatableContact
+    } if not appointment.hasOutcome and not appointment.isUpdatableContact,
+    {
+      key: { html: '<span data-qa="relatedDocumentsLabel">Related documents</span>' },
+      value: { html: '<span data-qa="relatedDocumentsValue">' + documentsHtml + '</span>' }
+    } if documentsHtml
   ]
   }) }}
