@@ -119,7 +119,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
     initiateBreachOrRecallPage.checkPageTitle('Initiate a recall')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    cy.get('legend').should('contain.text', 'Who will initiate the recall?')
+    cy.get('legend').should('contain.text', 'Who will create the recall?')
     const options = getExpectedOptions({ sentenceType: 'CUSTODY' })
     checkOptions(options)
     cy.get('[data-module="govuk-radios"]').should('have.length', 1)
