@@ -15,7 +15,6 @@ import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
   mockPredictors,
-  mockPredictorScores,
   mockRisks,
   mockUserCaseload,
   mockAppResponse,
@@ -52,11 +51,6 @@ jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
-
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  toPredictors: jest.fn(() => mockPredictorScores),
-}))
 
 jest.mock('@ministryofjustice/hmpps-mpop-frontend-components-lib', () => ({
   ...jest.requireActual('@ministryofjustice/hmpps-mpop-frontend-components-lib'),

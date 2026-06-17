@@ -12,9 +12,8 @@ import { tierLink, tierUrlV3, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
-import { RiskScoresDto, RiskSummary } from '../data/model/risk'
+import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
-import { ErrorSummary } from '../data/model/common'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const fetchTierDetails = async (
@@ -36,7 +35,6 @@ export const getPersonalDetails = (
     let tierCalculation: TierCalculation
     let userCaseload: UserCaseload
     let riskData: RiskData
-    let predictors: RiskScoresDto[] | ErrorSummary
     let probationPractitioner: ProbationPractitioner
     let tierDetails: LatestTierResponse | undefined
     let token: string | undefined
