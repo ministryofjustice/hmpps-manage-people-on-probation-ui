@@ -219,39 +219,6 @@ const stubDisableNonCompliance = (): SuperAgentRequest =>
     },
   })
 
-const stubDisableSentencePlanUrl = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableSentencePlanUrl',
-            name: 'enableSentencePlanUrl',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-02-26T12:00:00.000000Z',
-            updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
 const stubEnableDeepLinks = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -488,7 +455,6 @@ export default {
   stubDisableTierLink,
   stubDisableNonCompliance,
   stubEnableDeepLinks,
-  stubDisableSentencePlanUrl,
   stubDisableESupervisionCheckins,
   stubDisableHomePageOutcome,
   stubEnableShowMatchWithConcern,

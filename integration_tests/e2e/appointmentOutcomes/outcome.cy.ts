@@ -111,7 +111,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
   options.push({
     value: 'ACCEPTABLE_ABSENCE',
     text: 'Acceptable absence',
-    hint: 'They provided an acceptable reason or evidence.',
+    hint: dateInPast ? 'They provided an acceptable reason or evidence.' : null,
     redirectPageTitle: 'Why was Alton’s absence acceptable?',
     RedirectPage: AcceptableAbsencePage,
   })
@@ -171,9 +171,9 @@ const checkPageTitle = ({
   getUuid(2).then(pageUuid => {
     const id = journey === 'MANAGE' ? appointmentId : pageUuid
     let appointmentDate = journey === 'MANAGE' ? 'Wednesday 21 February 2024' : pastDate
-    let meetingType = ['MANAGE', 'RESCHEDULE'].includes(journey) ? '3 Way Meeting (NS)' : 'Planned Office Visit (NS)'
+    let meetingType = ['MANAGE', 'RESCHEDULE'].includes(journey) ? '3 way meeting (NS)' : 'Planned office visit (NS)'
     if (!inOffice) {
-      meetingType = 'Planned Telephone Contact (NS)'
+      meetingType = 'Planned telephone contact (NS)'
     }
     const officer = journey === 'ARRANGE' ? 'Deborah Fern' : 'Terry Jones'
     const h2Title = dateInPast

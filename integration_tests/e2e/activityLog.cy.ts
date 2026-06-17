@@ -59,6 +59,16 @@ context('Contacts', () => {
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
 
+  it('should render the update contact button when contact is updatable', () => {
+    cy.visit('/case/X000001/activity/322')
+
+    cy.get('[data-qa="manage-link"]')
+      .should('exist')
+      .and('contain.text', 'Update contact')
+      .invoke('attr', 'href')
+      .should('include', '/case/X000001/322/update-contact')
+  })
+
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -369,7 +379,7 @@ context('Contacts', () => {
     cy.get('.govuk-table').find('tr').eq(10).click()
     cy.get('.govuk-details__text')
       .find('[class*="govuk-!-font-weight-bold"]')
-      .should('contain.text', 'Enforcement Action:')
+      .should('contain.text', 'Enforcement action:')
   })
 
   it('should not display the outcome field when the activity has no outcome', () => {
