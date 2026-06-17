@@ -5,7 +5,7 @@ export default configureAllowedScripts({
     // Needed by esbuild for watching files during development
     'node_modules/@parcel/watcher@2.5.6': 'ALLOW',
     // Needed to interface with Sentry for app monitoring
-    'node_modules/@sentry/cli@3.5.0': 'ALLOW',
+    'node_modules/@sentry/cli@3.5.1': 'ALLOW',
     // Provides capabilities for integration testing
     'node_modules/cypress@15.17.0': 'ALLOW',
     // Provides native integration, supporting ability to write dtrace probes for bunyan
@@ -17,6 +17,6 @@ export default configureAllowedScripts({
     // Need by playwright for detecting file system changes during test runs
     'node_modules/playwright/node_modules/fsevents@2.3.2': 'ALLOW',
     // Native solution to quickly resolve module paths, used by jest and eslint
-    'node_modules/unrs-resolver@1.11.1': 'ALLOW',
+    'node_modules/unrs-resolver@1.12.2': 'ALLOW',
   },
 })
