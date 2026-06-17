@@ -1,4 +1,4 @@
-import { getApprovedContactDisplayName } from "../../utils/contactDisplayNames"
+import { getApprovedContactDisplayName } from '../../utils/contactDisplayNames'
 
 export type UpdateContactType = {
   code: string
@@ -126,10 +126,7 @@ export const MpopUpdatableContacts: UpdateContactType[] = [
   { code: 'COUP', description: 'Unplanned contact from person on probation' },
 ]
 
-const normaliseContactType = (value?: string): string =>
-  (value ?? '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
+const normaliseContactType = (value?: string): string => (value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
 export const checkIsUpdatableContact = (value?: string): boolean => {
   const approvedDisplayName = getApprovedContactDisplayName(value)
