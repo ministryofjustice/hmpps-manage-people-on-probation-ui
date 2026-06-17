@@ -33,7 +33,9 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
       : null
   if (responsePeriodDays) {
     const responseByDate = DateTime.fromISO(appointmentDate).plus({ days: responsePeriodDays })
-    const daysLeftToRespond = Math.ceil(responseByDate.startOf('day').diff(DateTime.now().startOf('day'), 'days').days)
+    const daysLeftToRespond = Math.ceil(
+      responseByDate.startOf('day').diff(DateTime.now().startOf('day'), 'days').days + 1,
+    )
     if (daysLeftToRespond > -1) {
       ticket = {
         title: `${forename} has until ${dateWithYear(responseByDate.toISO())} to submit evidence (${daysLeftToRespond} day${daysLeftToRespond !== 1 ? 's' : ''} remaining)`,
