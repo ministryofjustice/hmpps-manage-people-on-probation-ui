@@ -45,7 +45,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     let endDateTime: string
     if (nextAppt) {
       ;({ type, startDateTime, endDateTime } = nextAppt)
-      nextAppointment = `${type} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
+      nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
     }
 
     const noOutcome = 'No outcome'
@@ -82,7 +82,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
 
     let appointmentDetails = null
     if (appointment?.type && appointment?.startDateTime && appointment?.endDateTime) {
-      appointmentDetails = `${appointment.type} on ${dateWithDayAndWithYear(appointment.startDateTime)} at ${govukTime(appointment.startDateTime)} to ${govukTime(appointment.endDateTime)}`
+      appointmentDetails = `${toSentenceCase(appointment.type)} on ${dateWithDayAndWithYear(appointment.startDateTime)} at ${govukTime(appointment.startDateTime)} to ${govukTime(appointment.endDateTime)}`
     }
 
     summary = {

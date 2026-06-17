@@ -151,10 +151,7 @@ const checkValidationErrors = ({
 }
 
 describe('Appointment outcome', () => {
-  // afterEach(() => {
-  //   cy.task('resetMocks')
-  // })
-
+  
   let journey: Journey
   let inOffice: boolean
   let dateInPast: boolean

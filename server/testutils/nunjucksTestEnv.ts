@@ -10,6 +10,7 @@ import {
   fullName,
   govukTime,
   handleQuotes,
+  formatEnforcementActionNote,
   toSentenceCase,
   yearsSince,
 } from '../utils'
@@ -50,6 +51,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
     return decorateFormAttributes(req, res)(obj, sections)
   })
   env.addFilter('convertToTitleCase', convertToTitleCase)
+  env.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
 
   return env
 }
