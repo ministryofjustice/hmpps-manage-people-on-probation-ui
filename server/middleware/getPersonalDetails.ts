@@ -26,6 +26,7 @@ export const getPersonalDetails = (
     let overview: PersonalDetails
     let risks: RiskSummary
     let tierCalculation: TierCalculation
+
     let userCaseload: UserCaseload
     let riskData: RiskData
     let predictors: RiskScoresDto[] | ErrorSummary
