@@ -35,6 +35,9 @@ const buildResponse = ({
         },
       },
     },
+    flags: {
+      enableBreachOrRecallAndSendLetterAction: true,
+    },
   }
   return mockAppResponse(locals)
 }
