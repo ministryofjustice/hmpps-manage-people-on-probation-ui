@@ -151,22 +151,21 @@ const checkValidationErrors = ({
 }
 
 describe('Appointment outcome', () => {
-  afterEach(() => {
-    cy.task('resetMocks')
-  })
+  // afterEach(() => {
+  //   cy.task('resetMocks')
+  // })
 
   let journey: Journey
   let inOffice: boolean
   let dateInPast: boolean
-  let options
+  let options: ExpectedOption<RedirectPages>[]
 
-  describe('Manage appointment journey', () => {
-    journey = 'MANAGE' as Journey
-    inOffice = true
-    dateInPast = true
-    options = getExpectedOptions({ inOffice, dateInPast })
-
+  describe('Arrange appointment journey', { testIsolation: false }, () => {
     before(() => {
+      journey = 'ARRANGE' as Journey
+      inOffice = true
+      dateInPast = true
+      options = getExpectedOptions({ inOffice, dateInPast })
       loadPage({ journey, inOffice, dateInPast })
       outcomePage = new OutcomePage()
     })
@@ -176,37 +175,39 @@ describe('Appointment outcome', () => {
     })
     it('check validation error for past appointment', () => {
       checkValidationErrors({ journey, dateInPast })
+      cy.go('back')
     })
     it('check redirect options for past and inOffice appointment', () => {
       checkOptionRedirects(options, OutcomePage)
     })
   })
-  describe('Arrange appointment journey', () => {
-    journey = 'ARRANGE' as Journey
-    inOffice = true
-    dateInPast = false
-    options = getExpectedOptions({ inOffice, dateInPast })
-
+  describe('Manage appointment journey', { testIsolation: false }, () => {
     before(() => {
+      journey = 'MANAGE' as Journey
+      inOffice = true
+      dateInPast = false
+      options = getExpectedOptions({ inOffice, dateInPast })
       loadPage({ journey, inOffice, dateInPast })
       outcomePage = new OutcomePage()
     })
+
     it('check page rendered', () => {
       outcomePage.checkPageTitle('Why will Alton not attend this appointment?')
     })
-    it('check validation error for past appointment', () => {
+    it('check validation error for future appointment', () => {
       checkValidationErrors({ journey, dateInPast })
+      cy.go('back')
     })
     it('check untested redirect option for future appointment', () => {
-      checkOptionRedirects([options[-1]], OutcomePage)
+      checkOptionRedirects(options, OutcomePage)
     })
   })
-  describe('Reschedule appointment journey', () => {
-    journey = 'ARRANGE' as Journey
-    inOffice = true
-    dateInPast = true
-
+  describe('Reschedule appointment journey', { testIsolation: false }, () => {
     before(() => {
+      journey = 'RESCHEDULE' as Journey
+      inOffice = false
+      dateInPast = true
+      options = getExpectedOptions({ inOffice, dateInPast })
       loadPage({ journey, inOffice, dateInPast })
       outcomePage = new OutcomePage()
     })
