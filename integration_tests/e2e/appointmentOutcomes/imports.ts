@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { padEnd } from 'lodash'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
