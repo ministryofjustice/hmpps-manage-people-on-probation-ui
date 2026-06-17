@@ -7,7 +7,6 @@ export class FeatureFlags {
   enableDeliusClient?: boolean = undefined
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
-  enableSentencePlanUrl?: boolean = undefined
   enableDeepLinks?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
