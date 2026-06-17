@@ -1,9 +1,9 @@
 import * as cheerio from 'cheerio'
 import httpMocks from 'node-mocks-http'
-import { Activity } from "../../data/model/schedule"
-import { AttendedCompliedAppointment } from "../../models/Appointments"
-import { AppointmentOutcomeProps, AppResponse } from "../../models/Locals"
-import { createNunjucksTestEnv } from "../../testutils/nunjucksTestEnv"
+import { Activity } from '../../data/model/schedule'
+import { AttendedCompliedAppointment } from '../../models/Appointments'
+import { AppointmentOutcomeProps, AppResponse } from '../../models/Locals'
+import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
 
 const crn = 'X000001'
 const appointmentId = '123456'
@@ -14,8 +14,7 @@ type TestModel = {
 }
 
 const baseModel: TestModel = {
-  appointmentOutcome: {
-  } as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
+  appointmentOutcome: {} as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
 }
 
 const render = (model = {} as Partial<TestModel>) => {
@@ -55,9 +54,9 @@ describe('Appointment outcome form nunjucks render tests', () => {
           ticket: {
             title,
             type,
-            html 
-          }
-        }
+            html,
+          },
+        },
       } as unknown as Partial<TestModel>)
       expect($('[data-qa="ticket-panel"]').find(`.moj-ticket-panel__content--blue`).text()).toContain(title)
       expect($('[data-qa="ticket-panel"]').find(`.moj-ticket-panel__content--blue`).text()).toContain(html)
@@ -67,17 +66,16 @@ describe('Appointment outcome form nunjucks render tests', () => {
         appointmentOutcome: {
           ticket: {
             title,
-            html 
-          }
-        }
+            html,
+          },
+        },
       } as unknown as Partial<TestModel>)
       expect($('[data-qa="ticket-panel"]').find(`.moj-ticket-panel__content--red`).text()).toContain(title)
       expect($('[data-qa="ticket-panel"]').find(`.moj-ticket-panel__content--red`).text()).toContain(html)
     })
     it('should not display panel if not ticket given', () => {
       const $ = render({
-        appointmentOutcome: {
-        }
+        appointmentOutcome: {},
       } as unknown as Partial<TestModel>)
       expect($('[data-qa="ticket-panel"]').length).toBe(0)
     })
@@ -92,17 +90,16 @@ describe('Appointment outcome form nunjucks render tests', () => {
           breachOrRecallWarning: {
             title,
             type,
-            text
-          }
-        }
+            text,
+          },
+        },
       } as unknown as Partial<TestModel>)
       expect($('[data-qa="breach-warning"]').text()).toContain(title)
       expect($('[data-qa="breach-warning"]').text()).toContain(text)
     })
     it('should not display alert if not info given', () => {
       const $ = render({
-        appointmentOutcome: {
-        }
+        appointmentOutcome: {},
       } as unknown as Partial<TestModel>)
       expect($('[data-qa="breach-warning"]').length).toBe(0)
     })

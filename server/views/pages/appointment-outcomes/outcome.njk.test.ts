@@ -2,7 +2,13 @@ import * as cheerio from 'cheerio'
 import httpMocks from 'node-mocks-http'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
 import { Activity, PersonAppointment } from '../../../data/model/schedule'
-import { AcceptableAbsenceOutcomeType, AppointmentEnforcementAction, AppointmentOutcomeType, AttendedCompliedAppointment, EnforcementActionCreatedBy } from '../../../models/Appointments'
+import {
+  AcceptableAbsenceOutcomeType,
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+  AttendedCompliedAppointment,
+  EnforcementActionCreatedBy,
+} from '../../../models/Appointments'
 import { AppointmentOutcomeProps, AppResponse } from '../../../models/Locals'
 import { convertToTitleCase } from '../../../utils'
 import { Option } from '../../../models/Option'
@@ -31,16 +37,6 @@ const baseModel: TestModel = {
     id: appointmentId,
     uuid: appointmentId,
     contactId: appointmentId,
-    breachOrRecallWarning: {
-      title: 'title',
-      text: 'text',
-      type: 'BREACH', // 'BREACH' | 'RECALL'
-    },
-    ticket: {
-      title: 'title',
-      html: 'html',
-      type: 'RED', // 'RED' | 'BLUE'
-    },
     backLink: 'back',
     isInPast: false, // dateInPast effects
     appointmentHintText: 'hintText',
@@ -56,8 +52,8 @@ const baseModel: TestModel = {
       },
     ],
     appointmentSession: {
-      type: 'Planned Telephone Contact (NS)'
-    }
+      type: 'Planned Telephone Contact (NS)',
+    },
   } as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>,
   uuid: 'uuid',
   headerPersonName: { forename: 'Alton', surname: 'Berge' },
@@ -95,7 +91,14 @@ const render = (model = {} as Partial<TestModel>) => {
   return cheerio.load(env.render('pages/appointment-outcomes/outcome.njk', input))
 }
 
-const getExpectedOptions = ({ inOffice = true, dateInPast = true }) : Option<AppointmentOutcomeType>[] | Option<AcceptableAbsenceOutcomeType>[] | Option<AppointmentEnforcementAction | ''>[] | Option<EnforcementActionCreatedBy>[] => {
+const getExpectedOptions = ({
+  inOffice = true,
+  dateInPast = true,
+}):
+  | Option<AppointmentOutcomeType>[]
+  | Option<AcceptableAbsenceOutcomeType>[]
+  | Option<AppointmentEnforcementAction | ''>[]
+  | Option<EnforcementActionCreatedBy>[] => {
   const options = []
   if (dateInPast) {
     options.push(
@@ -161,68 +164,79 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }) : Option<App
       text: 'The appointment will be rescheduled',
     })
   }
-  return options as unknown as Option<AppointmentOutcomeType>[] | Option<AcceptableAbsenceOutcomeType>[] | Option<AppointmentEnforcementAction | ''>[] | Option<EnforcementActionCreatedBy>[]
+  return options as unknown as
+    | Option<AppointmentOutcomeType>[]
+    | Option<AcceptableAbsenceOutcomeType>[]
+    | Option<AppointmentEnforcementAction | ''>[]
+    | Option<EnforcementActionCreatedBy>[]
 }
 
-const checkPageTitle = (
-  $: cheerio.CheerioAPI,
-  dateInPast: boolean,
-) => {
+const checkPageTitle = ($: cheerio.CheerioAPI, dateInPast: boolean) => {
   const pageTitle = dateInPast
     ? 'What was the outcome of this appointment?'
     : `Why will ${convertToTitleCase(baseModel.headerPersonName.forename)} not attend this appointment?`
   expect($('[data-qa="pageHeading"]').text()).toContain(pageTitle)
-  expect($(`[id="appointments-${crn}-${appointmentId}-outcome-outcomeType-hint"]`).text()).toContain(baseModel.appointmentOutcome.appointmentHintText)
+  expect($(`[id="appointments-${crn}-${appointmentId}-outcome-outcomeType-hint"]`).text()).toContain(
+    baseModel.appointmentOutcome.appointmentHintText,
+  )
 }
 
-const checkOptions = ($: cheerio.CheerioAPI, options: Option<AppointmentOutcomeType>[] | Option<AcceptableAbsenceOutcomeType>[] | Option<AppointmentEnforcementAction | ''>[] | Option<EnforcementActionCreatedBy>[]): void => {
+const checkOptions = (
+  $: cheerio.CheerioAPI,
+  options:
+    | Option<AppointmentOutcomeType>[]
+    | Option<AcceptableAbsenceOutcomeType>[]
+    | Option<AppointmentEnforcementAction | ''>[]
+    | Option<EnforcementActionCreatedBy>[],
+): void => {
   options.forEach(({ value, text, hint }, index) => {
-    expect($('[data-module="govuk-radios"]:first').find('.govuk-radios__item').eq(index).find('label').text()).toContain(text)
+    expect(
+      $('[data-module="govuk-radios"]:first').find('.govuk-radios__item').eq(index).find('label').text(),
+    ).toContain(text)
     if (hint?.text) {
-      expect($('[data-module="govuk-radios"]:first').find('.govuk-radios__item').eq(index).find('.govuk-hint').text()).toContain(hint.text)
+      expect(
+        $('[data-module="govuk-radios"]:first').find('.govuk-radios__item').eq(index).find('.govuk-hint').text(),
+      ).toContain(hint.text)
     }
-    expect($('[data-module="govuk-radios"]:first').find(`.govuk-radios__input[value=${value}]`).length).toBeGreaterThan(0)
+    expect($('[data-module="govuk-radios"]:first').find(`.govuk-radios__input[value=${value}]`).length).toBeGreaterThan(
+      0,
+    )
   })
 }
 
-// const checkValidationErrors = ({
-//   journey = 'MANAGE',
-//   inOffice = true,
-//   dateInPast = true,
-// }: { journey?: Journey; inOffice?: boolean; dateInPast?: boolean } = {}): void => {
-//   const msg = dateInPast ? 'Select an outcome for this appointment' : 'Select why they will not attend this appointment'
-//   loadPage({ journey, inOffice, dateInPast })
-//   outcomePage = new OutcomePage()
-//   outcomePage.getSubmitBtn().click()
-//   outcomePage.checkErrorSummaryBox([msg])
-//   getUuid(2).then(pageUuid => {
-//     const id = journey === 'MANAGE' ? appointmentId : pageUuid
-//     cy.get(`#appointments-${crn}-${id}-outcome-outcomeType-error`).should('contain.text', msg)
-//   })
-// }
-
-let dateInPast : boolean
-let inOffice : boolean
-
-const setArgs = (dateInPast: boolean, inOffice: boolean, options: Option<AppointmentOutcomeType>[] | Option<AcceptableAbsenceOutcomeType>[] | Option<AppointmentEnforcementAction | ''>[] | Option<EnforcementActionCreatedBy>[]) => {
+const setArgs = (
+  dateInPast: boolean,
+  inOffice: boolean,
+  options:
+    | Option<AppointmentOutcomeType>[]
+    | Option<AcceptableAbsenceOutcomeType>[]
+    | Option<AppointmentEnforcementAction | ''>[]
+    | Option<EnforcementActionCreatedBy>[],
+) => {
   return {
     appointmentOutcome: {
       isInPast: dateInPast,
       appointmentSession: {
-        type: inOffice ? 'Planned Office Visit (NS)' : 'Planned Telephone Contact (NS)'
+        type: inOffice ? 'Planned Office Visit (NS)' : 'Planned Telephone Contact (NS)',
       },
-      options: options
-    }
-  } 
+      options,
+    },
+  }
 }
 
 describe('Appointment outcome nunjucks render tests', () => {
+  let dateInPast: boolean
+  let inOffice: boolean
   describe('Appointment is in the past and in office', () => {
     dateInPast = true
     inOffice = true
     it('should render the page', () => {
-      const options = getExpectedOptions({inOffice, dateInPast})
-      const $ = render(setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>)
+      const options = getExpectedOptions({ inOffice, dateInPast })
+      const $ = render(
+        setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<
+          AttendedCompliedAppointment | Activity
+        >,
+      )
       checkPageTitle($, dateInPast)
       checkOptions($, options)
     })
@@ -231,8 +245,12 @@ describe('Appointment outcome nunjucks render tests', () => {
     dateInPast = true
     inOffice = false
     it('should render the page', () => {
-      const options = getExpectedOptions({inOffice, dateInPast})
-      const $ = render(setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>)
+      const options = getExpectedOptions({ inOffice, dateInPast })
+      const $ = render(
+        setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<
+          AttendedCompliedAppointment | Activity
+        >,
+      )
       checkPageTitle($, dateInPast)
       checkOptions($, options)
     })
@@ -241,20 +259,24 @@ describe('Appointment outcome nunjucks render tests', () => {
     dateInPast = false
     inOffice = true
     it('should render the page', () => {
-      const options = getExpectedOptions({inOffice, dateInPast})
-      const $ = render(setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>)
+      const options = getExpectedOptions({ inOffice, dateInPast })
+      const $ = render(
+        setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<
+          AttendedCompliedAppointment | Activity
+        >,
+      )
       checkPageTitle($, dateInPast)
       checkOptions($, options)
     })
   })
 })
 
-//Covered here:
+// Covered here:
 // - Check title and options based on if appointment inPast / inOffice
 // - TODO: basic error message check (do in form nunjucks)
 
-//Still needed for cypress:
-// - Access page from arrange journey, manage journey, reschedule journey and check backLink - 3 cases 
+// Still needed for cypress:
+// - Access page from arrange journey, manage journey, reschedule journey and check backLink - 3 cases
 // - Check validation if no radios selected (message depends on past or future) - 2 cases (0 new cases)
 // - Check where options redirect too (need past and future to cover all) - 2 cases (0 new cases)
 // - - inPast and inOffice for most
