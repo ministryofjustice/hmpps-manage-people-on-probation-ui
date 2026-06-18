@@ -19,7 +19,7 @@ import {
   ExpectedOption,
   Journey,
   checkBreachOrRecallWarningBanner,
-  checkOptionRedirectsToCorrectPage,
+  checkOptionRedirects,
   checkOptions,
   checkTicketPanel,
 } from './imports'
@@ -184,7 +184,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
 
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, AcceptableAbsencePage, { journey })
+    loadPage({ journey })
+    checkOptionRedirects(options, AcceptableAbsencePage)
   })
   checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage)
   checkTicketPanel(loadPage, AcceptableAbsencePage)
