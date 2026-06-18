@@ -23,6 +23,7 @@ export const createNunjucksTestEnv = () => {
       'node_modules/@ministryofjustice/frontend/moj/components',
       'node_modules/@ministryofjustice/probation-search-frontend/components',
       'node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist',
+      'node_modules/@ministryofjustice/hmpps-mpop-frontend-components-lib/dist',
     ],
     {
       autoescape: true,
