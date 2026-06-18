@@ -181,7 +181,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
-          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
           .should('contain.text', 'You should consider initiating a breach')
         page
           .getTicketPanel()
@@ -201,7 +201,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
-          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
           .should('contain.text', 'Alton has breached this sentence before')
         page
           .getTicketPanel()
