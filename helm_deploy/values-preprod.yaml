@@ -102,6 +102,7 @@ generic-service:
     CAVAL_LINK: 'https://create-and-vary-a-licence-preprod.hmpps.service.justice.gov.uk'
     EPF2_LINK: '/'
     TIER_LINK: 'https://tier-preprod.hmpps.service.justice.gov.uk/case'
+    TIER_URL: 'https://tier-preprod.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_LINK: 'https://sentence-plan-preprod.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_LINK_V2: 'https://arns-assessment-platform-preprod.hmpps.service.justice.gov.uk/access/sentence-plan/crn'
     E_SUPERVISION_API_URL: 'https://esupervision-api-preprod.hmpps.service.justice.gov.uk'

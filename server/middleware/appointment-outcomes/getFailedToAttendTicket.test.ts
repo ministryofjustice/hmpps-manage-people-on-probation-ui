@@ -86,13 +86,13 @@ describe('middleware/appointment-outcomes/getFailedToAttendTicket', () => {
     getFailedToAttendTicket(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
       expect.objectContaining({
-        title: 'Stuart has until 10 June 2026 to submit evidence (5 days remaining)',
+        title: 'Stuart has until 10 June 2026 to submit evidence (6 days remaining)',
       }),
     )
   })
   it('should assign the correct ticket values if all enforcement actions have the same response period value and has one day remaining', () => {
     const res = buildResponse()
-    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.fromISO('2026-06-09') as DateTime<true>)
+    jest.spyOn(DateTime, 'now').mockReturnValueOnce(DateTime.fromISO('2026-06-10') as DateTime<true>)
     getFailedToAttendTicket(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
       expect.objectContaining({

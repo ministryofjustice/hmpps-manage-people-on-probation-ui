@@ -1,9 +1,17 @@
+{% from "_components/document/macro.njk" import appDocument %}
 {% set notes = '' %}
- {% set contactHasNote = appointment.isUpdatableContact and appointment.hasOutcome and appointment.appointmentNote %}
- {% set contactHasNotes = appointment.isUpdatableContact and appointment.hasOutcome and appointment.appointmentNotes.length > 0 %}
+{% set documentsHtml = '' %}
+ {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
+ {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
 {% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
+{% set _docs = appointmentDocuments if appointmentDocuments else appointment.documents %}
+{% if _docs and _docs.length > 0 %}
+  {% for document in _docs %}
+    {% set documentsHtml = documentsHtml ~ appDocument(document, crn) %}
+  {% endfor %}
+{% endif %}
 {% if hasNotes or contactHasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
@@ -90,14 +98,18 @@
     {
       key: { html: '<span data-qa="notesLabel">' + headings[1] + '</span>' },
       value: { html: '<span data-qa="notesValue">' + notes + '</span>' }
-    } if hasNotes and not hasNote,
+    } if hasNotes and not hasNote and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="noteLabel">Note</span>' },
       value: { html: '<span class="govuk-body line-break" data-qa="noteValue">' + appointment.appointmentNote.note + '</span>' }
-    } if hasNote,
+    } if hasNote and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
       value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo + '</span>' }
-    } if not appointment.hasOutcome and not appointment.isUpdatableContact
+    } if not appointment.hasOutcome and not appointment.isUpdatableContact,
+    {
+      key: { html: '<span data-qa="relatedDocumentsLabel">Related documents</span>' },
+      value: { html: '<div data-qa="relatedDocumentsValue">' + documentsHtml + '</div>' }
+    } if documentsHtml
   ]
   }) }}

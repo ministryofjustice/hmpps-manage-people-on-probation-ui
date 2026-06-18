@@ -23,7 +23,7 @@ export interface CheckinUserDetails {
   contactUpdated?: boolean
   settingsUpdated?: boolean
   eligibility?: string[]
-  eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
+  eligibilityChoice?: 'REPLACE_F2F' | 'SUPPLEMENT_F2F'
   eligibilitySPOApproval?: any
   rationale?: string
 }

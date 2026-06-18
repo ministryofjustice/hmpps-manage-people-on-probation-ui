@@ -83,6 +83,7 @@ export interface OffenderInfo {
   checkinInterval: string
   contactPreference: string
   startedAt?: string
+  eligibilityChoice?: 'REPLACE_F2F' | 'SUPPLEMENT_F2F'
   rationale?: string
 }
 

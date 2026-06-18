@@ -1,6 +1,19 @@
 import RestClient from './restClient'
 import config from '../config'
 
+export interface LatestTier {
+  tierScore: string
+  calculationId: string
+  calculationDate: string
+  changeReason: string
+  provisional: boolean
+}
+
+export interface LatestTierResponse {
+  calculation: LatestTier | null
+  httpStatus: number
+}
+
 export default class TierApiClient extends RestClient {
   constructor(token: string) {
     super('Tier API', config.apis.tierApi, token)

@@ -3,6 +3,11 @@
    "check-coverage": true,
    "compact": false,
    "inPlace": true,
+   "reporter": [
+     "text",
+     "json",
+     "lcov"
+   ],
    "exclude": [
      "assets/**",
      "coverage/**",
