@@ -1,6 +1,7 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "mpop/components/supervision-package/macro.njk" import supervisionPackage %}
 {% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
@@ -156,6 +157,15 @@
     {% endset %}
     {{ govukNotificationBanner({ html: html }) }}
   {% endif %}
+
+  {% if flags.enableSupervisionPackage and tierDetails %}
+    {{ supervisionPackage({
+      tierScore: tierDetails.calculation.tierScore,
+      provisional: tierDetails.calculation.provisional,
+      historyHref: tierUrlV3
+    }) }}
+  {% endif %}
+
   {% set schedule %}
   {% set nextApp = overview.schedule.nextAppointment %}
   {% set nextAppointmentText %}
