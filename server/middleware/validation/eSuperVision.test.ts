@@ -101,7 +101,7 @@ describe('Test eSuperVision validation', () => {
         [crn]: {
           [id]: {
             checkins: {
-              eligibilityChoice: 'replacement-contact',
+              eligibilityChoice: 'REPLACE_F2F',
             },
           },
         },

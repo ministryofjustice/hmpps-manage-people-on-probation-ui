@@ -19,4 +19,5 @@ export class FeatureFlags {
   enableEMDIOverviewShowGPSData?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
+  enableEsupervisionEligibility?: boolean = undefined
 }
