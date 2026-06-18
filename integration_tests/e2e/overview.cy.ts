@@ -95,12 +95,9 @@ context('Overview', () => {
 
         cy.get(`[data-qa=errors]`).should(
           'contain.text',
-          'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+          'Risk information from the Assess risks and needs service is currently unavailable.',
         )
-        cy.get(`[data-qa=errors]`).should(
-          'contain.text',
-          'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
-        )
+        cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
         page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
         page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
         page
@@ -300,7 +297,7 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
-  
+
   cases.forEach(({ title, setup, url, visitOptions, assertions }) => {
     it(title, () => {
       setup?.()
