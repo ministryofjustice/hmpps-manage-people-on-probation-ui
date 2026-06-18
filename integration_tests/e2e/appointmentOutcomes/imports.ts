@@ -77,7 +77,7 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
 // - accepts option
 // - submits to redirect
 // - check new page
-// - uses browser history to return to options
+// - uses backLink to return to options
 export const checkOptionRedirects = <TPage extends Page>(
   options: ExpectedOption<TPage>[],
   PageClass: RedirectPage,
