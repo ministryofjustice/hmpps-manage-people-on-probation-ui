@@ -34,6 +34,7 @@ describe('postCheckInDetails', () => {
         checkInMobile: '07123456789',
         photoUploadOption: '07123456789',
         preferredComs: 'EMAIL',
+        eligibilityChoice: 'REPLACE_F2F',
       } as const)
 
     const req: any = {
@@ -55,6 +56,7 @@ describe('postCheckInDetails', () => {
     const res: any = {
       locals: {
         user: overrides?.user ?? { username },
+        flags: { enableEsupervisionEligibility: true },
         case: { ...baseCase, ...(overrides?.caseOverrides ?? {}) },
       },
       status: jest.fn().mockReturnThis(),
@@ -100,10 +102,12 @@ describe('postCheckInDetails', () => {
       practitionerId: 'pp-user',
       crn,
       checkinInterval: 'WEEK',
+      eligibilityChoice: 'REPLACE_F2F',
     })
     expect(calledWith.firstCheckin).toBe('2025/3/12')
     expect(typeof calledWith.startedAt).toBe('string')
     expect(calledWith.contactPreference).toBe('EMAIL')
+    expect(calledWith.eligibilityChoice).toBe('REPLACE_F2F')
 
     expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg', validSha256)
     expect(result).toEqual({ setup, uploadLocation })

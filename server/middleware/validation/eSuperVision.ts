@@ -99,7 +99,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       let backUrl: string
       if (cya) {
         backUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      } else if (eligibilityChoice === 'replacement-contact') {
+      } else if (eligibilityChoice === 'REPLACE_F2F') {
         backUrl = `/case/${crn}/appointments/${id}/check-in/spo-approval`
       } else if (eligibilityArray.includes('eligibility-none')) {
         backUrl = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
