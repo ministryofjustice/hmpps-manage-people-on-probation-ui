@@ -80,6 +80,9 @@ export default {
   tier: {
     link: get('TIER_LINK', 'https://tier-dummy-url', requiredInProduction),
   },
+  tierUrl: {
+    link: get('TIER_URL', 'https://tier-dummy-url', requiredInProduction),
+  },
   sentencePlan: {
     link: get('SENTENCE_PLAN_LINK', 'https://sentence-plan-dummy-url', requiredInProduction),
     linkV2: get('SENTENCE_PLAN_LINK_V2', 'https://sentence-plan-dummy-url-v2/crn', requiredInProduction),

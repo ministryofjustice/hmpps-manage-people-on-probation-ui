@@ -221,4 +221,29 @@ describe('Manage an appointment', () => {
       })
     })
   })
+  describe('Related contacts', () => {
+    it('should not display the list if no related contact available', () => {
+      cy.task('stubNoRelatedContacts')
+      loadPage()
+      manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.getRelatedContacts().find('h3').should('contain.text', 'Related contacts')
+      manageAppointmentPage.getRelatedContacts().find('p').should('contain.text', 'No related contacts')
+    })
+    it('should  display the list if no related contact available', () => {
+      loadPage()
+      manageAppointmentPage.getRelatedContacts().find('h3').should('contain.text', 'Related contacts')
+      manageAppointmentPage.getRelatedContacts().find('li').should('have.length', 3)
+      manageAppointmentPage
+        .getRelatedContactLink(1)
+        .should('contain.text', 'Breach action - breach letter sent')
+        .should('have.attr', 'target', '_blank')
+        .should(
+          'have.attr',
+          'href',
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=2510615347',
+        )
+      manageAppointmentPage.getRelatedContact(1).should('contain.text', 'Created by J.Frost')
+      manageAppointmentPage.getRelatedContact(1).should('contain.text', 'on 12 May 2026')
+    })
+  })
 })

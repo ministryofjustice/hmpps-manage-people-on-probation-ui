@@ -103,6 +103,7 @@ generic-service:
     CAVAL_LINK: 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk'
     EPF2_LINK: '/'
     TIER_LINK: 'https://tier-dev.hmpps.service.justice.gov.uk/case'
+    TIER_URL: 'https://tier-dev.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_LINK: 'https://sentence-plan-dev.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_LINK_V2: 'https://arns-assessment-platform-dev.hmpps.service.justice.gov.uk/access/sentence-plan/crn'
     E_SUPERVISION_API_URL: 'https://esupervision-api-dev.hmpps.service.justice.gov.uk'

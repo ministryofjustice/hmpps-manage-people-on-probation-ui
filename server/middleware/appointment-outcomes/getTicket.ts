@@ -47,7 +47,8 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       if (failureToComplyContacts?.length > 1 && compliance?.priorBreachesOnCurrentOrderCount === 0) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months.`,
-          html: `<p class="govuk-body">You should consider initiating a breach. <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>`,
+          html: `<p class="govuk-body">You should consider initiating a breach.</p>
+          <p class="govuk-body"><a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>`,
           type: 'RED',
         }
       }

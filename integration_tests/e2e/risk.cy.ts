@@ -308,15 +308,14 @@ context('Risk', () => {
     const sanIndicator = true
     checkRiskPageView({ page, sanIndicator })
   })
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true, sentence plan link v2 disabled', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true, sentence plan link v2 enabled', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
-    cy.task('stubDisableSentencePlanUrl')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    checkRiskPageView({ page, sanIndicator, sentencePlanUrlEnabled: false })
+    checkRiskPageView({ page, sanIndicator })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
