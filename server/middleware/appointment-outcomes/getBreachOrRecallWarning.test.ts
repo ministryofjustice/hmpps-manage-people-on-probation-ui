@@ -12,7 +12,7 @@ const mockSentence: AppointmentOutcomeSentence = {
   length: 12,
   eventId: 1234,
   eventNumber: '5678',
-  order: 'Sentence type',
+  order: 'ORA Community Order',
   activeBreach: null,
   activeRecall: null,
   compliance: {} as Compliance,
@@ -63,7 +63,7 @@ describe('/middleware/appointment-outcomes/getBreachOrRecallWarning', () => {
     const res = buildResponse({ sentence })
     const expected: BreachOrRecallWarning = {
       title: 'There is a live breach for this sentence',
-      text: `The breach for sentence type was initiated on 3 June 2026.`,
+      text: `The breach for ORA community order was initiated on 3 June 2026.`,
       type: 'BREACH',
     }
     getBreachOrRecallWarning(req, res, nextSpy)
@@ -75,7 +75,7 @@ describe('/middleware/appointment-outcomes/getBreachOrRecallWarning', () => {
     const res = buildResponse({ sentence })
     const expected: BreachOrRecallWarning = {
       title: 'There is a live recall for this sentence',
-      text: `The recall for sentence type was initiated on 3 June 2026.`,
+      text: `The recall for ORA community order was initiated on 3 June 2026.`,
       type: 'RECALL',
     }
     getBreachOrRecallWarning(req, res, nextSpy)
