@@ -1260,6 +1260,7 @@ describe('checkInsController', () => {
               interval: 'WEEKLY',
               preferredComs: 'EMAIL',
               photoUploadOption: 'TAKE_A_PIC',
+              rationale: 'Unlikely to reoffend',
             },
           },
         },
@@ -1269,7 +1270,7 @@ describe('checkInsController', () => {
     it('renders summary with transformed userDetails when CRN and id are valid', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
       const req = httpMocks.createRequest({
         params: { crn, id: uuid },
         session: { data: baseSessionData },
@@ -1287,10 +1288,36 @@ describe('checkInsController', () => {
             interval: 'Every week',
             preferredComs: 'Email',
             photoUploadOption: 'Take a photo using this device',
+            rationale: 'Unlikely to reoffend',
           }),
         }),
       )
       expect(mockRenderError).not.toHaveBeenCalled()
+    })
+
+    it('renders summary with rationale hidden when rationale flag is disabled', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: false }
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        session: { data: baseSessionData },
+      })
+
+      await controllers.checkIns.getCheckinSummaryPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/checkin-summary.njk',
+        expect.objectContaining({
+          crn,
+          id: uuid,
+          isRationaleEnabled: false,
+          userDetails: expect.objectContaining({
+            rationale: 'Unlikely to reoffend',
+          }),
+        }),
+      )
     })
 
     it('returns 404 when CRN is invalid', async () => {
