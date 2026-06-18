@@ -541,17 +541,13 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
-  async getUserAlertsCount(): Promise<string> {
-    const response: UserAlerts = await this.get({
+  async getUserAlertsCount(): Promise<UserAlerts> {
+    return this.get({
       path: `/alerts`,
       handle404: true,
       handle500: true,
       errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
     })
-    if (response.totalResults) {
-      return response.totalResults < 100 ? response.totalResults.toString() : '99+'
-    }
-    return response as unknown as string
   }
 
   async clearAlerts(alertIds: number[]) {
