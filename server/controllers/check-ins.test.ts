@@ -599,32 +599,22 @@ describe('checkInsController', () => {
       })
     })
 
-    it('uses full eligibility as rationale backLink when eligibility-none was selected', async () => {
+    it('uses summary as rationale backLink when cya=true', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
+      req.query = { cya: 'true' }
       res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
-
-      req.session.data = {
-        esupervision: {
-          [crn]: {
-            [uuid]: {
-              checkins: {
-                eligibility: ['eligibility-none'],
-              },
-            },
-          },
-        },
-      }
 
       await controllers.checkIns.getRationalePage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/rationale.njk', {
-        crn,
-        id: uuid,
-        backLink: `/case/${crn}/appointments/${uuid}/check-in/full-eligibility`,
-      })
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/rationale.njk',
+        expect.objectContaining({
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/checkin-summary`,
+        }),
+      )
     })
   })
 
