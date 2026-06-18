@@ -64,7 +64,7 @@ context('Cases', () => {
 
   const sortableColumns = ['Cases', 'Sentence', 'Last Appointment', 'Next Appointment']
   for (let i = 0; i < sortableColumns.length; i += 1) {
-    it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i - 1]} sort button is clicked`, () => {
+    it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i]} sort button is clicked`, () => {
       cy.visit('/case')
       const page = new YourCasesPage()
       checkColumnSorting(page, i)
