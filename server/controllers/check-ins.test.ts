@@ -495,6 +495,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient)(req, res)

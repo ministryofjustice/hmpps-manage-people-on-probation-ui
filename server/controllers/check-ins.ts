@@ -221,7 +221,11 @@ const checkInsController: Controller<typeof routes, void> = {
       if (eligibilityChoice === 'REPLACE_F2F') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/spo-approval`)
       }
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+      if (isRationaleEnabled) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
+      }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
 
@@ -296,7 +300,9 @@ const checkInsController: Controller<typeof routes, void> = {
   getRationalePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      if (res.locals.flags.enableEsupervisionRationale === false) {
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+
+      if (!isRationaleEnabled) {
         return res.redirect(`/case/${crn}`)
       }
       const cya = req.query.cya === 'true'

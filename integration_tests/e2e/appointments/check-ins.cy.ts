@@ -188,7 +188,7 @@ context('Appointment check-ins', () => {
     cy.get('.govuk-error-message').should('contain', 'Select if any of these apply')
   })
 
-  it('should able to submit rationale details', () => {
+  it('should be able to submit rationale details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -251,7 +251,7 @@ context('Appointment check-ins', () => {
     })
   })
 
-  it('should able to submit check-in frequency details', () => {
+  it('should be able to submit check-in frequency details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -309,7 +309,7 @@ context('Appointment check-ins', () => {
     })
   })
 
-  it('should able to submit contact preference details', () => {
+  it('should be able to submit contact preference details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -345,7 +345,7 @@ context('Appointment check-ins', () => {
     photoOptionsPage.checkOnPage()
   })
 
-  it('should able to edit contact preference details', () => {
+  it('should be able to edit contact preference details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -376,7 +376,7 @@ context('Appointment check-ins', () => {
     contactPreferencePage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
 
-  it('Should able to choose photo options', () => {
+  it('should be able to choose photo options', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -421,7 +421,7 @@ context('Appointment check-ins', () => {
     takeAPhotoOptionsPage.checkOnPage()
   })
 
-  it('Should able to upload a pic and show rules page', () => {
+  it('should be able to upload a pic and show rules page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -470,7 +470,7 @@ context('Appointment check-ins', () => {
     uploadAPhoto.checkOnPage()
   })
 
-  it('Should able to show cya and confirm page', () => {
+  it('should be able to show cya and confirm page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -523,7 +523,7 @@ context('Appointment check-ins', () => {
     checkinConfirmationPage.checkOnPage()
   })
 
-  it('Should able to take a photo and show cya and confirm page', () => {
+  it('should be able to take a photo and show cya and confirm page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -575,7 +575,7 @@ context('Appointment check-ins', () => {
     checkinConfirmationPage.checkOnPage()
   })
 
-  it('Should able to change options from cya', () => {
+  it('should be able to change options from cya', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -775,7 +775,7 @@ context('check-ins error scenario ', () => {
     errorPage.checkPageTitle('Sorry, there is a problem with the service')
   })
 
-  it('Should able to show error message when same phone / email already registered', () => {
+  it('should be able to show error message when same phone / email already registered', () => {
     loadPage()
     cy.task('stubOffenderSetup422Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
@@ -833,7 +833,7 @@ context('check-ins error scenario ', () => {
       )
   })
 
-  it('Should able to show check ins registration error message', () => {
+  it('should be able to show check ins registration error message', () => {
     loadPage()
     cy.task('stubOffenderSetup500Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
@@ -886,7 +886,7 @@ context('check-ins error scenario ', () => {
     checkYourAnswersPage.getErrorText().should('contain.text', 'An error occurred during registration')
   })
 
-  it('Should able to show error page, when checkin registration fails', () => {
+  it('should be able to show error page, when checkin registration fails', () => {
     loadPage()
 
     cy.task('stubOffenderSetupComplete500Response')
@@ -1036,7 +1036,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.getImage().should('have.attr', 'alt', 'Image of Alton Berge')
   })
 
-  it('should able to visit contact details page', () => {
+  it('should be able to visit contact details page', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
@@ -1074,7 +1074,7 @@ context('check-ins overview and manage pages', () => {
     manageContact.checkOnPage()
   })
 
-  it('should able to vist change settings page', () => {
+  it('should be able to vist change settings page', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
@@ -1099,7 +1099,7 @@ context('check-ins overview and manage pages', () => {
     appointmentsPage.checkOnPage()
   })
 
-  it('should able to stop check in', () => {
+  it('should be able to stop check in', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
@@ -1117,7 +1117,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.checkOnPage()
   })
 
-  it('should able to stop and restart online check ins', () => {
+  it('should be able to stop and restart online check ins', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
 
