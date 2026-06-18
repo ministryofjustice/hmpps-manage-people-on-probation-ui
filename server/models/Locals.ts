@@ -22,7 +22,7 @@ import {
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
-import { TierCalculation } from '../data/tierApiClient'
+import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { Compliance } from '../data/model/overview'
@@ -105,9 +105,11 @@ interface Locals {
   headerCRN?: string
   headerDob?: string
   headerTierLink?: string
+  tierUrlV3?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
+  tierDetails?: LatestTierResponse
   predictorScores?: TimelineItem
   riskData?: RiskData
   risks?: RiskSummary
