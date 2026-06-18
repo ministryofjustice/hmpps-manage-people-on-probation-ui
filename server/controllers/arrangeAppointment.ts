@@ -219,7 +219,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
-      const staff = getDataValue<User[]>(data, ['staff', username])
+      const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
       const staffMember = staff?.find(person => person.username === username)
       if (providerCode) {
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
