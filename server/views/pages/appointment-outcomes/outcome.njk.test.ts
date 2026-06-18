@@ -212,7 +212,7 @@ const setArgs = (
     | Option<AcceptableAbsenceOutcomeType>[]
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[],
-) => {
+): Partial<TestModel> => {
   return {
     appointmentOutcome: {
       isInPast: dateInPast,
@@ -221,7 +221,7 @@ const setArgs = (
       },
       options,
     },
-  }
+  } as Partial<TestModel>
 }
 
 describe('Appointment outcome nunjucks render tests', () => {
@@ -232,11 +232,7 @@ describe('Appointment outcome nunjucks render tests', () => {
     inOffice = true
     it('should render the page', () => {
       const options = getExpectedOptions({ inOffice, dateInPast })
-      const $ = render(
-        setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<
-          AttendedCompliedAppointment | Activity
-        >,
-      )
+      const $ = render(setArgs(dateInPast, inOffice, options))
       checkPageTitle($, dateInPast)
       checkOptions($, options)
     })
@@ -246,11 +242,7 @@ describe('Appointment outcome nunjucks render tests', () => {
     inOffice = false
     it('should render the page', () => {
       const options = getExpectedOptions({ inOffice, dateInPast })
-      const $ = render(
-        setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<
-          AttendedCompliedAppointment | Activity
-        >,
-      )
+      const $ = render(setArgs(dateInPast, inOffice, options))
       checkPageTitle($, dateInPast)
       checkOptions($, options)
     })
@@ -260,11 +252,7 @@ describe('Appointment outcome nunjucks render tests', () => {
     inOffice = true
     it('should render the page', () => {
       const options = getExpectedOptions({ inOffice, dateInPast })
-      const $ = render(
-        setArgs(dateInPast, inOffice, options) as unknown as AppointmentOutcomeProps<
-          AttendedCompliedAppointment | Activity
-        >,
-      )
+      const $ = render(setArgs(dateInPast, inOffice, options))
       checkPageTitle($, dateInPast)
       checkOptions($, options)
     })

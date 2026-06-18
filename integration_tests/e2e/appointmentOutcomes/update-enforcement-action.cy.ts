@@ -223,9 +223,9 @@ const checkPage = () => {
     })
     it('should redirect to the correct page when an option is selected', () => {
       loadPage({
-        action: enforcementAction,
+        enforcementAction,
         sentenceType: 'COMMUNITY',
-      } as unknown)
+      })
       checkOptionRedirects(options, UpdateEnforcementActionPage)
     })
   })

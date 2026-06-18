@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon'
-import { padEnd } from 'lodash'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
@@ -13,7 +12,6 @@ import UpdateEnforcementActionPage from '../../pages/appointmentOutcomes/update-
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import ActivityLogPage from '../../pages/activityLog'
 import CompliancePage from '../../pages/compliance'
-import AddNotePage from '../../pages/appointmentOutcomes/add-note.page'
 
 export interface ExpectedOption<TPage extends Page> {
   value: string
@@ -90,7 +88,8 @@ export const checkOptionRedirects = <TPage extends Page>(
     outcomePage.getSubmitBtn().click()
     const page = new RedirectPage()
     page.checkPageTitle(redirectPageTitle)
-    cy.go(-1)
+    cy.go('back')
+    cy.get('[data-module="govuk-radios"]').should('exist')
   })
 }
 
