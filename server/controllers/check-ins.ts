@@ -306,7 +306,7 @@ const checkInsController: Controller<typeof routes, void> = {
       let backLink: string
       if (cya) {
         backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      } else if (eligibilityChoice === 'replacement-contact') {
+      } else if (eligibilityChoice === 'REPLACE_F2F') {
         backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
       } else if (eligibilityArray.includes('eligibility-none')) {
         backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
