@@ -105,7 +105,7 @@ describe('middleware/appointment-outcomes/getTicket', () => {
         await getTicket(hmppsAuthClient)(req, res, nextSpy)
         expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
           expect.objectContaining({
-            title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
+            title: 'Stuart has had multiple counts of non-compliance in the past 12 months',
             html: expect.stringContaining('You should consider initiating a breach'),
           }),
         )
@@ -120,7 +120,7 @@ describe('middleware/appointment-outcomes/getTicket', () => {
         await getTicket(hmppsAuthClient)(req, res, nextSpy)
         expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
           expect.objectContaining({
-            title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
+            title: 'Stuart has had multiple counts of non-compliance in the past 12 months',
             html: expect.stringContaining('Stuart has breached this sentence before'),
           }),
         )
