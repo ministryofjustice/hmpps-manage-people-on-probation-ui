@@ -1,11 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import httpMocks from 'node-mocks-http'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { AuthOptions } from '@ministryofjustice/hmpps-rest-client'
-import { getPersonalDetails } from './getPersonalDetails'
+import { fetchTierDetails, getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
+import TierApiClient, { LatestTier, LatestTierResponse } from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -14,7 +15,6 @@ import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
   mockPredictors,
-  mockPredictorScores,
   mockRisks,
   mockUserCaseload,
   mockAppResponse,
@@ -52,9 +52,9 @@ jest.mock('../data/arnsApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  toPredictors: jest.fn(() => mockPredictorScores),
+jest.mock('@ministryofjustice/hmpps-mpop-frontend-components-lib', () => ({
+  ...jest.requireActual('@ministryofjustice/hmpps-mpop-frontend-components-lib'),
+  MPoPComponents: jest.fn().mockImplementation(() => ({ getTierDetails: jest.fn() })),
 }))
 
 const mockAuthOptions: AuthOptions = {
@@ -72,6 +72,7 @@ jest.mock('@ministryofjustice/hmpps-rest-client', () => ({
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 const authClient = new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore)
 const arnsComponents = new ArnsComponents(authClient, config.apis.arnsApi, logger)
+const mpopComponents = jest.mocked(new MPoPComponents(authClient, config.apis.tierApi, logger))
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
@@ -108,14 +109,16 @@ const getReq = ({ ogrs4Enabled = true } = {}) =>
     },
   })
 
-const getRes = () =>
+const getRes = (enableSupervisionPackage: boolean = false, roles: Array<string> = ['SENTENCE_PLAN']) =>
   ({
     locals: {
       user: {
         username: 'user-1',
-        roles: ['SENTENCE_PLAN'],
+        roles,
       },
-      flags: {},
+      flags: {
+        enableSupervisionPackage,
+      },
     },
     redirect: jest.fn().mockReturnThis(),
   }) as unknown as AppResponse
@@ -271,6 +274,166 @@ describe('/middleware/getPersonalDetails', () => {
     })
   })
 
+  const calculation = {
+    provisional: true,
+    tierScore: 'B2',
+  } as Partial<LatestTier>
+
+  describe('enableSupervisionPackage', () => {
+    beforeEach(() => {
+      mpopComponents.getTierDetails.mockResolvedValue({ calculation: calculation as LatestTier, httpStatus: 200 })
+    })
+
+    it('should request tierDetails if feature is enabled', async () => {
+      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).toHaveBeenCalled()
+      expect(res.locals.tierDetails).toEqual({ calculation: { provisional: true, tierScore: 'B2' }, httpStatus: 200 })
+    })
+
+    it('should not request tierDetails if feature is disabled', async () => {
+      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes(false)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
+      expect(res.locals.tierDetails).toBeFalsy()
+    })
+
+    it('should fetch tierDetails when personal details are cached but tierDetails is missing', async () => {
+      req = httpMocks.createRequest({
+        params: {
+          crn: 'X000002',
+        },
+        session: {
+          data: {
+            personalDetails: {
+              X000002: mock({ crn: 'X000002' }),
+            },
+          },
+        },
+      })
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).toHaveBeenCalled()
+      expect(res.locals.tierDetails).toEqual({ calculation: { provisional: true, tierScore: 'B2' }, httpStatus: 200 })
+    })
+
+    it('should not fetch tierDetails when cached personal details already contain tierDetails', async () => {
+      const cachedTierDetails = {
+        calculation: { provisional: true, tierScore: 'A1' } as LatestTier,
+        httpStatus: 200,
+      }
+      const cached = mock({ crn: 'X000002' })
+      cached.tierDetails = cachedTierDetails
+      req = httpMocks.createRequest({
+        params: { crn: 'X000002' },
+        session: {
+          data: {
+            personalDetails: {
+              X000002: cached,
+            },
+          },
+        },
+      })
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
+      expect(res.locals.tierDetails).toEqual(cachedTierDetails)
+    })
+
+    it('should not fetch tierDetails when cached personal details exist and feature flag is disabled', async () => {
+      req = httpMocks.createRequest({
+        params: { crn: 'X000002' },
+        session: {
+          data: {
+            personalDetails: {
+              X000002: mock({ crn: 'X000002' }),
+            },
+          },
+        },
+      })
+      res = getRes(false)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
+      expect(res.locals.tierDetails).toBeUndefined()
+    })
+
+    it('should not attempt to fetch tierDetails when mpopComponents is not provided and personal details are uncached', async () => {
+      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
+      expect(res.locals.tierDetails).toBeUndefined()
+    })
+
+    it('should not attempt to fetch tierDetails when mpopComponents is not provided and personal details are cached', async () => {
+      req = httpMocks.createRequest({
+        params: { crn: 'X000002' },
+        session: {
+          data: {
+            personalDetails: {
+              X000002: mock({ crn: 'X000002' }),
+            },
+          },
+        },
+      })
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
+      expect(res.locals.tierDetails).toBeUndefined()
+    })
+
+    it('should set res.locals.tierDetails to undefined when calculation is not provisional', async () => {
+      mpopComponents.getTierDetails.mockResolvedValueOnce({
+        calculation: { provisional: false, tierScore: 'B2' } as LatestTier,
+        httpStatus: 200,
+      })
+      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).toHaveBeenCalled()
+      expect(res.locals.tierDetails).toBeUndefined()
+    })
+
+    it('should set res.locals.tierDetails to undefined when tierScore is missing', async () => {
+      mpopComponents.getTierDetails.mockResolvedValueOnce({
+        calculation: { provisional: true } as LatestTier,
+        httpStatus: 200,
+      })
+      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(mpopComponents.getTierDetails).toHaveBeenCalled()
+      expect(res.locals.tierDetails).toBeUndefined()
+    })
+
+    it('should persist fetched tierDetails to the session when refreshing cached personal details', async () => {
+      const cached = mock({ crn: 'X000002' })
+      req = httpMocks.createRequest({
+        params: { crn: 'X000002' },
+        session: {
+          data: {
+            personalDetails: {
+              X000002: cached,
+            },
+          },
+        },
+      })
+      res = getRes(true)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+      expect(req.session.data.personalDetails.X000002.tierDetails).toEqual({
+        calculation: { provisional: true, tierScore: 'B2' },
+        httpStatus: 200,
+      })
+    })
+  })
+
   it('should set the local variable if date of death is recorded', async () => {
     req = getReq()
     res = getRes()
@@ -287,15 +450,7 @@ describe('/middleware/getPersonalDetails', () => {
 
   it('should not request the sentence plan if logged in user does not have SENTENCE_PLAN role', async () => {
     req = getReq()
-    res = {
-      locals: {
-        user: {
-          username: 'user-1',
-          roles: [],
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    res = getRes(false, [])
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
@@ -477,5 +632,43 @@ describe('/middleware/getPersonalDetails', () => {
       showText: false,
       lastUpdatedDate: '',
     })
+  })
+})
+
+describe('/middleware/getPersonalDetails - fetchTierDetails', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should call mpopComponents.getTierDetails with the given token and crn', async () => {
+    mpopComponents.getTierDetails.mockResolvedValueOnce({
+      calculation: { provisional: true, tierScore: 'B2' } as LatestTier,
+      httpStatus: 200,
+    })
+    await fetchTierDetails(mpopComponents, 'X000003', 'system-token')
+    expect(mpopComponents.getTierDetails).toHaveBeenCalledTimes(1)
+    expect(mpopComponents.getTierDetails).toHaveBeenCalledWith('system-token', 'X000003')
+  })
+
+  it('should return the tier details resolved by mpopComponents.getTierDetails', async () => {
+    const tierResponse: LatestTierResponse = {
+      calculation: { provisional: true, tierScore: 'A1' } as LatestTier,
+      httpStatus: 200,
+    }
+    mpopComponents.getTierDetails.mockResolvedValueOnce(tierResponse)
+    const result = await fetchTierDetails(mpopComponents, 'X000003', 'system-token')
+    expect(result).toEqual(tierResponse)
+  })
+
+  it('should return undefined when mpopComponents.getTierDetails resolves with undefined', async () => {
+    mpopComponents.getTierDetails.mockResolvedValueOnce(undefined)
+    const result = await fetchTierDetails(mpopComponents, 'X000003', 'system-token')
+    expect(result).toBeUndefined()
+  })
+
+  it('should propagate errors thrown by mpopComponents.getTierDetails', async () => {
+    const error = new Error('upstream tier failure')
+    mpopComponents.getTierDetails.mockRejectedValueOnce(error)
+    await expect(fetchTierDetails(mpopComponents, 'X000003', 'system-token')).rejects.toThrow('upstream tier failure')
   })
 })

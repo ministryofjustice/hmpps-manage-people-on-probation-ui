@@ -3,7 +3,7 @@ import { Location, Provider, Team, User } from '../data/model/caseload'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
-import { TierCalculation } from '../data/tierApiClient'
+import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
 import { AppointmentSession, AppointmentType } from './Appointments'
 import { Errors } from './Errors'
 import { ESupervisionSession } from './ESupervision'
@@ -19,6 +19,7 @@ export interface PersonalDetailsSession {
   riskData?: RiskData
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
+  tierDetails?: LatestTierResponse
 }
 
 export interface Data {
