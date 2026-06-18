@@ -196,4 +196,23 @@ describe('postCheckInDetails', () => {
     expect(res.json).not.toHaveBeenCalled()
     expect(getProfilePhotoUploadLocation).not.toHaveBeenCalled()
   })
+  it('does not send rationale when rationale flag is disabled', async () => {
+    const { req, res } = buildReqRes()
+    res.locals.flags.enableEsupervisionRationale = false
+
+    jest.spyOn(MasApiClient.prototype, 'getProbationPractitioner').mockResolvedValue({ username: 'pp-user' } as any)
+
+    const setup = { uuid: setupUuid }
+    const postOffenderSetup = jest
+      .spyOn(ESupervisionClient.prototype, 'postOffenderSetup')
+      .mockResolvedValue(setup as any)
+
+    jest
+      .spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation')
+      .mockResolvedValue({ locationInfo: { url: 'http://upload', method: 'PUT' } } as any)
+
+    await postCheckInDetails(hmppsAuthClient)(req, res)
+
+    expect(postOffenderSetup.mock.calls[0][0]).not.toHaveProperty('rationale')
+  })
 })

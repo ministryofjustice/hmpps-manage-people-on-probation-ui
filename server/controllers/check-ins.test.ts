@@ -734,6 +734,52 @@ describe('checkInsController', () => {
         }),
       )
     })
+
+    it('uses SPO approval as date-frequency backLink when rationale is off and replacing F2F', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: false }
+
+      req.session.data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                eligibilityChoice: 'REPLACE_F2F',
+              },
+            },
+          },
+        },
+      }
+
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/date-frequency.njk',
+        expect.objectContaining({
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/spo-approval`,
+        }),
+      )
+    })
+
+    it('uses supplementary eligibility as date-frequency backLink when rationale is off by default', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: false }
+
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/date-frequency.njk',
+        expect.objectContaining({
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
+        }),
+      )
+    })
   })
 
   describe('postDateFrequencyPage', () => {
