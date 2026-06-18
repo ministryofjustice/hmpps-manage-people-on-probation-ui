@@ -160,8 +160,8 @@
           {% else %}
             {{ case.caseName.surname }}, {{ case.caseName.forename }}
           {% endif %}
-          </a></br>
-          <span class="govuk-!-font-weight-bold secondary-text">{{ crn }}</span></br>
+          </a><br/>
+          <span class="govuk-!-font-weight-bold secondary-text">{{ crn }}</span><br/>
           {% if case.dob %}
             <span class="secondary-text">{{ case.dob | dateWithYear }} (Age {{ case.dob | yearsSince }})</span>
           {% else %}
