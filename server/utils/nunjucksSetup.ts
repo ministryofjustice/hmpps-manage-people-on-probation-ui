@@ -196,8 +196,6 @@ export default function nunjucksSetup(
       return obj
     }
 
-    logger.warn(ctx.req.session.data)
-
     return decorateFormAttributes(ctx.req, ctx.res)(obj, sections)
   })
 
