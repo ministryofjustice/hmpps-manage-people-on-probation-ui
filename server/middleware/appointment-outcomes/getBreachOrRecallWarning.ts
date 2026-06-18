@@ -1,7 +1,7 @@
 import { Route } from '../../@types'
 import { SentenceCompliance } from '../../data/model/compliance'
 import { BreachOrRecallWarning, WarningType } from '../../models/Locals'
-import { dateWithYear } from '../../utils'
+import { convertToLowerCase, dateWithYear } from '../../utils'
 
 export const getBreachOrRecallWarning: Route<void> = (_req, res, next) => {
   const { sentence } = res.locals.appointmentOutcome
@@ -12,7 +12,7 @@ export const getBreachOrRecallWarning: Route<void> = (_req, res, next) => {
       const warningType = warningTypeKey.replace('active', '').toUpperCase() as WarningType
       breachOrRecallWarning = {
         title: `There is a live ${warningType.toLowerCase()} for this sentence`,
-        text: `The ${warningType.toLowerCase()} for ${sentence.order.toLowerCase()} was initiated on ${dateWithYear(sentence[warningTypeKey].startDate)}.`,
+        text: `The ${warningType.toLowerCase()} for ${convertToLowerCase(sentence.order)} was initiated on ${dateWithYear(sentence[warningTypeKey].startDate)}.`,
         type: warningType,
       }
     }
