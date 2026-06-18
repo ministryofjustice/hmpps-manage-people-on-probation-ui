@@ -82,7 +82,6 @@ import {
   dateToLongDate,
   merge,
   dateWithYearTimeFirst,
-  getDataValue,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
