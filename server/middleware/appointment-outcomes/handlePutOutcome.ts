@@ -57,6 +57,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         outcomeCode,
         notes: handleQuotes(notes),
         sensitive,
+        alert: false,
       }
 
       // if outcome but no action, check the outcome type does not require an associated action 👇
@@ -78,9 +79,11 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       if (enforcementActionCode?.length) {
         enforcementActionCode.forEach(code => {
           const requestWithAction = { ...request, enforcementActionCode: code }
+          console.log(requestWithAction)
           putRequests.push(masClient.putContact(contactId, requestWithAction))
         })
       } else {
+        console.log(request)
         putRequests.push(masClient.putContact(contactId, request))
       }
       await Promise.all(putRequests)
