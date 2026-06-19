@@ -95,7 +95,7 @@ context('Overview', () => {
 
         cy.get(`[data-qa=errors]`).should(
           'contain.text',
-          'Risk information from the Assess risks and needs service is currently unavailable.',
+          'Risk information from the Assess and plan service is currently unavailable.',
         )
         cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
         page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')

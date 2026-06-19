@@ -95,7 +95,7 @@ const mockErrorSummary = {
     },
     { text: 'A different unique error' },
     {
-      text: 'Risk information from the Assess risks and needs service is currently unavailable.',
+      text: 'Risk information from the Assess and plan service is currently unavailable.',
     },
   ],
 } as any

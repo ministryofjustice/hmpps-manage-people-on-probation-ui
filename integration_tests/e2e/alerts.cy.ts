@@ -21,7 +21,7 @@ context('Alerts Dashboard', () => {
     const page = Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-error-summary__list').should(
       'contain.text',
-      'Risk information from the Assess risks and needs service is currently unavailable.',
+      'Risk information from the Assess and plan service is currently unavailable.',
     )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
@@ -39,7 +39,7 @@ context('Alerts Dashboard', () => {
     const page = Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-error-summary__list').should(
       'contain.text',
-      'Risk information from the Assess risks and needs service is currently unavailable.',
+      'Risk information from the Assess and plan service is currently unavailable.',
     )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
