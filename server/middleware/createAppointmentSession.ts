@@ -32,8 +32,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     const { appointmentTypes } = res.locals
     let eventId = appointment?.eventId || ''
     const sentences = req?.session?.data?.sentences?.[crn]
-    console.log(sentences)
-    console.log({ eventId })
     if (!eventId && appointment?.eventNumber) {
       if (sentences) {
         eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
