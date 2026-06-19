@@ -28,7 +28,6 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       type === 'COMMUNITY' ? 'priorBreachesOnCurrentOrderCount' : 'priorRecallsOnCurrentOrderCount'
 
     const breachOrRecall = type === 'COMMUNITY' ? 'breach' : 'recall'
-
     // attended failed to comply page, unacceptable absence page 👈
 
     if (['attended-failed-to-comply', 'unacceptable-absence'].some(url => reqUrl.endsWith(url))) {
@@ -58,7 +57,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       if (failureToComplyContacts?.length > 1 && compliance?.[priorBreachOrRecallCountKey] === 0) {
         ticket = {
           title: `${forename} has had multiple counts of non-compliance in the past 12 months`,
-          html: `<p class="govuk-body">You should consider initiating a breach.</p>
+          html: `<p class="govuk-body">You should consider initiating a ${breachOrRecall}.</p>
           <p class="govuk-body"><a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&compliance=not+complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">View a list of ${forename}’s non-compliance (opens in new tab)</a>.</p>`,
           type: 'RED',
         }
@@ -94,7 +93,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
         type: 'BLUE',
       }
     }
-
+    console.log(ticket)
     res.locals.appointmentOutcome.ticket = ticket
     return next()
   }

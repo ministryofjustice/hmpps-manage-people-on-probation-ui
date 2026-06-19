@@ -132,6 +132,7 @@ describe('middleware/appointment-outcomes/getTicket', () => {
           }),
         )
       })
+
       it('should assign the correct ticket if sentence type is CUSTODY, more than one previous FTC, no previous recall', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
@@ -140,13 +141,15 @@ describe('middleware/appointment-outcomes/getTicket', () => {
         )
         const res = buildResponse({ type: 'CUSTODY' })
         await getTicket(hmppsAuthClient)(req, res, nextSpy)
-        expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
+        expect(res.locals.appointmentOutcome.ticket).toEqual(
           expect.objectContaining({
-            title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
             html: expect.stringContaining('You should consider initiating a recall'),
+            title: 'Stuart has had multiple counts of non-compliance in the past 12 months',
+            type: 'RED',
           }),
         )
       })
+
       it('should assign the correct ticket if sentence type is COMMUNIUTY, more than one previous FTC, previous breach', async () => {
         const attendedButDidNotComply: NonComplianceContact[] = [nonComplianceContact]
         const unacceptableAbsence: NonComplianceContact[] = [nonComplianceContact]
@@ -170,9 +173,9 @@ describe('middleware/appointment-outcomes/getTicket', () => {
         )
         const res = buildResponse({ type: 'CUSTODY', breachCount: 0, recallCount: 1 })
         await getTicket(hmppsAuthClient)(req, res, nextSpy)
-        expect(res.locals.appointmentOutcome.ticket).toStrictEqual(
+        expect(res.locals.appointmentOutcome.ticket).toEqual(
           expect.objectContaining({
-            title: 'Stuart has had multiple counts of non-compliance in the past 12 months.',
+            title: 'Stuart has had multiple counts of non-compliance in the past 12 months',
             html: expect.stringContaining('Stuart has been recalled before'),
           }),
         )
