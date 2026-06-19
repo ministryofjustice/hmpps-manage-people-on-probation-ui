@@ -191,6 +191,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       outcomeCode,
       notes: '',
       sensitive: true,
+      alert: false,
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
@@ -219,6 +220,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       enforcementActionCode: 'IBR',
       notes: `${notePrepend}\n${notes}`,
       sensitive: true,
+      alert: false,
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(putContactSpy).toHaveBeenCalledTimes(1)
@@ -249,6 +251,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
         enforcementActionCode: 'IBR',
         notes: `${notePrepend}\n${notes}`,
         sensitive: true,
+        alert: false,
       },
       {
         date,
@@ -257,6 +260,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
         enforcementActionCode: 'LCL',
         notes: `${notePrepend}\n${notes}`,
         sensitive: true,
+        alert: false,
       },
     ]
     expect(putContactSpy).toHaveBeenNthCalledWith(1, contactId, expectedRequests[0])
