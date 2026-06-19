@@ -527,12 +527,9 @@ context('Risk', () => {
 
     cy.get(`[data-qa=errors]`).should(
       'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      'Risk information from the Assess and plan service is currently unavailable.',
     )
-    cy.get(`[data-qa=errors]`).should(
-      'contain.text',
-      'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
-    )
+    cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
 
     cy.get(`[data-qa=errors]`).should(
       'contain.text',
