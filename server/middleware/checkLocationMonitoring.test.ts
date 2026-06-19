@@ -5,6 +5,8 @@ import {
   checkLocationMonitoringCode,
   LICENCE_GPS_TAGGING_CODE,
   REQUIREMENT_GPS_TAGGING_CODE,
+  checkRarDescriptionByEventNumber,
+  RAR_DESCRIPTION_CODE,
 } from './checkLocationMonitoring'
 import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceDetails'
 
@@ -175,5 +177,43 @@ describe('hasLocationMonitoring', () => {
 
   it('should handle null or undefined inputs', () => {
     expect(hasLocationMonitoring(null, undefined)).toBe(false)
+  })
+})
+
+describe('checkRarDescriptionByEventNumber', () => {
+  const sentences = [
+    {
+      eventNumber: '1',
+      requirements: [{ description: 'RAR Requirement', code: RAR_DESCRIPTION_CODE }],
+    },
+    {
+      eventNumber: '2',
+      requirements: [{ description: 'Regular requirement', code: 'EM03' }],
+    },
+  ] as unknown as Sentence[]
+
+  it('should return description when RAR_DESCRIPTION_CODE matches for the given event number', () => {
+    const result = checkRarDescriptionByEventNumber('1', sentences)
+    expect(result).toBe('RAR Requirement')
+  })
+
+  it('should return undefined when RAR_DESCRIPTION_CODE is not found for the given event number', () => {
+    const result = checkRarDescriptionByEventNumber('2', sentences)
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined when event number does not match', () => {
+    const result = checkRarDescriptionByEventNumber('3', sentences)
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined when sentences is null or undefined', () => {
+    expect(checkRarDescriptionByEventNumber('1', null)).toBeUndefined()
+    expect(checkRarDescriptionByEventNumber('1', undefined)).toBeUndefined()
+  })
+
+  it('should return undefined when requirements are null or undefined', () => {
+    const sentencesNoReqs = [{ eventNumber: '1', requirements: null }] as unknown as Sentence[]
+    expect(checkRarDescriptionByEventNumber('1', sentencesNoReqs)).toBeUndefined()
   })
 })

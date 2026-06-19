@@ -83,6 +83,83 @@
                   "active": false
                 }
               ]
+            },
+            {
+              "id": 50,
+              "eventNumber": "2",
+              "order": {
+                "description": "Pre-Sentence",
+                "sentenceType": "PRE_SENTENCE"
+              },
+              "nsis": [],
+              "licenceConditions": [],
+              "requirements": [
+                {
+                  "id": 84,
+                  "code": "F",
+                  "description": "10 of 10 RAR days completed",
+                  "active": true
+                }
+              ]
+            },
+            {
+              "id": 51,
+              "eventNumber": "3",
+              "order": {
+                "description": "Default Sentence Type (12 Months)",
+                "sentenceType": "CUSTODY",
+                "startDate": "2025-05-31"
+              },
+              "nsis": [
+                {
+                  "id": 162,
+                  "description": "BRE description"
+                },
+                {
+                  "id": 163,
+                  "description": "OPD1 description (OPD1 subtype)"
+                }
+              ],
+              "licenceConditions": [
+                {
+                  "id": 166,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 167,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 168,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 169,
+                  "mainDescription": "lic cond main",
+                  "active": false
+                }
+              ],
+              "requirements": [
+                {
+                  "id": 80,
+                  "description": "2 of 12 RAR days completed",
+                  "active": true
+                },
+                {
+                  "id": 83,
+                  "description": "Unpaid Work - Intensive",
+                  "active": false
+                },
+                {
+                  "id": 84,
+                  "code": "F",
+                  "description": "16 of 20 RAR days completed",
+                  "active": true
+                }
+              ]
             }
           ]
         },
@@ -118,14 +195,19 @@
           "sentences": [
             {
               "id": 49,
-              "eventNumber": "1234567",
+              "eventNumber": "2",
               "order": {
                 "description": "Pre-Sentence",
-                "sentenceType": "COMMUNITY"
+                "sentenceType": "PRE_SENTENCE"
               },
               "nsis": [],
               "licenceConditions": [],
-              "requirements": []
+              "requirements": [{
+                "id": 162,
+                "code": "F",
+                "description": "10 of 10 RAR days completed",
+                "active": true
+              }]
             },
             {
               "id": 48,
