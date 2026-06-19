@@ -391,7 +391,7 @@ export default class MasApiClient extends RestClient {
     return complianceResponse
   }
 
-  async getPersonNonCompliance(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
+  async getPersonNonComplianceDetail(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
     const nonComplianceResponse: NonComplianceHistoryResponse = await this.get({
       path: `/compliance/non-compliance-detail/${crn}?months=${months}`,
       handle404: false,
@@ -541,9 +541,13 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
-  async getUserAlertsCount(): Promise<number> {
-    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true, handle500: true })
-    return response?.totalResults ? response.totalResults : -1
+  async getUserAlertsCount(): Promise<UserAlerts> {
+    return this.get({
+      path: `/alerts`,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
+    })
   }
 
   async clearAlerts(alertIds: number[]) {

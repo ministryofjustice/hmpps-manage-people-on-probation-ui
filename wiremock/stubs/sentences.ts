@@ -8,7 +8,7 @@ const stubSentences = ({
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: '/mas/sentences/X778160',
+      urlPathPattern: `/mas/sentences/${crn}`,
       method: 'GET',
       queryParameters: {
         includeRarRequirements: {
@@ -26,13 +26,13 @@ const stubSentences = ({
           {
             id: 2501192724,
             eventNumber: '12345',
-            sentenceType,
             mainOffence: {
               code: '18502',
               description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
             },
             order: {
               description: '12 month Community order',
+              sentenceType,
               startDate,
               endDate,
             },
@@ -96,7 +96,6 @@ const stubSentences = ({
           {
             id: 2501192725,
             eventNumber: '5678',
-            sentenceType: 'COMMUNITY',
             mainOffence: {
               code: '18502',
               description:
@@ -104,6 +103,7 @@ const stubSentences = ({
             },
             order: {
               description: 'ORA Community Order',
+              sentenceType: 'COMMUNITY',
               endDate,
               startDate,
             },
@@ -151,7 +151,6 @@ const stubSentences = ({
           {
             id: 2501192726,
             eventNumber: '5679',
-            sentenceType: 'COMMUNITY',
             mainOffence: {
               code: '18502',
               description:
@@ -159,6 +158,7 @@ const stubSentences = ({
             },
             order: {
               description: 'ORA Community Order',
+              sentenceType: 'COMMUNITY',
               endDate,
               startDate,
             },
@@ -207,13 +207,13 @@ const stubSingleSentence = ({
           {
             id: 2501192724,
             eventNumber: '12345',
-            sentenceType,
             mainOffence: {
               code: '18502',
               description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
             },
             order: {
               description: '12 month Community order',
+              sentenceType,
               startDate,
               endDate,
             },

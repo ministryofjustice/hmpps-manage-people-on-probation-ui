@@ -23,9 +23,9 @@ const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 49,
     eventNumber: '1234567',
-    sentenceType: 'CUSTODY',
     order: {
       description: 'Pre-Sentence',
+      sentenceType: 'CUSTODY',
       startDate: '2025-05-31',
       endDate,
     },
@@ -36,9 +36,9 @@ const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 48,
     eventNumber: '7654321',
-    sentenceType: 'COMMUNITY',
     order: {
       description: 'Pre-Sentence',
+      sentenceType: 'COMMUNITY',
       startDate: '2025-05-31',
       endDate,
     },
@@ -175,11 +175,7 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
-          sentence: {
-            type: 'COMMUNITY',
-            length: 12,
-          },
+          appointmentHintText: 'Appointment: 3 way meeting (NS) with John Smith on Saturday 11 October 2025.',
           isProbationPractitioner: false,
         }),
       )
@@ -209,11 +205,35 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
-          sentence: {
-            type: 'CUSTODY',
-            length: 24,
-          },
+          appointmentHintText: 'Appointment: 3 way meeting (NS) with John Smith on Saturday 11 October 2025.',
+          isProbationPractitioner: true,
+        }),
+      )
+    })
+
+    it('should set the probation practitioner as true if logged in username matches PP username but case format is different', () => {
+      const req = buildRequest({ params: { contactId: undefined }, eventId: '49', sentenceEndDate: '2027-05-31' })
+      const res = buildResponse({ username: 'deborahfern' })
+      mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+      jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+      getOutcomeProps(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome).toEqual(
+        expect.objectContaining({
+          forename,
+          surname,
+          appointment: res.locals.personAppointment.appointment,
+          crn,
+          uuid,
+          contactId: undefined,
+          id: uuid,
+          isValidParams: true,
+          isInPast: true,
+          reqUrl: url,
+          baseUrl: `/case/${crn}/arrange-appointment/${uuid}`,
+          baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
+          completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
+          appointmentSession: req.session.data.appointments[crn][uuid],
+          appointmentHintText: 'Appointment: 3 way meeting (NS) with John Smith on Saturday 11 October 2025.',
           isProbationPractitioner: true,
         }),
       )
@@ -241,54 +261,12 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
           baseUrl: `/case/${crn}/appointments/appointment/${contactId}`,
           baseOutcomeUrl: `/case/${crn}/appointments/appointment/${contactId}/outcome`,
           completedUrl: `/case/${crn}/appointments/appointment/${contactId}/manage`,
-          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          appointmentHintText: 'Appointment: 3 way meeting (NS) with John Smith on Saturday 11 October 2025.',
           appointmentSession: req.session.data.appointments[crn][contactId],
-          sentence: {
-            type: 'COMMUNITY',
-            length: 12,
-          },
           isProbationPractitioner: false,
         }),
       )
       expect(nextSpy).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  it('should set sentence length to null when sentence dates are missing', () => {
-    const req = buildRequest({ params: { contactId: undefined } })
-
-    req.session.data.sentences[crn][0].order.startDate = null
-    req.session.data.sentences[crn][0].order.endDate = null
-
-    const res = buildResponse()
-
-    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
-    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-
-    getOutcomeProps(req, res, nextSpy)
-
-    expect(res.locals.appointmentOutcome.sentence).toEqual({
-      type: 'COMMUNITY',
-      length: 12,
-    })
-  })
-
-  it('should set sentence values to null when no matching sentence exists', () => {
-    const req = buildRequest({
-      params: { contactId: undefined },
-      eventId: '99999',
-    })
-
-    const res = buildResponse()
-
-    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
-    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-
-    getOutcomeProps(req, res, nextSpy)
-
-    expect(res.locals.appointmentOutcome.sentence).toEqual({
-      type: undefined,
-      length: null,
     })
   })
 

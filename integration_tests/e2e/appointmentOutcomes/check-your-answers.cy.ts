@@ -40,8 +40,8 @@ const checkSummary = ({
   documents = false,
 }: { outcomeText?: string; actionText?: string[]; documents?: boolean } = {}) => {
   const appointment = documents
-    ? '3 Way Meeting (NS) with Terry Jones on Wednesday 21 February 2024'
-    : 'Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024'
+    ? `3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am`
+    : 'Planned office visit (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am'
   checkYourAnswersOutcomePage
     .getSummaryListRow(1)
     .find('.govuk-summary-list__key')
@@ -49,7 +49,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(1)
     .find('.govuk-summary-list__value')
-    .should('contain.text', `Appointment: ${appointment}`)
+    .should('contain.text', appointment)
   checkYourAnswersOutcomePage
     .getSummaryListRow(2)
     .find('.govuk-summary-list__key')
@@ -107,7 +107,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(index + 2)
     .find('.govuk-summary-list__value')
-    .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
+    .should('contain.text', 'Other call on Wednesday 21 February 2024 at 10:15am to 10:30am')
 }
 
 const checkPage = () => {
@@ -253,15 +253,16 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
-      const appointmentType = `Planned Office Visit (NS)`
+      const appointmentType = `Planned office visit (NS)`
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
-        .should('contain.text', `Appointment: ${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
+
+        .should('contain.text', `${appointmentType} on Wednesday 21 February 2024 at 10:15am to 10:30am`)
       checkYourAnswersOutcomePage
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
+        .should('contain.text', 'Other call on Wednesday 21 February 2024 at 10:15am to 10:30am')
     })
   })
 }

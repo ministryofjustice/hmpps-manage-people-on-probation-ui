@@ -1,22 +1,29 @@
 {% extends "../../partials/layout.njk" %}
 {% from "../../_components/govuk/accordion-mpop/macro.njk" import probationAccordion %}
 {% from "probation/case-search/macro.njk" import caseSearch %}
-
+{% set homepage = true %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block header %}
   {% include "../../partials/prob_fe_header.njk" %}
   {% block banner %}{% endblock %}
+  <div class="govuk-width-container">
+  {% include "../../partials/_error-alerts.njk" %}
+  </div>
   <div class="dps-header">
-    <div class="govuk-width-container">
-      <h1 class="govuk-heading-l" data-qa="pageHeading">Manage people on probation</h1>
-    </div>
+  <div class="govuk-width-container">
+    <h1 class="govuk-heading-l" data-qa="pageHeading">Manage people on probation</h1>
   </div>
-  <div class="dps-homepage-search">
-    <div class="govuk-width-container">
-      {{ appSearch('/search', csrfToken) }}
-    </div>
+</div>
+<div class="dps-homepage-search">
+  <div class="govuk-width-container">
+    {{ appSearch('/search', csrfToken) }}
   </div>
+</div>
+{% endblock %}
+
+{% block containerStart %}
+{% block beforeContent %}{% endblock %}
 {% endblock %}
 
 {% set appointmentsTable %}

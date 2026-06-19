@@ -13,7 +13,7 @@ import {
 } from '../appointments/utils'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
-import { ExpectedOption, Journey, checkOptions, checkBreachWarningBanner } from './imports'
+import { ExpectedOption, Journey, checkOptions, checkBreachOrRecallWarningBanner } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
@@ -104,13 +104,23 @@ const getExpectedOptions = ({
 }
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
-  it('should render the page if sentence type is community', () => {
+  it('should render the page if sentence type is COMMUNITY', () => {
     loadPage({ journey })
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
     initiateBreachOrRecallPage.checkPageTitle('Initiate a breach')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
     cy.get('legend').should('contain.text', 'Who will create the breach NSI (non-statutory intervention)?')
     const options = getExpectedOptions()
+    checkOptions(options)
+    cy.get('[data-module="govuk-radios"]').should('have.length', 1)
+  })
+  it('should render the page if sentence type is CUSTODY', () => {
+    loadPage({ journey, sentenceType: 'CUSTODY' })
+    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+    initiateBreachOrRecallPage.checkPageTitle('Initiate a recall')
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+    cy.get('legend').should('contain.text', 'Who will create the recall?')
+    const options = getExpectedOptions({ sentenceType: 'CUSTODY' })
     checkOptions(options)
     cy.get('[data-module="govuk-radios"]').should('have.length', 1)
   })
@@ -196,7 +206,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage.checkOnPage()
   })
 
-  checkBreachWarningBanner(loadPage, { Page: InitiateBreachOrRecallPage })
+  checkBreachOrRecallWarningBanner(loadPage, InitiateBreachOrRecallPage)
 }
 
 describe('Initiate a breach or recall', () => {

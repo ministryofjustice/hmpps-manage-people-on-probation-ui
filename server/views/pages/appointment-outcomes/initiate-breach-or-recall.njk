@@ -12,7 +12,7 @@
         'data-qa': 'breachNSICreatedBy'
       },
       legend: {
-        text: "Who will create the breach NSI (non-statutory intervention)?",
+        text: "Who will " + ("create the breach NSI (non-statutory intervention)" if appointmentOutcome.sentence.type == 'COMMUNITY' else "create the recall") + "?",
         isPageHeading: false,
         classes: "govuk-fieldset__legend--m"
       }

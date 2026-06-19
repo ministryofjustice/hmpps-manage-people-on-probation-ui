@@ -13,6 +13,17 @@
           },
           "flags": [
             {
+              "key": "enableCaseloadV2",
+              "name": "enableCaseloadV2",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2025-11-17T15:28:37.920581Z",
+              "updatedAt": "2025-11-17T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
               "key": "enableSmsReminders",
               "name": "enableSmsReminders",
               "description": "",
@@ -70,17 +81,6 @@
             {
               "key": "enableNonCompliance",
               "name": "enableNonCompliance",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableSentencePlanUrl",
-              "name": "enableSentencePlanUrl",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
@@ -185,6 +185,39 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-05-18T12:00:00.000000Z",
               "updatedAt": "2026-05-18T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableEnforcementContacts",
+              "name": "enableEnforcementContacts",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-06-12T12:00:00.000000Z",
+              "updatedAt": "2026-06-12T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableBreachOrRecallAndSendLetterAction",
+              "name": "enableBreachOrRecallAndSendLetterAction",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-06-12T12:00:00.000000Z",
+              "updatedAt": "2026-06-12T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableEsupervisionEligibility",
+              "name": "enableEsupervisionEligibility",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-06-17T12:00:00.000000Z",
+              "updatedAt": "2026-06-17T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             }

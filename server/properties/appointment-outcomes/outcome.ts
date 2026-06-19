@@ -1,7 +1,7 @@
 import { AppointmentOutcomeType } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 
-export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
+export const outcomeOptions = (inPast = true): Option<AppointmentOutcomeType>[] => [
   {
     value: 'ATTENDED_COMPLIED',
     text: 'Attended - complied',
@@ -10,12 +10,15 @@ export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
     value: 'ATTENDED_FAILED_TO_COMPLY',
     text: 'Attended - failed to comply',
     hint: {
-      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
+      text: 'For example, they did not follow instructions.',
     },
   },
   {
     value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
     text: 'Attended - sent home (behaviour)',
+    hint: {
+      text: 'For example, their behaviour was disruptive.',
+    },
   },
   {
     value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
@@ -28,7 +31,7 @@ export const outcomeOptions: Option<AppointmentOutcomeType>[] = [
     value: 'ACCEPTABLE_ABSENCE',
     text: 'Acceptable absence',
     hint: {
-      text: 'They provided an acceptable reason or evidence.',
+      text: inPast ? 'They provided an acceptable reason or evidence.' : null,
     },
   },
   {

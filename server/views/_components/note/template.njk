@@ -1,18 +1,21 @@
 <div class="app-note text-break">
   <p class="govuk-body govuk-!-margin-bottom-1">
-    <span class="line-break">{% if notePrefix %}<span class='govuk-!-font-weight-bold' data-qa="note-prefix-text">{{ notePrefix }}</span>{% endif %}{{ note.note
-    | handleQuotes('unescape')
-    | replace('Enforcement Action:', '<span class="govuk-!-font-weight-bold">Enforcement Action:</span>')
-    | safe }}</span>
+    <span class="line-break">
+      {%- if notePrefix %}
+        <span class='govuk-!-font-weight-bold' data-qa="note-prefix-text">{{ notePrefix }}</span>
+      {% endif -%}
+      {{ note.note | handleQuotes('unescape') | formatEnforcementActionNote | safe }}</span>
     {% if note.hasNoteBeenTruncated === true %}... <a href="{{ href }}">{{ viewFullNoteText }}</a>
     {% endif %}
   </p>
   <p class="govuk-body-s secondary-text app-note__author">
     {% if note.lastUpdatedBy %}
-      Last updated: {{ note.lastUpdatedBy.forename }} {{ note.lastUpdatedBy.surname }} {{ note.lastUpdated | dateWithYear }}
+      Last updated: {{ note.lastUpdatedBy.forename }}
+      {{ note.lastUpdatedBy.surname }}
+      {{ note.lastUpdated | dateWithYear }}
     {% else %}
       Comment added by {% if note.createdBy %}{{ note.createdBy }} on {{ note.createdByDate | dateWithYear }}
-    {% else %}not entered{% endif %}
+      {% else %}not entered{% endif %}
     {% endif %}
   </p>
 </div>

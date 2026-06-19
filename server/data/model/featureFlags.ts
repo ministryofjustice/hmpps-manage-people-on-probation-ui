@@ -7,7 +7,7 @@ export class FeatureFlags {
   enableDeliusClient?: boolean = undefined
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
-  enableSentencePlanUrl?: boolean = undefined
+  enableSupervisionPackage?: boolean = undefined
   enableDeepLinks?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
@@ -17,4 +17,8 @@ export class FeatureFlags {
   enableShowMatchWithConcern?: boolean = undefined
   enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
+  enableCaseloadV2?: boolean = undefined
+  enableEnforcementContacts?: boolean = undefined
+  enableBreachOrRecallAndSendLetterAction?: boolean = undefined
+  enableEsupervisionEligibility?: boolean = undefined
 }

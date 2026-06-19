@@ -15,13 +15,13 @@
             {
               "id": 2501192724,
               "eventNumber": "12345",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831"
               },
               "order": {
                 "description": "12 month Community order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
                 "startDate": "2023-12-01"
               },
@@ -85,13 +85,13 @@
             {
               "id": 2501192725,
               "eventNumber": "5678",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
               },
               "order": {
                 "description": "ORA Community Order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               },
@@ -139,13 +139,13 @@
             {
               "id": 2501192726,
               "eventNumber": "5679",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
               },
               "order": {
                 "description": "ORA Community Order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               },
@@ -187,13 +187,13 @@
             {
               "id": 2501192734,
               "eventNumber": "12345",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831**"
               },
               "order": {
                 "description": "12 month Community order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
                 "startDate": "2023-12-01"
               },
@@ -257,13 +257,13 @@
             {
               "id": 2501192744,
               "eventNumber": "1234567",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831**"
               },
               "order": {
                 "description": "12 month Community order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
                 "startDate": "2023-12-01"
               },
@@ -333,13 +333,13 @@
             {
               "id": 2501192724,
               "eventNumber": "12345",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831**"
               },
               "order": {
                 "description": "12 month Community order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
                 "startDate": "2023-12-01"
               },
@@ -403,13 +403,13 @@
             {
               "id": 2501192725,
               "eventNumber": "7654321",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
               },
               "order": {
                 "description": "ORA Community Order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               },
@@ -463,13 +463,13 @@
             {
               "id": 2501192726,
               "eventNumber": "5679",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
               },
               "order": {
                 "description": "ORA Community Order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               },
@@ -510,13 +510,13 @@
           "sentences": [
             {
               "eventId": 12345,
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831***"
               },
               "order": {
                 "description": "12 month Community order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
                 "startDate": "2023-12-01"
               },
@@ -579,13 +579,13 @@
             },
             {
               "eventId": "5678",
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"
               },
               "order": {
                 "description": "ORA Community Order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
                 "startDate": "2020-03-02"
               },
@@ -656,13 +656,13 @@
           "sentences": [
             {
               "eventId": 12345,
-              "sentenceType": "COMMUNITY",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831****"
               },
               "order": {
                 "description": "12 month Community order",
+                "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
                 "startDate": "2023-12-01"
               },
