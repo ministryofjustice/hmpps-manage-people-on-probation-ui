@@ -57,8 +57,10 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       } else {
         attendingUsername = defaultUserDetails?.username
         if (res.locals.flags.enableMAN2344) {
-          attendingEmail = defaultUserDetails?.email
-          attendingName = defaultUserDetails.name
+          const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
+          const staffMember = staff?.find(person => person.username === defaultUserDetails.username)
+          attendingEmail = staffMember?.email ?? null
+          attendingName = staffMember?.name ?? null
         }
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
