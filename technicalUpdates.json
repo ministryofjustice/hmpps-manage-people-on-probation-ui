@@ -1,5 +1,35 @@
 [
   {
+    "heading": "Find and add 100 more contact types",
+    "summary": "19 June 2026",
+    "whatsNew": [
+      "Find and add 100 more contact types",
+      [
+        "You can now create and manage 100 more contact types that you regularly use. This makes it easier to manage your contacts in one place.\n\nYou can: \n add 22 contacts with outcomes search \nfor contacts using categories or keyword search\nchoose from 115 contact types in total, including the ones already available \n"
+      ],
+      "Enter date and times more easily",
+      [
+        "To make it easier for you to arrange appointments, we’ve improved how you enter dates and times.\n\nYou can enter:\n dates and times using spaces, dashes, slashes or full stops \ndates and times without leading zeros, for example 1/1/2026 or 9:30 \n shortened years, for example 26 instead of 2026 \n"
+      ],
+      "See updated risk predictors",
+      [
+        "We’ve updated the risk predictor screen badges. If the person on probation has an assessment created after 23 February 2026, you’ll see the new risk predictors in the header.\n\nThe names describe the type of reoffending they predict. They are spelled out, to avoid acronyms and make them simpler to scan. "
+      ],
+      "View updated criminogenic needs",
+      [
+        "We’ve updated the criminogenic needs labels on the risk and overview pages to improve clarity and align with OASys criminogenic needs."
+      ],
+      "See more details when you search",
+      [
+        "When you search for a person on probation, you’ll now see their allocated probation practitioner and probation delivery unit (PDU). "
+      ],
+      "Bug fixes ",
+      [
+        "We’ve fixed bugs:\non the Manage appointment screen, so you can now arrange another appointment from this screen, even if one is already booked \nthat caused security errors and stopped you adding notes\nThanks to everyone who reported these issues."
+      ]
+    ]
+  },
+  {
     "heading": "Probation-wide launch of this service",
     "summary": "27 April 2026",
     "whatsNew": [
