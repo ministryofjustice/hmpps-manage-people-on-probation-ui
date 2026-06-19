@@ -72,7 +72,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       if (![null, undefined].includes(smsOptIn)) {
         textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
       }
-      console.log({ eventId })
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(_sentence => _sentence.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
