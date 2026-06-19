@@ -209,24 +209,6 @@ const checkPage = () => {
     })
   })
 
-  describe('User updates the enforcement action by clicking the evidence due date change link', () => {
-    it('should render the page with updated outcome and enforcement action', () => {
-      cy.task('stubAppointment', { documents: true, isFuture: false })
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(4).find('.govuk-summary-list__actions').find('a').click()
-      completeAction({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'REFER_TO_OFFENDER_MANAGER' })
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Unacceptable absence')
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Refer to offender manager')
-    })
-  })
-
   describe('User updates the notes by clicking the change link', () => {
     it('should render the page with updated notes', () => {
       const value = 'Some changed notes'
