@@ -95,7 +95,7 @@ const mockErrorSummary = {
     },
     { text: 'A different unique error' },
     {
-      text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      text: 'Risk information from the Assess and plan service is currently unavailable.',
     },
   ],
 } as any
