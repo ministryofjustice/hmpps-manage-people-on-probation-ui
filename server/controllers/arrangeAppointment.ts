@@ -539,19 +539,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
       if (attending.username.toUpperCase() !== res.locals.user.username) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        try {
-          const probationPractitioner = await masClient.getProbationPractitioner(crn)
-          const probationPractitionersForename = probationPractitioner.name.forename || ''
-          const formattedName =
-            probationPractitionersForename.charAt(0).toUpperCase() +
-            probationPractitionersForename.slice(1).toLowerCase()
-          // First letter of the PPs name should be uppercase as per requirement
-          attendingName = `${formattedName}’s`
-        } catch {
-          attendingName = `The officer´s`
-        }
+        const formattedName =
+          attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
+        // First letter of the PPs name should be uppercase as per requirement
+        attendingName = `${formattedName}’s`
       }
       const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
 
