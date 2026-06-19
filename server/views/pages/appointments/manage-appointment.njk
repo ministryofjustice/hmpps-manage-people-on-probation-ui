@@ -31,7 +31,7 @@
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
   'their home' if nextAppointmentIsAtHome else 
-    addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithYear + "." %}
+    addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + "." %}
 {% endif %}
 {% if not nextAppointment.appointment and not nextAppointment.usernameIsCom %}
   {% set nextAppointmentHint = nextAppointment.personManager.name.forename + ' does not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
