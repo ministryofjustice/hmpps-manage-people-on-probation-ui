@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import httpMocks from 'node-mocks-http'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { AuthOptions } from '@ministryofjustice/hmpps-rest-client'
 import { getPersonalDetails } from './getPersonalDetails'
@@ -73,7 +72,6 @@ jest.mock('@ministryofjustice/hmpps-rest-client', () => ({
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 const authClient = new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore)
 const arnsComponents = new ArnsComponents(authClient, config.apis.arnsApi, logger)
-const mpopComponents = jest.mocked(new MPoPComponents(authClient, config.apis.tierApi, logger))
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))

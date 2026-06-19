@@ -43,15 +43,15 @@ export const getTierDetails = (
   }
 
   return async (req, res, next) => {
-    if (!res.locals.flags.enableSupervisionPackage || !mpopComponents) {
-      return next()
-    }
+    if (!res.locals.flags?.enableSupervisionPackage || !mpopComponents) return next()
 
-    const token: string | undefined = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
     const { crn } = req.params as Record<string, string>
     let tierDetails: LatestTierResponse | undefined
 
-    if (!req?.session?.data?.personalDetails?.[crn] || process.env.NODE_ENV === 'development') {
+    req.session.data.personalDetails ??= {}
+    req.session.data.personalDetails[crn] ??= {} as any
+    if (process.env.NODE_ENV === 'development') {
       const { tierData, tierDataIsLoading } = await fetchTierDetails(crn, token)
 
       tierDetails = !tierDataIsLoading ? tierData : undefined
@@ -68,7 +68,6 @@ export const getTierDetails = (
 
     res.locals.tierUrlV3 = tierUrlV3(crn)
     res.locals.tierDetails = tierDetails
-
     return next()
   }
 }
