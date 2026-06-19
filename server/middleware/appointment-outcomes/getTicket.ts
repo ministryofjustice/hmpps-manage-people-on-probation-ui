@@ -93,7 +93,6 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
         type: 'BLUE',
       }
     }
-    console.log(ticket)
     res.locals.appointmentOutcome.ticket = ticket
     return next()
   }
