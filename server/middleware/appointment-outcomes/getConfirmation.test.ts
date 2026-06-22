@@ -118,7 +118,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
         actions: [
           {
             text: 'use the Consider a recall service',
-            href: 'http://localhost:9090/auth?redirect_uri=https://consider-a-recall-dev.hmpps.service.justice.gov.uk//sign-in/callback',
+            href: 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/',
             external: true,
           },
           {
@@ -266,7 +266,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
         actions: [
           {
             text: 'use the Consider a recall service',
-            href: 'http://localhost:9090/auth?redirect_uri=https://consider-a-recall-dev.hmpps.service.justice.gov.uk//sign-in/callback',
+            href: 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/',
             external: true,
           },
           {
