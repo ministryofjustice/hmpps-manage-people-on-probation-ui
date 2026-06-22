@@ -135,7 +135,6 @@ context('Appointment check-ins', () => {
 
     const spoApprovalPage = new EligibilitySPOApprovalPage()
     spoApprovalPage.checkOnPage()
-    spoApprovalPage.getCheckbox()
     spoApprovalPage.getCheckbox().check()
     spoApprovalPage.getSubmitBtn().click()
     const rationalePage = new RationalePage()

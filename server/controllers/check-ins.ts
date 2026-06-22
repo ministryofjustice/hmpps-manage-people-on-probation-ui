@@ -300,6 +300,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getRationalePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
 
       if (!isRationaleEnabled) {
@@ -321,7 +322,6 @@ const checkInsController: Controller<typeof routes, void> = {
       }
 
       await sendAuditMessage(res, 'VIEW_MAS_RATIONALE_TO_USE_CHECK_INS', crn, SubjectType.CRN)
-      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
       return res.render('pages/check-in/rationale.njk', {
         crn,
@@ -334,7 +334,6 @@ const checkInsController: Controller<typeof routes, void> = {
   postRationalePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }

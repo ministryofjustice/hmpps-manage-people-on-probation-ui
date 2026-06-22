@@ -1,9 +1,7 @@
 {% extends "../_form.njk" %}
 
-{% set title = "Why is " + case.name.forename + " suitable to use online check ins?"  %}
+{% set textAreaTitle = "Why is " + case.name.forename + " suitable to use online check ins?"  %}
 {% set hintText = "For example, low risk of reoffending, stable lifestyle factors."  %}
-
-{% set showAnchorLink = true %}
 
 {% block form %}
     <div class="govuk-grid-row">
@@ -14,6 +12,7 @@
                 attributes: { "data-qa": "rationale-for-check-ins"}
             },
             label: {
+                text: textAreaTitle,
                 classes: 'govuk-label--l govuk-!-margin-bottom-3',
                 isPageHeading: true
             },

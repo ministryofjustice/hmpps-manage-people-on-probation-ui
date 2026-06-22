@@ -563,6 +563,8 @@ describe('checkInsController', () => {
     })
 
     it('redirects rationale page to case overview when rationale flag is off', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
       const req = baseReq()
 
       res.locals.flags = { enableEsupervisionRationale: false }
