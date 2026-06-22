@@ -130,7 +130,7 @@ describe('/middleware/getDefaultUser()', () => {
           jest.spyOn(MasApiClient.prototype, 'getUserProviders').mockImplementationOnce(() => Promise.resolve(mock))
           await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
         })
-        it.skip('should save the correct session values', () => {
+        it('should save the correct session values', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             1,
             data,
@@ -172,20 +172,18 @@ describe('/middleware/getDefaultUser()', () => {
             7,
             data,
             ['teams', username],
-            [...mock.teams, probationPractitioner.team].sort((a, b) =>
-              a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
-            ),
+            [...mock.teams, probationPractitioner.team],
           )
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             8,
-            req.session.data,
+            data,
             ['staff', username],
             [
               ...mock.users,
               {
                 staffCode: probationPractitioner.code,
                 username: probationPractitioner.username,
-                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
+                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
                 name: probationPractitioner.name,
                 email: probationPractitioner.email,
               },
@@ -221,7 +219,7 @@ describe('/middleware/getDefaultUser()', () => {
           jest.spyOn(MasApiClient.prototype, 'getUserProviders').mockImplementationOnce(() => Promise.resolve(mock))
           await getDefaultUser(hmppsAuthClient)(req, resWithoutFlag, nextSpy)
         })
-        it.skip('should save the correct session values', () => {
+        it('should save the correct session values', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             1,
             data,
@@ -263,9 +261,7 @@ describe('/middleware/getDefaultUser()', () => {
             5,
             data,
             ['teams', username],
-            [...mock.teams, probationPractitioner.team].sort((a, b) =>
-              a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
-            ),
+            [...mock.teams, probationPractitioner.team],
           )
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             6,
@@ -276,9 +272,7 @@ describe('/middleware/getDefaultUser()', () => {
               {
                 staffCode: probationPractitioner.code,
                 username: probationPractitioner.username,
-                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
-                name: probationPractitioner.name,
-                email: probationPractitioner.email,
+                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
               },
             ],
           )
@@ -320,11 +314,45 @@ describe('/middleware/getDefaultUser()', () => {
         )
         expect(nextSpy).toHaveBeenCalledTimes(1)
       })
-      it.skip('should request the teams from the api', () => {
-        expect(getTeamsByProviderSpy).toHaveBeenCalledWith(defaultUserProviderCode)
+
+      describe('enableMAN2344 flag is on', () => {
+        it('should set attending email and name from staff in session if available', async () => {
+          const staffInSession = [
+            {
+              username: userProviders.defaultUserDetails.username,
+              email: 'default.user@test.com',
+              name: { forename: 'Default', surname: 'User' },
+            },
+          ]
+          const reqWithStaff = buildRequest({
+            user: { providerCode: undefined, teamCode: undefined, username: undefined },
+            data: { staff: { [username]: staffInSession } },
+          })
+          const dataWithStaff = reqWithStaff.session.data
+
+          jest
+            .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+            .mockImplementationOnce(() => Promise.resolve(mock))
+
+          await getDefaultUser(hmppsAuthClient)(reqWithStaff, res, nextSpy)
+
+          expect(mockSetDataValue).toHaveBeenCalledWith(
+            dataWithStaff,
+            ['appointments', crn, uuid, 'user', 'email'],
+            'default.user@test.com',
+          )
+          expect(mockSetDataValue).toHaveBeenCalledWith(dataWithStaff, ['appointments', crn, uuid, 'user', 'name'], {
+            forename: 'Default',
+            surname: 'User',
+          })
+        })
       })
-      it.skip('should request the staff from the api', () => {
-        expect(getStaffByTeamSpy).toHaveBeenCalledWith(defaultUserTeamCode)
+
+      it('should request the teams from the api', () => {
+        expect(getTeamsByProviderSpy).not.toHaveBeenCalledWith(defaultUserProviderCode)
+      })
+      it('should request the staff from the api', () => {
+        expect(getStaffByTeamSpy).not.toHaveBeenCalledWith(defaultUserTeamCode)
       })
       it('should save the user providers to session', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['providers', username], userProviders.providers)

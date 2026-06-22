@@ -32,7 +32,7 @@ export const checkAppointmentSummary = ({
   action = 'NO_FURTHER_ACTION',
 }: SummaryProps) => {
   const appointmentFor = reschedule ? 'Default Sentence Type (12 Months)' : '12 month Community order'
-  let attending = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
+  let attending = 'Deborah Fern (Automated Allocation Team, London)'
   if (anotherAppointment || ((reschedule || anotherAppointment) && probationPractitioner)) {
     attending = 'Peter Parker (PS-PSO) (Automated Allocation Team, London)'
   }
