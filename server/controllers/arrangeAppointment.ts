@@ -538,11 +538,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending.username.toUpperCase() !== res.locals.user.username) {
-        const formattedName =
-          attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
-        // First letter of the PPs name should be uppercase as per requirement
-        attendingName = `${formattedName}’s`
+      if (attending.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+        if (attending?.name?.forename) {
+          const formattedName =
+            attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
+          // First letter of the PPs name should be uppercase as per requirement
+          attendingName = `${formattedName}’s`
+        } else {
+          attendingName = 'The officer´s'
+        }
       }
       const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
 

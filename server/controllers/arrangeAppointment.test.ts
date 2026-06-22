@@ -1098,7 +1098,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { user: { username: '' }, smsOptIn: 'YES' },
+        appointmentSession: { user: { username: username.toUpperCase() }, smsOptIn: 'YES' },
         dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
       })
       const mockRes = createMockResponse({
@@ -1108,6 +1108,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockReq.session.data.appointments?.[crn]?.[uuid]).toBeUndefined()
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
@@ -1117,25 +1118,56 @@ describe('controllers/arrangeAppointment', () => {
         isEnglishNotificationFailed: null,
         isWelshNotificationFailed: null,
         smsSent: true,
-        attendingName: 'First’s',
+        attendingName: 'your',
+        linkedAppointment: null,
+        url: '',
+      })
+    })
+    it('should render the confirmation page when attending is another user', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: 'another-user', name: { forename: 'john' } } as any, smsOptIn: 'YES' },
+        dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
+      })
+      const mockRes = createMockResponse({
+        contactResponse: {
+          content: [],
+        },
+      })
+      const mockRenderSpy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockReq.session.data.appointments?.[crn]?.[uuid]).toBeUndefined()
+      expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
+        crn,
+        isInPast: false,
+        responseContactId: '1234',
+        isOutLookEventFailed: false,
+        appointmentType: null,
+        isEnglishNotificationFailed: null,
+        isWelshNotificationFailed: null,
+        smsSent: true,
+        attendingName: 'John’s',
         linkedAppointment: null,
         url: '',
       })
     })
     it('should render the reschedule appointment confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { user: { username: '' }, rescheduleAppointment: { contactId: '1234' } },
+        appointmentSession: {
+          user: { username: username.toUpperCase() },
+          rescheduleAppointment: { contactId: '1234' },
+        },
         dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
         request: { url: '/reschedule/url' },
       })
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(mockReq.session.data.appointments?.[crn]?.[uuid]).toBeUndefined()
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
         responseContactId: '1234',
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
-        attendingName: 'First’s',
+        attendingName: 'your',
         url: encodeURIComponent('/reschedule/url'),
         linkedAppointment: null,
         isEnglishNotificationFailed: null,
@@ -1163,13 +1195,14 @@ describe('controllers/arrangeAppointment', () => {
         request: { url: '/reschedule/url' },
       })
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(mockReq.session.data.appointments?.[crn]?.[uuid]).toBeUndefined()
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
         responseContactId: '1234',
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
-        attendingName: 'First’s',
+        attendingName: expect.stringMatching(/The officer.s/),
         url: encodeURIComponent('/reschedule/url'),
         linkedAppointment: {
           contactId: '1234',
@@ -1180,6 +1213,24 @@ describe('controllers/arrangeAppointment', () => {
         isWelshNotificationFailed: null,
         smsSent: null,
       })
+    })
+    it('should show standard officer label when attending user name is missing', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: 'another-user' } as any, smsOptIn: 'YES' },
+        dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
+      })
+      const mockRes = createMockResponse({
+        contactResponse: {
+          content: [],
+        },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockRes.render).toHaveBeenCalledWith(
+        `pages/arrange-appointment/confirmation`,
+        expect.objectContaining({
+          attendingName: expect.stringMatching(/The officer.s/),
+        }),
+      )
     })
   })
   describe('postConfirmation', () => {

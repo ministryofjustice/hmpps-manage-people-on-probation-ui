@@ -72,9 +72,6 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       }
-      // const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
-      // sessionTeams = providerTeams
-      // sessionStaff = providerStaff
     } else {
       const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
       sessionProviders = getDataValue(data, ['providers', username]) ?? sessionProviders
