@@ -69,10 +69,7 @@ describe('Arrange an appointment', () => {
           'contain.text',
           'You can attend or book for someone else',
         )
-        cy.get('[data-qa="attendeeDetails"]').should(
-          'contain.text',
-          'Deborah Fern (Automated Allocation Team, London)',
-        )
+        cy.get('[data-qa="attendeeDetails"]').should('contain.text', 'Deborah Fern (Automated Allocation Team, London)')
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
       })
