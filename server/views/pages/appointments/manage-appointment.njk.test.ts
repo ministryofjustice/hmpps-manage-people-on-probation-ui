@@ -444,7 +444,7 @@ describe('Manage an appointment', () => {
         expect(relatedContacts.find('h3').text()).toContain('Related contacts')
         expect(relatedContacts.find('p').text()).toContain('No related contacts')
       })
-      it('should  display the list if no related contact available', () => {
+      it('should  display the list if related contacts are available', () => {
         const $ = render({
           relatedContacts: [
             {
