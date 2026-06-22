@@ -209,7 +209,7 @@
     "@types/luxon-business-days": "^3.0.0",
     "@types/mocha": "^10.0.10",
     "@types/multer": "^2.1.0",
-    "@types/node": "^25.9.2",
+    "@types/node": "^26.0.0",
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.17",
     "@types/passport-oauth2": "^1.4.17",
