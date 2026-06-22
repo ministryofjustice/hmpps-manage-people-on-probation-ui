@@ -13,6 +13,8 @@ import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
+import logger from '../../logger'
+import isTimeoutError from '../utils/isTimeoutError'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -121,7 +123,23 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         if (appointmentLocation) outlookEventRequestBody.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
-      outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
+
+      try {
+        outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
+      } catch (error) {
+        if (isTimeoutError(error)) {
+          logger.warn(
+            `Outlook calendar event creation timed out for ${outlookEventRequestBody.supervisionAppointmentUrn}`,
+            error,
+          )
+
+          data.isOutlookEventPending = true
+
+          return response
+        }
+
+        throw error
+      }
     }
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
