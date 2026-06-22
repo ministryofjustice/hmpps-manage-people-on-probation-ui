@@ -129,8 +129,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       } catch (error) {
         if (isTimeoutError(error)) {
           logger.warn(
+            { err: error },
             `Outlook calendar event creation timed out for ${outlookEventRequestBody.supervisionAppointmentUrn}`,
-            error,
           )
 
           data.isOutlookEventPending = true
