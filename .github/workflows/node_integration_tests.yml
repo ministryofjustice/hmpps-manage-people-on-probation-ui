@@ -59,6 +59,7 @@ jobs:
             test_results/
       - name: Prepare and run integration tests
         id: integration-tests
+        timeout-minutes: 30
         shell: bash
         run: |
           nohup npm run start-feature &
