@@ -45,21 +45,6 @@
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
   rows: [
     {
-      key: { html: '<span data-qa="compliedLabel">Complied</span>' },
-      value: { html: '<span data-qa="compliedValue">' + complianceText + '</span>' },
-      actions: {
-        items: [
-          {
-            classes: "govuk-link--no-visited-state",
-            attributes: { "target": "_blank", "rel": "external noopener noreferrer", "aria-label":"Change complied for '" + appointmentDisplayName | lower + " on NDelius" },
-            href: changeUrl,
-            text:'Change',
-            visuallyHiddenText: '(opens in new tab)'
-          }
-        ]
-      } if not flags.enableDeepLinks
-    },
-    {
       key: { html: '<span data-qa="acceptableAbsenceReasonLabel">Reason for absence</span>' },
       value: { html: '<span data-qa="acceptableAbsenceReasonValue">' + appointment.acceptableAbsenceReason + '</span>' if appointment.acceptableAbsence === true },
       actions: {
