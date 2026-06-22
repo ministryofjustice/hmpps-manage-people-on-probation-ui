@@ -19,7 +19,7 @@ export default configureAllowedScripts({
     // Native solution to quickly resolve module paths, used by jest and eslint
     'node_modules/unrs-resolver@1.11.1': 'ALLOW',
     // required for open telemetry for app insights
-    "node_modules/@grpc/proto-loader/node_modules/protobufjs@7.6.4": 'ALLOW',
-    "node_modules/protobufjs@8.0.1": 'ALLOW'
+    'node_modules/@grpc/proto-loader/node_modules/protobufjs@7.6.4': 'ALLOW',
+    'node_modules/protobufjs@8.0.1': 'ALLOW',
   },
 })
