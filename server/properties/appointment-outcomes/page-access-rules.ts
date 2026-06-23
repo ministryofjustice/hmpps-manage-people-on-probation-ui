@@ -268,63 +268,17 @@ export const pageAccessRules: PageAccessRule[] = [
       },
       {
         'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
-        'outcome.otherEnforcementAction': 'BREACH_LETTER_SENT',
+        'outcome.otherEnforcementAction': anyValue,
       },
-      {
-        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
-        'outcome.otherEnforcementAction': 'FIRST_WARNING_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
-        'outcome.otherEnforcementAction': 'SECOND_WARNING_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
-        'outcome.otherEnforcementAction': 'OTHER_ENFORCEMENT_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
-        'outcome.otherEnforcementAction': 'LICENCE_COMPLIANCE_LETTER_SENT',
-      },
+
       {
         'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
-        'outcome.otherEnforcementAction': 'BREACH_LETTER_SENT',
+        'outcome.otherEnforcementAction': anyValue,
       },
-      {
-        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
-        'outcome.otherEnforcementAction': 'FIRST_WARNING_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
-        'outcome.otherEnforcementAction': 'SECOND_WARNING_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
-        'outcome.otherEnforcementAction': 'OTHER_ENFORCEMENT_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
-        'outcome.otherEnforcementAction': 'LICENCE_COMPLIANCE_LETTER_SENT',
-      },
+
       {
         'outcome.outcomeType': 'FAILED_TO_ATTEND',
-        'outcome.otherEnforcementAction': 'BREACH_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'FAILED_TO_ATTEND',
-        'outcome.otherEnforcementAction': 'FIRST_WARNING_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'FAILED_TO_ATTEND',
-        'outcome.otherEnforcementAction': 'SECOND_WARNING_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'FAILED_TO_ATTEND',
-        'outcome.otherEnforcementAction': 'OTHER_ENFORCEMENT_LETTER_SENT',
-      },
-      {
-        'outcome.outcomeType': 'FAILED_TO_ATTEND',
-        'outcome.otherEnforcementAction': 'LICENCE_COMPLIANCE_LETTER_SENT',
+        'outcome.otherEnforcementAction': anyValue,
       },
     ],
   },
