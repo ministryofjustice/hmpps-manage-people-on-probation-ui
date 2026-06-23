@@ -22,6 +22,7 @@ export interface AppointmentsValidationArgs {
   previousStart?: string
   fileOrNote?: boolean
   isSensitive?: boolean
+  sensitivityLocked?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {

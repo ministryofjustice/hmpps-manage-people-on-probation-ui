@@ -88,6 +88,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const isProbationPractitioner =
     probationPractitioner?.username &&
     probationPractitioner.username.toLowerCase() === res.locals.user.username.toLowerCase()
+
   res.locals.appointmentOutcome = {
     forename,
     surname,

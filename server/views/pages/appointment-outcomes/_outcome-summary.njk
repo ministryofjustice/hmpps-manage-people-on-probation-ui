@@ -64,7 +64,7 @@
                             visuallyHiddenText: "sensitivity"
                         } 
                     ] 
-                } if showAction
+                } if showAction and not appointmentOutcome.appointmentSession.sensitivityLocked
             } if appointmentOutcome.summary.sensitivity,
             {
                 key: { text: "Documents"},

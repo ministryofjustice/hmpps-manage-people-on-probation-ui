@@ -40,14 +40,17 @@ export const cloneAppointmentAndRedirect = (
           ...(appointmentToClone?.rescheduleAppointment || {}),
         },
       }
+      clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
+
       redirectURL = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
     }
-    clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
-
+    if (apptType !== 'RESCHEDULE') {
+      clonedAppt.sensitivity = null
+      clonedAppt.sensitivityLocked = false
+    }
     if (req.url.includes('/outcome/next-appointment')) {
       setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
     }
-
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)
   }
