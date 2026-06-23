@@ -27,7 +27,16 @@ const loadPage = ({
   journey = 'MANAGE',
   outcome = 'ATTENDED_SENT_HOME_BEHAVIOUR',
   action = 'NO_FURTHER_ACTION',
-}: { journey?: Journey; outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}): void => {
+  isSensitive = false,
+}: {
+  journey?: Journey
+  outcome?: AppointmentOutcomeType
+  action?: AppointmentEnforcementAction
+  isSensitive?: boolean
+} = {}): void => {
+  if (isSensitive) {
+    cy.task('stubAppointment', { isSensitive: true, isFuture: false })
+  }
   const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
   if (journey === 'ARRANGE') {
     completeSentencePage()
@@ -124,6 +133,10 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         addNotePage.getCrissButton().click()
         cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', 'Some notes')
       })
+    })
+    it('should not display the sensitivity question if already set to true', () => {
+      loadPage({ journey, isSensitive: true })
+      addNotePage.getSensitiveInformation().should('not.exist')
     })
     checkValidation({ journey })
   }

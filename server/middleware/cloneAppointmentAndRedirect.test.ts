@@ -180,6 +180,36 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     )
   })
 
+  it('should reset the sensitivity if not RESCHEDULE', () => {
+    mockedGetDataValue.mockReturnValueOnce(undefined)
+    const { req: request, res: response } = setup()
+    const crn2 = request.params.crn
+    request.params.id = 'APPT123'
+    request.params.contactId = 'C9876'
+    const redirectSpy2 = jest.spyOn(response, 'redirect')
+
+    const sensitiveAppt = {
+      ...mockAppt,
+      sensitivity: 'Yes' as YesNo,
+    }
+
+    const expectedCloneNextAppointment = {
+      ...expectedClone,
+      uuid,
+      sensitivity: null as YesNo,
+      sensitivityLocked: false,
+    }
+
+    cloneAppointmentAndRedirect(sensitiveAppt, 'KEEP_TYPE')(request, response)
+
+    expect(mockedSetDataValue).toHaveBeenCalledWith(
+      request.session.data,
+      ['appointments', crn2, uuid],
+      expectedCloneNextAppointment,
+    )
+    expect(redirectSpy2).toHaveBeenCalledWith(`/case/${crn2}/arrange-appointment/${uuid}/arrange-another-appointment`)
+  })
+
   it('should lock sensitivity if original was sensitive when RESCHEDULE', () => {
     mockedGetDataValue.mockReturnValueOnce(undefined)
     const { req: request, res: response } = setup()

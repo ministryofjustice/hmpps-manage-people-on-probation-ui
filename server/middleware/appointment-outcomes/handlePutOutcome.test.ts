@@ -165,17 +165,13 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
     expect(res.redirect).toHaveBeenCalledWith(`${baseOutcomeUrl}?validation=true`)
   })
-
   it('should redirect to the outcome page if in manage journey and outcome is not completed', async () => {
-    const outcome: Partial<AppointmentSessionOutcome> = { outcomeType: null }
+    const outcome: Partial<AppointmentSessionOutcome> = { outcomeCode: null, outcomeType: null }
     const req = buildRequest()
     const res = buildResponse({ outcome })
-    const uncompletedUrl = `/case/${crn}/uncompleted-page?change=/change/url`
-    findUncompletedSpy.mockReturnValueOnce(() => uncompletedUrl)
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    expect(res.redirect).toHaveBeenCalledWith(`${uncompletedUrl}`)
+    expect(res.redirect).toHaveBeenCalledWith(`${baseOutcomeUrl}?validation=true`)
   })
-
   it('should put the correct request to the API if no notes and no enforcement action codes selected', async () => {
     const req = buildRequest()
     const res = buildResponse()
