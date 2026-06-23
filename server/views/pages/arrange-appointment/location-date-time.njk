@@ -3,7 +3,10 @@
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type-attendance?back=location-date-time' %}
-
+{% set title = "Appointment date, time and location" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set disabilities = [] %}
 {% set dependents = [] %}
 {% set employments = [] %}
@@ -14,7 +17,7 @@
     {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
 {% block heading %}
-    <h3 class="govuk-heading-l" data-qa="pageHeading">Appointment date, time and location</h3>
+    <h3 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h3>
 {% endblock %}
 
 {% for disability in case.disabilities.disabilities %}

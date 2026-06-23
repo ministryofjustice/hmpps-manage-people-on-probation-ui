@@ -5,6 +5,9 @@
 {% set headerCRN = crn %}
 {% set headerDob = personRisks.personSummary.dateOfBirth %}
 {% set title = 'Risk predictor scores' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 
 {% block primary %}
 

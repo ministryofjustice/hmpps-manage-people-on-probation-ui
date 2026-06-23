@@ -1,13 +1,16 @@
 {% extends "../_appointment-outcome-form.njk" %}
 {% set hideButton = true %}
 {% set backLink = appointmentOutcome.backLink %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Record an outcome"]
+}) %}
 
 {% block form %}
   {{ govukRadios({
   formGroup: {
       attributes: {
         'data-qa': 'outcome'
-      } 
+      }
     },
     fieldset: {
       legend: {

@@ -1,6 +1,9 @@
 {% extends "../partials/layout.njk" %}
 
 {% set pageTitle = title %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set mainClasses = "app-container govuk-body" %}
 {% block content %}
 <div class="govuk-grid-row">
@@ -12,4 +15,3 @@
   </div>
 </div>
 {% endblock %}
-

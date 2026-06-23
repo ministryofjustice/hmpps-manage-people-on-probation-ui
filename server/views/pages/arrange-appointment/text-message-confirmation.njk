@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'Text message confirmation' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/location-date-time?back=text-message-confirmation' %}
 {% set personForename = headerPersonName.forename %}
 
