@@ -10,7 +10,7 @@ export interface AppointmentOutcomesValidationArgs extends AppointmentsValidatio
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
-  const { crn, id, page, isInPast, msg, log, sendBreachOrRecallLetter, notes, maxCharCount } = args
+  const { crn, id, page, isInPast, msg, log, sendBreachOrRecallLetter, notes, maxCharCount, sensitivityLocked } = args
   const msgs = Array.isArray(msg) ? msg : [msg]
   const logs = Array.isArray(log) ? log : [log]
   return {
@@ -130,7 +130,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== `outcome/add-note`,
+      optional: page !== `outcome/add-note` || sensitivityLocked === true,
       checks: [
         {
           validator: isNotEmpty,

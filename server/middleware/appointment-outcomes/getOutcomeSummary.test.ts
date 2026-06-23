@@ -259,7 +259,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       outcomeCode: 'AAHO',
       acceptableAbsence: 'ACCEPTABLE_ABSENCE_HOLIDAY',
     }
-    const res = buildResponse({ outcome, nextAppointment: mockAppointment(), notes: null })
+    const res = buildResponse({ outcome, nextAppointment: mockAppointment(), notes: '' })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
       appointmentDetails: expectedAppointmentDetails,

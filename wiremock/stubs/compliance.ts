@@ -17,12 +17,14 @@ const stubCompliance = ({
   activeBreach = true,
   activeRecall = false,
   priorBreachesOnCurrentOrderCount = 1,
+  priorRecallsOnCurrentOrderCount = 0,
   eventNumber = '12345',
 }: {
   crn?: string
   activeBreach?: boolean
   activeRecall?: boolean
   priorBreachesOnCurrentOrderCount?: number
+  priorRecallsOnCurrentOrderCount?: number
   eventNumber?: string
 } = {}): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
@@ -72,6 +74,7 @@ const stubCompliance = ({
               breachStarted: true,
               breachesOnCurrentOrderCount: 0,
               priorBreachesOnCurrentOrderCount,
+              priorRecallsOnCurrentOrderCount,
               failureToComplyCount: 2,
             },
             activity: {

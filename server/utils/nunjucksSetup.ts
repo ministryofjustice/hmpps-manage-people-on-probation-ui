@@ -90,6 +90,7 @@ import config from '../config'
 import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
+import { toOutcomeLabel } from './outcomeLabel'
 import { to12HourTimeWithMinutes, toIso12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
 import { to12HourTimeCompact } from './to12HourTimeCompact'
 import {
@@ -173,6 +174,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('roleDescription', roleDescription)
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
+  njkEnv.addFilter('toOutcomeLabel', toOutcomeLabel)
   njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('merge', (obj, other) => ({ ...obj, ...other }))
   njkEnv.addFilter('shortTime', shortTime)

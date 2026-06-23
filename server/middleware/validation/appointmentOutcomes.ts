@@ -14,7 +14,9 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     baseOutcomeUrl,
     reqUrl,
     sendBreachOrRecallLetter,
+    appointmentSession: { sensitivityLocked },
   } = res.locals.appointmentOutcome
+
   const { maxCharCount } = config
   const id = uuid || contactId
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
@@ -205,6 +207,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/add-note`,
           notes: req.body.appointments[crn][id].notes,
           maxCharCount: maxCharCount as number,
+          sensitivityLocked,
         }),
       ),
     }

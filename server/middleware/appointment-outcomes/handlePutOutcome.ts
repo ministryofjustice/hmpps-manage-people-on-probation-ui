@@ -37,6 +37,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const time = appointmentSession?.start
       const outcomeType = appointmentSession?.outcome?.outcomeType
       const outcomeCode = appointmentSession?.outcome?.outcomeCode
+      const sensitivity = appointmentSession?.sensitivity
       const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
       let notes = appointmentSession?.notes || ''
       if (notes && notePrepend) {
@@ -51,6 +52,15 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         'ATTENDED_SENT_HOME_SERVICE_ISSUES',
       ]
 
+      // if outcome but no action, check the outcome type does not require an associated action 👇
+      if (
+        !sensitivity ||
+        !outcomeCode ||
+        (outcomeCode && !enforcementActionCode && outcomeType && !outcomeOnly.includes(outcomeType))
+      ) {
+        return res.redirect(`${baseOutcomeUrl}?validation=true`)
+      }
+
       const request: PutContactRequest = {
         date,
         time,
@@ -58,21 +68,6 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         notes: handleQuotes(notes),
         sensitive,
         alert: false,
-      }
-
-      // if outcome but no action, check the outcome type does not require an associated action 👇
-
-      if (outcomeCode && !enforcementActionCode && outcomeType && !outcomeOnly.includes(outcomeType)) {
-        return res.redirect(`${baseOutcomeUrl}?validation=true`)
-      }
-
-      // do a required value check only if in manage journey (as not posting the appointment first) 👇
-
-      if (!uuid) {
-        const uncompleted = findUncompleted({ forceValidation: true })(req, res)
-        if (uncompleted?.includes('?change')) {
-          return res.redirect(uncompleted)
-        }
       }
 
       const putRequests: PutContactPromise[] = []

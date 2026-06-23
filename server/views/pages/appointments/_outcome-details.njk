@@ -65,7 +65,7 @@
     } if appointment.action,
     {
       key: { html: '<span data-qa="outcomeLabel">Outcome</span>' },
-      value: { html: '<span data-qa="outcomeValue">' + (appointment.outcome | nl2br | safe) + '</span>' }
+      value: { html: '<span data-qa="outcomeValue">' + (appointment.outcome | toOutcomeLabel | nl2br | safe) + '</span>' }
     } if appointment.outcome,
     {
       key: { html: '<span data-qa="rarCategoryLabel">RAR activity</span>' },

@@ -177,13 +177,14 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args })
         page.getTicketPanel().should('not.exist')
       })
-      it('should display the ticket panel if one previous FTC and no previous breach', () => {
+      it('should display the ticket panel if sentence type is COMMUNITY, has one previous FTC and no previous breach', () => {
         cy.task('stubPersonNonComplianceDetail')
-        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0 })
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0, priorRecallsOnCurrentOrderCount: 0 })
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
           .should('contain.text', 'This is Alton’s second count of non-compliance in the past 12 months')
+          .should('contain.text', 'You should consider initiating a breach')
         page
           .getTicketPanel()
           .find('.govuk-link')
@@ -195,9 +196,28 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         const managePage = new ManageAppointmentPage()
         managePage.checkPageTitle('Manage 3 way meeting (NS) with Terry Jones')
       })
-      it('should display the ticket panel if more than one previous FTC and no previous breach', () => {
+      it('should display the ticket panel if sentence type is CUSTODY, has one previous FTC and no previous recall', () => {
+        cy.task('stubPersonNonComplianceDetail')
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0, priorRecallsOnCurrentOrderCount: 0 })
+        loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
+        page
+          .getTicketPanel()
+          .should('contain.text', 'This is Alton’s second count of non-compliance in the past 12 months')
+          .should('contain.text', 'You should consider initiating a recall')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', '18 January 2026: 12 month Community order (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const managePage = new ManageAppointmentPage()
+        managePage.checkPageTitle('Manage 3 way meeting (NS) with Terry Jones')
+      })
+      it('should display the ticket panel if sentence type is COMMUNITY, has more than one previous FTC and no previous breach', () => {
         cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
-        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0 })
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0, priorRecallsOnCurrentOrderCount: 0 })
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
@@ -215,14 +235,65 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         contactsPage.getSelectedFilterTags().eq(0).should('contain.text', 'Not complied')
         contactsPage.getComplianceFilter(3).should('be.checked')
       })
-      it('should display the ticket panel if more than one previous FTC and previous breach', () => {
+      it('should display the ticket panel if sentence type is CUSTODY, has more than one previous FTC and no previous recall', () => {
         cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
-        cy.task('stubCompliance')
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0, priorRecallsOnCurrentOrderCount: 0 })
+        loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
+        page
+          .getTicketPanel()
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
+          .should('contain.text', 'You should consider initiating a recall.')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', 'View a list of Alton’s non-compliance (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const contactsPage = new ActivityLogPage()
+        contactsPage.getSelectedFilterTags().eq(0).should('contain.text', 'Not complied')
+        contactsPage.getComplianceFilter(3).should('be.checked')
+      })
+      it('should display the ticket panel if sentence type is COMMUNITY, has more than one previous FTC and previous breach', () => {
+        cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 1, priorRecallsOnCurrentOrderCount: 0 })
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
           .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
           .should('contain.text', 'Alton has breached this sentence before')
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(0)
+          .should('contain.text', 'view Alton’s failures to comply (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const contactsPage = new ActivityLogPage()
+        contactsPage.getSelectedFilterTags().eq(0).should('contain.text', 'Not complied')
+        contactsPage.getComplianceFilter(3).should('be.checked')
+        loadPageFunc({ ...args })
+        page
+          .getTicketPanel()
+          .find('.govuk-link')
+          .eq(1)
+          .should('contain.text', 'view Alton’s previous breach information (opens in new tab)')
+          .should('have.attr', 'target', '_blank')
+          .invoke('removeAttr', 'target')
+          .click()
+        const compliancePage = new CompliancePage()
+        compliancePage.checkPageTitle('Compliance')
+      })
+      it('should display the ticket panel if sentence type is CUSTODY, has more than one previous FTC and previous recall', () => {
+        cy.task('stubPersonNonComplianceDetail', { unacceptableAbsenceCount: 1, attendedButDidNotComplyCount: 1 })
+        cy.task('stubCompliance', { priorBreachesOnCurrentOrderCount: 0, priorRecallsOnCurrentOrderCount: 1 })
+        loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
+        page
+          .getTicketPanel()
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
+          .should('contain.text', 'Alton has been recalled before')
         page
           .getTicketPanel()
           .find('.govuk-link')
