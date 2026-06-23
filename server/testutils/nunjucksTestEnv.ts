@@ -13,6 +13,7 @@ import {
   formatEnforcementActionNote,
   toSentenceCase,
   yearsSince,
+  makePageTitle,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -53,6 +54,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   })
   env.addFilter('convertToTitleCase', convertToTitleCase)
   env.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
+  env.addGlobal('makePageTitle', makePageTitle)
 
   return env
 }
