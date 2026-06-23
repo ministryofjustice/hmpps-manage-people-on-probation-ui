@@ -19,11 +19,13 @@ export const completeAddNotePage = ({
   let id = journey === 'ARRANGE' ? uuid : appointmentId
   if (idOverride) id = idOverride
   const addNotePage = new AddNotePage()
-  addNotePage
-    .getElement(`#appointments-${crnOverride || crn}-${id}-notes`)
-    .focus()
-    .clear()
-    .type(value)
+  if (value) {
+    addNotePage
+      .getElement(`#appointments-${crnOverride || crn}-${id}-notes`)
+      .focus()
+      .clear()
+      .type(value)
+  }
   if (!sensitivityIsLocked) {
     addNotePage
       .getSensitiveInformation()

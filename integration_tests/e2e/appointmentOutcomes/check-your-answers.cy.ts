@@ -23,14 +23,15 @@ interface Props {
   outcomeText?: string
   action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
   actionText?: string
+  notes?: string
 }
 
-const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null }: Props = {}): void => {
+const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null, notes = 'Some notes' }: Props = {}): void => {
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
   manageAppointmentPage = new ManageAppointmentPage()
   manageAppointmentPage.getTaskLink(1).click()
   completeOutcome({ outcome, action })
-  completeAddNotePage({ journey: 'MANAGE', crnOverride: crn })
+  completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, value: notes })
   completeNextAppointmentPage()
 }
 
@@ -38,7 +39,8 @@ const checkSummary = ({
   outcomeText,
   actionText = null,
   documents = false,
-}: { outcomeText?: string; actionText?: string[]; documents?: boolean } = {}) => {
+  notes = true,
+}: { outcomeText?: string; actionText?: string[]; documents?: boolean; notes?: boolean } = {}) => {
   const appointment = documents
     ? `3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am`
     : 'Planned office visit (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am'
@@ -80,7 +82,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(index)
     .find('.govuk-summary-list__value')
-    .should('contain.text', 'Some notes')
+    .should('contain.text', notes ? 'Some notes' : 'No notes')
   checkYourAnswersOutcomePage
     .getSummaryListRow(index + 1)
     .find('.govuk-summary-list__key')
@@ -169,6 +171,20 @@ const checkPage = () => {
         outcomeText: 'Unacceptable absence',
         actionText: ['I will initiate the breach', 'I will send a licence compliance letter'],
         documents: true,
+      })
+    })
+  })
+
+  describe('Outcome is unacceptable absence and action is initiate breach/recall and send a letter and no notes', () => {
+    it('should render the page', () => {
+      cy.task('stubAppointment', { documents: true, isFuture: false })
+      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER', notes: '' })
+      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+      checkSummary({
+        outcomeText: 'Unacceptable absence',
+        actionText: ['I will initiate the breach', 'I will send a licence compliance letter'],
+        documents: true,
+        notes: false,
       })
     })
   })

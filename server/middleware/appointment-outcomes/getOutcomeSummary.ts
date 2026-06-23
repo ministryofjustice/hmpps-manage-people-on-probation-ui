@@ -88,7 +88,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     summary = {
       appointmentDetails,
       outcome,
-      notes: notes ?? 'No notes',
+      notes: notes || 'No notes',
       sensitivity,
       nextAppointment,
       documents,
