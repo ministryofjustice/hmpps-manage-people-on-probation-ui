@@ -172,18 +172,20 @@ describe('/middleware/getDefaultUser()', () => {
             7,
             data,
             ['teams', username],
-            [...mock.teams, probationPractitioner.team],
+            [...mock.teams, probationPractitioner.team].sort((a, b) =>
+              a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
+            ),
           )
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             8,
-            data,
+            req.session.data,
             ['staff', username],
             [
               ...mock.users,
               {
                 staffCode: probationPractitioner.code,
                 username: probationPractitioner.username,
-                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
+                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
                 name: probationPractitioner.name,
                 email: probationPractitioner.email,
               },
@@ -261,7 +263,9 @@ describe('/middleware/getDefaultUser()', () => {
             5,
             data,
             ['teams', username],
-            [...mock.teams, probationPractitioner.team],
+            [...mock.teams, probationPractitioner.team].sort((a, b) =>
+              a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
+            ),
           )
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             6,
@@ -272,7 +276,9 @@ describe('/middleware/getDefaultUser()', () => {
               {
                 staffCode: probationPractitioner.code,
                 username: probationPractitioner.username,
-                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
+                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
+                name: probationPractitioner.name,
+                email: probationPractitioner.email,
               },
             ],
           )
@@ -314,45 +320,11 @@ describe('/middleware/getDefaultUser()', () => {
         )
         expect(nextSpy).toHaveBeenCalledTimes(1)
       })
-
-      describe('enableMAN2344 flag is on', () => {
-        it('should set attending email and name from staff in session if available', async () => {
-          const staffInSession = [
-            {
-              username: userProviders.defaultUserDetails.username,
-              email: 'default.user@test.com',
-              name: { forename: 'Default', surname: 'User' },
-            },
-          ]
-          const reqWithStaff = buildRequest({
-            user: { providerCode: undefined, teamCode: undefined, username: undefined },
-            data: { staff: { [username]: staffInSession } },
-          })
-          const dataWithStaff = reqWithStaff.session.data
-
-          jest
-            .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
-            .mockImplementationOnce(() => Promise.resolve(mock))
-
-          await getDefaultUser(hmppsAuthClient)(reqWithStaff, res, nextSpy)
-
-          expect(mockSetDataValue).toHaveBeenCalledWith(
-            dataWithStaff,
-            ['appointments', crn, uuid, 'user', 'email'],
-            'default.user@test.com',
-          )
-          expect(mockSetDataValue).toHaveBeenCalledWith(dataWithStaff, ['appointments', crn, uuid, 'user', 'name'], {
-            forename: 'Default',
-            surname: 'User',
-          })
-        })
-      })
-
       it('should request the teams from the api', () => {
-        expect(getTeamsByProviderSpy).not.toHaveBeenCalledWith(defaultUserProviderCode)
+        expect(getTeamsByProviderSpy).toHaveBeenCalledWith(defaultUserProviderCode)
       })
       it('should request the staff from the api', () => {
-        expect(getStaffByTeamSpy).not.toHaveBeenCalledWith(defaultUserTeamCode)
+        expect(getStaffByTeamSpy).toHaveBeenCalledWith(defaultUserTeamCode)
       })
       it('should save the user providers to session', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['providers', username], userProviders.providers)

@@ -501,7 +501,11 @@ describe('controllers/arrangeAppointment', () => {
 
       await controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient)(mockReq, mockRes)
 
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user', 'email'], 'user@email.com')
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'email'],
+        'user@email.com',
+      )
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'name'],
@@ -534,7 +538,11 @@ describe('controllers/arrangeAppointment', () => {
 
       await controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient)(mockReq, mockRes)
 
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user', 'email'], 'staff@email.com')
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'email'],
+        'staff@email.com',
+      )
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'name'],
