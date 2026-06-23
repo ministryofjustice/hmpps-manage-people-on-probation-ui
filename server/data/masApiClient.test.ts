@@ -333,7 +333,7 @@ describe('masApiClient', () => {
         () => masApiClient.getProbationPractitioner('X000001'),
       ],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
-      ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
+      ['getUserAlertsCount', '/alerts', () => masApiClient.getUserAlertsCount()],
       [
         'getUserAlerts (full params)',
         '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',
