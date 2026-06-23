@@ -21,4 +21,5 @@ export class FeatureFlags {
   enableEnforcementContacts?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
   enableEsupervisionEligibility?: boolean = undefined
+  enableEsupervisionRationale?: boolean = undefined
 }
