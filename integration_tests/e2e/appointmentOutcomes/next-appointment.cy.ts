@@ -112,7 +112,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         nextAppointmentPage.checkPageTitle('Eula’s next supervision appointment')
         cy.get('.govuk-inset-text').should(
           'contain.text',
-          '3 way meeting (NS) on 21 February 2024 with Eula Schmeler for their Default Sentence Type (12 Months)',
+          '3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am with Eula Schmeler for their Default Sentence Type (12 Months)',
         )
         cy.get('[data-qa=anotherAppointment]')
           .find('legend')

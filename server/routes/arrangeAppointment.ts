@@ -7,7 +7,6 @@ import {
   getSentences,
   getAppointmentTypes,
   getAppointment,
-  redirectWizard,
   getDefaultUser,
   getUserOptions,
   routeChangeAttendee,
@@ -17,6 +16,7 @@ import {
   getPersonAppointment,
   handlePostAppointment,
   forceValidation,
+  restrictPageAccess,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -67,7 +67,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/type-attendance',
-    redirectWizard(['eventId']),
+    restrictPageAccess({ requiredValues: ['eventId'] }),
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getDefaultUser(hmppsAuthClient),
@@ -86,7 +86,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
-    redirectWizard(['eventId']),
+    restrictPageAccess({ requiredValues: ['eventId'] }),
     getUserOptions(hmppsAuthClient),
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
@@ -101,7 +101,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
   router.get(
     '/case/:crn/arrange-appointment/:id/location-date-time',
-    redirectWizard(['eventId', 'type']),
+    restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getPersonRiskFlags(hmppsAuthClient),
     forceValidation,
@@ -118,7 +118,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location-not-in-list',
-    redirectWizard(['eventId', 'type']),
+    restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
@@ -126,7 +126,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/attended-complied',
-    redirectWizard(['eventId', 'type', 'date']),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date'] }),
     controllers.arrangeAppointments.getAttendedComplied(),
   )
 
@@ -140,7 +140,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/supporting-information',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', ['user', 'locationCode']] }),
     forceValidation,
     controllers.arrangeAppointments.getSupportingInformation(),
   )
@@ -153,7 +153,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.postSupportingInformation(),
   )
 
-  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', redirectWizard(['eventId']))
+  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', restrictPageAccess())
 
   router.all(
     [
@@ -173,8 +173,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getPersonAppointment(hmppsAuthClient),
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
-    getOutcomeSummary,
     getNotePrepend,
+    getOutcomeSummary,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
 
@@ -198,7 +198,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', ['user', 'locationCode']] }),
     getOverdueOutcomes(hmppsAuthClient),
     controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
   )
@@ -218,7 +218,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.all(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
-    redirectWizard(['eventId', 'type', 'date', 'start', ['user', 'locationCode']]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'start', ['user', 'locationCode']] }),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getSmsPreview(hmppsAuthClient),
     getSmsConfirmationOptions,
@@ -249,7 +249,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.all(
     '/case/:crn/arrange-appointment/:id/add-note',
-    redirectWizard(['eventId', 'type', 'date', 'outcomeRecorded']),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'outcomeRecorded'] }),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getAppointment(hmppsAuthClient),
     getOutcomeProps,

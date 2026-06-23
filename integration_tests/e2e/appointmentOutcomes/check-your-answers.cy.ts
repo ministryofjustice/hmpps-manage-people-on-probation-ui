@@ -40,8 +40,8 @@ const checkSummary = ({
   documents = false,
 }: { outcomeText?: string; actionText?: string[]; documents?: boolean } = {}) => {
   const appointment = documents
-    ? '3 Way Meeting (NS) with Terry Jones on Wednesday 21 February 2024'
-    : 'Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024'
+    ? `3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am`
+    : 'Planned office visit (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am'
   checkYourAnswersOutcomePage
     .getSummaryListRow(1)
     .find('.govuk-summary-list__key')
@@ -49,7 +49,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(1)
     .find('.govuk-summary-list__value')
-    .should('contain.text', `Appointment: ${appointment}`)
+    .should('contain.text', appointment)
   checkYourAnswersOutcomePage
     .getSummaryListRow(2)
     .find('.govuk-summary-list__key')
@@ -107,7 +107,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(index + 2)
     .find('.govuk-summary-list__value')
-    .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
+    .should('contain.text', 'Other call on Wednesday 21 February 2024 at 10:15am to 10:30am')
 }
 
 const checkPage = () => {
@@ -209,24 +209,6 @@ const checkPage = () => {
     })
   })
 
-  describe('User updates the enforcement action by clicking the evidence due date change link', () => {
-    it('should render the page with updated outcome and enforcement action', () => {
-      cy.task('stubAppointment', { documents: true, isFuture: false })
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(4).find('.govuk-summary-list__actions').find('a').click()
-      completeAction({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'REFER_TO_OFFENDER_MANAGER' })
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Unacceptable absence')
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Refer to offender manager')
-    })
-  })
-
   describe('User updates the notes by clicking the change link', () => {
     it('should render the page with updated notes', () => {
       const value = 'Some changed notes'
@@ -253,15 +235,16 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
-      const appointmentType = `Planned Office Visit (NS)`
+      const appointmentType = `Planned office visit (NS)`
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
-        .should('contain.text', `Appointment: ${appointmentType} with Terry Jones on Wednesday 21 February 2024.`)
+
+        .should('contain.text', `${appointmentType} on Wednesday 21 February 2024 at 10:15am to 10:30am`)
       checkYourAnswersOutcomePage
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'Other call on 21 February 2024 at 10:15am to 10:30am')
+        .should('contain.text', 'Other call on Wednesday 21 February 2024 at 10:15am to 10:30am')
     })
   })
 }

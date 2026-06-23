@@ -31,7 +31,7 @@
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
   'their home' if nextAppointmentIsAtHome else 
-    addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithYear + "." %}
+    addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + "." %}
 {% endif %}
 {% if not nextAppointment.appointment and not nextAppointment.usernameIsCom %}
   {% set nextAppointmentHint = nextAppointment.personManager.name.forename + ' does not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
@@ -140,7 +140,7 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName | convertToTitleCase }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "information",
@@ -174,9 +174,6 @@
       {% if not appointment.deliusManaged %}
         <section data-qa="appointmentActions">
           <h3 class="govuk-heading-m">Appointment actions</h3>
-          {{ govukInsetText({
-  html: 'You must <a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
-}) }}
           {{ govukTaskList({
   idPrefix: "appointment-actions",
   attributes: {
@@ -260,7 +257,7 @@
         </section>
       {% endif %}
       <section data-qa="appointmentDetails">
-          <h3 class="govuk-heading-m">Appointment details</h3>
+        <h3 class="govuk-heading-m">Appointment details</h3>
         {% if not appointment.deliusManaged %}
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
         {% else %}
@@ -510,11 +507,11 @@
           <ul class="govuk-list">
             {% for contact in relatedContacts %}
               <li class="govuk-!-margin-bottom-4">
-                <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, contact.contactId) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">{{ contact.contactTypeDescription }}</a><br>
+                <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, contact.contactId) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">{{ contact.contactTypeDescription | toSentenceCase }}</a><br>
                 <span class="govuk-body-s govuk-hint">
   Created by {{ contact.createdBy.forename[0] }}.{{ contact.createdBy.surname }}
   on {{ contact.contactDate | dateWithYear }}
-</span>
+                </span>
               </li>
             {% endfor %}
           </ul>

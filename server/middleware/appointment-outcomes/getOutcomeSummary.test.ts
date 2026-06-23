@@ -14,10 +14,12 @@ const req = httpMocks.createRequest()
 const mockAppointment = ({ appointment = {} } = {}): Activity => ({
   id: '123',
   type: 'Planned Office Visit (NS)',
-  startDateTime: '2026-05-15T12:36:24.050Z',
-  endDateTime: '2026-05-15T12:36:24.050Z',
+  startDateTime: '2026-05-15T12:00:00.000[Europe/London]',
+  endDateTime: '2026-05-15T13:30:00.000[Europe/London]',
   ...appointment,
 })
+
+const expectedAppointmentDetails = 'Planned office visit (NS) on Friday 15 May 2026 at 12pm to 1:30pm'
 
 const mockEnforcementActions: ContactEnforcementAction[] = [
   {
@@ -79,7 +81,6 @@ const mockAppointmentOutcome = ({
   baseOutcomeUrl: '/base/outcome/url',
   completedUrl: '/completed/url',
   notePrepend: 'Mock note prepend',
-  appointmentHintText: 'Appointment: Planned Office Visit (NS)',
   appointmentSession: {
     notes,
     sensitivity: 'No',
@@ -129,7 +130,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse()
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - complied',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
@@ -149,7 +150,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - failed to comply',
       enforcementAction: 'No further action',
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
@@ -172,7 +173,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - failed to comply',
       enforcementAction: mockAppointmentOutcome().notePrepend,
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
@@ -207,7 +208,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - failed to comply',
       enforcementAction: mockAppointmentOutcome().notePrepend,
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
@@ -239,7 +240,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome, appointment: mockAppointment({ appointment }) })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Failed to attend',
       enforcementAction: mockAppointmentOutcome().notePrepend,
       enforcementActionChangeLink: '/base/outcome/url/failed-to-attend',
@@ -261,11 +262,11 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome, nextAppointment: mockAppointment(), notes: null })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Acceptable absence - holiday',
       notes: 'No notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'Planned Office Visit (NS) on 15 May 2026 at 1:36pm to 1:36pm',
+      nextAppointment: expectedAppointmentDetails,
       documents: null,
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)

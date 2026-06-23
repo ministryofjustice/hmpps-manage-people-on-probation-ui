@@ -17,8 +17,8 @@ const checkColumnHeading = (
 }
 
 const checkColumnSorting = (page: YourCasesPage, index: number) => {
-  const firstSort = index < 4 ? 'ascending' : 'descending'
-  const secondSort = index < 4 ? 'descending' : 'ascending'
+  const firstSort = index < 3 ? 'ascending' : 'descending'
+  const secondSort = index < 3 ? 'descending' : 'ascending'
   page.getColumnHeader('myCases', index).find('button').click()
   page.getColumnHeader('myCases', index).should('have.attr', 'aria-sort', firstSort)
   page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', 'X778160')
@@ -41,16 +41,15 @@ context('Cases', () => {
   it('Cases page is rendered ', () => {
     cy.visit('/case')
     const page = Page.verifyOnPage(YourCasesPage)
-    checkColumnHeading(page, 0, 'Name / CRN', 'nameOrCrn', 'case')
-    checkColumnHeading(page, 1, 'DOB / Age', 'dob', 'case')
-    checkColumnHeading(page, 2, 'Sentence', 'sentence', 'case')
-    checkColumnHeading(page, 3, 'Last Appointment', 'lastContact', 'case')
-    checkColumnHeading(page, 4, 'Next Appointment', 'nextContact', 'case', 'ascending')
+    checkColumnHeading(page, 0, 'Cases', 'nameOrCrn', 'case')
+    checkColumnHeading(page, 1, 'Sentence', 'sentence', 'case')
+    checkColumnHeading(page, 2, 'Last Appointment', 'lastContact', 'case')
+    checkColumnHeading(page, 3, 'Next Appointment', 'nextContact', 'case', 'ascending')
     page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', 'X778160')
-    page.getRowData('myCases', 'dob', 'Value1').should('contain.text', '25 Sep 1975')
+    page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', '25 September 1975')
     page.getRowData('myCases', 'nameOrCrn', 'Value4').should('contain.text', 'Restricted access')
     page.getRowData('myCases', 'nameOrCrn', 'Value4').should('contain.text', 'X808126')
-    page.getRowData('myCases', 'dob', 'Value4').should('contain.text', 'Restricted')
+    page.getRowData('myCases', 'nameOrCrn', 'Value4').should('contain.text', 'Restricted')
     page.getPagination().should('contain.text', 'Showing 1 to 10 of 33 cases.')
     page.getNavigationLink(1).should('contain.text', 'Home')
     page.getNavigationLink(1).should('not.have.attr', 'aria-current', 'home')
@@ -63,9 +62,9 @@ context('Cases', () => {
     page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
   })
 
-  const sortableColumns = ['Name / CRN', 'DOB / Age', 'Sentence', 'Last Appointment', 'Next Appointment']
+  const sortableColumns = ['Cases', 'Sentence', 'Last Appointment', 'Next Appointment']
   for (let i = 0; i < sortableColumns.length; i += 1) {
-    it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i - 1]} sort button is clicked`, () => {
+    it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i]} sort button is clicked`, () => {
       cy.visit('/case')
       const page = new YourCasesPage()
       checkColumnSorting(page, i)

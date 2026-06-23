@@ -32,7 +32,20 @@ import {
   completeOutcome,
 } from './utils'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../server/models/Appointments'
 
+interface LoadPageArgs {
+  hasVisor?: boolean
+  typeOptionIndex?: number
+  sentenceOptionIndex?: number
+  notes?: boolean
+  dateInPast?: boolean
+  textMessageOptionIndex?: number
+  textMessageFeatureFlag?: boolean
+  enableNonCompliance?: boolean
+  outcome?: AppointmentOutcomeType
+  action?: AppointmentEnforcementAction
+}
 const loadPage = ({
   hasVisor = false,
   typeOptionIndex = 1,
@@ -42,7 +55,9 @@ const loadPage = ({
   textMessageOptionIndex = 1,
   textMessageFeatureFlag = true,
   enableNonCompliance = true,
-} = {}) => {
+  outcome = 'ATTENDED_FAILED_TO_COMPLY',
+  action = 'NO_FURTHER_ACTION',
+}: LoadPageArgs = {}) => {
   if (!enableNonCompliance) {
     cy.task('stubDisableNonCompliance')
   }
@@ -65,7 +80,7 @@ const loadPage = ({
       completeAttendedCompliedPage()
     }
     if (enableNonCompliance) {
-      completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+      completeOutcome({ outcome, action })
     }
     completeAddNotePage()
   }
@@ -207,13 +222,35 @@ describe('Check your answers then confirm the appointment', () => {
       checkUpdateSensitivity({ page: cyaPage, dateInPast: true, enableNonCompliance: false })
     })
   })
-  describe('Appointment date is in the past - non compliance enabled', () => {
+
+  describe('Appointment date is in the past, outcome is ATTENDED_FAILED_TO_COMPLY, action is NO_FURTHER_ACTION - non compliance enabled', () => {
     const cyaPage = new AppointmentCheckYourAnswersPage()
     beforeEach(() => {
       loadPage({ dateInPast: true })
     })
-    it('should display the attended and complied row', () => {
+    it('should display outcome and enforcement action rows', () => {
       checkAppointmentSummary({ page: cyaPage, probationPractitioner: false, dateInPast: true })
+    })
+    it('should update the notes when value is changed', () => {
+      checkUpdateNotes({ page: cyaPage, dateInPast: true })
+    })
+    it('should update the sensitivity when value is changed', () => {
+      checkUpdateSensitivity({ page: cyaPage, dateInPast: true })
+    })
+  })
+
+  describe('Appointment date is in the past, outcome is ATTENDED_FAILED_TO_COMPLY, action is BREACH_RECALL_INITIATED_AND_SEND_LETTER - non compliance enabled', () => {
+    const cyaPage = new AppointmentCheckYourAnswersPage()
+    beforeEach(() => {
+      loadPage({ dateInPast: true, action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
+    })
+    it('should display the outcome and enforcement action rows', () => {
+      checkAppointmentSummary({
+        page: cyaPage,
+        probationPractitioner: false,
+        dateInPast: true,
+        action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      })
     })
     it('should update the notes when value is changed', () => {
       checkUpdateNotes({ page: cyaPage, dateInPast: true })

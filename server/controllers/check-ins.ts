@@ -43,6 +43,8 @@ const routes = [
   'postSupplementaryEligibilityPage',
   'getSPOApprovalPage',
   'postSPOApprovalPage',
+  'getRationalePage',
+  'postRationalePage',
   'getDateFrequencyPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
@@ -216,8 +218,12 @@ const checkInsController: Controller<typeof routes, void> = {
       const eligibilityChoice: string | any[] =
         req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice || []
 
-      if (eligibilityChoice === 'replacement-contact') {
+      if (eligibilityChoice === 'REPLACE_F2F') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/spo-approval`)
+      }
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+      if (isRationaleEnabled) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
       }
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
@@ -243,6 +249,11 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'eligibilityChoice'], 'SUPPLEMENT_F2F')
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+      if (isRationaleEnabled) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
+      }
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
@@ -278,6 +289,54 @@ const checkInsController: Controller<typeof routes, void> = {
       if (approval) {
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'eligibilitySPOApproval'], approval)
       }
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+      if (isRationaleEnabled) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
+      }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+    }
+  },
+
+  getRationalePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+
+      if (!isRationaleEnabled) {
+        return res.redirect(`/case/${crn}`)
+      }
+      const cya = req.query.cya === 'true'
+      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
+      let backLink: string
+      if (cya) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityChoice === 'REPLACE_F2F') {
+        backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
+      } else if (eligibilityArray.includes('eligibility-none')) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+      } else {
+        backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+      }
+
+      await sendAuditMessage(res, 'VIEW_MAS_RATIONALE_TO_USE_CHECK_INS', crn, SubjectType.CRN)
+
+      return res.render('pages/check-in/rationale.njk', {
+        crn,
+        id,
+        backLink,
+      })
+    }
+  },
+
+  postRationalePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
@@ -290,20 +349,26 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const cya = req.query.cya === 'true'
-      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
-      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
-      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
       let backLink: string
-      if (cya) {
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
+      if (!isRationaleEnabled) {
+        const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+        const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+        const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
+        if (cya) {
+          backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+        } else if (eligibilityChoice === 'REPLACE_F2F') {
+          backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
+        } else if (eligibilityArray.includes('eligibility-none')) {
+          backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+        } else {
+          backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+        }
+      } else if (cya) {
         backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      } else if (eligibilityChoice === 'replacement-contact') {
-        backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
-      } else if (eligibilityArray.includes('eligibility-none')) {
-        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
       } else {
-        backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+        backLink = `/case/${crn}/appointments/${id}/check-in/rationale`
       }
-
       const checkInMinDate = getMinDate()
 
       return res.render(`pages/check-in/date-frequency.njk`, {
@@ -722,8 +787,9 @@ const checkInsController: Controller<typeof routes, void> = {
         photoUploadOption:
           savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
       }
+      const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_SUMMARY', crn, SubjectType.CRN)
-      return res.render('pages/check-in/checkin-summary.njk', { crn, id, userDetails })
+      return res.render('pages/check-in/checkin-summary.njk', { crn, id, userDetails, isRationaleEnabled })
     }
   },
 

@@ -73,6 +73,26 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
   })
 }
 
+// instead of loading page each time this method:
+// - accepts option
+// - submits to redirect
+// - check new page
+// - uses backLink to return to options
+export const checkOptionRedirects = <TPage extends Page>(
+  options: ExpectedOption<TPage>[],
+  PageClass: RedirectPage,
+): void => {
+  options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
+    const outcomePage = new PageClass()
+    cy.get(`.govuk-radios__input[value=${value}]`).click()
+    outcomePage.getSubmitBtn().click()
+    const page = new RedirectPage()
+    page.checkPageTitle(redirectPageTitle)
+    cy.go('back')
+    cy.get('[data-module="govuk-radios"]').should('exist')
+  })
+}
+
 type WarningBannerPage =
   | typeof OutcomePage
   | typeof AttendedFailedToComplyPage
@@ -181,7 +201,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
-          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
           .should('contain.text', 'You should consider initiating a breach')
         page
           .getTicketPanel()
@@ -201,7 +221,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args })
         page
           .getTicketPanel()
-          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
           .should('contain.text', 'Alton has breached this sentence before')
         page
           .getTicketPanel()
@@ -275,7 +295,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args, startDateTime: startDateTimeISO })
         page
           .getTicketPanel()
-          .should('contain.text', `Alton has until ${expectedDate} to submit evidence (5 days remaining)`)
+          .should('contain.text', `Alton has until ${expectedDate} to submit evidence (6 days remaining)`)
       })
     }
   })

@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
@@ -18,13 +19,14 @@ import {
   ExpectedOption,
   Journey,
   checkBreachOrRecallWarningBanner,
-  checkOptionRedirectsToCorrectPage,
+  checkOptionRedirects,
   checkOptions,
   checkTicketPanel,
 } from './imports'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
+import { dateWithDayAndWithYear } from '../../../server/utils'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -136,6 +138,17 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     acceptableAbsencePage = new AcceptableAbsencePage()
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
     cy.get('legend').should('contain.text', 'Why was Alton’s absence acceptable?')
+    let expectedAppointment = '3 way meeting (NS) with Terry Jones on Wednesday 21 February 2024'
+    const now = DateTime.now()
+    const yesterday = now.minus({ days: 1 })
+    const expectedDate = dateWithDayAndWithYear(yesterday.toISODate())
+    if (journey === 'ARRANGE') {
+      expectedAppointment = `Planned office visit (NS) with Deborah Fern on ${expectedDate}`
+    }
+    if (journey === 'RESCHEDULE') {
+      expectedAppointment = `3 way meeting (NS) with Terry Jones on ${expectedDate}`
+    }
+    cy.get('.govuk-hint').should('contain.text', `Appointment: ${expectedAppointment}.`)
     const options = getExpectedOptions()
     checkOptions(options)
   })
@@ -171,7 +184,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
 
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, AcceptableAbsencePage, { journey })
+    loadPage({ journey })
+    checkOptionRedirects(options, AcceptableAbsencePage)
   })
   checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage)
   checkTicketPanel(loadPage, AcceptableAbsencePage)

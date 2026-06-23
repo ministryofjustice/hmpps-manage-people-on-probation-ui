@@ -7,7 +7,7 @@ export default class EligibilityFullPage extends Page {
 
   getSubmitBtn = (): PageElement => cy.get('[data-qa="submit-btn"]')
 
-  getReplacementRadio = (): PageElement => cy.get('input[value="replacement-contact"]')
+  getReplacementRadio = (): PageElement => cy.get('input[value="REPLACE_F2F"]')
 
-  getSupplementaryRadio = (): PageElement => cy.get('input[value="supplementary-contact"]')
+  getSupplementaryRadio = (): PageElement => cy.get('input[value="SUPPLEMENT_F2F"]')
 }

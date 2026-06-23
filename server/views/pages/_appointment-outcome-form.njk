@@ -11,6 +11,9 @@
     html: '<span>' + appointmentOutcome.breachOrRecallWarning.text + '</span>'
   }) }}
   {% endif %}
+
+{% endblock %}
+{% block afterHeading %}
   {% if appointmentOutcome.ticket %}
     {% set type = (appointmentOutcome.ticket.type | default('RED')) | lower %}
     {{ mojTicketPanel({

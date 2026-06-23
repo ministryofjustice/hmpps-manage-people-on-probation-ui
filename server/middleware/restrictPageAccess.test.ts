@@ -1,9 +1,10 @@
 import httpMocks from 'node-mocks-http'
-import { redirectWizard } from './redirectWizard'
-import { getDataValue, isValidCrn, isValidUUID } from '../utils'
+import { restrictPageAccess } from './restrictPageAccess'
+import { isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
+import { CheckinUserDetails } from '../models/ESupervision'
 
 const crn = 'X000001'
 const uuid = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
@@ -14,7 +15,6 @@ jest.mock('../utils', () => {
     ...actualUtils,
     isValidCrn: jest.fn(),
     isValidUUID: jest.fn(),
-    getDataValue: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -26,7 +26,6 @@ jest.mock('./renderError', () => ({
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
-const mockedGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const mockAppointment: AppointmentSession = {
   user: {
@@ -40,21 +39,44 @@ const mockAppointment: AppointmentSession = {
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
 }
 
-const req = httpMocks.createRequest({
-  params: {
-    crn,
-    id: uuid,
-  },
-  session: {
-    data: {
-      appointments: {
-        [crn]: {
-          [uuid]: mockAppointment,
+const buildRequest = ({
+  _uuid = uuid,
+  appointment = {},
+  checkins = {},
+}: {
+  _uuid?: string
+  appointment?: Partial<AppointmentSession>
+  checkins?: Partial<CheckinUserDetails>
+} = {}): httpMocks.MockRequest<any> => {
+  const req = {
+    params: {
+      crn,
+      id: uuid,
+    },
+    session: {
+      data: {
+        appointments: {
+          [crn]: {
+            [_uuid]: { ...mockAppointment, ...appointment },
+          },
+        },
+        esupervision: {
+          [crn]: {
+            [_uuid]: {
+              checkins: {
+                id: 1,
+                date: '2044-12-22',
+                interval: 'WEEKLY',
+                ...checkins,
+              },
+            },
+          },
         },
       },
     },
-  },
-})
+  }
+  return httpMocks.createRequest(req)
+}
 
 const res = {
   locals: {
@@ -70,17 +92,36 @@ const res = {
 const redirectSpy = jest.spyOn(res, 'redirect')
 const nextSpy = jest.fn()
 
-describe('/middleware/redirectWizard - appointments', () => {
+describe('/middleware/restrictPageAccess - appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  describe('active appointment session is required for current uuid', () => {
+    beforeEach(() => {
+      const req = buildRequest({ _uuid: '12345' })
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      restrictPageAccess()(req, res, nextSpy)
+    })
+    it('should redirect to the sentence page if uuid does not exist in session', () => {
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence`)
+    })
   })
 
   describe('location is required, but it is undefined in the session appointment', () => {
     const requiredValues = [['user', 'locationCode']]
     beforeEach(() => {
+      const appointment: Partial<AppointmentSession> = {
+        user: {
+          ...mockAppointment.user,
+          locationCode: undefined,
+        },
+      }
+      const req = buildRequest({ appointment })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      restrictPageAccess({ requiredValues })(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -89,12 +130,20 @@ describe('/middleware/redirectWizard - appointments', () => {
       expect(nextSpy).not.toHaveBeenCalled()
     })
   })
+
   describe('type and location are required, but location is undefined in the session appointment', () => {
     const requiredValues = ['type', ['user', 'locationCode']]
     beforeEach(() => {
+      const appointment: Partial<AppointmentSession> = {
+        user: {
+          ...mockAppointment.user,
+          locationCode: undefined,
+        },
+      }
+      const req = buildRequest({ appointment })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      restrictPageAccess({ requiredValues })(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -103,13 +152,14 @@ describe('/middleware/redirectWizard - appointments', () => {
       expect(nextSpy).not.toHaveBeenCalled()
     })
   })
+
   describe('type is required, and it is available in the session appointment', () => {
     const requiredValues = ['type']
     beforeEach(() => {
+      const req = buildRequest()
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      mockedGetDataValue.mockReturnValue('type')
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      restrictPageAccess({ requiredValues })(req, res, nextSpy)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -121,12 +171,12 @@ describe('/middleware/redirectWizard - appointments', () => {
 
   describe('CRN and UUID in request url are invalid', () => {
     const requiredValues = [['user', 'locationCode']]
+    const req = buildRequest()
 
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
-      mockedGetDataValue.mockReturnValue(null)
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      restrictPageAccess({ requiredValues })(req, res, nextSpy)
     })
     it('should return a 404 status and render the error page', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -141,17 +191,31 @@ describe('/middleware/redirectWizard - appointments', () => {
   })
 })
 
-describe('/middleware/redirectWizard - setupcheckins', () => {
+describe('/middleware/restrictPageAccess - setupcheckins', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('date is required, but it is undefined in the session appointment', () => {
-    const requiredValues = [['interval', 'date']]
+  describe('active checkins session is required for current uuid', () => {
     beforeEach(() => {
+      const req = buildRequest({ _uuid: '12345' })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
+      restrictPageAccess({ route: 'setupcheckins' })(req, res, nextSpy)
+    })
+    it('should redirect to the sentence page if uuid does not exist in session', () => {
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/eligibility-check`)
+    })
+  })
+
+  describe('date is required, but it is undefined in the session appointment', () => {
+    const requiredValues = ['date']
+    beforeEach(() => {
+      const checkins: Partial<CheckinUserDetails> = { date: undefined }
+      const req = buildRequest({ checkins })
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      restrictPageAccess({ requiredValues, route: 'setupcheckins' })(req, res, nextSpy)
     })
     it('should redirect to the first page of the setup wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/eligibility-check`)
@@ -163,10 +227,10 @@ describe('/middleware/redirectWizard - setupcheckins', () => {
   describe('id is required, and it is available in the session', () => {
     const requiredValues = ['id']
     beforeEach(() => {
+      const req = buildRequest()
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      mockedGetDataValue.mockReturnValue('id')
-      redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
+      restrictPageAccess({ requiredValues, route: 'setupcheckins' })(req, res, nextSpy)
     })
     it('should not redirect to the first page of the setup wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -178,12 +242,12 @@ describe('/middleware/redirectWizard - setupcheckins', () => {
 
   describe('CRN and UUID in request url are invalid', () => {
     const requiredValues = [['id']]
+    const req = buildRequest()
 
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
-      mockedGetDataValue.mockReturnValue(null)
-      redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
+      restrictPageAccess({ requiredValues, route: 'setupcheckins' })(req, res, nextSpy)
     })
     it('should return a 404 status and render the error page', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)

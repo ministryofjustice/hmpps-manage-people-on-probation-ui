@@ -3,6 +3,164 @@ import OverviewPage from '../pages/overview'
 import { checkPopHeader, checkRiskToStaffAlert } from './appointments/imports'
 
 context('Overview', () => {
+  const disableEMDI = () => cy.task('stubDisableEMDIOverviewShowGPSData')
+  const stubSupervisionPackage = (enabled: boolean) =>
+    cy.task('stubFeatureFlag', { key: 'enableSupervisionPackage', enabled })
+  const expectNoEMDILinks = (page: OverviewPage) => {
+    page.getElementData('licencesEMDILink').should('not.exist')
+    page.getElementData('requirementsEMDILink').should('not.exist')
+  }
+  const verifyTabs = (page: OverviewPage) => {
+    page.getTab('overview').should('contain.text', 'Overview')
+    page.getTab('personalDetails').should('contain.text', 'Personal details')
+    page.getTab('risk').should('contain.text', 'Risk')
+    page.getTab('sentence').should('contain.text', 'Sentence')
+    page.getTab('activityLog').should('contain.text', 'Contacts')
+    page.getTab('compliance').should('contain.text', 'Compliance')
+  }
+
+  const cases: Array<{
+    title: string
+    setup?: () => void
+    url: string
+    visitOptions?: Partial<Cypress.VisitOptions>
+    assertions: (page: OverviewPage) => void
+  }> = [
+    {
+      title: 'Overview page is rendered when enableSupervisionPackage is true',
+      setup: () => stubSupervisionPackage(true),
+      url: '/case/X000001',
+      assertions: () => cy.get('.supervision-package').should('exist'),
+    },
+    {
+      title: 'Overview page is rendered when enableSupervisionPackage is false',
+      setup: () => stubSupervisionPackage(false),
+      url: '/case/X000001',
+      assertions: () => cy.get('.supervision-package').should('not.exist'),
+    },
+    {
+      title: 'Overview page is rendered with OGRS4 risk predictor scores',
+      setup: () => cy.task('stubPredictorScoresOGRS4'),
+      url: '/case/X000001',
+      assertions: () => checkPopHeader({ ogrs4: true }),
+    },
+    {
+      title: 'Overview page is rendered with date of death',
+      setup: () => cy.task('stubPersonalDetailsDateOfDeath'),
+      url: '/case/X000001',
+      assertions: () => {
+        cy.get('[data-qa="dateOfBirthAndAgeValue"]')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.eq(`9 January 2002`)
+          })
+        cy.get('[data-qa="dateOfDeathWarning"]').should(
+          'contain.text',
+          'There is a date of death recorded for Caroline.',
+        )
+        cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('contain.text', 'Date of death')
+        cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('contain.text', '11 September 2024 (22 years old)')
+      },
+    },
+    {
+      title: 'Overview page is rendered for new san indicator assessment',
+      setup: () => cy.task('stubSanIndicatorTrue'),
+      url: '/case/X000001',
+      assertions: () => {
+        cy.get('[data-qa="criminogenicNeedsLabel"]').should('not.exist')
+      },
+    },
+    {
+      title: 'Overview page is rendered when riskFlag level and levelDescription is undefined',
+      setup: () => cy.task('stubOverviewRiskFlagsNoLevel'),
+      url: '/case/X000001',
+      assertions: page => {
+        page.headerCrn().should('contain.text', 'X000001')
+        page.headerName().should('contain.text', 'Caroline Wolff')
+        page.pageHeading().should('contain.text', 'Overview')
+        page.assertRiskTags()
+      },
+    },
+    {
+      title: 'Risk information and tier is not provided due to 500 from ARNS and TIER',
+      setup: disableEMDI,
+      url: '/case/X000002',
+      assertions: page => {
+        page.headerCrn().should('contain.text', 'X000002')
+        page.headerName().should('contain.text', 'Eula Schmeler')
+        page.pageHeading().should('contain.text', 'Overview')
+        verifyTabs(page)
+        page.getCardHeader('schedule').should('contain.text', 'Appointments')
+
+        cy.get(`[data-qa=errors]`).should(
+          'contain.text',
+          'Risk information from the Assess and plan service is currently unavailable.',
+        )
+        cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
+        page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
+        page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
+        page
+          .getRowData('risk', 'criminogenicNeeds', 'Value')
+          .should('contain.text', 'There is no OASys risk assessment.')
+        page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
+      },
+    },
+    {
+      title: 'Overview page with pre-sentence is rendered',
+      setup: disableEMDI,
+      url: '/case/X777916',
+      assertions: page => {
+        page.getCardHeader('sentence11').should('contain.text', 'Pre-Sentence')
+        page.getRowData('sentence11', 'order', 'Value').should('contain.text', 'No order details')
+        page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'Details not available')
+      },
+    },
+    {
+      title: 'Overview page with medium risk to staff is rendered',
+      url: '/case/X000001',
+      visitOptions: { failOnStatusCode: false },
+      assertions: () => checkRiskToStaffAlert('X000001', 'Caroline', 'medium'),
+    },
+    {
+      title: 'Overview page with risk to probation staff is rendered',
+      setup: disableEMDI,
+      url: '/case/X777916',
+      visitOptions: { failOnStatusCode: false },
+      assertions: () => checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true),
+    },
+    {
+      title: 'Overview page should not be rendered with licence conditions when EMDI API responds with 404',
+      setup: () => cy.task('stubEMDIPeopleExists404Response', 'X778160'),
+      url: '/case/X778160',
+      assertions: expectNoEMDILinks,
+    },
+    {
+      title: 'Overview page should not be rendered with licence conditions when EMDI API responds with 500',
+      setup: () => cy.task('stubEMDIPeopleExists500Response', 'X778160'),
+      url: '/case/X778160',
+      assertions: expectNoEMDILinks,
+    },
+    {
+      title: 'Overview page should not be rendered with licence conditions when flag is disabled',
+      setup: disableEMDI,
+      url: '/case/X778160',
+      assertions: expectNoEMDILinks,
+    },
+    {
+      title: 'Overview page is rendered with licence conditions',
+      url: '/case/X778160',
+      assertions: page => {
+        page
+          .getRowData('sentence1234567', 'licenceConditions', 'Value')
+          .should('contain.text', 'Location Monitoring View GPS location monitoring data')
+        page
+          .getRowData('sentence7654321', 'requirements', 'Value')
+          .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
+      },
+    },
+  ]
+
   beforeEach(() => {
     cy.task('resetMocks')
   })
@@ -139,122 +297,13 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
-  it('Overview page is rendered with OGRS4 risk predictor scores', () => {
-    cy.task('stubPredictorScoresOGRS4')
-    cy.visit('/case/X000001')
-    checkPopHeader({ ogrs4: true })
-  })
 
-  it('Overview page is rendered with date of death', () => {
-    cy.task('stubPersonalDetailsDateOfDeath')
-    cy.visit('/case/X000001')
-    cy.get('[data-qa="dateOfBirthAndAgeValue"]')
-      .invoke('text')
-      .then(text => {
-        const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.eq(`9 January 2002`)
-      })
-    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
-    cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('contain.text', 'Date of death')
-    cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('contain.text', '11 September 2024 (22 years old)')
-  })
-  it('Overview page is rendered for new san indicator assessment', () => {
-    cy.task('stubSanIndicatorTrue')
-    cy.visit('/case/X000001')
-    const page = Page.verifyOnPage(OverviewPage)
-    cy.get('[data-qa="criminogenicNeedsLabel"]').should('not.exist')
-  })
-  it('Overview page is rendered when riskFlag level and levelDescription is undefined', () => {
-    cy.task('stubOverviewRiskFlagsNoLevel')
-    cy.visit('/case/X000001')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Caroline Wolff')
-    page.pageHeading().should('contain.text', 'Overview')
-    page.assertRiskTags()
-  })
-  it('Risk information and tier is not provided due to 500 from ARNS and TIER', () => {
-    cy.task('stubDisableEMDIOverviewShowGPSData')
-    cy.visit('/case/X000002')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.headerCrn().should('contain.text', 'X000002')
-    page.headerName().should('contain.text', 'Eula Schmeler')
-    page.pageHeading().should('contain.text', 'Overview')
-    page.getTab('overview').should('contain.text', 'Overview')
-    page.getTab('personalDetails').should('contain.text', 'Personal details')
-    page.getTab('risk').should('contain.text', 'Risk')
-    page.getTab('sentence').should('contain.text', 'Sentence')
-    page.getTab('activityLog').should('contain.text', 'Contacts')
-    page.getTab('compliance').should('contain.text', 'Compliance')
-    page.getCardHeader('schedule').should('contain.text', 'Appointments')
-
-    cy.get(`[data-qa=errors]`).should(
-      'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
-    )
-    cy.get(`[data-qa=errors]`).should(
-      'contain.text',
-      'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
-    )
-    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
-    page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
-    page.getRowData('risk', 'criminogenicNeeds', 'Value').should('contain.text', 'There is no OASys risk assessment.')
-    page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
-  })
-  it('Overview page with pre-sentence is rendered', () => {
-    cy.task('stubDisableEMDIOverviewShowGPSData')
-    cy.visit('/case/X777916')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getCardHeader('sentence11').should('contain.text', 'Pre-Sentence')
-    page.getRowData('sentence11', 'order', 'Value').should('contain.text', 'No order details')
-    page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'Details not available')
-  })
-
-  it('Overview page with medium risk to staff is rendered', () => {
-    cy.visit('/case/X000001', { failOnStatusCode: false })
-    Page.verifyOnPage(OverviewPage)
-    checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
-  })
-
-  it('Overview page with risk to probation staff is rendered', () => {
-    cy.task('stubDisableEMDIOverviewShowGPSData')
-    cy.visit('/case/X777916', { failOnStatusCode: false })
-    Page.verifyOnPage(OverviewPage)
-    checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
-  })
-
-  it('Overview page should not be rendered with licence conditions when EMDI API responds with 404', () => {
-    cy.task('stubEMDIPeopleExists404Response', 'X778160')
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getElementData('licencesEMDILink').should('not.exist')
-    page.getElementData('requirementsEMDILink').should('not.exist')
-  })
-
-  it('Overview page should not be rendered with licence conditions when EMDI API responds with 500', () => {
-    cy.task('stubEMDIPeopleExists500Response', 'X778160')
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getElementData('licencesEMDILink').should('not.exist')
-    page.getElementData('requirementsEMDILink').should('not.exist')
-  })
-
-  it('Overview page should not be rendered with licence conditions when flag is disabled', () => {
-    cy.task('stubDisableEMDIOverviewShowGPSData')
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getElementData('licencesEMDILink').should('not.exist')
-    page.getElementData('requirementsEMDILink').should('not.exist')
-  })
-
-  it('Overview page is rendered with licence conditions', () => {
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
-    page
-      .getRowData('sentence1234567', 'licenceConditions', 'Value')
-      .should('contain.text', 'Location Monitoring View GPS location monitoring data')
-    page
-      .getRowData('sentence7654321', 'requirements', 'Value')
-      .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
+  cases.forEach(({ title, setup, url, visitOptions, assertions }) => {
+    it(title, () => {
+      setup?.()
+      cy.visit(url, visitOptions)
+      const page = Page.verifyOnPage(OverviewPage)
+      assertions(page)
+    })
   })
 })

@@ -27,8 +27,7 @@ export default class ArnsApiClient extends RestClient {
       handle404: true,
       handle500: true,
       handle401: true,
-      errorMessage:
-        'OASys is experiencing technical difficulties. It has not been possible to provide the Criminogenic needs information held in OASys',
+      errorMessage: 'Risk information from the Assess and plan service is currently unavailable.',
     })
   }
 
@@ -38,8 +37,7 @@ export default class ArnsApiClient extends RestClient {
       handle404: true,
       handle500: true,
       handle401: true,
-      errorMessage:
-        'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      errorMessage: 'Risk information from the Assess and plan service is currently unavailable.',
     })
   }
 
@@ -49,8 +47,7 @@ export default class ArnsApiClient extends RestClient {
       handle404: true,
       handle500: true,
       handle401: true,
-      errorMessage:
-        'OASys is experiencing technical difficulties. It has not been possible to provide the predictor score information held in OASys',
+      errorMessage: 'Risk information from the Assess and plan service is currently unavailable.',
     })
   }
 }

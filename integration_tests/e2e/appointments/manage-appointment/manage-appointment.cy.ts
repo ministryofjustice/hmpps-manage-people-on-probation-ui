@@ -115,21 +115,7 @@ describe('Manage an appointment', () => {
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.getAppointmentActions().find('h3').should('contain.text', 'Appointment actions')
     })
-    it('should display the inset text and NDelius link', () => {
-      loadPage()
-      manageAppointmentPage = new ManageAppointmentPage()
-      manageAppointmentPage.getAppointmentActions().find('.govuk-inset-text').should('contain.text', 'You must')
-      manageAppointmentPage
-        .getAppointmentActions()
-        .find('.govuk-inset-text a')
-        .should('contain.text', 'use NDelius to log non-attendance or non-compliance (opens in new tab)')
-        .should('have.attr', 'target', '_blank')
-        .should(
-          'have.attr',
-          'href',
-          `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=${crn}&contactID=${appointmentId}`,
-        )
-    })
+
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
         loadPage()
@@ -233,6 +219,31 @@ describe('Manage an appointment', () => {
             )
         })
       })
+    })
+  })
+  describe('Related contacts', () => {
+    it('should not display the list if no related contact available', () => {
+      cy.task('stubNoRelatedContacts')
+      loadPage()
+      manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.getRelatedContacts().find('h3').should('contain.text', 'Related contacts')
+      manageAppointmentPage.getRelatedContacts().find('p').should('contain.text', 'No related contacts')
+    })
+    it('should  display the list if no related contact available', () => {
+      loadPage()
+      manageAppointmentPage.getRelatedContacts().find('h3').should('contain.text', 'Related contacts')
+      manageAppointmentPage.getRelatedContacts().find('li').should('have.length', 3)
+      manageAppointmentPage
+        .getRelatedContactLink(1)
+        .should('contain.text', 'Breach action - breach letter sent')
+        .should('have.attr', 'target', '_blank')
+        .should(
+          'have.attr',
+          'href',
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=2510615347',
+        )
+      manageAppointmentPage.getRelatedContact(1).should('contain.text', 'Created by J.Frost')
+      manageAppointmentPage.getRelatedContact(1).should('contain.text', 'on 12 May 2026')
     })
   })
 })

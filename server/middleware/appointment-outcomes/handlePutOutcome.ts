@@ -57,6 +57,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         outcomeCode,
         notes: handleQuotes(notes),
         sensitive,
+        alert: false,
       }
 
       // if outcome but no action, check the outcome type does not require an associated action 👇

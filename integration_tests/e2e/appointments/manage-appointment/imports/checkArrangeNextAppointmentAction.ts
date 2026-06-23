@@ -63,7 +63,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at The Building on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
@@ -82,7 +85,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at their home on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
@@ -159,7 +165,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at The Building on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
@@ -184,7 +193,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at their home on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
       })
     })
@@ -245,7 +257,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at The Building on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
@@ -279,7 +294,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at their home on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
@@ -356,7 +374,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at The Building on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
@@ -406,7 +427,10 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
             .getTaskHint(index)
-            .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
+            .should(
+              'contain.text',
+              'Other call arranged with Eula at their home on Wednesday 21 February 2024 at 10:15am.',
+            )
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage

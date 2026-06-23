@@ -24,6 +24,7 @@ import {
   deliusDeepLinkUrl,
   deepLinkContactTypes,
   drugHistoryContactTypes,
+  enforcementContactTypes,
   fromIsoDateToPicker,
   fullName,
   getCurrentRisksToThemselves,
@@ -77,6 +78,7 @@ import {
   convertToTitleCase,
   getPersonLevelTypes,
   handleQuotes,
+  formatEnforcementActionNote,
   dateToLongDate,
   merge,
   dateWithYearTimeFirst,
@@ -134,6 +136,7 @@ export default function nunjucksSetup(
       'node_modules/@ministryofjustice/frontend/moj/components/',
       'node_modules/@ministryofjustice/probation-search-frontend/components',
       'node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/',
+      'node_modules/@ministryofjustice/hmpps-mpop-frontend-components-lib/dist/',
     ],
     {
       autoescape: true,
@@ -176,6 +179,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
+  njkEnv.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
   njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
@@ -211,6 +215,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
   njkEnv.addGlobal('deepLinkContactTypes', deepLinkContactTypes)
   njkEnv.addGlobal('drugHistoryContactTypes', drugHistoryContactTypes)
+  njkEnv.addGlobal('enforcementContactTypes', enforcementContactTypes)
   njkEnv.addGlobal('oaSysUrl', oaSysUrl)
   njkEnv.addGlobal('deliusHomepageUrl', deliusHomepageUrl)
   njkEnv.addGlobal('scheduledAppointments', scheduledAppointments)

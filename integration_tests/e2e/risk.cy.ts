@@ -308,15 +308,14 @@ context('Risk', () => {
     const sanIndicator = true
     checkRiskPageView({ page, sanIndicator })
   })
-  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true, sentence plan link v2 disabled', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true, sentence plan link v2 enabled', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
-    cy.task('stubDisableSentencePlanUrl')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    checkRiskPageView({ page, sanIndicator, sentencePlanUrlEnabled: false })
+    checkRiskPageView({ page, sanIndicator })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
@@ -528,12 +527,9 @@ context('Risk', () => {
 
     cy.get(`[data-qa=errors]`).should(
       'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      'Risk information from the Assess and plan service is currently unavailable.',
     )
-    cy.get(`[data-qa=errors]`).should(
-      'contain.text',
-      'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
-    )
+    cy.get(`[data-qa=errors]`).should('contain.text', 'Tier information is currently unavailable.')
 
     cy.get(`[data-qa=errors]`).should(
       'contain.text',
