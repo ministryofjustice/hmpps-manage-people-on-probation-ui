@@ -35,6 +35,7 @@ import PreviewSupportPage from '../../pages/check-ins/questions/preview/support'
 import EditQuestionPage from '../../pages/check-ins/questions/edit-question'
 import ListQuestionsPage from '../../pages/check-ins/questions/list-questions'
 import EligibilitySPOApprovalPage from '../../pages/check-ins/eligibility-spo-approval'
+import RationalePage from '../../pages/check-ins/rationale'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -77,10 +78,7 @@ context('Appointment check-ins', () => {
     checkPage.getSubmitBtn().click()
 
     const supplementaryPage = new EligibilitySupplementaryPage()
-    supplementaryPage.getSubmitBtn().click()
-
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
+    supplementaryPage.checkOnPage()
   })
 
   it('should navigate to supplementary eligibility page when more than one eligible option is selected', () => {
@@ -94,10 +92,7 @@ context('Appointment check-ins', () => {
     checkPage.getSubmitBtn().click()
 
     const supplementaryPage = new EligibilitySupplementaryPage()
-    supplementaryPage.getSubmitBtn().click()
-
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
+    supplementaryPage.checkOnPage()
   })
 
   it('should navigate to full eligibility choice when "None of these apply" is selected', () => {
@@ -126,7 +121,7 @@ context('Appointment check-ins', () => {
     spoApprovalPage.checkOnPage()
   })
 
-  it('should navigate to date frequency when SPO approval checkbox is checked', () => {
+  it('should navigate to rationale page when SPO approval checkbox is checked', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
 
@@ -140,11 +135,13 @@ context('Appointment check-ins', () => {
 
     const spoApprovalPage = new EligibilitySPOApprovalPage()
     spoApprovalPage.checkOnPage()
-    spoApprovalPage.getCheckbox()
-    spoApprovalPage.getSubmitBtn()
+    spoApprovalPage.getCheckbox().check()
+    spoApprovalPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.checkOnPage()
   })
 
-  it('should navigate to date frequency when "As well as existing face-to-face contact" radio is selected', () => {
+  it('should navigate to rationale page when "As well as existing face-to-face contact" radio is selected', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
 
@@ -156,8 +153,8 @@ context('Appointment check-ins', () => {
     fullPage.getSupplementaryRadio().check()
     fullPage.getSubmitBtn().click()
 
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
+    const rationalePage = new RationalePage()
+    rationalePage.checkOnPage()
   })
 
   it('should navigate to denied page when option 10 (Intensive Supervision Court pilot case) is selected', () => {
@@ -190,6 +187,37 @@ context('Appointment check-ins', () => {
     cy.get('.govuk-error-message').should('contain', 'Select if any of these apply')
   })
 
+  it('should be able to submit rationale details', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.checkOnPage()
+  })
+
+  it('rationale page should fail with validation errors', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const eligibilityCheckPage = new EligibilityCheckPage()
+    eligibilityCheckPage.getOptionOne().click()
+    eligibilityCheckPage.getSubmitBtn().click()
+    const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
+    eligibilitySupplementaryPage.checkOnPage()
+    eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+
+    rationalePage.getSubmitBtn().click()
+    rationalePage.getErrorSummaryBox().should('be.visible')
+  })
+
   it('check-in frequency page should fail with validation errors', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
@@ -199,6 +227,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getSubmitBtn().click()
@@ -219,7 +250,7 @@ context('Appointment check-ins', () => {
     })
   })
 
-  it('should able to submit check-in frequency details', () => {
+  it('should be able to submit check-in frequency details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -228,6 +259,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -251,6 +285,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -271,7 +308,7 @@ context('Appointment check-ins', () => {
     })
   })
 
-  it('should able to submit contact preference details', () => {
+  it('should be able to submit contact preference details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -280,6 +317,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -304,7 +344,7 @@ context('Appointment check-ins', () => {
     photoOptionsPage.checkOnPage()
   })
 
-  it('should able to edit contact preference details', () => {
+  it('should be able to edit contact preference details', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -313,6 +353,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -332,7 +375,7 @@ context('Appointment check-ins', () => {
     contactPreferencePage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
 
-  it('Should able to choose photo options', () => {
+  it('should be able to choose photo options', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -341,6 +384,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -374,7 +420,7 @@ context('Appointment check-ins', () => {
     takeAPhotoOptionsPage.checkOnPage()
   })
 
-  it('Should able to upload a pic and show rules page', () => {
+  it('should be able to upload a pic and show rules page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -383,6 +429,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -420,7 +469,7 @@ context('Appointment check-ins', () => {
     uploadAPhoto.checkOnPage()
   })
 
-  it('Should able to show cya and confirm page', () => {
+  it('should be able to show cya and confirm page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -429,6 +478,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -470,7 +522,7 @@ context('Appointment check-ins', () => {
     checkinConfirmationPage.checkOnPage()
   })
 
-  it('Should able to take a photo and show cya and confirm page', () => {
+  it('should be able to take a photo and show cya and confirm page', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -479,6 +531,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -519,7 +574,7 @@ context('Appointment check-ins', () => {
     checkinConfirmationPage.checkOnPage()
   })
 
-  it('Should able to change options from cya', () => {
+  it('should be able to change options from cya', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
     const eligibilityCheckPage = new EligibilityCheckPage()
@@ -528,6 +583,9 @@ context('Appointment check-ins', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -564,21 +622,37 @@ context('Appointment check-ins', () => {
     const checkYourAnswersPage = new CheckYourAnswersPage()
     checkYourAnswersPage.checkOnPage()
 
+    // Rationale change
+    checkYourAnswersPage
+      .getSummaryListRow(1)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', 'Low risk of reoffending')
+    checkYourAnswersPage.getElementData('rationaleAction').click()
+    rationalePage.checkOnPage()
+    rationalePage.rationaleNotes().find('textarea').clear()
+    rationalePage.rationaleNotes().find('textarea').type('Hard for them to travel to the office')
+    rationalePage.getSubmitBtn().click()
+    checkYourAnswersPage.checkOnPage()
+    checkYourAnswersPage
+      .getSummaryListRow(1)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', 'Hard for them to travel to the office')
+
     // Date change
     checkYourAnswersPage.getElementData('dateAction').click()
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getSubmitBtn().click()
     checkYourAnswersPage.checkOnPage()
-    checkYourAnswersPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Every week')
+    checkYourAnswersPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', 'Every week')
     checkYourAnswersPage.getElementData('intervalAction').click()
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(2).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
     checkYourAnswersPage.checkOnPage()
-    checkYourAnswersPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Every 4 weeks')
+    checkYourAnswersPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', 'Every 4 weeks')
 
     // Contact preference change
-    checkYourAnswersPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', 'Text message')
+    checkYourAnswersPage.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', 'Text message')
     checkYourAnswersPage.getElementData('preferredComsAction').click()
     contactPreferencePage.checkOnPage()
     contactPreferencePage
@@ -589,7 +663,7 @@ context('Appointment check-ins', () => {
       .click()
     contactPreferencePage.getSubmitBtn().click()
     checkYourAnswersPage.checkOnPage()
-    checkYourAnswersPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', 'Email')
+    checkYourAnswersPage.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', 'Email')
 
     // Mobile
     checkYourAnswersPage.getElementData('checkInMobileAction').click()
@@ -611,7 +685,7 @@ context('Appointment check-ins', () => {
 
     // photo options
     checkYourAnswersPage
-      .getSummaryListRow(6)
+      .getSummaryListRow(7)
       .find('.govuk-summary-list__value')
       .should('contain.text', 'Take a photo using this device')
     checkYourAnswersPage.getElementData('photoUploadOptionAction').click()
@@ -627,7 +701,7 @@ context('Appointment check-ins', () => {
     photoRules.getSubmitBtn().click()
     checkYourAnswersPage.checkOnPage()
     checkYourAnswersPage
-      .getSummaryListRow(6)
+      .getSummaryListRow(7)
       .find('.govuk-summary-list__value')
       .should('contain.text', 'Upload a photo')
   })
@@ -644,6 +718,9 @@ context('check-ins error scenario ', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -674,6 +751,9 @@ context('check-ins error scenario ', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -694,7 +774,7 @@ context('check-ins error scenario ', () => {
     errorPage.checkPageTitle('Sorry, there is a problem with the service')
   })
 
-  it('Should able to show error message when same phone / email already registered', () => {
+  it('should be able to show error message when same phone / email already registered', () => {
     loadPage()
     cy.task('stubOffenderSetup422Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
@@ -704,6 +784,9 @@ context('check-ins error scenario ', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -749,7 +832,7 @@ context('check-ins error scenario ', () => {
       )
   })
 
-  it('Should able to show check ins registration error message', () => {
+  it('should be able to show check ins registration error message', () => {
     loadPage()
     cy.task('stubOffenderSetup500Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
@@ -759,6 +842,9 @@ context('check-ins error scenario ', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
@@ -799,7 +885,7 @@ context('check-ins error scenario ', () => {
     checkYourAnswersPage.getErrorText().should('contain.text', 'An error occurred during registration')
   })
 
-  it('Should able to show error page, when checkin registration fails', () => {
+  it('should be able to show error page, when checkin registration fails', () => {
     loadPage()
 
     cy.task('stubOffenderSetupComplete500Response')
@@ -811,6 +897,9 @@ context('check-ins error scenario ', () => {
     const eligibilitySupplementaryPage = new EligibilitySupplementaryPage()
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
+    const rationalePage = new RationalePage()
+    rationalePage.rationaleNotes().find('textarea').type('Low risk of reoffending')
+    rationalePage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
 
     dateFrequencyPage.checkOnPage()
@@ -946,7 +1035,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.getImage().should('have.attr', 'alt', 'Image of Alton Berge')
   })
 
-  it('should able to visit contact details page', () => {
+  it('should be able to visit contact details page', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
@@ -984,7 +1073,7 @@ context('check-ins overview and manage pages', () => {
     manageContact.checkOnPage()
   })
 
-  it('should able to vist change settings page', () => {
+  it('should be able to vist change settings page', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
@@ -1009,7 +1098,7 @@ context('check-ins overview and manage pages', () => {
     appointmentsPage.checkOnPage()
   })
 
-  it('should able to stop check in', () => {
+  it('should be able to stop check in', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
@@ -1027,7 +1116,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.checkOnPage()
   })
 
-  it('should able to stop and restart online check ins', () => {
+  it('should be able to stop and restart online check ins', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
 

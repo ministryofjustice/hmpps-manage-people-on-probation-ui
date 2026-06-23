@@ -210,6 +210,7 @@ describe('checkInsController', () => {
 
         const req = baseReq()
         const { id } = req.params as Record<string, string>
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-denied.njk', {
@@ -224,6 +225,7 @@ describe('checkInsController', () => {
       it('returns 404 when CRN is invalid', async () => {
         mockIsValidCrn.mockReturnValue(false)
         mockIsValidUUID.mockReturnValue(true)
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
 
         const req = baseReq()
         await controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient)(req, res)
@@ -240,6 +242,7 @@ describe('checkInsController', () => {
 
         const req = baseReq()
         const { id } = req.params as Record<string, string>
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.getFullEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-full.njk', {
@@ -256,6 +259,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.getFullEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -269,6 +273,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         const { id } = req.params as Record<string, string>
         await controllers.checkIns.getSPOApprovalPage(hmppsAuthClient)(req, res)
 
@@ -287,22 +292,53 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.getSPOApprovalPage(hmppsAuthClient)(req, res)
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
+
+      it('sets isApproved true when SPO approval is selected', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
+
+        const req = baseReq()
+        req.session.data = {
+          esupervision: {
+            [crn]: {
+              [uuid]: {
+                checkins: {
+                  eligibilitySPOApproval: 'spo-approval',
+                },
+              },
+            },
+          },
+        }
+
+        await controllers.checkIns.getSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/spo-approval.njk', {
+          crn,
+          id: uuid,
+          back: req.query.back,
+          isApproved: true,
+        })
+      })
     })
 
     describe('postSPOApprovalPage', () => {
-      it('redirects to date frequency when CRN and id are valid', async () => {
+      it('redirects to rationale page when CRN and id are valid', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
 
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/rationale`)
       })
 
       it('returns 404 when CRN is invalid', async () => {
@@ -310,6 +346,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -321,10 +358,23 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(false)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+
+      it('redirects SPO approval to date-frequency when rationale flag is off', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        res.locals.flags = { enableEsupervisionRationale: false }
+
+        await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
       })
     })
 
@@ -403,30 +453,67 @@ describe('checkInsController', () => {
     })
 
     describe('Full and Supplementary Results', () => {
-      it('postFullEligibilityPage saves data and redirects to date-frequency', async () => {
+      it('postFullEligibilityPage saves data and redirects to rationale page', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.postFullEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['esupervision', crn, id, 'checkins', 'id'], id)
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/rationale`)
       })
 
-      it('postSupplementaryEligibilityPage saves data and redirects to date-frequency', async () => {
+      it('redirects full eligibility to SPO approval when replacing F2F', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
+
+        const req = baseReq()
+        req.session.data = {
+          esupervision: {
+            [crn]: {
+              [uuid]: {
+                checkins: {
+                  eligibilityChoice: 'REPLACE_F2F',
+                },
+              },
+            },
+          },
+        }
+
+        await controllers.checkIns.postFullEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/spo-approval`)
+      })
+
+      it('postSupplementaryEligibilityPage saves data and redirects to rationale page', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
+        res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
         const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['esupervision', crn, id, 'checkins', 'id'], id)
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/rationale`)
+      })
+
+      it('redirects supplementary eligibility to date-frequency when rationale flag is off', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        res.locals.flags = { enableEsupervisionRationale: false }
+
+        await controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
       })
     })
 
@@ -444,6 +531,130 @@ describe('checkInsController', () => {
     })
   })
 
+  describe('getRationalePage', () => {
+    it('renders rationale page when CRN and id are valid', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
+
+      const { id } = req.params as Record<string, string>
+      await controllers.checkIns.getRationalePage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/rationale.njk', {
+        crn,
+        id,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
+      })
+      expect(mockRenderError).not.toHaveBeenCalled()
+      checkSendAuditMessage(res, 'VIEW_MAS_RATIONALE_TO_USE_CHECK_INS', crn, SubjectType.CRN)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getRationalePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('redirects rationale page to case overview when rationale flag is off', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const req = baseReq()
+
+      res.locals.flags = { enableEsupervisionRationale: false }
+
+      await controllers.checkIns.getRationalePage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
+    })
+
+    it('uses SPO approval as rationale backLink for REPLACE_F2F', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
+
+      req.session.data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                eligibilityChoice: 'REPLACE_F2F',
+              },
+            },
+          },
+        },
+      }
+
+      await controllers.checkIns.getRationalePage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/rationale.njk', {
+        crn,
+        id: uuid,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/spo-approval`,
+      })
+    })
+
+    it('uses summary as rationale backLink when cya=true', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      req.query = { cya: 'true' }
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
+
+      await controllers.checkIns.getRationalePage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/rationale.njk',
+        expect.objectContaining({
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/checkin-summary`,
+        }),
+      )
+    })
+  })
+
+  describe('postRationalePage', () => {
+    it('redirects to date frequency page when CRN and id are valid', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postRationalePage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postRationalePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postRationalePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
   describe('getDateFrequencyPage', () => {
     it('renders with min date using single-digit day format (d/M/yyyy)', async () => {
       jest.useFakeTimers()
@@ -453,6 +664,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
       await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/date-frequency.njk', {
@@ -460,7 +672,7 @@ describe('checkInsController', () => {
         id: uuid,
         checkInMinDate: '1/7/2025',
         cya,
-        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/rationale`,
       })
       checkSendAuditMessage(res, 'VIEW_MAS_SETUP_ONLINE_CHECK_INS', crn, SubjectType.CRN)
     })
@@ -473,6 +685,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
       await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/date-frequency.njk', {
@@ -480,7 +693,7 @@ describe('checkInsController', () => {
         id: uuid,
         checkInMinDate: '9/7/2025',
         cya,
-        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/rationale`,
       })
     })
 
@@ -504,6 +717,71 @@ describe('checkInsController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('uses summary as date-frequency backLink when cya=true', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      req.query = { cya: 'true' }
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
+
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/date-frequency.njk',
+        expect.objectContaining({
+          cya: true,
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/checkin-summary`,
+        }),
+      )
+    })
+
+    it('uses SPO approval as date-frequency backLink when rationale is off and replacing F2F', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: false }
+
+      req.session.data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                eligibilityChoice: 'REPLACE_F2F',
+              },
+            },
+          },
+        },
+      }
+
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/date-frequency.njk',
+        expect.objectContaining({
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/spo-approval`,
+        }),
+      )
+    })
+
+    it('uses supplementary eligibility as date-frequency backLink when rationale is off by default', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: false }
+
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/date-frequency.njk',
+        expect.objectContaining({
+          backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
+        }),
+      )
     })
   })
 
@@ -1031,6 +1309,7 @@ describe('checkInsController', () => {
               interval: 'WEEKLY',
               preferredComs: 'EMAIL',
               photoUploadOption: 'TAKE_A_PIC',
+              rationale: 'Unlikely to reoffend',
             },
           },
         },
@@ -1040,7 +1319,7 @@ describe('checkInsController', () => {
     it('renders summary with transformed userDetails when CRN and id are valid', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: true }
       const req = httpMocks.createRequest({
         params: { crn, id: uuid },
         session: { data: baseSessionData },
@@ -1058,10 +1337,36 @@ describe('checkInsController', () => {
             interval: 'Every week',
             preferredComs: 'Email',
             photoUploadOption: 'Take a photo using this device',
+            rationale: 'Unlikely to reoffend',
           }),
         }),
       )
       expect(mockRenderError).not.toHaveBeenCalled()
+    })
+
+    it('renders summary with rationale hidden when rationale flag is disabled', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      res.locals.flags = { enableEsupervisionEligibility: true, enableEsupervisionRationale: false }
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        session: { data: baseSessionData },
+      })
+
+      await controllers.checkIns.getCheckinSummaryPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/checkin-summary.njk',
+        expect.objectContaining({
+          crn,
+          id: uuid,
+          isRationaleEnabled: false,
+          userDetails: expect.objectContaining({
+            rationale: 'Unlikely to reoffend',
+          }),
+        }),
+      )
     })
 
     it('returns 404 when CRN is invalid', async () => {

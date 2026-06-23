@@ -84,6 +84,7 @@ export interface OffenderInfo {
   contactPreference: string
   startedAt?: string
   eligibilityChoice?: 'REPLACE_F2F' | 'SUPPLEMENT_F2F'
+  rationale?: string
 }
 
 export interface LocationInfo {
