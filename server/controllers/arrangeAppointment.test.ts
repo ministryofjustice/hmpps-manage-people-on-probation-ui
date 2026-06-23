@@ -488,6 +488,59 @@ describe('controllers/arrangeAppointment', () => {
 
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
     })
+    it('should set email and name in the appointment session if enableMAN2344 flag is true and user is the current user', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockRes = createMockResponse({
+        flags: { enableMAN2344: true },
+        user: { username: 'USER-1', email: 'user@email.com', surname: 'Smith' },
+      })
+      const mockReq = createMockRequest({
+        appointmentBody: { temp: { providerCode, teamCode, username: 'user-1' } },
+      })
+
+      await controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient)(mockReq, mockRes)
+
+      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user', 'email'], 'user@email.com')
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'name'],
+        { forename: 'Smith', surname: 'Smith' },
+      )
+    })
+    it('should set email and name in the appointment session if enableMAN2344 flag is true and user is a staff member', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockRes = createMockResponse({
+        flags: { enableMAN2344: true },
+        user: { username: 'user-1' },
+      })
+      const staffUsername = 'staff-1'
+      const mockReq = createMockRequest({
+        appointmentBody: { temp: { providerCode, teamCode, username: staffUsername } },
+        dataSession: {
+          staff: {
+            'user-1': [
+              {
+                username: staffUsername,
+                email: 'staff@email.com',
+                name: { forename: 'Staff', surname: 'Member' },
+                nameAndRole: 'Staff Member (Probation Practitioner)',
+              },
+            ],
+          },
+        },
+      })
+
+      await controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient)(mockReq, mockRes)
+
+      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user', 'email'], 'staff@email.com')
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'name'],
+        { forename: 'Staff', surname: 'Member' },
+      )
+    })
     it('should redirect to the next uncompleted field if the change query parameter exists in the url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
@@ -1097,8 +1150,13 @@ describe('controllers/arrangeAppointment', () => {
   })
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
-        appointmentSession: { user: { username: '' }, smsOptIn: 'YES' },
+        appointmentSession: {
+          user: { username: 'other-user', name: { forename: 'First', surname: 'Last' } },
+          smsOptIn: 'YES',
+        },
         dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
       })
       const mockRes = createMockResponse({
@@ -1123,8 +1181,13 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
     it('should render the reschedule appointment confirmation page', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
-        appointmentSession: { user: { username: '' }, rescheduleAppointment: { contactId: '1234' } },
+        appointmentSession: {
+          user: { username: 'other-user', name: { forename: 'First', surname: 'Last' } },
+          rescheduleAppointment: { contactId: '1234' },
+        },
         dataSession: { temp: { [crn]: { responseContactId: '1234' } }, isOutLookEventFailed: false },
         request: { url: '/reschedule/url' },
       })
@@ -1144,9 +1207,11 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
     it('should render the reschedule appointment confirmation page if next appointment has been arranged', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
         appointmentSession: {
-          user: { username: '' },
+          user: { username: 'other-user', name: { forename: 'First', surname: 'Last' } },
           rescheduleAppointment: { contactId: '1234' },
         },
         appointments: {

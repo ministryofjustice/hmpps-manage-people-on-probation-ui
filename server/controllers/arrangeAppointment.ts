@@ -31,6 +31,7 @@ import { getMinMaxDates } from '../utils/getMinMaxDates'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
 import { filterContacts } from '../middleware/filterContacts'
+import { Name } from '../data/model/personalDetails'
 
 const routes = [
   'redirectToSentence',
@@ -226,8 +227,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
         if (res.locals.flags.enableMAN2344) {
-          const email = staffMember?.email ?? null
-          const name = staffMember?.name ?? null
+          let email: string
+          let name: Name
+          if (username.toLowerCase() === res.locals.user.username.toLowerCase()) {
+            email = res.locals.user.email ?? null
+            name = { forename: res.locals.user?.surname ?? null, surname: res.locals.user?.surname ?? null }
+          } else {
+            email = staffMember?.email ?? null
+            name = staffMember?.name ?? null
+          }
           setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
           setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         }
@@ -538,18 +546,13 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending.username.toUpperCase() !== res.locals.user.username) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        try {
-          const probationPractitioner = await masClient.getProbationPractitioner(crn)
-          const probationPractitionersForename = probationPractitioner.name.forename || ''
+      if (attending.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+        if (attending?.name?.forename) {
           const formattedName =
-            probationPractitionersForename.charAt(0).toUpperCase() +
-            probationPractitionersForename.slice(1).toLowerCase()
+            attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
           // First letter of the PPs name should be uppercase as per requirement
           attendingName = `${formattedName}’s`
-        } catch {
+        } else {
           attendingName = `The officer´s`
         }
       }
