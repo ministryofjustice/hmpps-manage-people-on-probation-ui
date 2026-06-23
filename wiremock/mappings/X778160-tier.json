@@ -39,6 +39,25 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/tier/v3/crn/X778160/tier",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "tierScore": "B2",
+          "calculationId": "ee1f151f-7417-47f8-9366-2ced6356db37",
+          "calculationDate": "2023-12-07T12:05:11.524616",
+          "changeReason": "",
+          "provisional": true
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }

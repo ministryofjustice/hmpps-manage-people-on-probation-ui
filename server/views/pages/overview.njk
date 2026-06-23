@@ -158,7 +158,7 @@
     {{ govukNotificationBanner({ html: html }) }}
   {% endif %}
 
-  {% if flags.enableSupervisionPackage and tierDetails %}
+  {% if flags.enableSupervisionPackage %}
     {{ supervisionPackage({
       tierScore: tierDetails.calculation.tierScore,
       provisional: tierDetails.calculation.provisional,
@@ -613,7 +613,7 @@
               {
                 key: { html: '<span data-qa="orderLabel">Order</span>'},
                 value: { html: '<span data-qa="orderValue">No active sentence</span>'}
-              } 
+              }
             ]
           }) }}
         {%- endset %}
