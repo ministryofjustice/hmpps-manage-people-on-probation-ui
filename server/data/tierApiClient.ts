@@ -10,7 +10,7 @@ export interface LatestTier {
 }
 
 export interface LatestTierResponse {
-  calculation: LatestTier | null
+  calculation: LatestTier
   httpStatus: number
 }
 
