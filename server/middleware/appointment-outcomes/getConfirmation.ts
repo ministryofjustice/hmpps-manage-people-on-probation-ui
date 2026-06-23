@@ -65,7 +65,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
       if (sentenceType === 'CUSTODY') {
         actions.push({
           text: 'use the Consider a recall service',
-          href: `${config.apis.hmppsAuth.url}?redirect_uri=${config.recall.link}/sign-in/callback`,
+          href: config.recall.link,
           external: true,
         })
       }
