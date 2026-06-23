@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon'
+import { DateTime, DateTimeMaybeValid } from 'luxon'
 import { fromIsoDateToPicker } from './fromIsoDateToPicker'
 
 describe('utils/fromIsoDateToPicker', () => {
@@ -19,7 +19,7 @@ describe('utils/fromIsoDateToPicker', () => {
     const fakeDateTime = {
       toFormat: jest.fn().mockReturnValue('Invalid DateTime'),
       isValid: true,
-    } as unknown as DateTime
+    } as unknown as DateTimeMaybeValid
 
     jest.spyOn(DateTime, 'fromISO').mockReturnValue(fakeDateTime)
     expect(fromIsoDateToPicker('2025-02-27')).toEqual('2025-02-27')
