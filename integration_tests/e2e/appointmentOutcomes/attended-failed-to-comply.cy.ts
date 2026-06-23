@@ -117,7 +117,7 @@ const getExpectedOptions = ({
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it('should render the page if sentence type is community and user is not probation practitioner', () => {
-    loadPage({ journey })
+    loadPage({ journey, sentenceType: 'COMMUNITY' })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
     attendedFailedToComplyPage.checkPageTitle('Enforcement action for Alton’s failure to comply')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
@@ -165,6 +165,9 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
 }
 
 describe('Attended but failed to comply', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   afterEach(() => {
     cy.task('resetMocks')
   })
