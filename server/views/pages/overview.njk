@@ -160,8 +160,8 @@
 
   {% if flags.enableSupervisionPackage %}
     {{ supervisionPackage({
-      tierScore: tierDetails.calculation.tierScore,
-      provisional: tierDetails.calculation.provisional,
+      tierScore: tierDetails.calculation.tierScore if tierDetails.calculation.tierScore !== 'MISSING' else null,
+      tag: tierDetails.calculation.tag,
       historyHref: tierUrlV3
     }) }}
   {% endif %}

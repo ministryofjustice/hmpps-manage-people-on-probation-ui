@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { getTierDetails } from './getTierDetails'
 import HmppsAuthClient from '../data/hmppsAuthClient'
-import { LatestTier, LatestTierResponse } from '../data/tierApiClient'
+import { LatestTierV3, LatestTierResponse } from '../data/tierApiClient'
 import { AppResponse } from '../models/Locals'
 import { PersonalDetailsSession } from '../models/Data'
 import logger from '../../logger'
@@ -24,7 +24,8 @@ const makeTierResponse = (overrides: Partial<LatestTierResponse> = {}): LatestTi
     calculationDate: '2024-01-01T00:00:00',
     changeReason: '',
     provisional: true,
-  } as LatestTier,
+    tag: { text: null, color: null },
+  } as LatestTierV3,
   httpStatus: 200,
   ...overrides,
 })
@@ -139,7 +140,7 @@ describe('getTierDetails middleware', () => {
     process.env.NODE_ENV = 'development'
     const cached = makeTierResponse()
     const fresh = makeTierResponse({
-      calculation: { ...cached.calculation, tierScore: 'A1' } as LatestTier,
+      calculation: { ...cached.calculation, tierScore: 'A1' } as LatestTierV3,
     })
     mpopComponents.getTierDetails.mockResolvedValue(fresh)
     const req = buildReq({ [CRN]: makeSessionEntry(cached) })
@@ -233,7 +234,8 @@ describe('getTierDetails middleware', () => {
         calculationId: '1',
         calculationDate: '',
         changeReason: '',
-      } as LatestTier,
+        tag: { text: 'Missing', color: 'red' },
+      } as LatestTierV3,
       httpStatus: 200,
     })
     const req = buildReq({ [CRN]: makeSessionEntry() })
@@ -257,7 +259,8 @@ describe('getTierDetails middleware', () => {
         calculationId: '1',
         calculationDate: '',
         changeReason: '',
-      } as LatestTier,
+        tag: { text: 'Missing', color: 'red' },
+      } as LatestTierV3,
       httpStatus: 200,
     })
     const req = buildReq({ [CRN]: makeSessionEntry() })
@@ -286,6 +289,31 @@ describe('getTierDetails middleware', () => {
     )
 
     expect(res.locals.tierDetails?.calculation?.tierScore).toBe('B2')
+  })
+
+  it('should not display tierScore when it is MISSING', async () => {
+    mpopComponents.getTierDetails.mockResolvedValue({
+      calculation: {
+        tierScore: 'MISSING',
+        provisional: false,
+        calculationId: '1',
+        calculationDate: '',
+        changeReason: '',
+        tag: { text: 'Missing', color: 'red' },
+      } as LatestTierV3,
+      httpStatus: 200,
+    })
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
+      req,
+      res,
+      nextSpy,
+    )
+
+    expect(res.locals.tierDetails?.calculation?.tierScore).toBe('MISSING')
+    expect(res.locals.tierDetails?.calculation?.tag).toEqual({ text: 'Missing', color: 'red' })
   })
 
   it('should set res.locals.tierUrlV3 with the CRN-specific URL', async () => {
