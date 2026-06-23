@@ -2,7 +2,11 @@ import { Route } from '../../@types'
 import { appointmentOutcomesValidation } from '../../properties'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 import { validateWithSpec } from '../../utils/validationUtils'
-import { LocalParams } from '../../models/Appointments'
+import {
+  LocalParams,
+  otherEnforcementActionLetterTypes,
+  type OtherEnforcementActionsLetterType,
+} from '../../models/Appointments'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
@@ -14,6 +18,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     baseOutcomeUrl,
     reqUrl,
     sendBreachOrRecallLetter,
+    appointmentSession,
   } = res.locals.appointmentOutcome
   const { maxCharCount } = config
   const id = uuid || contactId
@@ -157,6 +162,9 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   }
 
   const validateSendLetter = (): void => {
+    const otherLetterActionSet = otherEnforcementActionLetterTypes.includes(
+      appointmentSession.outcome.otherEnforcementAction as OtherEnforcementActionsLetterType,
+    )
     if (!req.url.includes(`${baseOutcomeUrl}/send-letter`)) return
     render = 'pages/appointment-outcomes/send-letter'
     errorMessages = {
@@ -169,6 +177,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/send-letter`,
           msg: ['Select who will send the letter', 'Select the type of letter'],
           log: ['letter sent by no selected', 'letter type not selected'],
+          otherLetterActionSet,
         }),
       ),
     }

@@ -202,6 +202,18 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [
       `${arrangeBasePath}/attended-failed-to-comply`,
       `${manageBasePath}/attended-failed-to-comply`,
+      `${arrangeBasePath}/unacceptable-absence`,
+      `${manageBasePath}/unacceptable-absence`,
+      `${arrangeBasePath}/failed-to-attend`,
+      `${manageBasePath}/failed-to-attend`,
+    ],
+    resetSelectedActions(['otherEnforcementAction']),
+  )
+
+  router.post(
+    [
+      `${arrangeBasePath}/attended-failed-to-comply`,
+      `${manageBasePath}/attended-failed-to-comply`,
       `${arrangeBasePath}/acceptable-absence`,
       `${manageBasePath}/acceptable-absence`,
       `${arrangeBasePath}/unacceptable-absence`,

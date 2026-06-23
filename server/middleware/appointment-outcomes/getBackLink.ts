@@ -1,5 +1,9 @@
 import { Route } from '../../@types'
-import { AppointmentOutcomeType } from '../../models/Appointments'
+import {
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+  AppointmentSessionOutcome,
+} from '../../models/Appointments'
 import { getDataValue } from '../../utils'
 
 export const getBackLink: Route<void> = (req, res, next) => {
@@ -9,19 +13,24 @@ export const getBackLink: Route<void> = (req, res, next) => {
     backLink = uuid ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`
   }
   let outcomeType: AppointmentOutcomeType
+  let otherEnforcementAction: AppointmentEnforcementAction
   if (req?.body?.appointments?.[crn]?.[id]?.outcome?.outcomeType) {
     outcomeType = req.body.appointments[crn][id].outcome.outcomeType
+    otherEnforcementAction = req.body.appointments[crn][id].outcome.otherEnforcementAction
   } else {
-    outcomeType = req?.session?.data
-      ? getDataValue<AppointmentOutcomeType>(req.session.data, ['appointments', crn, id, 'outcome', 'outcomeType'])
-      : null
+    const outcome = getDataValue<AppointmentSessionOutcome>(req.session.data, ['appointments', crn, id, 'outcome'])
+    if (outcome) {
+      outcomeType = outcome?.outcomeType || null
+      otherEnforcementAction = outcome?.otherEnforcementAction || null
+    }
   }
   if (
     [
       `${baseOutcomeUrl}/enforcement-action`,
       `${baseOutcomeUrl}/send-letter`,
       `${baseOutcomeUrl}/initiate-breach-or-recall`,
-    ].some(route => route === reqUrl)
+    ].some(route => route === reqUrl) &&
+    outcomeType
   ) {
     switch (outcomeType) {
       case 'ATTENDED_SENT_HOME_BEHAVIOUR':
@@ -37,6 +46,9 @@ export const getBackLink: Route<void> = (req, res, next) => {
         break
       default:
         backLink = `/case/${crn}/appointments/appointment/${id}/manage`
+    }
+    if (otherEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/enforcement-action`
     }
   }
   res.locals.appointmentOutcome.backLink = backLink

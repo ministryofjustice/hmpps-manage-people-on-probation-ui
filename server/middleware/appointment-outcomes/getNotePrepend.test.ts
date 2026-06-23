@@ -1,18 +1,24 @@
 import httpMocks from 'node-mocks-http'
 import { getNotePrepend } from './getNotePrepend'
 import { mockAppResponse } from '../../controllers/mocks'
-import { EnforcementActionCreatedBy, EnforcementActionLetterType } from '../../models/Appointments'
+import {
+  EnforcementActionCreatedBy,
+  EnforcementActionLetterType,
+  OtherEnforcementActionsLetterType,
+} from '../../models/Appointments'
 import { SentenceType } from '../../data/model/sentenceDetails'
 
 const buildResponse = ({
   breachNSICreatedBy = null,
   letterSentBy = null,
   letterType = null,
+  otherEnforcementAction = null,
   sentenceType = 'COMMUNITY',
 }: {
   breachNSICreatedBy?: EnforcementActionCreatedBy
   letterSentBy?: EnforcementActionCreatedBy
   letterType?: EnforcementActionLetterType
+  otherEnforcementAction?: OtherEnforcementActionsLetterType
   sentenceType?: SentenceType
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
@@ -25,6 +31,7 @@ const buildResponse = ({
           breachNSICreatedBy,
           letterSentBy,
           letterType,
+          otherEnforcementAction,
         },
       },
     },
@@ -59,6 +66,11 @@ describe('/middleware/appointment-outcomes/getNotePrepend', () => {
   })
   it('should set the correct value if letter sent by USER and action is BREACH_LETTER_SENT', () => {
     const res = buildResponse({ letterSentBy: 'USER', letterType: 'BREACH_LETTER_SENT' })
+    getNotePrepend(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach warning letter')
+  })
+  it('should set the correct value if other letter type has been selected', () => {
+    const res = buildResponse({ letterSentBy: 'USER', letterType: null, otherEnforcementAction: 'BREACH_LETTER_SENT' })
     getNotePrepend(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach warning letter')
   })

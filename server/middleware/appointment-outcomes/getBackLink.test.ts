@@ -1,8 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { getBackLink } from './getBackLink'
-import { AppointmentOutcomeType } from '../../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
 import { AppointmentOutcomeProps } from '../../models/Locals'
-import { getDataValue } from '../../utils'
 import { Activity } from '../../data/model/schedule'
 
 const nextSpy = jest.fn()
@@ -17,22 +16,17 @@ type SelectedOutcomeTypes = {
   [K in AppointmentOutcomeType]?: string
 }
 
-jest.mock('../../utils', () => {
-  const actualUtils = jest.requireActual('../../utils')
-  return {
-    ...actualUtils,
-    getDataValue: jest.fn(),
-  }
-})
-
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
-
-const appointment = (id: string, outcomeType: AppointmentOutcomeType) => ({
+const appointment = (
+  id: string,
+  outcomeType: AppointmentOutcomeType,
+  otherEnforcementAction: AppointmentEnforcementAction = null,
+) => ({
   appointments: {
     [crn]: {
       [id]: {
         outcome: {
           outcomeType,
+          otherEnforcementAction,
         },
       },
     },
@@ -43,15 +37,17 @@ const mockReq = ({
   id = uuid,
   request = {},
   outcomeType = 'ATTENDED_COMPLIED',
+  otherEnforcementAction = null,
 }: {
   id?: string
   request?: Record<string, any>
   outcomeType?: AppointmentOutcomeType
+  otherEnforcementAction?: AppointmentEnforcementAction
 }): httpMocks.MockRequest<any> => {
   const req = {
-    body: appointment(id, outcomeType),
+    body: appointment(id, outcomeType, otherEnforcementAction),
     session: {
-      data: appointment(id, outcomeType),
+      data: appointment(id, outcomeType, otherEnforcementAction),
     },
     ...request,
   }
@@ -82,9 +78,11 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
     requestMethod: 'GET' | 'POST'
   }) => {
     const request = requestMethod === 'GET' ? { body: {} } : { session: {} }
-    const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
+
     const localsVars = arrangeAppointmentJourney ? { uuid, id: uuid } : { id: contactId, contactId }
+
     it('should return correct link if on outcome page', () => {
+      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: baseOutcomeUrl, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(
@@ -92,29 +90,46 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
       )
     })
     it('should return correct link if on attended complied page', () => {
+      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-complied`, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on attended failed to comply page', () => {
+      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-failed-to-comply`, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on acceptable absence page', () => {
+      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/acceptable-absence`, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on unacceptable absence page', () => {
+      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/unacceptable-absence`, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on failed to attend page', () => {
+      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/failed-to-attend`, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
+    })
+
+    it('should return the correct link if on send letter page and other enforcement action has been set', () => {
+      const req = mockReq({
+        request,
+        id: arrangeAppointmentJourney ? uuid : contactId,
+        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+        otherEnforcementAction: 'BREACH_LETTER_SENT',
+      })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/send-letter`, ...localsVars })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/enforcement-action`)
     })
 
     const outcomePages = {
@@ -133,10 +148,9 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
     Object.entries(outcomePages).forEach(([pageTitle, pageUrl]) => {
       Object.entries(selectedOutcomeTypes).forEach(([type, url]: [AppointmentOutcomeType, string]) => {
         it(`should return correct link if on ${pageTitle} and selected outcome is ${type}`, () => {
-          const mockedReq = mockReq({ id: arrangeAppointmentJourney ? uuid : contactId, outcomeType: type, request })
+          const req = mockReq({ id: arrangeAppointmentJourney ? uuid : contactId, outcomeType: type, request })
           const res = mockRes({ reqUrl: `${baseOutcomeUrl}/${pageUrl}`, ...localsVars })
-          mockGetDataValue.mockReturnValue(type)
-          getBackLink(mockedReq, res, nextSpy)
+          getBackLink(req, res, nextSpy)
           expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/${url}`)
         })
       })
