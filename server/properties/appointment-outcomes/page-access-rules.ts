@@ -221,6 +221,18 @@ export const pageAccessRules: PageAccessRule[] = [
         'outcome.outcomeType': anyValue,
         'outcome.updateEnforcementAction': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'BREACH_RECALL_INITIATED',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'BREACH_RECALL_INITIATED',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'BREACH_RECALL_INITIATED',
+      },
     ],
   },
   {
@@ -253,6 +265,66 @@ export const pageAccessRules: PageAccessRule[] = [
       {
         'outcome.outcomeType': 'FAILED_TO_ATTEND',
         'outcome.failedToAttend': 'SEND_LETTER',
+      },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'BREACH_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'FIRST_WARNING_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'SECOND_WARNING_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'OTHER_ENFORCEMENT_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'LICENCE_COMPLIANCE_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'BREACH_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'FIRST_WARNING_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'SECOND_WARNING_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'OTHER_ENFORCEMENT_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'LICENCE_COMPLIANCE_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'BREACH_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'FIRST_WARNING_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'SECOND_WARNING_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'OTHER_ENFORCEMENT_LETTER_SENT',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'LICENCE_COMPLIANCE_LETTER_SENT',
       },
     ],
   },

@@ -38,6 +38,17 @@ describe('middleware/appointment-outcomes/handleOutcomePageRedirect', () => {
     handleOutcomePageRedirect('attendedFailedToComply')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/send-letter`)
   })
+  it('should redirect to the send letter page if other enforcement action is a letter', () => {
+    const req = httpMocks.createRequest()
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      attendedFailedToComply: 'DIFFERENT_ACTION',
+      otherEnforcementAction: 'BREACH_LETTER_SENT',
+    }
+    const res = buildResponse(outcome)
+    const redirectSpy = jest.spyOn(res, 'redirect')
+    handleOutcomePageRedirect('otherEnforcementAction')(req, res)
+    expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/send-letter`)
+  })
   it('should redirect to the initiate breach or recall page with change url query', () => {
     const req = httpMocks.createRequest({ query: { change } })
     const outcome: Partial<AppointmentSessionOutcome> = {

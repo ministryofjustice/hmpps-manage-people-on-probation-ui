@@ -244,10 +244,6 @@ export interface CurrentEnforcementAction {
 
 export interface OutcomeCompliance {
   currentSentences?: SentenceCompliance[]
-  // sentence:
-  // failureToComplyInLast12MonthsCount?: number
-  // priorBreachesOnCurrentOrderCount?: number
-  // nonCompliance?: NonComplianceHistoryResponse
 }
 
 export interface AppointmentOutcomeProps<TAppointment> {

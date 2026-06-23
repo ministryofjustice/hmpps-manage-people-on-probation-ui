@@ -11,8 +11,8 @@
     },
     items: appointmentOutcome.letterSentByOptions
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'letterSentBy'])) }}
-
-{{ govukRadios({
+{% if not appointmentOutcome.appointmentSession.outcome.otherEnforcementAction %}
+  {{ govukRadios({
     fieldset: {
        attributes: {
         'data-qa': 'letterType'
@@ -25,3 +25,4 @@
     },
     items: appointmentOutcome.letterTypeOptions
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'letterType'])) }}
+{% endif %}
