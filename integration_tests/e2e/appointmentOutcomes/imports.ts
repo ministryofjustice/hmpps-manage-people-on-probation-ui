@@ -241,8 +241,8 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
         page
           .getTicketPanel()
-          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
-          .should('contain.text', 'You should consider initiating a recall')
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
+          .should('contain.text', 'You should consider initiating a recall.')
         page
           .getTicketPanel()
           .find('.govuk-link')
@@ -292,7 +292,7 @@ export const checkTicketPanel = <TArgs extends Record<string, any>>(
         loadPageFunc({ ...args, sentenceType: 'CUSTODY' })
         page
           .getTicketPanel()
-          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months.')
+          .should('contain.text', 'Alton has had multiple counts of non-compliance in the past 12 months')
           .should('contain.text', 'Alton has been recalled before')
         page
           .getTicketPanel()
