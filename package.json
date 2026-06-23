@@ -180,7 +180,7 @@
     "url-value-parser": "^2.2.0",
     "util": "^0.12.5",
     "util.inherits": "^1.0.3",
-    "uuid": "14.0.0",
+    "uuid": "14.0.1",
     "webpack": "^5.107.2",
     "webpack-cli": "^7.0.3",
     "wiremock": "^3.13.1"
