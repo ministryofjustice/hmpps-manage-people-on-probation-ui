@@ -221,6 +221,18 @@ export const pageAccessRules: PageAccessRule[] = [
         'outcome.outcomeType': anyValue,
         'outcome.updateEnforcementAction': 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': 'BREACH_RECALL_INITIATED',
+      },
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': 'BREACH_RECALL_INITIATED',
+      },
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': 'BREACH_RECALL_INITIATED',
+      },
     ],
   },
   {
@@ -253,6 +265,20 @@ export const pageAccessRules: PageAccessRule[] = [
       {
         'outcome.outcomeType': 'FAILED_TO_ATTEND',
         'outcome.failedToAttend': 'SEND_LETTER',
+      },
+      {
+        'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY',
+        'outcome.otherEnforcementAction': anyValue,
+      },
+
+      {
+        'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE',
+        'outcome.otherEnforcementAction': anyValue,
+      },
+
+      {
+        'outcome.outcomeType': 'FAILED_TO_ATTEND',
+        'outcome.otherEnforcementAction': anyValue,
       },
     ],
   },
