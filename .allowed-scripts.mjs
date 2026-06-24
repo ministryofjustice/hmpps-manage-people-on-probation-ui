@@ -20,6 +20,6 @@ export default configureAllowedScripts({
     'node_modules/unrs-resolver@1.11.1': 'ALLOW',
     // required for open telemetry for app insights
     'node_modules/@grpc/proto-loader/node_modules/protobufjs@7.6.4': 'ALLOW',
-    'node_modules/@opentelemetry/otlp-transformer/node_modules/protobufjs@8.0.1': 'ALLOW'
+    'node_modules/@opentelemetry/otlp-transformer/node_modules/protobufjs@8.0.1': 'ALLOW',
   },
 })
