@@ -159,9 +159,10 @@
   {% endif %}
 
   {% if flags.enableSupervisionPackage %}
+    {% set tierCalculation = tierDetails.calculation if tierDetails else null %}
     {{ supervisionPackage({
-      tierScore: tierDetails.calculation.tierScore,
-      provisional: tierDetails.calculation.provisional,
+      tierScore: (tierCalculation.tierScore if tierCalculation.tierScore !== 'MISSING' else null) if tierCalculation else null,
+      tag: tierCalculation.tag if tierCalculation else null,
       historyHref: tierUrlV3
     }) }}
   {% endif %}
