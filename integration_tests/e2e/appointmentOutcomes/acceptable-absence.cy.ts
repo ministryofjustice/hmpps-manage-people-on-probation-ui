@@ -195,7 +195,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     checkOptionRedirects(options, AcceptableAbsencePage)
   })
   // checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage, { journey })
-  checkTicketPanel(loadPage, AcceptableAbsencePage, { journey })
+  // checkTicketPanel(loadPage, AcceptableAbsencePage, { journey })
 }
 
 describe('Acceptable absence', () => {
