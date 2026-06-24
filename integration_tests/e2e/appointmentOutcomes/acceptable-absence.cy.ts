@@ -140,62 +140,62 @@ const getExpectedOptions = ({
 }
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
-  // it('should render the page if sentence length is over 24 months', () => {
-  //   loadPage({ journey })
-  //   acceptableAbsencePage = new AcceptableAbsencePage()
-  //   checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-  //   cy.get('legend').should('contain.text', 'Why was Alton’s absence acceptable?')
-  //   let expectedAppointment = '3 way meeting (NS) with Terry Jones on Wednesday 21 February 2024'
-  //   const now = DateTime.now()
-  //   const yesterday = now.minus({ days: 1 })
-  //   const expectedDate = dateWithDayAndWithYear(yesterday.toISODate())
-  //   if (journey === 'ARRANGE') {
-  //     expectedAppointment = `Planned office visit (NS) with Deborah Fern on ${expectedDate}`
-  //   }
-  //   if (journey === 'RESCHEDULE') {
-  //     expectedAppointment = `3 way meeting (NS) with Terry Jones on ${expectedDate}`
-  //   }
-  //   cy.get('.govuk-hint').should('contain.text', `Appointment: ${expectedAppointment}.`)
-  //   const options = getExpectedOptions()
-  //   checkOptions(options)
-  // })
-  // it('should render the page if sentence length is 24 months or less', () => {
-  //   loadPage({ journey, sentenceLength: 12 })
-  //   const options = getExpectedOptions({ sentenceLength: 12 })
-  //   checkOptions(options)
-  // })
-  // it('should have the correct back link', () => {
-  //   loadPage({ journey })
-  //   let expectedLink: string
-  //   getUuid(3).then(uuid => {
-  //     if (journey === 'MANAGE') {
-  //       expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome`
-  //     } else {
-  //       expectedLink = `/case/${crn}/arrange-appointment/${uuid}/outcome`
-  //     }
-  //     acceptableAbsencePage.getBackLink().should('have.attr', 'href', expectedLink)
-  //   })
-  // })
-  // it('should show validation error when no option is selected', () => {
-  //   const msg = 'Select why their absence was acceptable'
-  //   loadPage({ journey })
-  //   acceptableAbsencePage = new AcceptableAbsencePage()
-  //   uncheckAllRadios()
-  //   acceptableAbsencePage.getSubmitBtn().click()
-  //   acceptableAbsencePage.checkErrorSummaryBox([msg])
-  //   getUuid(3).then(uuid => {
-  //     const id = journey === 'MANAGE' ? appointmentId : uuid
-  //     cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
-  //   })
-  // })
+  it('should render the page if sentence length is over 24 months', () => {
+    loadPage({ journey })
+    acceptableAbsencePage = new AcceptableAbsencePage()
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+    cy.get('legend').should('contain.text', 'Why was Alton’s absence acceptable?')
+    let expectedAppointment = '3 way meeting (NS) with Terry Jones on Wednesday 21 February 2024'
+    const now = DateTime.now()
+    const yesterday = now.minus({ days: 1 })
+    const expectedDate = dateWithDayAndWithYear(yesterday.toISODate())
+    if (journey === 'ARRANGE') {
+      expectedAppointment = `Planned office visit (NS) with Deborah Fern on ${expectedDate}`
+    }
+    if (journey === 'RESCHEDULE') {
+      expectedAppointment = `3 way meeting (NS) with Terry Jones on ${expectedDate}`
+    }
+    cy.get('.govuk-hint').should('contain.text', `Appointment: ${expectedAppointment}.`)
+    const options = getExpectedOptions()
+    checkOptions(options)
+  })
+  it('should render the page if sentence length is 24 months or less', () => {
+    loadPage({ journey, sentenceLength: 12 })
+    const options = getExpectedOptions({ sentenceLength: 12 })
+    checkOptions(options)
+  })
+  it('should have the correct back link', () => {
+    loadPage({ journey })
+    let expectedLink: string
+    getUuid(3).then(uuid => {
+      if (journey === 'MANAGE') {
+        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome`
+      } else {
+        expectedLink = `/case/${crn}/arrange-appointment/${uuid}/outcome`
+      }
+      acceptableAbsencePage.getBackLink().should('have.attr', 'href', expectedLink)
+    })
+  })
+  it('should show validation error when no option is selected', () => {
+    const msg = 'Select why their absence was acceptable'
+    loadPage({ journey })
+    acceptableAbsencePage = new AcceptableAbsencePage()
+    uncheckAllRadios()
+    acceptableAbsencePage.getSubmitBtn().click()
+    acceptableAbsencePage.checkErrorSummaryBox([msg])
+    getUuid(3).then(uuid => {
+      const id = journey === 'MANAGE' ? appointmentId : uuid
+      cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
+    })
+  })
 
-  // it('should redirect to the correct page when an option is selected', () => {
-  //   const options = getExpectedOptions()
-  //   loadPage({ journey })
-  //   checkOptionRedirects(options, AcceptableAbsencePage)
-  // })
-  checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage, { journey })
-  // checkTicketPanel(loadPage, AcceptableAbsencePage, { journey })
+  it('should redirect to the correct page when an option is selected', () => {
+    const options = getExpectedOptions()
+    loadPage({ journey })
+    checkOptionRedirects(options, AcceptableAbsencePage)
+  })
+  // checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage, { journey })
+  checkTicketPanel(loadPage, AcceptableAbsencePage, { journey })
 }
 
 describe('Acceptable absence', () => {
@@ -205,10 +205,10 @@ describe('Acceptable absence', () => {
   describe('Manage appointment journey', () => {
     checkPage()
   })
-  // describe('Arrange appointment journey', () => {
-  //   checkPage({ journey: 'ARRANGE' })
-  // })
-  // describe('Reschedule appointment journey', () => {
-  //   checkPage({ journey: 'RESCHEDULE' })
-  // })
+  describe('Arrange appointment journey', () => {
+    checkPage({ journey: 'ARRANGE' })
+  })
+  describe('Reschedule appointment journey', () => {
+    checkPage({ journey: 'RESCHEDULE' })
+  })
 })
