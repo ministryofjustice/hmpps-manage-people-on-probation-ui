@@ -291,7 +291,7 @@ describe('getTierDetails middleware', () => {
     expect(res.locals.tierDetails?.calculation?.tierScore).toBe('B2')
   })
 
-  it('should not display tierScore when it is MISSING', async () => {
+  it('should display tierScore when it is MISSING', async () => {
     mpopComponents.getTierDetails.mockResolvedValue({
       calculation: {
         tierScore: 'MISSING',

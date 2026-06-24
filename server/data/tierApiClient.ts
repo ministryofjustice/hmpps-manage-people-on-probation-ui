@@ -17,7 +17,7 @@ export type LatestTierV3 = LatestTier & {
 }
 
 export interface LatestTierResponse {
-  calculation: LatestTierV3
+  calculation: LatestTierV3 | null
   httpStatus: number
   error?: Error | null
 }
