@@ -155,7 +155,7 @@ describe('masApiClient', () => {
       ],
       [
         'getEnforcementContacts',
-        '/contact/USER1/enforcements?size=10&page=0&filterDueDate=true',
+        '/contact/USER1/enforcements?page=0&size=10&filterDueDate=false&months=12&sortBy=contactDate&direction=DESC',
         () => masApiClient.getEnforcementContacts('USER1', '0', '10'),
       ],
       [
