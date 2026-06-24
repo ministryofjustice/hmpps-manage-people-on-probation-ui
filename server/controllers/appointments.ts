@@ -170,18 +170,23 @@ const appointmentsController: Controller<typeof routes, void> = {
       const canReschedule = canRescheduleAppointment(personAppointment)
       // eslint-disable-next-line no-console
       console.log('CAN RESCHEDULE SET')
-      return res.render('pages/appointments/manage-appointment', {
-        personAppointment,
-        crn,
-        back,
-        url,
-        nextAppointment,
-        nextAppointmentIsAtHome,
-        canReschedule,
-        contactId,
-        hasDeceased,
-        relatedContacts,
-      })
+      try {
+        return res.render('pages/appointments/manage-appointment', {
+          personAppointment,
+          crn,
+          back,
+          url,
+          nextAppointment,
+          nextAppointmentIsAtHome,
+          canReschedule,
+          contactId,
+          hasDeceased,
+          relatedContacts,
+        }) // FAILS HERE
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        return console.log(error)
+      }
     }
   },
   getRecordAnOutcome: _hmppsAuthClient => {
