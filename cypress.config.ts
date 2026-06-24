@@ -21,6 +21,10 @@ export default defineConfig({
       coverageTask(on, config)
       on('task', {
         ...stubs,
+        log(message) {
+          console.log(message)
+          return null
+        },
       })
       return config
     },
