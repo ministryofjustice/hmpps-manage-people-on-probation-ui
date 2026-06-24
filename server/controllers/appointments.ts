@@ -129,6 +129,8 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getManageAppointment: hmppsAuthClient => {
     return async (req, res) => {
+      // eslint-disable-next-line no-console
+      console.log('GET MANAGE APPOINTMENT')
       const { crn, contactId } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MANAGE_APPOINTMENT',
@@ -149,16 +151,20 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
+      console.log('GOT SYSTEM TOKEN')
       const [personAppointment, nextAppointment, relatedContacts] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
         masClient.getNextAppointment(username, crn, contactId),
         masClient.getRelatedContacts(crn, contactId),
       ])
+      // eslint-disable-next-line no-console
+      console.log('GOT RELATED CONTACTS')
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
+      console.log('GONNA RENDER PAGE')
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,

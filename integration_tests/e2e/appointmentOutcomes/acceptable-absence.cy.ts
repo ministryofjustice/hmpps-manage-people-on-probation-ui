@@ -44,7 +44,7 @@ const loadPage = ({
   cy.task('log', 'Starting page load')
   if (journey === 'MANAGE') {
     cy.task('log', 'Manage')
-    cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
+    cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`) // fails here
     cy.task('log', 'Visited page')
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getTaskLink(1).click()
