@@ -126,7 +126,6 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         if (appointmentLocation) outlookEventRequestBody.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
-      console.dir(outlookEventRequestBody, {depth:null})
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.

@@ -379,7 +379,7 @@ describe('Confirmation page', () => {
           .find('p')
           .eq(1)
           .should('contain.text', 'The appointment details have been updated on:')
-        cy.get('[data-qa="what-happens-next"]').find('ul').find('li').eq(0).should('contain.text', 'Deborah’s calendar')
+        cy.get('[data-qa="what-happens-next"]').find('ul').find('li').eq(0).should('contain.text', 'Terry’s calendar')
         cy.get('[data-qa="what-happens-next"]')
           .find('ul')
           .find('li')
