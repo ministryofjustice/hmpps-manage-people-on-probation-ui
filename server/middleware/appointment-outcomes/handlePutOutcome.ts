@@ -4,23 +4,14 @@ import MasApiClient from '../../data/masApiClient'
 import { PutContactRequest } from '../../data/model/schedule'
 import { AppointmentOutcomeType } from '../../models/Appointments'
 import { handleQuotes } from '../../utils'
-import { findUncompleted } from '../findUncompleted'
 import { renderError } from '../renderError'
 
 type PutContactPromise = ReturnType<MasApiClient['putContact']>
 
 export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
-    const {
-      appointmentSession,
-      notePrepend,
-      contactId,
-      uuid,
-      isValidParams,
-      baseOutcomeUrl,
-      responseContactId,
-      isInPast,
-    } = res.locals.appointmentOutcome
+    const { appointmentSession, notePrepend, contactId, isValidParams, baseOutcomeUrl, responseContactId, isInPast } =
+      res.locals.appointmentOutcome
 
     /*
      only send request if putting outcome for arranged/rescheduled appt in the past or 
@@ -40,8 +31,8 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const sensitivity = appointmentSession?.sensitivity
       const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
       let notes = appointmentSession?.notes || ''
-      if (notes && notePrepend) {
-        notes = `${notePrepend}\n${notes}`
+      if (notePrepend) {
+        notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
       }
       const sensitive = appointmentSession?.sensitivity === 'Yes'
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

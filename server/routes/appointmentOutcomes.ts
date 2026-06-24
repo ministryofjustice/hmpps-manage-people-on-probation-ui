@@ -305,15 +305,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(`${manageBasePath}/update-enforcement-action`, handleOutcomePageRedirect('updateEnforcementAction'))
 
-  /* Add note page in arrange journey (no file upload) 👇 */
-
-  router.get(
-    `${arrangeBasePath}/add-note`,
-    forceValidation,
-    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
-  )
-  router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
-
   router.all(
     `${manageBasePath}/next-appointment`,
     getNextComAppointment(hmppsAuthClient),
@@ -329,10 +320,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
 
+  router.all(`${manageBasePath}/check-your-answers`, getNotePrepend)
+
   router.get(
     `${manageBasePath}/check-your-answers`,
     getNextComAppointment(hmppsAuthClient),
-    getNotePrepend,
     getOutcomeSummary,
     controllers.appointmentOutcomes.getCheckYourAnswers(hmppsAuthClient),
   )
@@ -342,9 +334,18 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
   )
 
+  /* Add note page in arrange journey (no file upload) 👇 */
+
   router.all(`${arrangeBasePath}/add-note`, getNotePrepend)
-  router.get(`${arrangeBasePath}/add-note`, controllers.appointmentOutcomes.getAddNote(hmppsAuthClient))
+  router.get(
+    `${arrangeBasePath}/add-note`,
+    forceValidation,
+    controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
+  )
   router.post([`${arrangeBasePath}/add-note`], controllers.appointmentOutcomes.postAddNote(hmppsAuthClient))
+
+  /* Confirmation 👇 */
+
   router.get(
     `${manageBasePath}/confirmation`,
     getOverdueOutcomes(hmppsAuthClient),
