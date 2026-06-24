@@ -23,7 +23,7 @@ type TestModel = {
   canReschedule: boolean
   hasDeceased: boolean
   back?: string
-  relatedContacts?: LinkedContactResponse
+  relatedContacts: LinkedContactResponse
 }
 
 const baseModel: TestModel = {
@@ -438,13 +438,13 @@ describe('Manage an appointment', () => {
     })
 
     describe('Related contacts', () => {
-      it('should not display the list if no related contact available', () => {
+      it('should not display the list items if no related contacts are available', () => {
         const $ = render({})
         const relatedContacts = $('[data-qa="relatedContacts"]')
         expect(relatedContacts.find('h3').text()).toContain('Related contacts')
         expect(relatedContacts.find('p').text()).toContain('No related contacts')
       })
-      it('should  display the list if related contacts are available', () => {
+      it('should display the list if related contacts are available', () => {
         const $ = render({
           relatedContacts: [
             {
