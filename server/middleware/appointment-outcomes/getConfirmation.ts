@@ -1,8 +1,7 @@
 import { Route } from '../../@types'
 import { Activity } from '../../data/model/schedule'
 import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
-import { dateWithYear, dayOfWeek } from '../../utils'
-import { to12HourTimeCompact } from '../../utils/to12HourTimeCompact'
+import { dateWithYear, dayOfWeek, govukTime } from '../../utils'
 import { enforcementActionMap } from '../../properties/appointment-outcomes'
 import type { OutcomeConfirmationAction, OutcomeConfirmation, AppointmentOutcomeProps } from '../../models/Locals'
 import config from '../../config'
@@ -26,7 +25,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   let text = [diaryActionText]
   const { date, start, end } = appointmentSession
   const type = appointment?.type || null
-  const appointmentDate = `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTimeCompact(start)} to ${to12HourTimeCompact(end)}`
+  const appointmentDate = `${dayOfWeek(date)} ${dateWithYear(date)} from ${govukTime(start)} to ${govukTime(end)}`
 
   // Attended and complied, Attended but sent home due to service issues, Acceptable absence 👇
 
