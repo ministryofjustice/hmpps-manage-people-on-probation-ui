@@ -167,6 +167,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       // eslint-disable-next-line no-console
       console.log('GONNA RENDER PAGE')
+      const canReschedule = canRescheduleAppointment(personAppointment)
+      // eslint-disable-next-line no-console
+      console.log('CAN RESCHEDULE SET')
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
@@ -174,7 +177,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         nextAppointment,
         nextAppointmentIsAtHome,
-        canReschedule: canRescheduleAppointment(personAppointment),
+        canReschedule,
         contactId,
         hasDeceased,
         relatedContacts,
