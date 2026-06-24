@@ -556,7 +556,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
             // First letter of the PPs name should be uppercase as per requirement
             attendingName = `${formattedName}’s`
           } catch {
-            attendingName = `The officer´s`
+            attendingName = `The officer’s`
           }
         }
       }

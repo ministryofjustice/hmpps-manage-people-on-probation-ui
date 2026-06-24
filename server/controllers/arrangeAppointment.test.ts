@@ -1177,6 +1177,8 @@ describe('controllers/arrangeAppointment', () => {
     })
 
     it('should set attendingName to "your" when attending user is the logged-in user', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
         appointmentSession: { user: { username: username.toUpperCase() } },
       })
@@ -1185,6 +1187,8 @@ describe('controllers/arrangeAppointment', () => {
     })
 
     it('should set attendingName using attending.name.forename when attending user is different', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
         appointmentSession: { user: { username: 'OTHER_USER', name: { forename: 'jOHn', surname: 'smith' } } },
       })
@@ -1200,7 +1204,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(renderSpy).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ attendingName: 'First’s' }))
     })
 
-    it('should set attendingName to "The officer´s" when MasApiClient fails', async () => {
+    it('should set attendingName to "The officer’s" when MasApiClient fails', async () => {
       MockedMasApiClient.prototype.getProbationPractitioner.mockRejectedValueOnce(new Error('API Error'))
 
       const mockReq = createMockRequest({
@@ -1209,7 +1213,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
       expect(renderSpy).toHaveBeenCalledWith(
         expect.any(String),
-        expect.objectContaining({ attendingName: 'The officer´s' }),
+        expect.objectContaining({ attendingName: 'The officer’s' }),
       )
     })
   })
