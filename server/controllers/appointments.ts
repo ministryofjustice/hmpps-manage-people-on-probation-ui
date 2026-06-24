@@ -171,28 +171,28 @@ const appointmentsController: Controller<typeof routes, void> = {
       // eslint-disable-next-line no-console
       console.log('CAN RESCHEDULE SET')
       try {
-        // eslint-disable-next-line no-console
-        console.log('appointment: ', personAppointment)
-        // eslint-disable-next-line no-console
-        console.log('crn: ', crn)
-        // eslint-disable-next-line no-console
-        console.log('back: ', back)
-        // eslint-disable-next-line no-console
-        console.log('url: ', url)
-        // eslint-disable-next-line no-console
-        console.log('next: ', nextAppointment)
-        // eslint-disable-next-line no-console
-        console.log('nextAtHome: ', nextAppointmentIsAtHome)
-        // eslint-disable-next-line no-console
-        console.log('reschedule: ', canReschedule)
-        // eslint-disable-next-line no-console
-        console.log('id: ', contactId)
-        // eslint-disable-next-line no-console
-        console.log('deceased: ', hasDeceased)
-        // eslint-disable-next-line no-console
-        console.log('related: ', relatedContacts)
-        // eslint-disable-next-line no-console
-        console.log('locals: ', res.locals)
+        // // eslint-disable-next-line no-console
+        // console.log('appointment: ', personAppointment)
+        // // eslint-disable-next-line no-console
+        // console.log('crn: ', crn)
+        // // eslint-disable-next-line no-console
+        // console.log('back: ', back)
+        // // eslint-disable-next-line no-console
+        // console.log('url: ', url)
+        // // eslint-disable-next-line no-console
+        // console.log('next: ', nextAppointment)
+        // // eslint-disable-next-line no-console
+        // console.log('nextAtHome: ', nextAppointmentIsAtHome)
+        // // eslint-disable-next-line no-console
+        // console.log('reschedule: ', canReschedule)
+        // // eslint-disable-next-line no-console
+        // console.log('id: ', contactId)
+        // // eslint-disable-next-line no-console
+        // console.log('deceased: ', hasDeceased)
+        // // eslint-disable-next-line no-console
+        // console.log('related: ', relatedContacts)
+        // // eslint-disable-next-line no-console
+        // console.log('locals: ', res.locals)
         return res.render('pages/appointments/manage-appointment', {
           personAppointment,
           crn,
