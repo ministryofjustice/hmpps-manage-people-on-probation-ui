@@ -110,14 +110,18 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
 ): void => {
   describe('Breach warning banner', () => {
     it('should show when sentence type is COMMUNITY and there is an active breach', () => {
+      cy.log('START TASK')
       cy.task('stubCompliance')
+      cy.log('STUB SET')
       loadPageFunc(args)
+      cy.log('PAGE LOADED')
       const page = new PageClass()
       page.getBreachOrRecallWarning().find('h2').should('contain.text', 'There is a live breach for this sentence')
       page
         .getBreachOrRecallWarning()
         .find('span')
         .should('contain.text', 'The breach for 12 month community order was initiated on 15 January 2024.')
+      cy.log('BANNER CHECKED')
     })
     it('should not show when sentence type is COMMUNITY and there is no active breach', () => {
       cy.task('stubAppointment', { eventId: '2501192724', type: 'COMMUNITY' })
