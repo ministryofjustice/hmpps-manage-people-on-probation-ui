@@ -1,8 +1,10 @@
 {% extends "../_appointment-outcome-form.njk" %}
-
 {% set title = 'Initiate a ' + (
-'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
+'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else
   'recall') + (' and send a letter' if appointmentOutcome.sendBreachOrRecallLetter) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Record an outcome"]
+}) %}
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}

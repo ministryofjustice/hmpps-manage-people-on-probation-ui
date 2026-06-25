@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment type and attendance' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set personForename = headerPersonName.forename %}
 
 {% if change %}

@@ -82,6 +82,7 @@ import {
   dateToLongDate,
   merge,
   dateWithYearTimeFirst,
+  makePageTitle,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -245,6 +246,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('checkLocationMonitoring', checkLocationMonitoring)
   njkEnv.addFilter('checkLocationMonitoringCode', checkLocationMonitoringCode)
   njkEnv.addFilter('checkLocationMonitoringByEventNumber', checkLocationMonitoringByEventNumber)
+  njkEnv.addGlobal('makePageTitle', makePageTitle)
 
   arnsNunjucksSetup(njkEnv)
 }

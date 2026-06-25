@@ -1,7 +1,10 @@
 {% extends "../_appointment-outcome-form.njk" %}
-{% set outcome = 'acceptable absence' if appointmentOutcome.appointment.acceptableAbsence == true else 
+{% set outcome = 'acceptable absence' if appointmentOutcome.appointment.acceptableAbsence == true else
   'failure to comply' %}
 {% set title = 'Update enforcement action for ' + appointmentOutcome.forename + '’s ' + outcome %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Record an outcome"]
+}) %}
 {% set backLink = appointmentOutcome.backLink %}
 {% set hideButton = true %}
 {% block afterHeading %}

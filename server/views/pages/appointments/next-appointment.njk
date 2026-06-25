@@ -1,8 +1,11 @@
 {% extends "../_form.njk" %}
 {% set title = personAppointment.personSummary.name.forename + "’s next supervision appointment" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.type %}
 {% set sentence = appointment.appointmentFor.sentence %}
-{% set backLink = back if back else 
+{% set backLink = back if back else
   '/case/' + crn + '/appointments/appointment/' + id + '/manage/' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
@@ -10,7 +13,7 @@
    formGroup: {
       attributes: {
         'data-qa': 'anotherAppointment'
-      } 
+      }
     },
     fieldset: {
       legend: {
@@ -36,7 +39,7 @@
         text: "No",
         value: "NO",
         checked: body.nextAppointment == "NO"
-    }] 
+    }]
 } %}
 {% if not outcomeJourney %}
   {% set config = config | merge({id: "nextAppointment", idPrefix: "nextAppointment", name: "nextAppointment"}) %}

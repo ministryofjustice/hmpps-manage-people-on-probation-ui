@@ -10,6 +10,10 @@
 {% set alerts = true %}
 {% set alertRows = [] %}
 
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Alerts"]
+}) %}
+
 {% block beforeContent %}
     {% if note %}
         {{ govukBreadcrumbs({

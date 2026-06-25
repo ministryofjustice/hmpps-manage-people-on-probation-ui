@@ -1,6 +1,9 @@
 {% extends "../_form.njk" %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
 {% set title = 'Appointments you’re arranging' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% block form %}
   {% block heading %}{% endblock %}
   <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>

@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set personForename = headerPersonName.forename %}
 {% set backLink = change | default('/case/' + crn + '/appointments') %}
 
