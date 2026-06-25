@@ -1197,6 +1197,8 @@ describe('controllers/arrangeAppointment', () => {
     })
 
     it('should set attendingName from MasApiClient when attending user is different and has no forename', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
         appointmentSession: { user: { username: 'OTHER_USER' } },
       })
