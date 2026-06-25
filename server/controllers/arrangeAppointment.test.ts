@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
+import MasApiClient from '../data/masApiClient'
 import controllers from '.'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
@@ -74,20 +75,8 @@ jest.mock('uuid', () => ({
   v4: jest.fn(),
 }))
 
-jest.mock('../data/masApiClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getPersonRiskFlags: jest.fn(),
-      getUserDetails: jest.fn().mockImplementation(() => Promise.resolve({ firstName: 'first' })),
-      getProbationPractitioner: jest.fn().mockImplementation(() =>
-        Promise.resolve({
-          name: { forename: 'first', surname: 'last' },
-          unallocated: false,
-        }),
-      ),
-    }
-  })
-})
+jest.mock('../data/masApiClient')
+const MockedMasApiClient = MasApiClient as jest.MockedClass<typeof MasApiClient>
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
@@ -209,6 +198,11 @@ mockedFindUncompleted.mockReturnValue(() => redirectUrl)
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    MockedMasApiClient.prototype.getProbationPractitioner.mockResolvedValue({
+      name: { forename: 'first', surname: 'last' },
+      unallocated: false,
+    } as any)
+    MockedMasApiClient.prototype.getUserDetails.mockResolvedValue({ firstName: 'first' } as any)
   })
   describe('redirectToSentence', () => {
     mockedUuidv4.mockReturnValueOnce(uuid)
@@ -1180,6 +1174,49 @@ describe('controllers/arrangeAppointment', () => {
         isWelshNotificationFailed: null,
         smsSent: null,
       })
+    })
+
+    it('should set attendingName to "your" when attending user is the logged-in user', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: username.toUpperCase() } },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ attendingName: 'your' }))
+    })
+
+    it('should set attendingName using attending.name.forename when attending user is different', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: 'OTHER_USER', name: { forename: 'jOHn', surname: 'smith' } } },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ attendingName: 'John’s' }))
+    })
+
+    it('should set attendingName from MasApiClient when attending user is different and has no forename', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: 'OTHER_USER' } },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ attendingName: 'First’s' }))
+    })
+
+    it('should set attendingName to "The officer’s" when MasApiClient fails', async () => {
+      MockedMasApiClient.prototype.getProbationPractitioner.mockRejectedValueOnce(new Error('API Error'))
+
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: 'OTHER_USER' } },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ attendingName: 'The officer’s' }),
+      )
     })
   })
   describe('postConfirmation', () => {

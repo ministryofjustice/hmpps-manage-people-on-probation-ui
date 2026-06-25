@@ -70,9 +70,13 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       }
-      const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
-      sessionTeams = providerTeams
-      sessionStaff = providerStaff
+      const appointmentStaff = await masClient.getStaffByTeam(teamCode)
+      const ppStaff = appointmentStaff.users.find(
+        user => user?.username?.toLowerCase() === probationPractitioner?.username.toLowerCase(),
+      )
+      if (ppStaff && !sessionStaff.some(u => u?.username?.toLowerCase() === ppStaff.username?.toLowerCase())) {
+        sessionStaff.push(ppStaff)
+      }
     } else {
       const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
       sessionProviders = getDataValue(data, ['providers', username]) ?? sessionProviders
