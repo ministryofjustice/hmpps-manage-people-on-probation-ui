@@ -13,8 +13,8 @@ type TestModel = {
   pageTitle: string
   url: string
   flags: {
-    enableNonCompliance: boolean
-    enableDeepLinks: boolean
+    enableNonCompliance?: boolean
+    enableDeepLinks?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -33,7 +33,7 @@ const baseModel: TestModel = {
   pageTitle: 'Manage planned office visit (NS) with Terry Jones',
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
   flags: {
-    enableNonCompliance: true,
+    enableNonCompliance: false,
     enableDeepLinks: false,
   },
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
@@ -89,16 +89,13 @@ const baseModel: TestModel = {
   relatedContacts: [],
 }
 
-const render = (model = {} as Partial<TestModel> & { enableNonCompliance?: boolean; enableDeepLinks?: boolean }) => {
+const render = (model = {} as Partial<TestModel>) => {
   const input = {
     ...baseModel,
     ...model,
     flags: {
       ...baseModel.flags,
       ...model.flags,
-      enableNonCompliance:
-        model.enableNonCompliance ?? model.flags?.enableNonCompliance ?? baseModel.flags.enableNonCompliance,
-      enableDeepLinks: model.enableDeepLinks ?? model.flags?.enableDeepLinks ?? baseModel.flags.enableDeepLinks,
     },
     personAppointment: {
       ...baseModel.personAppointment,
@@ -139,25 +136,41 @@ describe('Manage an appointment', () => {
 
     describe('enableNonCompliance feature flag is enabled', () => {
       it('should display log outcome action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Log appointment outcome')
       })
 
       it('should display appointment notes action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Add appointment notes')
       })
 
       it('should display upload documents action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Upload documents')
       })
 
       it('should display arrange next appointment action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Arrange next appointment')
       })
@@ -165,25 +178,25 @@ describe('Manage an appointment', () => {
 
     describe('enableNonCompliance feature flag is disabled', () => {
       it('should display log outcome action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Log attended and complied appointment')
       })
 
       it('should display appointment notes action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Add appointment notes')
       })
 
       it('should not display upload documents action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).not.toContain('Upload documents')
       })
 
       it('should display arrange next appointment action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Arrange next appointment')
       })
@@ -215,7 +228,9 @@ describe('Manage an appointment', () => {
       describe('MPOP managed appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: false,
@@ -230,7 +245,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, no outcome', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -246,7 +263,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, complied', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -263,7 +282,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, acceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -282,7 +303,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, unacceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -303,7 +326,9 @@ describe('Manage an appointment', () => {
       describe('MPOP managed appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: false,
@@ -318,7 +343,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, no outcome', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -334,7 +358,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, complied', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -351,7 +374,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, acceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -370,7 +392,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, unacceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -391,7 +412,10 @@ describe('Manage an appointment', () => {
       describe('drug test appointment type', () => {
         it('should display the drug history deep link with correct wording', () => {
           const $ = render({
-            enableDeepLinks: true,
+            flags: {
+              enableDeepLinks: true,
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -415,7 +439,10 @@ describe('Manage an appointment', () => {
       describe('CP/UPW appointment type', () => {
         it('should display the UPW worksheet deep link with correct wording', () => {
           const $ = render({
-            enableDeepLinks: true,
+            flags: {
+              enableDeepLinks: true,
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
