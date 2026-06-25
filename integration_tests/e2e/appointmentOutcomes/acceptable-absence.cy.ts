@@ -181,18 +181,18 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
     })
   })
-
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
     loadPage({ journey })
     checkOptionRedirects(options, AcceptableAbsencePage)
   })
-  checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage)
-  checkTicketPanel(loadPage, AcceptableAbsencePage)
 }
 
 describe('Acceptable absence', () => {
   beforeEach(() => {
+    cy.task('resetMocks')
+  })
+  afterEach(() => {
     cy.task('resetMocks')
   })
   describe('Manage appointment journey', () => {

@@ -21,6 +21,11 @@ export default defineConfig({
       coverageTask(on, config)
       on('task', {
         ...stubs,
+        log(message) {
+          // eslint-disable-next-line no-console
+          console.log(message)
+          return null
+        },
       })
       return config
     },
