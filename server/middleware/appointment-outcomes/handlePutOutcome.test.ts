@@ -213,12 +213,13 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       date,
       time: start,
       outcomeCode: 'AFTC',
-      enforcementActionCode: 'ROM',
       notes: '',
       sensitive: true,
       alert: true,
     }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'ROM' }] }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
