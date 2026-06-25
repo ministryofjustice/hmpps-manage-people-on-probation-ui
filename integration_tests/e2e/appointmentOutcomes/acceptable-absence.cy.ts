@@ -41,14 +41,10 @@ const loadPage = ({
   const endDate = sentenceLength === 12 ? '2024-12-01' : '2027-01-01'
   cy.task('stubSentences', { endDate, sentenceType })
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
-  cy.task('log', 'Starting page load')
   if (journey === 'MANAGE') {
-    cy.task('log', 'Manage')
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`) // fails here
-    cy.task('log', 'Visited page')
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getTaskLink(1).click()
-    cy.task('log', 'Clicked task link')
   }
   if (journey === 'ARRANGE') {
     completeSentencePage()
@@ -65,11 +61,8 @@ const loadPage = ({
   }
   outcomePage = new OutcomePage()
   uncheckAllRadios()
-  cy.task('log', 'Radios unchecked')
   cy.get(`.govuk-radios__input[value=ACCEPTABLE_ABSENCE]`).click()
-  cy.task('log', 'Acceptable absence click')
   outcomePage.getSubmitBtn().click()
-  cy.task('log', 'Submit clicked')
 }
 
 type RedirectPages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
@@ -194,8 +187,8 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     loadPage({ journey })
     checkOptionRedirects(options, AcceptableAbsencePage)
   })
-  // checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage, { journey })
-  // checkTicketPanel(loadPage, AcceptableAbsencePage, { journey })
+  checkBreachOrRecallWarningBanner(loadPage, AcceptableAbsencePage)
+  checkTicketPanel(loadPage, AcceptableAbsencePage)
 }
 
 describe('Acceptable absence', () => {

@@ -129,8 +129,6 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getManageAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      // eslint-disable-next-line no-console
-      console.log('GET MANAGE APPOINTMENT')
       const { crn, contactId } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MANAGE_APPOINTMENT',
@@ -151,64 +149,29 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
-      // eslint-disable-next-line no-console
-      console.log('GOT SYSTEM TOKEN')
       const [personAppointment, nextAppointment, relatedContacts] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
         masClient.getNextAppointment(username, crn, contactId),
         masClient.getRelatedContacts(crn, contactId),
       ])
-      // eslint-disable-next-line no-console
-      console.log('GOT RELATED CONTACTS')
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
-      // eslint-disable-next-line no-console
-      console.log('GONNA RENDER PAGE')
       const canReschedule = canRescheduleAppointment(personAppointment)
-      // eslint-disable-next-line no-console
-      console.log('CAN RESCHEDULE SET')
-      try {
-        // // eslint-disable-next-line no-console
-        // console.log('appointment: ', personAppointment)
-        // // eslint-disable-next-line no-console
-        // console.log('crn: ', crn)
-        // // eslint-disable-next-line no-console
-        // console.log('back: ', back)
-        // // eslint-disable-next-line no-console
-        // console.log('url: ', url)
-        // // eslint-disable-next-line no-console
-        // console.log('next: ', nextAppointment)
-        // // eslint-disable-next-line no-console
-        // console.log('nextAtHome: ', nextAppointmentIsAtHome)
-        // // eslint-disable-next-line no-console
-        // console.log('reschedule: ', canReschedule)
-        // // eslint-disable-next-line no-console
-        // console.log('id: ', contactId)
-        // // eslint-disable-next-line no-console
-        // console.log('deceased: ', hasDeceased)
-        // // eslint-disable-next-line no-console
-        // console.log('related: ', relatedContacts)
-        // // eslint-disable-next-line no-console
-        // console.log('locals: ', res.locals)
-        return res.render('pages/appointments/manage-appointment', {
-          personAppointment,
-          crn,
-          back,
-          url,
-          nextAppointment,
-          nextAppointmentIsAtHome,
-          canReschedule,
-          contactId,
-          hasDeceased,
-          relatedContacts,
-        }) // FAILS HERE
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        return console.log(error)
-      }
+      return res.render('pages/appointments/manage-appointment', {
+        personAppointment,
+        crn,
+        back,
+        url,
+        nextAppointment,
+        nextAppointmentIsAtHome,
+        canReschedule,
+        contactId,
+        hasDeceased,
+        relatedContacts,
+      })
     }
   },
   getRecordAnOutcome: _hmppsAuthClient => {
