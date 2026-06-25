@@ -1,9 +1,7 @@
 import * as cheerio from 'cheerio'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
-import { Activity, PersonAppointment } from '../../../data/model/schedule'
+import { Activity, LinkedContactResponse, PersonAppointment } from '../../../data/model/schedule'
 import { PersonSummary } from '../../../data/model/personalDetails'
-
-const env = createNunjucksTestEnv()
 
 const crn = 'X000001'
 const appointmentId = '123456'
@@ -15,8 +13,8 @@ type TestModel = {
   pageTitle: string
   url: string
   flags: {
-    enableNonCompliance: boolean
-    enableDeepLinks: boolean
+    enableNonCompliance?: boolean
+    enableDeepLinks?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -25,6 +23,7 @@ type TestModel = {
   canReschedule: boolean
   hasDeceased: boolean
   back?: string
+  relatedContacts: LinkedContactResponse
 }
 
 const baseModel: TestModel = {
@@ -34,7 +33,7 @@ const baseModel: TestModel = {
   pageTitle: 'Manage planned office visit (NS) with Terry Jones',
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
   flags: {
-    enableNonCompliance: true,
+    enableNonCompliance: false,
     enableDeepLinks: false,
   },
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
@@ -87,30 +86,29 @@ const baseModel: TestModel = {
   },
   canReschedule: true,
   hasDeceased: false,
+  relatedContacts: [],
 }
 
-const render = (model = {} as Partial<TestModel> & { enableNonCompliance?: boolean; enableDeepLinks?: boolean }) =>
-  cheerio.load(
-    env.render('pages/appointments/manage-appointment.njk', {
-      ...baseModel,
-      ...model,
-      flags: {
-        ...baseModel.flags,
-        ...model.flags,
-        enableNonCompliance:
-          model.enableNonCompliance ?? model.flags?.enableNonCompliance ?? baseModel.flags.enableNonCompliance,
-        enableDeepLinks: model.enableDeepLinks ?? model.flags?.enableDeepLinks ?? baseModel.flags.enableDeepLinks,
+const render = (model = {} as Partial<TestModel>) => {
+  const input = {
+    ...baseModel,
+    ...model,
+    flags: {
+      ...baseModel.flags,
+      ...model.flags,
+    },
+    personAppointment: {
+      ...baseModel.personAppointment,
+      ...model.personAppointment,
+      appointment: {
+        ...baseModel.personAppointment.appointment,
+        ...model.personAppointment?.appointment,
       },
-      personAppointment: {
-        ...baseModel.personAppointment,
-        ...model.personAppointment,
-        appointment: {
-          ...baseModel.personAppointment.appointment,
-          ...model.personAppointment?.appointment,
-        },
-      },
-    }),
-  )
+    },
+  }
+  const env = createNunjucksTestEnv()
+  return cheerio.load(env.render('pages/appointments/manage-appointment.njk', input))
+}
 
 describe('Manage an appointment', () => {
   it('should render the page', () => {
@@ -138,25 +136,41 @@ describe('Manage an appointment', () => {
 
     describe('enableNonCompliance feature flag is enabled', () => {
       it('should display log outcome action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Log appointment outcome')
       })
 
       it('should display appointment notes action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Add appointment notes')
       })
 
       it('should display upload documents action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Upload documents')
       })
 
       it('should display arrange next appointment action', () => {
-        const $ = render({ enableNonCompliance: true })
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+        })
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Arrange next appointment')
       })
@@ -164,25 +178,25 @@ describe('Manage an appointment', () => {
 
     describe('enableNonCompliance feature flag is disabled', () => {
       it('should display log outcome action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Log attended and complied appointment')
       })
 
       it('should display appointment notes action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Add appointment notes')
       })
 
       it('should not display upload documents action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).not.toContain('Upload documents')
       })
 
       it('should display arrange next appointment action', () => {
-        const $ = render({ enableNonCompliance: false })
+        const $ = render({})
 
         expect($('[data-qa="appointmentActions"]').text()).toContain('Arrange next appointment')
       })
@@ -214,7 +228,9 @@ describe('Manage an appointment', () => {
       describe('MPOP managed appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: false,
@@ -229,7 +245,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, no outcome', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -245,7 +263,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, complied', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -262,7 +282,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, acceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -281,7 +303,9 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, unacceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: true,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -302,7 +326,9 @@ describe('Manage an appointment', () => {
       describe('MPOP managed appointment', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
+            flags: {
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: false,
@@ -317,7 +343,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, no outcome', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -333,7 +358,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment type, complied', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -350,7 +374,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, acceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -369,7 +392,6 @@ describe('Manage an appointment', () => {
       describe('Delius managed appointment, unacceptable absence', () => {
         it('should display appointment details', () => {
           const $ = render({
-            enableNonCompliance: false,
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -390,7 +412,10 @@ describe('Manage an appointment', () => {
       describe('drug test appointment type', () => {
         it('should display the drug history deep link with correct wording', () => {
           const $ = render({
-            enableDeepLinks: true,
+            flags: {
+              enableDeepLinks: true,
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -414,7 +439,10 @@ describe('Manage an appointment', () => {
       describe('CP/UPW appointment type', () => {
         it('should display the UPW worksheet deep link with correct wording', () => {
           const $ = render({
-            enableDeepLinks: true,
+            flags: {
+              enableDeepLinks: true,
+              enableNonCompliance: true,
+            },
             personAppointment: {
               appointment: {
                 deliusManaged: true,
@@ -433,6 +461,55 @@ describe('Manage an appointment', () => {
             `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UPWWorksheet&CRN=${crn}&EventNumber=7654321`,
           )
         })
+      })
+    })
+
+    describe('Related contacts', () => {
+      it('should not display the list items if no related contacts are available', () => {
+        const $ = render({})
+        const relatedContacts = $('[data-qa="relatedContacts"]')
+        expect(relatedContacts.find('h3').text()).toContain('Related contacts')
+        expect(relatedContacts.find('p').text()).toContain('No related contacts')
+      })
+      it('should display the list if related contacts are available', () => {
+        const $ = render({
+          relatedContacts: [
+            {
+              contactId: 2510615347,
+              contactTypeDescription: 'Breach Action - Breach Letter Sent',
+              contactDate: '2026-05-12',
+              createdBy: { forename: 'James', surname: 'Frost' },
+            },
+            {
+              contactId: 2510615348,
+              contactTypeDescription: 'First warning letter sent',
+              contactDate: '2026-05-19',
+              createdBy: { forename: 'Teddy', surname: 'Morris' },
+            },
+            {
+              contactId: 2510615349,
+              contactTypeDescription: 'First warning letter requested',
+              contactDate: '2026-05-16',
+              createdBy: { forename: 'Jack', surname: 'Smith' },
+            },
+          ],
+        })
+        const relatedContacts = $('[data-qa="relatedContacts"]')
+        const getRelatedContact = (index: number) => {
+          return $(`[data-qa="relatedContacts"]`).find('li').eq(index)
+        }
+        const getRelatedContactLink = (index: number) => {
+          return getRelatedContact(index).find('.govuk-link')
+        }
+        expect(relatedContacts.find('h3').text()).toContain('Related contacts')
+        expect(relatedContacts.find('li').length).toBe(3)
+        expect(getRelatedContactLink(0).text()).toContain('Breach action - breach letter sent')
+        expect(getRelatedContactLink(0).attr('target')).toBe('_blank')
+        expect(getRelatedContactLink(0).attr('href')).toBe(
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=2510615347',
+        )
+        expect(getRelatedContact(0).text()).toContain('Created by J.Frost')
+        expect(getRelatedContact(0).text()).toContain('on 12 May 2026')
       })
     })
   })
