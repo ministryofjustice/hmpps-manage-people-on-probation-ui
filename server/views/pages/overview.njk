@@ -539,11 +539,11 @@
         {% set requirements %}
          {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              {{ sentence.rarDescription }} <br/>
-             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View GPS location monitoring data</a>
          {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
             {{ sentence.rarDescription }}
          {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
-             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View GPS location monitoring data</a>
         {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
                     Details not available
                 {% endif %}
