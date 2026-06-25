@@ -191,6 +191,34 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
+  it('should put the correct request to the API if action is Refer to offender manager', async () => {
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'REFER_TO_OFFENDER_MANAGER',
+      enforcementActionCode: ['ROM'],
+    }
+    const req = buildRequest()
+    const res = buildResponse({ outcome, appointmentOutcome: { notePrepend: '' } })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const {
+      date,
+      start,
+      outcome: { outcomeCode },
+    } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: 'AFTC',
+      enforcementActionCode: 'ROM',
+      notes: '',
+      sensitive: true,
+      alert: true,
+    }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
   it('should put the correct request to the API if notes, notePrepend value exists and a single enforcement action is selected', async () => {
     const appointment: Partial<AppointmentSession> = { notes }
     const outcome: Partial<AppointmentSessionOutcome> = {

@@ -30,6 +30,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const outcomeCode = appointmentSession?.outcome?.outcomeCode
       const sensitivity = appointmentSession?.sensitivity
       const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
+      const alert = enforcementActionCode?.includes('ROM') || false
       let notes = appointmentSession?.notes || ''
       if (notePrepend) {
         notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
@@ -58,7 +59,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         outcomeCode,
         notes: handleQuotes(notes),
         sensitive,
-        alert: false,
+        alert,
       }
 
       const putRequests: PutContactPromise[] = []
