@@ -568,11 +568,12 @@ const checkInsController: Controller<typeof routes, void> = {
         SUBMITTED: 'review/identity',
         EXPIRED: 'review/expired',
       }
-      if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const practitionerId = res.locals.user.username
-        const eSupervisionClient = new ESupervisionClient(token)
-        await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
+      if ((checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') && !checkIn.reviewedAt) {
+        setDataValue(
+          req.session.data,
+          ['esupervision', crn, id, 'checkins', 'reviewStartedAt'],
+          new Date().toISOString(),
+        )
       }
       if (Object.keys(statusMap).includes(checkIn.status)) {
         return res.redirect(
@@ -756,6 +757,10 @@ const checkInsController: Controller<typeof routes, void> = {
         notes: reviewNotes,
         riskManagementFeedback: risk,
         sensitive: checkIn?.sensitiveContact === 'true',
+        reviewStartedAt:
+          checkIn && !checkIn?.reviewedAt
+            ? getDataValue(data, ['esupervision', crn, id, 'checkins', 'reviewStartedAt'])
+            : undefined,
       }
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
