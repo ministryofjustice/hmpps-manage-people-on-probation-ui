@@ -41,8 +41,9 @@
         {% if outcomes.length > 0 %}
             {% set appointmentRadioItems = [] %}
             {% for appointment in outcomes %}
+                {% set ppFullName = appointment.staff.name.forename + ' ' + appointment.staff.name.surname %}
                 {% set appointmentRadioItems = (appointmentRadioItems.push({
-                    html: '<strong>' + appointment.type.description + '</strong><br />' + appointment.date | dateWithDayAndWithYear + ' from ' + timeFromTo(appointment.start, appointment.end),
+                    html: '<strong>' + appointment.type.description + ' with ' + (ppFullName | convertToTitleCase) + '</strong><br />' + appointment.date | dateWithDayAndWithYear + ' from ' + timeFromTo(appointment.start, appointment.end),
                     value: appointment.id,
                     checked: contactId == appointment.id
                 }), appointmentRadioItems) %}
