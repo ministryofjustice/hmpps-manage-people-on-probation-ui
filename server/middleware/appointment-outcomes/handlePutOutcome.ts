@@ -1,12 +1,10 @@
 import { Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
-import { PutContactRequest } from '../../data/model/schedule'
+import { EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
 import { AppointmentOutcomeType } from '../../models/Appointments'
 import { handleQuotes } from '../../utils'
 import { renderError } from '../renderError'
-
-type PutContactPromise = ReturnType<MasApiClient['putContact']>
 
 export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -61,17 +59,14 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         sensitive,
         alert,
       }
+      await masClient.putContact(contactId, request)
 
-      const putRequests: PutContactPromise[] = []
       if (enforcementActionCode?.length) {
-        enforcementActionCode.forEach(code => {
-          const requestWithAction = { ...request, enforcementActionCode: code }
-          putRequests.push(masClient.putContact(contactId, requestWithAction))
-        })
-      } else {
-        putRequests.push(masClient.putContact(contactId, request))
+        const enforcementActionsRequest: EnforcementActionsRequest = {
+          enforcementActions: enforcementActionCode.map(code => ({ code })),
+        }
+        await masClient.postEnforcementActions(contactId, enforcementActionsRequest)
       }
-      await Promise.all(putRequests)
     }
     return next()
   }
