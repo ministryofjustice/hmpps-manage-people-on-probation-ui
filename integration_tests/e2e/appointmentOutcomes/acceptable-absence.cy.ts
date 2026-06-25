@@ -42,7 +42,7 @@ const loadPage = ({
   cy.task('stubSentences', { endDate, sentenceType })
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (journey === 'MANAGE') {
-    cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`) // fails here
+    cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getTaskLink(1).click()
   }
