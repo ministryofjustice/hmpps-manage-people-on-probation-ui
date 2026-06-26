@@ -7,7 +7,7 @@ export interface SentenceDetails {
   sentence: Sentence
 }
 
-export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE' | 'PSS' | 'YOUTH_CUSTODY'
+export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE'
 
 export interface Sentences {
   personSummary: PersonSummary
@@ -60,6 +60,7 @@ export interface Order {
   startDate: string
   endDate: string
   length?: string
+  pss?: boolean
 }
 
 export interface Requirement {

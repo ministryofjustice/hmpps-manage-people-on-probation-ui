@@ -13,6 +13,8 @@ const mockSentence: AppointmentOutcomeSentence = {
   eventId: 1234,
   eventNumber: '5678',
   order: 'ORA Community Order',
+  youth: false,
+  pss: false,
   activeBreach: null,
   activeRecall: null,
   compliance: {} as Compliance,

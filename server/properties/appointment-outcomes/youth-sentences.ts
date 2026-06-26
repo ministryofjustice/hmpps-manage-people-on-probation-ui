@@ -1,0 +1,17 @@
+export const youthSentences = [
+  '204 C JA - Youth Rehabilitation Order',
+  'OU22 Detained S53(1) or S250 (s.91)',
+  'OU23 Detained S53(2) or S250 (s.91)',
+  '318 Detention and Training Order',
+  '227 Intensive Alternative to Custody',
+  '228 Intensive Supervision & Control',
+  '310 Life imprisonment (Youth)',
+  '328 ORA Youth Custody (inc PSS)',
+  '331 ORA Youth Rehabilitation Order',
+  '221 Parenting Order CDA1998 S8',
+  '332 Referral Orders - YOS',
+  '342 SA2020 Youth Rehab Order',
+  '305 Young Offender Inst - <12 mths',
+  '306 Young Offender Inst - >=12 mths',
+  'OU15 Youth Custody (migration)',
+]

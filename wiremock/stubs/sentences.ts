@@ -5,6 +5,8 @@ const stubSentences = ({
   sentenceType = 'COMMUNITY',
   startDate = '2023-12-01',
   endDate = '2026-01-01',
+  pss = false,
+  description = '12 month Community order',
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -31,10 +33,11 @@ const stubSentences = ({
               description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
             },
             order: {
-              description: '12 month Community order',
+              description,
               sentenceType,
               startDate,
               endDate,
+              pss,
             },
             licenceConditions: [
               {
@@ -106,6 +109,7 @@ const stubSentences = ({
               sentenceType: 'COMMUNITY',
               endDate,
               startDate,
+              pss,
             },
             requirements: [
               {
@@ -161,6 +165,7 @@ const stubSentences = ({
               sentenceType: 'COMMUNITY',
               endDate,
               startDate,
+              pss,
             },
             nsis: [
               {
@@ -186,6 +191,7 @@ const stubSingleSentence = ({
   sentenceType = 'COMMUNITY',
   startDate = '2023-12-01',
   endDate = '2026-01-01',
+  pss = false,
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -216,6 +222,7 @@ const stubSingleSentence = ({
               sentenceType,
               startDate,
               endDate,
+              pss,
             },
             licenceConditions: [
               {

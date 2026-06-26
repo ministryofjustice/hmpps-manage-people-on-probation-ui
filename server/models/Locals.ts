@@ -177,6 +177,8 @@ export interface AppointmentOutcomeSentence {
   activeBreach?: BreachOrRecall | null
   activeRecall?: BreachOrRecall | null
   compliance: Compliance | null
+  youth: boolean
+  pss: boolean | null
 }
 
 export type TagColour = 'YELLOW' | 'GREEN' | 'PURPLE' | 'RED' | 'BLUE'

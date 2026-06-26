@@ -23,7 +23,8 @@
                 "description": "12 month Community order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "pss": false
               },
               "licenceConditions": [
                 {
@@ -93,7 +94,8 @@
                 "description": "ORA Community Order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
-                "startDate": "2020-03-02"
+                "startDate": "2020-03-02",
+                "pss": false
               },
               "requirements": [
                 {
@@ -147,7 +149,8 @@
                 "description": "ORA Community Order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
-                "startDate": "2020-03-02"
+                "startDate": "2020-03-02",
+                "pss": false
               },
               "nsis": [
                 {
@@ -195,7 +198,8 @@
                 "description": "12 month Community order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "pss": false
               },
               "licenceConditions": [
                 {
@@ -265,7 +269,8 @@
                 "description": "12 month Community order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "pss": false
               },
               "licenceConditions": [
                 {
@@ -341,7 +346,8 @@
                 "description": "12 month Community order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "pss": false
               },
               "licenceConditions": [
                 {
@@ -471,7 +477,8 @@
                 "description": "ORA Community Order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
-                "startDate": "2020-03-02"
+                "startDate": "2020-03-02",
+                "pss": false
               },
               "nsis": [
                 {
@@ -518,7 +525,8 @@
                 "description": "12 month Community order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "pss": false
               },
               "licenceConditions": [
                 {
@@ -587,7 +595,8 @@
                 "description": "ORA Community Order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-09-01",
-                "startDate": "2020-03-02"
+                "startDate": "2020-03-02",
+                "pss": false
               },
               "requirements": [
                 {
@@ -664,7 +673,8 @@
                 "description": "12 month Community order",
                 "sentenceType": "COMMUNITY",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "pss": false
               },
               "licenceConditions": [
                 {
