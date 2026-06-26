@@ -99,6 +99,7 @@ import {
   checkLocationMonitoringCode,
 } from '../middleware/checkLocationMonitoring'
 import logger from '../../logger'
+import { activityLinkUrl } from './activityContactLinkUrl'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -216,6 +217,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('addressToList', addressToList)
   njkEnv.addGlobal('lastUpdatedBy', lastUpdatedBy)
   njkEnv.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
+  njkEnv.addGlobal('activityLinkUrl', activityLinkUrl)
   njkEnv.addGlobal('deepLinkContactTypes', deepLinkContactTypes)
   njkEnv.addGlobal('drugHistoryContactTypes', drugHistoryContactTypes)
   njkEnv.addGlobal('enforcementContactTypes', enforcementContactTypes)

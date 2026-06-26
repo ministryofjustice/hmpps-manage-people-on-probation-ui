@@ -506,7 +506,7 @@ describe('Manage an appointment', () => {
         expect(getRelatedContactLink(0).text()).toContain('Breach action - breach letter sent')
         expect(getRelatedContactLink(0).attr('target')).toBe('_blank')
         expect(getRelatedContactLink(0).attr('href')).toBe(
-          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=2510615347',
+          '/case/X000001/activity/2510615347?back=%2Fcase%2FX000001%2Fappointments%2Fappointment%2F123456%2Fmanage%3Fback%3D%2Fcase%2FX000001%2Fappointments',
         )
         expect(getRelatedContact(0).text()).toContain('Created by J.Frost')
         expect(getRelatedContact(0).text()).toContain('on 12 May 2026')
