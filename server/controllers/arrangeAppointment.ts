@@ -592,7 +592,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
 
       // tidy up current appointment session 👇
-
       if (req.session.data.appointments?.[crn]?.[id]) {
         delete req.session.data.appointments[crn][id]
       }

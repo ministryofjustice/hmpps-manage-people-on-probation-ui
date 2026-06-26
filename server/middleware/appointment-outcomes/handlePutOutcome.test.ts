@@ -4,9 +4,8 @@ import { mockAppResponse } from '../../controllers/mocks'
 import { AppointmentSession, AppointmentSessionOutcome } from '../../models/Appointments'
 import { renderError } from '../renderError'
 import { HmppsAuthClient } from '../../data'
-import { findUncompleted } from '../findUncompleted'
 import MasApiClient from '../../data/masApiClient'
-import { PutContactRequest } from '../../data/model/schedule'
+import { EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
 import TokenStore from '../../data/tokenStore/redisTokenStore'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 
@@ -51,6 +50,9 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 const putContactSpy = jest.spyOn(MasApiClient.prototype, 'putContact').mockResolvedValue({} as any)
+const postEnforcementActionsSpy = jest
+  .spyOn(MasApiClient.prototype, 'postEnforcementActions')
+  .mockResolvedValue({} as any)
 
 const mockAppointment = ({
   appointment = {},
@@ -188,6 +190,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       alert: false,
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -210,12 +213,13 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       date,
       time: start,
       outcomeCode: 'AFTC',
-      enforcementActionCode: 'ROM',
       notes: '',
       sensitive: true,
       alert: true,
     }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'ROM' }] }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -235,13 +239,13 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       date,
       time: start,
       outcomeCode: outcome.outcomeCode,
-      enforcementActionCode: 'IBR',
       notes: `${notePrepend}\n${notes}`,
       sensitive: true,
       alert: false,
     }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'IBR' }] }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
-    expect(putContactSpy).toHaveBeenCalledTimes(1)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -261,13 +265,13 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       date,
       time: start,
       outcomeCode: outcome.outcomeCode,
-      enforcementActionCode: 'IBR',
       notes: notePrepend,
       sensitive: true,
       alert: false,
     }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'IBR' }] }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
-    expect(putContactSpy).toHaveBeenCalledTimes(1)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -282,34 +286,20 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     const req = buildRequest()
     const res = buildResponse({ appointment, outcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    const {
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
       date,
-      start,
-      outcome: { outcomeCode },
-    } = mockAppointment()
-    const expectedRequests: PutContactRequest[] = [
-      {
-        date,
-        time: start,
-        outcomeCode: outcome.outcomeCode,
-        enforcementActionCode: 'IBR',
-        notes: `${notePrepend}\n${notes}`,
-        sensitive: true,
-        alert: false,
-      },
-      {
-        date,
-        time: start,
-        outcomeCode: outcome.outcomeCode,
-        enforcementActionCode: 'LCL',
-        notes: `${notePrepend}\n${notes}`,
-        sensitive: true,
-        alert: false,
-      },
-    ]
-    expect(putContactSpy).toHaveBeenNthCalledWith(1, contactId, expectedRequests[0])
-    expect(putContactSpy).toHaveBeenNthCalledWith(2, contactId, expectedRequests[1])
-    expect(putContactSpy).toHaveBeenCalledTimes(2)
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: `${notePrepend}\n${notes}`,
+      sensitive: true,
+      alert: false,
+    }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = {
+      enforcementActions: [{ code: 'IBR' }, { code: 'LCL' }],
+    }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })
