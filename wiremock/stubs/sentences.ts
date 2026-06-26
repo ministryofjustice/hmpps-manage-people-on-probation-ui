@@ -6,6 +6,7 @@ const stubSentences = ({
   startDate = '2023-12-01',
   endDate = '2026-01-01',
   pss = false,
+  description = '12 month Community order',
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -32,7 +33,7 @@ const stubSentences = ({
               description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
             },
             order: {
-              description: '12 month Community order',
+              description,
               sentenceType,
               startDate,
               endDate,
