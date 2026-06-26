@@ -1,5 +1,4 @@
 import superagent, { SuperAgentRequest } from 'superagent'
-import { DateTime, DateTimeUnit } from 'luxon'
 import { WiremockMapping } from '../../integration_tests/utils'
 
 const stubUserNoCaseload = (): SuperAgentRequest =>
@@ -80,8 +79,9 @@ const stubUserNoStaffRecord = (): SuperAgentRequest =>
 const getUserCaseloadStub = (allocatedDate: string) => {
   const mapping: WiremockMapping = {
     request: {
-      urlPathPattern: '/mas/caseload/user/USER1',
-      method: 'GET',
+      urlPathPattern: '/mas/caseload/user/USER1/search',
+      method: 'POST',
+      queryParameters: {},
     },
     response: {
       status: 200,
@@ -101,7 +101,7 @@ const getUserCaseloadStub = (allocatedDate: string) => {
               middleName: '',
               surname: 'Berge',
             },
-            crn: 'X000001',
+            crn: 'X778160',
             dob: '1975-09-25',
             nextAppointment: {
               id: 6,
@@ -117,7 +117,130 @@ const getUserCaseloadStub = (allocatedDate: string) => {
             numberOfAdditionalSentences: 0,
             allocatedOn: allocatedDate,
           },
+          {
+            caseName: {
+              forename: 'Kari',
+              middleName: '',
+              surname: 'Bradtke',
+            },
+            crn: 'X801756',
+            dob: '1986-07-19',
+            previousAppointment: {
+              id: 11,
+              date: '2024-09-26T09:30:00+01:00',
+              description: 'Post Disclosure Session',
+            },
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 1,
+          },
+          {
+            caseName: {
+              forename: 'Caroline',
+              middleName: '',
+              surname: 'Wolff',
+            },
+            crn: 'X000001',
+            dob: '2002-01-09',
+            latestSentence: '12 month Community order',
+            numberOfAdditionalSentences: 1,
+          },
+          {
+            crn: 'X808126',
+            limitedAccess: true,
+          },
+          {
+            caseName: {
+              forename: 'Wendell',
+              middleName: '',
+              surname: 'Dooley',
+            },
+            crn: 'X777916',
+            dob: '2001-02-14',
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 0,
+          },
+          {
+            caseName: {
+              forename: 'Vera',
+              middleName: '',
+              surname: 'Kessler',
+            },
+            crn: 'X765410',
+            dob: '1977-11-21',
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 0,
+          },
+          {
+            caseName: {
+              forename: 'Lillie',
+              middleName: '',
+              surname: 'Stokes',
+            },
+            crn: 'X765523',
+            dob: '1978-08-09',
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 0,
+          },
+          {
+            caseName: {
+              forename: 'Dallas',
+              middleName: '',
+              surname: 'Bashirian',
+            },
+            crn: 'X767016',
+            dob: '1979-11-10',
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 0,
+          },
+          {
+            caseName: {
+              forename: 'Elvira',
+              middleName: '',
+              surname: 'Rogahn',
+            },
+            crn: 'X767644',
+            dob: '1955-11-16',
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 0,
+          },
+          {
+            caseName: {
+              forename: 'Nicole',
+              middleName: '',
+              surname: 'Kutch',
+            },
+            crn: 'X769773',
+            dob: '1955-03-16',
+            latestSentence: 'Adult Custody < 12m',
+            numberOfAdditionalSentences: 0,
+          },
         ],
+        metaData: {
+          sentenceTypes: [
+            {
+              code: '307',
+              description: 'Adult Custody < 12m',
+            },
+            {
+              code: '329',
+              description: 'ORA Community Order',
+            },
+          ],
+          contactTypes: [
+            {
+              code: 'APPA03',
+              description: 'AP PA - Accommodation',
+            },
+            {
+              code: 'COAI',
+              description: 'Initial Appointment - In office (NS)',
+            },
+            {
+              code: 'TCP6',
+              description: 'Post Disclosure Session',
+            },
+          ],
+        },
       },
       headers: {
         'Content-Type': 'application/json',

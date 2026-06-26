@@ -79,13 +79,15 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         page => addParameters(req, { page: page.toString() }),
         caseload?.pageSize || 10,
       )
-      newCaseload = {
-        ...caseload,
-        sortedBy: req?.query?.sortBy ? (req.query.sortBy as string) : caseload.sortedBy,
-        caseload: caseload?.caseload?.map(val => ({
-          ...val,
-          newCase: val.allocatedOn ? DateTime.fromISO(val.allocatedOn) >= DateTime.now().minus({ days: 21 }) : false,
-        })),
+      if (caseload) {
+        newCaseload = {
+          ...caseload,
+          sortedBy: req?.query?.sortBy ? (req.query.sortBy as string) : caseload.sortedBy,
+          caseload: caseload?.caseload?.map(val => ({
+            ...val,
+            newCase: val.allocatedOn ? DateTime.fromISO(val.allocatedOn) >= DateTime.now().minus({ days: 21 }) : false,
+          })),
+        }
       }
       res.render('pages/caseload/minimal-cases', {
         pagination,
