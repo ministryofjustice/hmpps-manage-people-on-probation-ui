@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import Page from '../pages/page'
 import YourCasesPage from '../pages/myCases'
 
@@ -38,8 +39,14 @@ const checkColumnSorting = (page: YourCasesPage, index: number) => {
 }
 
 context('Cases', () => {
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('Cases page is rendered ', () => {
     cy.visit('/case')
+    const now = DateTime.now()
+    const allocatedOn = now.toFormat('yyyy-MM-dd')
+    cy.task('stubCaseload', allocatedOn)
     const page = Page.verifyOnPage(YourCasesPage)
     checkColumnHeading(page, 0, 'Cases', 'nameOrCrn', 'case')
     checkColumnHeading(page, 1, 'Sentence', 'sentence', 'case')
@@ -60,10 +67,14 @@ context('Cases', () => {
     page.getNavigationLink(4).should('contain.text', 'Alerts')
     page.getNavigationLink(4).get('.moj-notification-badge').should('contain.text', 12)
     page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
+    cy.get('.govuk-tag--yellow').should('contain.text', 'New case')
   })
 
   const sortableColumns = ['Cases', 'Sentence', 'Last Appointment', 'Next Appointment']
   for (let i = 0; i < sortableColumns.length; i += 1) {
+    afterEach(() => {
+      cy.task('resetMocks')
+    })
     it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i]} sort button is clicked`, () => {
       cy.visit('/case')
       const page = new YourCasesPage()
