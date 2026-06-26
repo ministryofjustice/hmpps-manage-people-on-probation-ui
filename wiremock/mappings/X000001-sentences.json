@@ -135,7 +135,7 @@
               "order": {
                 "description": "Default Sentence Type (12 Months)",
                 "sentenceType": "COMMUNITY",
-                "startDate": "2025-05-31",,
+                "startDate": "2025-05-31",
                 "pss": false
               },
               "nsis": [

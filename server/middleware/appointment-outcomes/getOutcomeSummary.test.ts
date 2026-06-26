@@ -66,7 +66,15 @@ const mockAppointmentOutcome = ({
   notes?: string
   appointment?: Activity
 } = {}): AppointmentOutcomeProps<Activity> => ({
-  sentence: { type: 'COMMUNITY', length: 12, eventId: 123, order: '', compliance: {} as Compliance },
+  sentence: {
+    type: 'COMMUNITY',
+    length: 12,
+    eventId: 123,
+    order: '',
+    youth: false,
+    pss: false,
+    compliance: {} as Compliance,
+  },
   forename: 'James',
   surname: 'Morrison',
   crn,
