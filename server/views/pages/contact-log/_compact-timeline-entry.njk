@@ -1,5 +1,5 @@
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
-{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set shouldPromptToRecordAnOutcome = entry.isAppointment and not entry.isUpdatableContact and entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if entry.isAppointment %}
   {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}

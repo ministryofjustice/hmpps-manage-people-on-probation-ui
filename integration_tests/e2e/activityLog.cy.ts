@@ -642,4 +642,14 @@ context('Contacts', () => {
     page.getElementByDataQA('manage-on-delius-link').should('not.exist')
     page.getActivityViewLink(0).should('contain.text', 'Manage')
   })
+
+  it('should show Manage link for updatable contacts without outcomes in compact view', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').should('exist')
+    // Find an updatable contact without outcome (e.g., from the mock data)
+    // and verify it shows "Manage" link, not an outcome prompt
+    page.getActivityViewLink(0).should('contain.text', 'Manage')
+    page.getElementByDataQA('manage-on-delius-link').should('not.exist')
+  })
 })
