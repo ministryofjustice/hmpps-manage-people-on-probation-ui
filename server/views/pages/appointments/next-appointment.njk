@@ -51,7 +51,7 @@
 {% block afterHeading %}
   {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personAppointment.personSummary.name.forename + '’s ' + sentence + '.' %}
   {% if nextAppointment.appointment %}
-    {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + " with " + personAppointment.personSummary.name.forename + " " + personAppointment.personSummary.name.surname + " for their " + sentence %}
+    {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + " with " + nextAppointment.appointment.officer.name | fullName + " for their " + sentence %}
   {% endif %}
   {{ govukInsetText({
     html: nextAppointmentText
