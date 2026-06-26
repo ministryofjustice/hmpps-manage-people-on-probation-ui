@@ -41,7 +41,8 @@
                 "description": "AP PA - Accommodation"
               },
               "latestSentence": "CJA - Std Determinate Custody",
-              "numberOfAdditionalSentences": 0
+              "numberOfAdditionalSentences": 0,
+              "allocatedOn": "2026-06-26"
             },
             {
               "caseName": {
