@@ -5,6 +5,7 @@ const stubSentences = ({
   sentenceType = 'COMMUNITY',
   startDate = '2023-12-01',
   endDate = '2026-01-01',
+  pss = false,
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -35,6 +36,7 @@ const stubSentences = ({
               sentenceType,
               startDate,
               endDate,
+              pss,
             },
             licenceConditions: [
               {
@@ -106,6 +108,7 @@ const stubSentences = ({
               sentenceType: 'COMMUNITY',
               endDate,
               startDate,
+              pss,
             },
             requirements: [
               {
@@ -161,6 +164,7 @@ const stubSentences = ({
               sentenceType: 'COMMUNITY',
               endDate,
               startDate,
+              pss,
             },
             nsis: [
               {
@@ -186,6 +190,7 @@ const stubSingleSentence = ({
   sentenceType = 'COMMUNITY',
   startDate = '2023-12-01',
   endDate = '2026-01-01',
+  pss = false,
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -216,6 +221,7 @@ const stubSingleSentence = ({
               sentenceType,
               startDate,
               endDate,
+              pss,
             },
             licenceConditions: [
               {

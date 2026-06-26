@@ -37,7 +37,8 @@
               "order": {
                 "description": "Default Sentence Type (12 Months)",
                 "sentenceType": "COMMUNITY",
-                "startDate": "2025-05-31"
+                "startDate": "2025-05-31",
+                "pss": false
               },
               "nsis": [
                 {
@@ -121,7 +122,8 @@
               "eventNumber": "1234567",
               "order": {
                 "description": "Pre-Sentence",
-                "sentenceType": "COMMUNITY"
+                "sentenceType": "COMMUNITY",
+                "pss": false
               },
               "nsis": [],
               "licenceConditions": [],
@@ -133,7 +135,8 @@
               "order": {
                 "description": "Default Sentence Type (12 Months)",
                 "sentenceType": "COMMUNITY",
-                "startDate": "2025-05-31"
+                "startDate": "2025-05-31",,
+                "pss": false
               },
               "nsis": [
                 {
@@ -274,7 +277,8 @@
               "length": 12,
               "endDate": "2025-01-31",
               "releaseDate": "2024-11-01",
-              "startDate": "2024-02-01"
+              "startDate": "2024-02-01",
+              "pss": false
             },
             "requirements": [
               {
@@ -424,7 +428,8 @@
               "description": "Default Sentence Type",
               "length": 12,
               "endDate": "2025-03-19",
-              "startDate": "2024-03-19"
+              "startDate": "2024-03-19",
+              "pss": false
             },
             "requirements": [],
             "courtDocuments": [
