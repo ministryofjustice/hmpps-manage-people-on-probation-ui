@@ -290,12 +290,9 @@ export const pageAccessRules: PageAccessRule[] = [
     url: 'update-enforcement-action',
     oneRequired: [
       { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.attendedFailedToComply': anyValue },
-      { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.letterType': anyValue },
-      { 'outcome.outcomeType': 'ATTENDED_FAILED_TO_COMPLY', 'outcome.otherEnforcementAction': anyValue },
+      { 'outcome.outcomeType': 'ATTENDED_SENT_HOME_BEHAVIOUR', 'outcome.attendedFailedToComply': anyValue },
       { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.unacceptableAbsence': anyValue },
-      { 'outcome.outcomeType': 'UNACCEPTABLE_ABSENCE', 'outcome.letterType': anyValue },
       { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.failedToAttend': anyValue },
-      { 'outcome.outcomeType': 'FAILED_TO_ATTEND', 'outcome.letterType': anyValue },
     ],
   },
   {
