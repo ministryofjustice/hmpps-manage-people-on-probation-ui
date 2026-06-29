@@ -3,17 +3,16 @@
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
 {% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
-{% set title = (('Manage ' + appointmentDisplayName) | toSentenceCase) + ' with ' + (appointment.officer.name | fullName | convertToTitleCase) %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [title]
-}) %}
+{% set title = (('Manage ' + appointmentDisplayName) | toSentenceCase) + ' with ' + (
+appointment.officer.name | fullName | convertToTitleCase) %}
+{% set pageTitle = makePageTitle({pageHeading: [title]}) %}
 {% set notes = '' %}
 {% set alert = '' %}
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% set sentence = sentences[0].order.description %}
 
-{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else
+{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else 
   'Log attended and complied appointment' %}
 {% set outcomeLink = null %}
 {% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
@@ -34,7 +33,7 @@
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
-  'their home' if nextAppointmentIsAtHome else
+  'their home' if nextAppointmentIsAtHome else 
     addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + "." %}
 {% endif %}
 {% if not nextAppointment.appointment and not nextAppointment.usernameIsCom %}
