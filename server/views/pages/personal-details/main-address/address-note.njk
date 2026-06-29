@@ -1,5 +1,8 @@
 {% extends "../../../partials/case.njk" %}
-{% set pageTitle = makePageTitle({pageHeading: "Personal details"}) %}
+{% set title = 'Addresses' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Personal details"]
+}) %}
 {% set currentNavSection = 'personal-details' %}
 {% set currentSectionName = 'Personal details' %}
 {% set headerCRN = crn %}
@@ -112,9 +115,9 @@
     {% set hasPreviousAddresses = previousAddressCount > 0 %}
 
     {% if hasOtherAddresses or hasPreviousAddresses %}
-        {% set otherAddressString = '1 other address' if otherAddressCount == 1 else 
+        {% set otherAddressString = '1 other address' if otherAddressCount == 1 else
             otherAddressCount + ' other addresses' %}
-        {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else 
+        {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else
             previousAddressCount + ' previous addresses' %}
 
         {% if hasOtherAddresses and hasPreviousAddresses %}

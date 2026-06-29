@@ -63,7 +63,17 @@ export const letterEnforcementActions = [
   'WITHDRAW_WARNING_LETTER',
 ] as const
 
+export const otherEnforcementActionLetterTypes = [
+  'BREACH_LETTER_SENT',
+  'FIRST_WARNING_LETTER_SENT',
+  'SECOND_WARNING_LETTER_SENT',
+  'OTHER_ENFORCEMENT_LETTER_SENT',
+  'LICENCE_COMPLIANCE_LETTER_SENT',
+] as const
+
 export type LetterEnforcementAction = (typeof letterEnforcementActions)[number]
+
+export type OtherEnforcementActionsLetterType = (typeof otherEnforcementActionLetterTypes)[number]
 
 export const appointmentEnforcementActions = [
   'BREACH_RECALL_INITIATED',

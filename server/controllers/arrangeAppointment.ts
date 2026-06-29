@@ -219,7 +219,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
-      const staff = getDataValue<User[]>(data, ['staff', username])
+      const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
       const staffMember = staff?.find(person => person.username === username)
       if (providerCode) {
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
@@ -538,19 +538,26 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending.username.toUpperCase() !== res.locals.user.username) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        try {
-          const probationPractitioner = await masClient.getProbationPractitioner(crn)
-          const probationPractitionersForename = probationPractitioner.name.forename || ''
+      if (attending.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+        if (attending?.name?.forename) {
           const formattedName =
-            probationPractitionersForename.charAt(0).toUpperCase() +
-            probationPractitionersForename.slice(1).toLowerCase()
+            attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
           // First letter of the PPs name should be uppercase as per requirement
           attendingName = `${formattedName}’s`
-        } catch {
-          attendingName = `The officer´s`
+        } else {
+          const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+          const masClient = new MasApiClient(token)
+          try {
+            const probationPractitioner = await masClient.getProbationPractitioner(crn)
+            const probationPractitionersForename = probationPractitioner.name.forename || ''
+            const formattedName =
+              probationPractitionersForename.charAt(0).toUpperCase() +
+              probationPractitionersForename.slice(1).toLowerCase()
+            // First letter of the PPs name should be uppercase as per requirement
+            attendingName = `${formattedName}’s`
+          } catch {
+            attendingName = `The officer’s`
+          }
         }
       }
       const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
@@ -585,7 +592,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
 
       // tidy up current appointment session 👇
-
       if (req.session.data.appointments?.[crn]?.[id]) {
         delete req.session.data.appointments[crn][id]
       }

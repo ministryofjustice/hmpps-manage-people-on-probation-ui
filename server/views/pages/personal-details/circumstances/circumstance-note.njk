@@ -1,6 +1,8 @@
 {% extends "../../../partials/layout.njk" %}
 {% set title = 'Personal circumstances' %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal circumstances"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Personal details"]
+}) %}
 {% set circumstance = circumstanceOverview.circumstance %}
 
 {% block beforeContent %}
@@ -78,4 +80,3 @@
 
 
 {% endblock %}
-

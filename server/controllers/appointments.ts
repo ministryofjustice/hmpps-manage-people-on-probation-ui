@@ -159,6 +159,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         nextAppointment?.appointment?.location,
       )
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
+      const canReschedule = canRescheduleAppointment(personAppointment)
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
@@ -166,7 +167,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         nextAppointment,
         nextAppointmentIsAtHome,
-        canReschedule: canRescheduleAppointment(personAppointment),
+        canReschedule,
         contactId,
         hasDeceased,
         relatedContacts,

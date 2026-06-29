@@ -1,9 +1,10 @@
 import * as cheerio from 'cheerio'
+import { Environment } from 'nunjucks'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
 import { Activity, PersonAppointment } from '../../../data/model/schedule'
 import { PersonSummary } from '../../../data/model/personalDetails'
 
-const env = createNunjucksTestEnv()
+let env: Environment
 
 const crn = 'X000001'
 const appointmentId = '1'
@@ -105,6 +106,9 @@ const render = (model: TestModelOverride = {}) =>
   )
 
 describe('Alert banner', () => {
+  beforeAll(() => {
+    env = createNunjucksTestEnv()
+  })
   describe('Appointment is in the future', () => {
     it('should not show the alert', () => {
       const $ = render({

@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'Arrange an appointment in another location' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set backLink = ('/case/' + crn + '/arrange-appointment/' + id + '/type-attendance') if noLocations else ('/case/' + crn + '/arrange-appointment/' + id + '/location-date-time')  %}
 {% set notStandardForm = true %}
 {% block primary %}

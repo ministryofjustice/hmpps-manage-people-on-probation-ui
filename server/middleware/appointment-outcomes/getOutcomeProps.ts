@@ -72,8 +72,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const sendBreachOrRecallLetter = [attendedFailedToComply, unacceptableAbsence, updateEnforcementAction].some(
     value => value === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
   )
-  const sendLetter = [attendedFailedToComply, unacceptableAbsence, failedToAttend].some(
-    value => value === 'SEND_LETTER',
+  const sendLetter = [attendedFailedToComply, unacceptableAbsence, failedToAttend, updateEnforcementAction].some(
+    value => ['SEND_LETTER', 'SEND_ANOTHER_LETTER'].includes(value),
   )
   const appointmentHintText =
     appointment?.type && appointment?.officer?.name && appointment?.startDateTime

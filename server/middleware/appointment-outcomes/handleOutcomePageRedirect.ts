@@ -1,5 +1,11 @@
 import { Route } from '../../@types'
-import { EnforcementActionPage, AppointmentEnforcementAction, OutcomePage } from '../../models/Appointments'
+import {
+  EnforcementActionPage,
+  AppointmentEnforcementAction,
+  OutcomePage,
+  otherEnforcementActionLetterTypes,
+  OtherEnforcementActionsLetterType,
+} from '../../models/Appointments'
 import { findUncompleted } from '../findUncompleted'
 
 type EnforcementRedirectMap = {
@@ -19,7 +25,14 @@ export const handleOutcomePageRedirect = (pageKey: EnforcementActionPage | Outco
       BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
       DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
     }
+
     let redirect = redirectMap?.[enforcementAction]
+    if (
+      pageKey === 'otherEnforcementAction' &&
+      otherEnforcementActionLetterTypes.includes(enforcementAction as OtherEnforcementActionsLetterType)
+    ) {
+      redirect = `${baseOutcomeUrl}/send-letter`
+    }
     if (redirect) {
       redirect = `${redirect}${change ? `?change=${encodeURIComponent(change)}` : ''}`
     } else if (change) {

@@ -38,15 +38,16 @@ const sentenceEventNumber: { [K in SentenceType]?: string } = {
 
 const getPersonComplianceSpy = jest.spyOn(MasApiClient.prototype, 'getPersonCompliance')
 
-const mockSentences = (endDate = '2026-05-31'): Sentence[] => [
+const mockSentences = ({ endDate = '2026-05-31', description = 'Pre-Sentence', pss = false } = {}): Sentence[] => [
   {
     id: sentenceEventId.CUSTODY,
     eventNumber: sentenceEventNumber.CUSTODY,
     order: {
-      description: 'Pre-Sentence',
+      description,
       sentenceType: 'CUSTODY',
       startDate: '2025-05-31',
       endDate,
+      pss,
     },
     nsis: [],
     licenceConditions: [],
@@ -134,6 +135,8 @@ describe('/middleware/appointment-outcomes/getOutcomeSentence', () => {
       order: 'Pre-Sentence',
       activeBreach: null,
       compliance: mockComplianceCurrentSentence().compliance,
+      pss: false,
+      youth: false,
     }
     expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
     expect(nextSpy).toHaveBeenCalledTimes(1)
@@ -153,6 +156,8 @@ describe('/middleware/appointment-outcomes/getOutcomeSentence', () => {
       order: 'Pre-Sentence',
       activeBreach,
       compliance: mockComplianceCurrentSentence().compliance,
+      pss: false,
+      youth: false,
     }
     expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
   })
@@ -172,6 +177,8 @@ describe('/middleware/appointment-outcomes/getOutcomeSentence', () => {
       order: 'Pre-Sentence',
       activeRecall: null,
       compliance: mockComplianceCurrentSentence({ sentenceType }).compliance,
+      pss: false,
+      youth: false,
     }
     expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
   })
@@ -180,7 +187,7 @@ describe('/middleware/appointment-outcomes/getOutcomeSentence', () => {
     const sentenceType: SentenceType = 'CUSTODY'
     const response = mockPersonComplianceResponse({ sentenceType, activeBreachOrRecall: true })
     getPersonComplianceSpy.mockResolvedValueOnce(response)
-    getDataValueSpy.mockReturnValueOnce(mockSentences('2027-05-31'))
+    getDataValueSpy.mockReturnValueOnce(mockSentences({ endDate: '2027-05-31' }))
     const res = buildResponse({ sentenceType })
     await getOutcomeSentence(hmppsAuthClient)(req, res, nextSpy)
     const expectedSentence: AppointmentOutcomeSentence = {
@@ -191,6 +198,8 @@ describe('/middleware/appointment-outcomes/getOutcomeSentence', () => {
       order: 'Pre-Sentence',
       activeRecall,
       compliance: mockComplianceCurrentSentence({ sentenceType }).compliance,
+      pss: false,
+      youth: false,
     }
     expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
   })
@@ -209,8 +218,51 @@ describe('/middleware/appointment-outcomes/getOutcomeSentence', () => {
       order: 'Pre-Sentence',
       activeBreach: null,
       compliance: null,
+      pss: false,
+      youth: false,
     }
     expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
     expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should assign the correct details if youth sentence', async () => {
+    const youthSentence = '204 C JA - Youth Rehabilitation Order'
+    const sentenceType: SentenceType = 'CUSTODY'
+    const response = mockPersonComplianceResponse({ sentenceType, activeBreachOrRecall: false })
+    getPersonComplianceSpy.mockResolvedValueOnce(response)
+    getDataValueSpy.mockReturnValueOnce(mockSentences({ description: youthSentence }))
+    const res = buildResponse({ sentenceType })
+    await getOutcomeSentence(hmppsAuthClient)(req, res, nextSpy)
+    const expectedSentence: AppointmentOutcomeSentence = {
+      type: sentenceType,
+      length: 12,
+      eventId: sentenceEventId[sentenceType],
+      eventNumber: sentenceEventNumber[sentenceType],
+      order: youthSentence,
+      activeRecall: null,
+      compliance: mockComplianceCurrentSentence({ sentenceType }).compliance,
+      pss: false,
+      youth: true,
+    }
+    expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
+  })
+  it('should assign the correct details if pss sentence', async () => {
+    const sentenceType: SentenceType = 'CUSTODY'
+    const response = mockPersonComplianceResponse({ sentenceType, activeBreachOrRecall: false })
+    getPersonComplianceSpy.mockResolvedValueOnce(response)
+    getDataValueSpy.mockReturnValueOnce(mockSentences({ pss: true }))
+    const res = buildResponse({ sentenceType })
+    await getOutcomeSentence(hmppsAuthClient)(req, res, nextSpy)
+    const expectedSentence: AppointmentOutcomeSentence = {
+      type: sentenceType,
+      length: 12,
+      eventId: sentenceEventId[sentenceType],
+      eventNumber: sentenceEventNumber[sentenceType],
+      order: 'Pre-Sentence',
+      activeRecall: null,
+      compliance: mockComplianceCurrentSentence({ sentenceType }).compliance,
+      pss: true,
+      youth: false,
+    }
+    expect(res.locals.appointmentOutcome.sentence).toStrictEqual(expectedSentence)
   })
 })

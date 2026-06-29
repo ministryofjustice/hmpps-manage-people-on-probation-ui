@@ -1,0 +1,16 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/contact/.*/enforcement-actions",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

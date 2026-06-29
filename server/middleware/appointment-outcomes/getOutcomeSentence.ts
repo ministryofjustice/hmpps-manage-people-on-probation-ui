@@ -5,6 +5,7 @@ import MasApiClient from '../../data/masApiClient'
 import { type Sentence } from '../../data/model/sentenceDetails'
 import { type AppointmentOutcomeSentence } from '../../models/Locals'
 import { getDataValue } from '../../utils'
+import { youthSentences } from '../../properties/appointment-outcomes'
 
 export const getOutcomeSentence = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -15,6 +16,7 @@ export const getOutcomeSentence = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     const appointmentSentence: Sentence | undefined = eventId
       ? sentences.find(s => String(s.id) === String(eventId))
       : undefined
+    const youth = youthSentences.includes(appointmentSentence?.order?.description)
     const startDate = appointmentSentence?.order?.startDate
     const endDate = appointmentSentence?.order?.endDate
     let sentenceLength = null
@@ -36,6 +38,8 @@ export const getOutcomeSentence = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       eventNumber: appointmentSentence?.eventNumber ?? null,
       order: appointmentSentence?.order?.description ?? null,
       compliance: currentSentenceCompliance?.compliance ?? null,
+      youth,
+      pss: appointmentSentence?.order?.pss ?? false,
     }
     if (type === 'COMMUNITY') {
       sentence.activeBreach = currentSentenceCompliance?.activeBreach ?? null

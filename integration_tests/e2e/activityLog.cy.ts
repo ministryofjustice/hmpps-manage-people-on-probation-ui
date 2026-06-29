@@ -642,4 +642,16 @@ context('Contacts', () => {
     page.getElementByDataQA('manage-on-delius-link').should('not.exist')
     page.getActivityViewLink(0).should('contain.text', 'Manage')
   })
+
+  it('should show Manage link for updatable contacts without outcomes in compact view', () => {
+    cy.task('stubActivityLogWithUpdatableContactNoOutcome')
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').should('exist')
+    // Updatable contact without outcome should show Manage link, not outcome prompt
+    page.getActivity(1).should('contain.text', 'MAPPA level setting process')
+    page.getActivityViewLink(0).should('contain.text', 'Manage')
+    // Verify it's NOT showing outcome prompt (View + Manage on NDelius)
+    cy.get('.contact-activity__actions-cell').eq(0).find('[data-qa="manage-on-delius-link"]').should('not.exist')
+  })
 })

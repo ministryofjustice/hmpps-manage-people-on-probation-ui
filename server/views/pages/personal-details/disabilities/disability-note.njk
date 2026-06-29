@@ -1,5 +1,9 @@
 {% extends "../../../partials/layout.njk" %}
 {% set title = 'Disabilities' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Personal details"]
+}) %}
+
 {% block beforeContent %}
     {{ govukBreadcrumbs({
         items: [
@@ -22,8 +26,6 @@
         ]
     }) }}
 {% endblock %}
-
-{% block pageTitle %}{{ title }}{% endblock %}
 
 {% block content %}
     <h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>

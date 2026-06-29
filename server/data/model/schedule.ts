@@ -101,6 +101,10 @@ export interface PutContactRequest {
   sensitive: boolean
 }
 
+export interface EnforcementActionsRequest {
+  enforcementActions: { code: string }[]
+}
+
 export interface Activity {
   id: string
   eventNumber?: string

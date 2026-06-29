@@ -156,7 +156,7 @@ context('Overview', () => {
           .should('contain.text', 'Location Monitoring View GPS location monitoring data')
         page
           .getRowData('sentence7654321', 'requirements', 'Value')
-          .should('contain.text', 'Location Monitoring View (GPS tagging) Trail Monitoring data')
+          .should('contain.text', 'Location Monitoring View GPS location monitoring data')
       },
     },
   ]

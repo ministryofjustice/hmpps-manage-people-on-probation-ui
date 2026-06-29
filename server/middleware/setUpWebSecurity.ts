@@ -59,7 +59,6 @@ export default function setUpWebSecurity(): Router {
               // This is required for the S3 bucket to upload checkin images
               // (either have a custom domain for each environment or use the default wild card domain)
               'https://*.s3.eu-west-2.amazonaws.com',
-              'https://app.optimalworkshop.com/survey_status/treejack/etjdsmsh/active',
             ]
             // Allow localhost for local development only
             if (config.env === 'local') {

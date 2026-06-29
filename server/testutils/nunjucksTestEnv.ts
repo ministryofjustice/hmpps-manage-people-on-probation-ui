@@ -13,9 +13,11 @@ import {
   formatEnforcementActionNote,
   toSentenceCase,
   yearsSince,
+  makePageTitle,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
+import { activityLinkUrl } from '../utils/activityContactLinkUrl'
 
 export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   const env = nunjucks.configure(
@@ -37,6 +39,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
 
   env.addGlobal('addressToList', addressToList)
   env.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
+  env.addGlobal('activityLinkUrl', activityLinkUrl)
 
   env.addFilter('dateWithYear', dateWithYear)
   env.addFilter('yearsSince', yearsSince)
@@ -53,6 +56,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   })
   env.addFilter('convertToTitleCase', convertToTitleCase)
   env.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
+  env.addGlobal('makePageTitle', makePageTitle)
 
   return env
 }

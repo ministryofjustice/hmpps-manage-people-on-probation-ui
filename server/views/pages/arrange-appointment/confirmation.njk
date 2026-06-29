@@ -18,6 +18,9 @@
 {% if appointmentType == "RESCHEDULE" %}
   {% set title = 'Appointment rescheduled' %}
 {% endif %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set appointmentDatesHtml %}
 {% for appointmentDate in appointmentDates %}
   {% if loop.index > 1 %}<br>{% endif %}

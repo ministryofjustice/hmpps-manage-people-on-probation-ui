@@ -9,9 +9,17 @@ export interface LatestTier {
   provisional: boolean
 }
 
+export type LatestTierV3 = LatestTier & {
+  tag: {
+    text: 'Missing' | 'Provisional' | 'Unavailable' | null
+    color: 'red' | 'orange' | 'grey' | null
+  }
+}
+
 export interface LatestTierResponse {
-  calculation: LatestTier
+  calculation: LatestTierV3 | null
   httpStatus: number
+  error?: Error | null
 }
 
 export default class TierApiClient extends RestClient {

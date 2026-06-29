@@ -1,8 +1,11 @@
 {% extends "../_form.njk" %}
 {% from "_components/note/macro.njk" import appNote %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Add a note", "Record an outcome"]
+}) %}
 {% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
-{% set multipartForm = true if appointmentOutcome.contactId else 
+{% set multipartForm = true if appointmentOutcome.contactId else
     false %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% set notes = '' %}
@@ -171,7 +174,6 @@
                 <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
             {% endif %}
         {% endif %}
-        {{ appointmentOutcome.appointmentSession.sensitivityLocked  }}
         {% if not appointmentOutcome.appointmentSession.sensitivityLocked %}
             {{ govukRadios(sensitivityConfig) }}
         {% endif %}

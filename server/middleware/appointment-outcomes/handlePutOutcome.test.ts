@@ -4,9 +4,8 @@ import { mockAppResponse } from '../../controllers/mocks'
 import { AppointmentSession, AppointmentSessionOutcome } from '../../models/Appointments'
 import { renderError } from '../renderError'
 import { HmppsAuthClient } from '../../data'
-import { findUncompleted } from '../findUncompleted'
 import MasApiClient from '../../data/masApiClient'
-import { PutContactRequest } from '../../data/model/schedule'
+import { EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
 import TokenStore from '../../data/tokenStore/redisTokenStore'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 
@@ -50,9 +49,10 @@ const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
-
-const findUncompletedSpy = findUncompleted as jest.MockedFunction<typeof findUncompleted>
 const putContactSpy = jest.spyOn(MasApiClient.prototype, 'putContact').mockResolvedValue({} as any)
+const postEnforcementActionsSpy = jest
+  .spyOn(MasApiClient.prototype, 'postEnforcementActions')
+  .mockResolvedValue({} as any)
 
 const mockAppointment = ({
   appointment = {},
@@ -172,9 +172,9 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
     expect(res.redirect).toHaveBeenCalledWith(`${baseOutcomeUrl}?validation=true`)
   })
-  it('should put the correct request to the API if no notes and no enforcement action codes selected', async () => {
+  it('should put the correct request to the API if no notes, and no enforcement action codes selected', async () => {
     const req = buildRequest()
-    const res = buildResponse()
+    const res = buildResponse({ appointmentOutcome: { notePrepend: '' } })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
     const {
       date,
@@ -190,10 +190,40 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       alert: false,
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should put the correct request to the API if notePrepend value exists and a single enforcement action is selected', async () => {
+  it('should put the correct request to the API if action is Refer to offender manager', async () => {
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'REFER_TO_OFFENDER_MANAGER',
+      enforcementActionCode: ['ROM'],
+    }
+    const req = buildRequest()
+    const res = buildResponse({ outcome, appointmentOutcome: { notePrepend: '' } })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const {
+      date,
+      start,
+      outcome: { outcomeCode },
+    } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: 'AFTC',
+      notes: '',
+      sensitive: true,
+      alert: true,
+    }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'ROM' }] }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should put the correct request to the API if notes, notePrepend value exists and a single enforcement action is selected', async () => {
     const appointment: Partial<AppointmentSession> = { notes }
     const outcome: Partial<AppointmentSessionOutcome> = {
       outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
@@ -204,22 +234,44 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     const req = buildRequest()
     const res = buildResponse({ appointment, outcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    const {
-      date,
-      start,
-      outcome: { outcomeCode },
-    } = mockAppointment()
+    const { date, start } = mockAppointment()
     const expectedRequest: PutContactRequest = {
       date,
       time: start,
       outcomeCode: outcome.outcomeCode,
-      enforcementActionCode: 'IBR',
       notes: `${notePrepend}\n${notes}`,
       sensitive: true,
       alert: false,
     }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'IBR' }] }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
-    expect(putContactSpy).toHaveBeenCalledTimes(1)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should put the correct request to the API if no notes, notePrepend value exists and a single enforcement action is selected', async () => {
+    const appointment: Partial<AppointmentSession> = { notes: '' }
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED',
+      enforcementActionCode: ['IBR'],
+    }
+    const req = buildRequest()
+    const res = buildResponse({ appointment, outcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: notePrepend,
+      sensitive: true,
+      alert: false,
+    }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'IBR' }] }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -234,34 +286,20 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     const req = buildRequest()
     const res = buildResponse({ appointment, outcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    const {
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
       date,
-      start,
-      outcome: { outcomeCode },
-    } = mockAppointment()
-    const expectedRequests: PutContactRequest[] = [
-      {
-        date,
-        time: start,
-        outcomeCode: outcome.outcomeCode,
-        enforcementActionCode: 'IBR',
-        notes: `${notePrepend}\n${notes}`,
-        sensitive: true,
-        alert: false,
-      },
-      {
-        date,
-        time: start,
-        outcomeCode: outcome.outcomeCode,
-        enforcementActionCode: 'LCL',
-        notes: `${notePrepend}\n${notes}`,
-        sensitive: true,
-        alert: false,
-      },
-    ]
-    expect(putContactSpy).toHaveBeenNthCalledWith(1, contactId, expectedRequests[0])
-    expect(putContactSpy).toHaveBeenNthCalledWith(2, contactId, expectedRequests[1])
-    expect(putContactSpy).toHaveBeenCalledTimes(2)
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: `${notePrepend}\n${notes}`,
+      sensitive: true,
+      alert: false,
+    }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = {
+      enforcementActions: [{ code: 'IBR' }, { code: 'LCL' }],
+    }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

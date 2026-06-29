@@ -9,6 +9,7 @@ import {
   PersonAppointment,
   Schedule,
   PutContactRequest,
+  EnforcementActionsRequest,
 } from './model/schedule'
 import {
   AddressOverview,
@@ -160,6 +161,11 @@ export default class MasApiClient extends RestClient {
   async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
     const path = `/contact/${contactId}`
     return this.put({ data: body, path })
+  }
+
+  async postEnforcementActions(contactId: string, body: EnforcementActionsRequest): Promise<{ statusCode: number }> {
+    const path = `/contact/${contactId}/enforcement-actions`
+    return this.post({ data: body, path })
   }
 
   async getPersonalDetails(crn: string): Promise<PersonalDetails | null> {

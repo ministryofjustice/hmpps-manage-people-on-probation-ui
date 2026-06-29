@@ -319,6 +319,55 @@ const stubActivityLogWithUnplannedContact = (): SuperAgentRequest =>
     },
   })
 
+const stubActivityLogWithUpdatableContactNoOutcome = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/activity/X000001',
+      method: 'POST',
+      queryParameters: {
+        page: { matches: '.*' },
+        size: { equalTo: '25' },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        size: 1,
+        page: 0,
+        totalResults: 1,
+        totalPages: 1,
+        personSummary: {
+          name: { forename: 'Eula', surname: 'Schmeler' },
+          crn: 'X000001',
+          dateOfBirth: '1979-08-18',
+        },
+        activities: [
+          {
+            id: 9997,
+            eventNumber: '4',
+            type: 'MAPPA Level setting process',
+            displayName: 'MAPPA level setting process',
+            startDateTime: '2024-01-10T10:00:00.000Z',
+            isSensitive: false,
+            hasOutcome: false,
+            wasAbsent: false,
+            isAppointment: false,
+            isCommunication: false,
+            isSystemContact: false,
+            deliusManaged: true,
+            isUpdatableContact: true,
+            isInPast: true,
+            appointmentNotes: [],
+            officer: { name: { forename: 'Paul', surname: 'Smith' } },
+            lastUpdated: '2024-01-15',
+            lastUpdatedBy: { forename: 'Paul', surname: 'Smith' },
+          },
+        ],
+      },
+      headers: { 'Content-Type': 'application/json' },
+    },
+  })
+
 export default {
   stubAppointmentNoOutcomeWithNote,
   stubAppointmentOutcomeWithNote,
@@ -326,4 +375,5 @@ export default {
   stubAppointmentDeepLinkWithOutcome,
   stubActivityLogWithAlcoholConsumption,
   stubActivityLogWithUnplannedContact,
+  stubActivityLogWithUpdatableContactNoOutcome,
 }

@@ -3,6 +3,9 @@
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
 {% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set title = (('Manage ' + appointmentDisplayName) | toSentenceCase) + ' with ' + (
+appointment.officer.name | fullName | convertToTitleCase) %}
+{% set pageTitle = makePageTitle({pageHeading: [title]}) %}
 {% set notes = '' %}
 {% set alert = '' %}
 {% set documents = [] %}
@@ -129,7 +132,7 @@
 {% block beforeContent %}
   {% if backLink %}
     {{ govukBackLink({
-    href: backLink 
+    href: backLink
   }) }}
   {% endif %}
 {% endblock %}
@@ -221,7 +224,7 @@
           classes: "govuk-tag--" + notesTagColour
         } if not hasNotes or (hasNotes and not appointment.isInPast and not appointment.hasOutcome) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
         text: 'Completed' if hasNotes and appointment.hasOutcome
-      } 
+      }
     },
     {
       title: {
@@ -234,7 +237,7 @@
           classes: "govuk-tag--blue"
         } if appointment.documents.length == 0,
         text: 'Uploaded' if appointment.documents.length > 0
-      } 
+      }
     } if flags.enableNonCompliance,
     {
       title: {
@@ -291,7 +294,7 @@
         text: "Sentence"
       },
       value: {
-        html: '<span data-qa="sentenceValue">' + sentence | default('Details unavailable') + '</span>' 
+        html: '<span data-qa="sentenceValue">' + sentence | default('Details unavailable') + '</span>'
       },
       actions: {
         classes: "govuk-!-white-space-nowrap",
@@ -325,7 +328,7 @@
         text: "Location"
       },
       value: {
-        html: '<span data-qa="locationValue">' + location + '</span>' 
+        html: '<span data-qa="locationValue">' + location + '</span>'
       },
       actions: {
         classes: "govuk-!-white-space-nowrap",
@@ -507,7 +510,7 @@
           <ul class="govuk-list">
             {% for contact in relatedContacts %}
               <li class="govuk-!-margin-bottom-4">
-                <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, contact.contactId) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">{{ contact.contactTypeDescription | toSentenceCase }}</a><br>
+                <a href="{{ activityLinkUrl(crn, contact.contactId, contactId) }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ contact.contactTypeDescription | toSentenceCase }}</a><br>
                 <span class="govuk-body-s govuk-hint">
   Created by {{ contact.createdBy.forename[0] }}.{{ contact.createdBy.surname }}
   on {{ contact.contactDate | dateWithYear }}

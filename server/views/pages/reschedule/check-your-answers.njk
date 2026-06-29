@@ -1,6 +1,9 @@
 {% extends "../_form.njk" %}
 {% set notStandardForm = true %}
 {% set title = 'Change appointment details and reschedule' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set buttonText = 'Reschedule appointment' %}
 {% set rescheduleApptInsertText = "You'll receive an updated calendar invite for the appointment." %}
 {% set showCalendarInsetText = not isInPast %}

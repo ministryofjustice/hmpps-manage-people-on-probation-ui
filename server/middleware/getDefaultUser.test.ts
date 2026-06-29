@@ -172,25 +172,9 @@ describe('/middleware/getDefaultUser()', () => {
             7,
             data,
             ['teams', username],
-            [...mock.teams, probationPractitioner.team].sort((a, b) =>
-              a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
-            ),
+            [...mock.teams, probationPractitioner.team],
           )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            8,
-            req.session.data,
-            ['staff', username],
-            [
-              ...mock.users,
-              {
-                staffCode: probationPractitioner.code,
-                username: probationPractitioner.username,
-                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
-                name: probationPractitioner.name,
-                email: probationPractitioner.email,
-              },
-            ],
-          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(8, req.session.data, ['staff', username], [...mock.users])
           expect(nextSpy).toHaveBeenCalledTimes(1)
         })
       })
@@ -263,25 +247,9 @@ describe('/middleware/getDefaultUser()', () => {
             5,
             data,
             ['teams', username],
-            [...mock.teams, probationPractitioner.team].sort((a, b) =>
-              a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
-            ),
+            [...mock.teams, probationPractitioner.team],
           )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            6,
-            req.session.data,
-            ['staff', username],
-            [
-              ...mock.users,
-              {
-                staffCode: probationPractitioner.code,
-                username: probationPractitioner.username,
-                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
-                name: probationPractitioner.name,
-                email: probationPractitioner.email,
-              },
-            ],
-          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, req.session.data, ['staff', username], [...mock.users])
           expect(nextSpy).toHaveBeenCalledTimes(1)
         })
       })
@@ -319,9 +287,6 @@ describe('/middleware/getDefaultUser()', () => {
           userProviders.defaultUserDetails.username,
         )
         expect(nextSpy).toHaveBeenCalledTimes(1)
-      })
-      it('should request the teams from the api', () => {
-        expect(getTeamsByProviderSpy).toHaveBeenCalledWith(defaultUserProviderCode)
       })
       it('should request the staff from the api', () => {
         expect(getStaffByTeamSpy).toHaveBeenCalledWith(defaultUserTeamCode)

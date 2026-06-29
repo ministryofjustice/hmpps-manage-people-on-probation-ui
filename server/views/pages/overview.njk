@@ -159,9 +159,10 @@
   {% endif %}
 
   {% if flags.enableSupervisionPackage %}
+    {% set tierCalculation = tierDetails.calculation if tierDetails else null %}
     {{ supervisionPackage({
-      tierScore: tierDetails.calculation.tierScore,
-      provisional: tierDetails.calculation.provisional,
+      tierScore: (tierCalculation.tierScore if tierCalculation.tierScore !== 'MISSING' else null) if tierCalculation else null,
+      tag: tierCalculation.tag if tierCalculation else null,
       historyHref: tierUrlV3
     }) }}
   {% endif %}
@@ -538,11 +539,11 @@
         {% set requirements %}
          {% if sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
              {{ sentence.rarDescription }} <br/>
-             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View GPS location monitoring data</a>
          {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
             {{ sentence.rarDescription }}
          {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
-             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View (GPS tagging) Trail Monitoring data</a>
+             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View GPS location monitoring data</a>
         {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
                     Details not available
                 {% endif %}

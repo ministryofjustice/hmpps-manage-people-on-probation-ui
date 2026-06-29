@@ -2,6 +2,9 @@
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% set buttonText = "Return to " + appointmentOutcome.forename + "’s overview" %}
 {% set title = appointmentOutcome.confirmation.title %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Record an outcome"]
+}) %}
 {% set notStandardForm = true %}
 {% set panelHtml %}
 <div class="govuk-!-font-size-27">
