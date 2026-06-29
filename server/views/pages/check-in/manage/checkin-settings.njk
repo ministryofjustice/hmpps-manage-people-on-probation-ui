@@ -1,5 +1,8 @@
 {% extends "../../_form.njk" %}
 {% set title = "Change online check in settings" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
 {% set radioLabel =  "How often would you like "+ case.name.forename + " to check in?" %}
 {% set buttonText =  "Save changes" %}

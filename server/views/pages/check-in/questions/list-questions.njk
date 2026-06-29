@@ -1,6 +1,10 @@
 {% extends "../../_form.njk" %}
 {% set notStandardForm = true %}
 {% set title = "Choose a question to add" %}
+{% set pageTitleText = "Add questions to the person's next online check in" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set addQuestionLinkBase = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" %}
@@ -54,7 +58,7 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            {{ govukTable(tableData) }}    
+            {{ govukTable(tableData) }}
         </div>
     </div>
 

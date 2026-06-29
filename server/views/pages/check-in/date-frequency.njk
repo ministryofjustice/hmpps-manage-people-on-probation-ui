@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = "Set up online check ins" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set backLink = backLink %}
 {% set radioLabel = "How often would you like " + case.name.forename + " to check in?" %}
 

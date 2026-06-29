@@ -1,6 +1,10 @@
 {% extends "../../_form.njk" %}
 {% set notStandardForm = true %}
 {% set title = "Add questions to " + case.name.forename + "'s next online check in" %}
+{% set pageTitleText = "Add questions to the person's next online check in" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
 {% set formAnchorText = "Cancel and go back" %}
@@ -77,7 +81,7 @@
                 {% for question in addedQuestions %}
                     {% set editLink = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" + question.id + "/edit" %}
                     {% set deleteLink = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" + question.id + "/delete" %}
-                    
+
                     {% set row = additionalRows.push([
                         {
                             text: question.fullText
@@ -94,13 +98,13 @@
                         "data-qa": "custom-questions-table"
                     },
                     head: [
-                    { 
-                      text: "Question", 
-                      classes: "govuk-!-width-three-quarters" 
+                    {
+                      text: "Question",
+                      classes: "govuk-!-width-three-quarters"
                     },
-                    { 
+                    {
                       text: "Actions",
-                      classes: "govuk-!-width-one-quarter" 
+                      classes: "govuk-!-width-one-quarter"
                     }
                     ],
                     rows: additionalRows

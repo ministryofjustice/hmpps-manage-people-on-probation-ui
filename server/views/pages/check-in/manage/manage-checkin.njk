@@ -1,5 +1,8 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Online check ins" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check' %}
 {% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
 {% set changeQuestionsLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/questions/start' %}

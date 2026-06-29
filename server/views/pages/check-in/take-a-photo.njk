@@ -1,5 +1,9 @@
 {% extends "../_form.njk" %}
 {% set title = "Take a photo of " + case.name.forename %}
+{% set pageTitleText = "Take a photo of the person" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'photo-options' if not cya else 'checkin-summary' %}
 {% set hideButton =  true %}
 {% set formId =  true %}
@@ -34,7 +38,7 @@
     </div>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
     <input type="hidden" name="userPhotoUpload" id="userPhotoUpload" value="false" />
-    
+
     <div id="es-photo-capture__error" class="es-hidden">
         <div class="govuk-inset-text es-inset-text--error">
             <h2 class="govuk-heading-m es-heading--error">You need to accept permissions on your device</h2>

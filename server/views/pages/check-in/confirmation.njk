@@ -5,6 +5,9 @@
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
 {% set title = 'Online check ins added' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set cases = "/case/" %}
 {% set hideButton = true %}
 {% set overViewLink = "/case/" + crn %}

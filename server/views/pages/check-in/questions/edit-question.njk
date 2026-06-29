@@ -1,5 +1,9 @@
 {% extends "../../_form.njk" %}
 {% set title = "What do you want to ask " + case.name.forename + "?" %}
+{% set pageTitleText = question.prefix + " [insert text]" + question.suffix %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
 {% set formAnchorText = "Cancel and go back" %}
@@ -38,7 +42,7 @@
   {% else %}
   <div class="govuk-form-group govuk-!-margin-bottom-6">
   {% endif %}
-    
+
     <label class="govuk-visually-hidden" for="{{ htmlId }}">
       {{ question.prefix }} [insert text] {{ question.suffix }}
     </label>
@@ -52,11 +56,11 @@
         <span class="govuk-visually-hidden">Error:</span> {{ fieldError.text | default(fieldError) }}
       </p>
     {% endif %}
-  
-    <input class="govuk-input govuk-!-margin-bottom-2 govuk-!-width-three-quarters govuk-!-display-inline-block {% if fieldError %}govuk-input--error{% endif %}" 
-           id="{{ htmlId }}" 
-           name="{{ inputName }}" 
-           type="text" 
+
+    <input class="govuk-input govuk-!-margin-bottom-2 govuk-!-width-three-quarters govuk-!-display-inline-block {% if fieldError %}govuk-input--error{% endif %}"
+           id="{{ htmlId }}"
+           name="{{ inputName }}"
+           type="text"
            value="{{ inputValue }}"
            {% if fieldError %}aria-describedby="{{ htmlId }}-error"{% endif %}>
 
@@ -72,7 +76,7 @@
     {% endif %}
 
   </div>
-  
+
   {{ govukWarningText({
     text: "Do not include information that could be sensitive or lead to harm if read by someone who is not the person",
     iconFallbackText: "Warning"

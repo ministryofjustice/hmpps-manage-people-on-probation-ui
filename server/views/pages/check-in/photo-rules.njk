@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = "Does this photo meet the rules?" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set backPage =  "take-a-photo" if photoUpload else  "upload-a-photo" %}
 {% set buttonText =  "No, take another photo" if photoUpload else  "No, upload another photo" %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + backPage %}
@@ -30,4 +33,3 @@
             <a href="{{ backLink }}" class="govuk-button govuk-button--secondary" data-qa="anotherPhotoBtn">{{ buttonText }}</a>
     </div>
 {% endblock %}
-

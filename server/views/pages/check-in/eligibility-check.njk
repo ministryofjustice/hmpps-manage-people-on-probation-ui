@@ -2,6 +2,10 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% set title = "Check if " + case.name.forename + " is eligible to use online check ins"  %}
+{% set pageTitleText = "Check if the person is eligible" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set checkboxTitle = "Do any of these apply to " + case.name.forename + "?" %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn %}
@@ -36,7 +40,7 @@
             }) }}
           {% endif %}
         {% endif %}
-        
+
         <form method="post" autocomplete="off" action="{{ paths.current }}">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 

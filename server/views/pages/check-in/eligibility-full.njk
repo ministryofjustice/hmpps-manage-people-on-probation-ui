@@ -1,6 +1,10 @@
 {% extends "../_form.njk" %}
 
 {% set title = case.name.forename + " is eligible to use online check ins"  %}
+{% set pageTitleText = "The person is eligible to use online check ins" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn %}
 {% set formAnchorText = "Cancel and go back to " + case.name.forename + "'s overview" %}
