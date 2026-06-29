@@ -3,7 +3,7 @@
 {% set pageTitle = makePageTitle({
   pageHeading: [title]
 }) %}
-{% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.type %}
+{% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.description or personAppointment.appointment.type %}
 {% set sentence = appointment.appointmentFor.sentence %}
 {% set backLink = back if back else
   '/case/' + crn + '/appointments/appointment/' + id + '/manage/' %}

@@ -2,7 +2,7 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
 {% set pageTitle = makePageTitle({
   pageHeading: [appointmentDisplayName, 'note']}) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else
@@ -39,7 +39,7 @@
   } %}
 {% endif %}
 
-{% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else 
+{% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else
   'Upcoming' %}
 {% set title = appointmentDisplayName + ' with ' + appointment.officer.name | fullName %}
 {% set isOutcomeRecorded = appointment.hasOutcome %}
@@ -83,7 +83,7 @@
       </h2>
     </div>
   </div>
-  
+
   {% if (flags.enableDeepLinks and isOutcomeRecorded and appointment.deliusManaged) and not shouldShowManageButton %}
     <p class="govuk-body">
       {% if flags.enableDeepLinks and appointment.type in drugHistoryContactTypes and appointment.eventNumber %}

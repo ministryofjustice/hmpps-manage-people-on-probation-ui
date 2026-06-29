@@ -1,4 +1,4 @@
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
 
 {% set documents %}
 <ul class="govuk-list">
