@@ -30,7 +30,7 @@ const loadPage = ({
     eventId: 2501192724,
     isFuture: false,
     hasOutcome: true,
-    hasComplied: true,
+    hasComplied: false,
     notes: false,
     acceptableAbsence,
     action,
@@ -213,7 +213,7 @@ const checkPage = () => {
       updateEnforcementActionPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
     it('should render the page', () => {
-      loadPage({ enforcementAction })
+      loadPage({ enforcementAction, hasComplied: false })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
