@@ -12,7 +12,7 @@ import {
   handleQuotes,
   setDataValue,
   getDataValue,
-  canRescheduleAppointment,
+  canRescheduleAppointment, addressToList,
 } from '../utils'
 import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
@@ -158,6 +158,14 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+      let nextAppointmentLocation: string | null = null
+      if (nextAppointment.appointment.type !== 'Planned Telephone Contact (NS)') {
+        nextAppointmentLocation = nextAppointmentIsAtHome
+          ? 'their home'
+          : addressToList(nextAppointment.appointment.location)[0]
+      }
+
+      res.locals.nextAppointmentLocation = nextAppointmentLocation
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const canReschedule = canRescheduleAppointment(personAppointment)
       return res.render('pages/appointments/manage-appointment', {
@@ -166,7 +174,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         back,
         url,
         nextAppointment,
-        nextAppointmentIsAtHome,
         canReschedule,
         contactId,
         hasDeceased,

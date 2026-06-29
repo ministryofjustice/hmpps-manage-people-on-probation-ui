@@ -166,6 +166,7 @@ interface Locals {
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
   locationMonitoringUri?: string
+  nextAppointmentLocation?: string
 }
 
 export interface AppointmentOutcomeSentence {
