@@ -16,9 +16,9 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
   let currentEnforcementAction: CurrentEnforcementAction = null
   let evidenceDueDate: string = null
   let evidenceWarning: string = null
-  const { enforcementAction = null } = res.locals.personAppointment
+  const { enforcementAction = null, appointment } = res.locals.personAppointment
   if (enforcementAction) {
-    const { description = '', responseByDate = null } = enforcementAction
+    const { description = '', responseByDate = null, code: actionCode } = enforcementAction
     let action: AppointmentEnforcementAction = null
     if (enforcementAction.code) {
       action =
@@ -26,7 +26,8 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
           ([_key, { code }]) => code === enforcementAction.code,
         )?.[0] as AppointmentEnforcementAction) || null
     }
-    if (responseByDate) {
+
+    if (responseByDate && actionCode !== 'NFA' && appointment?.didTheyComply === false) {
       evidenceDueDate = dateWithYear(responseByDate)
       const date = DateTime.fromISO(responseByDate).startOf('day')
       const today = DateTime.now().startOf('day')

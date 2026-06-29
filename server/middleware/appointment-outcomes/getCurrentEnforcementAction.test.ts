@@ -5,8 +5,9 @@ import { PersonAppointmentEnforcementAction } from '../../data/model/schedule'
 
 const buildResponse = ({
   action = null,
+  didTheyComply = false,
   enforcementAction = null,
-}: { action?: string; enforcementAction?: PersonAppointmentEnforcementAction } = {}) => {
+}: { action?: string; didTheyComply?: boolean; enforcementAction?: PersonAppointmentEnforcementAction } = {}) => {
   const locals = {
     appointmentOutcome: {
       forename: 'James',
@@ -21,6 +22,9 @@ const buildResponse = ({
       },
     },
     personAppointment: {
+      appointment: {
+        didTheyComply,
+      },
       enforcementAction,
     },
   }
@@ -68,8 +72,8 @@ describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
       action: 'NO_FURTHER_ACTION',
       code: 'NFA',
       description: text,
-      evidenceDueDate: '23 May 2026',
-      evidenceWarning: 'James has until 23 May to submit evidence (0 days remaining)',
+      evidenceDueDate: null,
+      evidenceWarning: null,
       link: '/base/outcome/url/attended-failed-to-comply',
       tagColour: 'GREEN',
     })
