@@ -12,7 +12,8 @@ import {
   handleQuotes,
   setDataValue,
   getDataValue,
-  canRescheduleAppointment, addressToList,
+  canRescheduleAppointment,
+  addressToList,
 } from '../utils'
 import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
