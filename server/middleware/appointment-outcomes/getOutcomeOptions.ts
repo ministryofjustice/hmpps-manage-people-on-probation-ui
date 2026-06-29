@@ -9,12 +9,12 @@ export const getOutcomeOptions: Route<void> = (_req, res, next) => {
     appointmentSession?.outcome?.contactOutcomes,
     outcomeOptions(isInPast),
   )
-  const nonOfficeAppointmentTypes = ['COPT', 'CHVS', 'COVC']
+  const nonOfficeAppointmentTypes = new Set(['COPT', 'CHVS', 'COVC'])
 
-  if (isInPast && appointmentSession?.type && !nonOfficeAppointmentTypes.includes(appointmentSession.type)) {
+  if (isInPast && appointmentSession?.type && !nonOfficeAppointmentTypes.has(appointmentSession.type)) {
     options = options.filter(option => !['WILL_BE_RESCHEDULED'].includes(option.value))
   }
-  if (isInPast && appointmentSession?.type && nonOfficeAppointmentTypes.includes(appointmentSession.type)) {
+  if (isInPast && appointmentSession?.type && nonOfficeAppointmentTypes.has(appointmentSession.type)) {
     options = options.filter(
       option =>
         !['WILL_BE_RESCHEDULED', 'ATTENDED_SENT_HOME_SERVICE_ISSUES', 'ATTENDED_SENT_HOME_BEHAVIOUR'].includes(
