@@ -98,7 +98,7 @@ export const completeAction = ({
       if (letterActions.includes(action)) {
         const letterValue =
           action === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
-            ? 'LICENCE_COMPLIANCE_LETTER_SENT'
+            ? 'OTHER_ENFORCEMENT_LETTER_SENT'
             : 'FIRST_WARNING_LETTER_SENT'
         cy.get('[data-qa=letterSentBy]').find(`.govuk-radios__input[value=${letterSentBy}]`).click()
         cy.get('[data-qa=letterType]').find(`.govuk-radios__input[value=${letterValue}]`).click()

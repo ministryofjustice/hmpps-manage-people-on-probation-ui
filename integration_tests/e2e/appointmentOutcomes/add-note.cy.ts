@@ -197,7 +197,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         .should('be.visible')
         .should('contain.text', 'Manage people on probation will automatically add this update:')
         .should('contain.text', 'I will initiate the breach')
-        .should('contain.text', 'I will send a licence compliance letter')
+        .should('contain.text', 'I will send a different enforcement letter')
     })
   }
   it('submits successfully with no notes or upload and sensitivity selected', () => {
