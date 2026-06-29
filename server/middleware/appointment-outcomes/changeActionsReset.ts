@@ -13,7 +13,10 @@ export const changeActionsReset = (req: Request, res: Response, next: NextFuncti
     'enforcement-action',
     'update-enforcement-action',
   ]
-  if (change && !sendBreachOrRecallLetter && enforcementActionPages.some(url => reqUrl.includes(url))) {
+  if (
+    (change && !sendBreachOrRecallLetter && enforcementActionPages.some(url => reqUrl.includes(url))) ||
+    (!change && reqUrl.includes('update-enforcement-action'))
+  ) {
     setDataValue(data, ['appointments', crn, id, 'outcome', 'enforcementActionCode'], [])
     enforcementActionPageKeys.forEach(key => {
       setDataValue(data, ['appointments', crn, id, 'outcome', key], null)
