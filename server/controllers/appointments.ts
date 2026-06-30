@@ -160,10 +160,10 @@ const appointmentsController: Controller<typeof routes, void> = {
         nextAppointment?.appointment?.location,
       )
       let nextAppointmentLocation: string | null = null
-      if (nextAppointment.appointment.type !== 'Planned Telephone Contact (NS)') {
+      if (nextAppointment?.appointment?.type !== 'Planned Telephone Contact (NS)') {
         nextAppointmentLocation = nextAppointmentIsAtHome
           ? 'their home'
-          : addressToList(nextAppointment.appointment.location)[0]
+          : addressToList(nextAppointment?.appointment?.location)?.[0]
       }
 
       res.locals.nextAppointmentLocation = nextAppointmentLocation
