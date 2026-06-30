@@ -29,9 +29,18 @@ const activityLogController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { keywords = '', compliance = [] } = req.query
       const { crn } = req.params as Record<string, string>
+
+      const today = new Date()
+      const oneYearAgo = new Date(today)
+      oneYearAgo.setFullYear(today.getFullYear() - 1)
+
+      const formatDate = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+
       req.session.activityLogFilters = {
         keywords,
         compliance: Array.isArray(compliance) ? compliance : [compliance],
+        dateFrom: formatDate(oneYearAgo),
+        dateTo: formatDate(today),
         crn,
       }
       return res.redirect(`/case/${crn}/activity-log`)
