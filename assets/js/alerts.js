@@ -9,6 +9,7 @@ const setupAlertsPage = () => {
         // eslint-disable-next-line no-param-reassign
         checkbox.checked = !areAllSelected
       })
+      selectAllButton.ariaPressed = !areAllSelected
     })
   }
 }
