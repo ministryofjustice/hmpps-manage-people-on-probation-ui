@@ -196,7 +196,7 @@ const getExpectedOptions = ({
 
 const checkCurrentEnforcementStatus = ({
   colour = 'yellow',
-  text = 'First warning letter sent',
+  text = 'First Warning Letter Sent',
 }: { colour?: string; text?: string } = {}) => {
   cy.get('.govuk-inset-text').should('contain.text', 'The current enforcement status is:')
   cy.get('.govuk-inset-text').find(`.govuk-tag--${colour}`).should('contain.text', text)
@@ -237,7 +237,7 @@ const checkPage = () => {
       loadPage({ enforcementAction })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ text: 'Breach / recall initiated' })
+      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
@@ -257,7 +257,7 @@ const checkPage = () => {
       loadPage({ enforcementAction, sentenceType: 'CUSTODY' })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ text: 'Breach / recall initiated' })
+      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
@@ -301,14 +301,14 @@ const checkPage = () => {
       loadPage({ enforcementAction: 'NO_FURTHER_ACTION' })
       enforcementActionPage = new EnforcementActionPage()
       enforcementActionPage.checkPageTitle('Select an enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'No further action' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'No Further Action' })
     })
   })
 
   describe('Current enforcement action is WITHDRAWAL_OF_WARNING', () => {
     it('should render the page', () => {
       loadPage({ enforcementAction: 'WITHDRAWAL_OF_WARNING' })
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of warning' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of Warning' })
     })
   })
 
