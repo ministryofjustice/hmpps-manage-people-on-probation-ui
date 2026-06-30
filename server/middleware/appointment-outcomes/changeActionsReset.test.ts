@@ -58,9 +58,28 @@ describe('middleware/changeActionsReset', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
     expect(setDataValueSpy).not.toHaveBeenCalled()
   })
-  it('should reset the previously selected actions', () => {
+  it('should reset the previously selected actions if change and enforcement action page', () => {
     const req = httpMocks.createRequest({ query: { change: '/change/url' }, session: {} })
     const res = buildResponse()
+    changeActionsReset(req, res, nextSpy)
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(
+      1,
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'enforcementActionCode'],
+      [],
+    )
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(
+      2,
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'attendedFailedToComply'],
+      null,
+    )
+    expect(setDataValueSpy).toHaveBeenCalledTimes(9)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should reset the previously selected actions if no change and update enforcement action page', () => {
+    const req = httpMocks.createRequest({ query: {}, session: {} })
+    const res = buildResponse({ reqUrl: '/outcome/update-enforcement-action' })
     changeActionsReset(req, res, nextSpy)
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
       1,
