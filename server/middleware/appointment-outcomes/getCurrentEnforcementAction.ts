@@ -5,7 +5,7 @@ import { Activity } from '../../data/model/schedule'
 import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { AppointmentOutcomeProps, CurrentEnforcementAction, TagColour } from '../../models/Locals'
 import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
-import { dateWithYear } from '../../utils'
+import { dateWithYear, toSentenceCase } from '../../utils'
 
 type Map = { [K in AppointmentEnforcementAction]?: TagColour }
 
@@ -17,6 +17,7 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
   let evidenceDueDate: string = null
   let evidenceWarning: string = null
   const { enforcementAction = null, appointment } = res.locals.personAppointment
+
   if (enforcementAction) {
     const { description = '', responseByDate = null, code: actionCode } = enforcementAction
     let action: AppointmentEnforcementAction = null
@@ -45,7 +46,7 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
     const outcomeType = appointmentSession?.outcome?.outcomeType
     const link = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)?.[outcomeType] : baseOutcomeUrl
     currentEnforcementAction = {
-      description,
+      description: toSentenceCase(description),
       action,
       code: enforcementAction?.code,
       tagColour,
