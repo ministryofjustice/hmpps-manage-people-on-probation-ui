@@ -83,7 +83,7 @@ const checkPage = () => {
       confirmationPage
         .getWhatHappensNextText()
         .eq(1)
-        .should('contain.text', 'Follow your local process to request a licence compliance letter.')
+        .should('contain.text', 'Follow your local process to request a other enforcement letter.')
       confirmationPage.getWhatHappensNextText().should('have.length', 2)
       confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
       confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
@@ -109,7 +109,7 @@ const checkPage = () => {
       confirmationPage
         .getWhatHappensNextText()
         .eq(1)
-        .should('contain.text', 'Follow your local process to request a licence compliance letter.')
+        .should('contain.text', 'Follow your local process to request a other enforcement letter.')
       confirmationPage.getWhatHappensNextText().should('have.length', 2)
       confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'use the Consider a recall service')
       confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'arrange another appointment')
@@ -134,7 +134,7 @@ const checkPage = () => {
       confirmationPage
         .getWhatHappensNextText()
         .eq(1)
-        .should('contain.text', 'Your case administrator or you will create and send a licence compliance letter.')
+        .should('contain.text', 'Your case administrator or you will create and send a other enforcement letter.')
       confirmationPage.getWhatHappensNextText().should('have.length', 2)
       confirmationPage.getFurtherAction().should('not.exist')
     })

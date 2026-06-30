@@ -39,6 +39,11 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
       ].includes(typeOption.value),
     )
   }
+  if (sendBreachOrRecallLetter && (sentenceType === 'COMMUNITY' || pss || youth)) {
+    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
+      ['BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
+    )
+  }
   res.locals.appointmentOutcome = {
     ...res.locals.appointmentOutcome,
     letterSentByOptions,

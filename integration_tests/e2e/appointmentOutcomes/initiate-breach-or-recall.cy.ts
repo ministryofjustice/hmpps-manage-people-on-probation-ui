@@ -30,10 +30,21 @@ const loadPage = ({
   journey = 'MANAGE',
   sentenceType = 'COMMUNITY',
   sendLetter = false,
-}: { journey?: Journey; sentenceType?: SentenceType; sendLetter?: boolean } = {}): void => {
+  pss = false,
+  description = '12 month Community order',
+}: {
+  journey?: Journey
+  sentenceType?: SentenceType
+  sendLetter?: boolean
+  pss?: boolean
+  description?: string
+} = {}): void => {
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (sentenceType === 'CUSTODY') {
     cy.task('stubSentences', { sentenceType: 'CUSTODY' })
+  }
+  if (sentenceType === 'COMMUNITY' && (pss || description !== '12 month Community order')) {
+    cy.task('stubSentences', { sentenceType: 'COMMUNITY', pss, description })
   }
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
@@ -69,7 +80,14 @@ type OptionsFor = 'BREACH_CREATED_BY' | 'LETTER_SENT_BY' | 'LETTER_TYPE'
 const getExpectedOptions = ({
   optionsFor = 'BREACH_CREATED_BY',
   sentenceType = 'COMMUNITY',
-}: { optionsFor?: OptionsFor; sentenceType?: SentenceType } = {}): ExpectedOption<RedirectPages>[] => {
+  pss = false,
+  youth = false,
+}: {
+  optionsFor?: OptionsFor
+  sentenceType?: SentenceType
+  pss?: boolean
+  youth?: boolean
+} = {}): ExpectedOption<RedirectPages>[] => {
   let expectedOptions: ExpectedOption<RedirectPages>[] = []
   if (optionsFor === 'BREACH_CREATED_BY') {
     const text = sentenceType === 'COMMUNITY' ? 'breach' : 'recall'
@@ -95,10 +113,18 @@ const getExpectedOptions = ({
     ]
   }
   if (optionsFor === 'LETTER_TYPE') {
-    expectedOptions = [
-      { value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' },
-      { value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' },
-    ]
+    if (sentenceType === 'CUSTODY') {
+      expectedOptions = [
+        { value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' },
+        { value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' },
+      ]
+    }
+    if (sentenceType === 'COMMUNITY' || youth || pss) {
+      expectedOptions = [
+        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
+        { value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' },
+      ]
+    }
   }
   return expectedOptions
 }
@@ -134,7 +160,57 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const letterSentByOptions = getExpectedOptions({ optionsFor: 'LETTER_SENT_BY' })
     checkOptions(letterSentByOptions, 1)
     cy.get('legend').eq(2).should('contain.text', 'Select the type of letter')
+    const letterTypeOptions = getExpectedOptions({ optionsFor: 'LETTER_TYPE', sentenceType: 'CUSTODY' })
+    checkOptions(letterTypeOptions, 2)
+    cy.get('[data-module="govuk-radios"]').should('have.length', 3)
+  })
+
+  it('should render the page if sentence type is COMMUNITY and enforcement action is initiate breach and send a letter', () => {
+    loadPage({ journey, sentenceType: 'COMMUNITY', sendLetter: true })
+    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+    initiateBreachOrRecallPage.checkPageTitle('Initiate a breach and send a letter')
+    const options = getExpectedOptions({ sentenceType: 'COMMUNITY' })
+    checkOptions(options)
+    cy.get('legend').eq(1).should('contain.text', 'Who will send the letter?')
+    const letterSentByOptions = getExpectedOptions({ optionsFor: 'LETTER_SENT_BY' })
+    checkOptions(letterSentByOptions, 1)
+    cy.get('legend').eq(2).should('contain.text', 'Select the type of letter')
     const letterTypeOptions = getExpectedOptions({ optionsFor: 'LETTER_TYPE' })
+    checkOptions(letterTypeOptions, 2)
+    cy.get('[data-module="govuk-radios"]').should('have.length', 3)
+  })
+
+  it('should render the page if sentence type is YOUTH COMMUNITY and enforcement action is initiate breach and send a letter', () => {
+    loadPage({
+      journey,
+      sentenceType: 'COMMUNITY',
+      sendLetter: true,
+      description: '204 C JA - Youth Rehabilitation Order',
+    })
+    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+    initiateBreachOrRecallPage.checkPageTitle('Initiate a breach and send a letter')
+    const options = getExpectedOptions({ sentenceType: 'COMMUNITY' })
+    checkOptions(options)
+    cy.get('legend').eq(1).should('contain.text', 'Who will send the letter?')
+    const letterSentByOptions = getExpectedOptions({ optionsFor: 'LETTER_SENT_BY' })
+    checkOptions(letterSentByOptions, 1)
+    cy.get('legend').eq(2).should('contain.text', 'Select the type of letter')
+    const letterTypeOptions = getExpectedOptions({ optionsFor: 'LETTER_TYPE', youth: true })
+    checkOptions(letterTypeOptions, 2)
+    cy.get('[data-module="govuk-radios"]').should('have.length', 3)
+  })
+
+  it('should render the page if sentence type is PSS and enforcement action is initiate breach and send a letter', () => {
+    loadPage({ journey, sentenceType: 'COMMUNITY', sendLetter: true, pss: true })
+    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+    initiateBreachOrRecallPage.checkPageTitle('Initiate a breach and send a letter')
+    const options = getExpectedOptions({ sentenceType: 'COMMUNITY' })
+    checkOptions(options)
+    cy.get('legend').eq(1).should('contain.text', 'Who will send the letter?')
+    const letterSentByOptions = getExpectedOptions({ optionsFor: 'LETTER_SENT_BY' })
+    checkOptions(letterSentByOptions, 1)
+    cy.get('legend').eq(2).should('contain.text', 'Select the type of letter')
+    const letterTypeOptions = getExpectedOptions({ optionsFor: 'LETTER_TYPE', pss: true })
     checkOptions(letterTypeOptions, 2)
     cy.get('[data-module="govuk-radios"]').should('have.length', 3)
   })
