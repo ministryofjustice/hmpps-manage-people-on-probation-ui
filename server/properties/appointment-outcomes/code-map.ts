@@ -47,15 +47,7 @@ export type EnforcementActionCode =
 export type OutcomeCode = 'ATTC' | 'AFTC' | 'ATSH' | 'ATSS' | 'AAM11' | 'UAAB' | 'AFTA'
 
 export type AcceptableAbsenceOutcomeCode =
-  | 'AACL'
-  | 'AAEM'
-  | 'AAFC'
-  | 'AAHO'
-  | 'AAME'
-  | 'AARE'
-  | 'AARC'
-  | 'CO05'
-  | 'CO10'
+  'AACL' | 'AAEM' | 'AAFC' | 'AAHO' | 'AAME' | 'AARE' | 'AARC' | 'CO05' | 'CO10'
 
 export const outcomeMap: OutcomeMap = {
   ATTENDED_COMPLIED: { code: 'ATTC', description: 'Attended - Complied' },
