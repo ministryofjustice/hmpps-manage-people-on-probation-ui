@@ -46,7 +46,8 @@
                             {{ govukTextarea({
                                 name: item.id,
                                 id: item.id + "-textarea",
-                                label: { text: item.text }
+                                label: { text: item.text },
+                                attributes: { "readonly": "readonly" }
                             }) }}
                         </div>
                     {% endfor %}
