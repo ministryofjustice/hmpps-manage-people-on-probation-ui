@@ -20,6 +20,7 @@ const appointment = (
   id: string,
   outcomeType: AppointmentOutcomeType,
   otherEnforcementAction: AppointmentEnforcementAction = null,
+  updateEnforcementAction: AppointmentEnforcementAction = null,
 ) => ({
   appointments: {
     [crn]: {
@@ -27,6 +28,7 @@ const appointment = (
         outcome: {
           outcomeType,
           otherEnforcementAction,
+          updateEnforcementAction,
         },
       },
     },
@@ -38,16 +40,18 @@ const mockReq = ({
   request = {},
   outcomeType = 'ATTENDED_COMPLIED',
   otherEnforcementAction = null,
+  updateEnforcementAction = null,
 }: {
   id?: string
   request?: Record<string, any>
   outcomeType?: AppointmentOutcomeType
   otherEnforcementAction?: AppointmentEnforcementAction
+  updateEnforcementAction?: AppointmentEnforcementAction
 }): httpMocks.MockRequest<any> => {
   const req = {
-    body: appointment(id, outcomeType, otherEnforcementAction),
+    body: appointment(id, outcomeType, otherEnforcementAction, updateEnforcementAction),
     session: {
-      data: appointment(id, outcomeType, otherEnforcementAction),
+      data: appointment(id, outcomeType, otherEnforcementAction, updateEnforcementAction),
     },
     ...request,
   }
@@ -130,6 +134,18 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/send-letter`, ...localsVars })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/enforcement-action`)
+    })
+
+    it('should return the correct link if on send letter page and update enforcement action has been set', () => {
+      const req = mockReq({
+        request,
+        id: arrangeAppointmentJourney ? uuid : contactId,
+        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+        updateEnforcementAction: 'SEND_ANOTHER_LETTER',
+      })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/send-letter`, ...localsVars })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/update-enforcement-action`)
     })
 
     const outcomePages = {
