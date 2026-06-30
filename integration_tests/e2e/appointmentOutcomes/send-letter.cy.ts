@@ -17,6 +17,8 @@ import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import { AppointmentEnforcementAction } from '../../../server/models/Appointments'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
+import { PersonAppointmentEnforcementAction } from '../../../server/data/model/schedule'
+import UpdateEnforcementActionPage from '../../pages/appointmentOutcomes/update-enforcement-action.page'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -25,8 +27,19 @@ let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 let sendLetterPage: SendLetterPage
 let addNotePage: AddNotePage
 let otherEnforcmentActionPage: EnforcementActionPage
+let updateEnforcementActionPage: UpdateEnforcementActionPage
 
 const msgs = ['Select who will send the letter', 'Select the type of letter']
+
+interface Params {
+  eventId: string
+  isFuture: boolean
+  outcome?: string
+  action?: string
+  hasOutcome?: boolean
+  hasComplied?: boolean
+  enforcementAction?: PersonAppointmentEnforcementAction
+}
 
 const loadPage = ({
   journey = 'MANAGE',
@@ -34,21 +47,32 @@ const loadPage = ({
   action = 'SEND_LETTER',
   description = '12 month Community order',
   pss = false,
+  updateAction = false,
 }: {
   journey?: Journey
   sentenceType?: SentenceType
   action?: AppointmentEnforcementAction
   description?: string
   pss?: boolean
+  updateAction?: boolean
 } = {}): void => {
-  cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
+  const params: Params = { eventId: '2501192724', isFuture: false }
+  if (updateAction) {
+    params.outcome = 'Attended - failed to comply'
+    params.action = 'First warning letter sent'
+    params.hasOutcome = true
+    params.hasComplied = false
+    params.enforcementAction = { code: 'EA02', description: 'First warning letter sent' }
+  }
+  cy.task('stubAppointment', params)
   if (sentenceType !== 'COMMUNITY') {
     cy.task('stubSentences', { sentenceType, description, pss })
   }
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.getTaskLink(1).click()
+    const index = updateAction ? 2 : 1
+    manageAppointmentPage.getTaskLink(index).click()
   }
   if (journey === 'ARRANGE') {
     completeSentencePage()
@@ -63,12 +87,20 @@ const loadPage = ({
       completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid })
     })
   }
-  outcomePage = new OutcomePage()
-  cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
-  outcomePage.getSubmitBtn().click()
-  attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  cy.get(`.govuk-radios__input[value=${action}]`).click()
-  attendedFailedToComplyPage.getSubmitBtn().click()
+  if (updateAction) {
+    updateEnforcementActionPage = new UpdateEnforcementActionPage()
+    cy.get(`.govuk-radios__input[value=SEND_ANOTHER_LETTER]`).click()
+    updateEnforcementActionPage.getSubmitBtn().click()
+  } else {
+    outcomePage = new OutcomePage()
+    cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
+    outcomePage.getSubmitBtn().click()
+  }
+  if (!updateAction) {
+    attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+    cy.get(`.govuk-radios__input[value=${action}]`).click()
+    attendedFailedToComplyPage.getSubmitBtn().click()
+  }
   if (action === 'DIFFERENT_ACTION') {
     otherEnforcmentActionPage = new EnforcementActionPage()
     cy.get('select').select('BREACH_LETTER_SENT')
@@ -187,6 +219,16 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
+  if (journey === 'MANAGE') {
+    it('should have the correct back link if update enforcement action', () => {
+      loadPage({ journey, updateAction: true })
+      let expectedLink: string
+      getUuid(3).then(uuid => {
+        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome/update-enforcement-action`
+        attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
+      })
+    })
+  }
   it('should show validation errors when no options are selected', () => {
     loadPage({ journey })
     sendLetterPage = new SendLetterPage()
