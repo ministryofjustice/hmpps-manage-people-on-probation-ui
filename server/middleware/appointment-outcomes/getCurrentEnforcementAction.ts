@@ -6,6 +6,7 @@ import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { AppointmentOutcomeProps, CurrentEnforcementAction, TagColour } from '../../models/Locals'
 import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
 import { dateWithYear, toSentenceCase } from '../../utils'
+
 type Map = { [K in AppointmentEnforcementAction]?: TagColour }
 
 export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void => {
