@@ -8,6 +8,7 @@ export class FeatureFlags {
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
+  enableSupervisionPackagePoPHeader?: boolean = undefined
   enableDeepLinks?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined

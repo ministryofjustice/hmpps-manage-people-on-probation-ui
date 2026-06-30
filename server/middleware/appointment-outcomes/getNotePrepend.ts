@@ -38,7 +38,8 @@ export const getNotePrepend: Route<void> = (_req, res, next) => {
     if (_letterSentBy && selectedLetterType) {
       letterSentBy = getUser(_letterSentBy)
       letterType = letterTypeOptions.find(option => option.value === selectedLetterType).text
-      text.push(`${letterSentBy} will send a ${letterType.toLowerCase()}`)
+      const beginsWithA = letterType.toLowerCase().split(' ').at(0) === 'a'
+      text.push(`${letterSentBy} will send${!beginsWithA ? ' a ' : ' '}${letterType.toLowerCase()}`)
     }
     res.locals.appointmentOutcome.notePrepend = text.length ? text.join('\n') : null
   }

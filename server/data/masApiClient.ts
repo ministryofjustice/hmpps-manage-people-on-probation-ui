@@ -268,18 +268,28 @@ export default class MasApiClient extends RestClient {
     username: string,
     page: string,
     size: string = '5',
-    sortQuery?: string,
-    ascending?: string,
+    filterDueDate: string = 'false',
+    months: string = '12',
+    sortBy: string = 'contactDate',
+    direction: string = 'DESC',
   ): Promise<EnforcementContactsResponse> {
-    const filterQuery = `${sortQuery}=${ascending}`
-    const queryParameters = `?${new URLSearchParams({
-      size,
+    const queryParameters = new URLSearchParams({
       page,
-      filterDueDate: 'true',
-    }).toString()}&${sortQuery ? filterQuery : ''}`
+      size,
+      filterDueDate,
+      months,
+    })
+
+    if (sortBy) {
+      queryParameters.append('sortBy', sortBy)
+    }
+
+    if (direction) {
+      queryParameters.append('direction', direction)
+    }
 
     const enforcementContacts = (await this.get({
-      path: `/contact/${username}/enforcements${queryParameters}`,
+      path: `/contact/${username}/enforcements?${queryParameters.toString()}`,
       handle404: false,
     })) as EnforcementContactsResponse
 

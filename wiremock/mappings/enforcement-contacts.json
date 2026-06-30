@@ -27,7 +27,8 @@
               "appointmentOutcome": "Unacceptable absence",
               "enforcementAction": "Breach initiated",
               "evidenceDueDate": "2026-05-08",
-              "deliusManaged": true
+              "deliusManaged": true,
+              "lastModifiedDate": "2026-05-10"
             },
             {
               "caseName": {
@@ -43,7 +44,8 @@
               "appointmentOutcome": "Failed to attend",
               "enforcementAction": "Warning letter issued",
               "evidenceDueDate": "2030-05-10",
-              "deliusManaged": false
+              "deliusManaged": false,
+              "lastModifiedDate": "2026-05-15"
             }
           ]
         },
