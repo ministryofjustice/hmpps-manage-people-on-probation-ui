@@ -112,7 +112,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         }
         sessionStaff = [...sessionStaff, sessionStaffItem]
       }
-    } else if (res.locals.flags.enableMAN2344) {
+    } else {
       const ppStaff = sessionStaff.find(user => user?.username?.toLowerCase() === attendingUsername?.toLowerCase())
       setDataValue(data, ['appointments', crn, id, 'user', 'email'], ppStaff?.email)
       setDataValue(data, ['appointments', crn, id, 'user', 'name'], ppStaff?.name)
