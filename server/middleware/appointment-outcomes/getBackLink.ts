@@ -14,14 +14,17 @@ export const getBackLink: Route<void> = (req, res, next) => {
   }
   let outcomeType: AppointmentOutcomeType
   let otherEnforcementAction: AppointmentEnforcementAction
+  let updateEnforcementAction: AppointmentEnforcementAction
   if (req?.body?.appointments?.[crn]?.[id]?.outcome?.outcomeType) {
     outcomeType = req.body.appointments[crn][id].outcome.outcomeType
     otherEnforcementAction = req.body.appointments[crn][id].outcome.otherEnforcementAction
+    updateEnforcementAction = req.body.appointments[crn][id].outcome.updateEnforcementAction
   } else {
     const outcome = getDataValue<AppointmentSessionOutcome>(req.session.data, ['appointments', crn, id, 'outcome'])
     if (outcome) {
       outcomeType = outcome?.outcomeType || null
       otherEnforcementAction = outcome?.otherEnforcementAction || null
+      updateEnforcementAction = outcome?.updateEnforcementAction || null
     }
   }
   if (
@@ -49,6 +52,9 @@ export const getBackLink: Route<void> = (req, res, next) => {
     }
     if (otherEnforcementAction) {
       backLink = `${baseOutcomeUrl}/enforcement-action`
+    }
+    if (updateEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/update-enforcement-action`
     }
   }
   res.locals.appointmentOutcome.backLink = backLink
