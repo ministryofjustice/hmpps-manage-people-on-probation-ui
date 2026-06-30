@@ -286,19 +286,43 @@ describe('/middleware/getDefaultUser()', () => {
           ['appointments', crn, uuid, 'user', 'username'],
           userProviders.defaultUserDetails.username,
         )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          data,
+          ['appointments', crn, uuid, 'user', 'email'],
+          userProviders.defaultUserDetails.email,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          data,
+          ['appointments', crn, uuid, 'user', 'name'],
+          userProviders.defaultUserDetails.name,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          6,
+          data,
+          ['appointments', crn, uuid, 'user', 'email'],
+          userProviders.defaultUserDetails.email,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          7,
+          data,
+          ['appointments', crn, uuid, 'user', 'name'],
+          userProviders.defaultUserDetails.name,
+        )
         expect(nextSpy).toHaveBeenCalledTimes(1)
       })
       it('should request the staff from the api', () => {
         expect(getStaffByTeamSpy).toHaveBeenCalledWith(defaultUserTeamCode)
       })
       it('should save the user providers to session', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['providers', username], userProviders.providers)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(8, data, ['providers', username], userProviders.providers)
       })
       it('should save the user teams to session', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(7, data, ['teams', username], userProviders.teams)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(9, data, ['teams', username], userProviders.teams)
       })
       it('should save the user staff to session', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(8, data, ['staff', username], userProviders.users)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(10, data, ['staff', username], userProviders.users)
       })
     })
   })
@@ -455,9 +479,21 @@ describe('/middleware/getDefaultUser()', () => {
         expect(getStaffByTeamSpy).toHaveBeenCalledWith(teamCode)
       })
       it('should save the correct session values', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(1, data, ['providers', username], expectedProviders)
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(2, data, ['teams', username], expectedTeams)
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(3, req.session.data, ['staff', username], expectedStaff)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          data,
+          ['appointments', crn, uuid, 'user', 'email'],
+          undefined,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          data,
+          ['appointments', crn, uuid, 'user', 'name'],
+          undefined,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(3, data, ['providers', username], expectedProviders)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(4, data, ['teams', username], expectedTeams)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(5, req.session.data, ['staff', username], expectedStaff)
       })
     })
   })

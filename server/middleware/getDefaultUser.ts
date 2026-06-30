@@ -72,7 +72,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       const appointmentStaff = await masClient.getStaffByTeam(teamCode)
       const ppStaff = appointmentStaff.users.find(
-        user => user?.username?.toLowerCase() === probationPractitioner?.username.toLowerCase(),
+        user => user?.username?.toLowerCase() === probationPractitioner?.username?.toLowerCase(),
       )
       if (ppStaff && !sessionStaff.some(u => u?.username?.toLowerCase() === ppStaff.username?.toLowerCase())) {
         sessionStaff.push(ppStaff)
@@ -112,6 +112,10 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         }
         sessionStaff = [...sessionStaff, sessionStaffItem]
       }
+    } else if (res.locals.flags.enableMAN2344) {
+      const ppStaff = sessionStaff.find(user => user?.username?.toLowerCase() === attendingUsername?.toLowerCase())
+      setDataValue(data, ['appointments', crn, id, 'user', 'email'], ppStaff?.email)
+      setDataValue(data, ['appointments', crn, id, 'user', 'name'], ppStaff?.name)
     }
     setDataValue(data, ['providers', username], sessionProviders)
     setDataValue(data, ['teams', username], sessionTeams)
