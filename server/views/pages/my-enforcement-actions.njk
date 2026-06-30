@@ -83,13 +83,17 @@
                 {
                     classes: "nowrap",
                     html:
-                    ((((enforcement.enforcementAction | toSentenceCase) if enforcement.enforcementAction else 'Not provided') | escape))
-                    +
-                    (
-                    '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
-                    if enforcement.isOverdue
-                    else ''
-                    )
+                    (((enforcement.enforcementAction | lower | capitalize) | escape)
+                    if enforcement.enforcementAction
+                    else ('Not provided' | escape))
+                    + '</a><br>'
+                    + '<span class="govuk-body-s">'
+                    + (
+                enforcement.lastModifiedDate | dateWithYearShortMonth
+                if enforcement.lastModifiedDate
+                else ''
+                )
+                    + '</span>'
                 },
                 {
                     classes: "nowrap",
