@@ -22,7 +22,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   } = res.locals.appointmentOutcome
 
   const otherLetterActionSet = otherEnforcementActionLetterTypes.includes(
-    appointmentSession.outcome.otherEnforcementAction as OtherEnforcementActionsLetterType,
+    appointmentSession?.outcome?.otherEnforcementAction as OtherEnforcementActionsLetterType,
   )
   const { maxCharCount } = config
   const id = uuid || contactId
@@ -216,7 +216,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/add-note`,
           notes: req.body.appointments[crn][id].notes,
           maxCharCount: maxCharCount as number,
-          sensitivityLocked: appointmentSession.sensitivityLocked,
+          sensitivityLocked: appointmentSession?.sensitivityLocked || null,
         }),
       ),
     }

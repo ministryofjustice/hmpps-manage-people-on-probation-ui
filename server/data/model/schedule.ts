@@ -93,7 +93,7 @@ export interface ContactOutcomesResponse {
 export interface PutContactRequest {
   date: string
   time: string
-  outcomeCode: OutcomeCode | AcceptableAbsenceOutcomeCode
+  outcomeCode?: OutcomeCode | AcceptableAbsenceOutcomeCode
   enforcementActionCode?: EnforcementActionCode
   notes: string
   alert?: boolean
