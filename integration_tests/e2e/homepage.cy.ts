@@ -34,14 +34,13 @@ context('Sign In', () => {
     page.getEnforcementActions().find('button').should('have.attr', 'aria-expanded', 'false')
 
     // Check for "Overdue" label for the first row (Garrett Emard in wiremock mapping)
-    page.getEnforcementActionRows().eq(0).should('contain.text', 'Overdue')
-
+    page.getEnforcementActionRows().eq(0).should('contain.text', 'Unacceptable absence')
+    page.getEnforcementActionRows().eq(0).should('contain.text', 'Breach initiated')
     // Check for "Manage on NDelius" link for the first row (deliusManaged: true)
     page.getEnforcementActionRows().eq(0).find('a').contains('Manage on NDelius').should('exist')
 
     // Check for "Manage" link for the second row (Ethan Bradtke in wiremock mapping, deliusManaged: false)
     page.getEnforcementActionRows().eq(1).find('a').contains('Manage').should('exist')
-    page.getEnforcementActionRows().eq(1).should('not.contain.text', 'Overdue')
   })
 
   it('Renders the the outcomes to log', () => {

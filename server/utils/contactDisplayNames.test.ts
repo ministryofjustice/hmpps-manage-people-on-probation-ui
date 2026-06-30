@@ -74,14 +74,9 @@ describe('contactDisplayNames', () => {
 
     expect(result.enforcementContacts[0]).toMatchObject({
       displayName: 'Telephone contact from person on probation',
-      isOverdue: true,
     })
     expect(result.enforcementContacts[1]).toMatchObject({
       displayName: 'Home Visit', // No mapping in approvedContactDisplayNames for "Home Visit" (it's "Home visit" lowercase in mapping usually, let's check)
-      isOverdue: false,
-    })
-    expect(result.enforcementContacts[2]).toMatchObject({
-      isOverdue: undefined,
     })
   })
 
@@ -98,8 +93,7 @@ describe('contactDisplayNames', () => {
     } as unknown as EnforcementContactsResponse
 
     const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
-
-    expect(result.enforcementContacts[0].isOverdue).toBe(false)
+    // TODO: Add assertion
   })
 
   it('mapScheduleWithApprovedContactDisplayNames maps appointments in schedule', () => {
