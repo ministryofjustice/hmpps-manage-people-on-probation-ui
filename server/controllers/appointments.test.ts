@@ -6,7 +6,7 @@ import { ParsedQs } from 'qs'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
+import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment, isMatchingAddress } from '../utils'
 import { mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
 import { cloneAppointmentAndRedirect, renderError } from '../middleware'
@@ -74,6 +74,7 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
 >
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
+const mockIsMatchingAddress = isMatchingAddress as jest.MockedFunction<typeof isMatchingAddress>
 
 const reqObject = {
   params: {
@@ -331,13 +332,25 @@ describe('controllers/appointments', () => {
         crn,
         back: undefined,
         nextAppointment: nextApptResponse(),
-        nextAppointmentIsAtHome: true,
         hasDeceased: false,
         url: '',
         canReschedule: true,
         contactId: '1234',
         relatedContacts: mockRelatedContacts,
       })
+    })
+
+    it('should not set a location for a telephone appointment', async () => {
+      getNextAppointmentSpy.mockResolvedValueOnce(
+        nextApptResponse({
+          type: 'Planned Telephone Contact (NS)',
+          location: {},
+        } as Activity),
+      )
+
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
+
+      expect(res.locals.nextAppointmentLocation).toBeNull()
     })
   })
 
