@@ -17,10 +17,6 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
   let evidenceWarning: string = null
   const { enforcementAction = null, appointment } = res.locals.personAppointment
 
-  console.log('********* enforcementAction ***************')
-  console.dir(enforcementAction, { depth: null })
-  console.log('************************')
-
   if (enforcementAction) {
     const { description = '', responseByDate = null, code: actionCode } = enforcementAction
     let action: AppointmentEnforcementAction = null
@@ -57,12 +53,6 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
       evidenceDueDate,
       evidenceWarning,
     }
-
-    console.log('********* enforcementActionMap ***************')
-    console.dir(enforcementActionMap, { depth: null })
-    console.log('*********currentEnforcementAction***************')
-    console.dir(currentEnforcementAction, { depth: null })
-    console.log('************************')
   }
   res.locals.appointmentOutcome.currentEnforcementAction = currentEnforcementAction
   return next()
