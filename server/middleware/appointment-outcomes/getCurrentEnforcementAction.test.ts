@@ -2,6 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { mockAppResponse } from '../../controllers/mocks'
 import { getCurrentEnforcementAction } from './getCurrentEnforcementAction'
 import { PersonAppointmentEnforcementAction } from '../../data/model/schedule'
+import { toSentenceCase } from '../../utils'
 
 const buildResponse = ({
   action = null,
@@ -52,7 +53,7 @@ describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
     expect(res.locals.appointmentOutcome.currentEnforcementAction).toStrictEqual({
       action: 'FIRST_WARNING_LETTER_SENT',
       code: 'EA02',
-      description: text,
+      description: toSentenceCase(text),
       evidenceDueDate: '23 May 2026',
       evidenceWarning: 'James has until 23 May to submit evidence (0 days remaining)',
       link: '/base/outcome/url/attended-failed-to-comply',
@@ -71,7 +72,7 @@ describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
     expect(res.locals.appointmentOutcome.currentEnforcementAction).toStrictEqual({
       action: 'NO_FURTHER_ACTION',
       code: 'NFA',
-      description: text,
+      description: toSentenceCase(text),
       evidenceDueDate: null,
       evidenceWarning: null,
       link: '/base/outcome/url/attended-failed-to-comply',
@@ -89,7 +90,7 @@ describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
     expect(res.locals.appointmentOutcome.currentEnforcementAction).toStrictEqual({
       action: 'REFER_TO_OFFENDER_MANAGER',
       code: 'ROM',
-      description: text,
+      description: toSentenceCase(text),
       evidenceDueDate: null,
       evidenceWarning: null,
       link: '/base/outcome/url/attended-failed-to-comply',
@@ -108,7 +109,7 @@ describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
     expect(res.locals.appointmentOutcome.currentEnforcementAction).toStrictEqual({
       action: 'WITHDRAWAL_OF_WARNING',
       code: 'EA07',
-      description: text,
+      description: toSentenceCase(text),
       evidenceDueDate: '23 May 2026',
       evidenceWarning: 'James has until 23 May to submit evidence (0 days remaining)',
       link: '/base/outcome/url/attended-failed-to-comply',
