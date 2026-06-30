@@ -212,7 +212,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
           classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
         }
       }
-    } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action,
+    } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action and not appointment.didTheyComply,
     {
       title: {
         text: "Add appointment notes"

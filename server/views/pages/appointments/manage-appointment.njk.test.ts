@@ -203,6 +203,42 @@ describe('Manage an appointment', () => {
         expect($('[data-qa="appointmentActions"]').text()).toContain('Log appointment outcome')
       })
 
+      it('should display change enforcement action', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: false,
+              outcome: 'Attended - Failed to comply',
+              hasOutcome: true,
+              action: 'No Further Action',
+              didTheyComply: false,
+            } as Activity,
+          } as PersonAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).toContain('Change enforcement action')
+      })
+
+      it('should not display change enforcement action', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: false,
+              outcome: 'Attended - Complied',
+              hasOutcome: true,
+              action: '',
+              didTheyComply: true,
+            } as Activity,
+          } as PersonAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).not.toContain('Change enforcement action')
+      })
+
       it('should display appointment notes action', () => {
         const $ = render({
           flags: {
