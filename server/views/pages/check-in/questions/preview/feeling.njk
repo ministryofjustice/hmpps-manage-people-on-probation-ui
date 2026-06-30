@@ -10,20 +10,22 @@
 {% block primary %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-hint govuk-body govuk-!-margin-bottom-2">Question preview</p>
-            <h2 class="govuk-heading-l govuk-!-margin-top-0 govuk-!-margin-bottom-2 govuk-!-padding-top-0" data-qa="pageHeading">
-                {{ pageTitle }}
-            </h2>
 
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-2">Question preview</h2>
+            <p>This is a non-editable preview of the question that the person will be asked when they check in.</p>
+
+            <h3 class="govuk-heading-m govuk-!-margin-bottom-2" data-qa="pageHeading">
+                {{ pageTitle }}
+            </h3>
             <p class="govuk-hint">
                 Think about things like if you have noticed a change in your mood and what may have caused this.
             </p>
 
             <div class="govuk-form-group">
-                <div class="govuk-radios">
+                <div class="govuk-radios disabled-radios">
                     
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="mentalHealthVeryWell-radio" name="preview-very-well" type="radio" checked="true" readonly>
+                        <input class="govuk-radios__input" id="mentalHealthVeryWell-radio" name="preview-very-well" type="radio" checked="true">
                         <label class="govuk-label govuk-radios__label" for="mentalHealthVeryWell-radio">Very well</label>
                     </div>
                     <div class="govuk-radios__conditional">
@@ -36,7 +38,7 @@
                     </div>
 
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="mentalHealthWell-radio" name="preview-well" type="radio" checked="true" readonly>
+                        <input class="govuk-radios__input" id="mentalHealthWell-radio" name="preview-well" type="radio" checked="true">
                         <label class="govuk-label govuk-radios__label" for="mentalHealthWell-radio">Well</label>
                     </div>
                     <div class="govuk-radios__conditional">
@@ -49,7 +51,7 @@
                     </div>
 
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="mentalHealthOk-radio" name="preview-ok" type="radio" checked="true" readonly>
+                        <input class="govuk-radios__input" id="mentalHealthOk-radio" name="preview-ok" type="radio" checked="true">
                         <label class="govuk-label govuk-radios__label" for="mentalHealthOk-radio">OK</label>
                     </div>
                     <div class="govuk-radios__conditional">
@@ -62,7 +64,7 @@
                     </div>
 
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="mentalHealthNotGreat-radio" name="preview-not-great" type="radio" checked="true" readonly>
+                        <input class="govuk-radios__input" id="mentalHealthNotGreat-radio" name="preview-not-great" type="radio" checked="true">
                         <label class="govuk-label govuk-radios__label" for="mentalHealthNotGreat-radio">Not great</label>
                     </div>
                     <div class="govuk-radios__conditional">
@@ -75,7 +77,7 @@
                     </div>
 
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="mentalHealthStruggling-radio" name="preview-struggling" type="radio" checked="true" readonly>
+                        <input class="govuk-radios__input" id="mentalHealthStruggling-radio" name="preview-struggling" type="radio" checked="true">
                         <label class="govuk-label govuk-radios__label" for="mentalHealthStruggling-radio">Struggling</label>
                     </div>
                     <div class="govuk-radios__conditional">
@@ -95,4 +97,13 @@
 
         </div>
     </div>
+{% endblock %}
+
+{% block bodyEnd %}
+{{ super() }}
+<script nonce="{{ cspNonce }}">
+    const allTextareas = document.querySelectorAll('.disabled-radios .govuk-textarea')
+    // Disable keyboard interaction with textareas (apart from tabbing)
+    allTextareas.forEach(textarea => textarea.onkeydown = (key) => { return key.key === 'Tab' })
+</script>
 {% endblock %}

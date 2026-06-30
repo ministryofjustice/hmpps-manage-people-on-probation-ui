@@ -12,10 +12,13 @@
 {% block primary %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-hint govuk-body govuk-!-margin-bottom-2">Question preview</p>
-            <h2 class="govuk-heading-l govuk-!-margin-top-0 govuk-!-margin-bottom-2 govuk-!-padding-top-0" data-qa="pageHeading">
+
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-2">Question preview</h2>
+            <p>This is a non-editable preview of the question that the person will be asked when they check in.</p>
+
+            <h3 class="govuk-heading-m govuk-!-margin-bottom-2" data-qa="pageHeading">
                 {{ pageTitle }}
-            </h2>
+            </h3>
             <p class="govuk-hint">
                 This could be anything you're worrying about, struggling with or just want to let us know.
             </p>
@@ -34,7 +37,7 @@
                     ] %}
                     {% for item in supportOptions %}
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="{{ item.id }}-checkbox" name="assistance" type="checkbox" checked  data-aria-controls="conditional-{{ item.id }}">
+                            <input class="govuk-checkboxes__input" id="{{ item.id }}-checkbox" name="assistance" type="checkbox" checked  data-aria-controls="conditional-{{ item.id }}" aria-disabled="true">
                             <label class="govuk-label govuk-checkboxes__label" for="{{ item.id }}-checkbox">
                                 {{ item.label }}
                             </label>
@@ -43,7 +46,8 @@
                             {{ govukTextarea({
                                 name: item.id,
                                 id: item.id + "-textarea",
-                                label: { text: item.text }
+                                label: { text: item.text },
+                                attributes: { "readonly": "readonly" }
                             }) }}
                         </div>
                     {% endfor %}
@@ -63,4 +67,15 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block bodyEnd %}
+{{ super() }}
+<script nonce="{{ cspNonce }}">
+    const allCheckboxes = document.querySelectorAll('.disabled-checkboxes .govuk-checkboxes__input')
+    const allTextareas = document.querySelectorAll('.disabled-checkboxes .govuk-textarea')
+    // Disable keyboard interaction with checkboxes and textareas (apart from tabbing)
+    allCheckboxes.forEach(checkbox => checkbox.onkeydown = (key) => { return key.key === 'Tab' })
+    allTextareas.forEach(textarea => textarea.onkeydown = (key) => { return key.key === 'Tab' })
+</script>
 {% endblock %}
