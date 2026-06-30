@@ -9,8 +9,11 @@ const setupAlertsPage = () => {
         // eslint-disable-next-line no-param-reassign
         checkbox.checked = !areAllSelected
       })
-      selectAllButton.ariaPressed = !areAllSelected
     })
+    setInterval(() => {
+      const areAllSelected = Array.from(alertCheckboxes).every(checkbox => checkbox.checked)
+      selectAllButton.ariaPressed = areAllSelected
+    }, 100)
   }
 }
 
