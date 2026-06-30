@@ -2,6 +2,7 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { v4 } from 'uuid'
+import { DateTime } from 'luxon'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
@@ -78,10 +79,14 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         page => addParameters(req, { page: page.toString() }),
         caseload?.pageSize || 10,
       )
-      if (req?.query?.sortBy) {
+      if (caseload) {
         newCaseload = {
           ...caseload,
-          sortedBy: req.query.sortBy as string,
+          sortedBy: req?.query?.sortBy ? (req.query.sortBy as string) : caseload.sortedBy,
+          caseload: caseload?.caseload?.map(val => ({
+            ...val,
+            newCase: val.allocatedOn ? DateTime.fromISO(val.allocatedOn) >= DateTime.now().minus({ days: 21 }) : false,
+          })),
         }
       }
       res.render('pages/caseload/minimal-cases', {

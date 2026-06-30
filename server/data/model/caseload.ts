@@ -27,6 +27,8 @@ export interface Caseload {
   nextAppointment?: Appointment
   previousAppointment?: Appointment
   latestSentence?: string
+  allocatedOn?: string
+  newCase?: boolean
 }
 
 export interface CaseloadResponse {
