@@ -173,7 +173,7 @@
         </form>
       {% else %}
         <div class="govuk-grid-column-two-thirds" data-qa="logAppointmentOutcome">
-          <p class="govuk-body">You can now finish logging the outcome for {{ linkedAppointment.type }} on {{ linkedAppointment.date }}</p>
+          <p class="govuk-body">You can now finish logging the outcome for {{ linkedAppointment.type }} on {{ linkedAppointment.date }}.</p>
           <form method="post" autocomplete="off" action="{{ paths.current }}">
             <div class="govuk-button-group">
               {{ govukButton({
