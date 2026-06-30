@@ -131,6 +131,38 @@ describe('Manage an appointment', () => {
     expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
   })
 
+  it('should use description for title if no displayName', () => {
+    const $ = render({
+      personAppointment: {
+        appointment: {
+          type: 'Planned Office Visit (NS)',
+          description: 'Drug test',
+          displayName: undefined,
+        },
+      },
+    } as Partial<TestModel>)
+
+    expect($('.govuk-back-link').attr('href')).toBe(`/case/${crn}/appointments`)
+    expect($('title').text()).toContain('Manage drug test with Terry Jones')
+    expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
+  })
+
+  it('should use type for title if no displayName or description (remember sentence case)', () => {
+    const $ = render({
+      personAppointment: {
+        appointment: {
+          type: 'Planned Video Call (NS)',
+          description: undefined,
+          displayName: undefined,
+        },
+      },
+    } as Partial<TestModel>)
+
+    expect($('.govuk-back-link').attr('href')).toBe(`/case/${crn}/appointments`)
+    expect($('title').text()).toContain('Manage planned video call (NS) with Terry Jones')
+    expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
+  })
+
   describe('Alert banner', () => {
     it('should display the alert banner', () => {
       const $ = render()
