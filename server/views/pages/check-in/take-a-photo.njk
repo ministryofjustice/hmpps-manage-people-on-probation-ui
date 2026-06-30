@@ -1,9 +1,15 @@
 {% extends "../_form.njk" %}
 {% set title = "Take a photo of " + case.name.forename %}
 {% set pageTitleText = "Take a photo of the person" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'photo-options' if not cya else 'checkin-summary' %}
 {% set hideButton =  true %}
 {% set formId =  true %}

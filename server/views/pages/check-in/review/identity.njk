@@ -3,9 +3,15 @@
 
 {% set title = "Online check in submitted" %}
 {% set pageTitleText = "Review and confirm identity" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set backLink = back | default('/case/' + crn + '/appointments/' + id + '/check-in/review/identity') %}
 {% set hideButton = true %}
 

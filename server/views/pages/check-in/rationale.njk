@@ -2,9 +2,15 @@
 
 {% set textAreaTitle = "Why is " + case.name.forename + " suitable to use online check ins?"  %}
 {% set pageTitleText = "Why is the person suitable to use online check ins?" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set hintText = "For example, low risk of reoffending, stable lifestyle factors."  %}
 
 {% block form %}

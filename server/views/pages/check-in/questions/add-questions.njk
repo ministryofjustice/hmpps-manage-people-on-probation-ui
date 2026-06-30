@@ -2,9 +2,15 @@
 {% set notStandardForm = true %}
 {% set title = "Add questions to " + case.name.forename + "'s next online check in" %}
 {% set pageTitleText = "Add questions to the person's next online check in" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
 {% set formAnchorText = "Cancel and go back" %}

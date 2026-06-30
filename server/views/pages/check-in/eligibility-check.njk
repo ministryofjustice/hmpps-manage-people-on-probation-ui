@@ -3,9 +3,15 @@
 
 {% set title = "Check if " + case.name.forename + " is eligible to use online check ins"  %}
 {% set pageTitleText = "Check if the person is eligible" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set checkboxTitle = "Do any of these apply to " + case.name.forename + "?" %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn %}

@@ -1,8 +1,14 @@
 {% extends "../_form.njk" %}
 {% set title = "Does this photo meet the rules?" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [title]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + title]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [title]
+  }) %}
+{% endif %}
 {% set backPage =  "take-a-photo" if photoUpload else  "upload-a-photo" %}
 {% set buttonText =  "No, take another photo" if photoUpload else  "No, upload another photo" %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + backPage %}

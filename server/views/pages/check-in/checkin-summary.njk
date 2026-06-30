@@ -2,9 +2,15 @@
 {% from "../../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% set title = "Check your answers before adding " + case.name.forename + " to online check ins"  %}
 {% set pageTitleText = "Check your answers before adding the person to online check ins" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-rules' %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}

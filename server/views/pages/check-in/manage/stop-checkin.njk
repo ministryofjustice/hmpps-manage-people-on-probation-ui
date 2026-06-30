@@ -5,9 +5,15 @@
 {% set buttonText = "Continue" %}
 {% set title = "Stop online check ins for " + case.name.forename %}
 {% set pageTitleText = "Stop online check ins for the person" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = backLink %}
 {% set formAnchorText = "Cancel and go back" %}

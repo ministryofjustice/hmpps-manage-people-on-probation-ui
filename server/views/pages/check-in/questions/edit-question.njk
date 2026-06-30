@@ -1,9 +1,15 @@
 {% extends "../../_form.njk" %}
 {% set title = "What do you want to ask " + case.name.forename + "?" %}
 {% set pageTitleText = question.prefix + " [insert text]" + question.suffix %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
 {% set formAnchorText = "Cancel and go back" %}

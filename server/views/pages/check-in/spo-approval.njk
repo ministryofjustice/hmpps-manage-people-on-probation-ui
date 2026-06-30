@@ -2,9 +2,15 @@
 
 {% set title = "Check you've got approval before you sign " + case.name.forename + " up"  %}
 {% set pageTitleText = "Check you've got approval before you sign the person up" %}
-{% set pageTitle = makePageTitle({
-  pageHeading: [pageTitleText]
-}) %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set showAnchorLink = true %}
 {% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/full-eligibility' %}
 
