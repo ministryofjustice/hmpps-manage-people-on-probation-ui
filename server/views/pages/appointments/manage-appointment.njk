@@ -217,7 +217,8 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Add appointment notes"
       },
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/add-note',
+     
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true' if flags.enableNonCompliance),
       status: {
         tag: {
           text: notesStatus,

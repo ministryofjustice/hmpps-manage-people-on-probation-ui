@@ -16,7 +16,9 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
      managed appointment in past or future 👇
      */
 
-    const validRequest = (contactId && responseContactId && isInPast) || (contactId && !responseContactId)
+    const { put } = req.query
+    const validRequest =
+      (contactId && responseContactId && isInPast) || (contactId && !responseContactId) || (contactId && put)
 
     if (res.locals.flags.enableNonCompliance && validRequest) {
       if (!isValidParams) {
@@ -44,9 +46,10 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
       // if outcome but no action, check the outcome type does not require an associated action 👇
       if (
-        !sensitivity ||
-        !outcomeCode ||
-        (outcomeCode && !enforcementActionCode && outcomeType && !outcomeOnly.includes(outcomeType))
+        !put &&
+        (!sensitivity ||
+          !outcomeCode ||
+          (outcomeCode && !enforcementActionCode && outcomeType && !outcomeOnly.includes(outcomeType)))
       ) {
         return res.redirect(`${baseOutcomeUrl}?validation=true`)
       }
@@ -54,11 +57,11 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const request: PutContactRequest = {
         date,
         time,
-        outcomeCode,
         notes: handleQuotes(notes),
         sensitive,
         alert,
       }
+      if (outcomeCode) request.outcomeCode = outcomeCode
       await masClient.putContact(contactId, request)
 
       if (enforcementActionCode?.length) {

@@ -84,8 +84,9 @@ const mockAppointment = ({
   ...appointment,
 })
 
-const buildRequest = (): httpMocks.MockRequest<any> => {
+const buildRequest = ({ put = undefined }: { put?: string } = {}): httpMocks.MockRequest<any> => {
   const req = {
+    query: { put },
     params: { id, contactId, crn },
   }
   return httpMocks.createRequest(req)
@@ -171,6 +172,29 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     const res = buildResponse({ outcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
     expect(res.redirect).toHaveBeenCalledWith(`${baseOutcomeUrl}?validation=true`)
+  })
+  it('should put the correct request to the API if adding notes and no outcome', async () => {
+    const appointment: Partial<AppointmentSession> = { notes: 'Some added notes' }
+    const outcome: Partial<AppointmentSessionOutcome> = { outcomeCode: null, outcomeType: null }
+
+    const req = buildRequest({ put: 'true' })
+    const res = buildResponse({ appointmentOutcome: { notePrepend: '' }, appointment, outcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const {
+      date,
+      start,
+      outcome: { outcomeCode },
+    } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      notes: 'Some added notes',
+      sensitive: true,
+      alert: false,
+    }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
   })
   it('should put the correct request to the API if no notes, and no enforcement action codes selected', async () => {
     const req = buildRequest()
@@ -275,7 +299,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should send multiple requests to the API if two enforcement actions are selected', async () => {
+  it('should send the correct request to the API if two enforcement actions are selected', async () => {
     const appointment: Partial<AppointmentSession> = { notes }
     const outcome: Partial<AppointmentSessionOutcome> = {
       outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
