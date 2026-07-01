@@ -2,13 +2,13 @@ $govuk-global-styles: true;
 $path: '/assets/images/';
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
-$low-score-colour: #485b10;
+$low-score-colour-mpop: #485b10;
 $low-score-border-colour: #85994b;
-$medium-score-colour: #a34e00;
+$medium-score-colour-mpop: #a34e00;
 $medium-score-border-colour: #f47738;
-$high-score-colour: #942514;
+$high-score-colour-mpop: #942514;
 $high-score-border-colour: #d4351c;
-$very-high-score-colour: #711a0d;
+$very-high-score-colour-mpop: #711a0d;
 $very-high-score-border-colour: #942514;
 $unknown-score-border-colour: #fd0;
 $no-score-colour: #505a5f;
@@ -476,19 +476,19 @@ body.feature-disabled {
 }
 
 .rosh--very-high {
-  color: $very-high-score-colour;
+  color: $very-high-score-colour-mpop;
 }
 
 .rosh--high {
-  color: $high-score-colour;
+  color: $high-score-colour-mpop;
 }
 
 .rosh--medium {
-  color: $medium-score-colour;
+  color: $medium-score-colour-mpop;
 }
 
 .rosh--low {
-  color: $low-score-colour;
+  color: $low-score-colour-mpop;
 }
 
 .rosh-widget {
@@ -520,7 +520,7 @@ body.feature-disabled {
   border: 2px solid $low-score-border-colour;
   & h3,
   & h4 {
-    color: $low-score-colour;
+    color: $low-score-colour-mpop;
   }
 }
 
@@ -528,7 +528,7 @@ body.feature-disabled {
   border: 2px solid $medium-score-border-colour;
   & h3,
   & h4 {
-    color: $medium-score-colour;
+    color: $medium-score-colour-mpop;
   }
 }
 
@@ -536,7 +536,7 @@ body.feature-disabled {
   border: 2px solid $high-score-border-colour;
   & h3,
   & h4 {
-    color: $high-score-colour;
+    color: $high-score-colour-mpop;
   }
 }
 
@@ -544,7 +544,7 @@ body.feature-disabled {
   border: 2px solid $very-high-score-border-colour;
   & h3,
   & h4 {
-    color: $very-high-score-colour;
+    color: $very-high-score-colour-mpop;
   }
 }
 
@@ -564,19 +564,19 @@ body.feature-disabled {
 }
 
 .rosh-widget__risk--low {
-  color: $low-score-colour;
+  color: $low-score-colour-mpop;
 }
 
 .rosh-widget__risk--medium {
-  color: $medium-score-colour;
+  color: $medium-score-colour-mpop;
 }
 
 .rosh-widget__risk--high {
-  color: $high-score-colour;
+  color: $high-score-colour-mpop;
 }
 
 .rosh-widget__risk--very-high {
-  color: $very-high-score-colour;
+  color: $very-high-score-colour-mpop;
 }
 
 .mappa-widget {
