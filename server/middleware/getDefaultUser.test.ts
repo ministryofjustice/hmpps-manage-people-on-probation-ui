@@ -460,29 +460,34 @@ describe('/middleware/getDefaultUser()', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(3, req.session.data, ['staff', username], expectedStaff)
       })
 
-      it('should populate missing email and name from session staff when attendee is not probation practitioner', async () => {
-        const attendeeUsername = 'peter-parker'
-        const attendeeStaff = appointmentStaff.users.find(u => u.username === attendeeUsername)!
-        const request = buildRequest({
-          user: {
-            username: attendeeUsername,
-            email: undefined,
-            name: undefined,
-          },
+      describe('populate missing email and name', () => {
+        beforeEach(() => {
+          jest.clearAllMocks()
         })
+        it('should populate missing email and name from session staff when attendee is not probation practitioner', async () => {
+          const attendeeUsername = 'peter-parker'
+          const attendeeStaff = appointmentStaff.users.find(u => u.username === attendeeUsername)!
+          const request = buildRequest({
+            user: {
+              username: attendeeUsername,
+              email: undefined,
+              name: undefined,
+            },
+          })
 
-        await getDefaultUser(hmppsAuthClient)(request, res, nextSpy)
+          await getDefaultUser(hmppsAuthClient)(request, res, nextSpy)
 
-        expect(mockSetDataValue).toHaveBeenCalledWith(
-          request.session.data,
-          ['appointments', crn, uuid, 'user', 'email'],
-          attendeeStaff.email,
-        )
-        expect(mockSetDataValue).toHaveBeenCalledWith(
-          request.session.data,
-          ['appointments', crn, uuid, 'user', 'name'],
-          attendeeStaff.name,
-        )
+          expect(mockSetDataValue).toHaveBeenCalledWith(
+            request.session.data,
+            ['appointments', crn, uuid, 'user', 'email'],
+            attendeeStaff.email,
+          )
+          expect(mockSetDataValue).toHaveBeenCalledWith(
+            request.session.data,
+            ['appointments', crn, uuid, 'user', 'name'],
+            attendeeStaff.name,
+          )
+        })
       })
     })
   })
