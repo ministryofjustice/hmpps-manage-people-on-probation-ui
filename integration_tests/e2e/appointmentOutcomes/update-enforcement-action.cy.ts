@@ -19,10 +19,12 @@ const loadPage = ({
   sentenceType = 'COMMUNITY',
   acceptableAbsence = false,
   enforcementAction = 'FIRST_WARNING_LETTER_SENT',
+  hasComplied = false,
 }: {
   sentenceType?: SentenceType
   acceptableAbsence?: boolean
   enforcementAction?: AppointmentEnforcementAction
+  hasComplied?: boolean
 } = {}): void => {
   const action = enforcementActionMap?.[enforcementAction]?.description || null
   const code = enforcementActionMap?.[enforcementAction]?.code || null
