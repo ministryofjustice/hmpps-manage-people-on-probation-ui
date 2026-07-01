@@ -7,7 +7,7 @@ import { tierUrlV3 } from '../utils'
 
 export const getTierDetails = (
   hmppsAuthClient: HmppsAuthClient,
-  mpopComponents?: MPoPComponents,
+  mpopComponents: MPoPComponents,
 ): Route<Promise<void>> => {
   const fetchTierDetails = async (
     crn: string,
@@ -43,7 +43,8 @@ export const getTierDetails = (
   }
 
   return async (req, res, next) => {
-    if (!res.locals.flags?.enableSupervisionPackage || !mpopComponents) return next()
+    // If the feature flag is not enabled, skip fetching tier details and proceed to the next middleware
+    if (!res.locals.flags?.enableSupervisionPackage) return next()
 
     const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
     const { crn } = req.params as Record<string, string>
