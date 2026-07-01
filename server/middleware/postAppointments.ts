@@ -86,7 +86,11 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       ;({ forename: firstName, surname } = name)
 
       if (!email) {
-        email = (await masClient.getUserDetails(username))?.email
+        try {
+          email = (await masClient.getUserDetails(username))?.email
+        } catch (error) {
+          logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
+        }
       }
 
       const isDifferentUser = Boolean(email) && email !== res.locals.user.email
