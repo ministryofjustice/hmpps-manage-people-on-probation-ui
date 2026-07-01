@@ -414,7 +414,23 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn, contactId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const noteResponse = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const appointmentResponse = await masClient.getPersonAppointment(crn, contactId)
+
+      const selectedNote = noteResponse?.appointment?.appointmentNote
+      const notes = appointmentResponse?.appointment?.appointmentNotes || []
+
+      if (selectedNote && Array.isArray(notes)) {
+        appointmentResponse.appointment.appointmentNotes = notes.map(note =>
+          String(note.id) === String(noteId)
+            ? {
+                ...note,
+                ...selectedNote,
+                hasNoteBeenTruncated: false,
+              }
+            : note,
+        )
+      }
       const { back } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENT_NOTE',
@@ -426,7 +442,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       res.render('pages/appointments/appointment', {
         back,
-        personAppointment,
+        personAppointment: appointmentResponse,
         crn,
         contactId,
       })
