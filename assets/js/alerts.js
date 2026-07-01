@@ -10,6 +10,10 @@ const setupAlertsPage = () => {
         checkbox.checked = !areAllSelected
       })
     })
+    setInterval(() => {
+      const areAllSelected = Array.from(alertCheckboxes).every(checkbox => checkbox.checked)
+      selectAllButton.ariaPressed = areAllSelected
+    }, 100)
   }
 }
 

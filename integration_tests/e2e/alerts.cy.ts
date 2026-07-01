@@ -77,6 +77,20 @@ context('Alerts Dashboard', () => {
     page.getElement('[data-qa="clearSelectedAlerts"]').should('be.visible')
   })
 
+  it('Select all alerts button aria is set based on if all alerts are selected', () => {
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'true')
+    cy.get('.alert-checkbox').eq(0).click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'true')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
+  })
+
   it('Person link should navigate to case overview', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
