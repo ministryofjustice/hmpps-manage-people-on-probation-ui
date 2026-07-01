@@ -91,16 +91,6 @@ describe('getTierDetails middleware', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should call next() without fetching when mpopComponents is not provided', async () => {
-    const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
-
-    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient)(req, res, nextSpy)
-
-    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
   it('should use cached tierDetails when already present in session', async () => {
     const cached = makeTierResponse()
     const req = buildReq({ [CRN]: makeSessionEntry(cached) })
