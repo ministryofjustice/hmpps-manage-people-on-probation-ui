@@ -23,6 +23,7 @@
             {% if userSchedule.appointments.length > 0 %}
                 {% set rows = [] %}
                 {% for appointment in userSchedule.appointments %}
+                    {% set appointmentDescription = appointment.description if appointment.description else appointment.type %}
                     {% set fullName %}
                     {{ appointment.caseName.surname }}, {{ appointment.caseName.forename }}
                     {% endset %}
@@ -40,7 +41,7 @@
                     {% set appointmentCol = [] %}
                     {% if type == 'upcoming' %}
                         {% set appointmentCol = [
-{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>',
+{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointmentDescription + '</a>',
                           attributes: { "data-sort-value": appointment.type  }
                         }
                 ]

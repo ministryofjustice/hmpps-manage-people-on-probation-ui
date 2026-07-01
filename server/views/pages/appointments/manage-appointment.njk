@@ -2,7 +2,7 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
 {% set title = (('Manage ' + appointmentDisplayName) | toSentenceCase) + ' with ' + (
 appointment.officer.name | fullName | convertToTitleCase) %}
 {% set pageTitle = makePageTitle({pageHeading: [title]}) %}

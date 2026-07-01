@@ -2,7 +2,7 @@
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
 {% set isAttendedComplied = true %}
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set appointmentDisplayName = appointment.displayName or appointment.typeappointment.displayName or appointment.description or appointment.type %}
 {% set config = {
    classes: "govuk-checkboxes--small",
     fieldset: {
