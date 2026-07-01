@@ -438,7 +438,7 @@ describe('/middleware/postAppointments', () => {
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
-      it('should get email from user details if appointment session user email is empty', async () => {
+      it('should get email from user details if appointment session user email is blank', async () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)
@@ -453,7 +453,7 @@ describe('/middleware/postAppointments', () => {
         })
         const mockReq = createMockReq({
           ...mockAppointment,
-          user: { ...mockAppointment.user, email: undefined },
+          user: { ...mockAppointment.user, email: '' },
         })
         const res = buildResponse()
 
