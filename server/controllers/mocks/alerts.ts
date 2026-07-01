@@ -51,7 +51,7 @@ export const mockNote: Note = {
   createdBy: 'Me',
   createdByDate: '11-11-2000',
   note: 'Notes',
-  hasNotesBeenTruncated: false,
+  hasNoteBeenTruncated: false,
 }
 
 export const defaultUser = {
