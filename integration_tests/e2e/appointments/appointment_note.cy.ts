@@ -18,9 +18,9 @@ describe('View appointment note page', () => {
     page.getElement('.app-note__author').should('contain.text', 'Tom Brady')
     page.getElement('.app-note__author').should('contain.text', '29 October 2024')
     page.getElementData('notesValue').should('contain.text', 'Email sent to Stuart')
-    page.getElement('[data-qa="sensitiveLabel"]').should('contain.text', 'No')  
+    page.getElement('[data-qa="sensitiveLabel"]').should('contain.text', 'No')
   })
-    
+
   it('Back link goes to contacts by default', () => {
     cy.visit('/case/X000001/appointments/appointment/11/manage/note/1')
     const page = new AppointmentPage()

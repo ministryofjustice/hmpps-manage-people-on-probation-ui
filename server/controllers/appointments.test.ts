@@ -818,34 +818,34 @@ describe('controllers/appointments', () => {
       expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
     })
     it('should render the appointment page with merged notes (selected note full, others unchanged)', () => {
-        expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
-        expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
-        expect(renderSpy).toHaveBeenCalledWith(
-          'pages/appointments/appointment',
-          expect.objectContaining({
-            crn,
-            contactId,
-            back: undefined,
-            personAppointment: expect.objectContaining({
-              appointment: expect.objectContaining({
-                appointmentNotes: expect.arrayContaining([
-                  expect.objectContaining({
-                    id: Number(noteId),
-                    note: 'This is the full, untruncated note text',
-                    hasNoteBeenTruncated: false,
-                  }),
-                  expect.objectContaining({
-                    id: 999,
-                    note: 'Another note remains unchanged',
-                    hasNoteBeenTruncated: false,
-                  }),
-                ]),
-              }),
+      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          crn,
+          contactId,
+          back: undefined,
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              appointmentNotes: expect.arrayContaining([
+                expect.objectContaining({
+                  id: Number(noteId),
+                  note: 'This is the full, untruncated note text',
+                  hasNoteBeenTruncated: false,
+                }),
+                expect.objectContaining({
+                  id: 999,
+                  note: 'Another note remains unchanged',
+                  hasNoteBeenTruncated: false,
+                }),
+              ]),
             }),
           }),
-        )
-      })
+        }),
+      )
     })
+  })
 
   it('treats null patchDocuments response as success', async () => {
     mockIsValidCrn.mockReturnValue(true)
