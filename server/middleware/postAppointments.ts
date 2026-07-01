@@ -89,9 +89,10 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         email = (await masClient.getUserDetails(username))?.email
       }
 
-      logger.info(
-        `user attending appointment is different to user booking appointment ${email !== res.locals.user.email} for ${uuid}.`,
-      )
+      const isDifferentUser = Boolean(email) && email !== res.locals.user.email
+      if (isDifferentUser) {
+        logger.info(`Appointment ${uuid}: attending user is different to booking user.`)
+      }
     } else {
       ;({ email, firstName, surname } = res.locals.user)
     }
