@@ -116,11 +116,11 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
       attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
       const staff = sessionStaff.find(user => user?.username?.toLowerCase() === attendingUsername?.toLowerCase())
-      if (!attendingEmail) {
-        setDataValue(data, ['appointments', crn, id, 'user', 'email'], staff?.email)
+      if (!attendingEmail && staff?.email) {
+        setDataValue(data, ['appointments', crn, id, 'user', 'email'], staff.email)
       }
-      if (!attendingName) {
-        setDataValue(data, ['appointments', crn, id, 'user', 'name'], staff?.name)
+      if (!attendingName && staff?.name) {
+        setDataValue(data, ['appointments', crn, id, 'user', 'name'], staff.name)
       }
     }
     setDataValue(data, ['providers', username], sessionProviders)

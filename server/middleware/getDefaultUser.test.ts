@@ -462,7 +462,7 @@ describe('/middleware/getDefaultUser()', () => {
 
       it('should populate missing email and name from session staff when attendee is not probation practitioner', async () => {
         const attendeeUsername = 'peter-parker'
-        const attendeeStaff = appointmentStaff.users.find(u => u.username === attendeeUsername)
+        const attendeeStaff = appointmentStaff.users.find(u => u.username === attendeeUsername)!
         const request = buildRequest({
           user: {
             username: attendeeUsername,
