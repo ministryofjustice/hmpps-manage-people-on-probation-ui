@@ -57,6 +57,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 import { ErrorSummary } from './model/common'
 import {
+  mapAlertsWithApprovedContactDisplayNames,
   mapEnforcementContactsWithApprovedContactDisplayNames,
   mapPersonActivityWithApprovedContactDisplayNames,
   mapPersonAppointmentWithApprovedContactDisplayNames,
@@ -550,7 +551,8 @@ export default class MasApiClient extends RestClient {
     if (sortBy && sortOrder) {
       pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
     }
-    return this.get({ path: `/alerts${pageQuery}`, handle404: true })
+    const alerts: UserAlerts = await this.get({ path: `/alerts${pageQuery}`, handle404: true })
+    return mapAlertsWithApprovedContactDisplayNames(alerts)
   }
 
   async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {

@@ -1,5 +1,6 @@
 import { PersonActivity } from '../data/model/activityLog'
 import { PersonAppointment, Schedule, Activity, EnforcementContactsResponse } from '../data/model/schedule'
+import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 
 const approvedContactDisplayNames: Record<string, string> = {
   'Accommodation Evidence': 'Accommodation evidence',
@@ -184,6 +185,23 @@ export function withApprovedContactDisplayName<T extends Activity>(activity: T):
   }
 
   return { ...activity, displayName }
+}
+
+export function mapAlertWithApprovedContactDisplayNames(alert: UserAlertsContent): UserAlertsContent {
+  return {
+    ...alert,
+    type: {
+      ...alert.type,
+      description: getApprovedContactDisplayName(alert.type.description) ?? alert.type.description,
+    },
+  }
+}
+
+export function mapAlertsWithApprovedContactDisplayNames(alerts: UserAlerts): UserAlerts {
+  return {
+    ...alerts,
+    content: alerts?.content?.map(mapAlertWithApprovedContactDisplayNames),
+  }
 }
 
 export function mapScheduleWithApprovedContactDisplayNames(schedule: Schedule): Schedule {

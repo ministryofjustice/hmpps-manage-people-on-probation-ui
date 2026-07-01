@@ -213,7 +213,7 @@ const checkPage = () => {
       updateEnforcementActionPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
     it('should render the page', () => {
-      loadPage({ enforcementAction, hasComplied: false })
+      loadPage({ enforcementAction })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
