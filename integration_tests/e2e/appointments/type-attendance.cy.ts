@@ -153,7 +153,7 @@ describe('Arrange an appointment', () => {
         cy.get('[data-qa="visorReport"] legend').should('contain.text', 'Include appointment in ViSOR report?')
         cy.get('[data-qa="visorReport"] .govuk-hint').should(
           'contain.text',
-          'This will add the appointment to their record on the ViSOR secure national database.',
+          'This will add the appointment to the NDelius ViSOR report. It must still be added manually to the ViSOR secure national database.',
         )
         const options = ['Yes', 'No']
         for (let i = 1; i < options.length; i += 1) {
