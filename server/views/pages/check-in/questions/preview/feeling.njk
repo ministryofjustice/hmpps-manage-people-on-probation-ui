@@ -1,5 +1,15 @@
 {% extends "../../../_form.njk" %}
-{% set pageTitle = "How have you been feeling since we last spoke?" %}
+{% set title = "How have you been feeling since we last spoke?" %}
+{% set pageTitleText = "Question preview of How have you been feeling since we last spoke?" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set buttonText = "Back to questions" %}
 {% set notStandardForm = true %}
@@ -12,7 +22,7 @@
         <div class="govuk-grid-column-two-thirds">
             <p class="govuk-hint govuk-body govuk-!-margin-bottom-2">Question preview</p>
             <h2 class="govuk-heading-l govuk-!-margin-top-0 govuk-!-margin-bottom-2 govuk-!-padding-top-0" data-qa="pageHeading">
-                {{ pageTitle }}
+                {{ title }}
             </h2>
 
             <p class="govuk-hint">
@@ -21,7 +31,7 @@
 
             <div class="govuk-form-group">
                 <div class="govuk-radios">
-                    
+
                     <div class="govuk-radios__item">
                         <input class="govuk-radios__input" id="mentalHealthVeryWell-radio" name="preview-very-well" type="radio" checked="true" readonly>
                         <label class="govuk-label govuk-radios__label" for="mentalHealthVeryWell-radio">Very well</label>

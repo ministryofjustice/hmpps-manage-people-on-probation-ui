@@ -5,6 +5,15 @@
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
 {% set title = 'Online check ins restarted' %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + title]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [title]
+  }) %}
+{% endif %}
 {% set cases = "/case/" %}
 {% set hideButton = true %}
 {% set overViewLink = "/case/" + crn %}

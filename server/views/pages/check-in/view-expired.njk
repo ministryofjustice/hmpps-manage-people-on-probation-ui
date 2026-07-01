@@ -3,6 +3,15 @@
 {% from "_components/note/macro.njk" import appNote %}
 
 {% set title = "Online check in missed and reviewed" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + title]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [title]
+  }) %}
+{% endif %}
 {% set backLink = back | default('/case/' + crn + '/activity-log') %}
 {% set hideButton = true %}
 
@@ -55,7 +64,7 @@
             {% if checkIn.notes.length > 0 %}
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Notes</dt>
-                    <dd class="govuk-summary-list__value">{{ 
+                    <dd class="govuk-summary-list__value">{{
                         notes | safe
                     }}</dd>
                 </div>
@@ -121,4 +130,3 @@
 </div>
 
 {% endblock %}
- 
