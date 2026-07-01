@@ -11,6 +11,7 @@
   {% set pageTitle = makePageTitle({
     pageHeading: [pageTitleText]
   }) %}
+{% endif %}
 {% set backLink = '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-contact' if not cya else '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-summary' %}
 {% set buttonText = "Save changes" %}
 {% set formAnchorLink = backLink %}
