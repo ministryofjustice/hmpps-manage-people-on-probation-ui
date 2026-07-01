@@ -21,7 +21,7 @@ import { Option } from '../../models/Option'
 
 type OutcomeType = Extract<
   AppointmentOutcomeType | AcceptableAbsenceOutcomeType,
-  'ATTENDED_FAILED_TO_COMPLY' | 'UNACCEPTABLE_ABSENCE' | 'FAILED_TO_ATTEND'
+  'ATTENDED_FAILED_TO_COMPLY' | 'UNACCEPTABLE_ABSENCE' | 'FAILED_TO_ATTEND' | 'ATTENDED_SENT_HOME_BEHAVIOUR'
 >
 
 type OptionsMap = {
@@ -33,6 +33,7 @@ type OptionsMap = {
 
 const optionsMap: OptionsMap = {
   ATTENDED_FAILED_TO_COMPLY: { key: 'attendedFailedToComply', options: attendedFailedToComplyOptions() },
+  ATTENDED_SENT_HOME_BEHAVIOUR: { key: 'attendedFailedToComply', options: attendedFailedToComplyOptions() },
   UNACCEPTABLE_ABSENCE: { key: 'unacceptableAbsence', options: attendedFailedToComplyOptions() },
   FAILED_TO_ATTEND: { key: 'failedToAttend', options: failedToAttendOptions() },
 }
