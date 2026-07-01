@@ -3,6 +3,7 @@ import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
 import { Activity, LinkedContactResponse, PersonAppointment } from '../../../data/model/schedule'
 import { PersonSummary } from '../../../data/model/personalDetails'
 import { AppointmentOutcomeProps } from '../../../models/Locals'
+import { NextAppointmentResponse } from '../../../models/Appointments'
 
 const crn = 'X000001'
 const appointmentId = '123456'
@@ -21,11 +22,69 @@ type TestModel = {
   personAppointment: PersonAppointment
   appointmentOutcome: AppointmentOutcomeProps<Activity>
   sentences: Array<{ order: { description: string } }>
-  nextAppointment: Record<string, unknown>
+  nextAppointment: Partial<NextAppointmentResponse>
   canReschedule: boolean
   hasDeceased: boolean
   back?: string
   relatedContacts: LinkedContactResponse
+}
+
+const nextAppointment: Partial<NextAppointmentResponse> = {
+  appointment: {
+    id: '2510756010',
+    eventNumber: '4',
+    type: 'Planned Office Visit (NS)',
+    startDateTime: '2026-07-02T11:11:00+01:00',
+    endDateTime: '2026-07-02T11:12:00+01:00',
+    appointmentNotes: [],
+    isSensitive: false,
+    hasOutcome: false,
+    wasAbsent: false,
+    officer: {
+      code: 'N56A119',
+      name: { forename: 'Leigh', surname: 'Christie' },
+      teamCode: 'N56N07',
+      providerCode: 'N56',
+      username: 'leigh.christie1',
+    },
+    isInitial: false,
+    isNationalStandard: true,
+    location: {
+      code: 'N56WEMC',
+      officeName: 'Wellingborough Magistrates Court',
+      buildingName: 'The Court House',
+      streetName: 'Midland Road',
+      town: 'Wellingborough',
+      county: 'Northamptonshire',
+      postcode: 'NN8 1HF',
+      ldu: 'Default Unallocated District',
+      telephoneNumber: '01933 271415',
+    },
+    rescheduled: false,
+    rescheduledStaff: false,
+    rescheduledPop: false,
+    absentWaitingEvidence: false,
+    documents: [],
+    isRarRelated: false,
+    acceptableAbsence: false,
+    isAppointment: true,
+    isCommunication: false,
+    isSystemContact: false,
+    isEmailOrTextFromPop: false,
+    isPhoneCallFromPop: false,
+    isEmailOrTextToPop: false,
+    isPhoneCallToPop: false,
+    isInPast: false,
+    isPastAppointment: false,
+    lastUpdated: '2026-07-01T14:59:04+01:00',
+    lastUpdatedBy: { forename: 'ravindrakumar', surname: 'killamsetty' },
+    deliusManaged: false,
+    isVisor: false,
+    eventId: 2501085207,
+    externalReference: 'urn:uk:gov:hmpps:manage-supervision-service:appointment:968bfbbd-33a5-46f1-887d-0147465cfe3c',
+  },
+  personManager: { name: { forename: 'leigh', surname: 'christie1' }, code: 'ABC' },
+  usernameIsCom: false,
 }
 
 const baseModel: TestModel = {
@@ -296,8 +355,19 @@ describe('Manage an appointment', () => {
             enableNonCompliance: true,
           },
         })
-
         expect($('[data-qa="appointmentActions"]').text()).toContain('Arrange next appointment')
+      })
+
+      it('should display the next appointment details', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+          nextAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).toContain(
+          'Planned office visit (NS) arranged with Leigh on Thursday 2 July 2026 at 11:11am',
+        )
       })
     })
 

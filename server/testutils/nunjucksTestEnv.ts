@@ -14,6 +14,7 @@ import {
   toSentenceCase,
   yearsSince,
   makePageTitle,
+  dateWithDayAndWithYear,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -42,6 +43,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('activityLinkUrl', activityLinkUrl)
 
   env.addFilter('dateWithYear', dateWithYear)
+  env.addFilter('dateWithDayAndWithYear', dateWithDayAndWithYear)
   env.addFilter('yearsSince', yearsSince)
   env.addFilter('toSentenceCase', toSentenceCase)
   env.addFilter('fullName', fullName)
