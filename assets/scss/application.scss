@@ -11,7 +11,7 @@ $high-score-border-colour: #d4351c;
 $very-high-score-colour-mpop: #711a0d;
 $very-high-score-border-colour: #942514;
 $unknown-score-border-colour: #fd0;
-$no-score-colour: #505a5f;
+$no-score-colour-mpop: #505a5f;
 $no-score-border-colour: #505a5f;
 $no-score-background-colour: #ffffff;
 $mappa-colour: #4c2c92;
@@ -508,7 +508,7 @@ body.feature-disabled {
   border: 2px solid $no-score-border-colour;
   & h3,
   & h4 {
-    color: $no-score-colour;
+    color: $no-score-colour-mpop;
   }
 }
 
