@@ -71,9 +71,11 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       }
       const appointmentStaff = await masClient.getStaffByTeam(teamCode)
-      const ppStaff = appointmentStaff.users.find(
-        user => user?.username?.toLowerCase() === probationPractitioner?.username.toLowerCase(),
-      )
+      const ppStaff = probationPractitioner?.username
+        ? appointmentStaff.users.find(
+            user => user?.username?.toLowerCase() === probationPractitioner.username.toLowerCase(),
+          )
+        : undefined
       if (ppStaff && !sessionStaff.some(u => u?.username?.toLowerCase() === ppStaff.username?.toLowerCase())) {
         sessionStaff.push(ppStaff)
       }
