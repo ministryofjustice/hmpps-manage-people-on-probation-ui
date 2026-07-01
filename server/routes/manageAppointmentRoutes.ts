@@ -11,7 +11,12 @@ import {
   parseMultipartBody,
   forceValidation,
 } from '../middleware'
-import { getNotePrepend, getOutcomeProps, getOutcomeSentence } from '../middleware/appointment-outcomes'
+import {
+  getNotePrepend,
+  getOutcomeProps,
+  getOutcomeSentence,
+  handlePutOutcome,
+} from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import config from '../config'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
@@ -66,6 +71,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     parseMultipartBody,
     validate.appointmentOutcomes,
     autoStoreSessionData(hmppsAuthClient),
+    handlePutOutcome(hmppsAuthClient),
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 

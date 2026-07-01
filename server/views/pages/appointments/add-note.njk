@@ -2,7 +2,7 @@
 {% from "_components/note/macro.njk" import appNote %}
 {% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
 {% set pageTitle = makePageTitle({
   pageHeading: [title, appointmentDisplayName]
 }) %}

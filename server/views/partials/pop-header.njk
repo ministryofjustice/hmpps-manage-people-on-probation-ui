@@ -1,19 +1,33 @@
+{% from "mpop/components/pop-header/macro.njk" import popHeader %}
+
 <div class="govuk-flex">
     <div>
-        <ul class="govuk-list govuk-caption-m inline-list-from-tablet">
-            <li>CRN:
-                        <span data-qa='crn'>{{ headerCRN }}</span>
-                <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
-            </li>
-            <li>Date of birth:
-                        <span data-qa='headerDateOfBirthValue'>{{ headerDob | dateWithYear }}</span>
-                                (<span data-qa='headerDateOfBirthAge'>{{ headerDob | yearsSince }} years old</span>)
-                        <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
-            </li>
-            <li>Tier:{{' '}}
-                <a href="{{ headerTierLink }}" data-qa="tierLink" class="govuk-link">{{ tierCalculation.tierScore }}</a>   
-            </li>
-        </ul>
+        {% if flags.enableSupervisionPackagePoPHeader %}
+            <div data-qa="new-pop-header">
+            {{ popHeader({
+            crn:headerCRN,
+            dob: headerDob | dateWithYear,
+            age: headerDob | yearsSince,
+            tierScore: tierDetails.calculation.tierScore | convertToTitleCase,
+            historyHref: tierUrlV3
+        }) }}
+            </div>
+        {% else %}
+            <ul data-qa="legacy-pop-header" class="govuk-list govuk-caption-m inline-list-from-tablet">
+                <li>CRN:
+                    <span data-qa='crn'>{{ headerCRN }}</span>
+                    <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
+                </li>
+                <li>Date of birth:
+                    <span data-qa='headerDateOfBirthValue'>{{ headerDob | dateWithYear }}</span>
+                    (<span data-qa='headerDateOfBirthAge'>{{ headerDob | yearsSince }} years old</span>)
+                    <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
+                </li>
+                <li>Tier:{{' '}}
+                    <a href="{{ headerTierLink }}" data-qa="tierLink" class="govuk-link">{{ tierCalculation.tierScore }}</a>
+                </li>
+            </ul>
+        {% endif %}
     </div>
 </div>
 <div class="moj-page-header-actions govuk-!-static-margin-bottom-4">
@@ -32,7 +46,7 @@
                         name: 'ROSH' if riskData
                             .assessments[0]
                             .rsr
-                            .band else 
+                            .band else
                                 'RISK OF SERIOUS HARM',
                                 band: overallRisk
                         }

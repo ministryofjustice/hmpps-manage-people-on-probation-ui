@@ -13,6 +13,7 @@ import {
   setDataValue,
   getDataValue,
   canRescheduleAppointment,
+  addressToList,
 } from '../utils'
 import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
@@ -158,6 +159,14 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+      let nextAppointmentLocation: string | null = null
+      if (nextAppointment?.appointment?.type !== 'Planned Telephone Contact (NS)') {
+        nextAppointmentLocation = nextAppointmentIsAtHome
+          ? 'their home'
+          : addressToList(nextAppointment?.appointment?.location)?.[0]
+      }
+
+      res.locals.nextAppointmentLocation = nextAppointmentLocation
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const canReschedule = canRescheduleAppointment(personAppointment)
       return res.render('pages/appointments/manage-appointment', {
@@ -166,7 +175,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         back,
         url,
         nextAppointment,
-        nextAppointmentIsAtHome,
         canReschedule,
         contactId,
         hasDeceased,
@@ -406,7 +414,23 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn, contactId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const noteResponse = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const appointmentResponse = await masClient.getPersonAppointment(crn, contactId)
+
+      const selectedNote = noteResponse?.appointment?.appointmentNote
+      const notes = appointmentResponse?.appointment?.appointmentNotes || []
+
+      if (selectedNote && Array.isArray(notes)) {
+        appointmentResponse.appointment.appointmentNotes = notes.map(note =>
+          String(note.id) === String(noteId)
+            ? {
+                ...note,
+                ...selectedNote,
+                hasNoteBeenTruncated: false,
+              }
+            : note,
+        )
+      }
       const { back } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENT_NOTE',
@@ -418,7 +442,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       res.render('pages/appointments/appointment', {
         back,
-        personAppointment,
+        personAppointment: appointmentResponse,
         crn,
         contactId,
       })

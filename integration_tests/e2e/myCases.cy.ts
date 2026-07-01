@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import Page from '../pages/page'
 import YourCasesPage from '../pages/myCases'
 
@@ -38,7 +39,13 @@ const checkColumnSorting = (page: YourCasesPage, index: number) => {
 }
 
 context('Cases', () => {
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('Cases page is rendered ', () => {
+    const now = DateTime.now()
+    const allocatedOn = now.toFormat('yyyy-MM-dd')
+    cy.task('stubCaseload', allocatedOn)
     cy.visit('/case')
     const page = Page.verifyOnPage(YourCasesPage)
     checkColumnHeading(page, 0, 'Cases', 'nameOrCrn', 'case')
@@ -60,6 +67,7 @@ context('Cases', () => {
     page.getNavigationLink(4).should('contain.text', 'Alerts')
     page.getNavigationLink(4).get('.moj-notification-badge').should('contain.text', 12)
     page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
+    cy.get('.govuk-tag--yellow').should('contain.text', 'New case')
   })
 
   const sortableColumns = ['Cases', 'Sentence', 'Last Appointment', 'Next Appointment']

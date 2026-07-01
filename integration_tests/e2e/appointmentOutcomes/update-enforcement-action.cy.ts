@@ -30,7 +30,7 @@ const loadPage = ({
     eventId: 2501192724,
     isFuture: false,
     hasOutcome: true,
-    hasComplied: true,
+    hasComplied: false,
     notes: false,
     acceptableAbsence,
     action,
@@ -196,7 +196,7 @@ const getExpectedOptions = ({
 
 const checkCurrentEnforcementStatus = ({
   colour = 'yellow',
-  text = 'First Warning Letter Sent',
+  text = 'First warning letter sent',
 }: { colour?: string; text?: string } = {}) => {
   cy.get('.govuk-inset-text').should('contain.text', 'The current enforcement status is:')
   cy.get('.govuk-inset-text').find(`.govuk-tag--${colour}`).should('contain.text', text)
@@ -213,7 +213,7 @@ const checkPage = () => {
       updateEnforcementActionPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
     it('should render the page', () => {
-      loadPage({ enforcementAction })
+      loadPage({ enforcementAction, hasComplied: false })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
@@ -237,7 +237,7 @@ const checkPage = () => {
       loadPage({ enforcementAction })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
+      checkCurrentEnforcementStatus({ text: 'Breach / recall initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
@@ -257,7 +257,7 @@ const checkPage = () => {
       loadPage({ enforcementAction, sentenceType: 'CUSTODY' })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
+      checkCurrentEnforcementStatus({ text: 'Breach / recall initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
@@ -301,14 +301,14 @@ const checkPage = () => {
       loadPage({ enforcementAction: 'NO_FURTHER_ACTION' })
       enforcementActionPage = new EnforcementActionPage()
       enforcementActionPage.checkPageTitle('Select an enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'No Further Action' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'No further action' })
     })
   })
 
   describe('Current enforcement action is WITHDRAWAL_OF_WARNING', () => {
     it('should render the page', () => {
       loadPage({ enforcementAction: 'WITHDRAWAL_OF_WARNING' })
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of Warning' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of warning' })
     })
   })
 

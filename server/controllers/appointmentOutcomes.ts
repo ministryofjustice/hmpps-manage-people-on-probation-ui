@@ -82,7 +82,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl } = res.locals.appointmentOutcome
-      const { change } = req.query as Record<string, string>
+      const { change, put } = req.query as Record<string, string>
       const { notes, sensitive } = req.body
       const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
       if (!isValidParams) {
@@ -116,6 +116,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         redirect = `${baseOutcomeUrl}/check-your-answers`
       }
       if (change) redirect = change
+      if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
       return res.redirect(redirect)
     }
   },

@@ -99,7 +99,7 @@ export const checkAppointmentSummary = ({
       const expectedActionHtml =
         action === 'NO_FURTHER_ACTION'
           ? 'No further action'
-          : 'I will initiate the breach<br>I will send a licence compliance letter'
+          : 'I will initiate the breach<br>I will send a different enforcement letter'
       page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.html', expectedActionHtml)
       page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
       page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)

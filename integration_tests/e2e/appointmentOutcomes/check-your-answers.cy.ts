@@ -169,7 +169,7 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkSummary({
         outcomeText: 'Unacceptable absence',
-        actionText: ['I will initiate the breach', 'I will send a licence compliance letter'],
+        actionText: ['I will initiate the breach', 'I will send a different enforcement letter'],
         documents: true,
       })
     })
@@ -182,7 +182,7 @@ const checkPage = () => {
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkSummary({
         outcomeText: 'Unacceptable absence',
-        actionText: ['I will initiate the breach', 'I will send a licence compliance letter'],
+        actionText: ['I will initiate the breach', 'I will send a different enforcement letter'],
         documents: true,
         notes: false,
       })

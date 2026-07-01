@@ -3,7 +3,7 @@
 {% set documentsHtml = '' %}
  {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
  {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
 {% set _docs = appointmentDocuments if appointmentDocuments else appointment.documents %}
@@ -19,7 +19,7 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else 
+{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else
   ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',

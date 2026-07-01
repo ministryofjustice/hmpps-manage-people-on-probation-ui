@@ -48,13 +48,17 @@
           },
           {
               html:
-              ((((enforcementAction.enforcementAction | lower | capitalize) if enforcementAction.enforcementAction else 'Not provided') | escape))
-              +
-              (
-              '<br><strong class="govuk-tag app-compliance-tag govuk-tag--red">Overdue</strong>'
-              if enforcementAction.isOverdue
-              else ''
-              )
+              (((enforcementAction.enforcementAction | lower | capitalize) | escape)
+              if enforcementAction.enforcementAction
+              else ('Not provided' | escape))
+              + '</a><br>'
+              + '<span class="govuk-body-s">'
+              + (
+          enforcementAction.lastModifiedDate | dateWithYearShortMonth
+          if enforcementAction.lastModifiedDate
+          else ''
+          )
+              + '</span>'
           },
           {
               classes: 'govuk-!-text-align-left',

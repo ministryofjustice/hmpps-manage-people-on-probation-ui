@@ -66,7 +66,11 @@ describe('Add a note', () => {
   /* ------------------------------------------------------------------ */
 
   describe('Manage appointment', () => {
+    afterEach(() => {
+      cy.task('resetMocks')
+    })
     const loadPage = (): void => {
+      cy.task('stubDisableNonCompliance')
       cy.visit('/case/X000001/appointments/appointment/6/manage')
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.getTaskLink(2).click()

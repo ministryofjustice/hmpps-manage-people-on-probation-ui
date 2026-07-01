@@ -238,8 +238,6 @@ export function mapEnforcementContactsWithApprovedContactDisplayNames(
       return {
         ...contact,
         displayName: displayName || contact.appointmentType,
-        isOverdue:
-          contact.evidenceDueDate && new Date(contact.evidenceDueDate).getTime() < new Date().setHours(0, 0, 0, 0),
       }
     }),
   }

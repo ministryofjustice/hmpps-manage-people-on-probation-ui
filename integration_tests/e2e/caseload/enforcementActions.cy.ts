@@ -32,6 +32,7 @@ context('Enforcement actions', () => {
       )
     page.getTableCell(1, 3).should('contain.text', 'Unacceptable absence')
     page.getTableCell(1, 4).should('contain.text', 'Breach initiated')
+    page.getTableCell(1, 4).should('contain.text', '10 May 2026')
     page.getTableCell(1, 5).find('a').should('contain.text', 'Manage on NDelius')
 
     page
@@ -50,6 +51,7 @@ context('Enforcement actions', () => {
       )
     page.getTableCell(2, 3).should('contain.text', 'Failed to attend')
     page.getTableCell(2, 4).should('contain.text', 'Warning letter issued')
+    page.getTableCell(2, 4).should('contain.text', '15 May 2026')
     page.getTableCell(2, 5).find('a').should('contain.text', 'Manage')
   })
 

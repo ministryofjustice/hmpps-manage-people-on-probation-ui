@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
 import { Activity, LinkedContactResponse, PersonAppointment } from '../../../data/model/schedule'
 import { PersonSummary } from '../../../data/model/personalDetails'
+import { AppointmentOutcomeProps } from '../../../models/Locals'
 
 const crn = 'X000001'
 const appointmentId = '123456'
@@ -18,6 +19,7 @@ type TestModel = {
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
+  appointmentOutcome: AppointmentOutcomeProps<Activity>
   sentences: Array<{ order: { description: string } }>
   nextAppointment: Record<string, unknown>
   canReschedule: boolean
@@ -73,7 +75,9 @@ const baseModel: TestModel = {
       },
       lastUpdated: '2023-03-20',
     } as Activity,
+    enforcementAction: { code: 'IBR', description: '', responseByDate: '' },
   },
+  appointmentOutcome: {} as AppointmentOutcomeProps<Activity>,
   sentences: [
     {
       order: {
@@ -104,6 +108,14 @@ const render = (model = {} as Partial<TestModel>) => {
         ...baseModel.personAppointment.appointment,
         ...model.personAppointment?.appointment,
       },
+      enforcementAction: {
+        ...baseModel.personAppointment.enforcementAction,
+        ...model.personAppointment?.enforcementAction,
+      },
+    },
+    appointmentOutcome: {
+      ...baseModel.appointmentOutcome,
+      ...model.appointmentOutcome,
     },
   }
   const env = createNunjucksTestEnv()
@@ -119,11 +131,89 @@ describe('Manage an appointment', () => {
     expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
   })
 
+  it('should use description for title if no displayName', () => {
+    const $ = render({
+      personAppointment: {
+        appointment: {
+          type: 'Planned Office Visit (NS)',
+          description: 'Drug test',
+          displayName: undefined,
+        },
+      },
+    } as Partial<TestModel>)
+
+    expect($('.govuk-back-link').attr('href')).toBe(`/case/${crn}/appointments`)
+    expect($('title').text()).toContain('Manage drug test with Terry Jones')
+    expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
+  })
+
+  it('should use type for title if no displayName or description (remember sentence case)', () => {
+    const $ = render({
+      personAppointment: {
+        appointment: {
+          type: 'Planned Video Call (NS)',
+          description: undefined,
+          displayName: undefined,
+        },
+      },
+    } as Partial<TestModel>)
+
+    expect($('.govuk-back-link').attr('href')).toBe(`/case/${crn}/appointments`)
+    expect($('title').text()).toContain('Manage planned video call (NS) with Terry Jones')
+    expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
+  })
+
   describe('Alert banner', () => {
     it('should display the alert banner', () => {
       const $ = render()
-
       expect($('.moj-alert').length).toBe(1)
+    })
+  })
+
+  describe('Evidence warning banner', () => {
+    it('should display the evidence warning', () => {
+      const $ = render({
+        flags: {
+          enableNonCompliance: true,
+        },
+        personAppointment: {
+          appointment: {
+            deliusManaged: false,
+            hasOutcome: true,
+            didTheyComply: false,
+            outcome: 'Attended - failed to comply',
+          } as Partial<Activity>,
+          enforcementAction: { code: 'IBR', description: '', responseByDate: '2026-06-01' },
+        } as PersonAppointment,
+        appointmentOutcome: {
+          currentEnforcementAction: {
+            evidenceWarning: 'Stuart has until 9 February to submit evidence (5 days remaining)',
+          },
+        } as AppointmentOutcomeProps<Activity>,
+      })
+      expect($('[data-qa="evidenceWarning"]').length).toBe(1)
+    })
+
+    it('should not display the evidence warning', () => {
+      const $ = render({
+        flags: {
+          enableNonCompliance: true,
+        },
+        personAppointment: {
+          appointment: {
+            deliusManaged: false,
+            didTheyComply: false,
+            outcome: 'Attended - failed to comply',
+          } as Partial<Activity>,
+          enforcementAction: { code: 'NFA', description: '', responseByDate: '2026-06-01' },
+        } as PersonAppointment,
+        appointmentOutcome: {
+          currentEnforcementAction: {
+            evidenceWarning: null,
+          },
+        } as AppointmentOutcomeProps<Activity>,
+      })
+      expect($('[data-qa="evidenceWarning"]').length).toBe(0)
     })
   })
 
@@ -145,6 +235,42 @@ describe('Manage an appointment', () => {
         expect($('[data-qa="appointmentActions"]').text()).toContain('Log appointment outcome')
       })
 
+      it('should display change enforcement action', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: false,
+              outcome: 'Attended - Failed to comply',
+              hasOutcome: true,
+              action: 'No Further Action',
+              didTheyComply: false,
+            } as Activity,
+          } as PersonAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).toContain('Change enforcement action')
+      })
+
+      it('should not display change enforcement action', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: false,
+              outcome: 'Attended - Complied',
+              hasOutcome: true,
+              action: '',
+              didTheyComply: true,
+            } as Activity,
+          } as PersonAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).not.toContain('Change enforcement action')
+      })
+
       it('should display appointment notes action', () => {
         const $ = render({
           flags: {
@@ -161,7 +287,6 @@ describe('Manage an appointment', () => {
             enableNonCompliance: true,
           },
         })
-
         expect($('[data-qa="appointmentActions"]').text()).toContain('Upload documents')
       })
 

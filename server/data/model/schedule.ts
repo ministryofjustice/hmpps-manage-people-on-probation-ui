@@ -35,13 +35,12 @@ export interface EnforcementContact {
   crn: string
   dob: string
   appointmentType: string
-  displayName?: string
   appointmentDate: string
   appointmentOutcome: string
   enforcementAction: string
   evidenceDueDate: string
   deliusManaged: boolean
-  isOverdue?: boolean
+  lastModifiedDate: string
 }
 
 export interface CaseName {
@@ -94,7 +93,7 @@ export interface ContactOutcomesResponse {
 export interface PutContactRequest {
   date: string
   time: string
-  outcomeCode: OutcomeCode | AcceptableAbsenceOutcomeCode
+  outcomeCode?: OutcomeCode | AcceptableAbsenceOutcomeCode
   enforcementActionCode?: EnforcementActionCode
   notes: string
   alert?: boolean

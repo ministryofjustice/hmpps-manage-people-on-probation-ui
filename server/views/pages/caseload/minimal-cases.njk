@@ -160,7 +160,11 @@
           {% else %}
             {{ case.caseName.surname }}, {{ case.caseName.forename }}
           {% endif %}
-          </a><br/>
+          </a>
+          {% if case.newCase %}
+            {{ govukTag({ text: "New case", classes: 'app-compliance-tag govuk-tag--yellow govuk-!-margin-left-2' }) }}
+          {% endif %}
+          <br/>
           <span class="govuk-!-font-weight-bold secondary-text">{{ crn }}</span><br/>
           {% if case.dob %}
             <span class="secondary-text">{{ case.dob | dateWithYear }} (Age {{ case.dob | yearsSince }})</span>

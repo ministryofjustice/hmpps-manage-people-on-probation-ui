@@ -71,9 +71,11 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       }
       const appointmentStaff = await masClient.getStaffByTeam(teamCode)
-      const ppStaff = appointmentStaff.users.find(
-        user => user?.username?.toLowerCase() === probationPractitioner?.username.toLowerCase(),
-      )
+      const ppStaff = probationPractitioner?.username
+        ? appointmentStaff.users.find(
+            user => user?.username?.toLowerCase() === probationPractitioner.username.toLowerCase(),
+          )
+        : undefined
       if (ppStaff && !sessionStaff.some(u => u?.username?.toLowerCase() === ppStaff.username?.toLowerCase())) {
         sessionStaff.push(ppStaff)
       }
@@ -111,6 +113,16 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           }
         }
         sessionStaff = [...sessionStaff, sessionStaffItem]
+      }
+    } else {
+      attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
+      attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
+      const staff = sessionStaff.find(user => user?.username?.toLowerCase() === attendingUsername?.toLowerCase())
+      if (!attendingEmail && staff?.email) {
+        setDataValue(data, ['appointments', crn, id, 'user', 'email'], staff.email)
+      }
+      if (!attendingName && staff?.name) {
+        setDataValue(data, ['appointments', crn, id, 'user', 'name'], staff.name)
       }
     }
     setDataValue(data, ['providers', username], sessionProviders)
