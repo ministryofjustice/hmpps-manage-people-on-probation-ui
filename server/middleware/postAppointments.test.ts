@@ -438,6 +438,30 @@ describe('/middleware/postAppointments', () => {
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
+      it('should get email from user details if appointment session user email is blank', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+          userId: 123,
+          username,
+          firstName: 'Mock',
+          surname: 'User',
+          email: mockUser.email,
+          enabled: true,
+          roles: [],
+        })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, email: '' },
+        })
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        checkOutlookEventRequest()
+      })
     })
     describe('Attending user does not have email', () => {
       const mockReq = createMockReq({

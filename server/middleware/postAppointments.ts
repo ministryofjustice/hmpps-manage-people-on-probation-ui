@@ -13,6 +13,7 @@ import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
+import logger from '../../logger'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -83,6 +84,20 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         user: { name, email },
       } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid]))
       ;({ forename: firstName, surname } = name)
+
+      if (!email) {
+        try {
+          email = (await masClient.getUserDetails(username))?.email
+        } catch (error) {
+          logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
+        }
+      }
+
+      const bookingUserEmail = res.locals.user.email
+      const isDifferentUser = Boolean(email) && Boolean(bookingUserEmail) && email !== bookingUserEmail
+      if (isDifferentUser) {
+        logger.info(`Appointment ${uuid}: attending user is different to booking user.`)
+      }
     } else {
       ;({ email, firstName, surname } = res.locals.user)
     }
