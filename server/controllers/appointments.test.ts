@@ -11,7 +11,7 @@ import { mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mo
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
 import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
-import { Activity } from '../data/model/schedule'
+import { Activity, PersonAppointment } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { SubjectType } from '../middleware/sendAuditMessage'
@@ -768,19 +768,82 @@ describe('controllers/appointments', () => {
 
   describe('get appointment note', () => {
     beforeEach(async () => {
+      getPersonAppointmentNoteSpy.mockResolvedValue({
+        personSummary: {
+          crn,
+          dateOfBirth: '1979-08-18',
+          name: { forename: 'Eula', surname: 'Schmeler' },
+        },
+        documents: [],
+        appointment: {
+          id: contactId,
+          type: 'Phone call',
+          startDateTime: '2026-06-30T10:00:00Z',
+          appointmentNote: {
+            id: Number(noteId),
+            note: 'This is the full, untruncated note text',
+            hasNoteBeenTruncated: false,
+            createdBy: 'Test User',
+            createdByDate: '2026-06-30T10:00:00Z',
+          },
+        },
+      } as PersonAppointment)
+
+      getPersonAppointmentSpy.mockResolvedValue({
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          appointmentNotes: [
+            {
+              id: Number(noteId),
+              note: 'This is the truncated note...',
+              hasNoteBeenTruncated: true,
+              createdBy: 'Test User',
+              createdByDate: '2026-06-30T10:00:00Z',
+            },
+            {
+              id: 999,
+              note: 'Another note remains unchanged',
+              hasNoteBeenTruncated: false,
+              createdBy: 'Another User',
+              createdByDate: '2026-06-30T11:00:00Z',
+            },
+          ],
+        },
+      })
       await controllers.appointments.getAppointmentNote(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENT_NOTE', uuidv4(), crn, 'CRN')
     it('should request the person appointment note', () => {
       expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
     })
-    it('should render the appointment notepage', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
-        personAppointment: mockPersonAppointment,
-        crn,
-        contactId,
-        back: undefined,
-      })
+    it('should render the appointment page with merged notes (selected note full, others unchanged)', () => {
+      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          crn,
+          contactId,
+          back: undefined,
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              appointmentNotes: expect.arrayContaining([
+                expect.objectContaining({
+                  id: Number(noteId),
+                  note: 'This is the full, untruncated note text',
+                  hasNoteBeenTruncated: false,
+                }),
+                expect.objectContaining({
+                  id: 999,
+                  note: 'Another note remains unchanged',
+                  hasNoteBeenTruncated: false,
+                }),
+              ]),
+            }),
+          }),
+        }),
+      )
     })
   })
 

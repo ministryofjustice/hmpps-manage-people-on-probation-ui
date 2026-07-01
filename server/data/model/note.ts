@@ -3,5 +3,5 @@ export interface Note {
   createdBy?: string
   createdByDate?: string
   note: string
-  hasNotesBeenTruncated?: boolean
+  hasNoteBeenTruncated?: boolean
 }
