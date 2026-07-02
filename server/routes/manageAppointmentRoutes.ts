@@ -32,7 +32,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.all(
     '/case/:crn/appointments/appointment/:contactId/add-note',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
     getPersonAppointment(hmppsAuthClient),
     getOutcomeProps,
   )
@@ -53,7 +52,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     getAppointmentTypes(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,

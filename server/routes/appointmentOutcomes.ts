@@ -189,10 +189,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Attended - failed to comply 👇 */
 
-  router.all(
-    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-  )
   router.get(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
