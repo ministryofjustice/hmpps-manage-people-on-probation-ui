@@ -1,6 +1,9 @@
 {% extends "../../../_form.njk" %}
 {% set title = "Is there anything you need support with or want to let us know about?" %}
-{% set pageTitle = title %}
+{% set pageTitleText = "Question preview of Is there anything else you need support with or want to let us know about?" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set buttonText = "Back to questions" %}
 {% set formAnchorText = "Back to questions" %}
 {% set formAnchorLink = "/case/"+ crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
@@ -17,7 +20,7 @@
             <p>This is a non-editable preview of the question that the person will be asked when they check in.</p>
 
             <h3 class="govuk-heading-m govuk-!-margin-bottom-2" data-qa="pageHeading">
-                {{ pageTitle }}
+                {{ title }}
             </h3>
             <p class="govuk-hint">
                 This could be anything you're worrying about, struggling with or just want to let us know.

@@ -1,5 +1,9 @@
 {% extends "../../../_form.njk" %}
-{% set pageTitle = "How have you been feeling since we last spoke?" %}
+{% set title = "How have you been feeling since we last spoke?" %}
+{% set pageTitleText = "Question preview of How have you been feeling since we last spoke?" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set buttonText = "Back to questions" %}
 {% set notStandardForm = true %}
@@ -15,7 +19,7 @@
             <p>This is a non-editable preview of the question that the person will be asked when they check in.</p>
 
             <h3 class="govuk-heading-m govuk-!-margin-bottom-2" data-qa="pageHeading">
-                {{ pageTitle }}
+                {{ title }}
             </h3>
             <p class="govuk-hint">
                 Think about things like if you have noticed a change in your mood and what may have caused this.
@@ -23,7 +27,7 @@
 
             <div class="govuk-form-group">
                 <div class="govuk-radios disabled-radios">
-                    
+
                     <div class="govuk-radios__item">
                         <input class="govuk-radios__input" id="mentalHealthVeryWell-radio" name="preview-very-well" type="radio" checked="true">
                         <label class="govuk-label govuk-radios__label" for="mentalHealthVeryWell-radio">Very well</label>

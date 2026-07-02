@@ -1,5 +1,15 @@
 {% extends "../_form.njk" %}
 {% set title = "Upload a photo of " + case.name.forename %}
+{% set pageTitleText = "Upload a photo of the person" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'photo-options' if not cya else 'checkin-summary' %}
 {% set buttonText =  'Continue' %}
 {% block form %}

@@ -1,5 +1,14 @@
 {% extends "../../_form.njk" %}
 {% set title = "Online check in settings" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + title]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [title]
+  }) %}
+{% endif %}
 {% set backLink = '/case/' + crn + '/appointments/check-in/manage/' + id if not cya else '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-summary' %}
 {% set radioLabel =  "How often would you like "+ case.name.forename + " to check in?" %}
 {% set buttonText =  "Continue" %}

@@ -1,5 +1,9 @@
 {% extends "../_form.njk" %}
 {% set title = case.name.forename + " is not eligible to use online check ins"  %}
+{% set pageTitleText = "The person is not eligible to use online check ins" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set back = back if back else '' %}
 {% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/eligibility-check' %}
 {% set buttonText = "Go to " + case.name.forename + "'s overview" %}

@@ -2,6 +2,16 @@
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 
 {% set title = "Edit contact details for " + case.name.forename %}
+{% set pageTitleText = "Edit contact details for the person" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/contact-preference' %}
 {% set notStandardForm = true %}
 
@@ -41,7 +51,7 @@
             }) }}
           {% endif %}
         {% endif %}
-        
+
         <form method="post" autocomplete="off" action="{{ paths.current }}">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <input type="hidden" name="change" value="{{ change }}">

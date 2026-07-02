@@ -2,6 +2,16 @@
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 {% set title = "Online check in missed" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + title]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [title]
+  }) %}
+{% endif %}
+
 {% set backLink = back | default('/case/' + crn + '/activity-log') %}
 {% set hideButton = true %}
 

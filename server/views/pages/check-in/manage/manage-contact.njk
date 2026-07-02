@@ -2,6 +2,16 @@
 {% set title = "Change contact details" %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
 {% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
+{% set pageTitleText = "How does the person want us to send a link to the service?" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInEmail]' %}
