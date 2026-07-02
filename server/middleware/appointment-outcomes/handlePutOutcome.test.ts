@@ -111,6 +111,7 @@ const buildResponse = ({
       crn,
       id,
       contactId,
+      isInPast: true,
       appointmentSession: mockAppointment({ appointment, outcome }),
       notePrepend,
       baseOutcomeUrl,
@@ -176,19 +177,35 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
   it('should put the correct request to the API if adding notes and no outcome', async () => {
     const appointment: Partial<AppointmentSession> = { notes: 'Some added notes' }
     const outcome: Partial<AppointmentSessionOutcome> = { outcomeCode: null, outcomeType: null }
-
     const req = buildRequest({ put: 'true' })
     const res = buildResponse({ appointmentOutcome: { notePrepend: '' }, appointment, outcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    const {
-      date,
-      start,
-      outcome: { outcomeCode },
-    } = mockAppointment()
+    const { date, start } = mockAppointment()
     const expectedRequest: PutContactRequest = {
       date,
       time: start,
       notes: 'Some added notes',
+      sensitive: true,
+      alert: false,
+    }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should put the correct request to the API if arranging a past appointment with notes and no outcome', async () => {
+    const appointment: Partial<AppointmentSession> = { notes: 'Some added notes' }
+    const outcome: Partial<AppointmentSessionOutcome> = { outcomeCode: null, outcomeType: null }
+    const req = buildRequest({ put: 'true' })
+    const res = buildResponse({
+      appointmentOutcome: { notePrepend: '', responseContactId: '1234' },
+      appointment,
+      outcome,
+    })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
       sensitive: true,
       alert: false,
     }
@@ -209,7 +226,6 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       date,
       time: start,
       outcomeCode,
-      notes: '',
       sensitive: true,
       alert: false,
     }
@@ -228,16 +244,11 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     const req = buildRequest()
     const res = buildResponse({ outcome, appointmentOutcome: { notePrepend: '' } })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    const {
-      date,
-      start,
-      outcome: { outcomeCode },
-    } = mockAppointment()
+    const { date, start } = mockAppointment()
     const expectedRequest: PutContactRequest = {
       date,
       time: start,
       outcomeCode: 'AFTC',
-      notes: '',
       sensitive: true,
       alert: true,
     }
@@ -264,6 +275,32 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       time: start,
       outcomeCode: outcome.outcomeCode,
       notes: `${notePrepend}\n${notes}`,
+      sensitive: true,
+      alert: false,
+    }
+    const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'IBR' }] }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should put the correct request to the API if arranging an appointment in past with notes, notePrepend value exists and a single enforcement action is selected', async () => {
+    const appointment: Partial<AppointmentSession> = { notes }
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED',
+      enforcementActionCode: ['IBR'],
+    }
+    const req = buildRequest()
+    const res = buildResponse({ appointment, outcome, appointmentOutcome: { responseContactId: '1234' } })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: notePrepend,
       sensitive: true,
       alert: false,
     }

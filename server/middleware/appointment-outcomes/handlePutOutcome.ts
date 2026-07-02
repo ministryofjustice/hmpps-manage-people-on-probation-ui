@@ -19,7 +19,6 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const { put } = req.query
     const validRequest =
       (contactId && responseContactId && isInPast) || (contactId && !responseContactId) || (contactId && put)
-
     if (res.locals.flags.enableNonCompliance && validRequest) {
       if (!isValidParams) {
         return renderError(404)(req, res)
@@ -31,7 +30,10 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const sensitivity = appointmentSession?.sensitivity
       const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
       const alert = enforcementActionCode?.includes('ROM') || false
-      let notes = appointmentSession?.notes || ''
+      let notes = ''
+      if (!responseContactId) {
+        notes = appointmentSession?.notes || ''
+      }
       if (notePrepend) {
         notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
       }
@@ -57,13 +59,13 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const request: PutContactRequest = {
         date,
         time,
-        notes: handleQuotes(notes),
         sensitive,
         alert,
       }
       if (outcomeCode) request.outcomeCode = outcomeCode
-      await masClient.putContact(contactId, request)
+      if (notes) request.notes = handleQuotes(notes)
 
+      await masClient.putContact(contactId, request)
       if (enforcementActionCode?.length) {
         const enforcementActionsRequest: EnforcementActionsRequest = {
           enforcementActions: enforcementActionCode.map(code => ({ code })),
