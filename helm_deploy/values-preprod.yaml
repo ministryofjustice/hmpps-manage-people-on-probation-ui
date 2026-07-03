@@ -29,6 +29,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS:notes,\
         ctl:ruleRemoveTargetById=942360;ARGS:notes,\
         ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942190;ARGS:notes,\
         ctl:ruleRemoveTargetById=942350;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
 
@@ -39,6 +40,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942190;ARGS,\
         ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
 
@@ -49,6 +51,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942190;ARGS,\
         ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
 
@@ -59,6 +62,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS:notes,\
         ctl:ruleRemoveTargetById=942360;ARGS:notes,\
         ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942190;ARGS:notes,\
         ctl:ruleRemoveTargetById=942350;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
 
@@ -69,6 +73,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942190;ARGS,\
         ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
 
@@ -79,6 +84,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942190;ARGS,\
         ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
 
