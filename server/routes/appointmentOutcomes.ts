@@ -15,6 +15,7 @@ import {
   getUserProviders,
   forceValidation,
   getOverdueOutcomes,
+  getOfficeLocationsByTeamAndProvider,
 } from '../middleware'
 
 import {
@@ -53,6 +54,12 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   const manageBasePath = '/case/:crn/appointments/appointment/:contactId/outcome'
 
   /* restrict page access if required session data is not present 👇  */
+
+  router.get(
+    [arrangeBasePath, `${arrangeBasePath}/*path`],
+    getAppointmentTypes(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
 
   router.get(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
@@ -146,6 +153,13 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
 
   /* validate outcome options and store session data on all outcome post routes 👇  */
+
+  router.post(
+    [arrangeBasePath, `${arrangeBasePath}/*path`],
+    getAppointmentTypes(hmppsAuthClient),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
 
   router.post(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
