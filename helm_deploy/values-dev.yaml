@@ -22,7 +22,7 @@ generic-service:
          pass,\
          t:none,\
          setvar:tx.paranoia_level=2"
-  
+
       SecRule REQUEST_URI "@rx ^/case/[^/]+/appointments/appointment/[^/]+/add-note$" \
         "id:100101,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
@@ -30,8 +30,9 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS:notes,\
         ctl:ruleRemoveTargetById=942360;ARGS:notes,\
         ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942350;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
-      
+
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/arrange-appointment/[^/]+/add-note$" \
         "id:100107,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
@@ -39,8 +40,9 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
-  
+
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/arrange-appointment/[^/]+/supporting-information$" \
         "id:100104,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
@@ -48,8 +50,9 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
-      
+
       SecRule REQUEST_URI "@rx ^/case/[^/]+/personal-details/edit-main-address$" \
         "id:100102,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
@@ -57,8 +60,9 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS:notes,\
         ctl:ruleRemoveTargetById=942360;ARGS:notes,\
         ctl:ruleRemoveTargetById=942131;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942350;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
-      
+
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/[^/]+/check-in/review/(?:expired|identity|notes)$" \
         "id:100105,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
@@ -66,8 +70,9 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
-      
+
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/[^/]+/check-in/(?:view|view-expired)$" \
         "id:100106,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
@@ -75,6 +80,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
         ctl:ruleRemoveTargetById=942131;ARGS,\
+        ctl:ruleRemoveTargetById=942350;ARGS,\
         ctl:ruleRemoveTargetById=942370;ARGS"
 
   env:
