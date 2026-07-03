@@ -304,35 +304,49 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
 
   it('should set sendLetter to true when failedToAttend is SEND_LETTER', () => {
     const req = buildRequest({ params: { contactId: undefined } })
-
     req.session.data.appointments[crn][uuid].outcome = {
       failedToAttend: 'SEND_LETTER',
     }
-
     const res = buildResponse()
-
     mockAppointmentDateIsInPast.mockReturnValueOnce(true)
     jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-
     getOutcomeProps(req, res, nextSpy)
-
     expect(res.locals.appointmentOutcome.sendLetter).toBe(true)
   })
 
   it('should set sendBreachOrRecallLetter to true when outcome contains BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
     const req = buildRequest({ params: { contactId: undefined } })
-
     req.session.data.appointments[crn][uuid].outcome = {
       attendedFailedToComply: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
     }
-
     const res = buildResponse()
-
     mockAppointmentDateIsInPast.mockReturnValueOnce(true)
     jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
-
     getOutcomeProps(req, res, nextSpy)
-
     expect(res.locals.appointmentOutcome.sendBreachOrRecallLetter).toBe(true)
+  })
+
+  it('should set showLetterTypeOptions to true when selected enforcement action does not contain a letter action', () => {
+    const req = buildRequest({ params: { contactId: undefined } })
+    req.session.data.appointments[crn][uuid].outcome = {
+      enforcementActionCode: ['IBR'],
+    }
+    const res = buildResponse()
+    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+    getOutcomeProps(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.showLetterTypeOptions).toBe(true)
+  })
+
+  it('should set showLetterTypeOptions to false when selected enforcement action does contain a letter action', () => {
+    const req = buildRequest({ params: { contactId: undefined } })
+    req.session.data.appointments[crn][uuid].outcome = {
+      enforcementActionCode: ['EA02'],
+    }
+    const res = buildResponse()
+    mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+    jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+    getOutcomeProps(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.showLetterTypeOptions).toBe(false)
   })
 })

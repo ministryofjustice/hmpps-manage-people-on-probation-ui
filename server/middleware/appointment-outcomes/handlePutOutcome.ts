@@ -6,7 +6,7 @@ import { AppointmentOutcomeType } from '../../models/Appointments'
 import { handleQuotes } from '../../utils'
 import { renderError } from '../renderError'
 
-export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = false): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { appointmentSession, notePrepend, contactId, isValidParams, baseOutcomeUrl, responseContactId, isInPast } =
       res.locals.appointmentOutcome
@@ -18,7 +18,9 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
     const { put } = req.query
     const validRequest =
-      (contactId && responseContactId && isInPast) || (contactId && !responseContactId) || (contactId && put)
+      (contactId && responseContactId && isInPast && !addNotes) ||
+      (contactId && !responseContactId && !addNotes) ||
+      (contactId && addNotes && put)
     if (res.locals.flags.enableNonCompliance && validRequest) {
       if (!isValidParams) {
         return renderError(404)(req, res)

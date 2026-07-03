@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { changeActionsReset } from './changeActionsReset'
+import { resetEnforcementActionSelection } from './resetEnforcementActionSelection'
 import { setDataValue } from '../../utils'
 
 const crn = 'X000001'
@@ -33,35 +33,35 @@ const buildResponse = ({
   return httpMocks.createResponse(res)
 }
 
-describe('middleware/changeActionsReset', () => {
+describe('middleware/resetEnforcementActionSelection', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
   it('should return next() if change query parameter not set', () => {
     const req = httpMocks.createRequest({ query: {}, session: {} })
     const res = buildResponse({ sendBreachOrRecallLetter: true })
-    changeActionsReset(req, res, nextSpy)
+    resetEnforcementActionSelection(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalledTimes(1)
     expect(setDataValueSpy).not.toHaveBeenCalled()
   })
   it('should return next() if page current url is not an enforcement action page', () => {
     const req = httpMocks.createRequest({ query: { change: '/change/url' }, session: {} })
     const res = buildResponse({ reqUrl: '/outcome/add-note' })
-    changeActionsReset(req, res, nextSpy)
+    resetEnforcementActionSelection(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalledTimes(1)
     expect(setDataValueSpy).not.toHaveBeenCalled()
   })
   it('should return next() if breach/recall initiated action is selected', () => {
     const req = httpMocks.createRequest({ query: { change: '/change/url' }, session: {} })
     const res = buildResponse({ sendBreachOrRecallLetter: true })
-    changeActionsReset(req, res, nextSpy)
+    resetEnforcementActionSelection(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalledTimes(1)
     expect(setDataValueSpy).not.toHaveBeenCalled()
   })
-  it('should reset the previously selected actions if change and enforcement action page', () => {
+  it('should reset the previously selected actions if enforcement action page', () => {
     const req = httpMocks.createRequest({ query: { change: '/change/url' }, session: {} })
     const res = buildResponse()
-    changeActionsReset(req, res, nextSpy)
+    resetEnforcementActionSelection(req, res, nextSpy)
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
       1,
       req.session.data,
@@ -71,16 +71,29 @@ describe('middleware/changeActionsReset', () => {
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
       2,
       req.session.data,
-      ['appointments', crn, id, 'outcome', 'attendedFailedToComply'],
+      ['appointments', crn, id, 'outcome', 'letterType'],
       null,
     )
-    expect(setDataValueSpy).toHaveBeenCalledTimes(9)
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(
+      3,
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'letterSentBy'],
+      null,
+    )
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(
+      4,
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'breachNSICreatedBy'],
+      null,
+    )
+
+    expect(setDataValueSpy).toHaveBeenCalledTimes(4)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
   it('should reset the previously selected actions if no change and update enforcement action page', () => {
     const req = httpMocks.createRequest({ query: {}, session: {} })
     const res = buildResponse({ reqUrl: '/outcome/update-enforcement-action' })
-    changeActionsReset(req, res, nextSpy)
+    resetEnforcementActionSelection(req, res, nextSpy)
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
       1,
       req.session.data,
@@ -90,10 +103,23 @@ describe('middleware/changeActionsReset', () => {
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
       2,
       req.session.data,
-      ['appointments', crn, id, 'outcome', 'attendedFailedToComply'],
+      ['appointments', crn, id, 'outcome', 'letterType'],
       null,
     )
-    expect(setDataValueSpy).toHaveBeenCalledTimes(9)
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(
+      3,
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'letterSentBy'],
+      null,
+    )
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(
+      4,
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'breachNSICreatedBy'],
+      null,
+    )
+
+    expect(setDataValueSpy).toHaveBeenCalledTimes(4)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

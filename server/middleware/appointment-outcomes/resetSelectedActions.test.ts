@@ -73,9 +73,9 @@ describe('middleware/appointment-outcomes/resetSelectedActions', () => {
       'updateEnforcementAction',
     ]
     keys.forEach((key, i) => {
-      expect(setDataValueSpy).toHaveBeenNthCalledWith(i + 1, req.session.data, [...expectedPath, key], null)
+      expect(req.session.data.appointments?.[crn]?.[contactId]?.outcome?.[key]).toBeUndefined()
     })
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(9, req.session.data, [...expectedPath, 'enforcementActionCode'], [])
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(1, req.session.data, [...expectedPath, 'enforcementActionCode'], [])
   })
 
   it('should reset the selected breach and letter actions only', () => {
@@ -91,10 +91,10 @@ describe('middleware/appointment-outcomes/resetSelectedActions', () => {
     const keys: EnforcementActionPage[] = ['breachNSICreatedBy', 'letterSentBy', 'letterType']
     resetSelectedActions(keys)(req, res, nextSpy)
     keys.forEach((key, i) => {
-      expect(setDataValueSpy).toHaveBeenNthCalledWith(i + 1, req.session.data, [...expectedPath, key], null)
+      expect(req.session.data.appointments?.[crn]?.[contactId]?.outcome?.[key]).toBeUndefined()
     })
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      4,
+      1,
       req.session.data,
       [...expectedPath, 'enforcementActionCode'],
       ['IBR'],

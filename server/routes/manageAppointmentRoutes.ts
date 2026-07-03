@@ -71,7 +71,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     parseMultipartBody,
     validate.appointmentOutcomes,
     autoStoreSessionData(hmppsAuthClient),
-    handlePutOutcome(hmppsAuthClient),
+    handlePutOutcome(hmppsAuthClient, true),
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 
