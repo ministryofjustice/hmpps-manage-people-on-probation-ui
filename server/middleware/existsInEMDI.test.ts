@@ -73,4 +73,48 @@ describe('existsInEMDI', () => {
     expect(logger.info).toHaveBeenCalledWith('Sentry eventId: sentry-event-id')
     expect(result).toEqual({ status: 500, error: mockError, uri: 'https://emdi/people/X123456' })
   })
+
+  it('should use fallback error message when result.error is not available and status is 500', async () => {
+    const mockResponse = {
+      status: 500,
+      errors: [{ text: 'Custom EMDI error message' }],
+      uri: 'https://emdi/people/X123456',
+    }
+    mockEMDIClient.prototype.existsInEMDI.mockResolvedValue(mockResponse)
+    ;(Sentry.captureException as jest.Mock).mockReturnValue('sentry-event-id')
+
+    await existsInEMDI(crn, token)
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(new Error('Custom EMDI error message'), {
+      tags: {
+        'http.status': '500',
+        'error.type': 'internal_server_error',
+        service: 'Electronic monitoring data',
+        operation: 'existsInEMDI',
+      },
+    })
+  })
+
+  it('should use default error message when result.error and result.errors are not available and status is 500', async () => {
+    const mockResponse = {
+      status: 500,
+      uri: 'https://emdi/people/X123456',
+    }
+    mockEMDIClient.prototype.existsInEMDI.mockResolvedValue(mockResponse)
+    ;(Sentry.captureException as jest.Mock).mockReturnValue('sentry-event-id')
+
+    await existsInEMDI(crn, token)
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      new Error('Electronic monitoring data is currently unavailable.'),
+      {
+        tags: {
+          'http.status': '500',
+          'error.type': 'internal_server_error',
+          service: 'Electronic monitoring data',
+          operation: 'existsInEMDI',
+        },
+      },
+    )
+  })
 })

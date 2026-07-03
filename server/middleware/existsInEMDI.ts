@@ -6,7 +6,9 @@ export const existsInEMDI = async (crn: string, token: string): Promise<PersonEx
   const emdiClient = new EMDIClient(token)
   const result: any = await emdiClient.existsInEMDI(crn)
   if (result?.status === 500) {
-    const eventId = Sentry.captureException(result?.error, {
+    const sentryError =
+      result?.error ?? new Error(result?.errors?.[0]?.text ?? 'Electronic monitoring data is currently unavailable.')
+    const eventId = Sentry.captureException(sentryError, {
       tags: {
         'http.status': '500',
         'error.type': 'internal_server_error',
