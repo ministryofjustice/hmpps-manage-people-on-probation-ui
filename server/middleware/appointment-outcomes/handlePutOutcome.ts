@@ -37,6 +37,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       if (notePrepend) {
         notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
       }
+      if (notes) notes = handleQuotes(notes)
       const sensitive = appointmentSession?.sensitivity === 'Yes'
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -61,10 +62,9 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         time,
         sensitive,
         alert,
+        notes,
       }
       if (outcomeCode) request.outcomeCode = outcomeCode
-      if (notes) request.notes = handleQuotes(notes)
-
       await masClient.putContact(contactId, request)
       if (enforcementActionCode?.length) {
         const enforcementActionsRequest: EnforcementActionsRequest = {

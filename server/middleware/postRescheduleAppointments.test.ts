@@ -200,7 +200,7 @@ describe('middleware/postRescheduleAppointments', () => {
     jest.clearAllMocks()
   })
 
-  describe('reschedule an appointment in the future', () => {
+  describe('reschedule an appointment in the future - Non compliance disabled', () => {
     const [req, mockAppointmentSession] = buildRequest({ outcomeRecorded: 'No' })
     const {
       date,
@@ -239,6 +239,48 @@ describe('middleware/postRescheduleAppointments', () => {
       expect(returnedResponse).toEqual(mockRescheduleResponse)
     })
   })
+
+  describe('reschedule an appointment in the future - Non compliance enabled', () => {
+    const [req, mockAppointmentSession] = buildRequest({ outcomeRecorded: undefined })
+    const {
+      date,
+      start: startTime,
+      end: endTime,
+      user: { staffCode, teamCode, locationCode },
+      notes,
+      rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
+    } = mockAppointmentSession
+    const expectedBody = {
+      date,
+      startTime,
+      endTime,
+      uuid,
+      staffCode,
+      teamCode,
+      locationCode,
+      requestedBy,
+      notes,
+      sensitive: true,
+      isInFuture: true,
+      sendToVisor: false,
+      outcomeRecorded: false,
+      reasonForRecreate: 'Reschedule reason',
+      reasonIsSensitive: false,
+    }
+    let returnedResponse: RescheduleAppointmentResponse
+    const flags = { enableNonCompliance: true }
+    const res = buildResponse({ flags })
+    beforeEach(async () => {
+      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
+    })
+    it('should send a reschedule appointment request to the api', () => {
+      expect(putRescheduleAppointmentSpy).toHaveBeenCalledWith(contactId, expectedBody)
+    })
+    it('should return the response', () => {
+      expect(returnedResponse).toEqual(mockRescheduleResponse)
+    })
+  })
+
   describe('reschedule an appointment in the past - Non compliance disabled', () => {
     const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10' })
     const {
