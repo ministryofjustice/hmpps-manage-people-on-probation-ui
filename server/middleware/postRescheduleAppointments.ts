@@ -59,9 +59,9 @@ export const postRescheduleAppointments = (
       uuid,
       isInFuture: isInPast === false,
     }
-    if (res.locals.flags?.enableNonCompliance && outcome?.outcomeCode) {
-      body.outcomeRecorded = true
-    } else if (outcomeRecorded) {
+    if (res.locals.flags?.enableNonCompliance) {
+      body.outcomeRecorded = !!outcome?.outcomeCode
+    } else {
       body.outcomeRecorded = outcomeRecorded === 'Yes'
     }
     if (rescheduleAppointment?.reason) {

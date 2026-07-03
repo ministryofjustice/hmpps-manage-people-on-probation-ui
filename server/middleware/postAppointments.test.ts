@@ -351,7 +351,7 @@ describe('/middleware/postAppointments', () => {
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
 
-    it(`should add outcomeRecorded to the request body if outcome recorded - Non Compliance enabled`, async () => {
+    it(`should add outcomeRecorded = true to the request body if outcome recorded - Non Compliance enabled`, async () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         outcome: {
@@ -362,6 +362,18 @@ describe('/middleware/postAppointments', () => {
       const res = buildResponse({ flags: { enableNonCompliance: true } })
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: true })
+      expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
+    })
+
+    it(`should add outcomeRecorded = false to the request body if future appointment and no outcome recorded - Non Compliance enabled`, async () => {
+      const appointment: AppointmentSession = {
+        ...mockAppointment,
+        outcomeRecorded: undefined,
+      }
+      const mockReq = createMockReq(appointment)
+      const res = buildResponse({ flags: { enableNonCompliance: true } })
+      await postAppointments(hmppsAuthClient)(mockReq, res)
+      const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: false })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
 
