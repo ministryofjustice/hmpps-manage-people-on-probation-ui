@@ -7,7 +7,7 @@ export interface AppointmentOutcomesValidationArgs extends AppointmentsValidatio
   msg?: string | string[]
   log?: string | string[]
   sendBreachOrRecallLetter?: boolean
-  otherLetterActionSet?: boolean
+  showLetterTypeOptions?: boolean
   sensitivityLocked?: boolean
 }
 
@@ -23,7 +23,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     notes,
     maxCharCount,
     sensitivityLocked,
-    otherLetterActionSet,
+    showLetterTypeOptions,
   } = args
   const msgs = Array.isArray(msg) ? msg : [msg]
   const logs = Array.isArray(log) ? log : [log]
@@ -125,7 +125,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       optional:
         !['outcome/initiate-breach-or-recall', 'outcome/send-letter'].includes(page) ||
         (page === 'outcome/initiate-breach-or-recall' && !sendBreachOrRecallLetter) ||
-        otherLetterActionSet,
+        !showLetterTypeOptions,
       checks: [
         {
           validator: isNotEmpty,

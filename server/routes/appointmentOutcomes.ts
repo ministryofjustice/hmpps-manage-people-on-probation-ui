@@ -41,7 +41,7 @@ import {
   getOutcomeSentence,
   getFailedToAttendTicket,
   getTicket,
-  changeActionsReset,
+  resetEnforcementActionSelection,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -150,7 +150,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.post(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     validate.appointmentOutcomes,
-    changeActionsReset,
+    resetEnforcementActionSelection,
     autoStoreSessionData(hmppsAuthClient),
   )
 

@@ -279,6 +279,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
+  showLetterTypeOptions: boolean
   currentEnforcementAction?: CurrentEnforcementAction
   currentOutcome?: CurrentOutcome
   breachOrRecallWarning?: BreachOrRecallWarning | null

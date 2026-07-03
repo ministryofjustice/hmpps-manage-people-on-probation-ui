@@ -26,8 +26,11 @@ export const resetSelectedActions = (actionKeys: EnforcementActionPage[] = null)
           }
         }
       }
-      if (isEnforcementActionPageKey(actionKey)) {
-        setDataValue(data, [...path, actionKey], null)
+      if (
+        isEnforcementActionPageKey(actionKey) &&
+        req?.session?.data?.appointments?.[crn]?.[id]?.outcome?.[actionKey]
+      ) {
+        delete req.session.data.appointments[crn][id].outcome[actionKey]
       }
     })
     if (deleteCodes.length) {
