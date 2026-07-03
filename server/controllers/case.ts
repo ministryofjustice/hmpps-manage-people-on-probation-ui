@@ -45,7 +45,7 @@ const caseController: Controller<typeof routes, void> = {
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
-      let personExistsResponse: PersonExistsResponse
+      let personExistsResponse: PersonExistsResponse | undefined
       if (res.locals.flags.enableEMDIOverviewShowGPSData) {
         await getSentences(hmppsAuthClient)(req, res, () => {})
         const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>

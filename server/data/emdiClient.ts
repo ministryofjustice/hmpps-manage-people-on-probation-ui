@@ -1,4 +1,3 @@
-import { HTTPError } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 

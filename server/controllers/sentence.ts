@@ -49,7 +49,7 @@ const sentenceController: Controller<typeof routes, void> = {
       })
       const masClient = new MasApiClient(token)
       const sentenceDetails = await masClient.getSentenceDetails(crn, queryParam)
-      let personExistsResponse: PersonExistsResponse
+      let personExistsResponse: PersonExistsResponse | undefined
       if (res.locals.flags.enableEMDISentencesShowGPSData) {
         const licenceConditions: LicenceCondition[] = sentenceDetails.sentence?.licenceConditions
         const requirements: Requirement[] = sentenceDetails.sentence?.requirements
