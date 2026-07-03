@@ -8,6 +8,7 @@ import { getCheckinOffenderDetails, getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
+import { PersonExistsResponse } from '../data/emdiClient'
 
 const routes = ['getCase'] as const
 
@@ -44,13 +45,15 @@ const caseController: Controller<typeof routes, void> = {
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
+      let personExistsResponse: PersonExistsResponse
       if (res.locals.flags.enableEMDIOverviewShowGPSData) {
         await getSentences(hmppsAuthClient)(req, res, () => {})
         const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
           hasLocationMonitoring(item?.licenceConditions, item?.requirements),
         )
         if (hasLocationMonitoringData) {
-          res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
+          personExistsResponse = await existsInEMDI(crn, token)
+          res.locals.personExistsResponse = personExistsResponse
         }
       }
       return res.render('pages/overview', {
@@ -63,6 +66,7 @@ const caseController: Controller<typeof routes, void> = {
         hasDeceased,
         hasPractitioner,
         canAccessCheckins,
+        locationMonitoringUri: personExistsResponse?.uri,
       })
     }
   },

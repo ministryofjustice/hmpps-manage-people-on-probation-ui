@@ -178,6 +178,7 @@ context('Sentence', () => {
     cy.visit('/case/X000001/sentence?number=3')
     const page = Page.verifyOnPage(SentencePage)
     page.getElementData('licencesEMDILink').should('not.exist')
+    cy.get(`[data-qa=errors]`).should('contain.text', 'Electronic monitoring data is currently unavailable.')
   })
 
   it('Sentence page is rendered with date of death recorded warning', () => {

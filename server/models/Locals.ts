@@ -36,6 +36,7 @@ import {
   EsupervisionUpcomingQuestionsResponse,
   OffenderCheckinsByCRNResponse,
 } from '../data/model/esupervision'
+import { PersonExistsResponse } from '../data/emdiClient'
 
 export interface AppointmentLocals {
   meta: {
@@ -165,7 +166,7 @@ interface Locals {
   feedbackEmail?: string
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
-  locationMonitoringUri?: string
+  personExistsResponse?: PersonExistsResponse
   nextAppointmentLocation?: string
 }
 

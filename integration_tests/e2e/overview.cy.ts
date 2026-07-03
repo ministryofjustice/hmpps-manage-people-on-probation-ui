@@ -139,7 +139,11 @@ context('Overview', () => {
       title: 'Overview page should not be rendered with licence conditions when EMDI API responds with 500',
       setup: () => cy.task('stubEMDIPeopleExists500Response', 'X778160'),
       url: '/case/X778160',
-      assertions: expectNoEMDILinks,
+      assertions: page => {
+        page.getElementData('licencesEMDILink').should('not.exist')
+        page.getElementData('requirementsEMDILink').should('not.exist')
+        cy.get(`[data-qa=errors]`).should('contain.text', 'Electronic monitoring data is currently unavailable.')
+      },
     },
     {
       title: 'Overview page should not be rendered with licence conditions when flag is disabled',

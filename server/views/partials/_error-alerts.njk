@@ -14,6 +14,9 @@
 {% if personRisks.errors.length > 0 %}
     {% set errors = errors.concat(personRisks.errors) %}
 {% endif %}
+{% if personExistsResponse.errors | length %}
+    {% set errors = errors.concat(personExistsResponse.errors) %}
+{% endif %}
 {% if errors.length > 0 %}
   {% set errorsHtml %}
     {% if errors.length > 1 %}
@@ -30,8 +33,8 @@
   {{ mojAlert({
     variant: "error",
     title: "There is a problem",
-    showTitleAsHeading: true,
-    dismissible: false,
+    showTitleAsHeading: false,
+    dismissible: true,
     classes: alertClasses,
     attributes: { "data-qa": "errors" },
     html: errorsHtml
