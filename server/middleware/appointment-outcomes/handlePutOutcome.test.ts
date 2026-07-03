@@ -208,6 +208,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       time: start,
       sensitive: true,
       alert: false,
+      notes: '',
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
@@ -228,6 +229,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       outcomeCode,
       sensitive: true,
       alert: false,
+      notes: '',
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
@@ -251,6 +253,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       outcomeCode: 'AFTC',
       sensitive: true,
       alert: true,
+      notes: '',
     }
     const expectedEnforcementActionRequest: EnforcementActionsRequest = { enforcementActions: [{ code: 'ROM' }] }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)

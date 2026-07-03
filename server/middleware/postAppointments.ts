@@ -64,16 +64,15 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       body.licenceConditionId = parseInt(licenceConditionId as string, 10)
     }
 
-    if (res.locals.flags?.enableNonCompliance && outcome?.outcomeCode) {
-      body.outcomeRecorded = true
-    } else if (outcomeRecorded) {
+    if (res.locals.flags?.enableNonCompliance) {
+      body.outcomeRecorded = !!outcome?.outcomeCode
+    } else {
       body.outcomeRecorded = outcomeRecorded === 'Yes'
     }
 
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
-
     const response = await masClient.postAppointments(crn, body)
     let email: string | undefined
     let name: Name
