@@ -44,8 +44,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.get(
     '/case/:crn/arrange-appointment/:id/sentence',
     getAppointmentTypes(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
     getSentences(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
     forceValidation,
     controllers.arrangeAppointments.getSentence(),
   )
@@ -54,6 +54,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     '/case/:crn/arrange-appointment/:id/sentence',
     getAppointmentTypes(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getSentences(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     validate.appointments,
     autoStoreSessionData(hmppsAuthClient),
