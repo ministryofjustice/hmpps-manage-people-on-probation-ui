@@ -130,6 +130,12 @@ describe('/middleware/getAppointment', () => {
           team: '',
           username: '',
         },
+        headerPersonName: {
+          forename: 'Joe',
+        },
+        case: {
+          mobileNumber: '',
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
@@ -218,6 +224,12 @@ describe('/middleware/getAppointment', () => {
           team: '',
           username: '',
         },
+        headerPersonName: {
+          forename: 'Joe',
+        },
+        case: {
+          mobileNumber: '',
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
@@ -288,6 +300,12 @@ describe('/middleware/getAppointment', () => {
         user: {
           username: 'user-1',
         },
+        headerPersonName: {
+          forename: 'Joe',
+        },
+        case: {
+          mobileNumber: '',
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
@@ -333,6 +351,12 @@ describe('/middleware/getAppointment', () => {
         user: {
           username: 'user-1',
         },
+        headerPersonName: {
+          forename: 'Joe',
+        },
+        case: {
+          mobileNumber: '',
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
@@ -370,6 +394,12 @@ describe('/middleware/getAppointment', () => {
       locals: {
         user: {
           username: 'user-1',
+        },
+        headerPersonName: {
+          forename: 'Joe',
+        },
+        case: {
+          mobileNumber: '',
         },
       },
       redirect: jest.fn().mockReturnThis(),
