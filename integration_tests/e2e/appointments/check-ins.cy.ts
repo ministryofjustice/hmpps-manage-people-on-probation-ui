@@ -1027,7 +1027,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
     manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
     manageCheckins.getElementData('methodLabel').should('contain.text', 'Mobile number')
-    manageCheckins.getElementData('methodValue').should('contain.text', '071838893')
+    manageCheckins.getElementData('methodValue').should('contain.text', '07703123456')
 
     manageCheckins.getElementData('photoCard').should('contain.text', 'Photo')
     manageCheckins.getElementData('photoLabel').should('contain.text', 'Photo of Alton')
