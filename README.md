@@ -130,7 +130,7 @@ grep "ruleId" waf-logs/audit.log
 grep "Matched Data:" waf-logs/audit.log
 ```
 
-Alternatively, open `waf-logs/audit.log` directly in your IDE and use find/search for the same terms (e.g. `` against variable `ARGS` ``, `ruleId`, `Matched Data:`).
+Alternatively, open `waf-logs/audit.log` directly in your IDE and use find/search for the same terms (e.g. "against variable `ARGS`", "ruleId", "Matched Data:").
 
 You can also tail the log while reproducing the request:
 
