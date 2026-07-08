@@ -15,22 +15,33 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const { username: loggedInUsername = '' } = res.locals.user
     const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
     const masClient = new MasApiClient(token)
-    const { forename } = res.locals.headerPersonName
-    const { mobileNumber } = res.locals.case
+    let forename
+    let mobileNumber
+    let currentCase
+    if (res.locals.flags?.enableAppointmentsSpeedup) {
+      forename = res.locals.headerPersonName.forename
+      mobileNumber = res.locals.case.mobileNumber
+    } else {
+      currentCase = await masClient.getOverview(crn)
+      forename = currentCase.personalDetails.name.forename
+      mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
+    }
     const { data } = req.session
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
 
     let isVisor
-    if (!req.session?.data?.isVisor?.[crn]) {
-      const currentCase = await masClient.getOverview(crn)
-      isVisor = currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor')
-      req.session.data.isVisor = {
-        ...req.session.data.isVisor,
-        [crn]: isVisor,
+    if (res.locals.flags?.enableAppointmentsSpeedup) {
+      if (!req.session?.data?.isVisor?.[crn]) {
+        currentCase = await masClient.getOverview(crn)
+        isVisor = currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor')
+        req.session.data.isVisor = {
+          ...req.session.data.isVisor,
+          [crn]: isVisor,
+        }
+      } else {
+        isVisor = req.session.data.isVisor[crn]
       }
-    } else {
-      isVisor = req.session.data.isVisor[crn]
     }
 
     let userIsAttending = null
@@ -39,7 +50,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     }
     let appointment: AppointmentLocals = {
       meta: {
-        isVisor,
+        isVisor: res.locals.flags?.enableAppointmentsSpeedup
+          ? isVisor
+          : currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
         forename,
         change: (req?.query?.change as string) ?? null,
         userIsAttending,
