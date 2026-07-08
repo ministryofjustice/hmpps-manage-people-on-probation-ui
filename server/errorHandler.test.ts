@@ -26,9 +26,14 @@ const mockSearchService = {
   get: jest.fn((req, res, next) => next()),
 }
 
+const mockFlagService = {
+  getFlags: jest.fn().mockReturnValue({ enableAppointmentsSpeedup: true }),
+}
+
 const mockServices: Services = {
   technicalUpdatesService: mockTechnicalUpdatesService as any,
   searchService: mockSearchService as any,
+  flagService: mockFlagService as any,
 } as unknown as Services
 
 let app: Express

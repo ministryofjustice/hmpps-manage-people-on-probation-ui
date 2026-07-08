@@ -157,6 +157,9 @@ describe('/middleware/getAppointment', () => {
         case: {
           mobileNumber: '',
         },
+        flags: {
+          enableAppointmentsSpeedup: true,
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
@@ -250,6 +253,9 @@ describe('/middleware/getAppointment', () => {
         },
         case: {
           mobileNumber: '',
+        },
+        flags: {
+          enableAppointmentsSpeedup: false,
         },
       },
       redirect: jest.fn().mockReturnThis(),
