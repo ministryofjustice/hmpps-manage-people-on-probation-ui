@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
@@ -141,6 +142,22 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
+      const eventResponse: any = outlookEventResponse
+      if (eventResponse?.status === 500) {
+        const sentryError =
+          eventResponse?.error ??
+          new Error(eventResponse?.errors?.[0]?.text ?? 'Calendar event creation not successful.')
+        const sentryEventId = Sentry.captureException(sentryError, {
+          tags: {
+            'http.status': '500',
+            'error.type': 'internal_server_error',
+            service: 'Probation Supervision Appointments Api',
+            operation: 'postOutlookCalendarEvent',
+          },
+        })
+        logger.info(`Sentry eventId: ${sentryEventId}`)
+        logger.error(eventResponse?.errors?.[0]?.text, `Failed to create calendar event`)
+      }
     }
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true

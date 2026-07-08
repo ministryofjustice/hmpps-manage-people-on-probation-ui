@@ -1,11 +1,13 @@
 import httpMocks from 'node-mocks-http'
 import { DateTime } from 'luxon'
+import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { postRescheduleAppointments } from './postRescheduleAppointments'
 import { mockAppResponse } from '../controllers/mocks'
+import logger from '../../logger'
 import {
   AppointmentSession,
   AppointmentType,
@@ -24,6 +26,8 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/SupervisionAppointmentClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('@sentry/node')
+jest.mock('../../logger')
 
 const crn = 'X000001'
 const uuid = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
@@ -410,6 +414,29 @@ describe('middleware/postRescheduleAppointments', () => {
         .mockImplementation(() => Promise.resolve({ ...mockEventResponse, id: undefined }))
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       expect(req.session.data.isOutLookEventFailed).toEqual(true)
+    })
+    it('should capture exception and log error if postRescheduleAppointmentEvent returns 500 status', async () => {
+      const errorMessage = 'Rescheduling appointment event not successful.'
+      const [req] = buildRequest()
+      const res = buildResponse()
+      jest.spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent').mockResolvedValueOnce({
+        status: 500,
+        errors: [{ text: errorMessage }],
+      } as any)
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(Sentry.captureException).toHaveBeenCalledWith(
+        expect.any(Error),
+        expect.objectContaining({
+          tags: expect.objectContaining({
+            'http.status': '500',
+            service: 'Probation Supervision Appointments Api',
+            operation: 'postRescheduleAppointmentEvent',
+          }),
+        }),
+      )
+      expect(logger.error).toHaveBeenCalledWith(errorMessage, `Failed to create rescheduling calendar event`)
     })
   })
 
