@@ -22,7 +22,7 @@ generic-service:
          t:none,\
          setvar:tx.paranoia_level=2"
 
-      SecRule REQUEST_URI "@rx ^/case/[^/]+/(?:appointments/appointment/[^/]+/add-note|personal-details/edit-main-address)$" \
+      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/(?:appointments/appointment/[^/]+/add-note|personal-details/edit-main-address)$" \
         "id:100101,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
         ctl:ruleRemoveTargetById=930120;ARGS:notes,\
@@ -34,7 +34,7 @@ generic-service:
         ctl:ruleRemoveTargetById=942350;ARGS:notes,\
         ctl:ruleRemoveTargetById=942370;ARGS:notes"
 
-      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/(?:arrange-appointment/[^/]+/(?:add-note|supporting-information)|appointments/[^/]+/check-in/(?:review/(?:expired|identity|notes)|view|view-expired))$" \
+      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/(?:arrange-appointment/[^/]+/(?:add-note|supporting-information|outcome/add-note)|appointments/[^/]+/check-in/(?:review/(?:expired|identity|notes)|view|view-expired))$" \
         "id:100102,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
         ctl:ruleRemoveTargetById=942430;ARGS,\
@@ -47,7 +47,7 @@ generic-service:
 
       SecRule REQUEST_METHOD "@streq POST" \
       "id:100103,phase:1,pass,nolog,chain"
-      SecRule REQUEST_URI "@rx ^/case/[^/]+/appointments/appointment/[^/]+/outcome/add-note$" \
+      SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/appointment/[^/]+/outcome/add-note$" \
         "ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
           ctl:ruleRemoveTargetById=930120;ARGS,\
           ctl:ruleRemoveTargetById=932230;ARGS,\
