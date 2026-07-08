@@ -15,7 +15,9 @@ const mockAppt: AppointmentSession = {
   user: {
     locationCode: 'NE5',
     teamCode: 'NE5TTT',
+    providerCode: 'NE',
     username: 'user-1',
+    name: { forename: 'user', surname: '1' },
   },
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
@@ -25,6 +27,9 @@ const mockAppt: AppointmentSession = {
     previousStart: '',
     previousEnd: '',
   },
+  requirementId: '1',
+  licenceConditionId: '2',
+  nsiId: '3',
 }
 
 const username = 'user-1'
@@ -79,6 +84,9 @@ const mockSentences = [
       endDate: '2024-12-01',
       startDate: '2023-12-01',
     },
+    requirements: [{ requirementId: 1, description: 'Requirement 1' }],
+    licenceConditions: [{ licenceConditionId: 2, description: 'License Condition 1' }],
+    nsis: [{ nsiId: 3, description: 'NSI 1' }],
   },
 ] as unknown as Sentence[]
 
@@ -98,6 +106,9 @@ describe('/middleware/getAppointment', () => {
       },
       session: {
         data: {
+          isVisor: {
+            [crn]: false,
+          },
           appointments: {
             [crn]: {
               '100': mockAppt,
@@ -108,13 +119,23 @@ describe('/middleware/getAppointment', () => {
             [crn]: mockSentences,
           },
           providers: {
-            [username]: [],
+            [username]: [
+              {
+                code: 'NE',
+                description: 'NE provider',
+              },
+            ],
           },
           teams: {
-            [username]: [],
+            [username]: [
+              {
+                code: 'NE5TTT',
+                description: 'NE5TTT team',
+              },
+            ],
           },
           staff: {
-            [username]: [],
+            [username]: [{}],
           },
         },
       },
@@ -163,7 +184,7 @@ describe('/middleware/getAppointment', () => {
         forename: null,
         mobileNumber: '',
       },
-      attending: { name: '', team: '', region: '', html: '' },
+      attending: { name: 'user 1', team: 'NE5TTT team', region: '', html: 'user 1 (NE5TTT team)' },
       location: '',
       textMessageConfirmation: 'Yes',
       date: '2044-12-22T09:15:00.382936Z[Europe/London]',
@@ -257,7 +278,7 @@ describe('/middleware/getAppointment', () => {
         forename: null,
         mobileNumber: '',
       },
-      attending: { name: '', team: '', region: '', html: '' },
+      attending: { name: 'user 1', team: '', region: '', html: 'user 1' },
       location: '',
       textMessageConfirmation: 'Yes',
       date: '2044-12-22T09:15:00.382936Z[Europe/London]',
