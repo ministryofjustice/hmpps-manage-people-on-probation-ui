@@ -23,6 +23,7 @@ export interface PersonalDetailsSession {
 }
 
 export interface Data {
+  alertDismissed?: boolean
   isOutLookEventFailed?: any
   isEnglishNotificationFailed?: boolean
   isWelshNotificationFailed?: boolean

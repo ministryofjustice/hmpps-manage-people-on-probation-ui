@@ -1,8 +1,6 @@
 import { type Router } from 'express'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import {
   autoStoreSessionData,
-  getPersonalDetails,
   getOfficeLocationsByTeamAndProvider,
   getSentences,
   getAppointmentTypes,
@@ -11,7 +9,6 @@ import {
   getUserOptions,
   routeChangeAttendee,
   getSmsPreview,
-  getPersonRiskFlags,
   getOverdueOutcomes,
   getPersonAppointment,
   handlePostAppointment,
@@ -29,16 +26,14 @@ import {
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
 import { getTimeOptions } from '../middleware/getTimeOptions'
-import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
-import { dateIsInPast } from '../utils'
 import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
+import { dismissAlert } from '../middleware/dismissAlert'
+import { checkIsInPast } from '../middleware/isInPast'
 
-const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
-  const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
-
+const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   router.get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
 
   router.get(
@@ -317,17 +312,9 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   /* ----------------- 👆 -----------------  */
 
-  router.post('/alert/dismiss', (req, res) => {
-    req.session.alertDismissed = true
-    return res.json({ success: true })
-  })
+  router.post('/alert/dismiss', dismissAlert)
 
-  router.post('/appointment/is-in-past', (req, res) => {
-    const { date, time = '' } = req.body
-    const alertDismissed = req?.session?.alertDismissed
-    const { isInPast, isToday } = dateIsInPast(date, time)
-    return res.json({ isInPast, isToday, alertDismissed })
-  })
+  router.post('/appointment/is-in-past', checkIsInPast)
 }
 
 export default arrangeAppointmentRoutes
