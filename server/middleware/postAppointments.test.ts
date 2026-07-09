@@ -1,9 +1,11 @@
 import httpMocks from 'node-mocks-http'
+import * as Sentry from '@sentry/node'
 import { postAppointments, buildCaseLink } from './postAppointments'
 import { dateTime, isoFromDateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
+import logger from '../../logger'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
@@ -29,6 +31,8 @@ jest.mock('../data/SupervisionAppointmentClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('../services/flagService')
+jest.mock('@sentry/node')
+jest.mock('../../logger')
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
@@ -473,6 +477,35 @@ describe('/middleware/postAppointments', () => {
 
         expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
         checkOutlookEventRequest()
+      })
+      it('should capture exception and log error if postOutlookCalendarEvent returns 500 status', async () => {
+        const errorMessage = 'Calendar event creation not successful.'
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce({
+            status: 500,
+            errors: [{ text: errorMessage }],
+          } as any)
+
+        const mockReq = createMockReq(mockAppointment)
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              'http.status': '500',
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postOutlookCalendarEvent',
+            }),
+          }),
+        )
+        expect(logger.warn).toHaveBeenCalledWith(
+          expect.objectContaining({ apiErrors: [{ text: errorMessage }] }),
+          'Failed to create calendar event',
+        )
       })
     })
     describe('Attending user does not have email', () => {
