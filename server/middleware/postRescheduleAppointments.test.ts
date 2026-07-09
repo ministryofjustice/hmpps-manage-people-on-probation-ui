@@ -436,7 +436,10 @@ describe('middleware/postRescheduleAppointments', () => {
           }),
         }),
       )
-      expect(logger.error).toHaveBeenCalledWith(errorMessage, `Failed to create rescheduling calendar event`)
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ apiErrors: [{ text: errorMessage }] }),
+        'Failed to create rescheduling calendar event',
+      )
     })
   })
 

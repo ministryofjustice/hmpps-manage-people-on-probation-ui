@@ -502,7 +502,10 @@ describe('/middleware/postAppointments', () => {
             }),
           }),
         )
-        expect(logger.error).toHaveBeenCalledWith(errorMessage, `Failed to create calendar event`)
+        expect(logger.warn).toHaveBeenCalledWith(
+          expect.objectContaining({ apiErrors: [{ text: errorMessage }] }),
+          'Failed to create calendar event',
+        )
       })
     })
     describe('Attending user does not have email', () => {

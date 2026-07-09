@@ -156,7 +156,10 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           },
         })
         logger.info(`Sentry eventId: ${sentryEventId}`)
-        logger.error(eventResponse?.errors?.[0]?.text, `Failed to create calendar event`)
+        logger.warn(
+          { sentryEventId, apiError: eventResponse?.error, apiErrors: eventResponse?.errors },
+          'Failed to create calendar event',
+        )
       }
     }
     // Setting isOutLookEventFailed to display error based on API responses.

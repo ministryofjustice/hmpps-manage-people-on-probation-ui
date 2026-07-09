@@ -136,7 +136,10 @@ export const postRescheduleAppointments = (
           },
         })
         logger.info(`Sentry eventId: ${sentryEventId}`)
-        logger.error(outlookEventResponse?.errors?.[0]?.text, `Failed to create rescheduling calendar event`)
+        logger.warn(
+          { sentryEventId, apiError: outlookEventResponse?.error, apiErrors: outlookEventResponse?.errors },
+          'Failed to create rescheduling calendar event',
+        )
       }
     }
 
