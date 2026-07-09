@@ -23,4 +23,5 @@ export class FeatureFlags {
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
   enableEsupervisionEligibility?: boolean = undefined
   enableEsupervisionRationale?: boolean = undefined
+  enableAppointmentsSpeedup?: boolean = undefined
 }
