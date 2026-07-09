@@ -3,6 +3,8 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
+import { logSessionCacheChange } from '../utils/logSessionCacheChange'
+import logger from '../../logger'
 
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
@@ -125,12 +127,23 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     res.locals.userStaff = userOptions
     res.locals.providerCode = selectedProvider
     res.locals.teamCode = selectedTeam
+    logger.info(`[getUserOptions] uuid='${id}' username='${username}' calledWithNext=${Boolean(next)}`)
     if (!next) {
+      logger.info(
+        `[getUserOptions] uuid='${id}' adding staff/team/provider cache to session for username='${username}'`,
+      )
+      const context = { uuid: id, username }
+      logSessionCacheChange('getUserOptions', data, ['providers', username], providerOptions, context)
+      logSessionCacheChange('getUserOptions', data, ['teams', username], teamOptions, context)
+      logSessionCacheChange('getUserOptions', data, ['staff', username], userOptions, context)
       setDataValue(data, ['providers', username], providerOptions)
       setDataValue(data, ['teams', username], teamOptions)
       setDataValue(data, ['staff', username], userOptions)
       return null
     }
+    logger.info(
+      `[getUserOptions] uuid='${id}' called as middleware - NOT adding staff cache to session for username='${username}'`,
+    )
     return next()
   }
 }
