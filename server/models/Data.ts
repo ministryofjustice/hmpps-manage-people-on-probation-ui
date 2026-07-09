@@ -23,9 +23,13 @@ export interface PersonalDetailsSession {
 }
 
 export interface Data {
+  alertDismissed?: boolean
   isOutLookEventFailed?: any
   isEnglishNotificationFailed?: boolean
   isWelshNotificationFailed?: boolean
+  isVisor?: {
+    [crn: string]: boolean
+  }
   temp?: {
     [crn: string]: {
       linkedContactId?: string
