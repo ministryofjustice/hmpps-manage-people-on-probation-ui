@@ -1098,22 +1098,25 @@ context('check-ins overview and manage pages', () => {
     appointmentsPage.checkOnPage()
   })
 
-  it('should be able to stop check in', () => {
+  it('should redirect to new stop check-in journey when feature flag is enabled', () => {
     cy.task('resetMocks')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
+
+    cy.intercept(
+      'GET',
+      '/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/stop-checkin',
+    ).as('stopCheckinRedirect')
+
     manageCheckins.getElementData('stop-checkin-btn').click()
-    const stopCheckIn = new StopCheckins()
-    stopCheckIn.getSubmitBtn().click()
-    stopCheckIn.checkErrorSummaryBox([
-      'Enter the reason for stopping',
-      'Select yes if the reason for stopping includes sensitive information',
-    ])
-    stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
-    stopCheckIn.getElementData('sensitiveContact').find('input[type="radio"][value="false"]').click({ force: true })
-    stopCheckIn.getSubmitBtn().click()
-    manageCheckins.checkOnPage()
+
+    cy.wait('@stopCheckinRedirect').then(({ response }) => {
+      expect(response?.statusCode).to.be.oneOf([302, 303])
+      expect(response?.headers.location).to.eq(
+        'http://localhost:9091/esupervision-manage-checkins/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/stop-checkin',
+      )
+    })
   })
 
   it('should be able to stop and restart online check ins', () => {

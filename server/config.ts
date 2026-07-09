@@ -120,6 +120,13 @@ export default {
       requiredInProduction,
     ),
   },
+  eSupervisionManageCheckins: {
+    link: get(
+      'ESUPERVISION_MANAGE_CHECKINS_LINK',
+      'https://manage-online-check-ins-ui-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+  },
   epf2: {
     link: get('EPF2_LINK', 'https://epf.linkspace.uk', requiredInProduction),
   },
