@@ -16,8 +16,12 @@ context('Record an outcome', () => {
     it('page is rendered', () => {
       loadPage()
       recordAnOutcomePage = new RecordAnOutcomePage()
-      recordAnOutcomePage.checkPageTitle('Which appointment are you recording an outcome for?')
+      recordAnOutcomePage.checkPageTitle('Record an outcome')
       cy.get('[data-qa="outcomes-form"]').find('.govuk-radios__item').should('have.length', 2)
+      cy.get('[data-qa="outcomes-form"] legend').should(
+        'contain.text',
+        'Which appointment are you recording an outcome for?',
+      )
       cy.get('label[for="appointment-id"]')
         .should('contain.text', 'Phone call with Archibald Queeny')
         .should('contain.text', 'Saturday 21 March 2026 from 10:15am to 10:30am')
