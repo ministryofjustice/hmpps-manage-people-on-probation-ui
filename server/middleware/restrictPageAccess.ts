@@ -43,8 +43,6 @@ export const restrictPageAccess = ({
       },
     }
     const { dataPath, redirectPath, restartPath, queryParam } = mapping[route]
-    console.log(redirectPath)
-    console.log(findUncompleted()(req, res as AppResponse))
     const { data } = req.session
     if (!isValidCrn(crn) || !isValidUUID(id)) {
       return renderError(404)(req, res)
