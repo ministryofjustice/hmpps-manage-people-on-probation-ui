@@ -31,8 +31,8 @@ const buildPathString = (path: (string | number)[], uuid?: string, crn?: string)
     })
     .join('.')
 
-// Reference-equality first (cheap, correct for primitives); falls back to JSON.stringify for
-// small objects/arrays. Never throws - returns COMPARISON_FAILED instead of guessing.
+// Reference-equality first (cheap, correct for primitives); falls back to JSON.stringify.
+// Never throws - returns COMPARISON_FAILED instead of guessing.
 const COMPARISON_FAILED = Symbol('comparisonFailed')
 const valuesDiffer = (previousValue: unknown, newValue: unknown): boolean | typeof COMPARISON_FAILED => {
   if (previousValue === newValue) return false
