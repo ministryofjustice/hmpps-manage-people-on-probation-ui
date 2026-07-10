@@ -242,9 +242,18 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
       const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
       const staffMember = staff?.find(person => person.username === username)
-      logger.info(
-        `[postWhoWillAttend] uuid='${id}' loggedInUser='${res.locals.user.username}' selectedUsername='${username}' staffMemberFound=${Boolean(staffMember)}`,
-      )
+      if (res.locals.flags.enableSessionCacheLogging)
+        logger.info(
+          {
+            event: 'sessionCacheTrace',
+            source: 'postWhoWillAttend',
+            uuid: id,
+            loggedInUser: res.locals.user.username,
+            selectedUsername: username,
+            staffMemberFound: Boolean(staffMember),
+          },
+          '[postWhoWillAttend] selection details',
+        )
       if (providerCode) {
         const postWhoWillAttendContext = { uuid: id, username, enabled: res.locals.flags.enableSessionCacheLogging }
         logSessionCacheChange(
