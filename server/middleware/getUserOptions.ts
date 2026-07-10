@@ -129,9 +129,6 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     res.locals.teamCode = selectedTeam
     logger.info(`[getUserOptions] uuid='${id}' username='${username}' calledWithNext=${Boolean(next)}`)
     if (!next) {
-      logger.info(
-        `[getUserOptions] uuid='${id}' adding staff/team/provider cache to session for username='${username}'`,
-      )
       const context = { uuid: id, username, enabled: res.locals.flags.enableSessionCacheLogging }
       logSessionCacheChange('getUserOptions', data, ['providers', username], providerOptions, context)
       logSessionCacheChange('getUserOptions', data, ['teams', username], teamOptions, context)

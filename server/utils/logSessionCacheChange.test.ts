@@ -104,10 +104,7 @@ describe('utils/logSessionCacheChange', () => {
       circular.self = circular
       const data = { providers: { user1: { code: 'N06' } } }
 
-      let action: string
-      expect(() => {
-        action = logSessionCacheChange('testSource', data, ['providers', 'user1'], circular, enabledContext)
-      }).not.toThrow()
+      const action = logSessionCacheChange('testSource', data, ['providers', 'user1'], circular, enabledContext)
 
       expect(action).toEqual('unknown')
       expect(mockedLogger.info).toHaveBeenCalledTimes(1)

@@ -122,9 +122,6 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         : undefined
       if (ppStaff && !sessionStaff.some(u => u?.username?.toLowerCase() === ppStaff.username?.toLowerCase())) {
         sessionStaff.push(ppStaff)
-        logger.info(
-          `[getDefaultUser] uuid='${id}' added probation practitioner to staff cache for username='${username}'`,
-        )
       }
     } else {
       const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
@@ -161,9 +158,6 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           }
         }
         sessionStaff = [...sessionStaff, sessionStaffItem]
-        logger.info(
-          `[getDefaultUser] uuid='${id}' added probation practitioner to staff cache for username='${username}'`,
-        )
       }
     } else {
       attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
