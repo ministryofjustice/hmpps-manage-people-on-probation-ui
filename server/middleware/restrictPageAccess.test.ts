@@ -33,6 +33,7 @@ const mockAppointment: AppointmentSession = {
     teamCode: 'mock-team-code',
     locationCode: 'mock-location-code',
   },
+  eventId: '1234',
   type: 'C084',
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
@@ -150,6 +151,32 @@ describe('/middleware/restrictPageAccess - appointments', () => {
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('type is required, and it is not available but eventID is provided and feature flag getAppointmentsSetup is on', () => {
+    const requiredValues = ['type']
+    beforeEach(() => {
+      const appointment: Partial<AppointmentSession> = {
+        ...mockAppointment.user,
+        type: undefined,
+      }
+      const req = buildRequest({ appointment })
+      const mockRes = {
+        ...res,
+        locals: {
+          ...res.locals,
+          flags: {
+            enableAppointmentsSpeedup: true,
+          },
+        },
+      } as AppResponse
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      restrictPageAccess({ requiredValues })(req, mockRes, nextSpy)
+    })
+    it('should redirect to type page (first uncompleted page)', () => {
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance?`)
     })
   })
 

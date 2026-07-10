@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { Route } from '../@types'
 import { renderError } from './renderError'
+import { findUncompleted } from './findUncompleted'
+import { AppResponse } from '../models/Locals'
 
 type RouteKey = 'appointments' | 'setupcheckins'
 type Mapping = {
@@ -27,7 +29,9 @@ export const restrictPageAccess = ({
     const mapping: Mapping = {
       appointments: {
         dataPath: ['appointments', crn, id],
-        redirectPath: `/case/${crn}/arrange-appointment/${id}/sentence`,
+        redirectPath: res.locals.flags?.enableAppointmentsSpeedup
+          ? findUncompleted()(req, res as AppResponse)
+          : `/case/${crn}/arrange-appointment/${id}/sentence`,
         restartPath: `/case/${crn}/arrange-appointment/sentence`,
         queryParam: 'change',
       },
@@ -39,6 +43,8 @@ export const restrictPageAccess = ({
       },
     }
     const { dataPath, redirectPath, restartPath, queryParam } = mapping[route]
+    console.log(redirectPath)
+    console.log(findUncompleted()(req, res as AppResponse))
     const { data } = req.session
     if (!isValidCrn(crn) || !isValidUUID(id)) {
       return renderError(404)(req, res)

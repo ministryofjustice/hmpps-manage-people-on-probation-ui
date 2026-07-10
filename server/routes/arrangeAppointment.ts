@@ -128,9 +128,9 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, flagS
 
     router.get(
       '/case/:crn/arrange-appointment/:id/location-not-in-list',
+      restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
       getAppointmentTypes(hmppsAuthClient),
       getAppointment(hmppsAuthClient),
-      restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
       controllers.arrangeAppointments.getLocationNotInList(),
     )
 

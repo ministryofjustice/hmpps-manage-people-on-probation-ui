@@ -8,7 +8,6 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const id = uuid || contactId
     const { change } = req.query as Record<string, string>
-    const changeUrl = change ? encodeURIComponent(change) : encodeURIComponent(req.url)
     const data = req?.session?.data ?? {}
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     const dateInPast = appointmentDateIsInPast(req)
@@ -45,9 +44,9 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
         }
       }
       if (appointmentIsIncomplete) {
-        return `/case/${crn}/arrange-appointment/${id}/${redirect}?change=${changeUrl}${forceValidation ? `&validation=true` : ''}`
+        return `/case/${crn}/arrange-appointment/${id}/${redirect}?${change ? `change=${encodeURIComponent(change)}` : ``}${forceValidation ? `&validation=true` : ''}`
       }
     }
-    return decodeURIComponent(changeUrl)
+    return decodeURIComponent(change)
   }
 }
