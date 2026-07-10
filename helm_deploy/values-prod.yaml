@@ -26,6 +26,7 @@ generic-service:
         "id:100101,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
         ctl:ruleRemoveTargetById=930120;ARGS:notes,\
+        ctl:ruleRemoveTargetById=942100;ARGS:notes,\
         ctl:ruleRemoveTargetById=942430;ARGS:notes,\
         ctl:ruleRemoveTargetById=942200;ARGS:notes,\
         ctl:ruleRemoveTargetById=942360;ARGS:notes,\
@@ -37,6 +38,7 @@ generic-service:
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/(?:arrange-appointment/[^/]+/(?:add-note|supporting-information|outcome/add-note)|appointments/[^/]+/check-in/(?:review/(?:expired|identity|notes)|view|view-expired))$" \
         "id:100102,phase:1,pass,nolog,\
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
+        ctl:ruleRemoveTargetById=942100;ARGS,\
         ctl:ruleRemoveTargetById=942430;ARGS,\
         ctl:ruleRemoveTargetById=942200;ARGS,\
         ctl:ruleRemoveTargetById=942360;ARGS,\
@@ -52,6 +54,7 @@ generic-service:
           ctl:ruleRemoveTargetById=932230;ARGS,\
           ctl:ruleRemoveTargetById=932235;ARGS,\
           ctl:ruleRemoveTargetById=932250;ARGS,\
+          ctl:ruleRemoveTargetById=942100;ARGS,\
           ctl:ruleRemoveTargetById=942430;ARGS,\
           ctl:ruleRemoveTargetById=942200;ARGS,\
           ctl:ruleRemoveTargetById=942360;ARGS,\
