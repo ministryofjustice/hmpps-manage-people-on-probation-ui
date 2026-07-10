@@ -37,7 +37,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         teamCode: appointmentSession?.user?.teamCode,
         locationCode: appointmentSession?.user?.locationCode,
       },
-      { uuid },
+      { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
     )
     const {
       user: { username, locationCode, teamCode },

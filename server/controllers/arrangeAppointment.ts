@@ -65,7 +65,7 @@ const resetSessionValues = (req: Request, res: Response) => {
   const { crn, id } = req.params as Record<string, string>
   const { data } = req.session
   const path = ['appointments', crn, id]
-  const context = { uuid: id, username: res.locals.user?.username }
+  const context = { uuid: id, username: res.locals.user?.username, enabled: res.locals.flags.enableSessionCacheLogging }
   const originalDate = getDataValue(data, [...path, 'temp', 'date'])
   const updatedDate = getDataValue(data, [...path, 'date'])
   const smsOptIn = getDataValue<SmsOptInOptions>(data, [...path, 'smsOptIn'])
@@ -120,21 +120,26 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change } = req.query
       const { data } = req.session
       let { back } = req.query
+      const context = {
+        uuid: id,
+        username: res.locals.user?.username,
+        enabled: res.locals.flags.enableSessionCacheLogging,
+      }
 
       if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
-        logSessionCacheChange('getSentence', data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id, {
-          uuid: id,
-          username: res.locals.user?.username,
-        })
+        logSessionCacheChange(
+          'getSentence',
+          data,
+          ['appointments', crn, id, 'eventId'],
+          data?.sentences?.[crn][0].id,
+          context,
+        )
         setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
       }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       if (back) {
-        logSessionCacheChange('getSentence', data, ['backLink', 'sentence'], back, {
-          uuid: id,
-          username: res.locals.user?.username,
-        })
+        logSessionCacheChange('getSentence', data, ['backLink', 'sentence'], back, context)
         setDataValue(data, ['backLink', 'sentence'], back)
       } else {
         back = getDataValue(data, ['backLink', 'sentence'])
@@ -241,7 +246,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         `[postWhoWillAttend] uuid='${id}' loggedInUser='${res.locals.user.username}' selectedUsername='${username}' staffMemberFound=${Boolean(staffMember)}`,
       )
       if (providerCode) {
-        const postWhoWillAttendContext = { uuid: id, username }
+        const postWhoWillAttendContext = { uuid: id, username, enabled: res.locals.flags.enableSessionCacheLogging }
         logSessionCacheChange(
           'postWhoWillAttend',
           data,
@@ -312,7 +317,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const isReschedule = isRescheduleAppointment(req)
       if (change) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
-        const glDtContext = { uuid: id, username: res.locals.user?.username }
+        const glDtContext = {
+          uuid: id,
+          username: res.locals.user?.username,
+          enabled: res.locals.flags.enableSessionCacheLogging,
+        }
         logSessionCacheChange('getLocationDateTime', data, ['appointments', crn, id, 'temp', 'date'], date, glDtContext)
         logSessionCacheChange(
           'getLocationDateTime',
@@ -631,6 +640,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         logSessionCacheChange('getConfirmation', data, ['temp', crn, 'responseContactId'], null, {
           uuid: id,
           username: res.locals.user?.username,
+          enabled: res.locals.flags.enableSessionCacheLogging,
         })
         setDataValue(data, ['temp', crn, 'responseContactId'], null)
       }
