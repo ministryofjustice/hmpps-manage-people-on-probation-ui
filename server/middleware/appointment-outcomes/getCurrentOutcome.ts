@@ -3,12 +3,7 @@ import type { Activity } from '../../data/model/schedule'
 import type { AppointmentOutcomeProps, TagColour } from '../../models/Locals'
 
 type Status =
-  | 'Not started'
-  | 'Complied'
-  | 'Failed to comply'
-  | 'Acceptable absence'
-  | 'Unacceptable absence'
-  | 'Rescheduled'
+  'Not started' | 'Complied' | 'Failed to comply' | 'Acceptable absence' | 'Unacceptable absence' | 'Rescheduled'
 
 export const getCurrentOutcome: Route<void> = (_req, res, next): void => {
   const { appointment } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
