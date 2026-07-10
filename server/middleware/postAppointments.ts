@@ -15,6 +15,7 @@ import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 import logger from '../../logger'
+import { logFieldPresence } from '../utils/logSessionCacheChange'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -23,6 +24,22 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
+    const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    logFieldPresence(
+      'postAppointments',
+      {
+        appointmentSession,
+        user: appointmentSession?.user,
+        type: appointmentSession?.type,
+        date: appointmentSession?.date,
+        start: appointmentSession?.start,
+        end: appointmentSession?.end,
+        eventId: appointmentSession?.eventId,
+        teamCode: appointmentSession?.user?.teamCode,
+        locationCode: appointmentSession?.user?.locationCode,
+      },
+      { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
+    )
     const {
       user: { username, locationCode, teamCode },
       type,
@@ -39,7 +56,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outcomeRecorded,
       smsOptIn,
       outcome,
-    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    } = appointmentSession
 
     const body: AppointmentRequestBody = {
       user: {
@@ -82,7 +99,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (res.locals.flags.enableMAN2344) {
       ;({
         user: { name, email },
-      } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid]))
+      } = appointmentSession)
       ;({ forename: firstName, surname } = name)
 
       if (!email) {
