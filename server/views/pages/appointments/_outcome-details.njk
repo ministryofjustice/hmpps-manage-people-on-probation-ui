@@ -1,5 +1,3 @@
-{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
-
 {% set documents %}
 <ul class="govuk-list">
   {% for document in appointment.documents %}
@@ -9,16 +7,6 @@
   {% endfor %}
 </ul>
 {% endset %}
-
-{% if flags.enableDeepLinks and appointment.type in deepLinkContactTypes and appointment.eventNumber %}
-  {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
-    {% set changeUrl = deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) %}
-  {% else %}
-    {% set changeUrl = deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) %}
-  {% endif %}
-{% else %}
-  {% set changeUrl = deliusDeepLinkUrl('UpdateContact', crn, appointment.id) %}
-{% endif %}
 
 {% set notes = '' %}
 {% set hasNote = appointment.appointmentNote %}
@@ -35,33 +23,11 @@
   rows: [
     {
       key: { html: '<span data-qa="acceptableAbsenceReasonLabel">Reason for absence</span>' },
-      value: { html: '<span data-qa="acceptableAbsenceReasonValue">' + appointment.acceptableAbsenceReason + '</span>' if appointment.acceptableAbsence === true },
-      actions: {
-        items: [
-          {
-            classes: "govuk-link--no-visited-state",
-            attributes: { "target": "_blank", "rel": "external noopener noreferrer", "aria-label":"Change reason for absence for '" + appointmentDisplayName | lower + " on NDelius" },
-            href: changeUrl,
-            text:'Change',
-            visuallyHiddenText: '(opens in new tab)'
-          }
-        ]
-      } if not flags.enableDeepLinks
+      value: { html: '<span data-qa="acceptableAbsenceReasonValue">' + appointment.acceptableAbsenceReason + '</span>' if appointment.acceptableAbsence === true }
     } if appointment.acceptableAbsence,
     {
       key: { html: '<span data-qa="enforcementActionLabel">Enforcement action</span>' },
-      value: { html: '<span data-qa="enforcementActionValue">' + appointment.action + '</span>' },
-      actions: {
-        items: [
-          {
-            classes: "govuk-link--no-visited-state",
-            attributes: { "target": "_blank", "rel": "external noopener noreferrer", "aria-label":"Change enforcement action for '" + appointmentDisplayName | lower + " on NDelius" },
-            href: changeUrl,
-            text:'Change',
-            visuallyHiddenText: '(opens in new tab)'
-          }
-        ]
-      } if not flags.enableDeepLinks
+      value: { html: '<span data-qa="enforcementActionValue">' + appointment.action + '</span>' }
     } if appointment.action,
     {
       key: { html: '<span data-qa="outcomeLabel">Outcome</span>' },
@@ -73,14 +39,7 @@
     } if appointment.didTheyComply === true,
     {
       key: { html:  '<span data-qa="documentsLabel">Documents</span>' },
-      value: { html: '<span data-qa="documentsValue">' + documents + '</span>' },
-      actions: {
-        items: [
-          {
-            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="'+ changeUrl +'" aria-label="Change uploaded documents for ' + appointmentDisplayName | lower + ' appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
-          }
-        ]
-      } if not flags.enableDeepLinks
+      value: { html: '<span data-qa="documentsValue">' + documents + '</span>' }
     } if appointment.documents.length > 0,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
