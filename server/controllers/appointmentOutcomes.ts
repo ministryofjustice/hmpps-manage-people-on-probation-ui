@@ -117,6 +117,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       }
       if (change) redirect = change
       if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+      redirect = `${redirect}?back=${baseOutcomeUrl}/add-note`
       return res.redirect(redirect)
     }
   },

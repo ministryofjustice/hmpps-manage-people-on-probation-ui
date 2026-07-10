@@ -1,6 +1,12 @@
 import { DateTime } from 'luxon'
 import { type Activity } from '../../data/model/schedule'
-import { type AppointmentSession, type AttendedCompliedAppointment } from '../../models/Appointments'
+import {
+  letterEnforcementActions,
+  otherEnforcementActionLetterTypes,
+  OtherEnforcementActionsLetterType,
+  type AppointmentSession,
+  type AttendedCompliedAppointment,
+} from '../../models/Appointments'
 import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
@@ -9,7 +15,6 @@ import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidU
 import { type Document } from '../../data/model/personalDetails'
 import { renderError } from '../renderError'
 import { type ProbationPractitioner } from '../../models/CaseDetail'
-import { enforcementActionMap } from '../../properties/appointment-outcomes'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid } = req.params as Record<string, string>
@@ -69,21 +74,32 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
   const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
   const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction
+  const otherEnforcementAction = appointmentSession?.outcome?.otherEnforcementAction
   const failedToAttend = appointmentSession?.outcome?.failedToAttend
-  const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
   const sendBreachOrRecallLetter = [attendedFailedToComply, unacceptableAbsence, updateEnforcementAction].some(
     value => value === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
   )
-  const sendLetter = [attendedFailedToComply, unacceptableAbsence, failedToAttend, updateEnforcementAction].some(
-    value => ['SEND_LETTER', 'SEND_ANOTHER_LETTER'].includes(value),
-  )
-  const letterActionCodes = Object.values(enforcementActionMap)
-    .filter(({ description }) => description?.toLowerCase().includes('letter sent'))
-    .map(({ code }) => code)
+  const sendLetter = [
+    attendedFailedToComply,
+    unacceptableAbsence,
+    failedToAttend,
+    updateEnforcementAction,
+    otherEnforcementAction,
+  ].some(value => ['SEND_LETTER', 'SEND_ANOTHER_LETTER', ...letterEnforcementActions].includes(value))
 
-  const showLetterTypeOptions =
-    !enforcementActionCode?.length ||
-    (enforcementActionCode?.length && !letterActionCodes.some(code => enforcementActionCode.includes(code)))
+  let showLetterTypeOptions = true
+  if (otherEnforcementAction || updateEnforcementAction) {
+    const letterActionSelected =
+      (otherEnforcementAction &&
+        otherEnforcementActionLetterTypes.includes(otherEnforcementAction as OtherEnforcementActionsLetterType)) ||
+      (updateEnforcementAction &&
+        otherEnforcementActionLetterTypes.includes(updateEnforcementAction as OtherEnforcementActionsLetterType))
+    showLetterTypeOptions = !letterActionSelected
+  }
+
+  const otherAction = [attendedFailedToComply, unacceptableAbsence, failedToAttend, updateEnforcementAction].includes(
+    'DIFFERENT_ACTION',
+  )
 
   const appointmentHintText =
     appointment?.type && appointment?.officer?.name && appointment?.startDateTime
@@ -120,6 +136,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     sendBreachOrRecallLetter,
     sendLetter,
     showLetterTypeOptions,
+    otherAction,
     responseContactId,
     linkedContactId,
   }

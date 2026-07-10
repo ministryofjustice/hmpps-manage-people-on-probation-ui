@@ -33,7 +33,6 @@ import {
   getOutcomeSummary,
   getConfirmation,
   getNotePrepend,
-  resetSelectedActions,
   restrictPageAccess,
   getBreachOrRecallWarning,
   getContactOutcomes,
@@ -70,7 +69,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* create appointment session in manage journey 👇 */
 
-  router.get([manageBasePath, `${manageBasePath}/update-enforcement-action`], createAppointmentSession)
+  // router.get([manageBasePath, `${manageBasePath}/update-enforcement-action`], createAppointmentSession)
 
   /* get the contact outcomes and enforcement actions from api 👇 */
 
@@ -185,7 +184,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* Outcome index 👇 */
 
   router.get([arrangeBasePath, manageBasePath], forceValidation, controllers.appointmentOutcomes.getOutcome())
-  router.post([arrangeBasePath, manageBasePath], resetSelectedActions(), controllers.appointmentOutcomes.postOutcome())
+  router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
 
   /* Attended - failed to comply 👇 */
 
@@ -196,36 +195,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
-  )
-
-  /* Reset secondary enforcement action selections 👇 */
-
-  router.post(
-    [
-      `${arrangeBasePath}/attended-failed-to-comply`,
-      `${manageBasePath}/attended-failed-to-comply`,
-      `${arrangeBasePath}/unacceptable-absence`,
-      `${manageBasePath}/unacceptable-absence`,
-      `${arrangeBasePath}/failed-to-attend`,
-      `${manageBasePath}/failed-to-attend`,
-    ],
-    resetSelectedActions(['otherEnforcementAction']),
-  )
-
-  router.post(
-    [
-      `${arrangeBasePath}/attended-failed-to-comply`,
-      `${manageBasePath}/attended-failed-to-comply`,
-      `${arrangeBasePath}/acceptable-absence`,
-      `${manageBasePath}/acceptable-absence`,
-      `${arrangeBasePath}/unacceptable-absence`,
-      `${manageBasePath}/unacceptable-absence`,
-      `${arrangeBasePath}/failed-to-attend`,
-      `${manageBasePath}/failed-to-attend`,
-      `${arrangeBasePath}/enforcement-action`,
-      `${manageBasePath}/enforcement-action`,
-    ],
-    resetSelectedActions(['breachNSICreatedBy', 'letterSentBy', 'letterType']),
   )
 
   router.post(

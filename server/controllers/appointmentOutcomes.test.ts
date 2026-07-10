@@ -349,7 +349,7 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes()
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith(change)
+      expect(spy).toHaveBeenCalledWith(`${change}?back=/case/X000001/appointments/appointment/1234/outcome/add-note`)
     })
 
     it('should redirect to the check your answers page if arrange appointment journey', async () => {
@@ -357,7 +357,9 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes({ appointmentOutcome: { uuid, contactId: undefined, id: uuid } })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/arrange-appointment/${uuid}/check-your-answers?back=/case/X000001/appointments/appointment/1234/outcome/add-note`,
+      )
     })
     it('should redirect to the check your answers page if manage journey and next appointment has not been arranged', async () => {
       const req = mockReq()
@@ -370,7 +372,9 @@ describe('controllers/appointmentOutcomes', () => {
       })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/next-appointment`)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/appointments/appointment/${contactId}/outcome/next-appointment?back=/case/X000001/appointments/appointment/1234/outcome/add-note`,
+      )
     })
     it('should redirect to the check your answers page if manage journey and next appointment arranged', async () => {
       const req = mockReq({ linkedContactId: contactId })
@@ -383,7 +387,9 @@ describe('controllers/appointmentOutcomes', () => {
       })
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers?back=/case/X000001/appointments/appointment/1234/outcome/add-note`,
+      )
     })
     it('should redirect to the confirmation page when postCheckYourAnswers is called', async () => {
       const req = mockReq()
