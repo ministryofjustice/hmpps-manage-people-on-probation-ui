@@ -11,14 +11,13 @@ import {
   getAppointmentTypes,
   getOfficeLocationsByTeamAndProvider,
   getOverdueOutcomes,
-  getPersonalDetails,
   getPersonAppointment,
   getSentences,
   getUserProviders,
 } from '../middleware'
 import validate from '../middleware/validation'
 
-const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
+const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get(
