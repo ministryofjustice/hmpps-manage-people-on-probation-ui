@@ -4,7 +4,7 @@ import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 
-export default function personalDetailRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function personalDetailRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], handler: Route<void>) => router.post(path, asyncMiddleware(handler))
 

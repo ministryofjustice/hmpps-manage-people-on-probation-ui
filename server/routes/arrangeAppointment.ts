@@ -175,7 +175,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, flagS
       controllers.arrangeAppointments.postSupportingInformation(),
     )
 
-    // WHAT IS THIS ROUTE?
     router.get(
       '/case/:crn/appointments/appointment/:contactId/check-your-answers',
       getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
@@ -263,7 +262,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, flagS
     router.post(
       '/case/:crn/arrange-appointment/:id/confirmation',
       getAppointmentTypes(hmppsAuthClient),
-      getAppointment(hmppsAuthClient),
       getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
       getAppointment(hmppsAuthClient),
       controllers.arrangeAppointments.postConfirmation(),

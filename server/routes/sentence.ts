@@ -3,9 +3,8 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
-import { getPersonalDetails } from '../middleware'
 
-export default function sentenceRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get('/case/:crn/sentence', controllers.sentence.getSentence(hmppsAuthClient))
