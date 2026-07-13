@@ -291,7 +291,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
           setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         }
-        // MIDDLEWARE CALLED AGAIN WITHIN CONTROLLER
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
         await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)

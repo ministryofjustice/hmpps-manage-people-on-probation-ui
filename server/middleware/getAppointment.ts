@@ -15,34 +15,12 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const { username: loggedInUsername = '' } = res.locals.user
     const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
     const masClient = new MasApiClient(token)
-    let forename
-    let mobileNumber
-    let currentCase
-    if (res.locals.flags?.enableAppointmentsSpeedup) {
-      forename = res.locals.headerPersonName.forename
-      mobileNumber = res.locals.case.mobileNumber
-    } else {
-      currentCase = await masClient.getOverview(crn)
-      forename = currentCase.personalDetails.name.forename
-      mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
-    }
+    const currentCase = await masClient.getOverview(crn)
+    const { forename } = currentCase.personalDetails.name
+    const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
     const { data } = req.session
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
-
-    let isVisor
-    if (res.locals.flags?.enableAppointmentsSpeedup) {
-      if (req.session?.data?.isVisor?.[crn] === undefined) {
-        currentCase = await masClient.getOverview(crn)
-        isVisor = currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor')
-        req.session.data.isVisor = {
-          ...req.session.data.isVisor,
-          [crn]: isVisor,
-        }
-      } else {
-        isVisor = req.session.data.isVisor[crn]
-      }
-    }
 
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
@@ -50,9 +28,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     }
     let appointment: AppointmentLocals = {
       meta: {
-        isVisor: res.locals.flags?.enableAppointmentsSpeedup
-          ? isVisor
-          : currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
+        isVisor: currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
         forename,
         change: (req?.query?.change as string) ?? null,
         userIsAttending,
