@@ -76,6 +76,7 @@ generic-service:
     E_SUPERVISION_API_URL: 'https://esupervision-api-dev.hmpps.service.justice.gov.uk'
     EMDI_API_URL: 'https://electronic-monitoring-data-insights-api-dev.hmpps.service.justice.gov.uk'
     ESUPERVISION_GUIDANCE_LINK: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk'
+    ESUPERVISION_MANAGE_CHECKINS_LINK: 'https://manage-online-check-ins-ui-dev.hmpps.service.justice.gov.uk'
     CHAR_COUNT: 12000
     ENVIRONMENT_NAME: DEV
     ENVIRONMENT: dev

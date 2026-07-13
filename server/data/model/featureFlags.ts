@@ -21,4 +21,5 @@ export class FeatureFlags {
   enableEnforcementContacts?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
   enableSessionCacheLogging?: boolean = undefined
+  enableESUPCheckinNewStop?: boolean = undefined
 }

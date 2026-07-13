@@ -75,6 +75,7 @@ generic-service:
     E_SUPERVISION_API_URL: 'https://esupervision-api-preprod.hmpps.service.justice.gov.uk'
     EMDI_API_URL: 'https://electronic-monitoring-data-insights-api-preprod.hmpps.service.justice.gov.uk'
     ESUPERVISION_GUIDANCE_LINK: 'https://probation-check-in-preprod.hmpps.service.justice.gov.uk'
+    ESUPERVISION_MANAGE_CHECKINS_LINK: 'https://manage-online-check-ins-ui-preprod.hmpps.service.justice.gov.uk'
     CHAR_COUNT: 12000
     ENVIRONMENT_NAME: PRE-PRODUCTION
     ENVIRONMENT: preprod

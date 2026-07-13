@@ -1094,6 +1094,13 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const isEnabledESUPCheckinNewStop = res.locals.flags?.enableESUPCheckinNewStop === true
+      if (isEnabledESUPCheckinNewStop) {
+        const eSupervisionManageCheckinsUrl = config.eSupervisionManageCheckins.link.replace(/\/$/, '')
+        return res.redirect(
+          `${eSupervisionManageCheckinsUrl}/case/${crn}/appointments/check-in/manage/${id}/stop-checkin`,
+        )
+      }
       return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
     }
   },
@@ -1398,6 +1405,16 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+
+      const isEnabledESUPCheckinNewStop = res.locals.flags?.enableESUPCheckinNewStop === true
+
+      if (isEnabledESUPCheckinNewStop) {
+        const eSupervisionManageCheckinsUrl = config.eSupervisionManageCheckins.link.replace(/\/$/, '')
+
+        return res.redirect(
+          `${eSupervisionManageCheckinsUrl}/case/${crn}/appointments/check-in/manage/${id}/stop-checkin`,
+        )
       }
 
       const reasonData = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])

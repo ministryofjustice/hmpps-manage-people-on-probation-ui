@@ -417,6 +417,38 @@ const stubFeatureFlag = ({ key, enabled }: { key: string; enabled: boolean }): S
     },
   })
 
+const stubEnableESUPCheckinNewStop = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          {
+            key: 'enableESUPCheckinNewStop',
+            name: 'enableESUPCheckinNewStop',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-07-08T12:00:00.000000Z',
+            updatedAt: '2026-07-08T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubEnableESuperVision,
   stubDisableSmsReminders,
@@ -429,4 +461,5 @@ export default {
   stubDisableEMDIOverviewShowGPSData,
   stubDisableEnforcementContacts,
   stubFeatureFlag,
+  stubEnableESUPCheckinNewStop,
 }
