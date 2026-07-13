@@ -29,7 +29,7 @@ export const getPersonalDetails = (
     let riskData: RiskData
     let probationPractitioner: ProbationPractitioner
     let token: string | undefined
-    if (!req?.session?.data?.personalDetails?.[crn] || process.env.NODE_ENV === 'development') {
+    if (!req?.session?.data?.personalDetails?.[crn]) {
       const { username } = res.locals.user
       token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)

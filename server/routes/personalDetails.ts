@@ -3,9 +3,8 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
-import { getPersonalDetails } from '../middleware'
 
-export default function personalDetailRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function personalDetailRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], handler: Route<void>) => router.post(path, asyncMiddleware(handler))
 
@@ -30,13 +29,11 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   router.get(
     '/case/:crn/personal-details/staff-contacts',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
     controllers.personalDetails.getStaffContacts(hmppsAuthClient),
   )
 
   router.get(
     '/case/:crn/personal-details/personal-contact/:id',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
     controllers.personalDetails.getPersonalContact(hmppsAuthClient),
   )
 
@@ -50,11 +47,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
     controllers.personalDetails.getMainAddressNote(hmppsAuthClient),
   )
 
-  router.get(
-    '/case/:crn/personal-details/addresses',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    controllers.personalDetails.getAddresses(hmppsAuthClient),
-  )
+  router.get('/case/:crn/personal-details/addresses', controllers.personalDetails.getAddresses(hmppsAuthClient))
 
   get(
     '/case/:crn/personal-details/addresses/:addressId/note/:noteId',
@@ -68,33 +61,21 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   get('/case/:crn/handoff/:system', controllers.personalDetails.getHandoff(hmppsAuthClient))
 
-  router.get(
-    '/case/:crn/personal-details/disabilities',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    controllers.personalDetails.getDisabilities(hmppsAuthClient),
-  )
+  router.get('/case/:crn/personal-details/disabilities', controllers.personalDetails.getDisabilities(hmppsAuthClient))
 
   get(
     '/case/:crn/personal-details/disability/:disabilityId/note/:noteId',
     controllers.personalDetails.getDisabilitiesNote(hmppsAuthClient),
   )
 
-  router.get(
-    '/case/:crn/personal-details/adjustments',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    controllers.personalDetails.getAdjustments(hmppsAuthClient),
-  )
+  router.get('/case/:crn/personal-details/adjustments', controllers.personalDetails.getAdjustments(hmppsAuthClient))
 
   get(
     '/case/:crn/personal-details/adjustments/:adjustmentId/note/:noteId',
     controllers.personalDetails.getAdjustmentsNote(hmppsAuthClient),
   )
 
-  router.get(
-    '/case/:crn/personal-details/circumstances',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    controllers.personalDetails.getCircumstances(hmppsAuthClient),
-  )
+  router.get('/case/:crn/personal-details/circumstances', controllers.personalDetails.getCircumstances(hmppsAuthClient))
 
   get(
     '/case/:crn/personal-details/circumstances/:circumstanceId/note/:noteId',

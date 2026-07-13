@@ -3,24 +3,18 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
-import { getPersonalDetails } from '../middleware'
 
-export default function sentenceRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get('/case/:crn/sentence', controllers.sentence.getSentence(hmppsAuthClient))
 
   get('/case/:crn/sentence/probation-history', controllers.sentence.getProbationHistory(hmppsAuthClient))
 
-  router.get(
-    '/case/:crn/sentence/previous-orders',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    controllers.sentence.getPreviousOrders(hmppsAuthClient),
-  )
+  router.get('/case/:crn/sentence/previous-orders', controllers.sentence.getPreviousOrders(hmppsAuthClient))
 
   router.get(
     '/case/:crn/sentence/previous-orders/:eventNumber',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
     controllers.sentence.getPreviousOrderDetails(hmppsAuthClient),
   )
 

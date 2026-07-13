@@ -9,12 +9,12 @@ import {
   createAppointmentSession,
   getAppointmentTypes,
   getSentences,
-  getPersonalDetails,
   getNextComAppointment,
   getAppointment,
   getUserProviders,
   forceValidation,
   getOverdueOutcomes,
+  getOfficeLocationsByTeamAndProvider,
 } from '../middleware'
 
 import {
@@ -47,12 +47,18 @@ import {
 import validate from '../middleware/validation/index'
 import { handleOutcomePageRedirect } from '../middleware/appointment-outcomes/handleOutcomePageRedirect'
 
-export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const arrangeBasePath = '/case/:crn/arrange-appointment/:id/outcome'
   const manageBasePath = '/case/:crn/appointments/appointment/:contactId/outcome'
 
   /* restrict page access if required session data is not present 👇  */
+
+  router.get(
+    [arrangeBasePath, `${arrangeBasePath}/*path`],
+    getAppointmentTypes(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
 
   router.get(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
@@ -148,6 +154,13 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* validate outcome options and store session data on all outcome post routes 👇  */
 
   router.post(
+    [arrangeBasePath, `${arrangeBasePath}/*path`],
+    getAppointmentTypes(hmppsAuthClient),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
+
+  router.post(
     [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     validate.appointmentOutcomes,
     resetEnforcementActionSelection,
@@ -189,10 +202,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Attended - failed to comply 👇 */
 
-  router.all(
-    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-  )
   router.get(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
