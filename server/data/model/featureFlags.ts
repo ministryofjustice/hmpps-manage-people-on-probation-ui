@@ -21,7 +21,5 @@ export class FeatureFlags {
   enableCaseloadV2?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
-  enableEsupervisionEligibility?: boolean = undefined
-  enableEsupervisionRationale?: boolean = undefined
   enableSessionCacheLogging?: boolean = undefined
 }

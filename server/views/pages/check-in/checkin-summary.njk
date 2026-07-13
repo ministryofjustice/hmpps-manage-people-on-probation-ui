@@ -91,7 +91,6 @@
     {%  block pageContent %}
     {% set summaryRows = [] %}
 
-    {% if isRationaleEnabled %}
     {% set _ = summaryRows.push({
         key: {
         html: rationaleLabel
@@ -110,7 +109,6 @@
         }]
         }
     }) %}
-    {% endif %}
 
     {% set _ = summaryRows.push(
     {

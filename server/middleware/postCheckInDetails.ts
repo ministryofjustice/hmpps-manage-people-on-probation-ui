@@ -11,8 +11,6 @@ export const postCheckInDetails = (
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<{ setup: OffenderSetup; uploadLocation: UploadLocationResponse }>> => {
   return async (req, res) => {
-    const isEligibilityEnabled = res.locals.flags?.enableEsupervisionEligibility === true
-    const isRationaleEnabled = res.locals.flags?.enableEsupervisionRationale === true
     const { crn, id } = req.params as Record<string, string>
     // The browser sends a base64-encoded SHA-256 digest (see assets/js/photo.js sha256Base64).
     // S3 enforces the matching x-amz-checksum-sha256 on the PUT, so we only guard presence here.
@@ -43,12 +41,8 @@ export const postCheckInDetails = (
       checkinInterval: savedUserDetails.interval,
       startedAt: new Date().toISOString(),
       contactPreference: savedUserDetails.preferredComs,
-      ...(isEligibilityEnabled && {
-        eligibilityChoice: savedUserDetails.eligibilityChoice,
-      }),
-      ...(isRationaleEnabled && {
-        rationale: savedUserDetails.rationale,
-      }),
+      eligibilityChoice: savedUserDetails.eligibilityChoice,
+      rationale: savedUserDetails.rationale,
     }
     logger.info('Checkin Registration started')
     try {
