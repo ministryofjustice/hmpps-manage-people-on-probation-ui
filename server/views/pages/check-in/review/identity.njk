@@ -93,7 +93,6 @@
         </dl>
 
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
-            {% if flags.enableShowMatchWithConcern === true %}
                 {{ govukRadios({
                     fieldset: {
                         legend: {
@@ -124,31 +123,6 @@
                         }
                     ]
                 } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'manualIdCheck'])) }}
-            {% else %}
-                {{ govukRadios({
-                    fieldset: {
-                        legend: {
-                            text: 'Is the person in the image from the check in ' + checkIn.personalDetails.name.forename + '?',
-                            classes: "govuk-label--m govuk-!-font-weight-bold"
-                        }
-                    },
-                    formGroup: {
-                        attributes: {
-                            'data-qa': 'confirmIdentity'
-                        }
-                    },
-                    items: [
-                        {
-                            value: "MATCH",
-                            text: "Yes"
-                        },
-                        {
-                            value: "NO_MATCH",
-                            text: "No"
-                        }
-                    ]
-                } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'manualIdCheck'])) }}
-            {% endif %}
 
             <div class="govuk-button-group">
                 {{ govukButton({
