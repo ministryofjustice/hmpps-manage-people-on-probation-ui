@@ -533,7 +533,7 @@ const stubEnableESUPCheckinNewStop = (): SuperAgentRequest =>
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2026-07-08T12:00:00.000000Z',
-            updatedAt: '2026-06-08T12:00:00.000000Z',
+            updatedAt: '2026-07-08T12:00:00.000000Z',
             rules: [],
             rollouts: [],
           },

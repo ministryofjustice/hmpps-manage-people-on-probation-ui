@@ -1100,6 +1100,7 @@ context('check-ins overview and manage pages', () => {
 
   it('should redirect to new stop check-in journey when feature flag is enabled', () => {
     cy.task('resetMocks')
+    cy.task('stubFeatureFlag', { key: 'enableESUPCheckinNewStop', enabled: true })
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
