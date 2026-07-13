@@ -2,8 +2,10 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
+import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 import { Team, User } from '../data/model/caseload'
 import { Name } from '../data/model/personalDetails'
+import logger from '../../logger'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, res, next) => {
@@ -46,6 +48,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     if (!providerCode || !teamCode || !attendingUsername) {
       sessionTeams = teams
       sessionStaff = users
+      logger.info(`[getDefaultUser] uuid='${id}' username='${username}' resolving default attending user`)
       if (probationPractitioner.unallocated === false) {
         attendingUsername = probationPractitioner.username
         if (res.locals.flags.enableMAN2344) {
@@ -63,10 +66,51 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
       }
+      const defaultUserContext = {
+        uuid: id,
+        username: attendingUsername,
+        enabled: res.locals.flags.enableSessionCacheLogging,
+      }
+      logSessionCacheChange(
+        'getDefaultUser',
+        data,
+        ['appointments', crn, id, 'user', 'providerCode'],
+        providerCode,
+        defaultUserContext,
+      )
+      logSessionCacheChange(
+        'getDefaultUser',
+        data,
+        ['appointments', crn, id, 'user', 'teamCode'],
+        teamCode,
+        defaultUserContext,
+      )
+      logSessionCacheChange(
+        'getDefaultUser',
+        data,
+        ['appointments', crn, id, 'user', 'username'],
+        attendingUsername,
+        defaultUserContext,
+      )
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
+      logger.info(`[getDefaultUser] uuid='${id}' attendingUsername='${attendingUsername}'`)
       if (res.locals.flags.enableMAN2344) {
+        logSessionCacheChange(
+          'getDefaultUser',
+          data,
+          ['appointments', crn, id, 'user', 'email'],
+          attendingEmail,
+          defaultUserContext,
+        )
+        logSessionCacheChange(
+          'getDefaultUser',
+          data,
+          ['appointments', crn, id, 'user', 'name'],
+          attendingName,
+          defaultUserContext,
+        )
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       }
@@ -84,6 +128,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       sessionProviders = getDataValue(data, ['providers', username]) ?? sessionProviders
       sessionTeams = getDataValue(data, ['teams', username]) ?? providerTeams
       sessionStaff = getDataValue(data, ['staff', username]) ?? providerStaff
+      logger.info(`[getDefaultUser] uuid='${id}' username='${username}' reusing existing staff cache from session`)
     }
     if (attendingUsername?.toLowerCase() === probationPractitioner?.username?.toLowerCase()) {
       if (!sessionProviders.some(provider => provider.code === probationPractitioner.provider.code)) {
@@ -118,13 +163,40 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
       attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
       const staff = sessionStaff.find(user => user?.username?.toLowerCase() === attendingUsername?.toLowerCase())
+      const staffCacheContext = {
+        uuid: id,
+        username: attendingUsername,
+        enabled: res.locals.flags.enableSessionCacheLogging,
+      }
       if (!attendingEmail && staff?.email) {
+        logSessionCacheChange(
+          'getDefaultUser',
+          data,
+          ['appointments', crn, id, 'user', 'email'],
+          staff.email,
+          staffCacheContext,
+        )
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], staff.email)
       }
       if (!attendingName && staff?.name) {
+        logSessionCacheChange(
+          'getDefaultUser',
+          data,
+          ['appointments', crn, id, 'user', 'name'],
+          staff.name,
+          staffCacheContext,
+        )
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], staff.name)
+      } else if (!attendingName) {
+        logger.info(
+          `[getDefaultUser] uuid='${id}' unable to resolve attending user name from staff cache for username='${attendingUsername}'`,
+        )
       }
     }
+    const sharedCacheContext = { uuid: id, username, enabled: res.locals.flags.enableSessionCacheLogging }
+    logSessionCacheChange('getDefaultUser', data, ['providers', username], sessionProviders, sharedCacheContext)
+    logSessionCacheChange('getDefaultUser', data, ['teams', username], sessionTeams, sharedCacheContext)
+    logSessionCacheChange('getDefaultUser', data, ['staff', username], sessionStaff, sharedCacheContext)
     setDataValue(data, ['providers', username], sessionProviders)
     setDataValue(data, ['teams', username], sessionTeams)
     setDataValue(data, ['staff', username], sessionStaff)

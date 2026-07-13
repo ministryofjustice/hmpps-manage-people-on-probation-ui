@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
@@ -14,6 +15,7 @@ import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 import logger from '../../logger'
+import { logFieldPresence } from '../utils/logSessionCacheChange'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -22,6 +24,22 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
+    const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    logFieldPresence(
+      'postAppointments',
+      {
+        appointmentSession,
+        user: appointmentSession?.user,
+        type: appointmentSession?.type,
+        date: appointmentSession?.date,
+        start: appointmentSession?.start,
+        end: appointmentSession?.end,
+        eventId: appointmentSession?.eventId,
+        teamCode: appointmentSession?.user?.teamCode,
+        locationCode: appointmentSession?.user?.locationCode,
+      },
+      { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
+    )
     const {
       user: { username, locationCode, teamCode },
       type,
@@ -38,7 +56,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outcomeRecorded,
       smsOptIn,
       outcome,
-    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    } = appointmentSession
 
     const body: AppointmentRequestBody = {
       user: {
@@ -81,7 +99,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (res.locals.flags.enableMAN2344) {
       ;({
         user: { name, email },
-      } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid]))
+      } = appointmentSession)
       ;({ forename: firstName, surname } = name)
 
       if (!email) {
@@ -141,6 +159,25 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
+      const eventResponse: any = outlookEventResponse
+      if (eventResponse?.status === 500) {
+        const sentryError =
+          eventResponse?.error ??
+          new Error(eventResponse?.errors?.[0]?.text ?? 'Calendar event creation not successful.')
+        const sentryEventId = Sentry.captureException(sentryError, {
+          tags: {
+            'http.status': '500',
+            'error.type': 'internal_server_error',
+            service: 'Probation Supervision Appointments Api',
+            operation: 'postOutlookCalendarEvent',
+          },
+        })
+        logger.info(`Sentry eventId: ${sentryEventId}`)
+        logger.warn(
+          { sentryEventId, apiError: eventResponse?.error, apiErrors: eventResponse?.errors },
+          'Failed to create calendar event',
+        )
+      }
     }
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
