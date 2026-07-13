@@ -151,7 +151,6 @@ const getExpectedOptions = ({
       expectedOptions.push(
         { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
         { value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' },
-        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
       )
     }
     expectedOptions.push({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' })
@@ -192,6 +191,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     const letterSentByOptions = getExpectedOptions({ sentenceType: 'CUSTODY' })
     checkOptions(letterSentByOptions)
     const letterTypeOptions = getExpectedOptions({ sentenceType: 'CUSTODY', optionsFor: 'LETTER_TYPE', youth: true })
+    cy.log(JSON.stringify(letterTypeOptions, null, 2))
     checkOptions(letterTypeOptions, 1)
     cy.get('[data-module="govuk-radios"]').should('have.length', 2)
   })
