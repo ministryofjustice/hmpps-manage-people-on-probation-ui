@@ -1,8 +1,9 @@
 import { FliptEvaluationClient } from '@flipt-io/flipt-client'
 import * as Sentry from '@sentry/node'
-import { FlagService } from '.'
+import FlagService from './flagService'
 
 const email = 'test@example.com'
+const username = 'user-1'
 
 jest.mock('@sentry/node', () => ({
   getClient: jest.fn(() => ({})),
@@ -122,6 +123,31 @@ describe('FlagService', () => {
     expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableNonCompliance')).toHaveLength(1)
     expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(2)
   })
+  it('adds a username request for username-gated flags', async () => {
+    await service.getFlags({ email, username, pduCodes: ['PDU001', 'PDU002'] })
+    const requests = mockEvaluateBatch.mock.calls[0][0]
+
+    expect(requests).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flagKey: 'enableESupervisionCheckins',
+          entityId: email,
+          context: { email, pduCode: 'PDU001' },
+        }),
+        expect.objectContaining({
+          flagKey: 'enableESupervisionCheckins',
+          entityId: email,
+          context: { email, pduCode: 'PDU002' },
+        }),
+        expect.objectContaining({
+          flagKey: 'enableESupervisionCheckins',
+          entityId: email,
+          context: { email, username },
+        }),
+      ]),
+    )
+    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(3)
+  })
   it('resolves a PDU-gated flag to true if any pduCode evaluation is enabled', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
@@ -132,6 +158,21 @@ describe('FlagService', () => {
       ],
     })
     expect(await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })).toStrictEqual({
+      enableDeliusClient: false,
+      enableNonCompliance: false,
+      enableESupervisionCheckins: true,
+    })
+  })
+  it('resolves the check-ins flag to true if the username evaluation is enabled', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
+      ],
+    })
+
+    expect(await service.getFlags({ email, username, pduCodes: [] })).toStrictEqual({
       enableDeliusClient: false,
       enableNonCompliance: false,
       enableESupervisionCheckins: true,
@@ -162,7 +203,7 @@ describe('FlagService', () => {
     expect(result.enableDeliusClient).toBe(true)
     expect(result.enableNonCompliance).toBe(false)
   })
-  it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
+  it('fails closed for check-ins flag when pduCodes is empty and username is not available', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
@@ -174,6 +215,20 @@ describe('FlagService', () => {
 
     const requests = mockEvaluateBatch.mock.calls[0][0]
     expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(0)
+    expect(result.enableESupervisionCheckins).toBe(false)
+  })
+  it('fails closed for check-ins flag when all access route evaluations are disabled', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
+      ],
+    })
+
+    const result = await service.getFlags({ email, username, pduCodes: ['PDU001'] })
+
     expect(result.enableESupervisionCheckins).toBe(false)
   })
   it('calls evaluateBatch with correct requests if context.email does not exist', async () => {
@@ -208,6 +263,22 @@ describe('FlagService', () => {
         expect.objectContaining({
           entityId: mixedCaseEmail.toLowerCase(),
           context: { email: mixedCaseEmail.toLowerCase() },
+        }),
+      ]),
+    )
+  })
+
+  it('normalises username to lowercase before sending to Flipt', async () => {
+    const mixedCaseUsername = 'User-ONE'
+
+    await service.getFlags({ username: mixedCaseUsername })
+
+    expect(mockEvaluateBatch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flagKey: 'enableESupervisionCheckins',
+          entityId: mixedCaseUsername.toLowerCase(),
+          context: { username: mixedCaseUsername.toLowerCase() },
         }),
       ]),
     )

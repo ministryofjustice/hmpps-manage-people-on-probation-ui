@@ -1,5 +1,5 @@
 {% extends "../../partials/case.njk" %}
-{% set currentSectionName = "Which appointment are you recording an outcome for?" if actionType == "outcome" else 
+{% set currentSectionName = "Record an outcome" if actionType == "outcome" else
     "Which appointment?" %}
 {% set pageTitle = makePageTitle({
     pageHeading: ["Record an outcome", "Outcome"]
@@ -52,7 +52,13 @@
                 {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
                 {{ govukRadios({
                     name: "appointment-id",
-                    fieldset: {},
+                    fieldset: {
+                        legend: {
+                            text: "Which appointment are you recording an outcome for?",
+                            isPageHeading: false,
+                            classes: "govuk-fieldset__legend--m"
+                        }
+                    },
                     items: appointmentRadioItems,
                     attributes: {
                         'data-reset-conditional-radios': ''

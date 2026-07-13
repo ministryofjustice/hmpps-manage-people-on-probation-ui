@@ -11,7 +11,7 @@
     },
     items: appointmentOutcome.letterSentByOptions
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'letterSentBy'])) }}
-{% if not appointmentOutcome.appointmentSession.outcome.otherEnforcementAction %}
+{% if appointmentOutcome.showLetterTypeOptions %}
   {{ govukRadios({
     fieldset: {
        attributes: {

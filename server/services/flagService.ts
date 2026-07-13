@@ -5,9 +5,16 @@ import { FeatureFlags } from '../data/model/featureFlags'
 import logger from '../../logger'
 
 const PDU_GATED_FLAGS = new Set(['enableESupervisionCheckins'])
+const USERNAME_GATED_FLAGS = new Set(['enableESupervisionCheckins'])
+
+interface FlagContext {
+  email?: string
+  username?: string
+  pduCodes?: string[]
+}
 
 export default class FlagService {
-  async getFlags(context: { email?: string; pduCodes?: string[] }): Promise<FeatureFlags> {
+  async getFlags(context: FlagContext): Promise<FeatureFlags> {
     const namespace = 'manage-people-on-probation-ui'
     const fliptEvaluationClient = await FliptEvaluationClient.init(namespace, {
       url: config.flipt.url,
@@ -24,21 +31,35 @@ export default class FlagService {
     })
 
     const pduCodes: string[] = context?.pduCodes ?? []
+    const email = context?.email?.toLowerCase()
+    const username = context?.username?.toLowerCase()
 
-    const buildRequest = (flag: string, pduCode?: string): EvaluationRequest => {
+    const buildRequest = (
+      flag: string,
+      additionalContext: { pduCode?: string; username?: string } = {},
+    ): EvaluationRequest => {
       return {
         flagKey: flag,
-        entityId: context?.email ? context.email.toLowerCase() || 'anonymous' : flag,
+        entityId: email || additionalContext.username || flag,
         context: {
-          ...(context?.email ? { email: context.email.toLowerCase() } : {}),
-          ...(pduCode ? { pduCode } : {}),
+          ...(email ? { email } : {}),
+          ...additionalContext,
         },
       }
     }
 
     const requests: EvaluationRequest[] = flagList.flatMap(flag => {
-      if (PDU_GATED_FLAGS.has(flag)) {
-        return pduCodes.map(pduCode => buildRequest(flag, pduCode))
+      const isPduGatedFlag = PDU_GATED_FLAGS.has(flag)
+      const isUsernameGatedFlag = USERNAME_GATED_FLAGS.has(flag)
+      const requestsForFlag: EvaluationRequest[] = []
+      if (isPduGatedFlag) {
+        requestsForFlag.push(...pduCodes.map(pduCode => buildRequest(flag, { pduCode })))
+      }
+      if (isUsernameGatedFlag && username) {
+        requestsForFlag.push(buildRequest(flag, { username }))
+      }
+      if (isPduGatedFlag || isUsernameGatedFlag) {
+        return requestsForFlag
       }
       return [buildRequest(flag)]
     })
@@ -51,7 +72,7 @@ export default class FlagService {
 
     for (const f of flagList) {
       const matching = responsesFor(flags.responses, f)
-      if (PDU_GATED_FLAGS.has(f)) {
+      if (PDU_GATED_FLAGS.has(f) || USERNAME_GATED_FLAGS.has(f)) {
         featureFlags[f] = matching.some(r => r.booleanEvaluationResponse?.enabled === true)
       } else if (matching.length === 1) {
         featureFlags[f] = matching[0].booleanEvaluationResponse.enabled === true

@@ -17,13 +17,11 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     isInPast,
     baseOutcomeUrl,
     reqUrl,
+    showLetterTypeOptions,
     sendBreachOrRecallLetter,
     appointmentSession,
   } = res.locals.appointmentOutcome
 
-  const otherLetterActionSet = otherEnforcementActionLetterTypes.includes(
-    appointmentSession?.outcome?.otherEnforcementAction as OtherEnforcementActionsLetterType,
-  )
   const { maxCharCount } = config
   const id = uuid || contactId
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
@@ -160,7 +158,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           ],
           log: ['breach NSI created by not selected', 'letter sent by no selected', 'letter type not selected'],
           sendBreachOrRecallLetter,
-          otherLetterActionSet,
+          showLetterTypeOptions,
         }),
       ),
     }
@@ -179,7 +177,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/send-letter`,
           msg: ['Select who will send the letter', 'Select the type of letter'],
           log: ['letter sent by no selected', 'letter type not selected'],
-          otherLetterActionSet,
+          showLetterTypeOptions,
         }),
       ),
     }

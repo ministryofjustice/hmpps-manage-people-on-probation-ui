@@ -5,6 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import { LicenceCondition, Requirement } from '../data/model/sentenceDetails'
 import { checkLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
+import { PersonExistsResponse } from '../data/emdiClient'
 
 const routes = [
   'getSentence',
@@ -48,6 +49,7 @@ const sentenceController: Controller<typeof routes, void> = {
       })
       const masClient = new MasApiClient(token)
       const sentenceDetails = await masClient.getSentenceDetails(crn, queryParam)
+      let personExistsResponse: PersonExistsResponse | undefined
       if (res.locals.flags.enableEMDISentencesShowGPSData) {
         const licenceConditions: LicenceCondition[] = sentenceDetails.sentence?.licenceConditions
         const requirements: Requirement[] = sentenceDetails.sentence?.requirements
@@ -55,14 +57,15 @@ const sentenceController: Controller<typeof routes, void> = {
           hasLicenceConditionsLMData?: boolean
           hasRequirementsLMData?: boolean
         } = checkLocationMonitoring(licenceConditions, requirements)
-
         if (hasLocationMonitoring?.hasLicenceConditionsLMData || hasLocationMonitoring?.hasRequirementsLMData) {
-          res.locals.locationMonitoringUri = await existsInEMDI(crn, token)
+          personExistsResponse = await existsInEMDI(crn, token)
+          res.locals.personExistsResponse = personExistsResponse
         }
       }
       return res.render('pages/sentence', {
         sentenceDetails,
         crn,
+        locationMonitoringUri: personExistsResponse?.uri,
       })
     }
   },

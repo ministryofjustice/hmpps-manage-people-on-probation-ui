@@ -36,6 +36,7 @@ import {
   EsupervisionUpcomingQuestionsResponse,
   OffenderCheckinsByCRNResponse,
 } from '../data/model/esupervision'
+import { PersonExistsResponse } from '../data/emdiClient'
 
 export interface AppointmentLocals {
   meta: {
@@ -165,7 +166,7 @@ interface Locals {
   feedbackEmail?: string
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
-  locationMonitoringUri?: string
+  personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
 }
 
@@ -279,6 +280,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   appointmentHintText?: string
   sendBreachOrRecallLetter?: boolean
   sendLetter?: boolean
+  showLetterTypeOptions: boolean
   currentEnforcementAction?: CurrentEnforcementAction
   currentOutcome?: CurrentOutcome
   breachOrRecallWarning?: BreachOrRecallWarning | null

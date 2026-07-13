@@ -89,6 +89,7 @@ const mockAppointmentOutcome = ({
   baseOutcomeUrl: '/base/outcome/url',
   completedUrl: '/completed/url',
   notePrepend: 'Mock note prepend',
+  showLetterTypeOptions: false,
   appointmentSession: {
     notes,
     sensitivity: 'No',

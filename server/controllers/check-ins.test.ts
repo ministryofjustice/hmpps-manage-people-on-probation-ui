@@ -69,9 +69,6 @@ const postReviewSpy = jest
 const postReviewNoteSpy = jest
   .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInNote')
   .mockImplementation(() => Promise.resolve())
-const startReviewSpy = jest
-  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInStarted')
-  .mockImplementation(() => Promise.resolve({} as ESupervisionCheckIn))
 
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
@@ -107,6 +104,8 @@ const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const mockPostCheckInDetails = postCheckInDetails as jest.MockedFunction<typeof postCheckInDetails>
+
+const isoDateStringMatcher = expect.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)
 
 const crn = 'X000001'
 const cya = false
@@ -1541,7 +1540,11 @@ describe('checkInsController', () => {
       const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
       await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
 
-      expect(startReviewSpy).toHaveBeenCalled()
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'checkins', 'reviewStartedAt'],
+        isoDateStringMatcher,
+      )
       expect(reviewRedirectSpy).toHaveBeenCalledWith(
         `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/identity?back=${req.query.back}`,
       )
@@ -1556,7 +1559,11 @@ describe('checkInsController', () => {
       const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
       await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
 
-      expect(startReviewSpy).toHaveBeenCalled()
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'checkins', 'reviewStartedAt'],
+        isoDateStringMatcher,
+      )
       expect(reviewRedirectSpy).toHaveBeenCalledWith(
         `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/expired?back=${req.query.back}`,
       )
@@ -1572,7 +1579,11 @@ describe('checkInsController', () => {
       const resReview = reviewRes('EXPIRED')
       await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
 
-      expect(startReviewSpy).toHaveBeenCalledWith(req.params.id, resReview.locals.user.username)
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'checkins', 'reviewStartedAt'],
+        isoDateStringMatcher,
+      )
     })
 
     it('returns 404 when checkIn status is invalid', async () => {
