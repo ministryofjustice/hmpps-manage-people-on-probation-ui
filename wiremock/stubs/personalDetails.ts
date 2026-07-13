@@ -959,7 +959,7 @@ const stubPersonalDetailsDateOfDeathManage = (): SuperAgentRequest =>
           },
         ],
         telephoneNumber: '0123456999',
-        mobileNumber: '07703123456',
+        mobileNumber: '071838893',
         email: 'address1@gmail.com',
         circumstances: {
           circumstances: [
