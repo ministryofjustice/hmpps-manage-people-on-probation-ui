@@ -32,7 +32,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
 
     let isVisor
     if (res.locals.flags?.enableAppointmentsSpeedup) {
-      if (req.session?.data?.isVisor?.[crn] === undefined) {
+      if (!req.session?.data?.isVisor?.[crn]) {
         currentCase = await masClient.getOverview(crn)
         isVisor = currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor')
         req.session.data.isVisor = {

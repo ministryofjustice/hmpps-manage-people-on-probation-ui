@@ -200,7 +200,7 @@ describe('/middleware/getAppointment', () => {
       outcomeRecorded: null,
       isReschedule: false,
     })
-    expect(getOverviewSpy).not.toHaveBeenCalled()
+    expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
   })
 
