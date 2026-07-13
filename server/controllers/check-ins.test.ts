@@ -63,6 +63,18 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 
+jest.mock('../config', () => {
+  const actualConfig = jest.requireActual('../config').default
+
+  return {
+    ...actualConfig,
+    eSupervisionManageCheckins: {
+      ...actualConfig.eSupervisionManageCheckins,
+      link: 'http://localhost:9091/esupervision-manage-checkins',
+    },
+  }
+})
+
 const postReviewSpy = jest
   .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInReview')
   .mockImplementation(() => Promise.resolve({} as ESupervisionCheckIn))
@@ -135,6 +147,7 @@ describe('checkInsController', () => {
     jest.useRealTimers()
     res.locals.flags = {
       ...res.locals.flags,
+      enableESUPCheckinNewStop: false,
     }
   })
 
@@ -2926,6 +2939,29 @@ describe('checkInsController', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
+
+    it('redirects to new stop check in service when feature flag is enabled', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      res.locals.flags = {
+        ...res.locals.flags,
+        enableESUPCheckinNewStop: true,
+      }
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+      })
+
+      await controllers.checkIns.getStopCheckinPage(hmppsAuthClient)(req, res)
+
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_STOP_CHECK_IN', crn, SubjectType.CRN)
+
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `http://localhost:9091/esupervision-manage-checkins/case/${crn}/appointments/check-in/manage/${uuid}/stop-checkin`,
+      )
+      expect(renderSpy).not.toHaveBeenCalled()
+    })
   })
 
   describe('postManageStopCheckin', () => {
@@ -2975,6 +3011,27 @@ describe('checkInsController', () => {
         sensitive: true,
       })
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
+    })
+
+    it('redirects to new stop check-in service when feature flag is enabled', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      res.locals.flags = {
+        ...res.locals.flags,
+        enableESUPCheckinNewStop: true,
+      }
+
+      const req = baseReq()
+
+      await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `http://localhost:9091/esupervision-manage-checkins/case/${crn}/appointments/check-in/manage/${uuid}/stop-checkin`,
+      )
+
+      expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
+      expect(postDeactivateOffender).not.toHaveBeenCalled()
     })
   })
 

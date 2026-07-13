@@ -24,4 +24,5 @@ export class FeatureFlags {
   enableEsupervisionEligibility?: boolean = undefined
   enableEsupervisionRationale?: boolean = undefined
   enableSessionCacheLogging?: boolean = undefined
+  enableESUPCheckinNewStop?: boolean = undefined
 }
