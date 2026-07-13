@@ -120,7 +120,7 @@ context('Personal Details', () => {
   it('Personal Details page for a main address with a single note is rendered', () => {
     cy.visit('/case/X000001/personal-details/main-address/note/0')
     const page = Page.verifyOnPage(PersonalDetailsPage)
-    page.getRowData('contactDetails', 'mobileNumber', 'Value').should('contain.text', '07703123456')
+    page.getRowData('contactDetails', 'mobileNumber', 'Value').should('contain.text', '071838893')
     page.getRowData('contactDetails', 'telephoneNumber', 'Value').should('contain.text', '0123456999')
     page.getRowData('contactDetails', 'otherAddresses', 'Value').should('contain.text', '1 other address')
     page.getRowData('contactDetails', 'contacts', 'Value').should('contain.text', 'Steve Wilson – GP (secondary)')

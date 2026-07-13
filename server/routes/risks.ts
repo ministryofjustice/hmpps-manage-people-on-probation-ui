@@ -8,6 +8,7 @@ import { getPersonalDetails, getPersonRiskFlags } from '../middleware'
 export default function risksRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
+  router.all(['/case/:crn/risk', '/case/:crn/risk/*path'], getPersonalDetails(hmppsAuthClient, arnsComponents))
   router.get('/case/:crn/risk', getPersonRiskFlags(hmppsAuthClient), controllers.risk.getRisk(hmppsAuthClient))
 
   router.get('/case/:crn/risk/flag/:id', [controllers.risk.getRiskFlag(hmppsAuthClient)])

@@ -26,22 +26,9 @@ const mockSearchService = {
   get: jest.fn((req, res, next) => next()),
 }
 
-const mockFlagService = {
-  getFlags: jest.fn().mockReturnValue({ enableAppointmentsSpeedup: true }),
-}
-const mockFlagService2 = {
-  getFlags: jest.fn().mockReturnValue({ enableAppointmentsSpeedup: false }),
-}
-
 const mockServices: Services = {
   technicalUpdatesService: mockTechnicalUpdatesService as any,
   searchService: mockSearchService as any,
-  flagService: mockFlagService as any,
-} as unknown as Services
-const mockServices2: Services = {
-  technicalUpdatesService: mockTechnicalUpdatesService as any,
-  searchService: mockSearchService as any,
-  flagService: mockFlagService2 as any,
 } as unknown as Services
 
 let app: Express
@@ -122,7 +109,7 @@ describe('GET 404', () => {
   })
 
   it('should render content without stack in production mode', () => {
-    return request(appWithAllRoutes({ production: true, services: mockServices2 }))
+    return request(appWithAllRoutes({ production: true, services: mockServices }))
       .get('/unknown')
       .expect(404)
       .expect('Content-Type', /html/)

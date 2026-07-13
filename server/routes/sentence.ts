@@ -11,10 +11,15 @@ export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Serv
 
   get('/case/:crn/sentence/probation-history', controllers.sentence.getProbationHistory(hmppsAuthClient))
 
-  router.get('/case/:crn/sentence/previous-orders', controllers.sentence.getPreviousOrders(hmppsAuthClient))
+  router.get(
+    '/case/:crn/sentence/previous-orders',
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    controllers.sentence.getPreviousOrders(hmppsAuthClient),
+  )
 
   router.get(
     '/case/:crn/sentence/previous-orders/:eventNumber',
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
     controllers.sentence.getPreviousOrderDetails(hmppsAuthClient),
   )
 
