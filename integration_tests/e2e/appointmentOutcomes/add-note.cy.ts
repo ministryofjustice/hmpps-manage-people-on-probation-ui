@@ -102,7 +102,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it('renders the page', () => {
     loadPage({ journey })
     getUuid(3).then(uuid => {
-      cy.get('.govuk-back-link').should('not.exist')
+      cy.get('.govuk-back-link').should('exist')
       cy.contains('Use paragraphs and formatting').should('be.visible')
       cy.get('[data-qa="crissButton"]').should('contain.text', 'Show CRISS headers')
       const id = journey === 'MANAGE' ? appointmentId : uuid
