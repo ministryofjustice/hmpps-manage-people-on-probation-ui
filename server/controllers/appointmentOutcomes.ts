@@ -115,9 +115,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (contactId && linkedContactId) {
         redirect = `${baseOutcomeUrl}/check-your-answers`
       }
-      const back = encodeURIComponent(`${baseOutcomeUrl}/add-note`)
+      if (change) redirect = change
+      if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
       const joinChar = redirect.includes('?') ? '&' : '?'
-      redirect = `${redirect}${joinChar}back=${back}`
+      redirect = `${redirect}${joinChar}back=${baseOutcomeUrl}/add-note`
+      return res.redirect(redirect)
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {
