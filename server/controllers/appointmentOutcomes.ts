@@ -117,8 +117,12 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       }
       if (change) redirect = change
       if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
-      const joinChar = redirect.includes('?') ? '&' : '?'
-      redirect = `${redirect}${joinChar}back=${baseOutcomeUrl}/add-note`
+      const backParam = `back=${baseOutcomeUrl}/add-note`
+      if (redirect.includes('back=')) {
+        redirect = redirect.replace(/back=[^&]*/, backParam)
+      } else {
+        redirect = `${redirect}${redirect.includes('?') ? '&' : '?'}${backParam}`
+      }
       return res.redirect(redirect)
     }
   },

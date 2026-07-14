@@ -79,6 +79,10 @@ describe('/middleware/appointment-outcomes/getNotePrepend', () => {
     getNotePrepend(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach confirmation sent')
   })
+  it('should throw an explicit error if letterType value is not found in letterTypeOptions', () => {
+    const res = buildResponse({ letterSentBy: 'USER', letterType: 'UNKNOWN_LETTER_TYPE' as any })
+    expect(() => getNotePrepend(req, res, nextSpy)).toThrow('Letter type not found for value: UNKNOWN_LETTER_TYPE')
+  })
   it('should set the correct value if breach/recall initiated by USER, letter sent by CASE_ADMIN, letter type is FIRST_WARNING_LETTER_SENT and sentence type is CUSTODY', () => {
     const res = buildResponse({
       breachNSICreatedBy: 'USER',

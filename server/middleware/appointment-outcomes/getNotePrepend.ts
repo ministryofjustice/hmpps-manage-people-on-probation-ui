@@ -38,6 +38,7 @@ export const getNotePrepend: Route<void> = (_req, res, next) => {
     if (_letterSentBy && selectedLetterType) {
       letterSentBy = getUser(_letterSentBy)
       letterType = letterTypeOptions.find(option => option.value === selectedLetterType)?.text
+      if (!letterType) throw new Error(`Letter type not found for value: ${selectedLetterType}`)
       const beginsWithA = letterType.toLowerCase().split(' ').at(0) === 'a'
       text.push(`${letterSentBy} will send${!beginsWithA ? ' a ' : ' '}${letterType.toLowerCase()}`)
     }

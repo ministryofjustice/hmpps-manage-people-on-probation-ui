@@ -352,6 +352,15 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith(`${change}?back=/case/X000001/appointments/appointment/1234/outcome/add-note`)
     })
 
+    it('should not duplicate back param if change url already contains a back param when postAddNote is called', async () => {
+      const changeWithBack = `${change}?back=/case/X000001/appointments/appointment/1234/outcome/add-note`
+      const req = mockReq({ request: { query: { change: changeWithBack } } })
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`${change}?back=/case/X000001/appointments/appointment/1234/outcome/add-note`)
+    })
+
     it('should redirect to the check your answers page if arrange appointment journey', async () => {
       const req = mockReq()
       const res = mockRes({ appointmentOutcome: { uuid, contactId: undefined, id: uuid } })
