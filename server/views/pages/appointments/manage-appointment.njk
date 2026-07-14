@@ -12,7 +12,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% set sentence = sentences[0].order.description %}
 
-{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else 
+{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else
   'Log attended and complied appointment' %}
 {% set outcomeLink = null %}
 {% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
@@ -32,7 +32,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
-  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else 
+  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else
     "") + " on " + (
     nextAppointment.appointment.startDateTime | dateWithDayAndWithYear) + " at " + (
     nextAppointment.appointment.startDateTime | govukTime) + "."
@@ -149,7 +149,6 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "information",
-  showTitleAsHeading: true,
   dismissible: false,
   text: alert,
   attributes: {
@@ -160,7 +159,6 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       {% if appointmentOutcome.currentEnforcementAction.evidenceWarning and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "warning",
-  showTitleAsHeading: true,
   dismissible: false,
   text: appointmentOutcome.currentEnforcementAction.evidenceWarning,
   attributes: {
@@ -219,7 +217,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Add appointment notes"
       },
-     
+
       href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true' if flags.enableNonCompliance),
       status: {
         tag: {
