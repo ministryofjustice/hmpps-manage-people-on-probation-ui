@@ -45,7 +45,8 @@ export const resetEnforcementActionSelection = (req: Request, res: AppResponse, 
 
   if (
     reqUrl === `${baseOutcomeUrl}/enforcement-action` &&
-    letterEnforcementActions.includes(postedOtherEnforcementAction) &&
+    (letterEnforcementActions.includes(postedOtherEnforcementAction) ||
+      letterEnforcementActions.includes(otherEnforcementAction as (typeof letterEnforcementActions)[number])) &&
     otherEnforcementAction !== postedOtherEnforcementAction
   ) {
     resetLetterAction()
@@ -66,9 +67,14 @@ export const resetEnforcementActionSelection = (req: Request, res: AppResponse, 
     }
   }
 
+  const otherActionDownstreamPages = [
+    `${baseOutcomeUrl}/enforcement-action`,
+    `${baseOutcomeUrl}/update-enforcement-action`,
+  ]
+
   const skipReset =
     (reqUrl === `${baseOutcomeUrl}/initiate-breach-or-recall` && sendBreachOrRecallLetter) ||
-    (otherAction && enforcementActionPages.includes(reqUrl))
+    (otherAction && otherActionDownstreamPages.includes(reqUrl))
 
   if (!skipReset && enforcementActionPages.some(url => reqUrl === url)) {
     setDataValue(data, ['appointments', crn, id, 'outcome', 'enforcementActionCode'], [])

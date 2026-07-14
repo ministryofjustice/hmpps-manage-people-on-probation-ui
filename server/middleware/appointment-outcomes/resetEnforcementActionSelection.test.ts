@@ -111,6 +111,32 @@ describe('middleware/resetEnforcementActionSelection', () => {
     expect(setDataValueSpy).not.toHaveBeenCalled()
   })
 
+  it('should return next() if other action is selected and current page is enforcement action', () => {
+    const req = httpMocks.createRequest({ session: {} })
+    const res = buildResponse({
+      otherAction: true,
+      reqUrl: `${baseOutcomeUrl}/enforcement-action`,
+    })
+    resetEnforcementActionSelection(req, res, nextSpy)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+    expect(setDataValueSpy).not.toHaveBeenCalled()
+  })
+
+  it('should reset selected actions when other action is selected and user returns to attended-failed-to-comply (Change scenario)', () => {
+    const outcome: AppointmentSessionOutcome = {
+      ...mockOutcome,
+      attendedFailedToComply: 'DIFFERENT_ACTION',
+      otherEnforcementAction: 'FIRST_WARNING_LETTER_SENT',
+    }
+    const req = buildRequest({ outcome })
+    const res = buildResponse({
+      otherAction: true,
+      reqUrl: `${baseOutcomeUrl}/attended-failed-to-comply`,
+    })
+    resetEnforcementActionSelection(req, res, nextSpy)
+    checkReset(req)
+  })
+
   it('should reset the selected actions if current page is outcome', () => {
     const req = buildRequest({ outcome: mockOutcome })
     const res = buildResponse({
@@ -239,6 +265,26 @@ describe('middleware/resetEnforcementActionSelection', () => {
       expect(req.session.data.appointments[crn][id].outcome.letterType).toBeUndefined()
       expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBeUndefined()
       expect(req.session.data.appointments[crn][id].outcome.breachNSICreatedBy).toBeUndefined()
+    })
+
+    it('should reset letterType and letterSentBy on /enforcement-action when switching from a letter action to a non-letter action', () => {
+      const outcomeWithOtherAction: AppointmentSessionOutcome = {
+        ...outcomeWithLetter,
+        otherEnforcementAction: 'FIRST_WARNING_LETTER_SENT',
+      }
+      const req = buildRequest({ outcome: outcomeWithOtherAction })
+      req.body = {
+        appointments: { [crn]: { [id]: { outcome: { otherEnforcementAction: 'BREACH_RECALL_INITIATED' } } } },
+      }
+      // otherAction: true skips the main enforcement-action reset so only the letter branch runs
+      const res = buildResponse({
+        otherAction: true,
+        appointmentSession: { outcome: outcomeWithOtherAction },
+        reqUrl: `${baseOutcomeUrl}/enforcement-action`,
+      })
+      resetEnforcementActionSelection(req, res, nextSpy)
+      expect(req.session.data.appointments[crn][id].outcome.letterType).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBeUndefined()
     })
   })
 })

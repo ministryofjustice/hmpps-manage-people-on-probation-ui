@@ -280,4 +280,18 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
   })
+
+  it('should set enforcementActionChangeLink to /update-enforcement-action when updateEnforcementAction is set', () => {
+    const outcome: AppointmentSessionOutcome = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      updateEnforcementAction: 'SEND_ANOTHER_LETTER',
+      enforcementActionCode: ['NFA'],
+    }
+    const res = buildResponse({ outcome })
+    getOutcomeSummary(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.summary.enforcementActionChangeLink).toEqual(
+      '/base/outcome/url/update-enforcement-action',
+    )
+  })
 })
