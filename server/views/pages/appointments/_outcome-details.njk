@@ -1,8 +1,8 @@
 {% set documents %}
-<ul class="govuk-list">
+<ul class="govuk-list" data-qa="documentsValue">
   {% for document in appointment.documents %}
     <li {% if loop.last %}class="govuk-!-margin-bottom-0"{% endif %}>
-      <a href="/case/{{ crn }}/personal-details/documents/{{ document.id }}/download" download="{{ doc.name }}">{{ document.name }}</a>
+      <a href="/case/{{ crn }}/personal-details/documents/{{ document.id }}/download" download="{{ document.name }}">{{ document.name }}</a>
     </li>
   {% endfor %}
 </ul>
@@ -39,7 +39,7 @@
     } if appointment.didTheyComply === true,
     {
       key: { html:  '<span data-qa="documentsLabel">Documents</span>' },
-      value: { html: '<span data-qa="documentsValue">' + documents + '</span>' }
+      value: { html: documents }
     } if appointment.documents.length > 0,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
