@@ -35,6 +35,16 @@ export default class TierApiClient extends RestClient {
       errorMessage: 'Tier information is currently unavailable.',
     })
   }
+
+  async getTiers(crns: string[]): Promise<TierCalculations> {
+    return this.post({
+      path: `/v2/crns/tier`,
+      data: crns,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Tier information is currently unavailable.',
+    })
+  }
 }
 
 export type CalculationRule =
@@ -58,6 +68,10 @@ export interface TierCalculation {
     change: TierLevel
     calculationVersion: string
   }
+}
+
+export interface TierCalculations {
+  [key: string]: TierCalculation
 }
 
 export interface TierLevel {

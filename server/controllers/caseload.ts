@@ -12,6 +12,7 @@ import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { getDateRange, RangeType } from '../utils/getDateRange'
+import TierApiClient, { TierCalculations } from '../data/tierApiClient'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
@@ -58,6 +59,12 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sortByQuery,
         req.session.caseFilter,
       )
+      let tiers: TierCalculations
+      if (res.locals?.flags?.enableCaseloadV2) {
+        const uniqueCrns = [...new Set(caseload.caseload.map(item => item.crn))].filter(Boolean)
+        const tierClient = new TierApiClient(token)
+        tiers = await tierClient.getTiers(uniqueCrns)
+      }
       const { filter } = args
 
       const url = encodeURIComponent(req.url)
@@ -86,6 +93,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
           caseload: caseload?.caseload?.map(val => ({
             ...val,
             newCase: val.allocatedOn ? DateTime.fromISO(val.allocatedOn) >= DateTime.now().minus({ days: 21 }) : false,
+            tier: tiers ? tiers[val.crn]?.tierScore : undefined,
           })),
         }
       }
@@ -95,6 +103,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         currentNavSection,
         filter,
         url,
+        tiers,
       })
     }
   },

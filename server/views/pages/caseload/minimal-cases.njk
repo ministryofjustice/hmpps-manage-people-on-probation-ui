@@ -170,7 +170,13 @@
             <span class="secondary-text">{{ case.dob | dateWithYear }} (Age {{ case.dob | yearsSince }})</span>
           {% else %}
             <span class="secondary-text">Restricted</span>
-          {% endif %}
+          {% endif %}</br>
+          <div data-qa="" class="predictor-timeline-item-v1">
+            <span class="predictor-timeline-item-v1__level">
+              TIER
+              <strong>{{ case.tier if case.tier else "Unknown" }}</strong>
+            </span>
+          </div>
         {% endset %}
 
         {% set rows = (rows.push(
