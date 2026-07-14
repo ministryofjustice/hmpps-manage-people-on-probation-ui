@@ -16,4 +16,5 @@ export const letterTypeOptions: Option<EnforcementActionLetterType>[] = [
   { text: 'Second warning letter', value: 'SECOND_WARNING_LETTER_SENT' },
   { text: 'Breach warning letter', value: 'BREACH_LETTER_SENT' },
   { text: 'A different enforcement letter', value: 'OTHER_ENFORCEMENT_LETTER_SENT' },
+  { text: 'Breach confirmation sent', value: 'BREACH_CONFIRMATION_SENT' },
 ]

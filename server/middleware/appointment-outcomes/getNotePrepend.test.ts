@@ -74,6 +74,11 @@ describe('/middleware/appointment-outcomes/getNotePrepend', () => {
     getNotePrepend(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach warning letter')
   })
+  it('should set the correct value if other enforcement action is BREACH_CONFIRMATION_SENT', () => {
+    const res = buildResponse({ letterSentBy: 'USER', otherEnforcementAction: 'BREACH_CONFIRMATION_SENT' })
+    getNotePrepend(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach confirmation sent')
+  })
   it('should set the correct value if breach/recall initiated by USER, letter sent by CASE_ADMIN, letter type is FIRST_WARNING_LETTER_SENT and sentence type is CUSTODY', () => {
     const res = buildResponse({
       breachNSICreatedBy: 'USER',

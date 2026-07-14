@@ -203,6 +203,7 @@ export type EnforcementActionLetterType =
   | 'SECOND_WARNING_LETTER_SENT'
   | 'BREACH_LETTER_SENT'
   | 'OTHER_ENFORCEMENT_LETTER_SENT'
+  | 'BREACH_CONFIRMATION_SENT'
 
 export interface AppointmentType {
   code: string
