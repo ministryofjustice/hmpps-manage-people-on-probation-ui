@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { resetEnforcementActionSelection } from './resetEnforcementActionSelection'
 import { setDataValue } from '../../utils'
-import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentSession, AppointmentSessionOutcome } from '../../models/Appointments'
 
 const crn = 'X000001'
 const id = '12345'
@@ -56,7 +56,7 @@ const buildRequest = ({ outcome = {} }: { outcome?: AppointmentSessionOutcome })
         appointments: {
           [crn]: {
             [id]: {
-              outcome,
+              outcome: JSON.parse(JSON.stringify(outcome)),
             },
           },
         },
@@ -68,7 +68,8 @@ const buildRequest = ({ outcome = {} }: { outcome?: AppointmentSessionOutcome })
 
 const buildResponse = ({
   sendBreachOrRecallLetter = false,
-  otherEnforcementAction = undefined as AppointmentEnforcementAction,
+  otherAction = false,
+  appointmentSession = undefined as AppointmentSession,
   reqUrl = `/case/${crn}/appointment/appointment/${id}/failed-to-attend`,
 } = {}): httpMocks.MockResponse<any> => {
   const res = {
@@ -77,7 +78,8 @@ const buildResponse = ({
         crn,
         id,
         sendBreachOrRecallLetter,
-        otherEnforcementAction,
+        otherAction,
+        appointmentSession,
         reqUrl,
         baseOutcomeUrl,
       },
@@ -86,7 +88,7 @@ const buildResponse = ({
   return httpMocks.createResponse(res)
 }
 
-xdescribe('middleware/resetEnforcementActionSelection', () => {
+describe('middleware/resetEnforcementActionSelection', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -101,8 +103,8 @@ xdescribe('middleware/resetEnforcementActionSelection', () => {
   it('should return next() if other action is selected and current page is update enforcement action', () => {
     const req = httpMocks.createRequest({ session: {} })
     const res = buildResponse({
-      otherEnforcementAction: 'NO_FURTHER_ACTION',
-      reqUrl: '/outcome/update-enforcement-action',
+      otherAction: true,
+      reqUrl: `${baseOutcomeUrl}/update-enforcement-action`,
     })
     resetEnforcementActionSelection(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalledTimes(1)
@@ -136,6 +138,107 @@ xdescribe('middleware/resetEnforcementActionSelection', () => {
       })
       resetEnforcementActionSelection(req, res, nextSpy)
       checkReset(req)
+    })
+  })
+
+  describe('letter reset behaviour', () => {
+    const outcomeWithLetter: AppointmentSessionOutcome = {
+      ...mockOutcome,
+      letterType: 'FIRST_WARNING_LETTER_SENT',
+      letterSentBy: 'USER',
+    }
+
+    it('should reset letterType and letterSentBy when SEND_LETTER is posted but was not previously selected', () => {
+      const req = buildRequest({ outcome: outcomeWithLetter })
+      req.body = { appointments: { [crn]: { [id]: { outcome: { attendedFailedToComply: 'SEND_LETTER' } } } } }
+      // Use a URL not in enforcementActionPages so the main reset does not run
+      const res = buildResponse({
+        appointmentSession: { outcome: { ...outcomeWithLetter, attendedFailedToComply: 'NO_FURTHER_ACTION' } },
+        reqUrl: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+      })
+      resetEnforcementActionSelection(req, res, nextSpy)
+      expect(req.session.data.appointments[crn][id].outcome.letterType).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBeUndefined()
+    })
+
+    it('should not reset letterType and letterSentBy when SEND_LETTER was already the selected action', () => {
+      const outcomeAlreadySendLetter: AppointmentSessionOutcome = {
+        ...outcomeWithLetter,
+        attendedFailedToComply: 'SEND_LETTER',
+      }
+      const req = buildRequest({ outcome: outcomeAlreadySendLetter })
+      req.body = { appointments: { [crn]: { [id]: { outcome: { attendedFailedToComply: 'SEND_LETTER' } } } } }
+      // Use a URL not in enforcementActionPages so the main reset does not run
+      const res = buildResponse({
+        appointmentSession: { outcome: outcomeAlreadySendLetter },
+        reqUrl: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+      })
+      resetEnforcementActionSelection(req, res, nextSpy)
+      expect(req.session.data.appointments[crn][id].outcome.letterType).toBe('FIRST_WARNING_LETTER_SENT')
+      expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBe('USER')
+    })
+
+    it('should reset letterType and letterSentBy on /enforcement-action when a different letter action is posted', () => {
+      const outcomeWithOtherAction: AppointmentSessionOutcome = {
+        ...outcomeWithLetter,
+        otherEnforcementAction: 'FIRST_WARNING_LETTER_SENT',
+      }
+      const req = buildRequest({ outcome: outcomeWithOtherAction })
+      req.body = {
+        appointments: { [crn]: { [id]: { outcome: { otherEnforcementAction: 'SECOND_WARNING_LETTER_SENT' } } } },
+      }
+      // otherAction: true skips the main enforcement-action reset so only the letter branch runs
+      const res = buildResponse({
+        otherAction: true,
+        appointmentSession: { outcome: outcomeWithOtherAction },
+        reqUrl: `${baseOutcomeUrl}/enforcement-action`,
+      })
+      resetEnforcementActionSelection(req, res, nextSpy)
+      expect(req.session.data.appointments[crn][id].outcome.letterType).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBeUndefined()
+    })
+
+    it('should not reset letterType and letterSentBy on /enforcement-action when the same letter action is re-posted', () => {
+      const outcomeWithOtherAction: AppointmentSessionOutcome = {
+        ...outcomeWithLetter,
+        otherEnforcementAction: 'FIRST_WARNING_LETTER_SENT',
+      }
+      const req = buildRequest({ outcome: outcomeWithOtherAction })
+      req.body = {
+        appointments: { [crn]: { [id]: { outcome: { otherEnforcementAction: 'FIRST_WARNING_LETTER_SENT' } } } },
+      }
+      // otherAction: true skips the main enforcement-action reset so only the letter branch runs
+      const res = buildResponse({
+        otherAction: true,
+        appointmentSession: { outcome: outcomeWithOtherAction },
+        reqUrl: `${baseOutcomeUrl}/enforcement-action`,
+      })
+      resetEnforcementActionSelection(req, res, nextSpy)
+      expect(req.session.data.appointments[crn][id].outcome.letterType).toBe('FIRST_WARNING_LETTER_SENT')
+      expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBe('USER')
+    })
+
+    it('should reset letterType, letterSentBy and breachNSICreatedBy when BREACH_RECALL_INITIATED_AND_SEND_LETTER is posted but was not previously selected', () => {
+      const outcomeWithBreach: AppointmentSessionOutcome = {
+        ...outcomeWithLetter,
+        breachNSICreatedBy: 'USER',
+        attendedFailedToComply: 'NO_FURTHER_ACTION',
+      }
+      const req = buildRequest({ outcome: outcomeWithBreach })
+      req.body = {
+        appointments: {
+          [crn]: { [id]: { outcome: { attendedFailedToComply: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' } } },
+        },
+      }
+      // Use a URL not in enforcementActionPages so the main reset does not run
+      const res = buildResponse({
+        appointmentSession: { outcome: outcomeWithBreach },
+        reqUrl: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+      })
+      resetEnforcementActionSelection(req, res, nextSpy)
+      expect(req.session.data.appointments[crn][id].outcome.letterType).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].outcome.letterSentBy).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].outcome.breachNSICreatedBy).toBeUndefined()
     })
   })
 })
