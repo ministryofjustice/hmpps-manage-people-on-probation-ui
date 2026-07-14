@@ -17,7 +17,6 @@ type TestModel = {
   url: string
   flags: {
     enableNonCompliance: boolean
-    enableDeepLinks: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -35,7 +34,6 @@ const baseModel: TestModel = {
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
   flags: {
     enableNonCompliance: false,
-    enableDeepLinks: false,
   },
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {

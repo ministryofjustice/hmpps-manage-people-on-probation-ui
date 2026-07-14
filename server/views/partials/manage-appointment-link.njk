@@ -1,4 +1,4 @@
-{% macro manageAppointmentLink(flags, appointment, crn, manageUrl) %}
+{% macro manageAppointmentLink(appointment, crn, manageUrl) %}
     {% if not appointment.deliusManaged %}
         <a class="govuk-link govuk-link--no-visited-state"
                href={{ manageUrl }}
@@ -6,7 +6,7 @@
                 Manage
             </a>
     {% else %}
-        {% if flags.enableDeepLinks and appointment.type in deepLinkContactTypes and appointment.eventNumber %}
+        {% if appointment.type in deepLinkContactTypes and appointment.eventNumber %}
             {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
                 <a class="govuk-link govuk-link--no-visited-state"
                        target="_blank"

@@ -16,7 +16,6 @@ type TestModel = {
   url: string
   flags: {
     enableNonCompliance?: boolean
-    enableDeepLinks?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -95,7 +94,6 @@ const baseModel: TestModel = {
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
   flags: {
     enableNonCompliance: false,
-    enableDeepLinks: false,
   },
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {
@@ -603,12 +601,11 @@ describe('Manage an appointment', () => {
       })
     })
 
-    describe('enableDeepLinks feature flag is enabled', () => {
+    describe('deep link contact types', () => {
       describe('drug test appointment type', () => {
         it('should display the drug history deep link with correct wording', () => {
           const $ = render({
             flags: {
-              enableDeepLinks: true,
               enableNonCompliance: true,
             },
             personAppointment: {
@@ -635,7 +632,6 @@ describe('Manage an appointment', () => {
         it('should display the UPW worksheet deep link with correct wording', () => {
           const $ = render({
             flags: {
-              enableDeepLinks: true,
               enableNonCompliance: true,
             },
             personAppointment: {
