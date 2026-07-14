@@ -1,9 +1,9 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
 {%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
 
-{% set queryString = '?' + queryParams.join('&')if queryParams.length > 0 else 
+{% set queryString = '?' + queryParams.join('&')if queryParams.length > 0 else
   '' %}
-{% set clearLink = '?clear=true&view=' + view if view else 
+{% set clearLink = '?clear=true&view=' + view if view else
   '?clear=true' %}
 
 {%- set filterOptionsHtml %}
@@ -145,7 +145,7 @@
 
 
 <div class="govuk-grid-column-one-third contact-activity__filter govuk-!-padding-bottom-4">
-    <form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+    <form role="region" aria-label="Filters" method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
         <div class="moj-filter" data-module="moj-filter">
             <div class="moj-filter__header">
                 <div class="moj-filter__header-title">

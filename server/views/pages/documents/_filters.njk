@@ -134,7 +134,7 @@
 {% endif %}
 
 
-<form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+<form role="region" aria-label="Filters" method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
 {{ mojFilter({
   heading: {
     html: 'Filter documents',
@@ -167,4 +167,3 @@
 <input type="hidden" name="view" value="{{view}}">
 <input type="hidden" name="page" value="{{page}}">
 </form>
-
