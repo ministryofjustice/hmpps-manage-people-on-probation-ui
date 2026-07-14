@@ -52,10 +52,10 @@ export const getBackLink: Route<void> = (req, res, next) => {
         backLink = `/case/${crn}/appointments/appointment/${id}/manage`
     }
   }
-  if (otherEnforcementAction) {
+  if (otherEnforcementAction && reqUrl !== `${baseOutcomeUrl}/enforcement-action`) {
     backLink = `${baseOutcomeUrl}/enforcement-action`
   }
-  if (updateEnforcementAction) {
+  if (updateEnforcementAction && reqUrl !== `${baseOutcomeUrl}/update-enforcement-action`) {
     backLink = `${baseOutcomeUrl}/update-enforcement-action`
   }
   if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
