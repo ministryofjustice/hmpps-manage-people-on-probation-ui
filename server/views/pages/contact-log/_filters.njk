@@ -1,7 +1,7 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
 {%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
 
-{% set queryString = '?' + queryParams.join('&')if queryParams.length > 0 else
+{% set queryString = '?' + queryParams.join('&') if queryParams.length > 0 else
   '' %}
 {% set clearLink = '?clear=true&view=' + view if view else
   '?clear=true' %}
