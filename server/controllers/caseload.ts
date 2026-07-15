@@ -61,7 +61,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       )
       let tiers: TierCalculations
       if (res.locals?.flags?.enableCaseloadV2) {
-        const uniqueCrns = [...new Set(caseload.caseload?.map(item => item.crn))].filter(Boolean)
+        const uniqueCrns = [...new Set(caseload?.caseload?.map(item => item.crn))].filter(Boolean)
         const tierClient = new TierApiClient(token)
         tiers = await tierClient.getTiers(uniqueCrns)
       }

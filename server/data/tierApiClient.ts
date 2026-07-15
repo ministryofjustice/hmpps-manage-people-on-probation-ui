@@ -39,7 +39,7 @@ export default class TierApiClient extends RestClient {
   async getTiers(crns: string[]): Promise<TierCalculations> {
     return this.post({
       path: `/v2/crns/tier`,
-      data: crns,
+      data: crns as unknown as Record<string, any>,
       handle404: true,
       handle500: true,
       errorMessage: 'Tier information is currently unavailable.',
