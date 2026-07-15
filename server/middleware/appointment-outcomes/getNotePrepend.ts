@@ -5,10 +5,13 @@ import {
   type OtherEnforcementActionsLetterType,
 } from '../../models/Appointments'
 import { letterTypeOptions } from '../../properties/appointment-outcomes'
+import logger from '../../../logger'
 
-export const getNotePrepend: Route<void> = (_req, res, next) => {
+export const getNotePrepend: Route<void> = (req, res, next) => {
   if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome) {
     const {
+      crn,
+      id,
       sentence: { type },
       appointmentSession: {
         outcome: {
@@ -43,6 +46,24 @@ export const getNotePrepend: Route<void> = (_req, res, next) => {
       text.push(`${letterSentBy} will send${!beginsWithA ? ' a ' : ' '}${letterType.toLowerCase()}`)
     }
     res.locals.appointmentOutcome.notePrepend = text.length ? text.join('\n') : null
+    if (res.locals.flags?.enableSessionCacheLogging) {
+      logger.debug(
+        {
+          event: 'notePrepend',
+          source: 'getNotePrepend',
+          uuid: id,
+          crn,
+          username: res.locals.user?.username,
+          reqMethod: req.method,
+          sessionLetterType: _letterType,
+          sessionLetterSentBy: _letterSentBy,
+          sessionEnforcementActionChoice: otherEnforcementAction,
+          resolvedLetterType: selectedLetterType,
+          notePrependSet: text.length > 0,
+        },
+        '[notePrepend] computed',
+      )
+    }
   }
   return next()
 }
