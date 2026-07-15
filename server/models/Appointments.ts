@@ -60,7 +60,8 @@ export const letterEnforcementActions = [
   'OTHER_ENFORCEMENT_LETTER_SENT',
   'LICENCE_COMPLIANCE_LETTER_SENT',
   'ENFORCEMENT_LETTER_REQUESTED',
-  'WITHDRAW_WARNING_LETTER',
+  'BREACH_LETTER_SENT',
+  'BREACH_CONFIRMATION_SENT',
 ] as const
 
 export const otherEnforcementActionLetterTypes = [
@@ -69,6 +70,7 @@ export const otherEnforcementActionLetterTypes = [
   'SECOND_WARNING_LETTER_SENT',
   'OTHER_ENFORCEMENT_LETTER_SENT',
   'LICENCE_COMPLIANCE_LETTER_SENT',
+  'BREACH_CONFIRMATION_SENT',
 ] as const
 
 export type LetterEnforcementAction = (typeof letterEnforcementActions)[number]
@@ -88,6 +90,7 @@ export const appointmentEnforcementActions = [
   'IMMEDIATE_BREACH_OR_RECALL',
   'YOT_OM_NOTIFIED',
   'WITHDRAWAL_OF_WARNING',
+  'WITHDRAW_WARNING_LETTER',
   'SEND_LETTER',
   'SEND_ANOTHER_LETTER',
   'WILL_BE_RESCHEDULED',
@@ -119,6 +122,7 @@ export type OutcomePage = (typeof outcomePageKeys)[number]
 
 export const enforcementActionPageKeys = [
   'attendedFailedToComply',
+  'acceptableAbsence',
   'unacceptableAbsence',
   'failedToAttend',
   'otherEnforcementAction',
@@ -199,6 +203,7 @@ export type EnforcementActionLetterType =
   | 'SECOND_WARNING_LETTER_SENT'
   | 'BREACH_LETTER_SENT'
   | 'OTHER_ENFORCEMENT_LETTER_SENT'
+  | 'BREACH_CONFIRMATION_SENT'
 
 export interface AppointmentType {
   code: string

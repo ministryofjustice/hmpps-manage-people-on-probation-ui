@@ -341,7 +341,7 @@ describe('/middleware/appointment-outcomes/getOutcomeProps()', () => {
   it('should set showLetterTypeOptions to false when selected enforcement action does contain a letter action', () => {
     const req = buildRequest({ params: { contactId: undefined } })
     req.session.data.appointments[crn][uuid].outcome = {
-      enforcementActionCode: ['EA02'],
+      otherEnforcementAction: 'FIRST_WARNING_LETTER_SENT',
     }
     const res = buildResponse()
     mockAppointmentDateIsInPast.mockReturnValueOnce(true)

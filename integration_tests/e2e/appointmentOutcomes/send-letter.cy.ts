@@ -151,7 +151,6 @@ const getExpectedOptions = ({
       expectedOptions.push(
         { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
         { value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' },
-        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
       )
     }
     expectedOptions.push({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' })

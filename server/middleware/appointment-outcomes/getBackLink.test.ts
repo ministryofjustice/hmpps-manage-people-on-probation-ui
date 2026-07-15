@@ -148,6 +148,32 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
       expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/update-enforcement-action`)
     })
 
+    it('should not set back link to itself when on enforcement-action page and otherEnforcementAction is already in session', () => {
+      const req = mockReq({
+        request,
+        id: arrangeAppointmentJourney ? uuid : contactId,
+        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+        otherEnforcementAction: 'BREACH_LETTER_SENT',
+      })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/enforcement-action`, ...localsVars })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/attended-failed-to-comply`)
+    })
+
+    it('should not set back link to itself when on update-enforcement-action page and updateEnforcementAction is already in session', () => {
+      const req = mockReq({
+        request,
+        id: arrangeAppointmentJourney ? uuid : contactId,
+        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+        updateEnforcementAction: 'SEND_ANOTHER_LETTER',
+      })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/update-enforcement-action`, ...localsVars })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(
+        arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
+      )
+    })
+
     const outcomePages = {
       'enforcement action page': 'enforcement-action',
       'send a letter page': 'send-letter',

@@ -7,7 +7,8 @@ import {
 import { getDataValue } from '../../utils'
 
 export const getBackLink: Route<void> = (req, res, next) => {
-  const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id } = res.locals.appointmentOutcome
+  const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id, sendLetter, appointmentSession } =
+    res.locals.appointmentOutcome
   let backLink = baseOutcomeUrl
   if ([baseOutcomeUrl, `${baseOutcomeUrl}/update-enforcement-action`].includes(reqUrl)) {
     backLink = uuid ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`
@@ -50,11 +51,20 @@ export const getBackLink: Route<void> = (req, res, next) => {
       default:
         backLink = `/case/${crn}/appointments/appointment/${id}/manage`
     }
-    if (otherEnforcementAction) {
-      backLink = `${baseOutcomeUrl}/enforcement-action`
+  }
+  if (otherEnforcementAction && reqUrl !== `${baseOutcomeUrl}/enforcement-action`) {
+    backLink = `${baseOutcomeUrl}/enforcement-action`
+  }
+  if (updateEnforcementAction && reqUrl !== `${baseOutcomeUrl}/update-enforcement-action`) {
+    backLink = `${baseOutcomeUrl}/update-enforcement-action`
+  }
+  if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
+    // every journey goes to add note
+    if (sendLetter) {
+      backLink = `${baseOutcomeUrl}/send-letter`
     }
-    if (updateEnforcementAction) {
-      backLink = `${baseOutcomeUrl}/update-enforcement-action`
+    if (appointmentSession?.outcome?.breachNSICreatedBy) {
+      backLink = `${baseOutcomeUrl}/initiate-breach-or-recall`
     }
   }
   res.locals.appointmentOutcome.backLink = backLink

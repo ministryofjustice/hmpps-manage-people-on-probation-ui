@@ -12,10 +12,12 @@ import {
   forceValidation,
 } from '../middleware'
 import {
+  getBackLink,
   getNotePrepend,
   getOutcomeProps,
   getOutcomeSentence,
   handlePutOutcome,
+  restrictPageAccess,
 } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import config from '../config'
@@ -55,12 +57,14 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     getSentences(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getOutcomeProps,
+    getBackLink,
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
   )
 
   router.get(
     '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    restrictPageAccess,
     forceValidation,
     controllers.appointmentOutcomes.getAddNote(hmppsAuthClient),
   )

@@ -35,6 +35,7 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
           letterType,
           breachNSICreatedBy,
           updateEnforcementAction,
+          otherEnforcementAction,
         },
       },
       appointment,
@@ -101,11 +102,18 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       failedToAttend ||
       letterType ||
       breachNSICreatedBy ||
-      updateEnforcementAction
+      updateEnforcementAction ||
+      otherEnforcementAction
     ) {
       const enforcementAction = getSelectedEnforcementActions()
       summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : enforcementAction
       summary.enforcementActionChangeLink = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
+      // if (otherEnforcementAction) {
+      //   summary.enforcementActionChangeLink = `${baseOutcomeUrl}/enforcement-action`
+      // }
+      if (updateEnforcementAction) {
+        summary.enforcementActionChangeLink = `${baseOutcomeUrl}/update-enforcement-action`
+      }
       if (evidenceDueDate) {
         summary.evidenceDueDate = evidenceDueDate
       }

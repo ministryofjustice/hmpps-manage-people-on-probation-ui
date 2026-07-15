@@ -5,6 +5,7 @@ import {
   anyValue,
   type PageAccessRuleItem,
 } from '../../properties/appointment-outcomes/page-access-rules'
+import { AppointmentSession } from '../../models/Appointments'
 
 export const restrictPageAccess = (req: Request, res: Response, next: NextFunction) => {
   const { url, session, params } = req
@@ -12,7 +13,7 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
   const id = uuid || contactId
   const { data } = session
   const path = ['appointments', crn, id]
-  const appointmentSession = getDataValue(data, path)
+  const appointmentSession = getDataValue<AppointmentSession>(data, path)
   const baseUrl = uuid
     ? `/case/${crn}/arrange-appointment/${uuid}`
     : `/case/${crn}/appointments/appointment/${contactId}`

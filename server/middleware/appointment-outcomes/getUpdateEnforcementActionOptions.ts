@@ -48,7 +48,6 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   }
 
   /* Breach related */
-
   if (
     breachEnforcementActions.includes(currentEnforcementAction?.action as BreachEnforcementAction) &&
     !acceptableAbsence &&
@@ -92,7 +91,6 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
   }
 
   /* Any other enforcement action? */
-
   if (!values.length) {
     return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
   }

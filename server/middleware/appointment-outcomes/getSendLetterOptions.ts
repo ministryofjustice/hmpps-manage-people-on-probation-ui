@@ -31,12 +31,9 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   }
   if (sendLetter && (pss || (sentenceType === 'CUSTODY' && youth))) {
     filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
-      [
-        'FIRST_WARNING_LETTER_SENT',
-        'SECOND_WARNING_LETTER_SENT',
-        'BREACH_LETTER_SENT',
-        'OTHER_ENFORCEMENT_LETTER_SENT',
-      ].includes(typeOption.value),
+      ['FIRST_WARNING_LETTER_SENT', 'SECOND_WARNING_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(
+        typeOption.value,
+      ),
     )
   }
   if (sendBreachOrRecallLetter && (sentenceType === 'COMMUNITY' || pss || youth)) {
