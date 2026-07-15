@@ -21,4 +21,5 @@ export class FeatureFlags {
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
   enableSessionCacheLogging?: boolean = undefined
   enableESUPCheckinNewStop?: boolean = undefined
+  enableESUPCheckinNewReview?: boolean = undefined
 }

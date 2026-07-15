@@ -4,6 +4,7 @@ import controllers from '../controllers'
 import validate from '../middleware/validation'
 import { autoStoreSessionData, restrictPageAccess, renderError } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
+import { redirectToManageCheckInService } from '../middleware/redirectToManageCheckInService'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 import { AppResponse } from '../models/Locals'
 import { getCheckInQuestionsRedirect } from '../middleware/getCheckInQuestionsRedirect'
@@ -268,6 +269,20 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   router.get(
     '/case/:crn/appointments/check-in/manage/:id/restart-confirmation',
     controllers.checkIns.getRestartConfirmation(hmppsAuthClient),
+  )
+
+  // Mounted ahead of the review routes so the whole journey moves together: entering at
+  // `update` covers most traffic, but a bookmark or back button can land on any of these.
+  // `view-expired` and `review` are listed separately because a prefix only matches at a
+  // path segment boundary.
+  router.use(
+    [
+      '/case/:crn/appointments/:id/check-in/update',
+      '/case/:crn/appointments/:id/check-in/view',
+      '/case/:crn/appointments/:id/check-in/view-expired',
+      '/case/:crn/appointments/:id/check-in/review',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewReview'),
   )
 
   router.get('/case/:crn/appointments/:id/check-in/update', [
