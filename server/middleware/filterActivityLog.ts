@@ -120,10 +120,13 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
               href: filterHref(filterKey, text),
             })
           } else if (filterKey === 'category') {
-            value.push({
-              text: categoryOptionsSource.find(option => option.value === text).text,
-              href: filterHref(filterKey, text),
-            })
+            const categoryOption = categoryOptionsSource.find(option => option.value === text)
+            if (categoryOption) {
+              value.push({
+                text: categoryOption.text,
+                href: filterHref(filterKey, text),
+              })
+            }
           } else if (filterKey === 'hideContact') {
             value.push({
               text: hideContactsFilterOptions.find(option => option.value === text).text,

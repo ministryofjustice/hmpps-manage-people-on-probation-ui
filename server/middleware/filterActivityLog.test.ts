@@ -247,6 +247,29 @@ describe('/middleware/filterActivityLog()', () => {
     })
   })
 
+  describe('a session category value is not present in the current options (e.g. flag turned off after selecting SPARKS)', () => {
+    const req = getRequest({
+      submit: true,
+      keywords: '',
+      dateFrom: '',
+      dateTo: '',
+      compliance: 'complied',
+      category: ['appointments with sparks activity', 'appointments'],
+      hideContact: 'hide NDelius system generated contacts',
+    })
+    beforeEach(() => {
+      filterActivityLog(req, res, nextSpy)
+    })
+    it('should skip the unknown category instead of throwing', () => {
+      expect(res.locals.filters.selectedFilterItems.category).toEqual([
+        {
+          text: 'Appointments',
+          href: `/case/${crn}/activity-log?clearFilterKey=category&clearFilterValue=appointments`,
+        },
+      ])
+    })
+  })
+
   describe('All filters are completed', () => {
     const req = getRequest()
     req.session.activityLogFilters = {
