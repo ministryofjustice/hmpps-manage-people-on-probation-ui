@@ -228,6 +228,15 @@ describe('/middleware/filterActivityLog()', () => {
       )
       expect(appointmentsOption.text).toEqual('All appointments')
     })
+    it('should add the SPARKS category directly after "All appointments" in the checkbox options', () => {
+      const { categoryOptions } = flaggedRes.locals.filters
+      const appointmentsIndex = categoryOptions.findIndex(option => option.value === 'appointments')
+      expect(categoryOptions[appointmentsIndex + 1]).toEqual({
+        text: 'Appointments with SPARKS activity',
+        value: 'appointments with sparks activity',
+        checked: false,
+      })
+    })
     it('should rename the appointments category to "All appointments" in the selected filter tag', () => {
       expect(flaggedRes.locals.filters.selectedFilterItems.category).toEqual([
         {

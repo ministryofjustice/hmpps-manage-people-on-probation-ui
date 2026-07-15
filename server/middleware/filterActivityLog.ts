@@ -5,6 +5,7 @@ import { Route } from '../@types'
 
 import {
   categoryFilterOptions,
+  sparksCategoryFilterOption,
   filterOptions as complianceFilterOptions,
   hideContactsFilterOptions,
 } from '../properties'
@@ -70,8 +71,10 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   }
 
   const categoryOptionsSource = res.locals.flags?.enableSparksFilter
-    ? categoryFilterOptions.map(option =>
-        option.value === 'appointments' ? { ...option, text: 'All appointments' } : option,
+    ? categoryFilterOptions.flatMap(option =>
+        option.value === 'appointments'
+          ? [{ ...option, text: 'All appointments' }, sparksCategoryFilterOption]
+          : [option],
       )
     : categoryFilterOptions
 

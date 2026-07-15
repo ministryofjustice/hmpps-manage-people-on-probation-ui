@@ -7,7 +7,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { Document } from '../data/model/personalDetails'
-import { APPOINTMENTS_CODES, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
+import { APPOINTMENTS_CODES, SPARKS_CODES, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -185,5 +185,34 @@ describe('/middleware/getPersonActivity', () => {
     expect(tierSpy).toHaveBeenCalledWith(crn)
     expect(personActivity).toEqual(mockPersonActivityResponse)
     expect(tierCalculation).toEqual(mockTierCalculationResponse)
+  })
+
+  it('should map the SPARKS category to its type codes when enableSparksFilter is enabled', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSparksFilter: true }
+    res.locals.filters = {
+      ...filterVals,
+      category: ['appointments with sparks activity'],
+      complianceOptions: [],
+      categoryOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({ typeCodes: SPARKS_CODES }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
+    res.locals.flags = {}
   })
 })

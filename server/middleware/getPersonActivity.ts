@@ -6,7 +6,7 @@ import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
 import { AppResponse } from '../models/Locals'
 import { ActivityLogRequestBody, SelectedFilterItem } from '../models/ActivityLog'
-import { categoryFilterOptions, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
+import { categoryFilterOptions, sparksCategoryFilterOption, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 export const getPersonActivity = async (
   req: Request,
@@ -22,10 +22,14 @@ export const getPersonActivity = async (
   const masClient = new MasApiClient(token)
   const tierClient = new TierApiClient(token)
 
+  const categoryOptions = res.locals.flags?.enableSparksFilter
+    ? [...categoryFilterOptions, sparksCategoryFilterOption]
+    : categoryFilterOptions
+
   const combinedCategoryCodes: string[] = []
   if (Array.isArray(category)) {
     for (const val of category) {
-      combinedCategoryCodes.push(...(categoryFilterOptions.find(option => option.value === val)?.codes || []))
+      combinedCategoryCodes.push(...(categoryOptions.find(option => option.value === val)?.codes || []))
     }
   }
 
