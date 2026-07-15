@@ -202,6 +202,42 @@ describe('/middleware/filterActivityLog()', () => {
     })
   })
 
+  describe('enableSparksFilter feature flag is enabled', () => {
+    const flaggedRes = {
+      locals: {
+        user: { username: 'user-1' },
+        flags: { enableSparksFilter: true },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
+    const req = getRequest({
+      submit: true,
+      keywords: '',
+      dateFrom: '',
+      dateTo: '',
+      compliance: 'complied',
+      category: 'appointments',
+      hideContact: 'hide NDelius system generated contacts',
+    })
+    beforeEach(() => {
+      filterActivityLog(req, flaggedRes, nextSpy)
+    })
+    it('should rename the appointments category to "All appointments" in the checkbox options', () => {
+      const appointmentsOption = flaggedRes.locals.filters.categoryOptions.find(
+        option => option.value === 'appointments',
+      )
+      expect(appointmentsOption.text).toEqual('All appointments')
+    })
+    it('should rename the appointments category to "All appointments" in the selected filter tag', () => {
+      expect(flaggedRes.locals.filters.selectedFilterItems.category).toEqual([
+        {
+          text: 'All appointments',
+          href: `/case/${crn}/activity-log?clearFilterKey=category&clearFilterValue=appointments`,
+        },
+      ])
+    })
+  })
+
   describe('All filters are completed', () => {
     const req = getRequest()
     req.session.activityLogFilters = {

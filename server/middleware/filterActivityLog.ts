@@ -69,6 +69,12 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     }
   }
 
+  const categoryOptionsSource = res.locals.flags?.enableSparksFilter
+    ? categoryFilterOptions.map(option =>
+        option.value === 'appointments' ? { ...option, text: 'All appointments' } : option,
+      )
+    : categoryFilterOptions
+
   const baseUrl = `/case/${crn}/activity-log`
   const filters: ActivityLogFilters = {
     keywords,
@@ -112,7 +118,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
             })
           } else if (filterKey === 'category') {
             value.push({
-              text: categoryFilterOptions.find(option => option.value === text).text,
+              text: categoryOptionsSource.find(option => option.value === text).text,
               href: filterHref(filterKey, text),
             })
           } else if (filterKey === 'hideContact') {
@@ -141,7 +147,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     checked: filters.compliance.includes(value),
   }))
 
-  const categoryOptions: Option[] = categoryFilterOptions.map(({ text, value }) => ({
+  const categoryOptions: Option[] = categoryOptionsSource.map(({ text, value }) => ({
     text,
     value,
     checked: filters.category.includes(value),
