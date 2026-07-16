@@ -271,10 +271,8 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getRestartConfirmation(hmppsAuthClient),
   )
 
-  // Mounted ahead of the review routes so the whole journey moves together: entering at
-  // `update` covers most traffic, but a bookmark or back button can land on any of these.
-  // `view-expired` and `review` are listed separately because a prefix only matches at a
-  // path segment boundary.
+  // Check these routes against the enableESUPCheckinNewReview flag
+  // and redirect to the manage online check-ins service if set
   router.use(
     [
       '/case/:crn/appointments/:id/check-in/update',

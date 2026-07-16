@@ -74,7 +74,7 @@ describe('redirectToManageCheckInService', () => {
     expect(redirectSpy).toHaveBeenCalledWith(`${link}${url}`)
   })
 
-  it('makes the back url absolute so it resolves against this service', () => {
+  it('makes the back url absolute so it returns to this service', () => {
     const res = mockAppResponse({ flags: { enableESUPCheckinNewReview: true } })
     const redirectSpy = jest.spyOn(res, 'redirect')
     const backPath = `/case/${crn}/activity-log?page=1`

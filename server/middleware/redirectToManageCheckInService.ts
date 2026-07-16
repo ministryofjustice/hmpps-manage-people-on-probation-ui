@@ -3,14 +3,12 @@ import { AppResponse } from '../models/Locals'
 import { Route } from '../@types'
 import config from '../config'
 
-// Flags that hand a check-in journey over to the manage online check-ins service.
-// Add each new de-integration flag here as well as to FeatureFlags.
 export type NewCheckInServiceFlag = 'enableESUPCheckinNewReview'
 
 const stripTrailingSlash = (url: string): string => url.replace(/\/$/, '')
 
-// `back` arrives as a site-relative path, so it has to be made absolute before it is
-// handed to the manage online check-ins service on a separate domain.
+// `back` param is a relative url, so it has to be made absolute before it is
+// redirecting to the manage online check-ins service
 const absoluteBackUrl = (back: unknown): string | null => {
   if (typeof back !== 'string' || !back.startsWith('/') || back.startsWith('//')) {
     return null
