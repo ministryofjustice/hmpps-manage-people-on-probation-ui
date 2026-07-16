@@ -1,4 +1,5 @@
 {% extends "../partials/case.njk" %}
+{% from "../_components/govuk/accordion-mpop/macro.njk" import probationAccordion %}
 {% set pageTitle = makePageTitle({
     pageHeading: [sentenceDetails.sentence.order.description, "Sentence"]
 }) %}
@@ -336,6 +337,28 @@
                   }) }}
                 {% endset %}
 
+                {{ probationAccordion({
+                id: "sentence-supervision-packages",
+                attributes: {
+                    'data-qa': 'sentence-supervision-packages'
+                },
+                rememberExpanded: false,
+                items: [
+                    {
+                    heading: {
+                        html: 'Supervision packages'
+                    },
+                    content: {
+                        html: '<p class="govuk-body govuk-!-margin-bottom-2 govuk-!-margin-left-3 govuk-!-margin-top-3">Tier: ' + (tierCalculation.tierScore | convertToTitleCase) + '</p>' +
+                            '<p class="govuk-body govuk-!-margin-bottom-0 govuk-!-margin-left-3">' +
+                            '<a class="govuk-link govuk-link--no-visited-state" href="' + headerTierLink + '">View tier change history</a>' +
+                            '</p>'
+                    },
+                    expanded: false
+                    }
+                ]
+                }) }}
+
                 {{ appSummaryCard({
                   attributes: {'data-qa': 'offenceCard'},
                   titleText: 'Offence',
@@ -359,6 +382,8 @@
                   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
                   html: sentence
             }) }}
+
+
             </div>
         {% else %}
             <div data-qa="no-active-sentence">
