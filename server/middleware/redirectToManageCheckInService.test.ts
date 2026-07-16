@@ -97,4 +97,13 @@ describe('redirectToManageCheckInService', () => {
 
     expect(redirectSpy).toHaveBeenCalledWith(`${link}${path}`)
   })
+
+  it('redirects when enableESUPCheckinNewQuestions is enabled', () => {
+    const res = mockAppResponse({ flags: { enableESUPCheckinNewQuestions: true } })
+    const redirectSpy = jest.spyOn(res, 'redirect')
+
+    redirectToManageCheckInService('enableESUPCheckinNewQuestions')(createReq(), res, jest.fn())
+
+    expect(redirectSpy).toHaveBeenCalledWith(`${link}${path}`)
+  })
 })
