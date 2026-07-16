@@ -53,7 +53,11 @@ export const dataAccess = () => ({
   authClientArns,
   arnsComponents: new ArnsComponents(authClientArns, config.apis.arnsApi, logger),
   authClientMpop,
-  mpopComponents: new MPoPComponents(authClientMpop, config.apis.tierApi, logger),
+  mpopComponents: new MPoPComponents(
+    authClientMpop,
+    { ...config.apis.tierApi, supervisionPackageApiConfig: config.apis.supervisionPackageApi },
+    logger,
+  ),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>

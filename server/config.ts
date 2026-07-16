@@ -214,6 +214,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('TIER_API_TIMEOUT_RESPONSE', 10000))),
     },
+    supervisionPackageApi: {
+      url: get('SUPERVISION_PACKAGE_API_URL', 'http://localhost:8100', requiredInProduction),
+      timeout: {
+        response: Number(get('SUPERVISION_PACKAGE_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('SUPERVISION_PACKAGE_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('SUPERVISION_PACKAGE_API_TIMEOUT_RESPONSE', 10000))),
+    },
     interventionsApi: {
       url: get('INTERVENTIONS_API_URL', 'http://localhost:8100', requiredInProduction),
       timeout: {

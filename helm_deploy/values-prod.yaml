@@ -52,6 +52,7 @@ generic-service:
     DELIUS_API_URL: 'https://manage-people-on-probation-and-delius.hmpps.service.justice.gov.uk'
     ARNS_API_URL: 'https://assess-risks-and-needs.hmpps.service.justice.gov.uk'
     TIER_API_URL: 'https://hmpps-tier.hmpps.service.justice.gov.uk'
+    SUPERVISION_PACKAGE_API_URL: 'https://supervision-packages-api.hmpps.service.justice.gov.uk'
     INTERVENTIONS_API_URL: 'https://hmpps-interventions-service.apps.live-1.cloud-platform.service.justice.gov.uk'
     SUPERVISION_API_URL: 'https://probation-supervision-appointments-api.hmpps.service.justice.gov.uk'
     ARNS_ASSESSMENT_PLATFORM_API_URL: 'https://arns-assessment-platform-api.hmpps.service.justice.gov.uk'
