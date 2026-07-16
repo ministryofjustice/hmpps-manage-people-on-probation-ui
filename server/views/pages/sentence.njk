@@ -15,6 +15,32 @@
     <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View GPS location monitoring data</a>
 {% endset %}
 
+{% set supervisionPackagesContent %}
+  <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-margin-left-3 govuk-!-margin-top-3">
+    Tier: {{ tierCalculation.tierScore | convertToTitleCase }}
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-3 govuk-!-margin-left-3">
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ headerTierLink }}">View tier change history</a>
+  </p>
+
+  <table class="govuk-table govuk-!-margin-left-3 govuk-!-margin-bottom-0">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Stage</th>
+        <th scope="col" class="govuk-table__header">Start date</th>
+        <th scope="col" class="govuk-table__header">Status</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">-</td>
+        <td class="govuk-table__cell">-</td>
+        <td class="govuk-table__cell">-</td>
+      </tr>
+    </tbody>
+  </table>
+{% endset %}
+
 {% block beforeContent %}
     {{ govukBreadcrumbs({
       items: [
@@ -349,10 +375,7 @@
                         html: 'Supervision packages'
                     },
                     content: {
-                        html: '<p class="govuk-body govuk-!-margin-bottom-2 govuk-!-margin-left-3 govuk-!-margin-top-3">Tier: ' + (tierCalculation.tierScore | convertToTitleCase) + '</p>' +
-                            '<p class="govuk-body govuk-!-margin-bottom-0 govuk-!-margin-left-3">' +
-                            '<a class="govuk-link govuk-link--no-visited-state" href="' + headerTierLink + '">View tier change history</a>' +
-                            '</p>'
+                        html: supervisionPackagesContent
                     },
                     expanded: false
                     }
