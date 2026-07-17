@@ -558,31 +558,12 @@ export const ENFORCEMENT_CODES: string[] = [
   'C145',
 ]
 
-export const SPARKS_CODES: string[] = [
-  'SPK001',
-  'SPK002',
-  'SPK003',
-  'SPK004',
-  'SPK005',
-  'SPK006',
-  'SPK007',
-  'SPK008',
-  'SPK009',
-  'SPK010',
-  'SPK011',
-  'SPK012',
-  'SPK013',
-  'SPK014',
-  'SPK015',
-  'SPK016',
-  'SPK017',
-  'SPK018',
-]
+export const SPARKS_FILTER_VALUE = 'sparks'
 
 export const sparksCategoryFilterOption = {
   text: 'Appointments with SPARKS activity',
   value: 'appointments with sparks activity',
-  codes: SPARKS_CODES,
+  codes: [SPARKS_FILTER_VALUE],
 }
 
 export const categoryFilterOptions = [

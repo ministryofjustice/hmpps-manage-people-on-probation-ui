@@ -88,6 +88,26 @@
     items: filters.complianceOptions
   }) }}
 
+  {% if filters.sparksOptions.length %}
+  {{ govukCheckboxes({
+    idPrefix: 'sparks',
+    name: 'sparks',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: 'SPARKS filters',
+        classes: 'govuk-fieldset__legend--s'
+      }
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'sparks'
+      }
+    },
+    items: filters.sparksOptions
+  }) }}
+  {% endif %}
+
   {{ govukCheckboxes({
     idPrefix: 'category',
     name: 'category',
@@ -140,6 +160,15 @@
             text: 'Category filters'
         },
         items: filters.selectedFilterItems.category
+    }), filterCategories) %}
+{% endif %}
+
+{% if filters.selectedFilterItems.sparks.length %}
+    {% set filterCategories = (filterCategories.push({
+        heading: {
+            text: 'SPARKS filters'
+        },
+        items: filters.selectedFilterItems.sparks
     }), filterCategories) %}
 {% endif %}
 
@@ -196,7 +225,7 @@
       href: '/case/' + crn + '/activity-log' + clearLink
     },
     categories: filterCategories
-  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length,
+  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length or filters.selectedFilterItems.sparks.length,
   optionsHtml: filterOptionsHtml
 }) }}
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
