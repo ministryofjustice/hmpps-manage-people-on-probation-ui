@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { resetEnforcementActionSelection } from './resetEnforcementActionSelection'
 import { setDataValue } from '../../utils'
-import { AppointmentEnforcementAction, AppointmentSession, AppointmentSessionOutcome } from '../../models/Appointments'
+import { AppointmentSession, AppointmentSessionOutcome } from '../../models/Appointments'
 
 const crn = 'X000001'
 const id = '12345'
@@ -70,7 +70,7 @@ const buildResponse = ({
   sendBreachOrRecallLetter = false,
   otherAction = false,
   appointmentSession = undefined as AppointmentSession,
-  reqUrl = `/case/${crn}/appointment/appointment/${id}/failed-to-attend`,
+  reqUrl = `${baseOutcomeUrl}/add-note`,
 } = {}): httpMocks.MockResponse<any> => {
   const res = {
     locals: {

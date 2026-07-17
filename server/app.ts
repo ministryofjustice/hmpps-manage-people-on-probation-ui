@@ -30,12 +30,14 @@ import manageAppointmentRoutes from './routes/manageAppointmentRoutes'
 import testRoutes from './routes/testRoutes'
 import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
 import { getUserAlertsCount } from './middleware/getUserAlertsCount'
+import requestLogger from './middleware/requestLogger'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
 
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
+    app.use(requestLogger())
   }
 
   app.set('json spaces', 2)
