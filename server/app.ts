@@ -31,6 +31,7 @@ import testRoutes from './routes/testRoutes'
 import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
 import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 import requestLogger from './middleware/requestLogger'
+import instrumentRouter from './middleware/instrumentRouter'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -38,6 +39,9 @@ export default function createApp(services: Services): express.Application {
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
     app.use(requestLogger())
+    // Must run before any routes are registered (see instrumentRouter.ts) -
+    // routes() is called later, at app.use(routes(router, services)) below.
+    instrumentRouter()
   }
 
   app.set('json spaces', 2)

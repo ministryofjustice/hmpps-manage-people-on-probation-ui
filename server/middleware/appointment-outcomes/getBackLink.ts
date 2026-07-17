@@ -1,3 +1,4 @@
+import logger from '../../../logger'
 import { Route } from '../../@types'
 import {
   AppointmentEnforcementAction,
@@ -52,10 +53,14 @@ export const getBackLink: Route<void> = (req, res, next) => {
         backLink = `/case/${crn}/appointments/appointment/${id}/manage`
     }
   }
-  if (otherEnforcementAction && reqUrl !== `${baseOutcomeUrl}/enforcement-action`) {
+  if (otherEnforcementAction && reqUrl !== `${baseOutcomeUrl}/enforcement-action` && reqUrl !== baseOutcomeUrl) {
     backLink = `${baseOutcomeUrl}/enforcement-action`
   }
-  if (updateEnforcementAction && reqUrl !== `${baseOutcomeUrl}/update-enforcement-action`) {
+  if (
+    updateEnforcementAction &&
+    reqUrl !== `${baseOutcomeUrl}/update-enforcement-action` &&
+    reqUrl !== baseOutcomeUrl
+  ) {
     backLink = `${baseOutcomeUrl}/update-enforcement-action`
   }
   if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {

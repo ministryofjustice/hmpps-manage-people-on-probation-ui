@@ -48,6 +48,29 @@ npm run start:dev
 
 Open http://localhost:3000 in your browser.
 
+### Local request/route logging
+
+In development (`NODE_ENV=development`), the app logs one `request received`
+and one `request completed` debug line per request (see
+`server/middleware/requestLogger.ts`), skipping static assets (`/assets/*`,
+`/favicon.ico`). The completed line includes a `handlers` array - the full,
+correctly-ordered chain of middleware and controllers that actually ran for
+that request, including handlers from `router.all()`/`router.use()` calls
+that Express's own `req.route.stack` would miss (see
+`server/middleware/instrumentRouter.ts` for how this is captured).
+
+Each entry is formatted as `<registrationMethod>:<name>`, e.g:
+
+- `use:session` - registered via `app.use(...)` or `router.use(...)`
+- `all:getSentences` - registered via `router.all(...)` (runs for every HTTP method on that path)
+- `get:forceValidation` / `post:checkAnswers` - registered via `router.get(...)` / `router.post(...)` (runs only for that HTTP method)
+
+This prefix reflects how the handler was *registered*, not the HTTP method of
+the incoming request (that's the separate top-level `method` field). Handlers
+with no function name (common with factory-pattern middleware/controllers,
+e.g. `(dep) => (req, res, next) => {...}`) show as `unnamed#<position>`
+instead - name the inner function to get a real name in the log.
+
 ## Formatting
 
 ### Check formatting

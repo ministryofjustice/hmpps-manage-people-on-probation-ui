@@ -45,27 +45,24 @@ describe('requestLogger', () => {
     )
   })
 
-  it('labels named handlers by name and unnamed (factory-returned) handlers by position', () => {
+  it('logs the full handler chain from req.handlerTrace, populated by instrumentRouter()', () => {
     const req = httpMocks.createRequest({ method: 'GET', url: '/case/X123456/appointments/appointment/1/manage' })
     const res = httpMocks.createResponse({ eventEmitter: EventEmitter })
     const next = jest.fn()
 
-    function namedMiddleware() {
-      /* no-op stand-in for a real middleware */
-    }
-    // Express itself sets layer.name to the literal string "<anonymous>" for
-    // middleware with no function name (not an empty string) - mirrored here.
-    req.route = {
-      path: '/case/:crn/appointments/appointment/:contactId/manage',
-      stack: [{ name: '<anonymous>' }, { name: namedMiddleware.name }, { name: '<anonymous>' }],
-    } as unknown as typeof req.route
+    // instrumentRouter() populates this as handlers actually execute - here we
+    // simulate the result, including a mix of named and unnamed (factory-
+    // returned) handlers from a router.all() registration (that req.route.stack
+    // alone would have missed) and a router.get() registration, each prefixed
+    // with the method that registered it.
+    req.handlerTrace = ['all:unnamed#1', 'all:unnamed#2', 'get:namedMiddleware', 'get:unnamed#4']
 
     requestLogger()(req, res, next)
     res.emit('finish')
 
     expect(logger.debug).toHaveBeenCalledWith(
       expect.objectContaining({
-        handlers: ['unnamed#1', 'namedMiddleware', 'unnamed#3'],
+        handlers: ['all:unnamed#1', 'all:unnamed#2', 'get:namedMiddleware', 'get:unnamed#4'],
       }),
       'request completed',
     )
