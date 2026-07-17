@@ -38,10 +38,11 @@ export default function createApp(services: Services): express.Application {
 
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
-    app.use(requestLogger())
-    // Must run before any routes are registered (see instrumentRouter.ts) -
-    // routes() is called later, at app.use(routes(router, services)) below.
+    // Must run before ANY app.use()/router.*() calls - including
+    // requestLogger() below - so every registered handler (this one
+    // included) is captured in the trace, not just ones registered after it.
     instrumentRouter()
+    app.use(requestLogger())
   }
 
   app.set('json spaces', 2)

@@ -24,7 +24,18 @@ import { Router } from 'express'
 //
 // Must be called once, in development only, before route files are invoked
 // (see app.ts) - it patches the shared Router prototype, so timing relative
-// to route registration matters, not import order.
+// to route registration matters, not import order. It must also run before
+// app.use(requestLogger()) itself, or requestLogger's own registration won't
+// be captured in the trace.
+//
+// Caveat: this only patches Router.prototype, not Express's separate
+// internal Route class. `app.get('/path', handler)` / `app.post(...)` etc
+// called directly on `app` (not on a Router() instance) are NOT covered,
+// because Express internally delegates those single-path overloads to
+// Route.prototype rather than Router.prototype. Not an issue in this
+// codebase, which always registers routes via Router() instances (see
+// server/routes/*.ts) mounted with app.use(router) - only app.use(...) is
+// ever called directly on `app`.
 //
 // Each entry in req.handlerTrace (and the `handlers` field logged by
 // requestLogger.ts) is formatted as "<registrationMethod>:<name>", e.g:
@@ -71,12 +82,30 @@ export default function instrumentRouter(): void {
 
         const label = arg.name && arg.name !== '<anonymous>' ? arg.name : undefined
 
-        return function wrappedHandler(this: unknown, req: any, ...rest: any[]) {
+        const record = (req: any) => {
           req.handlerTrace = req.handlerTrace || []
           // Prefixed with the registration method (all/get/post/...) so it's
           // clear which router.<method>() call added this handler - useful
           // when the same path is split across multiple registrations.
           req.handlerTrace.push(`${method}:${label || `unnamed#${req.handlerTrace.length + 1}`}`)
+        }
+
+        // Express decides whether middleware is an error handler purely by
+        // checking `fn.length === 4` (i.e. it was declared with exactly 4
+        // params: (err, req, res, next)). Wrapping with a rest-param function
+        // would collapse `.length` to something else and silently break
+        // error handling - Express would stop invoking it on errors. So
+        // error-handling middleware must be wrapped with a function that
+        // preserves that exact 4-param arity, with `req` as the 2nd param.
+        if (arg.length === 4) {
+          return function wrappedErrorHandler(this: unknown, err: any, req: any, res: any, next: any) {
+            record(req)
+            return arg.apply(this, [err, req, res, next])
+          }
+        }
+
+        return function wrappedHandler(this: unknown, req: any, ...rest: any[]) {
+          record(req)
           return arg.apply(this, [req, ...rest])
         }
       })

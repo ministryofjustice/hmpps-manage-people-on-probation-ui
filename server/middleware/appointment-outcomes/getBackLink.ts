@@ -1,4 +1,3 @@
-import logger from '../../../logger'
 import { Route } from '../../@types'
 import {
   AppointmentEnforcementAction,
