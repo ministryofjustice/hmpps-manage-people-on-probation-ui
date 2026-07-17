@@ -164,7 +164,9 @@
       tierScore: (tierCalculation.tierScore if tierCalculation.tierScore !== 'MISSING' else null) if tierCalculation else null,
       tag: tierCalculation.tag if tierCalculation else null,
       historyHref: tierUrlV3,
-      forename: overview.personalDetails.name.forename
+      forename: overview.personalDetails.name.forename,
+      arrangeAppointmentHref: '/case/' + crn + '/arrange-appointment/sentence?back=' + url,
+      updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn)
     } | merge(supervisionPackageDetails or {})) }}
   {% endif %}
 

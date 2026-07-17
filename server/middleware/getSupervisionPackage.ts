@@ -70,6 +70,7 @@ export const getSupervisionPackage = (
     }
 
     if (supervisionPackageResponse?.httpStatus === 200) {
+      console.dir(supervisionPackageResponse.supervisionPackage, { depth: null })
       res.locals.supervisionPackageDetails = supervisionPackageResponse.supervisionPackage
     }
 
