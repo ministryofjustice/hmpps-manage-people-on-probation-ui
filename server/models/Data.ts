@@ -10,6 +10,7 @@ import { ESupervisionSession } from './ESupervision'
 import { SentencePlan } from './Risk'
 import { ErrorSummary } from '../data/model/common'
 import { ProbationPractitioner } from './CaseDetail'
+import { SupervisionPackageResponse } from './SupervisionPackage'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -20,6 +21,7 @@ export interface PersonalDetailsSession {
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
   tierDetails?: LatestTierResponse
+  supervisionPackageResponse?: SupervisionPackageResponse
 }
 
 export interface Data {

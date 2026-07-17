@@ -22,4 +22,5 @@ export class FeatureFlags {
   enableSessionCacheLogging?: boolean = undefined
   enableESUPCheckinNewStop?: boolean = undefined
   enableESUPCheckinNewReview?: boolean = undefined
+  enableESUPCheckinNewQuestions?: boolean = undefined
 }

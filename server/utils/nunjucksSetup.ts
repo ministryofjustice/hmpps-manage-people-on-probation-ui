@@ -4,6 +4,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 import nunjucks from 'nunjucks'
 
 import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { mpopNunjucksSetup } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import express, { Request, NextFunction } from 'express'
 import type { Services } from '../services'
 
@@ -251,4 +252,5 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('makePageTitle', makePageTitle)
 
   arnsNunjucksSetup(njkEnv)
+  mpopNunjucksSetup(njkEnv)
 }

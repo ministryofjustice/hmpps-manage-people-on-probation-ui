@@ -8,6 +8,7 @@ import { redirectToManageCheckInService } from '../middleware/redirectToManageCh
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 import { AppResponse } from '../models/Locals'
 import { getCheckInQuestionsRedirect } from '../middleware/getCheckInQuestionsRedirect'
+import { redirectToManageCheckInService } from '../middleware/redirectToManageCheckInService'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.use(
@@ -338,6 +339,22 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     autoStoreSessionData(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
+
+  // Check these routes against the enableESUPCheckinNewQuestions flag
+  // and redirect to the manage online check-ins service if set
+  router.use(
+    [
+      '/case/:crn/appointments/check-in/manage/:id/questions/start',
+      '/case/:crn/appointments/check-in/manage/:id/questions/add',
+      '/case/:crn/appointments/check-in/manage/:id/questions/list',
+      '/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit',
+      '/case/:crn/appointments/check-in/manage/:id/questions/:templateId/select',
+      '/case/:crn/appointments/check-in/manage/:id/questions/:questionId/delete',
+      '/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling',
+      '/case/:crn/appointments/check-in/manage/:id/questions/preview/support',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewQuestions'),
+  )
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/start', [
     getCheckInQuestionsRedirect(hmppsAuthClient),

@@ -29,6 +29,7 @@ export interface Caseload {
   latestSentence?: string
   allocatedOn?: string
   newCase?: boolean
+  tier?: string
 }
 
 export interface CaseloadResponse {

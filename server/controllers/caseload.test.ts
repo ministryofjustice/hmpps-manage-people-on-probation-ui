@@ -11,10 +11,11 @@ import { UserSchedule } from '../data/model/userSchedule'
 import { mockAppResponse } from './mocks'
 import { CaseSearchFilter, TeamCaseload, UserCaseload, UserTeam } from '../data/model/caseload'
 import caseloadController from './caseload'
-import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
+import { RecentlyViewedCase } from '../data/model/caseAccess'
 import * as utils from '../utils'
 import * as dateRangeUtils from '../utils/getDateRange'
 import { checkAuditMessage } from './testutils'
+import TierApiClient, { TierCalculations } from '../data/tierApiClient'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -68,13 +69,24 @@ const mockResponse = {
   ],
 } as unknown as UserSchedule
 
+const mockTiers = {
+  X801756: {
+    tierScore: 'A0',
+  },
+  X801758: {
+    tierScore: 'D2',
+  },
+} as unknown as TierCalculations
+
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const nextSpy = jest.fn()
 const showCaseloadSpy = jest.spyOn(caseloadController, 'showCaseload')
 const res = mockAppResponse()
+const resFlag = mockAppResponse({ flags: { enableCaseloadV2: true } })
 const renderSpy = jest.spyOn(res, 'render')
+const flagRenderSpy = jest.spyOn(resFlag, 'render')
 const mockCaseload = {} as UserCaseload
 const mockFilters = {} as CaseSearchFilter
 
@@ -82,6 +94,8 @@ describe('caseloadController', () => {
   const getUserScheduleSpy = jest
     .spyOn(MasApiClient.prototype, 'getUserSchedule')
     .mockImplementation(() => Promise.resolve(mockResponse))
+
+  const tiersSpy = jest.spyOn(TierApiClient.prototype, 'getTiers').mockImplementation(() => Promise.resolve(mockTiers))
 
   const expectedUserSchedule = {
     ...mockResponse,
@@ -91,10 +105,20 @@ describe('caseloadController', () => {
     ],
   }
 
-  const mockUserCaseload = {} as UserCaseload
+  const mockEmptyCaseload = {} as UserCaseload
+  const mockUserCaseload = {
+    caseload: [
+      {
+        crn: 'X801756',
+      },
+      {
+        crn: 'X801758',
+      },
+    ],
+  } as UserCaseload
   const searchUserCaseloadSpy = jest
     .spyOn(MasApiClient.prototype, 'searchUserCaseload')
-    .mockImplementation(() => Promise.resolve(mockUserCaseload))
+    .mockImplementation(() => Promise.resolve(mockEmptyCaseload))
 
   afterEach(() => {
     jest.clearAllMocks()
@@ -163,6 +187,40 @@ describe('caseloadController', () => {
         'nextContact.asc',
         expectedCaseFilter,
       )
+    })
+    it('should request the tiers from the api when flag set', async () => {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
+      expect(tiersSpy).toHaveBeenCalled()
+    })
+    it('should not request the tiers from the api when flag not set', async () => {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
+      expect(tiersSpy).not.toHaveBeenCalled()
+    })
+    it('should link tiers with cases when flag set', async () => {
+      searchUserCaseloadSpy.mockImplementationOnce(() => Promise.resolve(mockUserCaseload))
+      const mockNewCaseload = {
+        caseload: [
+          {
+            crn: 'X801756',
+            newCase: false,
+            tier: 'A0',
+          },
+          {
+            crn: 'X801758',
+            newCase: false,
+            tier: 'D2',
+          },
+        ],
+      }
+      await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
+      expect(flagRenderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
+        pagination: mockPagination,
+        caseload: mockNewCaseload,
+        currentNavSection: 'yourCases',
+        filter: expectedCaseFilter,
+        url: req.url,
+        tiers: mockTiers,
+      })
     })
     it('should call caseloadController.showCaseload', async () => {
       await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)

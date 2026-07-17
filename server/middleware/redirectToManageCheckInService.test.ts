@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
-import { redirectToManageCheckInService } from './redirectToManageCheckInService'
 import { mockAppResponse } from '../controllers/mocks'
 import config from '../config'
+import { redirectToManageCheckInService } from './redirectToManageCheckInService'
 
 const crn = 'X000001'
 const id = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
@@ -97,4 +97,14 @@ describe('redirectToManageCheckInService', () => {
 
     expect(redirectSpy).toHaveBeenCalledWith(`${link}${path}`)
   })
+
+  it('redirects when enableESUPCheckinNewQuestions is enabled', () => {
+    const res = mockAppResponse({ flags: { enableESUPCheckinNewQuestions: true } })
+    const redirectSpy = jest.spyOn(res, 'redirect')
+
+    redirectToManageCheckInService('enableESUPCheckinNewQuestions')(createReq(), res, jest.fn())
+
+    expect(redirectSpy).toHaveBeenCalledWith(`${link}${path}`)
+  })
+
 })

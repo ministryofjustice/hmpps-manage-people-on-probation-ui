@@ -7,6 +7,8 @@
 {% endif %}
 {% if tierCalculation.errors.length > 0 %}
     {% set errors = errors.concat(tierCalculation.errors) %}
+{% elif tiers.errors.length > 0 %}
+    {% set errors = errors.concat(tiers.errors) %}
 {% endif %}
 {% if interventions.errors.length > 0 %}
     {% set errors = errors.concat(interventions.errors) %}
