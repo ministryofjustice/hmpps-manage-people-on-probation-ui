@@ -4,7 +4,7 @@
   pageHeading: [title, "Arrange appointment"]
 }) %}
 {% set personForename = headerPersonName.forename %}
-{% set backLink = change | default('/case/' + crn + '/appointments') %}
+{% set backLink = change | default(back) | default('/case/' + crn + '/appointments') %}
 
 {% block alertBanner %}
   {% include "../../partials/_risk-to-staff-alert.njk" %}
