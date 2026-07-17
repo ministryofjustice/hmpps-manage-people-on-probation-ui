@@ -251,4 +251,35 @@ describe('/middleware/getPersonActivity', () => {
     )
     res.locals.flags = {}
   })
+
+  it('should not apply the SPARKS filter when enableSparksFilter is disabled, even if the session holds a SPARKS value', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = {}
+    res.locals.filters = {
+      ...filterVals,
+      compliance: ['complied'],
+      category: [],
+      sparks: ['appointments with sparks activity'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({ filters: ['complied'], typeCodes: [] }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
+  })
 })

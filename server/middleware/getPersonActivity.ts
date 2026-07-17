@@ -30,7 +30,11 @@ export const getPersonActivity = async (
   }
 
   const sparksFilters: string[] = []
-  if (Array.isArray(sparks) && sparks.includes(sparksCategoryFilterOption.value)) {
+  if (
+    res.locals.flags?.enableSparksFilter &&
+    Array.isArray(sparks) &&
+    sparks.includes(sparksCategoryFilterOption.value)
+  ) {
     sparksFilters.push(...sparksCategoryFilterOption.codes)
   }
 

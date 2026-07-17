@@ -96,28 +96,12 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     hideContact,
   }
 
+  const keysWithClearValue = ['compliance', 'category', 'sparks', 'hideContact']
   const filterHref = (key: string, value: string): string => {
-    if (key === 'compliance') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    if (key === 'category') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    if (key === 'sparks') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    if (key === 'hideContact') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    return view ? `${baseUrl}?clearFilterKey=${key}&view=${view}` : `${baseUrl}?clearFilterKey=${key}`
+    const base = keysWithClearValue.includes(key)
+      ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
+      : `${baseUrl}?clearFilterKey=${key}`
+    return view ? `${base}&view=${view}` : base
   }
 
   const selectedFilterItems: Record<string, SelectedFilterItem[]> = Object.entries(filters)
