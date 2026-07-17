@@ -23,7 +23,7 @@ import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
-import { SupervisionPackage } from './SupervisionPackage'
+import { SupervisionPackage, PersonSchedule as MpopPersonSchedule } from './SupervisionPackage'
 import { ErrorSummary } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { Compliance } from '../data/model/overview'
@@ -170,6 +170,7 @@ interface Locals {
   action?: string
   personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
+  nextAppointmentDetails: Activity | null
 }
 
 export interface AppointmentOutcomeSentence {

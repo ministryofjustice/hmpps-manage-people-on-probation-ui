@@ -158,15 +158,6 @@
     {{ govukNotificationBanner({ html: html }) }}
   {% endif %}
 
-  {% if flags.enableSupervisionPackage %}
-    {% set tierCalculation = tierDetails.calculation if tierDetails else null %}
-    {{ supervisionPackage({
-      tierScore: (tierCalculation.tierScore if tierCalculation.tierScore !== 'MISSING' else null) if tierCalculation else null,
-      tag: tierCalculation.tag if tierCalculation else null,
-      historyHref: tierUrlV3,
-      forename: overview.personalDetails.name.forename
-    } | merge(supervisionPackageDetails or {})) }}
-  {% endif %}
 
   {% set schedule %}
   {% set nextApp = overview.schedule.nextAppointment %}
@@ -174,8 +165,8 @@
   {% if nextApp %}
     {{ nextApp['date'] | dateWithDayAndWithoutYear }} at {{ nextApp['date'] | govukTime }} ({{ nextApp['description'] | toSentenceCase }})
                 {% else %}
-                    No appointments scheduled
-                {% endif %}
+                  No appointments scheduled
+  {% endif %}
   {% endset %}
   {{ govukSummaryList({
             rows: [
@@ -186,6 +177,28 @@
             ]
             }) }}
   {% endset %}
+
+  {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
+
+  {% if flags.enableSupervisionPackage %}
+    {% set tierCalculation = tierDetails.calculation if tierDetails else null %}
+    {{ supervisionPackage({
+      tierScore: (tierCalculation.tierScore if tierCalculation.tierScore !== 'MISSING' else null) if tierCalculation else null,
+      tag: tierCalculation.tag if tierCalculation else null,
+      historyHref: tierUrlV3,
+      forename: overview.personalDetails.name.forename,
+      arrangeAppointmentHref: '/case/' + crn + '/arrange-appointment/sentence?back=' + url,
+      updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn),
+      crn: crn,
+      deliusBaseURL: deliusHomepageUrl(),
+      nextAppointment: {
+        description: nextAppointmentDetails.type,
+        date: nextAppointmentDetails.startDateTime,
+        href: '/case/' + crn + '/appointments/appointment/' + nextAppointmentDetails.id + '/manage?back=' + url
+      },
+      allAppointmentsHref: '/case/' + crn + '/appointments'
+    } | merge(supervisionPackageDetails or {})) }}
+  {% endif %}
 
   {{ appSummaryCard({
       titleText: 'Appointments',

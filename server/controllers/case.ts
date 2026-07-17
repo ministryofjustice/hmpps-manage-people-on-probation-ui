@@ -16,6 +16,7 @@ const caseController: Controller<typeof routes, void> = {
   getCase: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params as Record<string, string>
+      const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -60,6 +61,7 @@ const caseController: Controller<typeof routes, void> = {
         overview,
         needs,
         crn,
+        url,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: outcomes?.length ?? 0,

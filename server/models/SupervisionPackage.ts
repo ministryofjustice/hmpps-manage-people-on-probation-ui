@@ -1,3 +1,5 @@
+import { Activity } from '../data/model/schedule'
+
 export type SupervisionPackageResponse = {
   supervisionPackage: SupervisionPackage | null
   httpStatus: number
@@ -70,4 +72,33 @@ type Sentence = {
 type Release = {
   releaseDate: string
   recallDate?: string
+}
+
+export type NextAppointmentResponse = {
+  personSchedule: PersonSchedule | null
+  httpStatus: number
+  error?: Error | null
+}
+
+export type PersonSchedule = {
+  personSummary: {
+    name: {
+      forename: string
+      middleName?: string
+      surname: string
+      username?: string
+    }
+    crn: string
+    offenderId?: number
+    pnc?: string
+    dateOfBirth: string
+    preferredLanguage?: string
+  }
+  personSchedule: {
+    size: number
+    page: number
+    totalResults: number
+    totalPages: number
+    appointments: Array<Activity>
+  }
 }
