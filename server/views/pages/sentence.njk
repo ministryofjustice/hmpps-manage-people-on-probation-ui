@@ -15,7 +15,7 @@
     <a class="govuk-link" href="{{ locationMonitoringUri }}" data-qa="requirementsEMDILink">View GPS location monitoring data</a>
 {% endset %}
 
-{% set supervisionPackagesContent %}
+{% set supervisionProgressContent %}
   <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-margin-left-3 govuk-!-margin-top-3">
     Tier: {{ tierCalculation.tierScore | convertToTitleCase }}
   </p>
@@ -363,24 +363,27 @@
                   }) }}
                 {% endset %}
 
+                {% if flags.enableNSDCard %}
+
                 {{ probationAccordion({
-                id: "sentence-supervision-packages",
+                id: "sentence-supervision-progress",
                 attributes: {
-                    'data-qa': 'sentence-supervision-packages'
+                    'data-qa': 'sentence-supervision-progress'
                 },
                 rememberExpanded: false,
                 items: [
                     {
                     heading: {
-                        html: 'Supervision packages'
+                        html: 'Supervision progress'
                     },
                     content: {
-                        html: supervisionPackagesContent
+                        html: supervisionProgressContent
                     },
                     expanded: false
                     }
                 ]
                 }) }}
+                {% endif %}
 
                 {{ appSummaryCard({
                   attributes: {'data-qa': 'offenceCard'},
