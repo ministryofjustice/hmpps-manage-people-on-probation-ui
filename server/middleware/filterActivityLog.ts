@@ -5,6 +5,7 @@ import { Route } from '../@types'
 
 import {
   categoryFilterOptions,
+  sparksCategoryFilterOption,
   filterOptions as complianceFilterOptions,
   hideContactsFilterOptions,
 } from '../properties'
@@ -19,7 +20,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const { clearFilterKey, clearFilterValue } = req.query
   const view = req?.query?.view ?? req?.body?.view
   const { crn } = req.params as Record<string, string>
-  const { keywords, dateFrom, dateTo, compliance, category, hideContact } = setSession()
+  const { keywords, dateFrom, dateTo, compliance, category, sparks, hideContact } = setSession()
   const errorMessages = req?.session?.errorMessages
 
   function setSession() {
@@ -29,10 +30,12 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     if (req.body?.submit && !req?.query?.error) {
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
       const categoryFilters: Array<string> = req.body.category ? [req.body.category].flat() : []
+      const sparksFilters: Array<string> = req.body.sparks ? [req.body.sparks].flat() : []
       const hideContactFilters: Array<string> = req.body.hideContact ? [req.body.hideContact].flat() : []
       req.session.activityLogFilters = req.body as ActivityLogFilters
       req.session.activityLogFilters.compliance = complianceFilters
       req.session.activityLogFilters.category = categoryFilters
+      req.session.activityLogFilters.sparks = sparksFilters
       req.session.activityLogFilters.hideContact = hideContactFilters
       req.session.activityLogFilters.crn = crn
     }
@@ -45,6 +48,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       dateTo: req.session?.activityLogFilters?.dateTo ?? '',
       compliance: req.session?.activityLogFilters?.compliance ?? [],
       category: req.session?.activityLogFilters?.category ?? [],
+      sparks: req.session?.activityLogFilters?.sparks ?? [],
       hideContact: req.session?.activityLogFilters?.hideContact ?? [],
     }
   }
@@ -62,12 +66,24 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters.category = req.session.activityLogFilters.category.filter(
         (value: string) => value !== clearFilterValue,
       )
+    } else if (clearFilterKey === 'sparks') {
+      req.session.activityLogFilters.sparks = req.session.activityLogFilters.sparks.filter(
+        (value: string) => value !== clearFilterValue,
+      )
     } else if (clearFilterKey === 'hideContact') {
       req.session.activityLogFilters.hideContact = req.session.activityLogFilters.hideContact.filter(
         (value: string) => value !== clearFilterValue,
       )
     }
   }
+
+  const sparksEnabled = res.locals.flags?.enableSparksFilter === true
+  const categoryOptionsSource = sparksEnabled
+    ? categoryFilterOptions.map(option =>
+        option.value === 'appointments' ? { ...option, text: 'All appointments' } : option,
+      )
+    : categoryFilterOptions
+  const sparksOptionsSource = sparksEnabled ? [sparksCategoryFilterOption] : []
 
   const baseUrl = `/case/${crn}/activity-log`
   const filters: ActivityLogFilters = {
@@ -76,26 +92,16 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     dateTo: dateTo && dateFrom && !errorMessages?.dateTo && clearFilterKey !== 'dateRange' ? dateTo : '',
     compliance,
     category,
+    sparks,
     hideContact,
   }
 
+  const keysWithClearValue = ['compliance', 'category', 'sparks', 'hideContact']
   const filterHref = (key: string, value: string): string => {
-    if (key === 'compliance') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    if (key === 'category') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    if (key === 'hideContact') {
-      return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
-    }
-    return view ? `${baseUrl}?clearFilterKey=${key}&view=${view}` : `${baseUrl}?clearFilterKey=${key}`
+    const base = keysWithClearValue.includes(key)
+      ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
+      : `${baseUrl}?clearFilterKey=${key}`
+    return view ? `${base}&view=${view}` : base
   }
 
   const selectedFilterItems: Record<string, SelectedFilterItem[]> = Object.entries(filters)
@@ -111,10 +117,21 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
               href: filterHref(filterKey, text),
             })
           } else if (filterKey === 'category') {
-            value.push({
-              text: categoryFilterOptions.find(option => option.value === text).text,
-              href: filterHref(filterKey, text),
-            })
+            const categoryOption = categoryOptionsSource.find(option => option.value === text)
+            if (categoryOption) {
+              value.push({
+                text: categoryOption.text,
+                href: filterHref(filterKey, text),
+              })
+            }
+          } else if (filterKey === 'sparks') {
+            const sparksOption = sparksOptionsSource.find(option => option.value === text)
+            if (sparksOption) {
+              value.push({
+                text: sparksOption.text,
+                href: filterHref(filterKey, text),
+              })
+            }
           } else if (filterKey === 'hideContact') {
             value.push({
               text: hideContactsFilterOptions.find(option => option.value === text).text,
@@ -141,10 +158,16 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     checked: filters.compliance.includes(value),
   }))
 
-  const categoryOptions: Option[] = categoryFilterOptions.map(({ text, value }) => ({
+  const categoryOptions: Option[] = categoryOptionsSource.map(({ text, value }) => ({
     text,
     value,
     checked: filters.category.includes(value),
+  }))
+
+  const sparksOptions: Option[] = sparksOptionsSource.map(({ text, value }) => ({
+    text,
+    value,
+    checked: filters.sparks.includes(value),
   }))
 
   const hideContactOptions: Option[] = hideContactsFilterOptions.map(({ text, value }) => ({
@@ -160,11 +183,13 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     selectedFilterItems,
     complianceOptions,
     categoryOptions,
+    sparksOptions,
     hideContactOptions,
     baseUrl,
     keywords: filters.keywords,
     compliance: filters.compliance,
     category: filters.category,
+    sparks: filters.sparks,
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     hideContact: filters.hideContact,

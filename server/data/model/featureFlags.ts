@@ -23,4 +23,5 @@ export class FeatureFlags {
   enableESUPCheckinNewStop?: boolean = undefined
   enableESUPCheckinNewReview?: boolean = undefined
   enableESUPCheckinNewQuestions?: boolean = undefined
+  enableSparksFilter?: boolean = undefined
 }
