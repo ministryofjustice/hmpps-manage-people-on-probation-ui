@@ -106,5 +106,4 @@ describe('redirectToManageCheckInService', () => {
 
     expect(redirectSpy).toHaveBeenCalledWith(`${link}${path}`)
   })
-
 })
