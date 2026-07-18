@@ -59,6 +59,58 @@ declare module 'express-serve-static-core' {
 
 let instrumented = false
 
+// Wraps a single handler function so that, when it executes, it records its
+// name onto req.handlerTrace. Handles both regular and 4-arity (error)
+// middleware; see the comment further down on why arity must be preserved.
+function wrapHandler(arg: (...handlerArgs: any[]) => any, method: string): (...handlerArgs: any[]) => any {
+  const label = arg.name && arg.name !== '<anonymous>' ? arg.name : undefined
+
+  const record = (req: any) => {
+    req.handlerTrace = req.handlerTrace || []
+    // Prefixed with the registration method (all/get/post/...) so it's
+    // clear which router.<method>() call added this handler - useful
+    // when the same path is split across multiple registrations.
+    req.handlerTrace.push(`${method}:${label || `unnamed#${req.handlerTrace.length + 1}`}`)
+  }
+
+  // Express decides whether middleware is an error handler purely by
+  // checking `fn.length === 4` (i.e. it was declared with exactly 4
+  // params: (err, req, res, next)). Wrapping with a rest-param function
+  // would collapse `.length` to something else and silently break
+  // error handling - Express would stop invoking it on errors. So
+  // error-handling middleware must be wrapped with a function that
+  // preserves that exact 4-param arity, with `req` as the 2nd param.
+  if (arg.length === 4) {
+    return function wrappedErrorHandler(this: unknown, err: any, req: any, res: any, next: any) {
+      record(req)
+      return arg.apply(this, [err, req, res, next])
+    }
+  }
+
+  return function wrappedHandler(this: unknown, req: any, ...rest: any[]) {
+    record(req)
+    return arg.apply(this, [req, ...rest])
+  }
+}
+
+// Express allows handler arrays (and nested arrays) to be passed to
+// router.get()/post()/etc, e.g. router.get('/x', [mw1, mw2], controller) -
+// this codebase uses that pattern in several routes (e.g.
+// server/routes/appointments.ts, risks.ts, eSupervisionCheckins.ts). Walk
+// into arrays recursively so every handler function is wrapped, not just
+// top-level ones.
+function wrapArg(arg: unknown, method: string): unknown {
+  if (Array.isArray(arg)) {
+    return arg.map(item => wrapArg(item, method))
+  }
+  // Skip non-functions, and nested routers/sub-apps (identifiable by their
+  // own `.stack` array) - only wrap genuine handler functions.
+  if (typeof arg !== 'function' || (arg as { stack?: unknown }).stack) {
+    return arg
+  }
+  return wrapHandler(arg as (...handlerArgs: any[]) => any, method)
+}
+
 export default function instrumentRouter(): void {
   // Router.prototype is a shared singleton - patching it more than once
   // (e.g. if this is called again, or in multiple test files) would wrap
@@ -73,43 +125,7 @@ export default function instrumentRouter(): void {
     const original = Router.prototype[method]
 
     Router.prototype[method] = function patched(...args: any[]) {
-      const wrappedArgs = args.map(arg => {
-        // Skip non-functions, and nested routers/sub-apps (identifiable by
-        // their own `.stack` array) - only wrap genuine handler functions.
-        if (typeof arg !== 'function' || arg.stack) {
-          return arg
-        }
-
-        const label = arg.name && arg.name !== '<anonymous>' ? arg.name : undefined
-
-        const record = (req: any) => {
-          req.handlerTrace = req.handlerTrace || []
-          // Prefixed with the registration method (all/get/post/...) so it's
-          // clear which router.<method>() call added this handler - useful
-          // when the same path is split across multiple registrations.
-          req.handlerTrace.push(`${method}:${label || `unnamed#${req.handlerTrace.length + 1}`}`)
-        }
-
-        // Express decides whether middleware is an error handler purely by
-        // checking `fn.length === 4` (i.e. it was declared with exactly 4
-        // params: (err, req, res, next)). Wrapping with a rest-param function
-        // would collapse `.length` to something else and silently break
-        // error handling - Express would stop invoking it on errors. So
-        // error-handling middleware must be wrapped with a function that
-        // preserves that exact 4-param arity, with `req` as the 2nd param.
-        if (arg.length === 4) {
-          return function wrappedErrorHandler(this: unknown, err: any, req: any, res: any, next: any) {
-            record(req)
-            return arg.apply(this, [err, req, res, next])
-          }
-        }
-
-        return function wrappedHandler(this: unknown, req: any, ...rest: any[]) {
-          record(req)
-          return arg.apply(this, [req, ...rest])
-        }
-      })
-
+      const wrappedArgs = args.map(arg => wrapArg(arg, method))
       return original.apply(this, wrappedArgs)
     }
   })

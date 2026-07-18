@@ -40,8 +40,11 @@ import logger from '../../logger'
  *   return async (req, res) => {...}                           // unnamed#N in the log
  *   return async function getLocationNotInList(req, res) {...} // shows as "getLocationNotInList"
  *
- * Only mounted in development - see app.ts. Requires instrumentRouter() to
- * have been called before routes are registered (also see app.ts).
+ * Only mounted in development, and only when NOT explicitly disabled via
+ * DISABLE_DEV_REQUEST_LOGGING=true (set in feature.env /
+ * docker-compose-feature-dev.yml, to avoid flooding output during Cypress/CI
+ * runs) - see app.ts. Requires instrumentRouter() to have been called before
+ * routes are registered (also see app.ts).
  */
 export default function requestLogger(): RequestHandler {
   // Named (rather than a plain arrow function) so it shows up in the

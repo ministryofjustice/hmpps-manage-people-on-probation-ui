@@ -59,6 +59,13 @@ that request, including handlers from `router.all()`/`router.use()` calls
 that Express's own `req.route.stack` would miss (see
 `server/middleware/instrumentRouter.ts` for how this is captured).
 
+This logging can be disabled by setting `DISABLE_DEV_REQUEST_LOGGING=true`.
+It's set this way in `feature.env` and `docker-compose-feature-dev.yml`
+(used by `npm run start-feature`/`start-feature:dev` and Cypress/CI runs),
+since Cypress fires many rapid automated requests and the verbose handler
+logging would flood test output there for no benefit. If you don't see these
+log lines locally, check this isn't set in your environment.
+
 Each entry is formatted as `<registrationMethod>:<name>`, e.g:
 
 - `use:session` - registered via `app.use(...)` or `router.use(...)`

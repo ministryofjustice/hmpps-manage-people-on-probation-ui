@@ -106,4 +106,32 @@ describe('instrumentRouter', () => {
     expect(response.body.message).toBe('boom')
     expect(response.body.handlerTrace).toEqual(['get:throwingController', 'use:errorHandler'])
   })
+
+  it('wraps handlers passed inside arrays (e.g. router.get(path, [mw1, mw2]))', async () => {
+    instrumentRouter()
+
+    const router = Router()
+
+    function mwArray1(req: express.Request, res: express.Response, next: express.NextFunction) {
+      next()
+    }
+    function mwArray2(req: express.Request, res: express.Response, next: express.NextFunction) {
+      next()
+    }
+    function controller(req: express.Request, res: express.Response) {
+      res.json({ handlerTrace: req.handlerTrace })
+    }
+
+    // Mirrors the real app's pattern, e.g. server/routes/appointments.ts:36
+    // (`router.all(path, [getOverdueOutcomes(hmppsAuthClient)])`) and
+    // server/routes/eSupervisionCheckins.ts (`router.get(path, [handler])`).
+    router.get('/thing', [mwArray1, mwArray2], controller)
+
+    const app = express()
+    app.use(router)
+
+    const response = await request(app).get('/thing')
+
+    expect(response.body.handlerTrace).toEqual(['get:mwArray1', 'get:mwArray2', 'get:controller'])
+  })
 })
