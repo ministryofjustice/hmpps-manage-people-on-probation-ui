@@ -44,7 +44,9 @@ import logger from '../../logger'
  * have been called before routes are registered (also see app.ts).
  */
 export default function requestLogger(): RequestHandler {
-  return (req, res, next) => {
+  // Named (rather than a plain arrow function) so it shows up in the
+  // handlers log as "use:requestLoggerHandler" instead of "use:unnamed#N".
+  return function requestLoggerHandler(req, res, next) {
     if (req.path.startsWith('/assets') || req.path === '/favicon.ico') {
       return next()
     }
