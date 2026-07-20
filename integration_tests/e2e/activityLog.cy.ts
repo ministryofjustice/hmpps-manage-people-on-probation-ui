@@ -223,7 +223,7 @@ context('Contacts', () => {
     page.getActivityTitle(1).should('contain.text', 'Phone call')
     page.getKeywordsInput().should('have.value', value)
   })
-    it('should apply keyword filter when bottom apply filters button is clicked', () => {
+  it('should apply keyword filter when bottom apply filters button is clicked', () => {
     cy.visit('/case/X000001/activity-log')
     const value = 'Phone call'
     const page = Page.verifyOnPage(ActivityLogPage)
