@@ -241,7 +241,7 @@ describe('/middleware/filterActivityLog()', () => {
     it('should expose the SPARKS filter in its own sparksOptions checkbox group', () => {
       expect(flaggedRes.locals.filters.sparksOptions).toEqual([
         {
-          text: 'Appointments with SPARKS activity',
+          text: 'Show appointments with SPARKS activity',
           value: 'appointments with sparks activity',
           checked: true,
         },
@@ -258,7 +258,7 @@ describe('/middleware/filterActivityLog()', () => {
     it('should show the SPARKS filter as its own selected filter tag', () => {
       expect(flaggedRes.locals.filters.selectedFilterItems.sparks).toEqual([
         {
-          text: 'Appointments with SPARKS activity',
+          text: 'Show appointments with SPARKS activity',
           href: `/case/${crn}/activity-log?clearFilterKey=sparks&clearFilterValue=appointments%20with%20sparks%20activity`,
         },
       ])
