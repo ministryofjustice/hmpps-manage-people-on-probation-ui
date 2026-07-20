@@ -1,8 +1,10 @@
 {% extends "../_appointment-outcome-form.njk" %}
-
 {% set title = 'Initiate a ' + (
-'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
+'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else
   'recall') + (' and send a letter' if appointmentOutcome.sendBreachOrRecallLetter) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Record an outcome"]
+}) %}
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
@@ -12,7 +14,7 @@
         'data-qa': 'breachNSICreatedBy'
       },
       legend: {
-        text: "Who will create the breach NSI (non-statutory intervention)?",
+        text: "Who will " + ("create the breach NSI (non-statutory intervention)" if appointmentOutcome.sentence.type == 'COMMUNITY' else "create the recall") + "?",
         isPageHeading: false,
         classes: "govuk-fieldset__legend--m"
       }

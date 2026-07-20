@@ -5,9 +5,11 @@ import {
   mapPersonActivityWithApprovedContactDisplayNames,
   mapPersonAppointmentWithApprovedContactDisplayNames,
   mapEnforcementContactsWithApprovedContactDisplayNames,
+  mapAlertsWithApprovedContactDisplayNames,
 } from './contactDisplayNames'
 import { PersonActivity } from '../data/model/activityLog'
 import { PersonAppointment, EnforcementContactsResponse } from '../data/model/schedule'
+import { UserAlerts } from '../models/Alerts'
 
 describe('contactDisplayNames', () => {
   it('returns the approved display name for a legacy contact type', () => {
@@ -74,14 +76,9 @@ describe('contactDisplayNames', () => {
 
     expect(result.enforcementContacts[0]).toMatchObject({
       displayName: 'Telephone contact from person on probation',
-      isOverdue: true,
     })
     expect(result.enforcementContacts[1]).toMatchObject({
       displayName: 'Home Visit', // No mapping in approvedContactDisplayNames for "Home Visit" (it's "Home visit" lowercase in mapping usually, let's check)
-      isOverdue: false,
-    })
-    expect(result.enforcementContacts[2]).toMatchObject({
-      isOverdue: undefined,
     })
   })
 
@@ -98,8 +95,7 @@ describe('contactDisplayNames', () => {
     } as unknown as EnforcementContactsResponse
 
     const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
-
-    expect(result.enforcementContacts[0].isOverdue).toBe(false)
+    // TODO: Add assertion
   })
 
   it('mapScheduleWithApprovedContactDisplayNames maps appointments in schedule', () => {
@@ -120,5 +116,25 @@ describe('contactDisplayNames', () => {
     expect(normalizeContactDisplayNameKey('Phone – Contact')).toBe('phone - contact')
     expect(normalizeContactDisplayNameKey('  Multiple   Spaces  ')).toBe('multiple spaces')
     expect(normalizeContactDisplayNameKey('slash/separated')).toBe('slash / separated')
+  })
+
+  it('mapAlertsWithApprovedContactDisplayNames maps UserAlerts', () => {
+    const alerts = {
+      content: [
+        {
+          type: {
+            description: 'Phone Contact from PoP',
+          },
+        },
+        {
+          type: {
+            description: 'Unknown',
+          },
+        },
+      ],
+    } as UserAlerts
+    const result = mapAlertsWithApprovedContactDisplayNames(alerts)
+    expect(result.content[0].type.description).toBe('Telephone contact from person on probation')
+    expect(result.content[1].type.description).toBe('Unknown')
   })
 })

@@ -8,6 +8,8 @@ import {
   LinkedContactResponse,
   PersonAppointment,
   Schedule,
+  PutContactRequest,
+  EnforcementActionsRequest,
 } from './model/schedule'
 import {
   AddressOverview,
@@ -55,6 +57,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 import { ErrorSummary } from './model/common'
 import {
+  mapAlertsWithApprovedContactDisplayNames,
   mapEnforcementContactsWithApprovedContactDisplayNames,
   mapPersonActivityWithApprovedContactDisplayNames,
   mapPersonAppointmentWithApprovedContactDisplayNames,
@@ -154,6 +157,16 @@ export default class MasApiClient extends RestClient {
   async getContactOutcomes(typeCode: string, outcomeCode?: string): Promise<ContactOutcomesResponse> {
     const path = `/contact/types/${typeCode}/outcomes${outcomeCode ? `/${outcomeCode}` : ''}`
     return this.get({ path })
+  }
+
+  async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
+    const path = `/contact/${contactId}`
+    return this.put({ data: body, path })
+  }
+
+  async postEnforcementActions(contactId: string, body: EnforcementActionsRequest): Promise<{ statusCode: number }> {
+    const path = `/contact/${contactId}/enforcement-actions`
+    return this.post({ data: body, path })
   }
 
   async getPersonalDetails(crn: string): Promise<PersonalDetails | null> {
@@ -256,18 +269,28 @@ export default class MasApiClient extends RestClient {
     username: string,
     page: string,
     size: string = '5',
-    sortQuery?: string,
-    ascending?: string,
+    filterDueDate: string = 'false',
+    months: string = '12',
+    sortBy: string = 'contactDate',
+    direction: string = 'DESC',
   ): Promise<EnforcementContactsResponse> {
-    const filterQuery = `${sortQuery}=${ascending}`
-    const queryParameters = `?${new URLSearchParams({
-      size,
+    const queryParameters = new URLSearchParams({
       page,
-      filterDueDate: 'true',
-    }).toString()}&${sortQuery ? filterQuery : ''}`
+      size,
+      filterDueDate,
+      months,
+    })
+
+    if (sortBy) {
+      queryParameters.append('sortBy', sortBy)
+    }
+
+    if (direction) {
+      queryParameters.append('direction', direction)
+    }
 
     const enforcementContacts = (await this.get({
-      path: `/contact/${username}/enforcements${queryParameters}`,
+      path: `/contact/${username}/enforcements?${queryParameters.toString()}`,
       handle404: false,
     })) as EnforcementContactsResponse
 
@@ -385,7 +408,7 @@ export default class MasApiClient extends RestClient {
     return complianceResponse
   }
 
-  async getPersonNonCompliance(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
+  async getPersonNonComplianceDetail(crn: string, months: number = 12): Promise<NonComplianceHistoryResponse> {
     const nonComplianceResponse: NonComplianceHistoryResponse = await this.get({
       path: `/compliance/non-compliance-detail/${crn}?months=${months}`,
       handle404: false,
@@ -528,16 +551,21 @@ export default class MasApiClient extends RestClient {
     if (sortBy && sortOrder) {
       pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
     }
-    return this.get({ path: `/alerts${pageQuery}`, handle404: true })
+    const alerts: UserAlerts = await this.get({ path: `/alerts${pageQuery}`, handle404: true })
+    return mapAlertsWithApprovedContactDisplayNames(alerts)
   }
 
   async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {
     return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
-  async getUserAlertsCount(): Promise<number> {
-    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true })
-    return response.totalResults
+  async getUserAlertsCount(): Promise<UserAlerts> {
+    return this.get({
+      path: `/alerts`,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
+    })
   }
 
   async clearAlerts(alertIds: number[]) {

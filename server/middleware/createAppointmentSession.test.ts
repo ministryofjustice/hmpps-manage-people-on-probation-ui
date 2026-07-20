@@ -131,6 +131,7 @@ const mockAppointment: Activity = {
   eventId: 49,
   nsiId: null,
   externalReference,
+  isUpdatableContact: false,
 }
 
 const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppointment => ({

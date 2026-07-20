@@ -1,19 +1,15 @@
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
-import { Option } from '../../models/Option'
-import { dateWithYear, govukTime } from '../../utils'
-import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
 import {
-  outcomeOptions,
-  attendedFailedToComplyOptions,
-  acceptableAbsenceOptions,
-  failedToAttendOptions,
-  enforcementActionOptions,
-  outcomeMap,
-  enforcementActionMap,
-  letterTypeOptions,
-} from '../../properties/appointment-outcomes'
+  dateWithDayAndWithYear,
+  dateWithYear,
+  getContactEnforcementActions,
+  getMappedActions,
+  getMappedOutcome,
+  govukTime,
+  toSentenceCase,
+} from '../../utils'
+import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
 import { Activity } from '../../data/model/schedule'
 import { AppointmentOutcomeProps, OutcomeSummary } from '../../models/Locals'
 
@@ -21,27 +17,25 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
   let summary: OutcomeSummary
   if (res?.locals?.appointmentOutcome?.appointmentSession?.outcome) {
     const {
-      sentence: { type: sentenceType },
-      forename,
       notePrepend,
-      appointmentHintText,
       baseOutcomeUrl,
       appointmentSession: {
         notes,
         sensitivity,
         date,
         outcome: {
+          contactOutcomes,
           outcomeType,
           outcomeCode,
           enforcementActionCode,
-          contactEnforcementActions,
           attendedFailedToComply,
-          acceptableAbsence,
           unacceptableAbsence,
           failedToAttend,
           letterSentBy,
           letterType,
           breachNSICreatedBy,
+          updateEnforcementAction,
+          otherEnforcementAction,
         },
       },
       appointment,
@@ -53,41 +47,30 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     let endDateTime: string
     if (nextAppt) {
       ;({ type, startDateTime, endDateTime } = nextAppt)
-      nextAppointment = `${type} on ${dateWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
+      nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
     }
-    const allEnforcementActionOptions: Option<AppointmentEnforcementAction | ''>[] = [
-      ...attendedFailedToComplyOptions(sentenceType),
-      ...acceptableAbsenceOptions,
-      ...failedToAttendOptions(forename),
-      ...enforcementActionOptions(forename),
-      ...letterTypeOptions,
-    ]
 
     const noOutcome = 'No outcome'
     const noAction = 'No enforcement action'
 
     const getSelectedOutcome = (): string => {
       if (!outcomeCode) return noOutcome
-      const selected = Object.entries(outcomeMap).find(
-        ([_key, { code }]) => outcomeCode === code,
-      )?.[0] as AppointmentOutcomeType
-      if (!selected) return noOutcome
-      return outcomeOptions.find(option => option.value === selected)?.text || noOutcome
+      const selected = getMappedOutcome({ code: outcomeCode })
+      return selected?.[1]?.description ? toSentenceCase(selected[1].description) : noOutcome
     }
 
-    const getSelectedEnforcementAction = (): string => {
+    const getSelectedEnforcementActions = (): string => {
       if (!enforcementActionCode?.length) {
         return noAction
       }
-      const selected = Object.entries(enforcementActionMap).find(
-        ([_key, { code }]) => enforcementActionCode?.at(-1) === code,
-      )?.[0] as AppointmentOutcomeType
-      if (!selected) {
+      const selectedActions = getMappedActions(enforcementActionCode)
+      if (!selectedActions) {
         return noAction
       }
-      return allEnforcementActionOptions.find(option => option?.value && selected === option.value)?.text || noAction
+      return selectedActions.map(([_key, { description }]) => toSentenceCase(description)).join(', ')
     }
 
+    const contactEnforcementActions = getContactEnforcementActions(contactOutcomes)
     const defaultResponsePeriodDays = contactEnforcementActions?.find(
       action => action.code === enforcementActionCode?.at(-1),
     )?.defaultResponsePeriodDays
@@ -97,21 +80,40 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
 
     const documents = appointment?.documents?.length ? appointment.documents.map(document => document.name) : null
 
-    const enforcementAction = getSelectedEnforcementAction()
-    const outcome = `${getSelectedOutcome()}${acceptableAbsence ? ` - ${enforcementAction.toLowerCase()}` : ''}`
+    const outcome = getSelectedOutcome()
+
+    let appointmentDetails = null
+    if (appointment?.type && appointment?.startDateTime && appointment?.endDateTime) {
+      appointmentDetails = `${toSentenceCase(appointment.type)} on ${dateWithDayAndWithYear(appointment.startDateTime)} at ${govukTime(appointment.startDateTime)} to ${govukTime(appointment.endDateTime)}`
+    }
 
     summary = {
-      appointmentDetails: appointmentHintText,
+      appointmentDetails,
       outcome,
-      notes: notes ?? 'No notes',
+      notes: notes || 'No notes',
       sensitivity,
       nextAppointment,
       documents,
     }
 
-    if (attendedFailedToComply || unacceptableAbsence || failedToAttend || letterType) {
+    if (
+      attendedFailedToComply ||
+      unacceptableAbsence ||
+      failedToAttend ||
+      letterType ||
+      breachNSICreatedBy ||
+      updateEnforcementAction ||
+      otherEnforcementAction
+    ) {
+      const enforcementAction = getSelectedEnforcementActions()
       summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : enforcementAction
       summary.enforcementActionChangeLink = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
+      // if (otherEnforcementAction) {
+      //   summary.enforcementActionChangeLink = `${baseOutcomeUrl}/enforcement-action`
+      // }
+      if (updateEnforcementAction) {
+        summary.enforcementActionChangeLink = `${baseOutcomeUrl}/update-enforcement-action`
+      }
       if (evidenceDueDate) {
         summary.evidenceDueDate = evidenceDueDate
       }

@@ -23,6 +23,7 @@
 
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
+      {% set appointmentDescription = appointment.description if appointment.description else appointment.type %}
       {% set dateAndTime %}
       {% endset %}
       {% set row = tableData.rows.push([
@@ -30,7 +31,7 @@
               html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.name.surname + ', ' + appointment.name.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
           },
           {
-              html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>'
+              html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointmentDescription + '</a>'
           },
           {
               text: appointment.location if appointment.location else 'Not Provided'

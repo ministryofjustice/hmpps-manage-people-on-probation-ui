@@ -10,11 +10,23 @@ const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'N
 export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment, enforcementAction } = res.locals.personAppointment
   const { crn, id, contactId } = req.params as Record<string, string>
-  const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
+  const outcomeJourney = req.url.includes('outcome/next-appointment')
+  const nextAppointmentSelection = outcomeJourney
+    ? req?.body?.appointments?.[crn]?.[contactId]?.outcome?.nextAppointment
+    : req?.body?.nextAppointment
+  const selection: AppointmentSessionSelection = nextAppointmentSelection || 'KEEP_TYPE'
   let appointmentSession: AppointmentSession = {
     eventId: '',
     username: res.locals.user.username,
     uuid: '',
+  }
+  let sensitivity: YesNo | undefined = null
+  let sensitivityLocked: boolean | undefined = null
+  if (selection === 'RESCHEDULE' || contactId) {
+    sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
+    if (sensitivity === 'Yes') {
+      sensitivityLocked = true
+    }
   }
   if (['KEEP_TYPE', 'RESCHEDULE'].includes(selection)) {
     if (selection === 'RESCHEDULE') {
@@ -52,8 +64,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     let date = ''
     let start = ''
     let end = ''
-    let sensitivity: YesNo | undefined = null
-    let sensitivityLocked: boolean | undefined = null
+
     if (appointment?.startDateTime) {
       ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
     }
@@ -71,12 +82,6 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     }
     if (!eventId || !type || !providerCode || !teamCode || !username) {
       locationCode = ''
-    }
-    if (selection === 'RESCHEDULE') {
-      sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
-      if (sensitivity === 'Yes') {
-        sensitivityLocked = true
-      }
     }
     appointmentSession = {
       ...appointmentSession,
@@ -116,11 +121,14 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
     appointmentSession.smsOptIn = null
   }
 
-  const outcome = persistOutcomeAndAction(appointment?.outcome, enforcementAction?.code)(req, res)
+  const outcome = persistOutcomeAndAction({
+    outcome: appointment?.outcome,
+    actionCode: enforcementAction?.code,
+  })
+
   if (outcome) {
     appointmentSession.outcome = outcome
   }
-
   res.locals.appointmentSession = appointmentSession
   if (contactId) {
     setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)

@@ -10,6 +10,10 @@
 {% set alerts = true %}
 {% set alertRows = [] %}
 
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Alerts"]
+}) %}
+
 {% block beforeContent %}
     {% if note %}
         {{ govukBreadcrumbs({
@@ -196,6 +200,7 @@
                                 class="govuk-button govuk-button--secondary"
                                 data-module="govuk-button"
                                 id="select-all-alerts"
+                                aria-pressed="false"
                                 data-qa="selectAllAlertsBtn">
                             Select all alerts on this page
                         </button>

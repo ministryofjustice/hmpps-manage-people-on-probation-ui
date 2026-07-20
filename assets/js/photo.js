@@ -21,10 +21,10 @@ if (hash === '#main-content') {
 }
 
 const IMAGE_CONTENT_TYPE = 'image/jpeg'
-const IMAGE_SESSION_KEY = 'esImageUpload'
+const IMAGE_STORAGE_KEY = 'esImageUpload'
 
 const displayUploadedImage = document.getElementsByClassName('es-uploaded-image')
-const uploadedImageData = localStorage.getItem(IMAGE_SESSION_KEY)
+const uploadedImageData = localStorage.getItem(IMAGE_STORAGE_KEY)
 
 const photoUploadInput = document.getElementById('photoUpload-input')
 const photoContentDisplay = document.getElementById('photoPreview')
@@ -67,7 +67,7 @@ const capturePhoto = async v => {
           const dataUrl = canvas.toDataURL(IMAGE_CONTENT_TYPE)
           const img = document.createElement('img')
           img.src = dataUrl
-          localStorage.setItem(IMAGE_SESSION_KEY, dataUrl)
+          localStorage.setItem(IMAGE_STORAGE_KEY, dataUrl)
           videoContainer.innerHTML = ''
           videoContainer.appendChild(img)
           form.submit()
@@ -111,7 +111,7 @@ if (displayUploadedImage && uploadedImageData) {
   if (displayUploadedImage[0]) {
     const img = new Image()
     img.src = uploadedImageData
-    img.alt = `Image of ${displayUploadedImage[0].dataset.person || 'the person'} added for identification`
+    img.alt = `${displayUploadedImage[0].dataset.person || 'the person'} added for identification`
     img.classList.add('es-profile-image')
 
     img.onload = () => {
@@ -127,7 +127,7 @@ if (displayUploadedImage && uploadedImageData) {
 // If registration personal details page, and has 'start' query string is present
 if (document.getElementById('registerPoPStartPage')) {
   const url = new URL(window.location.href)
-  localStorage.removeItem(IMAGE_SESSION_KEY)
+  localStorage.removeItem(IMAGE_STORAGE_KEY)
   window.history.replaceState({}, '', url.pathname)
 }
 
@@ -137,7 +137,7 @@ if (photoUploadInput) {
 }
 
 const handlePhotoSelection = event => {
-  localStorage.removeItem(IMAGE_SESSION_KEY)
+  localStorage.removeItem(IMAGE_STORAGE_KEY)
   const file = event.target.files[0]
   const field = event.target
   photoContentDisplay.textContent = ''
@@ -188,7 +188,7 @@ const handlePhotoSelection = event => {
       const screenshot = canvas.toDataURL(IMAGE_CONTENT_TYPE, 0.8)
 
       // Store the screenshot in localStorage
-      localStorage.setItem(IMAGE_SESSION_KEY, screenshot)
+      localStorage.setItem(IMAGE_STORAGE_KEY, screenshot)
     }
     img.src = reader.result.toString()
 
@@ -214,6 +214,12 @@ const dataUrlToBlob = dataUrl => {
     bytes[i] = byteString.charCodeAt(i)
   }
   return new Blob([bytes], { type: mime })
+}
+
+const sha256Base64 = async blob => {
+  const buffer = await blob.arrayBuffer()
+  const digest = await crypto.subtle.digest('SHA-256', buffer)
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
 }
 
 const showValidationMessage = message => {
@@ -248,12 +254,23 @@ if (registerButton) {
       }
       const crn = crnInput.value
       const id = idInput.value
+      const image = localStorage.getItem(IMAGE_STORAGE_KEY)
+      if (!image) {
+        console.warn('Image not found in local storage')
+        return
+      }
+      const imageBlob = dataUrlToBlob(image)
+      // Hash the image before requesting the upload URL so the API can bind the URL
+      // to this exact payload (S3 enforces the matching x-amz-checksum-sha256 on PUT).
+      const contentSha256 = await sha256Base64(imageBlob)
       const checkinUrl = `/case/${crn}/appointments/${id}/check-in/confirm-start`
       const registerResponse = await fetch(checkinUrl, {
         method: 'POST',
         headers: {
           'x-csrf-token': document.querySelector('input[name=_csrf]').value,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ contentSha256 }),
       })
 
       if (!registerResponse.ok) {
@@ -273,17 +290,13 @@ if (registerButton) {
           code: result.code || 'REGISTRATION_FAILED',
         })
       }
-      const image = localStorage.getItem(IMAGE_SESSION_KEY)
-      if (!image) {
-        console.warn('Image not found in session storage')
-        return
-      }
-      const { url } = result.uploadLocation.locationInfo
+      const { url, requiredHeaders } = result.uploadLocation.locationInfo
       const uploadImageResult = await fetch(url, {
         method: 'PUT',
-        body: dataUrlToBlob(image),
+        body: imageBlob,
         headers: {
           'Content-Type': IMAGE_CONTENT_TYPE,
+          ...(requiredHeaders || {}),
         },
       })
       if (!uploadImageResult.ok) {
@@ -295,7 +308,7 @@ if (registerButton) {
         })
       }
       // Success: clear session, set hidden field, and submit form
-      localStorage.removeItem(IMAGE_SESSION_KEY)
+      localStorage.removeItem(IMAGE_STORAGE_KEY)
       document.getElementById('setupId').value = result.setup.uuid
       document.getElementById('completeRegistrationForm').submit()
     } catch (error) {

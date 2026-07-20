@@ -1,6 +1,27 @@
 import RestClient from './restClient'
 import config from '../config'
 
+export interface LatestTier {
+  tierScore: string
+  calculationId: string
+  calculationDate: string
+  changeReason: string
+  provisional: boolean
+}
+
+export type LatestTierV3 = LatestTier & {
+  tag: {
+    text: 'Missing' | 'Provisional' | 'Unavailable' | null
+    color: 'red' | 'orange' | 'grey' | null
+  }
+}
+
+export interface LatestTierResponse {
+  calculation: LatestTierV3 | null
+  httpStatus: number
+  error?: Error | null
+}
+
 export default class TierApiClient extends RestClient {
   constructor(token: string) {
     super('Tier API', config.apis.tierApi, token)
@@ -11,8 +32,17 @@ export default class TierApiClient extends RestClient {
       path: `/crn/${crn}/tier/details`,
       handle404: true,
       handle500: true,
-      errorMessage:
-        'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
+      errorMessage: 'Tier information is currently unavailable.',
+    })
+  }
+
+  async getTiers(crns: string[]): Promise<TierCalculations> {
+    return this.post({
+      path: `/v2/crns/tier`,
+      data: crns as unknown as Record<string, any>,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Tier information is currently unavailable.',
     })
   }
 }
@@ -38,6 +68,10 @@ export interface TierCalculation {
     change: TierLevel
     calculationVersion: string
   }
+}
+
+export interface TierCalculations {
+  [key: string]: TierCalculation
 }
 
 export interface TierLevel {

@@ -1,6 +1,8 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = 'Continue on OASys' %}
-{% block pageTitle %}{{ title }}{% endblock %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 
 {% block beforeContent %}
 {{ govukBreadcrumbs({

@@ -36,6 +36,7 @@
             {
               "eventNumber": "3",
               "activity": {
+                "acceptableAbsenceCount": 2,
                 "unacceptableAbsenceCount": 1,
                 "attendedButDidNotComplyCount": 1,
                 "outcomeNotRecordedCount": 3,
@@ -72,6 +73,25 @@
             },
             {
               "eventNumber": "1",
+              "breachesOnCurrentOrderCount": 2,
+              "mainOffence": {
+                "code": "18502",
+                "description": "(Another main offence - 18502)"
+              },
+              "compliance": {
+                "currentBreaches": 0,
+                "breachStarted": false,
+                "breachesOnCurrentOrderCount": 0,
+                "failureToComplyCount": 0
+              },
+              "order": {
+                "description": "ORA Community Order",
+                "endDate": null,
+                "startDate": null
+              }
+            },
+            {
+              "eventNumber": "12345",
               "breachesOnCurrentOrderCount": 2,
               "mainOffence": {
                 "code": "18502",

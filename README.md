@@ -14,7 +14,7 @@ Try it out in the dev environment: https://manage-people-on-probation-dev.hmpps.
 
 You'll need to install:
 
-- [Node 22.x](https://nodejs.org/en/download) - Node and nvm installation. 
+- [Node 22.x](https://nodejs.org/en/download) - Node and nvm installation.
 - [Docker](https://www.docker.com/)
 - [Latest version of Java with Homebrew](https://formulae.brew.sh/formula/openjdk#default) - Needed for wiremock
 
@@ -47,6 +47,36 @@ npm run start:dev
 ```
 
 Open http://localhost:3000 in your browser.
+
+### Local request/route logging
+
+In development (`NODE_ENV=development`), the app logs one `request received`
+and one `request completed` debug line per request (see
+`server/middleware/requestLogger.ts`), skipping static assets (`/assets/*`,
+`/favicon.ico`). The completed line includes a `handlers` array - the full,
+correctly-ordered chain of middleware and controllers that actually ran for
+that request, including handlers from `router.all()`/`router.use()` calls
+that Express's own `req.route.stack` would miss (see
+`server/middleware/instrumentRouter.ts` for how this is captured).
+
+This logging can be disabled by setting `DISABLE_DEV_REQUEST_LOGGING=true`.
+It's set this way in `feature.env` and `docker-compose-feature-dev.yml`
+(used by `npm run start-feature`/`start-feature:dev` and Cypress/CI runs),
+since Cypress fires many rapid automated requests and the verbose handler
+logging would flood test output there for no benefit. If you don't see these
+log lines locally, check this isn't set in your environment.
+
+Each entry is formatted as `<registrationMethod>:<name>`, e.g:
+
+- `use:session` - registered via `app.use(...)` or `router.use(...)`
+- `all:getSentences` - registered via `router.all(...)` (runs for every HTTP method on that path)
+- `get:forceValidation` / `post:checkAnswers` - registered via `router.get(...)` / `router.post(...)` (runs only for that HTTP method)
+
+This prefix reflects how the handler was *registered*, not the HTTP method of
+the incoming request (that's the separate top-level `method` field). Handlers
+with no function name (common with factory-pattern middleware/controllers,
+e.g. `(dep) => (req, res, next) => {...}`) show as `unnamed#<position>`
+instead - name the inner function to get a real name in the log.
 
 ## Formatting
 
@@ -82,7 +112,58 @@ npm run int-test
 npm run int-test-ui
 ```
 
-### Dependency Checks
+### Docker compose
 
-The template project has implemented some scheduled checks to ensure that key dependencies are kept up to date.
-If these are not desired in the cloned project, remove references to `check_outdated` job from `.circleci/config.yml`
+There are two Docker Compose files in this repository:
+
+- `docker-compose.yml` - builds and runs the app image alongside a WAF (ModSecurity) container in front of it, using your local `.env` file (dev credentials, connected to the real dev backend/downstream services that all test users share). **If you need to test WAF rules using copies of real production note data (e.g. to reproduce a 406 response), if a request passes the WAF rules it will be saved to the real dev backend.** Only use test data here, never real production data, to avoid persisting it anywhere.
+- `docker-compose-feature-dev.yml` - runs the app in feature/test mode against Wiremock stubs, alongside a WAF container. There is no real backend involved, so nothing is ever saved, even if a request passes the WAF rules - this is the **safe option** for testing WAF rules with copies of real production note data.
+
+To build and run the app with the WAF:
+
+```shell
+docker compose up --build
+```
+
+Open http://localhost:8080 to hit the app through the WAF (the app itself runs on http://localhost:3000).
+
+To run the feature/test setup (Wiremock + app + WAF) locally:
+
+```shell
+docker compose -f docker-compose-feature-dev.yml up --build
+```
+
+Open http://localhost:8081 to hit the app through the WAF (the app itself runs on http://localhost:3007).
+
+Stop and remove containers for either setup with:
+
+```shell
+docker compose down
+# or
+docker compose -f docker-compose-feature-dev.yml down
+```
+
+#### Checking WAF audit logs
+
+When testing the WAF, ModSecurity audit logs are written to `./waf-logs` (this directory is git-ignored, so logs won't be committed). The main log file is `./waf-logs/audit.log`.
+
+To find out why a request was blocked, search the log for the relevant rule and matched data, for example:
+
+```shell
+# Find which variable/argument triggered a rule
+grep "against variable \`ARGS" waf-logs/audit.log
+
+# Find a specific rule id
+grep "ruleId" waf-logs/audit.log
+
+# Find what data actually matched the rule
+grep "Matched Data:" waf-logs/audit.log
+```
+
+Alternatively, open `waf-logs/audit.log` directly in your IDE and use find/search for the same terms (e.g. "against variable `ARGS`", "ruleId", "Matched Data:").
+
+You can also tail the log while reproducing the request:
+
+```shell
+tail -f waf-logs/audit.log
+```

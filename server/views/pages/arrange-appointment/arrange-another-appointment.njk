@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = "Arrange another appointment" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set notStandardForm = true %}
 {% set anotherAppointment = true %}
 {% set buttonText = "Arrange appointment" %}

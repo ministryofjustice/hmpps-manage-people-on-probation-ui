@@ -5,17 +5,23 @@ export class FeatureFlags {
   enableCompliancePage?: boolean = undefined
   enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableOGRS4?: boolean = undefined
   enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
-  enableSentencePlanUrl?: boolean = undefined
-  enableDeepLinks?: boolean = undefined
+  enableSupervisionPackage?: boolean = undefined
+  enableSupervisionPackagePoPHeader?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
-  enableShowMatchWithConcern?: boolean = undefined
   enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
+  enableCaseloadV2?: boolean = undefined
+  enableEnforcementContacts?: boolean = undefined
+  enableBreachOrRecallAndSendLetterAction?: boolean = undefined
+  enableSessionCacheLogging?: boolean = undefined
+  enableESUPCheckinNewStop?: boolean = undefined
+  enableESUPCheckinNewReview?: boolean = undefined
+  enableESUPCheckinNewQuestions?: boolean = undefined
+  enableSparksFilter?: boolean = undefined
 }

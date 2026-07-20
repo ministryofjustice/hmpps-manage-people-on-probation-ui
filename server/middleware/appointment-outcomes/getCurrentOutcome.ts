@@ -9,10 +9,12 @@ type Status =
   | 'Acceptable absence'
   | 'Unacceptable absence'
   | 'Rescheduled'
+  | 'Failed to attend'
 
 export const getCurrentOutcome: Route<void> = (_req, res, next): void => {
   const { appointment } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
-  const { acceptableAbsence, acceptableAbsenceReason, hasOutcome, wasAbsent, rescheduled, didTheyComply } = appointment
+  const { acceptableAbsence, acceptableAbsenceReason, hasOutcome, wasAbsent, rescheduled, didTheyComply, outcome } =
+    appointment
   let tagColour: TagColour = 'BLUE'
   let reason: string = null
   let status: Status = 'Not started'
@@ -27,6 +29,11 @@ export const getCurrentOutcome: Route<void> = (_req, res, next): void => {
       status = 'Acceptable absence'
       reason = acceptableAbsenceReason
       tagColour = 'GREEN'
+    }
+    // Failed to attend
+    else if (outcome?.toLowerCase() === 'failed to attend') {
+      status = 'Failed to attend'
+      tagColour = 'YELLOW'
     }
     // Unacceptable absence
     else if (didTheyComply === false && acceptableAbsence === false && wasAbsent === true) {

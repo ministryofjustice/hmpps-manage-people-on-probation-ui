@@ -13,14 +13,10 @@ import {
   setDataValue,
   getDataValue,
   canRescheduleAppointment,
+  addressToList,
 } from '../utils'
-import {
-  renderError,
-  cloneAppointmentAndRedirect,
-  getCheckinOffenderDetails,
-  createAppointmentSession,
-} from '../middleware'
-import { AppointmentPatch } from '../models/Appointments'
+import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
+import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
 
@@ -163,15 +159,23 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+      let nextAppointmentLocation: string | null = null
+      if (nextAppointment?.appointment?.type !== 'Planned Telephone Contact (NS)') {
+        nextAppointmentLocation = nextAppointmentIsAtHome
+          ? 'their home'
+          : addressToList(nextAppointment?.appointment?.location)?.[0]
+      }
+
+      res.locals.nextAppointmentLocation = nextAppointmentLocation
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
+      const canReschedule = canRescheduleAppointment(personAppointment)
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
         back,
         url,
         nextAppointment,
-        nextAppointmentIsAtHome,
-        canReschedule: canRescheduleAppointment(personAppointment),
+        canReschedule,
         contactId,
         hasDeceased,
         relatedContacts,
@@ -353,7 +357,8 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params as Record<string, string>
+      const { crn, contactId, id: uuid } = req.params as Record<string, string>
+      const id = uuid || contactId
       const { data } = req.session
       let { back } = req.query
       if (back) {
@@ -371,12 +376,14 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const outcomeJourney = req.url.includes('outcome/next-appointment')
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
+        id,
         back,
-        contactId,
+        outcomeJourney,
       })
     }
   },
@@ -385,10 +392,13 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { body, session } = req
       const { crn, contactId, id: uuid } = req.params as Record<string, string>
       const id = uuid || contactId
+      const outcomeJourney = req.url.includes('/outcome/next-appointment')
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
-      const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
+      const nextAppointment = !outcomeJourney
+        ? (body.nextAppointment as AppointmentSessionSelection)
+        : (body.appointments[crn][id].outcome.nextAppointment as AppointmentSessionSelection)
       const currentAppointment = getDataValue(session.data, ['appointments', crn, id])
       if (nextAppointment !== 'NO') {
         return cloneAppointmentAndRedirect(currentAppointment, nextAppointment)(req, res)
@@ -404,7 +414,23 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn, contactId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const noteResponse = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const appointmentResponse = await masClient.getPersonAppointment(crn, contactId)
+
+      const selectedNote = noteResponse?.appointment?.appointmentNote
+      const notes = appointmentResponse?.appointment?.appointmentNotes || []
+
+      if (selectedNote && Array.isArray(notes)) {
+        appointmentResponse.appointment.appointmentNotes = notes.map(note =>
+          String(note.id) === String(noteId)
+            ? {
+                ...note,
+                ...selectedNote,
+                hasNoteBeenTruncated: false,
+              }
+            : note,
+        )
+      }
       const { back } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENT_NOTE',
@@ -416,7 +442,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       res.render('pages/appointments/appointment', {
         back,
-        personAppointment,
+        personAppointment: appointmentResponse,
         crn,
         contactId,
       })

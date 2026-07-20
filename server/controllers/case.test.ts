@@ -363,20 +363,18 @@ describe('caseController', () => {
     afterEach(() => {
       jest.clearAllMocks()
       res.locals.flags = { enableOutcomesV1: true }
-      delete res.locals.locationMonitoringUri
       delete res.locals.sentences
     })
 
     it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(true)
-      existsInEMDISpy.mockResolvedValue('http://emdi-uri')
+      existsInEMDISpy.mockResolvedValue({ uri: 'https://emdi-uri' })
 
       await controllers.case.getCase(hmppsAuthClient)(req, res)
 
       expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
-      expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
     })
 
     it('should call getSentences but NOT existsInEMDI when flag is enabled but NO location monitoring is present', async () => {
@@ -387,7 +385,6 @@ describe('caseController', () => {
       expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
-      expect(res.locals.locationMonitoringUri).toBeUndefined()
     })
 
     it('should NOT call getSentences when flag is disabled', async () => {

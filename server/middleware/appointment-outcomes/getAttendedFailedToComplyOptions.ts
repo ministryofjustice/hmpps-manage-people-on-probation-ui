@@ -13,14 +13,13 @@ export const getAttendedFailedToComplyOptions: Route<void> = (_req, res, next) =
     appointmentSession,
   } = res.locals.appointmentOutcome
 
-  if (!appointmentSession?.outcome?.contactEnforcementActions) {
-    return next()
-  }
-
   let options = validEnforcementActionOptions<AppointmentEnforcementAction>(
-    appointmentSession.outcome.contactEnforcementActions,
+    appointmentSession?.outcome?.contactOutcomes,
     attendedFailedToComplyOptions(type),
   )
+  if (!res?.locals?.flags?.enableBreachOrRecallAndSendLetterAction) {
+    options = options.filter(option => option.value !== 'BREACH_RECALL_INITIATED_AND_SEND_LETTER')
+  }
   if (isProbationPractitioner) {
     options = options.filter(option => option.value !== 'REFER_TO_OFFENDER_MANAGER')
   }

@@ -156,8 +156,8 @@
         }
     } if appointmentOutcome.summary.outcome and flags.enableNonCompliance and isInPast,
     {
-        key: { text: 'Enforcement action' },
-        value: { text: appointmentOutcome.summary.enforcementAction | nl2br },
+        key: { text: 'Enforcement action' }, 
+        value: { html: appointmentOutcome.summary.enforcementAction  | replace('\n', '<br>') | safe },
         actions: {
             items: [
                 { href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url, text: 'Change', visuallyHiddenText: 'enforcement action' }
@@ -198,7 +198,7 @@
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 
-    href:   (appointmentOutcome.baseOutcomeUrl + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
+    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "notes"
      } 
@@ -208,7 +208,7 @@
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ { 
-    href:   (appointmentOutcome.baseOutcomeUrl + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
+    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
     text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
     visuallyHiddenText: "sensitivity"
      } 

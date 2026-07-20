@@ -2,8 +2,9 @@ import httpMocks from 'node-mocks-http'
 import { getOutcomeSummary } from './getOutcomeSummary'
 import { mockAppResponse } from '../../controllers/mocks'
 import { AppointmentOutcomeProps, OutcomeSummary, type AppResponse } from '../../models/Locals'
-import { Activity } from '../../data/model/schedule'
+import { Activity, ContactEnforcementAction, ContactOutcome } from '../../data/model/schedule'
 import { AppointmentSessionOutcome } from '../../models/Appointments'
+import { Compliance } from '../../data/model/overview'
 
 const crn = 'X000001'
 const contactId = '12345'
@@ -13,10 +14,48 @@ const req = httpMocks.createRequest()
 const mockAppointment = ({ appointment = {} } = {}): Activity => ({
   id: '123',
   type: 'Planned Office Visit (NS)',
-  startDateTime: '2026-05-15T12:36:24.050Z',
-  endDateTime: '2026-05-15T12:36:24.050Z',
+  startDateTime: '2026-05-15T12:00:00.000[Europe/London]',
+  endDateTime: '2026-05-15T13:30:00.000[Europe/London]',
   ...appointment,
 })
+
+const expectedAppointmentDetails = 'Planned office visit (NS) on Friday 15 May 2026 at 12pm to 1:30pm'
+
+const mockEnforcementActions: ContactEnforcementAction[] = [
+  {
+    code: 'NFA',
+    description: 'No Further Action',
+  },
+  {
+    code: 'IBR',
+    description: 'Breach / Recall Initiated',
+  },
+  {
+    code: 'EA02',
+    description: 'First Warning Letter Sent',
+    defaultResponsePeriodDays: 7,
+  },
+]
+
+const mockContactOutcomes: ContactOutcome[] = [
+  {
+    code: 'ATTC',
+    description: 'Attended - Complied',
+    enforcementActions: [],
+  },
+  {
+    code: 'AFTC',
+    description: 'Attended - Failed To Comply',
+    enforcementActions: mockEnforcementActions,
+  },
+  {
+    code: 'AFTA',
+    description: 'Failed To Attend',
+    enforcementActions: mockEnforcementActions,
+  },
+  { code: 'AAHO', description: 'Acceptable Absence - Holiday', enforcementActions: [] },
+  { code: 'AAME', description: 'Acceptable Absence - Medical', enforcementActions: [] },
+]
 
 const mockAppointmentOutcome = ({
   outcome = {},
@@ -27,7 +66,15 @@ const mockAppointmentOutcome = ({
   notes?: string
   appointment?: Activity
 } = {}): AppointmentOutcomeProps<Activity> => ({
-  sentence: { type: 'COMMUNITY', length: 12 },
+  sentence: {
+    type: 'COMMUNITY',
+    length: 12,
+    eventId: 123,
+    order: '',
+    youth: false,
+    pss: false,
+    compliance: {} as Compliance,
+  },
   forename: 'James',
   surname: 'Morrison',
   crn,
@@ -42,7 +89,7 @@ const mockAppointmentOutcome = ({
   baseOutcomeUrl: '/base/outcome/url',
   completedUrl: '/completed/url',
   notePrepend: 'Mock note prepend',
-  appointmentHintText: 'Appointment: Planned Office Visit (NS)',
+  showLetterTypeOptions: false,
   appointmentSession: {
     notes,
     sensitivity: 'No',
@@ -51,7 +98,7 @@ const mockAppointmentOutcome = ({
       outcomeType: 'ATTENDED_COMPLIED',
       outcomeCode: 'ATTC',
       enforcementActionCode: [],
-      contactEnforcementActions: [],
+      contactOutcomes: mockContactOutcomes,
       attendedFailedToComply: null,
       acceptableAbsence: null,
       unacceptableAbsence: null,
@@ -92,7 +139,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse()
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - complied',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
@@ -112,7 +159,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - failed to comply',
       enforcementAction: 'No further action',
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
@@ -135,7 +182,7 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - failed to comply',
       enforcementAction: mockAppointmentOutcome().notePrepend,
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
@@ -156,15 +203,21 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       letterSentBy: 'CASE_ADMIN',
       letterType: 'BREACH_LETTER_SENT',
       enforcementActionCode: ['IBR', 'EA08'],
-      contactEnforcementActions: [
-        { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
-        { code: 'EA08', description: 'Breach Letter Sent', defaultResponsePeriodDays: 14 },
+      contactOutcomes: [
+        {
+          code: 'AFTC',
+          description: 'Attended - Failed To Comply',
+          enforcementActions: [
+            { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
+            { code: 'EA08', description: 'Breach Letter Sent', defaultResponsePeriodDays: 14 },
+          ],
+        },
       ],
     }
     const res = buildResponse({ outcome })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Attended - failed to comply',
       enforcementAction: mockAppointmentOutcome().notePrepend,
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
@@ -196,35 +249,49 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
     const res = buildResponse({ outcome, appointment: mockAppointment({ appointment }) })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Failed to attend',
       enforcementAction: mockAppointmentOutcome().notePrepend,
       enforcementActionChangeLink: '/base/outcome/url/failed-to-attend',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
       nextAppointment: 'No next appointment',
+      evidenceDueDate: '22 May 2026',
       documents: ['FILE1', 'FILE2'],
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
   })
 
-  it('should create the correct summary if outcome is acceptable absence and action has been selected', () => {
+  it('should create the correct summary if outcome is acceptable absence - holiday', () => {
     const outcome: AppointmentSessionOutcome = {
       outcomeType: 'ACCEPTABLE_ABSENCE',
-      outcomeCode: 'AAM11',
+      outcomeCode: 'AAHO',
       acceptableAbsence: 'ACCEPTABLE_ABSENCE_HOLIDAY',
-      enforcementActionCode: ['AAHO'],
     }
-    const res = buildResponse({ outcome, nextAppointment: mockAppointment(), notes: null })
+    const res = buildResponse({ outcome, nextAppointment: mockAppointment(), notes: '' })
     getOutcomeSummary(req, res, nextSpy)
     const expectedSummary: OutcomeSummary = {
-      appointmentDetails: mockAppointmentOutcome().appointmentHintText,
+      appointmentDetails: expectedAppointmentDetails,
       outcome: 'Acceptable absence - holiday',
       notes: 'No notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'Planned Office Visit (NS) on 15 May 2026 at 1:36pm to 1:36pm',
+      nextAppointment: expectedAppointmentDetails,
       documents: null,
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
+  })
+
+  it('should set enforcementActionChangeLink to /update-enforcement-action when updateEnforcementAction is set', () => {
+    const outcome: AppointmentSessionOutcome = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      updateEnforcementAction: 'SEND_ANOTHER_LETTER',
+      enforcementActionCode: ['NFA'],
+    }
+    const res = buildResponse({ outcome })
+    getOutcomeSummary(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.summary.enforcementActionChangeLink).toEqual(
+      '/base/outcome/url/update-enforcement-action',
+    )
   })
 })

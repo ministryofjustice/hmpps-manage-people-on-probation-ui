@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import config from '../config'
 import ArnsApiClient from '../data/arnsApiClient'
 import { PersonRiskFlag, TimelineItem } from '../data/model/risk'
-import { toTimeline, findReplace } from '../utils'
+import { findReplace } from '../utils'
 
 const routes = [
   'getRisk',
@@ -39,23 +39,11 @@ const riskController: Controller<typeof routes, void> = {
       })
       const arnsClient = new ArnsApiClient(token)
 
-      // remove predictors below with migration to ARNS predictor timeline component
-      let predictors
-      let needs
-      let sanIndicatorResponse
-      let timeline: TimelineItem[] = []
-      if (res?.locals?.flags?.enableOGRS4) {
-        ;[needs, sanIndicatorResponse] = await Promise.all([arnsClient.getNeeds(crn), arnsClient.getSanIndicator(crn)])
-      } else {
-        ;[predictors, needs, sanIndicatorResponse] = await Promise.all([
-          arnsClient.getPredictorsAll(crn),
-          arnsClient.getNeeds(crn),
-          arnsClient.getSanIndicator(crn),
-        ])
-        if (Array.isArray(predictors)) {
-          timeline = toTimeline(predictors)
-        }
-      }
+      const timeline: TimelineItem[] = []
+      const [needs, sanIndicatorResponse] = await Promise.all([
+        arnsClient.getNeeds(crn),
+        arnsClient.getSanIndicator(crn),
+      ])
 
       const oasysLink = config.oaSys.link
       return res.render('pages/risk', {

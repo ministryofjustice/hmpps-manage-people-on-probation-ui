@@ -14,20 +14,21 @@
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set hidePageHeader = true %}
-{% set backQueryParam = "?back=" + url if url else 
+{% set backQueryParam = "?back=" + url if url else
     "" %}
 
 {% if upcomingAppointments.length > 0 %}
     {% for appointment in upcomingAppointments %}
+        {% set appointmentDescription = appointment.description if appointment.description else appointment.type %}
         {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" + backQueryParam %}
         {% set appointmentDetails %}
         <a class='govuk-link' href={{ manageUrl }}>
-            {{ appointment.type | toSentenceCase }}
+            {{ appointmentDescription | toSentenceCase }}
             {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
         </a>
         {% endset %}
         {% set actionsButton %}
-        {{ manageAppointmentLink(flags, appointment, crn, manageUrl) }}
+        {{ manageAppointmentLink(appointment, crn, manageUrl) }}
         {% endset %}
 
         {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([

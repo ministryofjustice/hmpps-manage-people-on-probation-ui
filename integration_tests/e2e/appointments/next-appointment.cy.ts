@@ -38,6 +38,12 @@ describe('Create next appointment', () => {
   it('should render the pop header', () => {
     checkPopHeader()
   })
+  it('should display the inset text', () => {
+    cy.get('.govuk-inset-text').should(
+      'contain.text',
+      'Planned office visit (NS) on Wednesday 21 February 2024 at 10:15am with Terry Jones for their Pre-Sentence',
+    )
+  })
   it('should display the options', () => {
     nextAppointmentPage
       .getRadioLabel('anotherAppointment', 1)

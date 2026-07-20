@@ -7,7 +7,11 @@ export default function evaluateFeatureFlags(flagService: FlagService): RequestH
   return async (req, res: AppResponse, next) => {
     try {
       const pduCodes = (res.locals.user.probationDeliveryUnits || []).map(p => p.code)
-      const flags = await flagService.getFlags({ email: res.locals.user.email, pduCodes })
+      const flags = await flagService.getFlags({
+        email: res.locals.user.email,
+        username: res.locals.user.username,
+        pduCodes,
+      })
       if (flags) {
         res.locals.flags = flags
 

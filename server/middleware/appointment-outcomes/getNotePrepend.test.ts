@@ -1,18 +1,24 @@
 import httpMocks from 'node-mocks-http'
 import { getNotePrepend } from './getNotePrepend'
 import { mockAppResponse } from '../../controllers/mocks'
-import { EnforcementActionCreatedBy, EnforcementActionLetterType } from '../../models/Appointments'
+import {
+  EnforcementActionCreatedBy,
+  EnforcementActionLetterType,
+  OtherEnforcementActionsLetterType,
+} from '../../models/Appointments'
 import { SentenceType } from '../../data/model/sentenceDetails'
 
 const buildResponse = ({
   breachNSICreatedBy = null,
   letterSentBy = null,
   letterType = null,
+  otherEnforcementAction = null,
   sentenceType = 'COMMUNITY',
 }: {
   breachNSICreatedBy?: EnforcementActionCreatedBy
   letterSentBy?: EnforcementActionCreatedBy
   letterType?: EnforcementActionLetterType
+  otherEnforcementAction?: OtherEnforcementActionsLetterType
   sentenceType?: SentenceType
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
@@ -25,6 +31,7 @@ const buildResponse = ({
           breachNSICreatedBy,
           letterSentBy,
           letterType,
+          otherEnforcementAction,
         },
       },
     },
@@ -61,6 +68,20 @@ describe('/middleware/appointment-outcomes/getNotePrepend', () => {
     const res = buildResponse({ letterSentBy: 'USER', letterType: 'BREACH_LETTER_SENT' })
     getNotePrepend(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach warning letter')
+  })
+  it('should set the correct value if other letter type has been selected', () => {
+    const res = buildResponse({ letterSentBy: 'USER', letterType: null, otherEnforcementAction: 'BREACH_LETTER_SENT' })
+    getNotePrepend(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach warning letter')
+  })
+  it('should set the correct value if other enforcement action is BREACH_CONFIRMATION_SENT', () => {
+    const res = buildResponse({ letterSentBy: 'USER', otherEnforcementAction: 'BREACH_CONFIRMATION_SENT' })
+    getNotePrepend(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.notePrepend).toEqual('I will send a breach confirmation sent')
+  })
+  it('should throw an explicit error if letterType value is not found in letterTypeOptions', () => {
+    const res = buildResponse({ letterSentBy: 'USER', letterType: 'UNKNOWN_LETTER_TYPE' as any })
+    expect(() => getNotePrepend(req, res, nextSpy)).toThrow('Letter type not found for value: UNKNOWN_LETTER_TYPE')
   })
   it('should set the correct value if breach/recall initiated by USER, letter sent by CASE_ADMIN, letter type is FIRST_WARNING_LETTER_SENT and sentence type is CUSTODY', () => {
     const res = buildResponse({

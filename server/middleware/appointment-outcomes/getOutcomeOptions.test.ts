@@ -3,7 +3,7 @@ import httpMocks from 'node-mocks-http'
 import { getOutcomeOptions } from './getOutcomeOptions'
 import { mockAppResponse } from '../../controllers/mocks'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
-import { ContactOutcomes } from '../../data/model/schedule'
+import { ContactOutcome } from '../../data/model/schedule'
 import { validOutcomeOptions } from '../../utils'
 import { outcomeOptions } from '../../properties/appointment-outcomes'
 
@@ -21,14 +21,16 @@ const end = '10:00'
 const now = DateTime.now()
 const futureDate = now.plus({ day: 1 }).toFormat('yyyy-MM-dd')
 
-const contactOutcomes: ContactOutcomes[] = [
+const contactOutcomes: ContactOutcome[] = [
   {
     code: 'ATTC',
     description: 'Attended - Complied',
+    enforcementActions: [],
   },
   {
     code: 'AFTC',
     description: 'Attended - Failed To Comply',
+    enforcementActions: [],
   },
 ]
 
@@ -118,7 +120,7 @@ jest.mock('../appointmentDateIsInPast', () => ({
 }))
 
 jest.mock('../../utils', () => ({
-  validOutcomeOptions: jest.fn(() => outcomeOptions),
+  validOutcomeOptions: jest.fn(),
 }))
 
 const validOutcomeOptionsSpy = validOutcomeOptions as jest.MockedFunction<typeof validOutcomeOptions>
@@ -131,28 +133,33 @@ describe('/middleware/appointment-outcomes/getOutcomeOptions', () => {
   })
 
   it('should return the correct values if manage appointment journey and appointment in the past and appointment type is non office based', () => {
-    const req = buildRequest({ params: { id: undefined }, id: contactId })
-    const res = buildResponse({ type: 'COPT' })
-    mockAppointmentDateIsInPast.mockReturnValue(true)
-    getOutcomeOptions(req, res, nextSpy)
-    expect(validOutcomeOptions).toHaveBeenCalledWith(contactOutcomes, outcomeOptions)
-    expect(res.locals.appointmentOutcome.options).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
-        expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
-        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
-        expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
-        expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
-      ]),
-    )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(5)
-    expect(nextSpy).toHaveBeenCalledTimes(1)
+    ;['COPT', 'CHVS', 'COVC'].forEach(type => {
+      const req = buildRequest({ params: { id: undefined }, id: contactId })
+      const res = buildResponse({ type })
+      mockAppointmentDateIsInPast.mockReturnValue(true)
+      validOutcomeOptionsSpy.mockReturnValueOnce(outcomeOptions(true))
+      getOutcomeOptions(req, res, nextSpy)
+      expect(validOutcomeOptions).toHaveBeenCalledWith(contactOutcomes, outcomeOptions())
+      expect(res.locals.appointmentOutcome.options).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
+          expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
+          expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
+        ]),
+      )
+      expect(res.locals.appointmentOutcome.options).toHaveLength(5)
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+      jest.clearAllMocks()
+    })
   })
 
   it('should return the correct values if manage appointment journey and appointment in the past and appointment type is office based', () => {
     const req = buildRequest({ params: { id: undefined }, id: contactId, type: 'COAI' })
     const res = buildResponse()
     mockAppointmentDateIsInPast.mockReturnValue(true)
+    validOutcomeOptionsSpy.mockReturnValueOnce(outcomeOptions(true))
     getOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
@@ -171,12 +178,13 @@ describe('/middleware/appointment-outcomes/getOutcomeOptions', () => {
 
   it('should return the correct values if manage appointment journey and appointment in the future', () => {
     const req = buildRequest({ params: { id: undefined }, date: futureDate, id: contactId })
+    validOutcomeOptionsSpy.mockReturnValueOnce(outcomeOptions(false))
     const res = buildResponse({ date: futureDate, isInPast: false })
     mockAppointmentDateIsInPast.mockReturnValue(false)
     getOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE', hint: { text: null } }),
         expect.objectContaining({ value: 'WILL_BE_RESCHEDULED' }),
       ]),
     )
@@ -187,13 +195,17 @@ describe('/middleware/appointment-outcomes/getOutcomeOptions', () => {
   it('should return the correct values if arrange appointment journey and appointment in the past and appointment type is non office based', () => {
     const req = buildRequest({ params: { contactId: undefined, id: uuid }, id: uuid })
     const res = buildResponse({ type: 'COPT' })
+    validOutcomeOptionsSpy.mockReturnValueOnce(outcomeOptions())
     mockAppointmentDateIsInPast.mockReturnValue(true)
     getOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
         expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
-        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+        expect.objectContaining({
+          value: 'ACCEPTABLE_ABSENCE',
+          hint: { text: 'They provided an acceptable reason or evidence.' },
+        }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
       ]),
@@ -205,6 +217,7 @@ describe('/middleware/appointment-outcomes/getOutcomeOptions', () => {
   it('should return the correct values if arrange appointment journey and appointment in the past and appointment type is office based', () => {
     const req = buildRequest({ params: { contactId: undefined, id: uuid }, id: uuid })
     const res = buildResponse()
+    validOutcomeOptionsSpy.mockReturnValueOnce(outcomeOptions(false))
     mockAppointmentDateIsInPast.mockReturnValue(true)
     getOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(

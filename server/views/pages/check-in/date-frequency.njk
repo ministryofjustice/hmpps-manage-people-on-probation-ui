@@ -1,5 +1,14 @@
 {% extends "../_form.njk" %}
 {% set title = "Set up online check ins" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + title]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [title]
+  }) %}
+{% endif %}
 {% set backLink = backLink %}
 {% set radioLabel = "How often would you like " + case.name.forename + " to check in?" %}
 

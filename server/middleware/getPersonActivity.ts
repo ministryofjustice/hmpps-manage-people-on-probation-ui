@@ -6,7 +6,7 @@ import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
 import { AppResponse } from '../models/Locals'
 import { ActivityLogRequestBody, SelectedFilterItem } from '../models/ActivityLog'
-import { categoryFilterOptions, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
+import { categoryFilterOptions, sparksCategoryFilterOption, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 export const getPersonActivity = async (
   req: Request,
@@ -15,7 +15,7 @@ export const getPersonActivity = async (
 ): Promise<[TierCalculation, PersonActivity]> => {
   const { filters } = res.locals
   const { params, query } = req
-  const { keywords, dateFrom, dateTo, compliance, category, hideContact } = filters
+  const { keywords, dateFrom, dateTo, compliance, category, sparks, hideContact } = filters
   const { crn } = params as Record<string, string>
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -29,11 +29,32 @@ export const getPersonActivity = async (
     }
   }
 
+  const sparksFilters: string[] = []
+  if (
+    res.locals.flags?.enableSparksFilter &&
+    Array.isArray(sparks) &&
+    sparks.includes(sparksCategoryFilterOption.value)
+  ) {
+    sparksFilters.push(...sparksCategoryFilterOption.codes)
+  }
+
+  const formatCompliance = (): Array<string> => {
+    const complianceArray: string[] = []
+
+    if (compliance && Array.isArray(compliance)) {
+      compliance.forEach(option => complianceArray.push(toCamelCase(option)))
+    } else if (compliance && typeof compliance === 'string') {
+      complianceArray.push(compliance)
+    }
+
+    return complianceArray
+  }
+
   const body: ActivityLogRequestBody = {
     keywords,
     dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
-    filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
+    filters: [...formatCompliance(), ...sparksFilters],
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }

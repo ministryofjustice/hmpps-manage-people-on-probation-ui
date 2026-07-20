@@ -6,7 +6,7 @@ import { validEnforcementActionOptions } from '../../utils'
 
 export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   const {
-    sentence: { type: sentenceType },
+    sentence: { type: sentenceType, youth, pss },
     sendLetter,
     sendBreachOrRecallLetter,
     appointmentSession,
@@ -15,7 +15,7 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   let filteredLetterTypeOptions: Option<EnforcementActionLetterType>[]
 
   const letterTypeOptions = validEnforcementActionOptions<EnforcementActionLetterType>(
-    appointmentSession.outcome.contactEnforcementActions,
+    appointmentSession?.outcome?.contactOutcomes,
     _letterTypeOptions,
   )
 
@@ -29,14 +29,16 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
       ['FIRST_WARNING_LETTER_SENT', 'BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
     )
   }
-  if (sendLetter && ['PSS', 'YOUTH_CUSTODY'].includes(sentenceType)) {
+  if (sendLetter && (pss || (sentenceType === 'CUSTODY' && youth))) {
     filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
-      [
-        'FIRST_WARNING_LETTER_SENT',
-        'SECOND_WARNING_LETTER_SENT',
-        'BREACH_LETTER_SENT',
-        'OTHER_ENFORCEMENT_LETTER_SENT',
-      ].includes(typeOption.value),
+      ['FIRST_WARNING_LETTER_SENT', 'SECOND_WARNING_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(
+        typeOption.value,
+      ),
+    )
+  }
+  if (sendBreachOrRecallLetter && (sentenceType === 'COMMUNITY' || pss || youth)) {
+    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
+      ['BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
     )
   }
   res.locals.appointmentOutcome = {

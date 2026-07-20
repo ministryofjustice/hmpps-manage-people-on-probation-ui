@@ -1,6 +1,10 @@
 {% extends "../_form.njk" %}
 {% set notStandardForm = true %}
+
 {% set title = 'Check your answers then confirm the appointment outcome' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Record an outcome"]
+}) %}
 {% set buttonText = 'Confirm this appointment' %}
 {% set showCalendarInsetText = not isInPast %}
 {% set outcome = true %}

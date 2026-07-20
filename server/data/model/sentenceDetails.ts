@@ -7,7 +7,7 @@ export interface SentenceDetails {
   sentence: Sentence
 }
 
-export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE' | 'PSS' | 'YOUTH_CUSTODY'
+export type SentenceType = 'CUSTODY' | 'COMMUNITY' | 'PRE_SENTENCE'
 
 export interface Sentences {
   personSummary: PersonSummary
@@ -56,16 +56,18 @@ export interface Offence {
 
 export interface Order {
   description: string
+  sentenceType?: SentenceType
   startDate: string
   endDate: string
   length?: string
+  pss?: boolean
 }
 
 export interface Requirement {
   id: number
   description: string
+  code: string
 }
-
 export interface Nsi {
   id: number
   description: string
@@ -86,6 +88,7 @@ export interface CourtDocument {
 export interface LicenceCondition {
   id: number
   mainDescription: string
+  code: string
 }
 
 export interface ProbationHistory {

@@ -558,6 +558,14 @@ export const ENFORCEMENT_CODES: string[] = [
   'C145',
 ]
 
+export const SPARKS_FILTER_VALUE = 'sparks'
+
+export const sparksCategoryFilterOption = {
+  text: 'Appointments with SPARKS activity',
+  value: 'appointments with sparks activity',
+  codes: [SPARKS_FILTER_VALUE],
+}
+
 export const categoryFilterOptions = [
   { text: 'Appointments', value: 'appointments', codes: APPOINTMENTS_CODES },
   { text: 'Approved Premises', value: 'Approved Premises', codes: APPROVED_PREMISES_CODES },

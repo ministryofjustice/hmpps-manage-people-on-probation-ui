@@ -1,15 +1,25 @@
+{% from "_components/document/macro.njk" import appDocument %}
 {% set notes = '' %}
-{% set appointmentDisplayName = appointment.displayName or appointment.type %}
+{% set documentsHtml = '' %}
+ {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
+ {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
-{% if hasNotes %}
+{% set _docs = appointmentDocuments if appointmentDocuments else appointment.documents %}
+{% if _docs and _docs.length > 0 %}
+  {% for document in _docs %}
+    {% set documentsHtml = documentsHtml ~ appDocument(document, crn) %}
+  {% endfor %}
+{% endif %}
+{% if hasNotes or contactHasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
       {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
     {% endif %}
   {% endfor %}
 {% endif %}
-{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else 
+{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else
   ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
@@ -62,6 +72,22 @@
       value: { html: '<span data-qa="rarActivityValue">' + appointment.countsTowardsRAR | toYesNo + '</span>' }
     } if not appointment.hasOutcome,
     {
+      key: { html: '<span data-qa="contactNotesLabel">Details</span>' },
+      value: { html: '<span data-qa="contactNotesValue">' + notes + '</span>' }
+    } if contactHasNotes and not contactHasNote,
+    {
+      key: { html: '<span data-qa="contactNoteLabel">Details</span>' },
+      value: { html: '<span class="govuk-body line-break" data-qa="contactNoteValue">' + appointment.appointmentNote.note + '</span>' }
+    } if contactHasNote,
+    {
+    key: { html: '<span data-qa="outcomeLabel">Outcome</span>' },
+    value: { html: '<span data-qa="outcomeValue">' + (appointment.outcome | toOutcomeLabel | nl2br | safe) + '</span>' }
+    } if appointment.isUpdatableContact and appointment.outcome,
+    {
+    key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
+    value: { html: '<span data-qa="sensitiveValue">' + appointment.isSensitive | toYesNo + '</span>' }
+    } if appointment.isUpdatableContact,
+    {
       key: { html: '<span data-qa="noteAddedByLabel">Note added by</span>' },
       value: { html: '<span data-qa="noteAddedByValue">' + appointment.appointmentNote.createdBy + '</span>' }
     } if appointment.appointmentNote.createdBy and hasNote,
@@ -72,14 +98,18 @@
     {
       key: { html: '<span data-qa="notesLabel">' + headings[1] + '</span>' },
       value: { html: '<span data-qa="notesValue">' + notes + '</span>' }
-    } if hasNotes and not hasNote,
+    } if hasNotes and not hasNote and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="noteLabel">Note</span>' },
       value: { html: '<span class="govuk-body line-break" data-qa="noteValue">' + appointment.appointmentNote.note + '</span>' }
-    } if hasNote,
+    } if hasNote and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
       value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo + '</span>' }
-    } if not appointment.hasOutcome
+    } if not appointment.hasOutcome and not appointment.isUpdatableContact,
+    {
+      key: { html: '<span data-qa="relatedDocumentsLabel">Related documents</span>' },
+      value: { html: '<div data-qa="relatedDocumentsValue">' + documentsHtml + '</div>' }
+    } if documentsHtml
   ]
   }) }}

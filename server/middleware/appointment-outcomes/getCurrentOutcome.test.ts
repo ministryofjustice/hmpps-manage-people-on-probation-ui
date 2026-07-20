@@ -81,6 +81,22 @@ describe('middleware/appointment-outcomes/getCurrentOutcome', () => {
       tagColour: 'RED',
     })
   })
+  it(`should set the correct current outcome if appointment outcome is failed to attend`, () => {
+    const appointment: Partial<Activity> = {
+      hasOutcome: true,
+      didTheyComply: false,
+      wasAbsent: true,
+      acceptableAbsence: false,
+      outcome: 'FAILED to Attend',
+    }
+    const res = buildResponse(appointment)
+    getCurrentOutcome(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.currentOutcome).toStrictEqual({
+      status: 'Failed to attend',
+      reason: null,
+      tagColour: 'YELLOW',
+    })
+  })
   it(`should set the correct current outcome if appointment outcome is attended not complied`, () => {
     const appointment: Partial<Activity> = {
       hasOutcome: true,

@@ -44,31 +44,7 @@
     {% include './_rosh.njk' %}
     {% include './_mappa.njk' %}
     <div data-qa="oasysScoreHistory">
-        {% if flags.enableOGRS4 %}
-            {{ predictorTimeline({ data: riskData }) }}
-        {% else %}
-            <div class="govuk-body predictor-timeline__heading">
-                <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
-                {% if riskData.httpStatus !== 200 and caseSummary.roshHistory.error %}
-                    <p class='govuk-body' data-qa='timeline-missing'>ROSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
-                {% elif riskData.httpStatus !== 200 %}
-                    <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
-                {% elif caseSummary.roshHistory.error %}
-                    <p class='govuk-body' data-qa='rosh-history-missing'>Historical ROSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
-                {% endif %}
-                {% if timeline.length %}
-                    <div>
-                        <button type='button' data-js="predictor-timeline__toggle-all" class="reset-button link-button govuk-link">Open all<span class='govuk-visually-hidden'> scores in timeline</span>
-                        </button>
-                    </div>
-                {% else %}
-                    <p class='govuk-body' data-qa='rosh-history-missing'>No risk scores have been recorded</p>
-                {% endif %}
-            </div>
-            {% if timeline.length %}
-                {{ predictorTimelineV1(timeline, 'x') }}
-            {% endif %}
-        {% endif %}
+        {{ predictorTimeline({ data: riskData }) }}
     </div>
     {% include './_sentence-plan.njk' %}
 </div>

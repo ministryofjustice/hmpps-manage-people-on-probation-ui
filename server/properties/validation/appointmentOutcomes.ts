@@ -7,10 +7,24 @@ export interface AppointmentOutcomesValidationArgs extends AppointmentsValidatio
   msg?: string | string[]
   log?: string | string[]
   sendBreachOrRecallLetter?: boolean
+  showLetterTypeOptions?: boolean
+  sensitivityLocked?: boolean
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
-  const { crn, id, page, isInPast, msg, log, sendBreachOrRecallLetter, notes, maxCharCount } = args
+  const {
+    crn,
+    id,
+    page,
+    isInPast,
+    msg,
+    log,
+    sendBreachOrRecallLetter,
+    notes,
+    maxCharCount,
+    sensitivityLocked,
+    showLetterTypeOptions,
+  } = args
   const msgs = Array.isArray(msg) ? msg : [msg]
   const logs = Array.isArray(log) ? log : [log]
   return {
@@ -110,7 +124,8 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     [`[appointments][${crn}][${id}][outcome][letterType]`]: {
       optional:
         !['outcome/initiate-breach-or-recall', 'outcome/send-letter'].includes(page) ||
-        (page === 'outcome/initiate-breach-or-recall' && !sendBreachOrRecallLetter),
+        (page === 'outcome/initiate-breach-or-recall' && !sendBreachOrRecallLetter) ||
+        !showLetterTypeOptions,
       checks: [
         {
           validator: isNotEmpty,
@@ -130,12 +145,22 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== `outcome/add-note`,
+      optional: page !== `outcome/add-note` || sensitivityLocked === true,
       checks: [
         {
           validator: isNotEmpty,
           msg: 'Select whether or not the appointment note contains sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][nextAppointment]`]: {
+      optional: page !== 'outcome/next-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if you want to arrange the next appointment',
+          log: 'Next appointment type not selected',
         },
       ],
     },

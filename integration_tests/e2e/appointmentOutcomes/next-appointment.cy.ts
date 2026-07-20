@@ -71,11 +71,9 @@ const completeRescheduleJourney = () => {
 const completeNextAppointment = ({
   type = 'KEEP_TYPE',
   dateInPast = false,
-  sensitivityIsLocked = false,
 }: {
   type?: AppointmentSessionSelection
   dateInPast?: boolean
-  sensitivityIsLocked?: boolean
 } = {}): void => {
   if (type === 'KEEP_TYPE') {
     arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
@@ -91,10 +89,10 @@ const completeNextAppointment = ({
     }
     if (!dateInPast) {
       completeTextMessageConfirmationPage({ _crn: crn, _uuid: uuid, index: 1 })
-      completeSupportingInformationPage({ crnOverride: crn, uuidOveride: uuid, sensitivityIsLocked })
+      completeSupportingInformationPage({ crnOverride: crn, uuidOveride: uuid, sensitivityIsLocked: false })
     } else {
       completeOutcome()
-      completeAddNotePage({ crnOverride: crn, idOverride: uuid, sensitivityIsLocked })
+      completeAddNotePage({ crnOverride: crn, idOverride: uuid, sensitivityIsLocked: false })
     }
     checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
     checkYourAnswersPage.getSubmitBtn().click()
@@ -112,7 +110,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         nextAppointmentPage.checkPageTitle('Eula’s next supervision appointment')
         cy.get('.govuk-inset-text').should(
           'contain.text',
-          '3 way meeting (NS) on 21 February 2024 with Eula Schmeler for their Default Sentence Type (12 Months)',
+          '3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am with Terry Jones for their Default Sentence Type (12 Months)',
         )
         cy.get('[data-qa=anotherAppointment]')
           .find('legend')
@@ -124,7 +122,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         confirmationPage.checkPageTitle('Past appointment arranged')
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
-          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}`)
+          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}.`)
         cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       })
@@ -138,12 +136,12 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         nextAppointmentPage = new NextAppointmentPage()
         cy.get(`.govuk-radios__input[value=CHANGE_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
-        completeNextAppointment({ type: 'CHANGE_TYPE', dateInPast: false, sensitivityIsLocked: true })
+        completeNextAppointment({ type: 'CHANGE_TYPE', dateInPast: false })
         confirmationPage = new AppointmentConfirmationPage()
         confirmationPage.checkPageTitle('Appointment arranged')
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
-          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}`)
+          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}.`)
         cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       })

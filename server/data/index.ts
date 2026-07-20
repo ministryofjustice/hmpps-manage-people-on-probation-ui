@@ -6,6 +6,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { initialiseAppInsights, buildAppInsightsClient } from '../utils/azureAppInsights'
 import applicationInfoSupplier from '../applicationInfo'
 
@@ -35,6 +36,12 @@ const authClientSearch = new AuthenticationClient(
   config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
 )
 
+const authClientMpop = new AuthenticationClient(
+  config.apis.hmppsAuth,
+  logger,
+  config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
+)
+
 export const dataAccess = () => ({
   applicationInfo,
   hmppsAuthClient: new HmppsAuthClient(
@@ -45,6 +52,12 @@ export const dataAccess = () => ({
   probationFrontendComponentsApiClient: new ProbationFrontendComponentsApiClient(),
   authClientArns,
   arnsComponents: new ArnsComponents(authClientArns, config.apis.arnsApi, logger),
+  authClientMpop,
+  mpopComponents: new MPoPComponents(
+    authClientMpop,
+    { ...config.apis.tierApi, supervisionPackageApiConfig: config.apis.supervisionPackageApi },
+    logger,
+  ),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>

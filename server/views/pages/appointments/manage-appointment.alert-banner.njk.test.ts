@@ -1,9 +1,10 @@
 import * as cheerio from 'cheerio'
+import { Environment } from 'nunjucks'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
 import { Activity, PersonAppointment } from '../../../data/model/schedule'
 import { PersonSummary } from '../../../data/model/personalDetails'
 
-const env = createNunjucksTestEnv()
+let env: Environment
 
 const crn = 'X000001'
 const appointmentId = '1'
@@ -16,7 +17,6 @@ type TestModel = {
   url: string
   flags: {
     enableNonCompliance: boolean
-    enableDeepLinks: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -34,7 +34,6 @@ const baseModel: TestModel = {
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
   flags: {
     enableNonCompliance: false,
-    enableDeepLinks: false,
   },
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {
@@ -105,6 +104,9 @@ const render = (model: TestModelOverride = {}) =>
   )
 
 describe('Alert banner', () => {
+  beforeAll(() => {
+    env = createNunjucksTestEnv()
+  })
   describe('Appointment is in the future', () => {
     it('should not show the alert', () => {
       const $ = render({

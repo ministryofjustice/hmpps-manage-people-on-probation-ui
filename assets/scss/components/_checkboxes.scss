@@ -9,3 +9,9 @@
     opacity: 1 !important;
     border-color: #0b0c0c !important;
 }
+.disabled-checkboxes .govuk-label,
+.disabled-checkboxes .govuk-textarea,
+.disabled-checkboxes .govuk-checkboxes__label,
+.disabled-checkboxes .govuk-checkboxes__input {
+    pointer-events: none;
+}

@@ -1,6 +1,9 @@
 {% extends "../_appointment-outcome-form.njk" %}
 {% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s unacceptable absence' %}
 {% set backLink = appointmentOutcome.backLink %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Unacceptable absence action", "Record an outcome"]
+}) %}
 
 {% block form %}
   {{ govukRadios({

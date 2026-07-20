@@ -3,12 +3,8 @@
   {% include "./_ogrs.njk" %}
   {% include "./_ogp.njk" %}
   {% if not sanIndicator %}
-    {% if flags.enableOGRS4 %}
-      {% include "./_ospdc.njk" %}
-      {% include "./_ospiic.njk" %}
-    {% else %}
-      {% include "./_osp.njk" %}
-    {% endif %}
+    {% include "./_ospdc.njk" %}
+    {% include "./_ospiic.njk" %}
   {% endif %}
   {% include "./_ovp.njk" %}
   {% include "./_snsv.njk" %}
@@ -30,16 +26,12 @@
   ]
 } %}
 
-{% if flags.enableOGRS4 %}
-  {{ appSummaryCard({
-    attributes: {'data-qa': 'riskScoresCard'},
-    titleText: "Risk predictor scores",
-    subTitleText: latestAssessmentDateString,
-    headingLevel: scoresHeadingLevel | default('3'),
-    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-    html: scaleContent,
-    actions: detailsPageLink if ogrs4Version else null
-  }) }}
-{% else %}
-  {{ scaleContent | safe }}
-{% endif %}
+{{ appSummaryCard({
+  attributes: {'data-qa': 'riskScoresCard'},
+  titleText: "Risk predictor scores",
+  subTitleText: latestAssessmentDateString,
+  headingLevel: scoresHeadingLevel | default('3'),
+  classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+  html: scaleContent,
+  actions: detailsPageLink if ogrs4Version else null
+}) }}

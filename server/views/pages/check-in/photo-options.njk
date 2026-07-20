@@ -1,5 +1,15 @@
 {% extends "../_form.njk" %}
 {% set title = "Take a photo of " + case.name.forename %}
+{% set pageTitleText = "How to take a photo of the person" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'contact-preference' if not cya else 'checkin-summary'%}
 {% set radioLabel =  "How do you want to take a photo of "+ case.name.forename + "?" %}
 {% set insertTextMsg =  "Turn off notifications and close anything you do not want " + case.name.forename + " to see before <br/> taking the photo." %}
@@ -13,7 +23,7 @@
         <li>are the only person in the photo</li>
         <li>are not wearing a hat or sunglasses</li>
     </ul>
-    <p>When you've taken the photo, you'll be able to review it to make sure it meets <br/> the rules.</p>
+    <p class="govuk-body">You'll need to accept permissions to use the camera on your laptop or device. When you've taken the photo, you'll be able to review it to make sure it meets the rules.</p>
 
     {{ govukRadios({
         fieldset: {
@@ -30,7 +40,7 @@
         items: [
             {
                 value: "TAKE_A_PIC",
-                text: "Take a photo now using the laptop you're on"
+                text: "Take a photo now using the laptop or device you're on"
             },
             {
                 value: "UPLOAD_A_PIC",

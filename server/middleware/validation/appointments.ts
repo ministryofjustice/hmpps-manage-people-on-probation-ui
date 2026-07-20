@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Request } from 'express'
-import { get } from 'lodash'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes, setDataValue, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
@@ -16,10 +15,12 @@ import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
-  const { crn, id, contactId, actionType } = params as Record<string, string>
+  const { crn, id: uuid, contactId, actionType } = params as Record<string, string>
+  const id = uuid || contactId
   const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
+  const outcomeJourney = req.url.includes('outcome/next-appointment')
 
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
 
@@ -46,6 +47,7 @@ const appointments: Route<void> = (req, res, next) => {
     change,
     alertDismissed,
     isSensitive,
+    outcomeJourney,
   }
 
   if (

@@ -1,6 +1,32 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { NonComplianceContact } from '../../server/data/model/overview'
 
-const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
+const nonComplianceContact: NonComplianceContact = {
+  contactId: 6,
+  eventNumber: '1',
+  eventId: 1,
+  type: {
+    code: 'NS',
+    description: 'Planned Office Visit (NS)',
+  },
+  date: '2026-01-18',
+}
+
+const stubCompliance = ({
+  crn = 'X778160',
+  activeBreach = true,
+  activeRecall = false,
+  priorBreachesOnCurrentOrderCount = 1,
+  priorRecallsOnCurrentOrderCount = 0,
+  eventNumber = '12345',
+}: {
+  crn?: string
+  activeBreach?: boolean
+  activeRecall?: boolean
+  priorBreachesOnCurrentOrderCount?: number
+  priorRecallsOnCurrentOrderCount?: number
+  eventNumber?: string
+} = {}): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: `/mas/compliance/${crn}`,
@@ -25,11 +51,19 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
         },
         currentSentences: [
           {
-            eventNumber: '12345',
-            activeBreach: {
-              startDate: '2024-01-15',
-              status: 'Breach initiated',
-            },
+            eventNumber,
+            activeBreach: activeBreach
+              ? {
+                  startDate: '2024-01-15',
+                  status: 'Breach initiated',
+                }
+              : null,
+            activeRecall: activeRecall
+              ? {
+                  startDate: '2024-01-15',
+                  status: 'Recall initiated',
+                }
+              : null,
             order: {
               description: '12 month Community order',
               startDate: '2023-12-01',
@@ -38,8 +72,13 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
             compliance: {
               currentBreaches: 1,
               breachStarted: true,
-              breachesOnCurrentOrderCount: 1,
+              breachesOnCurrentOrderCount: 0,
+              priorBreachesOnCurrentOrderCount,
+              priorRecallsOnCurrentOrderCount,
               failureToComplyCount: 2,
+            },
+            activity: {
+              acceptableAbsenceCount: 3,
             },
             mainOffence: {
               code: '18502',
@@ -54,8 +93,21 @@ const stubBreachCompliance = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
     },
   })
 
-const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
+const stubPersonNonComplianceDetail = ({
+  crn = 'X778160',
+  acceptableAbsenceCount = 0,
+  unacceptableAbsenceCount = 1,
+  attendedButDidNotComplyCount = 0,
+} = {}): SuperAgentRequest => {
+  const acceptableAbsence =
+    acceptableAbsenceCount > 0 ? Array.from({ length: acceptableAbsenceCount }).map(_i => nonComplianceContact) : []
+  const unacceptableAbsence =
+    unacceptableAbsenceCount > 0 ? Array.from({ length: unacceptableAbsenceCount }).map(_i => nonComplianceContact) : []
+  const attendedButDidNotComply =
+    attendedButDidNotComplyCount > 0
+      ? Array.from({ length: attendedButDidNotComplyCount }).map(_i => nonComplianceContact)
+      : []
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: `/mas/compliance/non-compliance-detail/${crn}`,
       method: 'GET',
@@ -66,28 +118,18 @@ const stubNonComplianceHistory = ({ crn = 'X778160' } = {}): SuperAgentRequest =
     response: {
       status: 200,
       jsonBody: {
-        acceptableAbsence: [],
-        unacceptableAbsence: [
-          {
-            contactId: 123456,
-            eventNumber: '1',
-            eventId: 1,
-            type: {
-              code: 'NS',
-              description: 'Planned Office Visit (NS)',
-            },
-            date: '2026-01-18',
-          },
-        ],
-        attendedButDidNotComply: [],
+        acceptableAbsence,
+        unacceptableAbsence,
+        attendedButDidNotComply,
       },
       headers: {
         'Content-Type': 'application/json',
       },
     },
   })
+}
 
 export default {
-  stubBreachCompliance,
-  stubNonComplianceHistory,
+  stubCompliance,
+  stubPersonNonComplianceDetail,
 }

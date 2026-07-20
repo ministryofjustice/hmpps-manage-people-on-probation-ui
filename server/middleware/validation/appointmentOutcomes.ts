@@ -2,16 +2,30 @@ import { Route } from '../../@types'
 import { appointmentOutcomesValidation } from '../../properties'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 import { validateWithSpec } from '../../utils/validationUtils'
-import { LocalParams } from '../../models/Appointments'
+import {
+  LocalParams,
+  otherEnforcementActionLetterTypes,
+  type OtherEnforcementActionsLetterType,
+} from '../../models/Appointments'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
-  const { crn, id, isInPast, baseOutcomeUrl, reqUrl, sendBreachOrRecallLetter } = res.locals.appointmentOutcome
+  const {
+    crn,
+    id: uuid,
+    contactId,
+    isInPast,
+    baseOutcomeUrl,
+    reqUrl,
+    showLetterTypeOptions,
+    sendBreachOrRecallLetter,
+    appointmentSession,
+  } = res.locals.appointmentOutcome
+
   const { maxCharCount } = config
-
+  const id = uuid || contactId
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
-
-  let localParams: LocalParams = { crn, id }
+  let localParams: LocalParams = { crn, id, outcomeJourney: true }
   if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
     localParams = { ...localParams, maxCharCount: maxCharCount as number }
   }
@@ -66,7 +80,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/acceptable-absence`,
           msg: 'Select why their absence was acceptable',
-          log: 'Acceptable absence enforcement action not selected',
+          log: 'Acceptable absence reason not selected',
         }),
       ),
     }
@@ -144,6 +158,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           ],
           log: ['breach NSI created by not selected', 'letter sent by no selected', 'letter type not selected'],
           sendBreachOrRecallLetter,
+          showLetterTypeOptions,
         }),
       ),
     }
@@ -162,6 +177,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/send-letter`,
           msg: ['Select who will send the letter', 'Select the type of letter'],
           log: ['letter sent by no selected', 'letter type not selected'],
+          showLetterTypeOptions,
         }),
       ),
     }
@@ -198,6 +214,23 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           page: `outcome/add-note`,
           notes: req.body.appointments[crn][id].notes,
           maxCharCount: maxCharCount as number,
+          sensitivityLocked: appointmentSession?.sensitivityLocked || null,
+        }),
+      ),
+    }
+  }
+
+  const validateNextAppointment = (): void => {
+    if (!reqUrl.includes(`${baseOutcomeUrl}/next-appointment`)) return
+    render = 'pages/appointments/next-appointment'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/next-appointment`,
         }),
       ),
     }
@@ -213,6 +246,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateSendLetter()
   validateUpdateEnforcementAction()
   validateAddNote()
+  validateNextAppointment()
 
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages

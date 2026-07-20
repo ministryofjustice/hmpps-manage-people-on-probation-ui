@@ -1,10 +1,13 @@
 {% extends "../_form.njk" %}
 {% set notStandardForm = true %}
-{% set title = 'Check your answers then confirm the appointment' if not appointment.isReschedule else 
+{% set title = 'Check your answers then confirm the appointment' if not appointment.isReschedule else
   'Change appointment details and reschedule' %}
-{% set rescheduleApptInsertText = "You'll receive a calendar invite for the appointment." if not appointment.isReschedule else 
+  {% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
+{% set rescheduleApptInsertText = "You'll receive a calendar invite for the appointment." if not appointment.isReschedule else
   "You'll receive an updated calendar invite for the appointment." %}
-{% set buttonText = 'Confirm this appointment' if not appointment.isReschedule else 
+{% set buttonText = 'Confirm this appointment' if not appointment.isReschedule else
   'Reschedule appointment' %}
 {% set showCalendarInsetText = not isInPast %}
 {% if appointment.isReschedule %}

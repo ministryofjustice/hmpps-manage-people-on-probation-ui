@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
+import { AsyncLocalStorage } from 'node:async_hooks'
 import nunjucks from 'nunjucks'
 
 import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { mpopNunjucksSetup } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import express, { Request, NextFunction } from 'express'
 import type { Services } from '../services'
 
@@ -23,6 +25,7 @@ import {
   deliusDeepLinkUrl,
   deepLinkContactTypes,
   drugHistoryContactTypes,
+  enforcementContactTypes,
   fromIsoDateToPicker,
   fullName,
   getCurrentRisksToThemselves,
@@ -76,9 +79,11 @@ import {
   convertToTitleCase,
   getPersonLevelTypes,
   handleQuotes,
+  formatEnforcementActionNote,
   dateToLongDate,
   merge,
   dateWithYearTimeFirst,
+  makePageTitle,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -86,13 +91,16 @@ import config from '../config'
 import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
+import { toOutcomeLabel } from './outcomeLabel'
 import { to12HourTimeWithMinutes, toIso12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
 import { to12HourTimeCompact } from './to12HourTimeCompact'
 import {
   checkLocationMonitoring,
   checkLocationMonitoringByEventNumber,
-  checkLocationMonitoringString,
+  checkLocationMonitoringCode,
 } from '../middleware/checkLocationMonitoring'
+import logger from '../../logger'
+import { activityLinkUrl } from './activityContactLinkUrl'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -107,17 +115,20 @@ export default function nunjucksSetup(
   app.locals.environmentName = config.environmentName
   app.locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
 
-  // Cachebusting version string
   if (production) {
-    // Version only changes with new commits
     app.locals.version = applicationInfo.gitShortHash
   } else {
-    // Version changes every request
     app.use((_req, res: AppResponse, next) => {
       res.locals.version = Date.now().toString()
       return next()
     })
   }
+
+  const requestContext = new AsyncLocalStorage<{ req: Request; res: AppResponse }>()
+
+  app.use((req: Request, res: AppResponse, next: NextFunction) => {
+    requestContext.run({ req, res }, next)
+  })
 
   const njkEnv = nunjucks.configure(
     [
@@ -129,12 +140,14 @@ export default function nunjucksSetup(
       'node_modules/@ministryofjustice/frontend/moj/components/',
       'node_modules/@ministryofjustice/probation-search-frontend/components',
       'node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/',
+      'node_modules/@ministryofjustice/hmpps-mpop-frontend-components-lib/dist/',
     ],
     {
       autoescape: true,
       express: app,
     },
   )
+
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('dateWithYear', dateWithYear)
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
@@ -163,6 +176,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('roleDescription', roleDescription)
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
+  njkEnv.addFilter('toOutcomeLabel', toOutcomeLabel)
   njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('merge', (obj, other) => ({ ...obj, ...other }))
   njkEnv.addFilter('shortTime', shortTime)
@@ -170,15 +184,24 @@ export default function nunjucksSetup(
   njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
+  njkEnv.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
   njkEnv.addFilter('merge', merge)
   njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
-  njkEnv.addFilter('isArray', (str: string | string[]) => {
-    return Array.isArray(str)
-  })
-  app.use((req: Request, res: AppResponse, next: NextFunction) => {
-    njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
-    return next()
+  njkEnv.addFilter('isArray', (str: string | string[]) => Array.isArray(str))
+
+  njkEnv.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
+    const ctx = requestContext.getStore()
+
+    // Some render paths (for example tests or non-request rendering) may not
+    // have an AsyncLocalStorage context. Fall back to the undecorated object and
+    // log for investigation.
+    if (!ctx) {
+      logger.warn('decorateFormAttributes called without request context')
+      return obj
+    }
+
+    return decorateFormAttributes(ctx.req, ctx.res)(obj, sections)
   })
 
   njkEnv.addFilter('dateWithYearShortMonthAndTime', dateWithYearShortMonthAndTime)
@@ -195,8 +218,10 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('addressToList', addressToList)
   njkEnv.addGlobal('lastUpdatedBy', lastUpdatedBy)
   njkEnv.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
+  njkEnv.addGlobal('activityLinkUrl', activityLinkUrl)
   njkEnv.addGlobal('deepLinkContactTypes', deepLinkContactTypes)
   njkEnv.addGlobal('drugHistoryContactTypes', drugHistoryContactTypes)
+  njkEnv.addGlobal('enforcementContactTypes', enforcementContactTypes)
   njkEnv.addGlobal('oaSysUrl', oaSysUrl)
   njkEnv.addGlobal('deliusHomepageUrl', deliusHomepageUrl)
   njkEnv.addGlobal('scheduledAppointments', scheduledAppointments)
@@ -222,8 +247,10 @@ export default function nunjucksSetup(
   njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   njkEnv.addFilter('toIso12HourTimeWithMinutes', toIso12HourTimeWithMinutes)
   njkEnv.addFilter('checkLocationMonitoring', checkLocationMonitoring)
-  njkEnv.addFilter('checkLocationMonitoringString', checkLocationMonitoringString)
+  njkEnv.addFilter('checkLocationMonitoringCode', checkLocationMonitoringCode)
   njkEnv.addFilter('checkLocationMonitoringByEventNumber', checkLocationMonitoringByEventNumber)
+  njkEnv.addGlobal('makePageTitle', makePageTitle)
 
   arnsNunjucksSetup(njkEnv)
+  mpopNunjucksSetup(njkEnv)
 }

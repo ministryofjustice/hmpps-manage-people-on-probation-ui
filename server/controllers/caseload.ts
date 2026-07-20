@@ -2,6 +2,7 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { v4 } from 'uuid'
+import { DateTime } from 'luxon'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
@@ -11,6 +12,7 @@ import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { getDateRange, RangeType } from '../utils/getDateRange'
+import TierApiClient, { TierCalculations } from '../data/tierApiClient'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
@@ -57,6 +59,12 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sortByQuery,
         req.session.caseFilter,
       )
+      let tiers: TierCalculations
+      if (res.locals?.flags?.enableCaseloadV2) {
+        const uniqueCrns = [...new Set(caseload?.caseload?.map(item => item.crn))].filter(Boolean)
+        const tierClient = new TierApiClient(token)
+        tiers = await tierClient.getTiers(uniqueCrns)
+      }
       const { filter } = args
 
       const url = encodeURIComponent(req.url)
@@ -78,10 +86,15 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         page => addParameters(req, { page: page.toString() }),
         caseload?.pageSize || 10,
       )
-      if (req?.query?.sortBy) {
+      if (caseload) {
         newCaseload = {
           ...caseload,
-          sortedBy: req.query.sortBy as string,
+          sortedBy: req?.query?.sortBy ? (req.query.sortBy as string) : caseload.sortedBy,
+          caseload: caseload?.caseload?.map(val => ({
+            ...val,
+            newCase: val.allocatedOn ? DateTime.fromISO(val.allocatedOn) >= DateTime.now().minus({ days: 21 }) : false,
+            tier: tiers ? tiers[val.crn]?.tierScore : undefined,
+          })),
         }
       }
       res.render('pages/caseload/minimal-cases', {
@@ -90,6 +103,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         currentNavSection,
         filter,
         url,
+        tiers,
       })
     }
   },

@@ -1,23 +1,39 @@
 import { DateTime } from 'luxon'
-import { Activity } from '../../data/model/schedule'
-import { AppointmentSession, AttendedCompliedAppointment } from '../../models/Appointments'
+import { type Activity } from '../../data/model/schedule'
+import {
+  letterEnforcementActions,
+  otherEnforcementActionLetterTypes,
+  OtherEnforcementActionsLetterType,
+  type AppointmentSession,
+  type AttendedCompliedAppointment,
+} from '../../models/Appointments'
 import { getDataValue } from '../../utils/getDataValue'
 import { convertToTitleCase } from '../../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
-import { Route } from '../../@types'
-import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../../utils'
-import { Sentence } from '../../data/model/sentenceDetails'
-import { AppointmentOutcomeSentence } from '../../models/Locals'
-import { Document } from '../../data/model/personalDetails'
+import { type Route } from '../../@types'
+import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID, toSentenceCase } from '../../utils'
+import { type Document } from '../../data/model/personalDetails'
 import { renderError } from '../renderError'
+import { type ProbationPractitioner } from '../../models/CaseDetail'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
-  const { crn, id: uuid, contactId } = req.params as Record<string, string>
-  const id = uuid || contactId
+  const { crn, id: uuid } = req.params as Record<string, string>
+  let { contactId } = req.params as Record<string, string>
+  let id = uuid || contactId
+  const data = req?.session?.data
+  const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
+  const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+
+  // override contact id with response contact id if exists 👇
+
+  if (responseContactId) {
+    id = responseContactId
+    contactId = responseContactId
+  }
+
   const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
   const isValidParams = isValidCrn(crn) && isValidId
   const path = ['appointments', crn, id]
-  const data = req?.session?.data
   const appointmentSession = getDataValue<AppointmentSession>(data, path) || null
   let appointment: AttendedCompliedAppointment | Activity
   let documents: Document[] = []
@@ -27,7 +43,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const baseOutcomeUrl = `${baseUrl}/outcome`
   const completedUrl = uuid ? `${baseUrl}/check-your-answers` : `${baseUrl}/manage`
   if (contactId) {
-    ;({ appointment, documents = [] } = res.locals.personAppointment)
+    appointment = res.locals?.personAppointment?.appointment || null
+    documents = res.locals?.personAppointment?.documents || []
   } else {
     const description = res?.locals?.appointment?.type?.description
     const name = res?.locals?.appointment?.attending?.name
@@ -54,37 +71,50 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     }
   }
   const isInPast = appointmentDateIsInPast(req)
-  const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
-  const eventId = appointmentSession?.eventId
-  const appointmentSentence: Sentence = eventId
-    ? sentences.find(_sentence => _sentence.id.toString() === eventId)
-    : null
-  const startDate = appointmentSentence?.order?.startDate
-  const endDate = appointmentSentence?.order?.endDate
-  let sentenceLength = null
-  if (startDate && endDate) {
-    const start = DateTime.fromISO(startDate)
-    const end = DateTime.fromISO(endDate)
-    sentenceLength = end.diff(start, 'months').months
-  }
-  const sentence: AppointmentOutcomeSentence = {
-    type: appointmentSentence?.sentenceType,
-    length: sentenceLength,
-  }
-
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
   const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
   const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction
+  const otherEnforcementAction = appointmentSession?.outcome?.otherEnforcementAction
   const failedToAttend = appointmentSession?.outcome?.failedToAttend
   const sendBreachOrRecallLetter = [attendedFailedToComply, unacceptableAbsence, updateEnforcementAction].some(
     value => value === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
   )
-  const sendLetter = [attendedFailedToComply, unacceptableAbsence, failedToAttend].some(
-    value => value === 'SEND_LETTER',
+  const sendLetter = [
+    attendedFailedToComply,
+    unacceptableAbsence,
+    failedToAttend,
+    updateEnforcementAction,
+    otherEnforcementAction,
+  ].some(value => ['SEND_LETTER', 'SEND_ANOTHER_LETTER', ...letterEnforcementActions].includes(value))
+
+  let showLetterTypeOptions = true
+  if (otherEnforcementAction || updateEnforcementAction) {
+    const letterActionSelected =
+      (otherEnforcementAction &&
+        otherEnforcementActionLetterTypes.includes(otherEnforcementAction as OtherEnforcementActionsLetterType)) ||
+      (updateEnforcementAction &&
+        otherEnforcementActionLetterTypes.includes(updateEnforcementAction as OtherEnforcementActionsLetterType))
+    showLetterTypeOptions = !letterActionSelected
+  }
+
+  const otherAction = [attendedFailedToComply, unacceptableAbsence, failedToAttend, updateEnforcementAction].includes(
+    'DIFFERENT_ACTION',
   )
-  const appointmentHintText = `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
-  const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
-  const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
+
+  const appointmentHintText =
+    appointment?.type && appointment?.officer?.name && appointment?.startDateTime
+      ? `Appointment: ${toSentenceCase(appointment.type)} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
+      : null
+
+  const probationPractitioner = getDataValue<ProbationPractitioner>(data, [
+    'personalDetails',
+    crn,
+    'probationPractitioner',
+  ])
+  const isProbationPractitioner =
+    probationPractitioner?.username &&
+    probationPractitioner.username.toLowerCase() === res.locals.user.username.toLowerCase()
+
   res.locals.appointmentOutcome = {
     forename,
     surname,
@@ -101,11 +131,14 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
     baseOutcomeUrl,
     completedUrl,
     appointmentSession,
-    sentence,
     isProbationPractitioner,
     appointmentHintText,
     sendBreachOrRecallLetter,
     sendLetter,
+    showLetterTypeOptions,
+    otherAction,
+    responseContactId,
+    linkedContactId,
   }
   return next()
 }

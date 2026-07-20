@@ -81,6 +81,7 @@ export interface Provision {
 }
 
 export interface ActivityCount {
+  acceptableAbsenceCount: number
   unacceptableAbsenceCount: number
   attendedButDidNotComplyCount: number
   outcomeNotRecordedCount: number
@@ -97,11 +98,13 @@ export interface ActivityCount {
 export interface Compliance {
   currentBreaches: number
   priorBreachesOnCurrentOrderCount: number
+  priorRecallsOnCurrentOrderCount?: number
   failureToComplyInLast12MonthsCount?: number
   failureToComplyInLast12Months: number
   breachStarted: boolean
   breachesOnCurrentOrderCount: number
   failureToComplyCount: number
+  acceptableAbsenceCount?: number
   nonCompliance?: NonComplianceHistoryResponse
 }
 

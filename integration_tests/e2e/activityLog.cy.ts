@@ -59,6 +59,16 @@ context('Contacts', () => {
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
 
+  it('should render the update contact button when contact is updatable', () => {
+    cy.visit('/case/X000001/activity/322')
+
+    cy.get('[data-qa="manage-link"]')
+      .should('exist')
+      .and('contain.text', 'Update contact')
+      .invoke('attr', 'href')
+      .should('include', '/case/X000001/322/update-contact')
+  })
+
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -369,7 +379,7 @@ context('Contacts', () => {
     cy.get('.govuk-table').find('tr').eq(10).click()
     cy.get('.govuk-details__text')
       .find('[class*="govuk-!-font-weight-bold"]')
-      .should('contain.text', 'Enforcement Action:')
+      .should('contain.text', 'Enforcement action:')
   })
 
   it('should not display the outcome field when the activity has no outcome', () => {
@@ -601,5 +611,47 @@ context('Contacts', () => {
     cy.get('.govuk-table').should('exist')
     page.getActivity(1).should('contain.text', 'AP PA - attitudes, thinking & behaviours')
     page.getActivity(2).should('contain.text', 'Pre-intervention session 1')
+  })
+
+  it('should show View and Manage on NDelius links for enforcement contact types when flag is enabled', () => {
+    cy.task('stubActivityLogWithAlcoholConsumption')
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getActivity(1).should('contain.text', 'Alcohol consumption')
+    page.getActivityViewLink(0).should('contain.text', 'View')
+    page.getElementByDataQA('manage-on-delius-link').should('be.visible')
+    page.getElementByDataQA('manage-on-delius-link').should('contain.text', 'Manage on NDelius')
+  })
+
+  it('should show View and Manage on NDelius links for Unplanned Contact from Person on Probation when flag is enabled', () => {
+    cy.task('stubActivityLogWithUnplannedContact')
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getActivity(1).should('contain.text', 'Unplanned contact from person on probation')
+    page.getActivityViewLink(0).should('contain.text', 'View')
+    page.getElementByDataQA('manage-on-delius-link').should('be.visible')
+    page.getElementByDataQA('manage-on-delius-link').should('contain.text', 'Manage on NDelius')
+  })
+
+  it('should show standard Manage link for enforcement contact types when flag is disabled', () => {
+    cy.task('stubDisableEnforcementContacts')
+    cy.task('stubActivityLogWithAlcoholConsumption')
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getActivity(1).should('contain.text', 'Alcohol consumption')
+    page.getElementByDataQA('manage-on-delius-link').should('not.exist')
+    page.getActivityViewLink(0).should('contain.text', 'Manage')
+  })
+
+  it('should show Manage link for updatable contacts without outcomes in compact view', () => {
+    cy.task('stubActivityLogWithUpdatableContactNoOutcome')
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').should('exist')
+    // Updatable contact without outcome should show Manage link, not outcome prompt
+    page.getActivity(1).should('contain.text', 'MAPPA level setting process')
+    page.getActivityViewLink(0).should('contain.text', 'Manage')
+    // Verify it's NOT showing outcome prompt (View + Manage on NDelius)
+    cy.get('.contact-activity__actions-cell').eq(0).find('[data-qa="manage-on-delius-link"]').should('not.exist')
   })
 })

@@ -2,16 +2,16 @@ $govuk-global-styles: true;
 $path: '/assets/images/';
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
-$low-score-colour: #485b10;
+$low-score-colour-mpop: #485b10;
 $low-score-border-colour: #85994b;
-$medium-score-colour: #a34e00;
+$medium-score-colour-mpop: #a34e00;
 $medium-score-border-colour: #f47738;
-$high-score-colour: #942514;
+$high-score-colour-mpop: #942514;
 $high-score-border-colour: #d4351c;
-$very-high-score-colour: #711a0d;
+$very-high-score-colour-mpop: #711a0d;
 $very-high-score-border-colour: #942514;
 $unknown-score-border-colour: #fd0;
-$no-score-colour: #505a5f;
+$no-score-colour-mpop: #505a5f;
 $no-score-border-colour: #505a5f;
 $no-score-background-colour: #ffffff;
 $mappa-colour: #4c2c92;
@@ -19,6 +19,7 @@ $mappa-colour: #4c2c92;
 @import '../../node_modules/govuk-frontend/dist/govuk/index';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
 @import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/all';
+@import '../../node_modules/@ministryofjustice/hmpps-mpop-frontend-components-lib/dist/all';
 @import './components/header-bar';
 @import './components/summary-card';
 @import './components/card';
@@ -475,19 +476,19 @@ body.feature-disabled {
 }
 
 .rosh--very-high {
-  color: $very-high-score-colour;
+  color: $very-high-score-colour-mpop;
 }
 
 .rosh--high {
-  color: $high-score-colour;
+  color: $high-score-colour-mpop;
 }
 
 .rosh--medium {
-  color: $medium-score-colour;
+  color: $medium-score-colour-mpop;
 }
 
 .rosh--low {
-  color: $low-score-colour;
+  color: $low-score-colour-mpop;
 }
 
 .rosh-widget {
@@ -507,7 +508,7 @@ body.feature-disabled {
   border: 2px solid $no-score-border-colour;
   & h3,
   & h4 {
-    color: $no-score-colour;
+    color: $no-score-colour-mpop;
   }
 }
 
@@ -519,7 +520,7 @@ body.feature-disabled {
   border: 2px solid $low-score-border-colour;
   & h3,
   & h4 {
-    color: $low-score-colour;
+    color: $low-score-colour-mpop;
   }
 }
 
@@ -527,7 +528,7 @@ body.feature-disabled {
   border: 2px solid $medium-score-border-colour;
   & h3,
   & h4 {
-    color: $medium-score-colour;
+    color: $medium-score-colour-mpop;
   }
 }
 
@@ -535,7 +536,7 @@ body.feature-disabled {
   border: 2px solid $high-score-border-colour;
   & h3,
   & h4 {
-    color: $high-score-colour;
+    color: $high-score-colour-mpop;
   }
 }
 
@@ -543,7 +544,7 @@ body.feature-disabled {
   border: 2px solid $very-high-score-border-colour;
   & h3,
   & h4 {
-    color: $very-high-score-colour;
+    color: $very-high-score-colour-mpop;
   }
 }
 
@@ -563,19 +564,19 @@ body.feature-disabled {
 }
 
 .rosh-widget__risk--low {
-  color: $low-score-colour;
+  color: $low-score-colour-mpop;
 }
 
 .rosh-widget__risk--medium {
-  color: $medium-score-colour;
+  color: $medium-score-colour-mpop;
 }
 
 .rosh-widget__risk--high {
-  color: $high-score-colour;
+  color: $high-score-colour-mpop;
 }
 
 .rosh-widget__risk--very-high {
-  color: $very-high-score-colour;
+  color: $very-high-score-colour-mpop;
 }
 
 .mappa-widget {
@@ -821,41 +822,4 @@ body.feature-disabled {
 
 .arns-summary-card-expanded-badge-spacing{
   padding-bottom: 15px;
-}
-
-.owInviteSnippet {
-  position: fixed; 
-  right: 20px; 
-  bottom: 20px;
-  width: 280px; 
-  padding: 20px; 
-  margin: 0; 
-  border-radius: 6px; 
-  background: #1D70B8; 
-  color: #FFFFFF; 
-  text-align: left; 
-  z-index: 2200000000; 
-  opacity: 0; 
-  transition: opacity 500ms; 
-  display: none;  
-}
-
-.owInviteMessage {
-  padding:0;
-  margin:0 0 20px 0;
-  font-size:16px;
-}
-
-.owInviteOk {
-  color:#FFFFFF !important;
-  font-size:16px;
-  font-weight:bold;
-  text-decoration:underline;
-}
-
-.owInviteCancel {
-  color:#FFFFFF !important;
-  font-size:14px;
-  text-decoration:underline;
-  float:right;
 }

@@ -90,9 +90,53 @@ const eSuperVision: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateRationale = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/rationale`)) {
+      render = `pages/check-in/rationale`
+
+      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
+
+      let backUrl: string
+
+      if (cya) {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityChoice === 'REPLACE_F2F') {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/spo-approval`
+      } else if (eligibilityArray.includes('eligibility-none')) {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+      } else {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+      }
+
+      res.locals.backLink = backUrl
+
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'rationale',
+        }),
+      )
+    }
+  }
+
   const validateDateFrequency = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
       render = `pages/check-in/date-frequency`
+
+      let backUrl: string
+
+      if (cya) {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else {
+        backUrl = `/case/${crn}/appointments/${id}/check-in/rationale`
+      }
+
+      res.locals.backLink = backUrl
+
       errorMessages = validateWithSpec(
         req,
         eSuperVisionValidation({
@@ -318,6 +362,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateEligibilityCheck()
   validateEligibilityChoice()
   validateSPOApproval()
+  validateRationale()
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()

@@ -80,6 +80,9 @@ export default {
   tier: {
     link: get('TIER_LINK', 'https://tier-dummy-url', requiredInProduction),
   },
+  tierUrl: {
+    link: get('TIER_URL', 'https://tier-dummy-url', requiredInProduction),
+  },
   sentencePlan: {
     link: get('SENTENCE_PLAN_LINK', 'https://sentence-plan-dummy-url', requiredInProduction),
     linkV2: get('SENTENCE_PLAN_LINK_V2', 'https://sentence-plan-dummy-url-v2/crn', requiredInProduction),
@@ -114,6 +117,13 @@ export default {
     link: get(
       'ESUPERVISION_GUIDANCE_LINK',
       'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+  },
+  eSupervisionManageCheckins: {
+    link: get(
+      'ESUPERVISION_MANAGE_CHECKINS_LINK',
+      'https://manage-online-check-ins-ui-dev.hmpps.service.justice.gov.uk',
       requiredInProduction,
     ),
   },
@@ -203,6 +213,14 @@ export default {
         deadline: Number(get('TIER_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(Number(get('TIER_API_TIMEOUT_RESPONSE', 10000))),
+    },
+    supervisionPackageApi: {
+      url: get('SUPERVISION_PACKAGE_API_URL', 'http://localhost:8100', requiredInProduction),
+      timeout: {
+        response: Number(get('SUPERVISION_PACKAGE_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('SUPERVISION_PACKAGE_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('SUPERVISION_PACKAGE_API_TIMEOUT_RESPONSE', 10000))),
     },
     interventionsApi: {
       url: get('INTERVENTIONS_API_URL', 'http://localhost:8100', requiredInProduction),

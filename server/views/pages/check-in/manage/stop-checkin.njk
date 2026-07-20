@@ -4,6 +4,16 @@
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
 {% set buttonText = "Continue" %}
 {% set title = "Stop online check ins for " + case.name.forename %}
+{% set pageTitleText = "Stop online check ins for the person" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = backLink %}
 {% set formAnchorText = "Cancel and go back" %}
@@ -16,8 +26,7 @@
             },
             label: {
                 text: "Reason for stopping",
-                classes: 'govuk-label--m govuk-!-margin-bottom-3',
-                isPageHeading: true
+                classes: 'govuk-label--m govuk-!-margin-bottom-3'
             },
             hint: {
                 text: hintText

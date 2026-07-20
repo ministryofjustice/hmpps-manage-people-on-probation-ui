@@ -15,6 +15,7 @@ interface Args {
   dateTo?: string
   compliance?: string | string[]
   category?: string | string[]
+  sparks?: string | string[]
   hideContact?: string | string[]
   clearFilterKey?: string
   clearFilterValue?: string
@@ -117,6 +118,7 @@ describe('/middleware/filterActivityLog()', () => {
         clearFilterValue: '',
         compliance: ['no outcome', 'complied', 'not complied'],
         category: categeoryList,
+        sparks: [],
         hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '21/03/2025',
         dateTo: '22/03/2025',
@@ -170,6 +172,7 @@ describe('/middleware/filterActivityLog()', () => {
               href: `${url}?clearFilterKey=category&clearFilterValue=appointments`,
             },
           ],
+          sparks: [],
           hideContact: [
             {
               text: 'Hide NDelius system generated contacts',
@@ -183,6 +186,7 @@ describe('/middleware/filterActivityLog()', () => {
           value,
           checked: value === 'appointments',
         })),
+        sparksOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({
           text,
           value,
@@ -192,6 +196,7 @@ describe('/middleware/filterActivityLog()', () => {
         keywords: req.query.keywords as string,
         compliance: [req.query.compliance] as string[],
         category: [req.query.category] as string[],
+        sparks: [],
         hideContact: [req.query.hideContact] as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
@@ -199,6 +204,87 @@ describe('/middleware/filterActivityLog()', () => {
         crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
+    })
+  })
+
+  describe('enableSparksFilter feature flag is enabled', () => {
+    const flaggedRes = {
+      locals: {
+        user: { username: 'user-1' },
+        flags: { enableSparksFilter: true },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
+    const req = getRequest({
+      submit: true,
+      keywords: '',
+      dateFrom: '',
+      dateTo: '',
+      compliance: 'complied',
+      category: 'appointments',
+      sparks: 'appointments with sparks activity',
+      hideContact: 'hide NDelius system generated contacts',
+    })
+    beforeEach(() => {
+      filterActivityLog(req, flaggedRes, nextSpy)
+    })
+    it('should rename the appointments category to "All appointments" in the checkbox options', () => {
+      const appointmentsOption = flaggedRes.locals.filters.categoryOptions.find(
+        option => option.value === 'appointments',
+      )
+      expect(appointmentsOption.text).toEqual('All appointments')
+    })
+    it('should not include the SPARKS category in the category checkbox options', () => {
+      const { categoryOptions } = flaggedRes.locals.filters
+      expect(categoryOptions.find(option => option.value === 'appointments with sparks activity')).toBeUndefined()
+    })
+    it('should expose the SPARKS filter in its own sparksOptions checkbox group', () => {
+      expect(flaggedRes.locals.filters.sparksOptions).toEqual([
+        {
+          text: 'Appointments with SPARKS activity',
+          value: 'appointments with sparks activity',
+          checked: true,
+        },
+      ])
+    })
+    it('should rename the appointments category to "All appointments" in the selected filter tag', () => {
+      expect(flaggedRes.locals.filters.selectedFilterItems.category).toEqual([
+        {
+          text: 'All appointments',
+          href: `/case/${crn}/activity-log?clearFilterKey=category&clearFilterValue=appointments`,
+        },
+      ])
+    })
+    it('should show the SPARKS filter as its own selected filter tag', () => {
+      expect(flaggedRes.locals.filters.selectedFilterItems.sparks).toEqual([
+        {
+          text: 'Appointments with SPARKS activity',
+          href: `/case/${crn}/activity-log?clearFilterKey=sparks&clearFilterValue=appointments%20with%20sparks%20activity`,
+        },
+      ])
+    })
+  })
+
+  describe('a session category value is not present in the current options (e.g. flag turned off after selecting SPARKS)', () => {
+    const req = getRequest({
+      submit: true,
+      keywords: '',
+      dateFrom: '',
+      dateTo: '',
+      compliance: 'complied',
+      category: ['appointments with sparks activity', 'appointments'],
+      hideContact: 'hide NDelius system generated contacts',
+    })
+    beforeEach(() => {
+      filterActivityLog(req, res, nextSpy)
+    })
+    it('should skip the unknown category instead of throwing', () => {
+      expect(res.locals.filters.selectedFilterItems.category).toEqual([
+        {
+          text: 'Appointments',
+          href: `/case/${crn}/activity-log?clearFilterKey=category&clearFilterValue=appointments`,
+        },
+      ])
     })
   })
 
@@ -239,6 +325,7 @@ describe('/middleware/filterActivityLog()', () => {
               href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
+          sparks: [],
           hideContact: [
             ...(query.hideContact as string[]).map((item, i) => ({
               text: hideContactsFilterOptions[i].text,
@@ -254,11 +341,13 @@ describe('/middleware/filterActivityLog()', () => {
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
+        sparksOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
         category: req.query.category as string[],
+        sparks: [],
         hideContact: req.query.hideContact as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
@@ -328,6 +417,7 @@ describe('/middleware/filterActivityLog()', () => {
               href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
+          sparks: [],
           hideContact: [
             ...(query.hideContact as string[]).map((item, i) => ({
               text: hideContactsFilterOptions[i].text,
@@ -337,11 +427,13 @@ describe('/middleware/filterActivityLog()', () => {
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
+        sparksOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
         category: req.query.category as string[],
+        sparks: [],
         hideContact: req.query.hideContact as string[],
         dateFrom: '',
         dateTo: '',
@@ -383,6 +475,7 @@ describe('/middleware/filterActivityLog()', () => {
               href: `${url}?clearFilterKey=category&clearFilterValue=appointments`,
             },
           ],
+          sparks: [],
           hideContact: [
             {
               text: 'Hide NDelius system generated contacts',
@@ -408,6 +501,7 @@ describe('/middleware/filterActivityLog()', () => {
           value,
           checked: value === 'appointments',
         })),
+        sparksOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({
           text,
           value,
@@ -417,6 +511,7 @@ describe('/middleware/filterActivityLog()', () => {
         keywords: 'testing',
         compliance: ['not complied'],
         category: ['appointments'],
+        sparks: [],
         hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '20/03/2025',
         dateTo: '23/03/2025',

@@ -21,7 +21,7 @@ context('Alerts Dashboard', () => {
     const page = Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-error-summary__list').should(
       'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      'Risk information from the Assess and plan service is currently unavailable.',
     )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
@@ -39,7 +39,7 @@ context('Alerts Dashboard', () => {
     const page = Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-error-summary__list').should(
       'contain.text',
-      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      'Risk information from the Assess and plan service is currently unavailable.',
     )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
@@ -75,6 +75,20 @@ context('Alerts Dashboard', () => {
       })
 
     page.getElement('[data-qa="clearSelectedAlerts"]').should('be.visible')
+  })
+
+  it('Select all alerts button aria is set based on if all alerts are selected', () => {
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'true')
+    cy.get('.alert-checkbox').eq(0).click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'true')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
   })
 
   it('Person link should navigate to case overview', () => {

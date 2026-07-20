@@ -1,5 +1,8 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Online check ins" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check' %}
 {% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
 {% set changeQuestionsLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/questions/start' %}
@@ -45,7 +48,7 @@
           {% else %}
               {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
           {% endif %}
-          
+
         <div class="moj-button-group__item">
             <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
         </div>
@@ -87,7 +90,8 @@
                     items: [
                         {
                             text: 'Change questions',
-                            href: changeQuestionsLink
+                            href: changeQuestionsLink,
+                            visuallyHiddenText: 'for upcoming check in'
                         }
                     ]
                 } if showChange and canEditQuestions
@@ -120,7 +124,8 @@
             items: [
                 {
                     text: 'Change',
-                    href: changeDtLink
+                    href: changeDtLink,
+                    visuallyHiddenText: 'check in settings'
                 }
             ]
         } if showChange
@@ -154,7 +159,8 @@
             items: [
                 {
                     text: 'Change',
-                    href: changeContactLink
+                    href: changeContactLink,
+                    visuallyHiddenText: 'contact details'
                 }
             ]
         } if showChange

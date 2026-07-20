@@ -12,8 +12,7 @@ export default class InterventionsApiClient extends RestClient {
       path: `/probation-case/${crn}/referral`,
       handle404: true,
       handle500: true,
-      errorMessage:
-        'The interventions service is experiencing technical difficulties. It has not been possible to provide intervention information',
+      errorMessage: 'Interventions information is currently unavailable.',
     })
   }
 }

@@ -12,9 +12,13 @@ import {
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
-import { ExpectedOption, Journey, checkBreachWarningBanner, checkOptions } from './imports'
+import { ExpectedOption, Journey, checkBreachOrRecallWarningBanner, checkOptions } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import { AppointmentEnforcementAction } from '../../../server/models/Appointments'
+import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
+import { PersonAppointmentEnforcementAction } from '../../../server/data/model/schedule'
+import UpdateEnforcementActionPage from '../../pages/appointmentOutcomes/update-enforcement-action.page'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -22,21 +26,53 @@ let attendedFailedToComplyPage: AttendedFailedToComplyPage
 let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 let sendLetterPage: SendLetterPage
 let addNotePage: AddNotePage
+let otherEnforcmentActionPage: EnforcementActionPage
+let updateEnforcementActionPage: UpdateEnforcementActionPage
 
 const msgs = ['Select who will send the letter', 'Select the type of letter']
+
+interface Params {
+  eventId: string
+  isFuture: boolean
+  outcome?: string
+  action?: string
+  hasOutcome?: boolean
+  hasComplied?: boolean
+  enforcementAction?: PersonAppointmentEnforcementAction
+}
 
 const loadPage = ({
   journey = 'MANAGE',
   sentenceType = 'COMMUNITY',
-}: { journey?: Journey; sentenceType?: SentenceType } = {}): void => {
-  cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
+  action = 'SEND_LETTER',
+  description = '12 month Community order',
+  pss = false,
+  updateAction = false,
+}: {
+  journey?: Journey
+  sentenceType?: SentenceType
+  action?: AppointmentEnforcementAction
+  description?: string
+  pss?: boolean
+  updateAction?: boolean
+} = {}): void => {
+  const params: Params = { eventId: '2501192724', isFuture: false }
+  if (updateAction) {
+    params.outcome = 'Attended - failed to comply'
+    params.action = 'First warning letter sent'
+    params.hasOutcome = true
+    params.hasComplied = false
+    params.enforcementAction = { code: 'EA02', description: 'First warning letter sent' }
+  }
+  cy.task('stubAppointment', params)
   if (sentenceType !== 'COMMUNITY') {
-    cy.task('stubSentences', { sentenceType })
+    cy.task('stubSentences', { sentenceType, description, pss })
   }
   if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.getTaskLink(1).click()
+    const index = updateAction ? 2 : 1
+    manageAppointmentPage.getTaskLink(index).click()
   }
   if (journey === 'ARRANGE') {
     completeSentencePage()
@@ -51,12 +87,25 @@ const loadPage = ({
       completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid })
     })
   }
-  outcomePage = new OutcomePage()
-  cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
-  outcomePage.getSubmitBtn().click()
-  attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  cy.get(`.govuk-radios__input[value=SEND_LETTER]`).click()
-  attendedFailedToComplyPage.getSubmitBtn().click()
+  if (updateAction) {
+    updateEnforcementActionPage = new UpdateEnforcementActionPage()
+    cy.get(`.govuk-radios__input[value=SEND_ANOTHER_LETTER]`).click()
+    updateEnforcementActionPage.getSubmitBtn().click()
+  } else {
+    outcomePage = new OutcomePage()
+    cy.get(`.govuk-radios__input[value=ATTENDED_FAILED_TO_COMPLY]`).click()
+    outcomePage.getSubmitBtn().click()
+  }
+  if (!updateAction) {
+    attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+    cy.get(`.govuk-radios__input[value=${action}]`).click()
+    attendedFailedToComplyPage.getSubmitBtn().click()
+  }
+  if (action === 'DIFFERENT_ACTION') {
+    otherEnforcmentActionPage = new EnforcementActionPage()
+    cy.get('select').select('BREACH_LETTER_SENT')
+    otherEnforcmentActionPage.getSubmitBtn().click()
+  }
 }
 
 type RedirectPages = AddNotePage
@@ -66,7 +115,14 @@ type OptionsFor = 'LETTER_SENT_BY' | 'LETTER_TYPE'
 const getExpectedOptions = ({
   optionsFor = 'LETTER_SENT_BY',
   sentenceType = 'COMMUNITY',
-}: { optionsFor?: OptionsFor; sentenceType?: SentenceType } = {}): ExpectedOption<RedirectPages>[] => {
+  youth = false,
+  pss = false,
+}: {
+  optionsFor?: OptionsFor
+  sentenceType?: SentenceType
+  youth?: boolean
+  pss?: boolean
+} = {}): ExpectedOption<RedirectPages>[] => {
   let expectedOptions: ExpectedOption<RedirectPages>[] = []
   if (optionsFor === 'LETTER_SENT_BY') {
     expectedOptions = [
@@ -82,7 +138,7 @@ const getExpectedOptions = ({
     ]
   }
   if (optionsFor === 'LETTER_TYPE') {
-    if (sentenceType === 'CUSTODY') {
+    if (sentenceType === 'CUSTODY' && !youth && !pss) {
       expectedOptions.push({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' })
     }
     if (sentenceType === 'COMMUNITY') {
@@ -91,11 +147,10 @@ const getExpectedOptions = ({
         { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
       )
     }
-    if (['PSS', 'YOUTH_CUSTODY'].includes(sentenceType)) {
+    if (pss || youth) {
       expectedOptions.push(
         { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
         { value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' },
-        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
       )
     }
     expectedOptions.push({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' })
@@ -128,18 +183,27 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     checkOptions(letterTypeOptions, 1)
     cy.get('[data-module="govuk-radios"]').should('have.length', 2)
   })
-  const sentenceTypes: SentenceType[] = ['PSS', 'YOUTH_CUSTODY']
-  sentenceTypes.forEach(sentenceType => {
-    it(`should render the page if sentence type is ${sentenceType}`, () => {
-      loadPage({ journey, sentenceType })
-      sendLetterPage = new SendLetterPage()
-      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-      const letterSentByOptions = getExpectedOptions({ sentenceType })
-      checkOptions(letterSentByOptions)
-      const letterTypeOptions = getExpectedOptions({ optionsFor: 'LETTER_TYPE', sentenceType })
-      checkOptions(letterTypeOptions, 1)
-      cy.get('[data-module="govuk-radios"]').should('have.length', 2)
-    })
+
+  it('should render the page if youth custody sentence', () => {
+    loadPage({ journey, sentenceType: 'CUSTODY', description: '204 C JA - Youth Rehabilitation Order' })
+    sendLetterPage = new SendLetterPage()
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+    const letterSentByOptions = getExpectedOptions({ sentenceType: 'CUSTODY' })
+    checkOptions(letterSentByOptions)
+    const letterTypeOptions = getExpectedOptions({ sentenceType: 'CUSTODY', optionsFor: 'LETTER_TYPE', youth: true })
+    checkOptions(letterTypeOptions, 1)
+    cy.get('[data-module="govuk-radios"]').should('have.length', 2)
+  })
+
+  it('should render the page if pss sentence', () => {
+    loadPage({ journey, sentenceType: 'CUSTODY', pss: true })
+    sendLetterPage = new SendLetterPage()
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+    const letterSentByOptions = getExpectedOptions({ sentenceType: 'CUSTODY' })
+    checkOptions(letterSentByOptions)
+    const letterTypeOptions = getExpectedOptions({ sentenceType: 'CUSTODY', optionsFor: 'LETTER_TYPE', pss: true })
+    checkOptions(letterTypeOptions, 1)
+    cy.get('[data-module="govuk-radios"]').should('have.length', 2)
   })
 
   it('should have the correct back link', () => {
@@ -154,6 +218,16 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
+  if (journey === 'MANAGE') {
+    it('should have the correct back link if update enforcement action', () => {
+      loadPage({ journey, updateAction: true })
+      let expectedLink: string
+      getUuid(3).then(uuid => {
+        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome/update-enforcement-action`
+        attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
+      })
+    })
+  }
   it('should show validation errors when no options are selected', () => {
     loadPage({ journey })
     sendLetterPage = new SendLetterPage()
@@ -173,8 +247,16 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     addNotePage = new AddNotePage()
     addNotePage.checkOnPage()
   })
-
-  checkBreachWarningBanner(loadPage, { Page: SendLetterPage })
+  it('should render the page if other letter type action selected', () => {
+    loadPage({ journey, action: 'DIFFERENT_ACTION' })
+    sendLetterPage = new SendLetterPage()
+    cy.get('[data-qa=letterType]').should('not.exist')
+    cy.get('[data-module="govuk-radios"]').eq(0).find('.govuk-radios__item').eq(0).find('input').click()
+    sendLetterPage.getSubmitBtn().click()
+    addNotePage = new AddNotePage()
+    addNotePage.checkOnPage()
+  })
+  checkBreachOrRecallWarningBanner(loadPage, SendLetterPage)
 }
 
 describe('Send a letter', () => {

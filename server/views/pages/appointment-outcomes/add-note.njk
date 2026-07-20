@@ -1,6 +1,10 @@
 {% extends "../_form.njk" %}
 {% from "_components/note/macro.njk" import appNote %}
+{% set pageTitle = makePageTitle({
+    pageHeading: ["Add a note", "Record an outcome"]
+}) %}
 {% set title = 'Add a note' %}
+{% set backLink = appointmentOutcome.backLink %}
 {% set appointment = personAppointment.appointment %}
 {% set multipartForm = true if appointmentOutcome.contactId else 
     false %}
@@ -21,6 +25,9 @@
     rows: '10',
     maxlength: maxCharCount,
     classes: "",
+    attributes: {
+        "aria-labelledby": "title"
+    },
     formGroup: {
         attributes: { "data-qa": "notes" }
     }
@@ -89,8 +96,8 @@
     {% endif %}
     {% if appointmentOutcome.notePrepend %}
         {{ govukInsetText({
-        classes: "govuk-!-margin-0 guidance-panel",
-        html: '<p class="govuk-body">Manage people on probation will automatically add this update:<br>' + appointmentOutcome.notePrepend + '</p>'
+        classes: "guidance-panel govuk-!-margin-bottom-6",
+        html: '<p class="govuk-body">Manage people on probation will automatically add this update:<br>' + appointmentOutcome.notePrepend | replace('\n', '<br>') | safe   + '</p>'
             }) }}
     {% endif %}
     {{ govukButton({
@@ -171,5 +178,7 @@
                 <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
             {% endif %}
         {% endif %}
-        {{ govukRadios(sensitivityConfig) }}
+        {% if not appointmentOutcome.appointmentSession.sensitivityLocked %}
+            {{ govukRadios(sensitivityConfig) }}
+        {% endif %}
     {% endblock %}

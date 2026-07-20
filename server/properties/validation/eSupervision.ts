@@ -57,6 +57,16 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][checkins][rationale]`]: {
+      optional: page !== 'rationale',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter why the person is suitable to use online check ins',
+          log: 'Rationale not entered in check in process',
+        },
+      ],
+    },
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
       checks: [

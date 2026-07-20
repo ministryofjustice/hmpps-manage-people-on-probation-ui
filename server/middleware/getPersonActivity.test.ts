@@ -7,7 +7,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { Document } from '../data/model/personalDetails'
-import { APPOINTMENTS_CODES, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
+import { APPOINTMENTS_CODES, SPARKS_FILTER_VALUE, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -153,6 +153,7 @@ describe('/middleware/getPersonActivity', () => {
       ...filterVals,
       complianceOptions: [],
       categoryOptions: [],
+      sparksOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -185,5 +186,100 @@ describe('/middleware/getPersonActivity', () => {
     expect(tierSpy).toHaveBeenCalledWith(crn)
     expect(personActivity).toEqual(mockPersonActivityResponse)
     expect(tierCalculation).toEqual(mockTierCalculationResponse)
+  })
+
+  it('should map the SPARKS filter to the request body filters (not typeCodes) when enableSparksFilter is enabled', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSparksFilter: true }
+    res.locals.filters = {
+      ...filterVals,
+      compliance: [],
+      category: [],
+      sparks: ['appointments with sparks activity'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({ filters: [SPARKS_FILTER_VALUE], typeCodes: [] }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
+    res.locals.flags = {}
+  })
+
+  it('should keep category filters in typeCodes while routing SPARKS to filters', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSparksFilter: true }
+    res.locals.filters = {
+      ...filterVals,
+      compliance: ['complied'],
+      category: ['appointments'],
+      sparks: ['appointments with sparks activity'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({ filters: ['complied', SPARKS_FILTER_VALUE], typeCodes: APPOINTMENTS_CODES }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
+    res.locals.flags = {}
+  })
+
+  it('should not apply the SPARKS filter when enableSparksFilter is disabled, even if the session holds a SPARKS value', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = {}
+    res.locals.filters = {
+      ...filterVals,
+      compliance: ['complied'],
+      category: [],
+      sparks: ['appointments with sparks activity'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({ filters: ['complied'], typeCodes: [] }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
   })
 })

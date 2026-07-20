@@ -14,13 +14,13 @@ import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
   mockPredictors,
-  mockPredictorScores,
   mockRisks,
   mockUserCaseload,
   mockAppResponse,
   mockSentencePlanResult,
   mockRiskData,
   probationPractitioner,
+  mockPredictorScores,
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
@@ -115,9 +115,7 @@ const getRes = () =>
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     },
     redirect: jest.fn().mockReturnThis(),
   }) as unknown as AppResponse
@@ -192,9 +190,7 @@ describe('/middleware/getPersonalDetails', () => {
             username: 'user-1',
             roles: ['SENTENCE_PLAN'],
           },
-          flags: {
-            enableOGRS4: true,
-          },
+          flags: {},
         },
         redirect: jest.fn().mockReturnThis(),
       } as unknown as AppResponse
@@ -250,9 +246,7 @@ describe('/middleware/getPersonalDetails', () => {
             username: 'user-1',
             roles: ['SENTENCE_PLAN'],
           },
-          flags: {
-            enableOGRS4: true,
-          },
+          flags: {},
         },
         redirect: jest.fn().mockReturnThis(),
       } as unknown as AppResponse
@@ -273,100 +267,6 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.dateOfDeath).toBeUndefined()
       expect(res.locals.riskData).toEqual(mockRiskData)
       expect(res.locals.predictorScores).toBeUndefined()
-      expect(nextSpy).toHaveBeenCalled()
-    })
-  })
-  describe('OGRS4 feature flag is disabled', () => {
-    it('should request data from the api if personal details for crn does not exist in the session and env is not development', async () => {
-      process.env.NODE_ENV = 'production'
-      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
-      req = getReq({ ogrs4Enabled: false })
-      res = {
-        locals: {
-          user: {
-            username: 'user-1',
-            roles: ['SENTENCE_PLAN'],
-          },
-          flags: {
-            enableOGRS4: false,
-          },
-        },
-        redirect: jest.fn().mockReturnThis(),
-      } as unknown as AppResponse
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
-      const expected = {
-        personalDetails: {
-          X000001: mock({ ogrs4Enabled: false }),
-          X000002: mock({ crn: 'X000002', lastUpdatedDate: '', ogrs4Enabled: false }),
-        },
-      }
-
-      expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(risksSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', {
-        nameOrCrn: req.params.crn,
-      })
-      expect(getRiskDataSpy).not.toHaveBeenCalled()
-      expect(predictorsSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
-      expect(req.session.data).toEqual(expected)
-      expect(res.locals.case).toEqual(overview('X000002'))
-      expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
-      expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
-      expect(res.locals.riskData).toBeUndefined()
-      expect(res.locals.predictorScores).toEqual(mockPredictorScores)
-      expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
-      expect(res.locals.headerCRN).toEqual(req.params.crn)
-      expect(res.locals.headerDob).toEqual('1979-08-18')
-      expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
-      expect(nextSpy).toHaveBeenCalled()
-    })
-
-    it('should not request data from the api if personal details for crn already exist in the session and env is not development', async () => {
-      process.env.NODE_ENV = 'production'
-      req = httpMocks.createRequest({
-        params: {
-          crn: 'X000002',
-        },
-        session: {
-          data: {
-            personalDetails: {
-              X000001: mock({ ogrs4Enabled: false }),
-              X000002: mock({ crn: 'X000002', ogrs4Enabled: false }),
-            },
-          },
-        },
-      })
-      res = {
-        locals: {
-          user: {
-            username: 'user-1',
-            roles: ['SENTENCE_PLAN'],
-          },
-          flags: {
-            enableOGRS4: false,
-          },
-        },
-        redirect: jest.fn().mockReturnThis(),
-      } as unknown as AppResponse
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
-      expect(getPersonalDetailsSpy).not.toHaveBeenCalled()
-      expect(risksSpy).not.toHaveBeenCalled()
-      expect(tierCalculationSpy).not.toHaveBeenCalled()
-      expect(searchUserCaseloadSpy).not.toHaveBeenCalled()
-      expect(getRiskDataSpy).not.toHaveBeenCalled()
-      expect(predictorsSpy).not.toHaveBeenCalled()
-      expect(res.locals.case).toEqual(overview('X000002'))
-      expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
-      expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
-      expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
-      expect(res.locals.headerCRN).toEqual(req.params.crn)
-      expect(res.locals.headerDob).toEqual('1979-08-18')
-      expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
-      expect(res.locals.dateOfDeath).toBeUndefined()
-      expect(res.locals.riskData).toBeUndefined()
-      expect(res.locals.predictorScores).toEqual(mockPredictorScores)
       expect(nextSpy).toHaveBeenCalled()
     })
   })
@@ -393,12 +293,10 @@ describe('/middleware/getPersonalDetails', () => {
           username: 'user-1',
           roles: [],
         },
-        flags: {
-          enableOGRS4: true,
-        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
+
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
@@ -414,9 +312,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     })
     jest
       .spyOn(MasApiClient.prototype, 'searchUserCaseload')
@@ -439,9 +335,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: [],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     })
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
@@ -479,9 +373,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
@@ -516,9 +408,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
@@ -557,9 +447,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: ['SENTENCE_PLAN'],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
@@ -582,9 +470,7 @@ describe('/middleware/getPersonalDetails', () => {
         username: 'user-1',
         roles: [],
       },
-      flags: {
-        enableOGRS4: true,
-      },
+      flags: {},
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({

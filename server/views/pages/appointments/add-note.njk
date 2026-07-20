@@ -2,6 +2,10 @@
 {% from "_components/note/macro.njk" import appNote %}
 {% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
+{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, appointmentDisplayName]
+}) %}
 {% set multipartForm = true %}
 {% if useDecorator %}
     {% set multipartForm = false %}
@@ -23,6 +27,9 @@
     rows: '10',
     maxlength: maxCharCount,
     classes: "",
+    attributes: {
+        "aria-labelledby": "title"
+    },
     formGroup: {
         attributes: { "data-qa": "notes" }
     }

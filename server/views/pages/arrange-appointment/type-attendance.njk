@@ -1,5 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment type and attendance' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set personForename = headerPersonName.forename %}
 
 {% if change %}
@@ -105,7 +108,7 @@
       }
     },
     hint: {
-      text: 'This will add the appointment to their record on the ViSOR secure national database.'
+      text: 'This will add the appointment to the NDelius ViSOR report. It must still be added manually to the ViSOR secure national database.'
     },
     items: [
       {

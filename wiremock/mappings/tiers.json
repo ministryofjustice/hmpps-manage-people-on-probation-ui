@@ -1,0 +1,24 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/tier/v2/crns/tier",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "X778160": {
+            "tierScore": "B2"
+          },
+          "X801756": {
+            "tierScore": "D0"
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

@@ -18,9 +18,10 @@ import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-a
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
-  checkOptionRedirectsToCorrectPage,
+  checkBreachOrRecallWarningBanner,
+  checkOptionRedirects,
   checkOptions,
+  checkTicketPanel,
 } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -116,7 +117,7 @@ const getExpectedOptions = ({
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it('should render the page if sentence type is community and user is not probation practitioner', () => {
-    loadPage({ journey })
+    loadPage({ journey, sentenceType: 'COMMUNITY' })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
     attendedFailedToComplyPage.checkPageTitle('Enforcement action for Alton’s failure to comply')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
@@ -155,49 +156,18 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   })
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AttendedFailedToComplyPage, journey })
+    loadPage({ journey })
+    checkOptionRedirects(options, AttendedFailedToComplyPage)
   })
 
-  checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
-
-  describe('breach warning banner', () => {
-    it('should show when breach is active and enableNonCompliance is enabled', () => {
-      cy.task('stubBreachCompliance')
-      loadPage({ journey })
-      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-      attendedFailedToComplyPage.getBreachWarning().should('exist')
-    })
-
-    it('should not show when there is no active breach', () => {
-      loadPage({ journey })
-      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-      attendedFailedToComplyPage.getBreachWarning().should('not.exist')
-    })
-  })
-
-  describe('compliance info panel', () => {
-    it('should show the correct compliance information panel when using fallback fields', () => {
-      cy.task('stubBreachCompliance')
-      cy.task('stubNonComplianceHistory')
-      // Note: stubBreachCompliance in wiremock/stubs/compliance.ts uses failureToComplyCount: 2 and breachesOnCurrentOrderCount: 1
-      // and eventNumber: '12345'.
-      // We need to make sure the loadPage uses the same eventNumber or it might use compliance.currentSentences[0]
-      loadPage({ journey })
-      attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-
-      // Panel 3 (multiple counts of non-compliance and previous breach)
-      // failureToComplyCount: 2 (mapped to failureToComplyInLast12MonthsCount)
-      // breachesOnCurrentOrderCount: 1 (mapped to priorBreachesOnCurrentOrderCount)
-      cy.get('[data-qa="alert-panel"]').should(
-        'contain.text',
-        'Alton has had multiple counts of non-compliance in the past 12 months.',
-      )
-      cy.get('[data-qa="alert-panel"]').should('contain.text', 'Alton has breached this sentence before.')
-    })
-  })
+  checkBreachOrRecallWarningBanner(loadPage, AttendedFailedToComplyPage)
+  checkTicketPanel(loadPage, AttendedFailedToComplyPage)
 }
 
 describe('Attended but failed to comply', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   afterEach(() => {
     cy.task('resetMocks')
   })

@@ -1,7 +1,6 @@
-describe('Appointment detail - enableDeepLinks', () => {
+describe('Appointment detail - deep links', () => {
   beforeEach(() => {
     cy.task('resetMocks')
-    cy.task('stubEnableDeepLinks')
     cy.task('stubAppointmentDeepLinkWithOutcome')
     cy.visit('/case/X000001/activity/12')
   })

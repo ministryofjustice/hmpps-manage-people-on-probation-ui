@@ -2,6 +2,9 @@
 
 {% set title = 'Send a letter' %}
 {% set backLink = appointmentOutcome.backLink %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Record an outcome"]
+}) %}
 
 {% block form %}
     {% include './_send-letter-radios.njk' %}

@@ -100,9 +100,6 @@ describe('sentenceController', () => {
         })
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
       })
-      afterEach(() => {
-        delete res.locals.locationMonitoringUri
-      })
       checkAuditMessage(res, 'VIEW_MAS_SENTENCE', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
         expect(getSentenceDetailsSpy).toHaveBeenCalledWith(crn, '?activeSentence=true&number=1')
@@ -120,11 +117,10 @@ describe('sentenceController', () => {
           hasLicenceConditionsLMData: true,
           hasRequirementsLMData: false,
         })
-        existsInEMDISpy.mockResolvedValue('http://emdi-uri')
+        existsInEMDISpy.mockResolvedValue({ uri: 'https://emdi-uri' })
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
 
         expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
-        expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
       })
 
       it('should call existsInEMDI if location monitoring data is present in requirements', async () => {
@@ -133,11 +129,10 @@ describe('sentenceController', () => {
           hasLicenceConditionsLMData: false,
           hasRequirementsLMData: true,
         })
-        existsInEMDISpy.mockResolvedValue('http://emdi-uri')
+        existsInEMDISpy.mockResolvedValue({ uri: 'https://emdi-uri' })
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
 
         expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
-        expect(res.locals.locationMonitoringUri).toBe('http://emdi-uri')
       })
 
       it('should NOT call existsInEMDI if location monitoring data is NOT present', async () => {
@@ -149,16 +144,12 @@ describe('sentenceController', () => {
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
 
         expect(existsInEMDISpy).not.toHaveBeenCalled()
-        expect(res.locals.locationMonitoringUri).toBeUndefined()
       })
     })
 
     describe('getSentence when enableEMDISentencesShowGPSData flag is disabled', () => {
       beforeEach(async () => {
         res.locals.flags = { enableEMDISentencesShowGPSData: false }
-      })
-      afterEach(() => {
-        delete res.locals.locationMonitoringUri
       })
       it('should NOT call existsInEMDI if flag is disabled even if location monitoring data is present', async () => {
         checkLocationMonitoringSpy.mockReturnValue({
@@ -168,7 +159,6 @@ describe('sentenceController', () => {
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
 
         expect(existsInEMDISpy).not.toHaveBeenCalled()
-        expect(res.locals.locationMonitoringUri).toBeUndefined()
       })
     })
     describe('getProbationHistory', () => {

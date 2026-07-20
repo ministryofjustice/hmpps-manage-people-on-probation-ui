@@ -38,16 +38,7 @@
             } if appointmentOutcome.summary.enforcementAction,
             {
                 key: { text: "Evidence due date"},
-                value: { text: appointmentOutcome.summary.evidenceDueDate },
-                actions: {
-                    items: [ 
-                        {
-                            href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url,
-                            text: "Change",
-                            visuallyHiddenText: "evidence due date"
-                        } 
-                    ] 
-                } if showAction
+                value: { text: appointmentOutcome.summary.evidenceDueDate }
             } if appointmentOutcome.summary.evidenceDueDate,
             {
                 key: { text: "Notes"},
@@ -73,7 +64,7 @@
                             visuallyHiddenText: "sensitivity"
                         } 
                     ] 
-                } if showAction
+                } if showAction and not appointmentOutcome.appointmentSession.sensitivityLocked
             } if appointmentOutcome.summary.sensitivity,
             {
                 key: { text: "Documents"},

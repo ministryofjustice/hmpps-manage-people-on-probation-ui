@@ -18,9 +18,10 @@ import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-a
 import {
   ExpectedOption,
   Journey,
-  checkBreachWarningBanner,
-  checkOptionRedirectsToCorrectPage,
+  checkBreachOrRecallWarningBanner,
+  checkOptionRedirects,
   checkOptions,
+  checkTicketPanel,
 } from './imports'
 import { SentenceType } from '../../../server/data/model/sentenceDetails'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -155,10 +156,12 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   })
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AttendedFailedToComplyPage, journey })
+    loadPage({ journey })
+    checkOptionRedirects(options, AttendedFailedToComplyPage)
   })
 
-  checkBreachWarningBanner(loadPage, { Page: AttendedFailedToComplyPage })
+  checkBreachOrRecallWarningBanner(loadPage, AttendedFailedToComplyPage)
+  checkTicketPanel(loadPage, AttendedFailedToComplyPage)
 }
 
 describe('Unacceptable absence', () => {

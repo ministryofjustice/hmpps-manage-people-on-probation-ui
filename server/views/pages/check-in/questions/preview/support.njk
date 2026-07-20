@@ -1,6 +1,9 @@
 {% extends "../../../_form.njk" %}
 {% set title = "Is there anything you need support with or want to let us know about?" %}
-{% set pageTitle = title %}
+{% set pageTitleText = "Question preview of Is there anything else you need support with or want to let us know about?" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [pageTitleText]
+}) %}
 {% set buttonText = "Back to questions" %}
 {% set formAnchorText = "Back to questions" %}
 {% set formAnchorLink = "/case/"+ crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
@@ -12,17 +15,19 @@
 {% block primary %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-hint govuk-body govuk-!-margin-bottom-2">Question preview</p>
-            <h2 class="govuk-heading-l govuk-!-margin-top-0 govuk-!-margin-bottom-2 govuk-!-padding-top-0" data-qa="pageHeading">
-                {{ pageTitle }}
-            </h2>
+
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-2">Question preview</h2>
+            <p>This is a non-editable preview of the question that the person will be asked when they check in.</p>
+
+            <h3 class="govuk-heading-m govuk-!-margin-bottom-2" data-qa="pageHeading">
+                {{ title }}
+            </h3>
             <p class="govuk-hint">
                 This could be anything you're worrying about, struggling with or just want to let us know.
             </p>
 
-            <div class="govuk-form-group disabled-checkboxes">
-                <div class="govuk-checkboxes">
-                    
+            <div class="govuk-form-group">
+                <div class="govuk-checkboxes disabled-checkboxes" data-module="govuk-checkboxes">
                     {% set supportOptions = [
                         { label: "Mental health", id: "mentalHealthSupport", text: "Tell us what you want us to know about mental health (optional)" },
                         { label: "Alcohol", id: "alcoholSupport", text: "Tell us what you want us to know about alcohol (optional)" },
@@ -33,15 +38,14 @@
                         { label: "Relationships (family, friends, partner)", id: "relationshipsSupport", text: "Tell us what you want us to know about your relationships (optional)" },
                         { label: "Something else", id: "otherSupport", text: "Tell us what you want us to know about (optional)" }
                     ] %}
-
                     {% for item in supportOptions %}
                         <div class="govuk-checkboxes__item">
-                            <input class="govuk-checkboxes__input" id="{{ item.id }}-checkbox" name="assistance" type="checkbox" checked disabled aria-disabled="true" onclick="return false;" onkeydown="if(event.key === ' ') return false;">
+                            <input class="govuk-checkboxes__input" id="{{ item.id }}-checkbox" name="assistance" type="checkbox" checked  data-aria-controls="conditional-{{ item.id }}" aria-disabled="true">
                             <label class="govuk-label govuk-checkboxes__label" for="{{ item.id }}-checkbox">
                                 {{ item.label }}
                             </label>
                         </div>
-                        <div class="govuk-checkboxes__conditional">
+                        <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="conditional-{{ item.id }}">
                             {{ govukTextarea({
                                 name: item.id,
                                 id: item.id + "-textarea",
@@ -50,11 +54,9 @@
                             }) }}
                         </div>
                     {% endfor %}
-
                     <div class="govuk-checkboxes__divider">or</div>
-
                     <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="no-help-checkbox" name="assistance" type="checkbox" readonly disabled>
+                        <input class="govuk-checkboxes__input" id="no-help-checkbox" name="assistance" type="checkbox" value="none" data-behaviour="exclusive">
                         <label class="govuk-label govuk-checkboxes__label" for="no-help-checkbox">
                             No, I do not need any support
                         </label>
@@ -68,4 +70,15 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block bodyEnd %}
+{{ super() }}
+<script nonce="{{ cspNonce }}">
+    const allCheckboxes = document.querySelectorAll('.disabled-checkboxes .govuk-checkboxes__input')
+    const allTextareas = document.querySelectorAll('.disabled-checkboxes .govuk-textarea')
+    // Disable keyboard interaction with checkboxes and textareas (apart from tabbing)
+    allCheckboxes.forEach(checkbox => checkbox.onkeydown = (key) => { return key.key === 'Tab' })
+    allTextareas.forEach(textarea => textarea.onkeydown = (key) => { return key.key === 'Tab' })
+</script>
 {% endblock %}

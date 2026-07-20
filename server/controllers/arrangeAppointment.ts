@@ -12,9 +12,9 @@ import {
   isValidUUID,
   setDataValue,
 } from '../utils'
+import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 import {
   renderError,
-  postAppointments,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
   getUserOptions,
@@ -22,19 +22,17 @@ import {
   appointmentDateIsInPast,
   isRescheduleAppointment,
 } from '../middleware'
-import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
+import { AppointmentSession } from '../models/Appointments'
 import { SmsOptInOptions } from '../data/model/OutlookEvent'
 import { AppResponse } from '../models/Locals'
-import { HmppsAuthClient } from '../data'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
-import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
-import { PersonAppointment } from '../data/model/schedule'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
 import { filterContacts } from '../middleware/filterContacts'
+import logger from '../../logger'
 
 const routes = [
   'redirectToSentence',
@@ -67,6 +65,7 @@ const resetSessionValues = (req: Request, res: Response) => {
   const { crn, id } = req.params as Record<string, string>
   const { data } = req.session
   const path = ['appointments', crn, id]
+  const context = { uuid: id, username: res.locals.user?.username, enabled: res.locals.flags.enableSessionCacheLogging }
   const originalDate = getDataValue(data, [...path, 'temp', 'date'])
   const updatedDate = getDataValue(data, [...path, 'date'])
   const smsOptIn = getDataValue<SmsOptInOptions>(data, [...path, 'smsOptIn'])
@@ -75,72 +74,25 @@ const resetSessionValues = (req: Request, res: Response) => {
   const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
   if (!retainOutcomeRecorded) {
     if (res.locals.flags.enableNonCompliance) {
+      logSessionCacheChange('resetSessionValues', data, [...path, 'outcome', 'outcomeType'], null, context)
       setDataValue(data, [...path, 'outcome', 'outcomeType'], null)
     } else {
+      logSessionCacheChange('resetSessionValues', data, [...path, 'outcomeRecorded'], null, context)
       setDataValue(data, [...path, 'outcomeRecorded'], null)
     }
   }
   if (updatedDateIsInPast && smsOptIn?.includes('YES')) {
+    logSessionCacheChange('resetSessionValues', data, [...path, 'smsOptIn'], 'NO', context)
     setDataValue(data, [...path, 'smsOptIn'], 'NO')
     delete req.session.data.appointments[crn][id].smsPreview
   }
   const retainNotesAndSensitivity = (!originalDateWasInPast && !updatedDateIsInPast) || retainOutcomeRecorded
   if (!retainNotesAndSensitivity) {
+    logSessionCacheChange('resetSessionValues', data, [...path, 'notes'], null, context)
+    logSessionCacheChange('resetSessionValues', data, [...path, 'sensitivity'], null, context)
     setDataValue(data, [...path, 'notes'], null)
     setDataValue(data, [...path, 'sensitivity'], null)
   }
-}
-
-export const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
-  const { data } = req.session
-  const { crn, id, contactId } = req.params as Record<string, string>
-  if (!isValidCrn(crn) || !isValidUUID(id)) {
-    return renderError(404)(req, res)
-  }
-  const { sensitivityLocked } = getDataValue(data, ['appointments', crn, id])
-  if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
-    setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
-  }
-  const {
-    user: { providerCode, teamCode, username, locationCode },
-    eventId,
-    type,
-    date,
-    sensitivity,
-    rescheduleAppointment,
-  } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-  const mapping = {
-    eventId: 'sentence',
-    type: 'type-attendance',
-    providerCode: 'attendance',
-    teamCode: 'attendance',
-    username: 'attendance',
-    locationCode: 'location-date-time',
-    date: 'location-date-time',
-    sensitivity: 'supporting-information',
-  }
-  const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
-  const baseUrl = `/case/${crn}/arrange-appointment/${id}`
-  let backendId
-  for (const [k, v] of Object.entries(mapping)) {
-    const value = requiredValues[k as keyof typeof requiredValues]
-    if (!value) {
-      return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
-    }
-  }
-  if (rescheduleAppointment?.contactId) {
-    const response: RescheduleAppointmentResponse | PersonAppointment = await postRescheduleAppointments(client)(
-      req,
-      res,
-    )
-    backendId = 'id' in response ? response.id : contactId
-  } else {
-    const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
-    backendId = response.appointments[response.appointments.length - 1].id
-  }
-  // setting backendId (part of AppointmentSession ) to create 'anotherAppointment' link in confirmation.njk
-  setDataValue(data, ['appointments', crn, id, 'backendId'], backendId)
-  return res.redirect(`${baseUrl}/confirmation`)
 }
 
 const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
@@ -165,26 +117,34 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         delete req.session.data.errors
       }
       const { crn, id } = req.params as Record<string, string>
-      const { change, validation } = req.query
+      const { change } = req.query
       const { data } = req.session
       let { back } = req.query
+      const context = {
+        uuid: id,
+        username: res.locals.user?.username,
+        enabled: res.locals.flags.enableSessionCacheLogging,
+      }
 
       if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+        logSessionCacheChange(
+          'getSentence',
+          data,
+          ['appointments', crn, id, 'eventId'],
+          data?.sentences?.[crn][0].id,
+          context,
+        )
         setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
       }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       if (back) {
+        logSessionCacheChange('getSentence', data, ['backLink', 'sentence'], back, context)
         setDataValue(data, ['backLink', 'sentence'], back)
       } else {
         back = getDataValue(data, ['backLink', 'sentence'])
       }
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-eventId`]: 'Select what this appointment is for',
-        }
-      }
+
       return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors, back })
     }
   },
@@ -202,7 +162,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
       let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance${queryParameters}`
       if (change) {
-        redirect = findUncompleted(req, res)
+        redirect = findUncompleted()(req, res)
       }
       return res.redirect(redirect)
     }
@@ -211,7 +171,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const errors = req?.session?.data?.errors
       const { crn, id } = req.params as Record<string, string>
-      const { change, validation } = req.query
+      const { change } = req.query
       const { data } = req.session
       const url = encodeURIComponent(req.url)
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
@@ -226,12 +186,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { appointmentTypes } = res.locals
       if (personLevel) {
         res.locals.appointmentTypes = getPersonLevelTypes(appointmentTypes)
-      }
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-type`]: 'Select a valid appointment type',
-        }
       }
       if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
         return res.render(`pages/arrange-appointment/type-attendance`, {
@@ -257,7 +211,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/location-date-time${query}`
       if (change) {
-        redirect = findUncompleted(req, res)
+        redirect = findUncompleted()(req, res)
       }
       return res.redirect(redirect)
     }
@@ -286,15 +240,54 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
-      const staff = getDataValue<User[]>(data, ['staff', username])
+      const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
       const staffMember = staff?.find(person => person.username === username)
+      logger.info(
+        `[postWhoWillAttend] uuid='${id}' loggedInUser='${res.locals.user.username}' selectedUsername='${username}' staffMemberFound=${Boolean(staffMember)}`,
+      )
       if (providerCode) {
+        const postWhoWillAttendContext = { uuid: id, username, enabled: res.locals.flags.enableSessionCacheLogging }
+        logSessionCacheChange(
+          'postWhoWillAttend',
+          data,
+          ['appointments', crn, id, 'user', 'providerCode'],
+          providerCode,
+          postWhoWillAttendContext,
+        )
+        logSessionCacheChange(
+          'postWhoWillAttend',
+          data,
+          ['appointments', crn, id, 'user', 'teamCode'],
+          teamCode,
+          postWhoWillAttendContext,
+        )
+        logSessionCacheChange(
+          'postWhoWillAttend',
+          data,
+          ['appointments', crn, id, 'user', 'username'],
+          username,
+          postWhoWillAttendContext,
+        )
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
         if (res.locals.flags.enableMAN2344) {
           const email = staffMember?.email ?? null
           const name = staffMember?.name ?? null
+          logSessionCacheChange(
+            'postWhoWillAttend',
+            data,
+            ['appointments', crn, id, 'user', 'email'],
+            email,
+            postWhoWillAttendContext,
+          )
+          logSessionCacheChange(
+            'postWhoWillAttend',
+            data,
+            ['appointments', crn, id, 'user', 'name'],
+            name,
+            postWhoWillAttendContext,
+          )
           setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
           setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         }
@@ -307,7 +300,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance`
       if (change) {
-        redirect = findUncompleted(req, res)
+        redirect = findUncompleted()(req, res)
       }
       return res.redirect(redirect)
     }
@@ -318,23 +311,24 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
       const { change, validation } = req.query as Record<string, string>
-      const showValidation = validation === 'true'
       const isInPast = appointmentDateIsInPast(req)
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
-      if (showValidation) {
-        const errorMessages = {
-          [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
-          [`appointments-${crn}-${id}-start`]: 'Enter a start time',
-          [`appointments-${crn}-${id}-end`]: 'Enter an end time',
-        }
-        if (!getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])) {
-          errorMessages[`appointments-${crn}-${id}-user-locationCode`] = 'Select an appointment location'
-        }
-        res.locals.errorMessages = errorMessages
-      }
       const isReschedule = isRescheduleAppointment(req)
       if (change) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
+        const glDtContext = {
+          uuid: id,
+          username: res.locals.user?.username,
+          enabled: res.locals.flags.enableSessionCacheLogging,
+        }
+        logSessionCacheChange('getLocationDateTime', data, ['appointments', crn, id, 'temp', 'date'], date, glDtContext)
+        logSessionCacheChange(
+          'getLocationDateTime',
+          data,
+          ['appointments', crn, id, 'temp', 'isInPast'],
+          isInPast,
+          glDtContext,
+        )
         setDataValue(data, ['appointments', crn, id, 'temp', 'date'], date)
         setDataValue(data, ['appointments', crn, id, 'temp', 'isInPast'], isInPast)
       }
@@ -356,7 +350,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         _maxDate,
         errors,
         change,
-        showValidation,
         isInPast,
         alertDismissed,
         isReschedule,
@@ -389,7 +382,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/${nextPage}`
       if (change && nextPage !== 'location-not-in-list') {
-        redirect = findUncompleted(req, res)
+        redirect = findUncompleted()(req, res)
       }
       if (change && nextPage === 'location-not-in-list') {
         redirect = `${redirect}?change=${change}`
@@ -508,7 +501,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         req.body.appointments[crn][id].smsOptIn,
       )
       if (change) {
-        redirect = findUncompleted(req, res)
+        redirect = findUncompleted()(req, res)
       }
       if (isEditingMobileNumber) {
         redirect = `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}${change ? `&change=${change}` : ''}`
@@ -520,13 +513,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const { maxCharCount } = config
       const { crn, id } = req.params as Record<string, string>
-      const { change, validation } = req.query
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-sensitivity`]: 'Select the sensitivity of the appointment',
-        }
-      }
+      const { change } = req.query
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_SUPPORTING_INFO', crn, SubjectType.CRN)
       const isInPast = appointmentDateIsInPast(req)
       const back = 'date-time'
@@ -539,7 +526,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         id,
         back,
         change,
-        showValidation,
         maxCharCount,
         isInPast,
         isSensitive,
@@ -555,7 +541,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
       if (change) {
-        redirect = findUncompleted(req, res)
+        redirect = findUncompleted()(req, res)
       }
       return res.redirect(redirect)
     }
@@ -602,8 +588,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
 
-  postCheckYourAnswers: hmppsAuthClient => {
-    return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
+  postCheckYourAnswers: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+    }
   },
   getConfirmation: hmppsAuthClient => {
     return async (req, res) => {
@@ -617,27 +606,43 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         user: attending,
         smsOptIn,
         rescheduleAppointment,
-        linkedContactId,
       } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+      const linkedContactId = getDataValue<string>(data, ['temp', crn, 'linkedContactId']) || null
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending.username.toUpperCase() !== res.locals.user.username) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        try {
-          const probationPractitioner = await masClient.getProbationPractitioner(crn)
-          const probationPractitionersForename = probationPractitioner.name.forename || ''
+      if (attending.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+        if (attending?.name?.forename) {
           const formattedName =
-            probationPractitionersForename.charAt(0).toUpperCase() +
-            probationPractitionersForename.slice(1).toLowerCase()
+            attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
           // First letter of the PPs name should be uppercase as per requirement
           attendingName = `${formattedName}’s`
-        } catch {
-          attendingName = `The officer´s`
+        } else {
+          const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+          const masClient = new MasApiClient(token)
+          try {
+            const probationPractitioner = await masClient.getProbationPractitioner(crn)
+            const probationPractitionersForename = probationPractitioner.name.forename || ''
+            const formattedName =
+              probationPractitionersForename.charAt(0).toUpperCase() +
+              probationPractitionersForename.slice(1).toLowerCase()
+            // First letter of the PPs name should be uppercase as per requirement
+            attendingName = `${formattedName}’s`
+          } catch {
+            attendingName = `The officer’s`
+          }
         }
       }
-      const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
+      const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
+
+      if (responseContactId) {
+        logSessionCacheChange('getConfirmation', data, ['temp', crn, 'responseContactId'], null, {
+          uuid: id,
+          username: res.locals.user?.username,
+          enabled: res.locals.flags.enableSessionCacheLogging,
+        })
+        setDataValue(data, ['temp', crn, 'responseContactId'], null)
+      }
       const { isOutLookEventFailed = null, isEnglishNotificationFailed = null, isWelshNotificationFailed = null } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
@@ -663,9 +668,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           type: res.locals.appointmentTypes.find((type: any) => type.code === typeCode)?.description || null,
         }
       }
+
+      // tidy up current appointment session 👇
+      if (req.session.data.appointments?.[crn]?.[id]) {
+        delete req.session.data.appointments[crn][id]
+      }
+
       return res.render(`pages/arrange-appointment/confirmation`, {
         crn,
-        backendId,
+        responseContactId,
         isOutLookEventFailed,
         attendingName,
         linkedAppointment,
@@ -712,8 +723,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id, isInPast })
     }
   },
-  postArrangeAnotherAppointment: hmppsAuthClient => {
-    return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
+  postArrangeAnotherAppointment: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+    }
   },
 }
 

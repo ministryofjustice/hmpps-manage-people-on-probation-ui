@@ -90,7 +90,6 @@ describe('rescheduleAppointmentController', () => {
           crn,
           contactId,
           id,
-          showValidation: false,
         }),
       )
       checkSendAuditMessage(res, 'ADD_MAS_RESCHEDULE_APPOINTMENT', crn, SubjectType.CRN)
@@ -118,7 +117,6 @@ describe('rescheduleAppointmentController', () => {
           uploadedFiles,
           errorMessages,
           body,
-          showValidation: true,
         }),
       )
       expect(req.session.cache.uploadedFiles).toBeUndefined()

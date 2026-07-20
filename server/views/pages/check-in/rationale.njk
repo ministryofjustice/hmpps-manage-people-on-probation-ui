@@ -1,0 +1,38 @@
+{% extends "../_form.njk" %}
+
+{% set textAreaTitle = "Why is " + case.name.forename + " suitable to use online check ins?"  %}
+{% set pageTitleText = "Why is the person suitable to use online check ins?" %}
+{% if errorMessages and errorMessages | length %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Error: " + pageTitleText]
+  }) %}
+{% else %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: [pageTitleText]
+  }) %}
+{% endif %}
+{% set hintText = "For example, low risk of reoffending, stable lifestyle factors."  %}
+
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+        {{ govukTextarea({
+            formGroup: {
+                attributes: { "data-qa": "rationale-for-check-ins"}
+            },
+            label: {
+                text: textAreaTitle,
+                classes: 'govuk-label--l govuk-!-margin-bottom-3',
+                isPageHeading: true,
+                attributes: {
+                    "data-qa": "pageHeading"
+                }
+            },
+            hint: {
+                text: hintText
+            }
+        } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'rationale'])) }}
+        </div>
+    </div>
+{% endblock %}

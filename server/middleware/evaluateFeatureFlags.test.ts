@@ -106,6 +106,7 @@ describe('/middleware/evaluateFeatureFlags', () => {
 
       expect(getFlagsSpy).toHaveBeenCalledWith({
         email: 'test@example.com',
+        username: 'user-1',
         pduCodes: ['PDU001', 'PDU002'],
       })
     })
@@ -120,6 +121,7 @@ describe('/middleware/evaluateFeatureFlags', () => {
 
       expect(getFlagsSpy).toHaveBeenCalledWith({
         email: undefined,
+        username: 'user-1',
         pduCodes: [],
       })
     })

@@ -43,6 +43,8 @@ const routes = [
   'postSupplementaryEligibilityPage',
   'getSPOApprovalPage',
   'postSPOApprovalPage',
+  'getRationalePage',
+  'postRationalePage',
   'getDateFrequencyPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
@@ -216,10 +218,10 @@ const checkInsController: Controller<typeof routes, void> = {
       const eligibilityChoice: string | any[] =
         req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice || []
 
-      if (eligibilityChoice === 'replacement-contact') {
+      if (eligibilityChoice === 'REPLACE_F2F') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/spo-approval`)
       }
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
     }
   },
 
@@ -243,7 +245,8 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'eligibilityChoice'], 'SUPPLEMENT_F2F')
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
     }
   },
 
@@ -278,6 +281,46 @@ const checkInsController: Controller<typeof routes, void> = {
       if (approval) {
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'eligibilitySPOApproval'], approval)
       }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/rationale`)
+    }
+  },
+
+  getRationalePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const cya = req.query.cya === 'true'
+      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
+      let backLink: string
+      if (cya) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityChoice === 'REPLACE_F2F') {
+        backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
+      } else if (eligibilityArray.includes('eligibility-none')) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+      } else {
+        backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+      }
+
+      await sendAuditMessage(res, 'VIEW_MAS_RATIONALE_TO_USE_CHECK_INS', crn, SubjectType.CRN)
+
+      return res.render('pages/check-in/rationale.njk', {
+        crn,
+        id,
+        backLink,
+      })
+    }
+  },
+
+  postRationalePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
@@ -290,20 +333,12 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const cya = req.query.cya === 'true'
-      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
-      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
-      const eligibilityChoice = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice
       let backLink: string
       if (cya) {
         backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      } else if (eligibilityChoice === 'replacement-contact') {
-        backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
-      } else if (eligibilityArray.includes('eligibility-none')) {
-        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
       } else {
-        backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+        backLink = `/case/${crn}/appointments/${id}/check-in/rationale`
       }
-
       const checkInMinDate = getMinDate()
 
       return res.render(`pages/check-in/date-frequency.njk`, {
@@ -503,11 +538,12 @@ const checkInsController: Controller<typeof routes, void> = {
         SUBMITTED: 'review/identity',
         EXPIRED: 'review/expired',
       }
-      if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const practitionerId = res.locals.user.username
-        const eSupervisionClient = new ESupervisionClient(token)
-        await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
+      if ((checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') && !checkIn.reviewedAt) {
+        setDataValue(
+          req.session.data,
+          ['esupervision', crn, id, 'checkins', 'reviewStartedAt'],
+          new Date().toISOString(),
+        )
       }
       if (Object.keys(statusMap).includes(checkIn.status)) {
         return res.redirect(
@@ -691,6 +727,10 @@ const checkInsController: Controller<typeof routes, void> = {
         notes: reviewNotes,
         riskManagementFeedback: risk,
         sensitive: checkIn?.sensitiveContact === 'true',
+        reviewStartedAt:
+          checkIn && !checkIn?.reviewedAt
+            ? getDataValue(data, ['esupervision', crn, id, 'checkins', 'reviewStartedAt'])
+            : undefined,
       }
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
@@ -1054,6 +1094,13 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const isEnabledESUPCheckinNewStop = res.locals.flags?.enableESUPCheckinNewStop === true
+      if (isEnabledESUPCheckinNewStop) {
+        const eSupervisionManageCheckinsUrl = config.eSupervisionManageCheckins.link.replace(/\/$/, '')
+        return res.redirect(
+          `${eSupervisionManageCheckinsUrl}/case/${crn}/appointments/check-in/manage/${id}/stop-checkin`,
+        )
+      }
       return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
     }
   },
@@ -1358,6 +1405,16 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+
+      const isEnabledESUPCheckinNewStop = res.locals.flags?.enableESUPCheckinNewStop === true
+
+      if (isEnabledESUPCheckinNewStop) {
+        const eSupervisionManageCheckinsUrl = config.eSupervisionManageCheckins.link.replace(/\/$/, '')
+
+        return res.redirect(
+          `${eSupervisionManageCheckinsUrl}/case/${crn}/appointments/check-in/manage/${id}/stop-checkin`,
+        )
       }
 
       const reasonData = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckinReason'])

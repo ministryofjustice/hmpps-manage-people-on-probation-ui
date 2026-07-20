@@ -5,8 +5,9 @@ import { groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
+import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
 
-const routes = ['getOrPostActivityLog', 'getActivity'] as const
+const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -24,6 +25,18 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 }
 
 const activityLogController: Controller<typeof routes, void> = {
+  redirectToActivityLog: () => {
+    return async (req, res) => {
+      const { keywords = '', compliance = [] } = req.query
+      const { crn } = req.params as Record<string, string>
+      req.session.activityLogFilters = {
+        keywords,
+        compliance: Array.isArray(compliance) ? compliance : [compliance],
+        crn,
+      }
+      return res.redirect(`/case/${crn}/activity-log`)
+    }
+  },
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { params } = req
@@ -57,6 +70,10 @@ const activityLogController: Controller<typeof routes, void> = {
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
+      personActivity.activities = personActivity.activities.map(activity => ({
+        ...activity,
+        isUpdatableContact: checkIsUpdatableContact(activity.type),
+      }))
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG',
@@ -66,7 +83,6 @@ const activityLogController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-
       const baseUrl = req.url.split('?')[0]
       return res.render('pages/contact-log', {
         personActivity,
@@ -106,6 +122,14 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
+
+      const isUpdatableContact = checkIsUpdatableContact(personAppointment?.appointment?.type)
+
+      if (isUpdatableContact) {
+        personAppointment.appointment.isUpdatableContact = true
+      } else {
+        personAppointment.appointment.isUpdatableContact = false
+      }
       if (personAppointment.appointment.isAppointment) {
         if (back) {
           return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage?back=${back}`)

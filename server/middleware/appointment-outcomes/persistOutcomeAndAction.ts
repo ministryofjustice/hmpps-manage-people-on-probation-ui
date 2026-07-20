@@ -1,80 +1,95 @@
 import {
-  AppointmentEnforcementAction,
-  AppointmentOutcomeType,
-  AppointmentSessionOutcome,
+  acceptableAbsenceOutcomeTypes,
+  type AcceptableAbsenceOutcomeType,
+  type AppointmentEnforcementAction,
+  type AppointmentOutcomeType,
+  type AppointmentSessionOutcome,
+  type OutcomePage,
   type EnforcementActionPage,
 } from '../../models/Appointments'
 import {
   attendedFailedToComplyOptions,
-  acceptableAbsenceOptions,
   failedToAttendOptions,
-  type EnforcementActionCode,
-  enforcementActionMap,
   enforcementActionOptions,
   letterTypeOptions,
-  OutcomeCode,
-  outcomeMap,
+  type EnforcementActionCode,
+  type OutcomeCode,
+  type AcceptableAbsenceOutcomeCode,
 } from '../../properties/appointment-outcomes'
-import { getDataValue } from '../../utils'
-import { Route } from '../../@types'
+import { getMappedActions, getMappedOutcome } from '../../utils'
 import { Option } from '../../models/Option'
 
+type OutcomeType = Extract<
+  AppointmentOutcomeType | AcceptableAbsenceOutcomeType,
+  'ATTENDED_FAILED_TO_COMPLY' | 'UNACCEPTABLE_ABSENCE' | 'FAILED_TO_ATTEND' | 'ATTENDED_SENT_HOME_BEHAVIOUR'
+>
+
 type OptionsMap = {
-  [K in AppointmentOutcomeType]?: { key: EnforcementActionPage; options: Option<AppointmentEnforcementAction>[] }
+  [K in OutcomeType]: {
+    key: EnforcementActionPage
+    options: Option<AppointmentEnforcementAction | AcceptableAbsenceOutcomeType>[]
+  }
 }
+
 const optionsMap: OptionsMap = {
   ATTENDED_FAILED_TO_COMPLY: { key: 'attendedFailedToComply', options: attendedFailedToComplyOptions() },
+  ATTENDED_SENT_HOME_BEHAVIOUR: { key: 'attendedFailedToComply', options: attendedFailedToComplyOptions() },
   UNACCEPTABLE_ABSENCE: { key: 'unacceptableAbsence', options: attendedFailedToComplyOptions() },
-  ACCEPTABLE_ABSENCE: { key: 'acceptableAbsence', options: acceptableAbsenceOptions },
   FAILED_TO_ATTEND: { key: 'failedToAttend', options: failedToAttendOptions() },
 }
 
-export const persistOutcomeAndAction = (
-  outcome: string,
-  actionCode?: EnforcementActionCode,
-): Route<AppointmentSessionOutcome> => {
-  return (req, _res) => {
-    let outcomeType: AppointmentOutcomeType
-    let outcomeCode: OutcomeCode
-    let outcomeSession: AppointmentSessionOutcome = null
-    const { crn, id: uuid, contactId } = req.params as Record<string, string>
-    const id = uuid || contactId
-    const { data } = req.session
-    const path = ['appointments', crn, id, 'outcome']
-    const currentOutcome = getDataValue(data, path) || {}
-    if (outcome) {
-      const contactOutcome = Object.entries(outcomeMap).find(
-        ([_key, { description }]) => description.toLowerCase() === outcome.toLowerCase(),
-      )
-      outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType) || null
-      outcomeCode = contactOutcome?.[1]?.code || null
+export const persistOutcomeAndAction = ({
+  outcome = null,
+  actionCode = null,
+}: {
+  outcome: string | null
+  actionCode?: EnforcementActionCode | null
+}): AppointmentSessionOutcome => {
+  let outcomeType: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
+  let outcomeCode: OutcomeCode | AcceptableAbsenceOutcomeCode
+  let outcomeSession: AppointmentSessionOutcome = null
+  let pageKey: OutcomePage | EnforcementActionPage = null
+  let pageValue: AcceptableAbsenceOutcomeType | AppointmentEnforcementAction
+
+  if (outcome) {
+    const contactOutcome = getMappedOutcome<AppointmentOutcomeType | AcceptableAbsenceOutcomeType>({
+      description: outcome,
+    })
+    if (contactOutcome) {
+      outcomeType = (contactOutcome?.[0] as AppointmentOutcomeType | AcceptableAbsenceOutcomeType) || null
+      outcomeCode = (contactOutcome?.[1]?.code as OutcomeCode | AcceptableAbsenceOutcomeCode) || null
+    }
+    if (acceptableAbsenceOutcomeTypes.includes(outcomeType as AcceptableAbsenceOutcomeType)) {
+      pageValue = outcomeType as AcceptableAbsenceOutcomeType
+      outcomeType = 'ACCEPTABLE_ABSENCE'
+      pageKey = 'acceptableAbsence'
     }
     if (outcomeType && outcomeCode) {
       outcomeSession = {
-        ...currentOutcome,
-        outcomeType,
+        outcomeType: outcomeType as AppointmentOutcomeType,
         outcomeCode,
       }
-      if (actionCode) {
-        const match = optionsMap?.[outcomeType]
-        if (match) {
-          const actionKey = Object.entries(enforcementActionMap).find(([key, { code }]) => code === actionCode)?.[0]
-          let actionPageKey: EnforcementActionPage = null
-          if (actionKey) {
-            if (match.options.find(option => option?.value === actionKey)) {
-              actionPageKey = match.key
-            } else if (letterTypeOptions.find(option => option.value === actionKey)) {
-              actionPageKey = 'letterType'
-            } else if (enforcementActionOptions().find(option => option.value === actionKey)) {
-              actionPageKey = 'otherEnforcementAction'
-            }
-            if (actionPageKey) {
-              outcomeSession = { ...outcomeSession, [actionPageKey]: actionKey, enforcementActionCode: [actionCode] }
-            }
+    }
+    if (actionCode) {
+      const match = optionsMap?.[outcomeType as OutcomeType]
+      if (match) {
+        const mappedActions = getMappedActions(actionCode)
+        pageValue = mappedActions?.[0] ? mappedActions[0][0] : null
+        if (pageValue) {
+          if (match?.options?.find(option => option?.value === pageValue)) {
+            pageKey = match.key
+          } else if (letterTypeOptions.find(option => option.value === pageValue)) {
+            pageKey = 'letterType'
+          } else if (enforcementActionOptions().find(option => option.value === pageValue)) {
+            pageKey = 'otherEnforcementAction'
           }
+          outcomeSession = { ...outcomeSession, enforcementActionCode: [actionCode] }
         }
       }
     }
-    return outcomeSession
+    if (pageKey && pageValue) {
+      outcomeSession = { ...outcomeSession, [pageKey]: pageValue }
+    }
   }
+  return outcomeSession
 }

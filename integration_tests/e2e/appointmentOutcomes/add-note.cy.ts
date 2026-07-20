@@ -10,22 +10,33 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
+  completeOutcome,
 } from '../appointments/utils'
-import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
-import AttendedFailedToComplyPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../server/models/Appointments'
 
 let addNotePage: AddNotePage
 let manageAppointmentPage: ManageAppointmentPage
-let outcomePage: OutcomePage
-let attendedFailedToComplyPage: AttendedFailedToComplyPage
 let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 let nextAppointmentPage: NextAppointmentPage
 
 type Journey = 'MANAGE' | 'ARRANGE' | 'RESCHEDULE'
 
-const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
+const loadPage = ({
+  journey = 'MANAGE',
+  outcome = 'ATTENDED_SENT_HOME_BEHAVIOUR',
+  action = 'NO_FURTHER_ACTION',
+  isSensitive = false,
+}: {
+  journey?: Journey
+  outcome?: AppointmentOutcomeType
+  action?: AppointmentEnforcementAction
+  isSensitive?: boolean
+} = {}): void => {
+  if (isSensitive) {
+    cy.task('stubAppointment', { isSensitive: true, isFuture: false })
+  }
   const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
   if (journey === 'ARRANGE') {
     completeSentencePage()
@@ -45,12 +56,7 @@ const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
       completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid, crnOverride: crn })
     })
   }
-  outcomePage = new OutcomePage()
-  cy.get(`.govuk-radios__input[value=ATTENDED_SENT_HOME_BEHAVIOUR]`).click()
-  outcomePage.getSubmitBtn().click()
-  attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).click()
-  attendedFailedToComplyPage.getSubmitBtn().click()
+  completeOutcome({ outcome, action })
   addNotePage = new AddNotePage()
 }
 
@@ -96,13 +102,14 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it('renders the page', () => {
     loadPage({ journey })
     getUuid(3).then(uuid => {
-      cy.get('.govuk-back-link').should('not.exist')
+      cy.get('.govuk-back-link').should('exist')
       cy.contains('Use paragraphs and formatting').should('be.visible')
       cy.get('[data-qa="crissButton"]').should('contain.text', 'Show CRISS headers')
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', '')
       if (journey === 'MANAGE') {
         cy.get('label[for="fileUpload"]').should('contain.text', 'Upload a file (optional)')
+        cy.get('.guidance-panel').should('not.exist')
       }
     })
   })
@@ -126,6 +133,10 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         addNotePage.getCrissButton().click()
         cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', 'Some notes')
       })
+    })
+    it('should not display the sensitivity question if already set to true', () => {
+      loadPage({ journey, isSensitive: true })
+      addNotePage.getSensitiveInformation().should('not.exist')
     })
     checkValidation({ journey })
   }
@@ -164,6 +175,29 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         nextAppointmentPage = new NextAppointmentPage()
         nextAppointmentPage.checkPageTitle(`Eula’s next supervision appointment`)
       })
+    })
+    it('should display the prepended note inset text if breach action', () => {
+      loadPage({ journey, action: 'BREACH_RECALL_INITIATED' })
+      cy.get('.guidance-panel')
+        .should('be.visible')
+        .should('be.visible')
+        .should('contain.text', 'Manage people on probation will automatically add this update:')
+        .should('contain.text', 'I will initiate the breach')
+    })
+    it('should display the prepended note inset text if letter action', () => {
+      loadPage({ journey, action: 'SEND_LETTER' })
+      cy.get('.guidance-panel')
+        .should('be.visible')
+        .should('contain.text', 'Manage people on probation will automatically add this update:')
+        .should('contain.text', 'I will send a first warning letter')
+    })
+    it('should display the prepended note inset text if breach and letter action', () => {
+      loadPage({ journey, action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
+      cy.get('.guidance-panel')
+        .should('be.visible')
+        .should('contain.text', 'Manage people on probation will automatically add this update:')
+        .should('contain.text', 'I will initiate the breach')
+        .should('contain.text', 'I will send a different enforcement letter')
     })
   }
   it('submits successfully with no notes or upload and sensitivity selected', () => {

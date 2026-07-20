@@ -155,7 +155,7 @@ describe('masApiClient', () => {
       ],
       [
         'getEnforcementContacts',
-        '/contact/USER1/enforcements?size=10&page=0&filterDueDate=true',
+        '/contact/USER1/enforcements?page=0&size=10&filterDueDate=false&months=12&sortBy=contactDate&direction=DESC',
         () => masApiClient.getEnforcementContacts('USER1', '0', '10'),
       ],
       [
@@ -333,7 +333,7 @@ describe('masApiClient', () => {
         () => masApiClient.getProbationPractitioner('X000001'),
       ],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
-      ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
+      ['getUserAlertsCount', '/alerts', () => masApiClient.getUserAlertsCount()],
       [
         'getUserAlerts (full params)',
         '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',

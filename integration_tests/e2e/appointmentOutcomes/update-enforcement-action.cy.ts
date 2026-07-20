@@ -9,7 +9,7 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
-import { checkBreachWarningBanner, checkOptionRedirectsToCorrectPage, checkOptions, ExpectedOption } from './imports'
+import { checkBreachOrRecallWarningBanner, checkOptionRedirects, checkOptions, ExpectedOption } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let updateEnforcementActionPage: UpdateEnforcementActionPage
@@ -19,10 +19,12 @@ const loadPage = ({
   sentenceType = 'COMMUNITY',
   acceptableAbsence = false,
   enforcementAction = 'FIRST_WARNING_LETTER_SENT',
+  hasComplied = false,
 }: {
   sentenceType?: SentenceType
   acceptableAbsence?: boolean
   enforcementAction?: AppointmentEnforcementAction
+  hasComplied?: boolean
 } = {}): void => {
   const action = enforcementActionMap?.[enforcementAction]?.description || null
   const code = enforcementActionMap?.[enforcementAction]?.code || null
@@ -30,7 +32,7 @@ const loadPage = ({
     eventId: 2501192724,
     isFuture: false,
     hasOutcome: true,
-    hasComplied: true,
+    hasComplied: false,
     notes: false,
     acceptableAbsence,
     action,
@@ -196,7 +198,7 @@ const getExpectedOptions = ({
 
 const checkCurrentEnforcementStatus = ({
   colour = 'yellow',
-  text = 'First Warning Letter Sent',
+  text = 'First warning letter sent',
 }: { colour?: string; text?: string } = {}) => {
   cy.get('.govuk-inset-text').should('contain.text', 'The current enforcement status is:')
   cy.get('.govuk-inset-text').find(`.govuk-tag--${colour}`).should('contain.text', text)
@@ -222,11 +224,11 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
-        action: enforcementAction,
+      loadPage({
+        enforcementAction,
         sentenceType: 'COMMUNITY',
       })
+      checkOptionRedirects(options, UpdateEnforcementActionPage)
     })
   })
 
@@ -237,16 +239,16 @@ const checkPage = () => {
       loadPage({ enforcementAction })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
+      checkCurrentEnforcementStatus({ text: 'Breach / recall initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      loadPage({
         enforcementAction,
         sentenceType: 'COMMUNITY',
       })
+      checkOptionRedirects(options, UpdateEnforcementActionPage)
     })
   })
 
@@ -257,16 +259,16 @@ const checkPage = () => {
       loadPage({ enforcementAction, sentenceType: 'CUSTODY' })
       updateEnforcementActionPage = new UpdateEnforcementActionPage()
       updateEnforcementActionPage.checkPageTitle('Update enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ text: 'Breach / Recall Initiated' })
+      checkCurrentEnforcementStatus({ text: 'Breach / recall initiated' })
       cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      loadPage({
         enforcementAction,
         sentenceType: 'CUSTODY',
       })
+      checkOptionRedirects(options, UpdateEnforcementActionPage)
     })
   })
 
@@ -287,11 +289,11 @@ const checkPage = () => {
         checkOptions(options)
       })
       it('should redirect to the correct page when an option is selected', () => {
-        checkOptionRedirectsToCorrectPage(options, loadPage, {
-          Page: UpdateEnforcementActionPage,
+        loadPage({
           enforcementAction: action,
           sentenceType,
         })
+        checkOptionRedirects(options, UpdateEnforcementActionPage)
       })
     })
   })
@@ -301,14 +303,14 @@ const checkPage = () => {
       loadPage({ enforcementAction: 'NO_FURTHER_ACTION' })
       enforcementActionPage = new EnforcementActionPage()
       enforcementActionPage.checkPageTitle('Select an enforcement action for Alton’s failure to comply')
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'No Further Action' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'No further action' })
     })
   })
 
   describe('Current enforcement action is WITHDRAWAL_OF_WARNING', () => {
     it('should render the page', () => {
       loadPage({ enforcementAction: 'WITHDRAWAL_OF_WARNING' })
-      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of Warning' })
+      checkCurrentEnforcementStatus({ colour: 'green', text: 'Withdrawal of warning' })
     })
   })
 
@@ -323,10 +325,10 @@ const checkPage = () => {
       checkOptions(options)
     })
     it('should redirect to the correct page when an option is selected', () => {
-      checkOptionRedirectsToCorrectPage(options, loadPage, {
-        Page: UpdateEnforcementActionPage,
+      loadPage({
         acceptableAbsence,
       })
+      checkOptionRedirects(options, UpdateEnforcementActionPage)
     })
   })
 
@@ -341,7 +343,7 @@ const checkPage = () => {
     })
   })
 
-  checkBreachWarningBanner(loadPage, { Page: UpdateEnforcementActionPage })
+  checkBreachOrRecallWarningBanner(loadPage, UpdateEnforcementActionPage)
 }
 
 describe('Update enforcement action', () => {

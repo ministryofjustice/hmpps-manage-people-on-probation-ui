@@ -70,16 +70,18 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     getNextComAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getUserProviders(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
+    createAppointmentSession,
+    getAppointment(hmppsAuthClient),
     controllers.appointments.getNextAppointment(hmppsAuthClient),
   )
   router.post(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
     validate.appointments,
     createAppointmentSession,
+    getAppointment(hmppsAuthClient),
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
   router.get(

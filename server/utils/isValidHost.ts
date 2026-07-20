@@ -7,6 +7,7 @@ export const isValidHost = (host: string): boolean => {
     process.env.DELIUS_API_URL,
     process.env.ARNS_API_URL,
     process.env.TIER_API_URL,
+    process.env.SUPERVISION_PACKAGE_API_URL,
     process.env.FLIPT_URL,
     process.env.INTERVENTIONS_API_URL,
     process.env.ARNS_ASSESSMENT_PLATFORM_API_URL,

@@ -15,8 +15,7 @@ export default class EMDIClient extends RestClient {
       path: `/people/exists/${crn}`,
       handle404: true,
       handle500: true,
-      errorMessage:
-        'The EMDI service is experiencing technical difficulties. It has not been possible to provide EMDI information',
+      errorMessage: 'Electronic monitoring data is currently unavailable.',
     })
   }
 }

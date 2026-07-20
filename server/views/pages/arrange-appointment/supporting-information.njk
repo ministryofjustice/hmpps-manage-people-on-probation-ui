@@ -1,6 +1,9 @@
 {% extends "../_form.njk" %}
 
 {% set title = 'Add supporting information (optional)' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Arrange appointment"]
+}) %}
 {% set backLink = change | default('/case/' + crn + '/arrange-appointment/' + id + '/text-message-confirmation') %}
 {% set personForename = headerPersonName.forename %}
 {% if isInPast %}
@@ -51,6 +54,6 @@
     ]
 } | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
 {% else %}
-    <p>You already told us that this contact includes sensitive information.</p>    
+    <p>You already told us that this contact includes sensitive information.</p>
 {% endif %}
 {% endblock %}

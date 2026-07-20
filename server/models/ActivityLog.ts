@@ -4,8 +4,9 @@ export interface ActivityLogFilters {
   keywords: string
   dateFrom: string
   dateTo: string
-  compliance: Array<string>
+  compliance: Array<string> | string
   category: string[]
+  sparks?: string[]
   clearFilterKey?: string
   clearFilterValue?: string
   hideContact?: Array<string>
@@ -29,6 +30,7 @@ export interface ActivityLogFiltersResponse extends ActivityLogFilters {
   selectedFilterItems: Record<string, SelectedFilterItem[]>
   complianceOptions: Option[]
   categoryOptions: Option[]
+  sparksOptions: Option[]
   hideContactOptions: Option[]
   baseUrl: string
   maxDate: string

@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
 import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
@@ -12,14 +13,14 @@ import {
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { EventResponse, RescheduleEventRequest, SmsPreviewRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { PersonAppointment } from '../data/model/schedule'
 import { buildCaseLink } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
+import logger from '../../logger'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
-): Route<Promise<RescheduleAppointmentResponse | PersonAppointment>> => {
+): Route<Promise<RescheduleAppointmentResponse>> => {
   return async (req, res) => {
     const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -39,6 +40,7 @@ export const postRescheduleAppointments = (
       rescheduleAppointment,
       outcomeRecorded,
       smsOptIn,
+      outcome,
       user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
@@ -51,7 +53,6 @@ export const postRescheduleAppointments = (
       staffCode,
       teamCode: selectedTeam,
       locationCode: selectedLocation,
-      outcomeRecorded: outcomeRecorded === 'Yes',
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       sendToVisor: visorReport === 'Yes',
@@ -59,6 +60,11 @@ export const postRescheduleAppointments = (
       reasonIsSensitive: rescheduleAppointment.sensitivity === 'Yes',
       uuid,
       isInFuture: isInPast === false,
+    }
+    if (res.locals.flags?.enableNonCompliance) {
+      body.outcomeRecorded = !!outcome?.outcomeCode
+    } else {
+      body.outcomeRecorded = outcomeRecorded === 'Yes'
     }
     if (rescheduleAppointment?.reason) {
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
@@ -116,6 +122,25 @@ export const postRescheduleAppointments = (
       }
 
       eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
+      const outlookEventResponse: any = eventResponse
+      if (outlookEventResponse?.status === 500) {
+        const sentryError =
+          outlookEventResponse?.error ??
+          new Error(outlookEventResponse?.errors?.[0]?.text ?? 'Rescheduling appointment event not successful.')
+        const sentryEventId = Sentry.captureException(sentryError, {
+          tags: {
+            'http.status': '500',
+            'error.type': 'internal_server_error',
+            service: 'Probation Supervision Appointments Api',
+            operation: 'postRescheduleAppointmentEvent',
+          },
+        })
+        logger.info(`Sentry eventId: ${sentryEventId}`)
+        logger.warn(
+          { sentryEventId, apiError: outlookEventResponse?.error, apiErrors: outlookEventResponse?.errors },
+          'Failed to create rescheduling calendar event',
+        )
+      }
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.

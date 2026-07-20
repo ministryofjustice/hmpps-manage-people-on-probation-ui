@@ -1,4 +1,9 @@
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../../server/models/Appointments'
+import {
+  AcceptableAbsenceOutcomeType,
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+  EnforcementActionCreatedBy,
+} from '../../../../server/models/Appointments'
 import AcceptableAbsencePage from '../../../pages/appointmentOutcomes/acceptable-absence.page'
 import AttendedFailedToComplyPage from '../../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import FailedToAttendPage from '../../../pages/appointmentOutcomes/failed-to-attend.page'
@@ -35,43 +40,56 @@ const map: Map = {
   FAILED_TO_ATTEND: FailedToAttendPage,
 }
 
-const isValidOutcome = (outcome: AppointmentOutcomeType): outcome is ValidOutcome => {
+const isValidOutcome = (outcome: AppointmentOutcomeType | AcceptableAbsenceOutcomeType): outcome is ValidOutcome => {
   return Object.hasOwn(map, outcome)
 }
 
 export const completeOutcome = ({
   outcome = 'ATTENDED_COMPLIED',
   action = null,
-}: { outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}) => {
+  letterSentBy = 'USER',
+}: {
+  outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
+  action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+  letterSentBy?: EnforcementActionCreatedBy
+} = {}) => {
   const outcomePage = new OutcomePage()
   uncheckAllRadios()
   cy.get(`.govuk-radios__input[value=${outcome}]`).click()
   outcomePage.getSubmitBtn().click()
   if (action) {
-    completeAction({ outcome, action })
+    completeAction({ outcome, action, letterSentBy })
   }
 }
 
 export const completeAction = ({
   outcome = 'ATTENDED_COMPLIED',
   action = null,
-}: { outcome?: AppointmentOutcomeType; action?: AppointmentEnforcementAction } = {}) => {
+  letterSentBy = 'USER',
+}: {
+  outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
+  action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
+  letterSentBy?: EnforcementActionCreatedBy
+} = {}) => {
   if (action && isValidOutcome(outcome)) {
     let breachPage: InitiateBreachOrRecallPage
     let sendLetterPage: SendLetterPage
     const page = new map[outcome]()
     cy.get(`.govuk-radios__input[value=${action}]`).click()
     page.getSubmitBtn().click()
-    const actions: AppointmentEnforcementAction[] = [
+    const actions: (AppointmentEnforcementAction | AcceptableAbsenceOutcomeType)[] = [
       'BREACH_RECALL_INITIATED',
       'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       'SEND_LETTER',
     ]
-    const breachActions: AppointmentEnforcementAction[] = [
+    const breachActions: (AppointmentEnforcementAction | AcceptableAbsenceOutcomeType)[] = [
       'BREACH_RECALL_INITIATED',
       'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
     ]
-    const letterActions: AppointmentEnforcementAction[] = ['BREACH_RECALL_INITIATED_AND_SEND_LETTER', 'SEND_LETTER']
+    const letterActions: (AppointmentEnforcementAction | AcceptableAbsenceOutcomeType)[] = [
+      'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      'SEND_LETTER',
+    ]
     if (actions.includes(action)) {
       if (breachActions.includes(action)) {
         breachPage = new InitiateBreachOrRecallPage()
@@ -80,9 +98,9 @@ export const completeAction = ({
       if (letterActions.includes(action)) {
         const letterValue =
           action === 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
-            ? 'LICENCE_COMPLIANCE_LETTER_SENT'
+            ? 'OTHER_ENFORCEMENT_LETTER_SENT'
             : 'FIRST_WARNING_LETTER_SENT'
-        cy.get('[data-qa=letterSentBy]').find(`.govuk-radios__input[value=USER]`).click()
+        cy.get('[data-qa=letterSentBy]').find(`.govuk-radios__input[value=${letterSentBy}]`).click()
         cy.get('[data-qa=letterType]').find(`.govuk-radios__input[value=${letterValue}]`).click()
       }
       if (breachActions.includes(action)) {

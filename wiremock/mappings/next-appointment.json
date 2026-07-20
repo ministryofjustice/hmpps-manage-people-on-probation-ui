@@ -16,24 +16,25 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "personManager": {
-            "name": {
-              "forename": "Terry",
-              "surname": "Jones"
-            }
-          },
-          "usernameIsCom": true,
           "appointment": {
             "id": 6,
+            "eventNumber": "4",
             "type": "Other call",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
-            "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
             "isSensitive": false,
-            "didTheyComply": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "N07B786",
+              "name": { "forename": "Terry", "surname": "Jones" },
+              "teamCode": "N07AAT",
+              "providerCode": "N07",
+              "username": "AmardeepChimber"
+            },
+            "isInitial": false,
+            "isNationalStandard": true,
             "location": {
               "buildingName": "The Building",
               "buildingNumber": "77",
@@ -48,6 +49,10 @@
                 "surname": "Cricket"
               }
             },
+            "rescheduled": false,
+            "rescheduledStaff": false,
+            "rescheduledPop": false,
+            "absentWaitingEvidence": false,
             "documents": [
               {
                 "id": "83fdbf8a-a2f2-43b4-93ef-67e71c04fc58",
@@ -65,16 +70,36 @@
                 "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
               }
             ],
+            "isRarRelated": false,
+            "acceptableAbsence": false,
+            "isAppointment": true,
+            "isCommunication": false,
+            "isSystemContact": false,
+            "isEmailOrTextFromPop": false,
+            "isPhoneCallFromPop": false,
+            "isEmailOrTextToPop": false,
+            "isPhoneCallToPop": false,
+            "isInPast": false,
+            "isPastAppointment": false,
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
-            },
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
+            },
+            "deliusManaged": false,
+            "isVisor": false,
+            "eventId": 2501085207,
+            "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:2fd8d981-fc5b-4b77-a341-a9dee2321293",
+            "rarToolKit": "Choices and Changes",
+            "didTheyComply": false
+          },
+          "personManager": {
+            "name": {
+              "forename": "Terry",
+              "surname": "Jones"
             }
-          }
+          },
+          "usernameIsCom": true
         },
         "headers": {
           "Content-Type": "application/json"

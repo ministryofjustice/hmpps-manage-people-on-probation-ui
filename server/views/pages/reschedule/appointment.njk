@@ -1,10 +1,13 @@
 {% extends "../_form.njk" %}
 {% set title = 'Reschedule an appointment' %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set headerPersonNameForename = personAppointment.personSummary.name.forename %}
 {% set apptDetails = personAppointment.appointment %}
 {% set officerName = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname %}
 {% set officerStaffCode = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname %}
-{% set appointmentWithTitle = 'Appointment: ' + apptDetails.type + ' with ' + officerName + ' on ' + apptDetails.startDateTime | dayOfWeek + ' ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime + '.' if apptDetails.endDateTime else 
+{% set appointmentWithTitle = 'Appointment: ' + apptDetails.type + ' with ' + officerName + ' on ' + apptDetails.startDateTime | dayOfWeek + ' ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime + '.' if apptDetails.endDateTime else
     ''
 ) %}
 {% set showAnchorLink = true %}
@@ -90,6 +93,6 @@
             ]
         } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }}
     {% else %}
-        <p>You already told us that this contact includes sensitive information.</p>    
+        <p>You already told us that this contact includes sensitive information.</p>
     {% endif %}
 {% endblock %}

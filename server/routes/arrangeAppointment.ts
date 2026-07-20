@@ -7,7 +7,6 @@ import {
   getSentences,
   getAppointmentTypes,
   getAppointment,
-  redirectWizard,
   getDefaultUser,
   getUserOptions,
   routeChangeAttendee,
@@ -15,12 +14,17 @@ import {
   getPersonRiskFlags,
   getOverdueOutcomes,
   getPersonAppointment,
+  handlePostAppointment,
+  forceValidation,
+  restrictPageAccess,
 } from '../middleware'
 import {
-  getContactOutcomes,
   getNotePrepend,
   getOutcomeProps,
   getOutcomeSummary,
+  getContactOutcomes,
+  handlePutOutcome,
+  getOutcomeSentence,
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -42,8 +46,12 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getAppointment(hmppsAuthClient),
   )
   router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
-  get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
-  get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
+  router.get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
+  router.get(
+    '/case/:crn/arrange-appointment/:id/sentence',
+    forceValidation,
+    controllers.arrangeAppointments.getSentence(),
+  )
 
   router.post('/case/:crn/arrange-appointment/:id/*path', [
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
@@ -59,11 +67,12 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/type-attendance',
-    redirectWizard([{ path: 'eventId' }]),
+    restrictPageAccess({ requiredValues: ['eventId'] }),
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getDefaultUser(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
+    forceValidation,
     controllers.arrangeAppointments.getTypeAttendance(),
   )
 
@@ -77,7 +86,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
-    redirectWizard([{ path: 'eventId' }]),
+    restrictPageAccess({ requiredValues: ['eventId'] }),
     getUserOptions(hmppsAuthClient),
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
@@ -92,9 +101,10 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
   router.get(
     '/case/:crn/arrange-appointment/:id/location-date-time',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getPersonRiskFlags(hmppsAuthClient),
+    forceValidation,
     controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
   router.post(
@@ -108,7 +118,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location-not-in-list',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
@@ -116,7 +126,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/attended-complied',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: 'date' }]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date'] }),
     controllers.arrangeAppointments.getAttendedComplied(),
   )
 
@@ -130,7 +140,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.get(
     '/case/:crn/arrange-appointment/:id/supporting-information',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: ['user', 'locationCode'] }]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', ['user', 'locationCode']] }),
+    forceValidation,
     controllers.arrangeAppointments.getSupportingInformation(),
   )
 
@@ -142,9 +153,9 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.postSupportingInformation(),
   )
 
-  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', redirectWizard([{ path: 'eventId' }]))
+  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', restrictPageAccess())
 
-  router.get(
+  router.all(
     [
       '/case/:crn/arrange-appointment/:id/check-your-answers',
       '/case/:crn/appointments/appointment/:contactId/check-your-answers',
@@ -153,48 +164,61 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
-    getOutcomeProps,
-    getContactOutcomes(hmppsAuthClient),
-    getNotePrepend,
-    getOutcomeSummary,
   )
   router.get(
     [
       '/case/:crn/arrange-appointment/:id/check-your-answers',
       '/case/:crn/appointments/appointment/:contactId/check-your-answers',
     ],
+    getPersonAppointment(hmppsAuthClient),
+    getOutcomeProps,
+    getOutcomeSentence(hmppsAuthClient),
+    getNotePrepend,
+    getOutcomeSummary,
     controllers.arrangeAppointments.getCheckYourAnswers(),
+  )
+
+  router.post(
+    [
+      '/case/:crn/arrange-appointment/:id/check-your-answers',
+      '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
+    ],
+    getPersonAppointment(hmppsAuthClient),
+    handlePostAppointment(hmppsAuthClient),
+    getOutcomeProps,
+    getOutcomeSentence(hmppsAuthClient),
+    getContactOutcomes(hmppsAuthClient),
+    getNotePrepend,
+    getOutcomeSummary,
+    handlePutOutcome(hmppsAuthClient),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
-    getPersonAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient),
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: ['user', 'locationCode'] }]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', ['user', 'locationCode']] }),
     getOverdueOutcomes(hmppsAuthClient),
     controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
   )
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
   router.get(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
+    getOutcomeProps,
+    getContactOutcomes(hmppsAuthClient),
+    getOutcomeSentence(hmppsAuthClient),
+    getNotePrepend,
+    getOutcomeSummary,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
-    getPersonAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
   )
   router.all(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
-    redirectWizard([
-      { path: 'eventId' },
-      { path: 'type' },
-      { path: 'date' },
-      { path: 'start' },
-      { path: ['user', 'locationCode'] },
-    ]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'start', ['user', 'locationCode']] }),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getSmsPreview(hmppsAuthClient),
     getSmsConfirmationOptions,
@@ -225,12 +249,16 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
 
   router.all(
     '/case/:crn/arrange-appointment/:id/add-note',
-    redirectWizard([{ path: 'eventId' }, { path: 'type' }, { path: 'date' }, { path: 'outcomeRecorded' }]),
+    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'outcomeRecorded'] }),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getAppointment(hmppsAuthClient),
     getOutcomeProps,
   )
-  router.get('/case/:crn/arrange-appointment/:id/add-note', controllers.arrangeAppointments.getAddNote())
+  router.get(
+    '/case/:crn/arrange-appointment/:id/add-note',
+    forceValidation,
+    controllers.arrangeAppointments.getAddNote(),
+  )
 
   router.post(
     '/case/:crn/arrange-appointment/:id/add-note',

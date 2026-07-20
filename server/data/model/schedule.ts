@@ -1,6 +1,6 @@
 import { Name, PersonSummary, Document, Address } from './personalDetails'
 import { Note } from './note'
-import { EnforcementActionCode } from '../../properties/appointment-outcomes'
+import { AcceptableAbsenceOutcomeCode, EnforcementActionCode, OutcomeCode } from '../../properties/appointment-outcomes'
 
 export interface Schedule {
   personSummary: PersonSummary
@@ -35,13 +35,12 @@ export interface EnforcementContact {
   crn: string
   dob: string
   appointmentType: string
-  displayName?: string
   appointmentDate: string
   appointmentOutcome: string
   enforcementAction: string
   evidenceDueDate: string
   deliusManaged: boolean
-  isOverdue?: boolean
+  lastModifiedDate: string
 }
 
 export interface CaseName {
@@ -75,18 +74,34 @@ export interface EnforcementAction {
   responseByDate: string
 }
 
-export interface ContactOutcomes {
+export interface ContactOutcome {
   code: string
   description: string
+  enforcementActions: ContactEnforcementAction[]
 }
 
-export interface ContactEnforcementActions extends ContactOutcomes {
+export interface ContactEnforcementAction {
+  code: EnforcementActionCode
+  description: string
   defaultResponsePeriodDays?: number
 }
 
 export interface ContactOutcomesResponse {
-  outcomes: ContactOutcomes[]
-  enforcementActions?: ContactEnforcementActions[]
+  outcomes: ContactOutcome[]
+}
+
+export interface PutContactRequest {
+  date: string
+  time: string
+  outcomeCode?: OutcomeCode | AcceptableAbsenceOutcomeCode
+  enforcementActionCode?: EnforcementActionCode
+  notes: string
+  alert?: boolean
+  sensitive: boolean
+}
+
+export interface EnforcementActionsRequest {
+  enforcementActions: { code: string }[]
 }
 
 export interface Activity {
@@ -143,6 +158,7 @@ export interface Activity {
   nsiId?: number
   esupervisionId?: string
   externalReference?: string
+  isUpdatableContact?: boolean
 }
 
 export interface PersonAppointmentEnforcementAction {

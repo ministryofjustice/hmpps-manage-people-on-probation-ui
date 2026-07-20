@@ -1,5 +1,8 @@
 {% extends "../../_form.njk" %}
 {% set title = "How to write questions for an online service" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title]
+}) %}
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn %}
 {% set formAnchorText = "Cancel and go to " + case.name.forename + "'s overview" %}

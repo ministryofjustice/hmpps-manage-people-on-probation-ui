@@ -7,6 +7,7 @@ const id = '1'
 
 const checkInUrl = `/case/${crn}/appointments/${id}/check-in`
 
+const rationaleUrl = `${checkInUrl}/rationale`
 const dateFrequencyUrl = `${checkInUrl}/date-frequency`
 const contactPreferenceUrl = `${checkInUrl}/contact-preference`
 const editContactPreferenceUrl = `${checkInUrl}/edit-contact-preference`
@@ -101,7 +102,7 @@ describe('Test eSuperVision validation', () => {
         [crn]: {
           [id]: {
             checkins: {
-              eligibilityChoice: 'replacement-contact',
+              eligibilityChoice: 'REPLACE_F2F',
             },
           },
         },
@@ -176,6 +177,101 @@ describe('Test eSuperVision validation', () => {
       const req = makeReq({ url: dateFrequencyUrl, body: { esupervision: {} }, session: { data: {} } })
       const res = makeRes()
       validation.eSuperVision(req, res, next)
+      expect(res.render).toHaveBeenCalled()
+    })
+  })
+
+  describe('Test rationale', () => {
+    it('passes with valid rationale entry', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            checkins: {
+              rationale: 'Unlikely to reoffend',
+            },
+          },
+        },
+      }
+      const req = makeReq({ url: rationaleUrl, body: { esupervision }, session: { data: { esupervision } } })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails and sets summary backLink when cya=true', () => {
+      const req = makeReq({
+        url: `${rationaleUrl}?cya=true`,
+        body: { esupervision: {} },
+        session: { data: {} },
+        query: { cya: 'true' },
+      })
+      const res = makeRes()
+
+      validation.eSuperVision(req, res, next)
+
+      expect(res.locals.backLink).toBe(`/case/${crn}/appointments/${id}/check-in/checkin-summary`)
+      expect(res.render).toHaveBeenCalled()
+    })
+
+    it('fails and sets SPO approval backLink when replacing F2F', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            checkins: {
+              eligibilityChoice: 'REPLACE_F2F',
+            },
+          },
+        },
+      }
+
+      const req = makeReq({
+        url: rationaleUrl,
+        body: { esupervision: {} },
+        session: { data: { esupervision } },
+      })
+      const res = makeRes()
+
+      validation.eSuperVision(req, res, next)
+
+      expect(res.locals.backLink).toBe(`/case/${crn}/appointments/${id}/check-in/spo-approval`)
+      expect(res.render).toHaveBeenCalled()
+    })
+
+    it('fails and sets full eligibility backLink when eligibility-none was selected', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            checkins: {
+              eligibility: ['eligibility-none'],
+            },
+          },
+        },
+      }
+
+      const req = makeReq({
+        url: rationaleUrl,
+        body: { esupervision: {} },
+        session: { data: { esupervision } },
+      })
+      const res = makeRes()
+
+      validation.eSuperVision(req, res, next)
+
+      expect(res.locals.backLink).toBe(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)
+      expect(res.render).toHaveBeenCalled()
+    })
+
+    it('fails and sets supplementary eligibility backLink by default', () => {
+      const req = makeReq({
+        url: rationaleUrl,
+        body: { esupervision: {} },
+        session: { data: {} },
+      })
+      const res = makeRes()
+
+      validation.eSuperVision(req, res, next)
+
+      expect(res.locals.backLink).toBe(`/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`)
       expect(res.render).toHaveBeenCalled()
     })
   })

@@ -2,11 +2,12 @@ import { type Router } from 'express'
 import type { Services } from '../services'
 import controllers from '../controllers'
 import validate from '../middleware/validation'
-import { autoStoreSessionData, redirectWizard, renderError } from '../middleware'
+import { autoStoreSessionData, restrictPageAccess, renderError } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 import { AppResponse } from '../models/Locals'
 import { getCheckInQuestionsRedirect } from '../middleware/getCheckInQuestionsRedirect'
+import { redirectToManageCheckInService } from '../middleware/redirectToManageCheckInService'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.use(
@@ -59,7 +60,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/spo-approval', [
-    redirectWizard([{ path: 'eligibility' }, { path: 'eligibilityChoice' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['eligibility', 'eligibilityChoice'], route: 'setupcheckins' }),
     controllers.checkIns.getSPOApprovalPage(hmppsAuthClient),
   ])
   router.post(
@@ -70,8 +71,20 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postSPOApprovalPage(hmppsAuthClient),
   )
 
+  router.get('/case/:crn/appointments/:id/check-in/rationale', [
+    restrictPageAccess({ requiredValues: ['id'], route: 'setupcheckins' }),
+    controllers.checkIns.getRationalePage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/rationale',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    postRedirectWizard(),
+    controllers.checkIns.postRationalePage(hmppsAuthClient),
+  )
+
   router.get('/case/:crn/appointments/:id/check-in/date-frequency', [
-    redirectWizard([{ path: 'id' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['id'], route: 'setupcheckins' }),
     controllers.checkIns.getDateFrequencyPage(hmppsAuthClient),
   ])
   router.post(
@@ -83,7 +96,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/contact-preference', [
-    redirectWizard([{ path: 'date' }, { path: 'interval' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['date', 'interval'], route: 'setupcheckins' }),
     controllers.checkIns.getContactPreferencePage(hmppsAuthClient),
   ])
   router.post(
@@ -95,7 +108,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/edit-contact-preference', [
-    redirectWizard([{ path: 'date' }, { path: 'interval' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['date', 'interval'], route: 'setupcheckins' }),
     controllers.checkIns.getEditContactPrePage(hmppsAuthClient),
   ])
   router.post(
@@ -106,7 +119,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/photo-options', [
-    redirectWizard([{ path: 'preferredComs' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['preferredComs'], route: 'setupcheckins' }),
     controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient),
   ])
   router.post(
@@ -117,7 +130,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/take-a-photo', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getTakePhotoPage(hmppsAuthClient),
   ])
   router.post(
@@ -127,7 +140,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/upload-a-photo', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getUploadPhotoPage(hmppsAuthClient),
   ])
   router.post(
@@ -138,7 +151,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/photo-rules', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getPhotoRulesPage(hmppsAuthClient),
   ])
   router.post(
@@ -148,7 +161,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postPhotoRulesPage(hmppsAuthClient),
   )
   router.get('/case/:crn/appointments/:id/check-in/checkin-summary', [
-    redirectWizard([{ path: 'photoUploadOption' }], 'setupcheckins'),
+    restrictPageAccess({ requiredValues: ['photoUploadOption'], route: 'setupcheckins' }),
     controllers.checkIns.getCheckinSummaryPage(hmppsAuthClient),
   ])
 
@@ -258,6 +271,18 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getRestartConfirmation(hmppsAuthClient),
   )
 
+  // Check these routes against the enableESUPCheckinNewReview flag
+  // and redirect to the manage online check-ins service if set
+  router.use(
+    [
+      '/case/:crn/appointments/:id/check-in/update',
+      '/case/:crn/appointments/:id/check-in/view',
+      '/case/:crn/appointments/:id/check-in/view-expired',
+      '/case/:crn/appointments/:id/check-in/review',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewReview'),
+  )
+
   router.get('/case/:crn/appointments/:id/check-in/update', [
     getCheckIn(hmppsAuthClient),
     controllers.checkIns.getUpdateCheckIn(hmppsAuthClient),
@@ -313,6 +338,22 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     autoStoreSessionData(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
+
+  // Check these routes against the enableESUPCheckinNewQuestions flag
+  // and redirect to the manage online check-ins service if set
+  router.use(
+    [
+      '/case/:crn/appointments/check-in/manage/:id/questions/start',
+      '/case/:crn/appointments/check-in/manage/:id/questions/add',
+      '/case/:crn/appointments/check-in/manage/:id/questions/list',
+      '/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit',
+      '/case/:crn/appointments/check-in/manage/:id/questions/:templateId/select',
+      '/case/:crn/appointments/check-in/manage/:id/questions/:questionId/delete',
+      '/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling',
+      '/case/:crn/appointments/check-in/manage/:id/questions/preview/support',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewQuestions'),
+  )
 
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/start', [
     getCheckInQuestionsRedirect(hmppsAuthClient),

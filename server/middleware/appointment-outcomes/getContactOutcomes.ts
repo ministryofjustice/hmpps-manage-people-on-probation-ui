@@ -1,7 +1,7 @@
 import { Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
-import { ContactEnforcementActions, ContactOutcomes } from '../../data/model/schedule'
+import { ContactOutcome } from '../../data/model/schedule'
 import { AppointmentSession } from '../../models/Appointments'
 import { getDataValue, setDataValue } from '../../utils'
 
@@ -14,18 +14,15 @@ export const getContactOutcomes = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     const appointment = getDataValue<AppointmentSession>(data, [...path])
     const type = appointment?.type
     const outcome = appointment?.outcome
-    let contactOutcomes: ContactOutcomes[] = []
-    let contactEnforcementActions: ContactEnforcementActions[] = []
+    let contactOutcomes: ContactOutcome[] = []
     if (type) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      ;({ outcomes: contactOutcomes = [], enforcementActions: contactEnforcementActions = [] } =
-        await masClient.getContactOutcomes(type))
+      ;({ outcomes: contactOutcomes = [] } = await masClient.getContactOutcomes(type))
     }
     setDataValue(data, [...path, 'outcome'], {
       ...outcome,
       contactOutcomes,
-      contactEnforcementActions,
     })
     return next()
   }

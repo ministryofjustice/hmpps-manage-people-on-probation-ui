@@ -1,5 +1,8 @@
 {% extends "../_appointment-outcome-form.njk" %}
 {% set backLink = appointmentOutcome.backLink %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Enforcement action", "Record an outcome"]
+}) %}
 {% block afterHeading %}
   {% if appointmentOutcome.currentEnforcementAction %}
     {{ govukInsetText({

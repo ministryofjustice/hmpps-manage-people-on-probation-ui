@@ -1,51 +1,6 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (ogrs4 = true, sentencePlanUrl = true) => ({
-  request: {
-    urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-    method: 'GET',
-  },
-  response: {
-    status: 200,
-    jsonBody: {
-      namespace: {
-        key: 'manage-people-on-probation-ui',
-      },
-      flags: [
-        {
-          key: 'enableOGRS4',
-          name: 'enableOGRS4',
-          description: '',
-          enabled: ogrs4,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as string[],
-          rollouts: [] as string[],
-        },
-        {
-          key: 'enableSentencePlanUrl',
-          name: 'enableSentencePlanUrl',
-          description: '',
-          enabled: sentencePlanUrl,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
-        },
-      ],
-    },
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  },
-})
-
-const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(true))
-
 const stubEnableESuperVision = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -223,50 +178,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
             rules: [],
             rollouts: [],
           },
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubDisableOGRS4 = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-02-26T12:00:00.000000Z',
-            updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
         ],
       },
       headers: {
@@ -297,72 +208,6 @@ const stubDisableNonCompliance = (): SuperAgentRequest =>
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2026-02-26T12:00:00.000000Z',
             updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubDisableSentencePlanUrl = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableSentencePlanUrl',
-            name: 'enableSentencePlanUrl',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-02-26T12:00:00.000000Z',
-            updatedAt: '2026-02-26T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubEnableDeepLinks = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          ...flags.mappings[0].response.jsonBody.flags,
-          {
-            key: 'enableDeepLinks',
-            name: 'enableDeepLinks',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-04-10T12:00:00.000000Z',
-            updatedAt: '2026-04-10T12:00:00.000000Z',
             rules: [],
             rollouts: [],
           },
@@ -440,38 +285,6 @@ const stubDisableESupervisionCheckins = (): SuperAgentRequest =>
     },
   })
 
-const stubEnableShowMatchWithConcern = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          {
-            key: 'enableShowMatchWithConcern',
-            name: 'enableShowMatchWithConcern',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2026-05-18T12:00:00.000000Z',
-            updatedAt: '2026-05-18T12:00:00.000000Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
 const stubDisableEMDIOverviewShowGPSData = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -505,18 +318,114 @@ const stubDisableEMDIOverviewShowGPSData = (): SuperAgentRequest =>
     },
   })
 
+const stubDisableEnforcementContacts = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => f.key !== 'enableEnforcementContacts'),
+          {
+            key: 'enableEnforcementContacts',
+            name: 'enableEnforcementContacts',
+            description: '',
+            enabled: false,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-06-12T12:00:00.000000Z',
+            updatedAt: '2026-06-12T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubFeatureFlag = ({ key, enabled }: { key: string; enabled: boolean }): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => f.key !== key),
+          {
+            key,
+            name: key,
+            description: '',
+            enabled,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-04-10T12:00:00.000000Z',
+            updatedAt: '2026-04-10T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubEnableESUPCheckinNewStop = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          {
+            key: 'enableESUPCheckinNewStop',
+            name: 'enableESUPCheckinNewStop',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-07-08T12:00:00.000000Z',
+            updatedAt: '2026-07-08T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubEnableESuperVision,
   stubDisableSmsReminders,
   stubDisableCompliancePage,
   stubDisableTierLink,
-  stubDisableOGRS4,
   stubDisableNonCompliance,
-  stubEnableDeepLinks,
-  stubDisableSentencePlanUrl,
-  stubOgrs4SummaryCardEnabled,
   stubDisableESupervisionCheckins,
   stubDisableHomePageOutcome,
-  stubEnableShowMatchWithConcern,
   stubDisableEMDIOverviewShowGPSData,
+  stubDisableEnforcementContacts,
+  stubFeatureFlag,
+  stubEnableESUPCheckinNewStop,
 }

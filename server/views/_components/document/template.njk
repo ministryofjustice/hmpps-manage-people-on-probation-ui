@@ -1,0 +1,8 @@
+<div class="app-document">
+  <a href="{{ baseUrl }}/case/{{ crn }}/personal-details/documents/{{ document.id }}/download" download="{{ document.name }}" class="govuk-link">{{ document.name }}</a>
+  {% if document.author or document.lastUpdated %}
+    <p class="govuk-body-s secondary-text app-note__author govuk-!-margin-bottom-0">
+      Last modified{% if document.author %} by {{ document.author.forename[0] }} {{ document.author.surname | capitalize }}{% endif %}{% if document.lastUpdated %} {{ document.lastUpdated | dateWithYear }}{% endif %}
+    </p>
+  {% endif %}
+</div>
