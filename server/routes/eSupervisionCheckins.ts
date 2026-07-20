@@ -223,6 +223,19 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postManageStopCheckin(hmppsAuthClient),
   )
 
+  // Check these routes against the enableESUPCheckinNewRestart flag
+  // and redirect to the manage online check-ins service if set
+  router.use(
+    [
+      '/case/:crn/appointments/check-in/manage/:id/restart-checkin',
+      '/case/:crn/appointments/check-in/manage/:id/restart-contact',
+      '/case/:crn/appointments/check-in/manage/:id/restart-edit-contact',
+      '/case/:crn/appointments/check-in/manage/:id/restart-summary',
+      '/case/:crn/appointments/check-in/manage/:id/restart-confirmation',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewRestart'),
+  )
+
   router.get(
     '/case/:crn/appointments/check-in/manage/:id/restart-checkin',
     controllers.checkIns.getRestartCheckinPage(hmppsAuthClient),

@@ -3,7 +3,8 @@ import { AppResponse } from '../models/Locals'
 import { Route } from '../@types'
 import config from '../config'
 
-export type NewCheckInServiceFlag = 'enableESUPCheckinNewReview' | 'enableESUPCheckinNewQuestions'
+export type NewCheckInServiceFlag =
+  'enableESUPCheckinNewReview' | 'enableESUPCheckinNewQuestions' | 'enableESUPCheckinNewRestart'
 
 const stripTrailingSlash = (url: string): string => url.replace(/\/$/, '')
 
