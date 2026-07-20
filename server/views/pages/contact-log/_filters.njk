@@ -95,7 +95,7 @@
     classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
-        text: 'SPARKS filters',
+        text: 'SPARKS activity filter',
         classes: 'govuk-fieldset__legend--s'
       }
     },
@@ -166,7 +166,7 @@
 {% if filters.selectedFilterItems.sparks.length %}
     {% set filterCategories = (filterCategories.push({
         heading: {
-            text: 'SPARKS filters'
+            text: 'SPARKS activity filter'
         },
         items: filters.selectedFilterItems.sparks
     }), filterCategories) %}
