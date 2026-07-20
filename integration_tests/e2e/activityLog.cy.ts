@@ -74,6 +74,7 @@ context('Contacts', () => {
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Filter contacts'))
     page.getApplyFiltersButton().should('contain.text', 'Apply filters')
+    page.getApplyFiltersButtonBottom().should('contain.text', 'Apply filters')
     page.getSelectedFiltersBox().should('not.exist')
     cy.get('[data-qa="keywords"]').within(() => cy.get('label').should('contain.text', 'Keywords'))
     page.getKeywordsInput().should('exist').should('have.value', '')
@@ -215,6 +216,21 @@ context('Contacts', () => {
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getKeywordsInput().type(value)
     page.getApplyFiltersButton().click()
+    page.getSelectedFiltersBox().find('h2').should('contain.text', 'Selected filters')
+    page.getSelectedFiltersBox().find('h3:nth-of-type(1)').should('contain.text', 'Search term')
+    page.getSelectedFilterTags().should('have.length', 1)
+    page.getSelectedFilterTag(1).should('contain.text', value)
+    page.getActivityTitle(1).should('contain.text', 'Phone call')
+    page.getKeywordsInput().should('have.value', value)
+  })
+  it('should apply keyword filter when bottom apply filters button is clicked', () => {
+    cy.visit('/case/X000001/activity-log')
+    const value = 'Phone call'
+    const page = Page.verifyOnPage(ActivityLogPage)
+
+    page.getKeywordsInput().type(value)
+    page.getApplyFiltersButtonBottom().click()
+
     page.getSelectedFiltersBox().find('h2').should('contain.text', 'Selected filters')
     page.getSelectedFiltersBox().find('h3:nth-of-type(1)').should('contain.text', 'Search term')
     page.getSelectedFilterTags().should('have.length', 1)

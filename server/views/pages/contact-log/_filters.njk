@@ -126,6 +126,15 @@
     items: filters.categoryOptions
   }) }}
 
+  {{ govukButton({
+    text: "Apply filters",
+    type: "submit",
+    classes: "govuk-!-margin-top-3 govuk-!-margin-bottom-2",
+    attributes: {
+      "data-qa": "submit-button-bottom"
+    }
+  }) }}
+
 {% endset -%}
 
 {% set filterCategories = [] %}

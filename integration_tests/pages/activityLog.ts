@@ -9,6 +9,8 @@ export default class ActivityLogPage extends Page {
 
   getApplyFiltersButton = (): PageElement => cy.get('[data-qa="submit-button"]')
 
+  getApplyFiltersButtonBottom = (): PageElement => cy.get('[data-qa="submit-button-bottom"]')
+
   getKeywordsInput = (): PageElement => cy.get('[data-qa="keywords"] input')
 
   getDateFromInput = (): PageElement => cy.get('[data-qa="date-from"] input')
