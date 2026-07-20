@@ -4,9 +4,25 @@ import { Activity, LinkedContactResponse, PersonAppointment } from '../../../dat
 import { PersonSummary } from '../../../data/model/personalDetails'
 import { AppointmentOutcomeProps } from '../../../models/Locals'
 import { NextAppointmentResponse } from '../../../models/Appointments'
+import { Sentence } from '../../../data/model/sentenceDetails'
 
 const crn = 'X000001'
 const appointmentId = '123456'
+
+const sentence: Sentence = {
+  id: 2501085207,
+  eventNumber: '7654321',
+  order: {
+    description: 'Adult Custody < 12m (3 Months)',
+    sentenceType: 'CUSTODY',
+    startDate: '2024-06-04',
+    endDate: '2025-09-02',
+    pss: true,
+  },
+  nsis: [],
+  licenceConditions: [],
+  requirements: [],
+}
 
 type TestModel = {
   crn: string
@@ -20,7 +36,8 @@ type TestModel = {
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
   appointmentOutcome: AppointmentOutcomeProps<Activity>
-  sentences: Array<{ order: { description: string } }>
+  sentence: Partial<Sentence>
+  sentences: Partial<Sentence>[]
   nextAppointment: Partial<NextAppointmentResponse>
   canReschedule: boolean
   hasDeceased: boolean
@@ -135,13 +152,8 @@ const baseModel: TestModel = {
     enforcementAction: { code: 'IBR', description: '', responseByDate: '' },
   },
   appointmentOutcome: {} as AppointmentOutcomeProps<Activity>,
-  sentences: [
-    {
-      order: {
-        description: 'Sentence description',
-      },
-    },
-  ],
+  sentence,
+  sentences: [sentence],
   nextAppointment: {
     usernameIsCom: true,
   },
@@ -174,6 +186,7 @@ const render = (model = {} as Partial<TestModel>) => {
       ...baseModel.appointmentOutcome,
       ...model.appointmentOutcome,
     },
+    sentences: [...baseModel.sentences, ...(model?.sentences || [])],
   }
   const env = createNunjucksTestEnv()
   return cheerio.load(env.render('pages/appointments/manage-appointment.njk', input))
@@ -427,11 +440,14 @@ describe('Manage an appointment', () => {
             personAppointment: {
               appointment: {
                 deliusManaged: false,
+                eventNumber: '7654321',
               } as Activity,
             } as PersonAppointment,
           })
-
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
+          expect($('[data-qa="sentenceValue"]').text()).toContain('Adult Custody < 12m (3 Months)')
+          expect($('[data-qa="sentenceLink"]').text()).toContain('View sentence details')
+          expect($('[data-qa="sentenceLink"]').attr('href')).toBe('/case/X000001/sentence?number=7654321')
         })
       })
 

@@ -12,35 +12,40 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
     appointmentSession,
   } = res.locals.appointmentOutcome
 
-  let filteredLetterTypeOptions: Option<EnforcementActionLetterType>[] = []
-
   const letterTypeOptions = validEnforcementActionOptions<EnforcementActionLetterType>(
     appointmentSession?.outcome?.contactOutcomes,
     _letterTypeOptions,
   )
 
-  if (sendBreachOrRecallLetter || (sendLetter && sentenceType === 'CUSTODY')) {
-    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
-      ['LICENCE_COMPLIANCE_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
-    )
+  const letterSentOption: EnforcementActionLetterType =
+    sentenceType === 'COMMUNITY' ? 'BREACH_LETTER_SENT' : 'LICENCE_COMPLIANCE_LETTER_SENT'
+
+  const options: EnforcementActionLetterType[] = []
+
+  // Initiate a breach and send a letter 👇
+
+  if (sendBreachOrRecallLetter) {
+    options.push(letterSentOption)
   }
-  if (sendLetter && sentenceType === 'COMMUNITY') {
-    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
-      ['FIRST_WARNING_LETTER_SENT', 'BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
-    )
+
+  // send letter 👇
+
+  if (sendLetter) {
+    if (sentenceType === 'COMMUNITY' || pss || youth) {
+      options.push('FIRST_WARNING_LETTER_SENT')
+    }
+    if (pss || youth) {
+      options.push('SECOND_WARNING_LETTER_SENT')
+    }
+    options.push(letterSentOption)
   }
-  if (sendLetter && (pss || (sentenceType === 'CUSTODY' && youth))) {
-    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
-      ['FIRST_WARNING_LETTER_SENT', 'SECOND_WARNING_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(
-        typeOption.value,
-      ),
-    )
-  }
-  if (sendBreachOrRecallLetter && (sentenceType === 'COMMUNITY' || pss || youth)) {
-    filteredLetterTypeOptions = (letterTypeOptions as Option<EnforcementActionLetterType>[]).filter(typeOption =>
-      ['BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
-    )
-  }
+
+  options.push('OTHER_ENFORCEMENT_LETTER_SENT')
+
+  const filteredLetterTypeOptions: Option<EnforcementActionLetterType>[] = (
+    letterTypeOptions as Option<EnforcementActionLetterType>[]
+  ).filter(typeOption => options.includes(typeOption.value))
+
   res.locals.appointmentOutcome = {
     ...res.locals.appointmentOutcome,
     letterSentByOptions: letterSentByOptions.map(({ text, value, hint }) => ({ text, value, hint })),

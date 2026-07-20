@@ -150,8 +150,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
-      const [personAppointment, nextAppointment, relatedContacts] = await Promise.all([
-        masClient.getPersonAppointment(crn, contactId),
+      const [nextAppointment, relatedContacts] = await Promise.all([
         masClient.getNextAppointment(username, crn, contactId),
         masClient.getRelatedContacts(crn, contactId),
       ])
@@ -168,9 +167,11 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       res.locals.nextAppointmentLocation = nextAppointmentLocation
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
-      const canReschedule = canRescheduleAppointment(personAppointment)
+      const canReschedule = canRescheduleAppointment(res.locals.personAppointment)
+      const sentence = res.locals?.sentences?.find(
+        s => s.eventNumber === res.locals.personAppointment.appointment.eventNumber,
+      )
       return res.render('pages/appointments/manage-appointment', {
-        personAppointment,
         crn,
         back,
         url,
@@ -179,6 +180,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         contactId,
         hasDeceased,
         relatedContacts,
+        sentence,
       })
     }
   },
