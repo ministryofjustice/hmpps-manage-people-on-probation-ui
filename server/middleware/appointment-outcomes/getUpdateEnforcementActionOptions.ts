@@ -66,6 +66,7 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
 
   const pendingResponseActions: AppointmentEnforcementAction[] = [
     'DECISION_PENDING_RESPONSE',
+    'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
     'REFER_TO_OFFENDER_MANAGER',
     'YOT_OM_NOTIFIED',
   ]
