@@ -93,6 +93,20 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
         arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
       )
     })
+
+    it('should return correct link if on outcome page when stale otherEnforcementAction is in session', () => {
+      const req = mockReq({
+        request,
+        id: arrangeAppointmentJourney ? uuid : contactId,
+        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+        otherEnforcementAction: 'BREACH_LETTER_SENT',
+      })
+      const res = mockRes({ reqUrl: baseOutcomeUrl, ...localsVars })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(
+        arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
+      )
+    })
     it('should return correct link if on attended complied page', () => {
       const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
       const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-complied`, ...localsVars })

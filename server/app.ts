@@ -30,12 +30,21 @@ import manageAppointmentRoutes from './routes/manageAppointmentRoutes'
 import testRoutes from './routes/testRoutes'
 import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
 import { getUserAlertsCount } from './middleware/getUserAlertsCount'
+import requestLogger from './middleware/requestLogger'
+import instrumentRouter from './middleware/instrumentRouter'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
 
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
+    if (process.env.DISABLE_DEV_REQUEST_LOGGING !== 'true') {
+      // Must run before ANY app.use()/router.*() calls - including
+      // requestLogger() below - so every registered handler (this one
+      // included) is captured in the trace, not just ones registered after it.
+      instrumentRouter()
+      app.use(requestLogger())
+    }
   }
 
   app.set('json spaces', 2)
