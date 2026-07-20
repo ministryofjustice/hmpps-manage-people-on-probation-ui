@@ -126,14 +126,14 @@
     items: filters.categoryOptions
   }) }}
 
-  <button
-  type="submit"
-  class="govuk-button govuk-!-margin-top-3 govuk-!-margin-bottom-2"
-  data-module="govuk-button"
-  data-qa="submit-button-bottom"
->
-  Apply filters
-</button>
+  {{ govukButton({
+    text: "Apply filters",
+    type: "submit",
+    classes: "govuk-!-margin-top-3 govuk-!-margin-bottom-2",
+    attributes: {
+      "data-qa": "submit-button-bottom"
+    }
+  }) }}
 
 {% endset -%}
 
