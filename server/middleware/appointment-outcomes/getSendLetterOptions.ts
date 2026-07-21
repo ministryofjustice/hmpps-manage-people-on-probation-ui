@@ -41,6 +41,15 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
       ['BREACH_LETTER_SENT', 'OTHER_ENFORCEMENT_LETTER_SENT'].includes(typeOption.value),
     )
   }
+
+  console.log('*********** filteredLetterTypeOptions *****************')
+  console.log(filteredLetterTypeOptions)
+  console.log('****************************')
+
+  console.log('*********** letterTypeOptions *****************')
+  console.log(letterTypeOptions)
+  console.log('****************************')
+
   res.locals.appointmentOutcome = {
     ...res.locals.appointmentOutcome,
     letterSentByOptions,
