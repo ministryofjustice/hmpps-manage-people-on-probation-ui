@@ -15,6 +15,7 @@ import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 import logger from '../../logger'
+import isTimeoutError from '../utils/isTimeoutError'
 import { logFieldPresence } from '../utils/logSessionCacheChange'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
@@ -158,25 +159,41 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         if (appointmentLocation) outlookEventRequestBody.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
-      outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
-      const eventResponse: any = outlookEventResponse
-      if (eventResponse?.status === 500) {
-        const sentryError =
-          eventResponse?.error ??
-          new Error(eventResponse?.errors?.[0]?.text ?? 'Calendar event creation not successful.')
-        const sentryEventId = Sentry.captureException(sentryError, {
-          tags: {
-            'http.status': '500',
-            'error.type': 'internal_server_error',
-            service: 'Probation Supervision Appointments Api',
-            operation: 'postOutlookCalendarEvent',
-          },
-        })
-        logger.info(`Sentry eventId: ${sentryEventId}`)
-        logger.warn(
-          { sentryEventId, apiError: eventResponse?.error, apiErrors: eventResponse?.errors },
-          'Failed to create calendar event',
-        )
+
+      try {
+        outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
+        const eventResponse: any = outlookEventResponse
+        if (eventResponse?.status === 500) {
+          const sentryError =
+            eventResponse?.error ??
+            new Error(eventResponse?.errors?.[0]?.text ?? 'Calendar event creation not successful.')
+          const sentryEventId = Sentry.captureException(sentryError, {
+            tags: {
+              'http.status': '500',
+              'error.type': 'internal_server_error',
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postOutlookCalendarEvent',
+            },
+          })
+          logger.info(`Sentry eventId: ${sentryEventId}`)
+          logger.warn(
+            { sentryEventId, apiError: eventResponse?.error, apiErrors: eventResponse?.errors },
+            'Failed to create calendar event',
+          )
+        }
+      } catch (error) {
+        if (isTimeoutError(error)) {
+          logger.warn(
+            { err: error },
+            `Outlook calendar event creation timed out for ${outlookEventRequestBody.supervisionAppointmentUrn}`,
+          )
+
+          data.isOutlookEventPending = true
+
+          return response
+        }
+
+        throw error
       }
     }
     // Setting isOutLookEventFailed to display error based on API responses.
