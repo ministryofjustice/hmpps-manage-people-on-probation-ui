@@ -294,6 +294,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   compliance?: OutcomeCompliance
   responseContactId?: string
   linkedContactId?: string
+  redirectFromUpdate?: boolean
 }
 
 export interface AppResponse extends Response {

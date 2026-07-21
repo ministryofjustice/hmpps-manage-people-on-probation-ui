@@ -159,6 +159,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         nextAppointment?.appointment?.location,
       )
       let nextAppointmentLocation: string | null = null
+      if (req.session.data?.appointments?.[crn]?.[contactId]?.outcome?.redirectFromUpdate) {
+        delete req.session.data.appointments[crn][contactId].outcome.redirectFromUpdate
+      }
       if (nextAppointment?.appointment?.type !== 'Planned Telephone Contact (NS)') {
         nextAppointmentLocation = nextAppointmentIsAtHome
           ? 'their home'

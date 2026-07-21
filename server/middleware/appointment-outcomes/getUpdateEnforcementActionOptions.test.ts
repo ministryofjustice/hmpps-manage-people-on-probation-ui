@@ -5,13 +5,17 @@ import { AppointmentEnforcementAction } from '../../models/Appointments'
 import { SentenceType } from '../../data/model/sentenceDetails'
 import { ContactOutcome, ContactEnforcementAction } from '../../data/model/schedule'
 import { updateEnforcementActionOptions } from '../../properties/appointment-outcomes'
-import { validEnforcementActionOptions } from '../../utils'
+import { validEnforcementActionOptions, setDataValue } from '../../utils'
 
 const enforcementActions: ContactEnforcementAction[] = [
   { code: 'IBR', description: 'Breach / Recall Initiated', defaultResponsePeriodDays: 7 },
   { code: 'ROM', description: 'Refer to Offender Manager', defaultResponsePeriodDays: 7 },
   { code: 'NFA', description: 'No Further Action', defaultResponsePeriodDays: 7 },
 ]
+
+const baseOutcomeUrl = '/base/outcome/url'
+const crn = 'X000001'
+const id = '12345'
 
 const contactOutcomes: ContactOutcome[] = [
   {
@@ -20,6 +24,17 @@ const contactOutcomes: ContactOutcome[] = [
     enforcementActions,
   },
 ]
+
+jest.mock('../../utils', () => {
+  const actualUtils = jest.requireActual('../../utils')
+  return {
+    ...actualUtils,
+    setDataValue: jest.fn(),
+    validEnforcementActionOptions: jest.fn(),
+  }
+})
+
+const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 const buildResponse = ({
   action = 'FIRST_WARNING_LETTER_SENT',
@@ -32,6 +47,9 @@ const buildResponse = ({
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
+      baseOutcomeUrl,
+      crn,
+      id,
       forename: 'Alton',
       currentEnforcementAction: {
         action,
@@ -52,16 +70,12 @@ const buildResponse = ({
   return mockAppResponse(locals)
 }
 
-jest.mock('../../utils', () => ({
-  validEnforcementActionOptions: jest.fn(),
-}))
-
 const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.MockedFunction<
   typeof validEnforcementActionOptions
 >
 
 const nextSpy = jest.fn()
-const req = httpMocks.createRequest()
+const req = httpMocks.createRequest({ session: {} })
 
 describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
   it('should define the correct options if current enforcement action is LETTER related', () => {
@@ -145,5 +159,20 @@ describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', ()
       ]),
     )
     expect(res.locals.appointmentOutcome.options).toHaveLength(4)
+  })
+
+  it('should redirect to the other enforcement action page', () => {
+    const res = buildResponse({ action: 'NO_FURTHER_ACTION' })
+    const redirectSpy = jest.spyOn(res, 'redirect')
+    validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
+    getUpdateEnforcementActionOptions(req, res, nextSpy)
+    expect(redirectSpy).toHaveBeenCalledWith(
+      `${baseOutcomeUrl}/enforcement-action?back=/case/${crn}/appointments/appointment/${id}/manage`,
+    )
+    expect(setDataValueSpy).toHaveBeenCalledWith(
+      req.session.data,
+      ['appointments', crn, id, 'outcome', 'redirectFromUpdate'],
+      true,
+    )
   })
 })

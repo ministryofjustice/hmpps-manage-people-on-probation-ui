@@ -9,9 +9,9 @@ import {
 } from '../../models/Appointments'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 import { updateEnforcementActionOptions } from '../../properties/appointment-outcomes'
-import { validEnforcementActionOptions } from '../../utils'
+import { setDataValue, validEnforcementActionOptions } from '../../utils'
 
-export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) => {
+export const getUpdateEnforcementActionOptions: Route<void> = (req, res, next) => {
   const {
     crn,
     id,
@@ -93,7 +93,8 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
 
   /* Any other enforcement action? */
   if (!values.length) {
-    return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
+    setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'redirectFromUpdate'], true)
+    return res.redirect(`${baseOutcomeUrl}/enforcement-action?back=/case/${crn}/appointments/appointment/${id}/manage`)
   }
 
   values = [...values, 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
