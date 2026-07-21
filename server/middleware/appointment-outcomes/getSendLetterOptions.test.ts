@@ -148,12 +148,11 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
     getSendLetterOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
         expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
         expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(3)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
   it('should set the correct options if action is SEND_LETTER and sentence type is CUSTODY and is YOUTH', () => {
