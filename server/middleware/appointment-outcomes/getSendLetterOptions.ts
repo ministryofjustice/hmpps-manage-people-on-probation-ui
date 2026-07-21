@@ -3,6 +3,7 @@ import { EnforcementActionLetterType } from '../../models/Appointments'
 import { Option } from '../../models/Option'
 import { letterSentByOptions, letterTypeOptions as _letterTypeOptions } from '../../properties/appointment-outcomes'
 import { validEnforcementActionOptions } from '../../utils'
+import { getLetterSentByOptions } from './getLetterSentByOptions'
 
 export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   const {
@@ -16,7 +17,7 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
 
   const letterTypeOptions = validEnforcementActionOptions<EnforcementActionLetterType>(
     appointmentSession?.outcome?.contactOutcomes,
-    _letterTypeOptions,
+    getLetterSentByOptions(),
   )
 
   if (sendBreachOrRecallLetter || (sendLetter && sentenceType === 'CUSTODY')) {
@@ -43,7 +44,7 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   }
   res.locals.appointmentOutcome = {
     ...res.locals.appointmentOutcome,
-    letterSentByOptions,
+    letterSentByOptions: getLetterSentByOptions(),
     letterTypeOptions: filteredLetterTypeOptions,
   }
   return next()
