@@ -9,9 +9,9 @@ import {
 } from '../../models/Appointments'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 import { updateEnforcementActionOptions } from '../../properties/appointment-outcomes'
-import { validEnforcementActionOptions } from '../../utils'
+import { setDataValue, validEnforcementActionOptions } from '../../utils'
 
-export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) => {
+export const getUpdateEnforcementActionOptions: Route<void> = (req, res, next) => {
   const {
     crn,
     id,
@@ -91,8 +91,10 @@ export const getUpdateEnforcementActionOptions: Route<void> = (_req, res, next) 
     values = ['WITHDRAW_WARNING_LETTER']
   }
 
-  /* Any other enforcement action? */
+  /* Any other enforcement action */
+
   if (!values.length) {
+    setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'redirectFromUpdate'], true)
     return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
   }
 

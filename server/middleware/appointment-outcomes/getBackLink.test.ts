@@ -1,236 +1,261 @@
 import httpMocks from 'node-mocks-http'
 import { getBackLink } from './getBackLink'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
-import { AppointmentOutcomeProps } from '../../models/Locals'
-import { Activity } from '../../data/model/schedule'
+import { AppointmentSessionOutcome } from '../../models/Appointments'
+import { AppResponse } from '../../models/Locals'
+import { mockAppResponse } from '../../controllers/mocks'
 
 const nextSpy = jest.fn()
-const crn = 'X000001'
-const uuid = '9f4e0d84-c1af-4517-89f5-1c04d1aacc13'
-const contactId = '12345'
-const baseUrl = '/route/to'
-const baseOutcomeUrl = '/route/to/outcome'
-const reqUrl = ''
+const baseUrl = '/base/url'
+const baseOutcomeUrl = '/base/outcome/url'
 
-type SelectedOutcomeTypes = {
-  [K in AppointmentOutcomeType]?: string
-}
-
-const appointment = (
-  id: string,
-  outcomeType: AppointmentOutcomeType,
-  otherEnforcementAction: AppointmentEnforcementAction = null,
-  updateEnforcementAction: AppointmentEnforcementAction = null,
-) => ({
-  appointments: {
-    [crn]: {
-      [id]: {
-        outcome: {
-          outcomeType,
-          otherEnforcementAction,
-          updateEnforcementAction,
-        },
-      },
-    },
-  },
-})
-
-const mockReq = ({
-  id = uuid,
-  request = {},
-  outcomeType = 'ATTENDED_COMPLIED',
-  otherEnforcementAction = null,
-  updateEnforcementAction = null,
-}: {
-  id?: string
-  request?: Record<string, any>
-  outcomeType?: AppointmentOutcomeType
-  otherEnforcementAction?: AppointmentEnforcementAction
-  updateEnforcementAction?: AppointmentEnforcementAction
-}): httpMocks.MockRequest<any> => {
+const buildRequest = ({
+  url = '',
+  query = {},
+}: { url?: string; query?: Record<string, string> } = {}): httpMocks.MockRequest<any> => {
   const req = {
-    body: appointment(id, outcomeType, otherEnforcementAction, updateEnforcementAction),
-    session: {
-      data: appointment(id, outcomeType, otherEnforcementAction, updateEnforcementAction),
-    },
-    ...request,
+    url,
+    query,
   }
   return httpMocks.createRequest(req)
 }
 
-const mockRes = (appointmentOutcome: Partial<AppointmentOutcomeProps<Activity>> = {}): httpMocks.MockResponse<any> => {
-  const res = {
-    locals: {
-      appointmentOutcome: {
-        baseOutcomeUrl,
-        baseUrl,
-        reqUrl,
-        crn,
-        ...appointmentOutcome,
-      },
+const buildResponse = ({
+  sendLetter = false,
+  outcome = {},
+  uuid = undefined,
+  reqUrl = '',
+}: {
+  sendLetter?: boolean
+  outcome?: Partial<AppointmentSessionOutcome>
+  uuid?: string
+  reqUrl?: string
+} = {}): AppResponse => {
+  const locals = {
+    appointmentOutcome: {
+      baseOutcomeUrl,
+      reqUrl,
+      uuid,
+      baseUrl,
+      sendLetter,
+      appointmentSession: { outcome },
     },
   }
-  return httpMocks.createResponse(res)
+  return mockAppResponse(locals)
 }
 
 describe('/middleware/appointment-outcomes/getBackLink', () => {
-  const checkBackLinks = ({
-    arrangeAppointmentJourney = true,
-    requestMethod,
-  }: {
-    arrangeAppointmentJourney?: boolean
-    requestMethod: 'GET' | 'POST'
-  }) => {
-    const request = requestMethod === 'GET' ? { body: {} } : { session: {} }
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  describe('Outcome page', () => {
+    it('should set the correct back link if update journey', () => {
+      const req = buildRequest({ url: baseOutcomeUrl })
+      const res = buildResponse({ reqUrl: baseOutcomeUrl })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseUrl}/manage`)
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+    it('should set the correct back link if arrange journey', () => {
+      const req = buildRequest({ url: baseOutcomeUrl })
+      const res = buildResponse({ uuid: '12345', reqUrl: baseOutcomeUrl })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseUrl}/location-date-time`)
+    })
+  })
 
-    const localsVars = arrangeAppointmentJourney ? { uuid, id: uuid } : { id: contactId, contactId }
+  describe('Update enforcement action page', () => {
+    const url = `${baseOutcomeUrl}/update-enforcement-action`
+    it('should set the correct back link', () => {
+      const req = buildRequest({ url })
+      const res = buildResponse({ reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseUrl}/manage`)
+    })
+  })
 
-    it('should return correct link if on outcome page', () => {
-      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
-      const res = mockRes({ reqUrl: baseOutcomeUrl, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(
-        arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
-      )
-    })
-
-    it('should return correct link if on outcome page when stale otherEnforcementAction is in session', () => {
-      const req = mockReq({
-        request,
-        id: arrangeAppointmentJourney ? uuid : contactId,
-        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
-        otherEnforcementAction: 'BREACH_LETTER_SENT',
-      })
-      const res = mockRes({ reqUrl: baseOutcomeUrl, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(
-        arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
-      )
-    })
-    it('should return correct link if on attended complied page', () => {
-      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-complied`, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
-    })
-    it('should return correct link if on attended failed to comply page', () => {
-      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-failed-to-comply`, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
-    })
-    it('should return correct link if on acceptable absence page', () => {
-      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/acceptable-absence`, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
-    })
-    it('should return correct link if on unacceptable absence page', () => {
-      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/unacceptable-absence`, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
-    })
-    it('should return correct link if on failed to attend page', () => {
-      const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/failed-to-attend`, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
-    })
-
-    it('should return the correct link if on send letter page and other enforcement action has been set', () => {
-      const req = mockReq({
-        request,
-        id: arrangeAppointmentJourney ? uuid : contactId,
-        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
-        otherEnforcementAction: 'BREACH_LETTER_SENT',
-      })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/send-letter`, ...localsVars })
-      getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/enforcement-action`)
-    })
-
-    it('should return the correct link if on send letter page and update enforcement action has been set', () => {
-      const req = mockReq({
-        request,
-        id: arrangeAppointmentJourney ? uuid : contactId,
-        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
-        updateEnforcementAction: 'SEND_ANOTHER_LETTER',
-      })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/send-letter`, ...localsVars })
+  describe('Other enforcement action page', () => {
+    const url = `${baseOutcomeUrl}/enforcement-action`
+    const req = buildRequest({ url })
+    it('should set the correct back link if linked to from update enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { updateEnforcementAction: 'DIFFERENT_ACTION' }
+      const res = buildResponse({ outcome, reqUrl: url })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/update-enforcement-action`)
     })
-
-    it('should not set back link to itself when on enforcement-action page and otherEnforcementAction is already in session', () => {
-      const req = mockReq({
-        request,
-        id: arrangeAppointmentJourney ? uuid : contactId,
-        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
-        otherEnforcementAction: 'BREACH_LETTER_SENT',
-      })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/enforcement-action`, ...localsVars })
+    it('should set the correct back link if redirected to from update enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { redirectFromUpdate: true }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseUrl}/manage`)
+    })
+    it('should set the correct back link if attended failed to comply action is DIFFERENT_ACTION', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { attendedFailedToComply: 'DIFFERENT_ACTION' }
+      const res = buildResponse({ outcome, reqUrl: url })
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/attended-failed-to-comply`)
     })
-
-    it('should not set back link to itself when on update-enforcement-action page and updateEnforcementAction is already in session', () => {
-      const req = mockReq({
-        request,
-        id: arrangeAppointmentJourney ? uuid : contactId,
-        outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
-        updateEnforcementAction: 'SEND_ANOTHER_LETTER',
-      })
-      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/update-enforcement-action`, ...localsVars })
+    it('should set the correct back link if unacceptable absence action is DIFFERENT_ACTION', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { unacceptableAbsence: 'DIFFERENT_ACTION' }
+      const res = buildResponse({ outcome, reqUrl: url })
       getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(
-        arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
-      )
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/unacceptable-absence`)
     })
-
-    const outcomePages = {
-      'enforcement action page': 'enforcement-action',
-      'send a letter page': 'send-letter',
-      'initiate breach or recall page': 'initiate-breach-or-recall',
-    }
-
-    const selectedOutcomeTypes: SelectedOutcomeTypes = {
-      ATTENDED_SENT_HOME_BEHAVIOUR: 'attended-failed-to-comply',
-      ATTENDED_FAILED_TO_COMPLY: 'attended-failed-to-comply',
-      ATTENDED_SENT_HOME_SERVICE_ISSUES: 'attended-failed-to-comply',
-      UNACCEPTABLE_ABSENCE: 'unacceptable-absence',
-      FAILED_TO_ATTEND: 'failed-to-attend',
-    }
-    Object.entries(outcomePages).forEach(([pageTitle, pageUrl]) => {
-      Object.entries(selectedOutcomeTypes).forEach(([type, url]: [AppointmentOutcomeType, string]) => {
-        it(`should return correct link if on ${pageTitle} and selected outcome is ${type}`, () => {
-          const req = mockReq({ id: arrangeAppointmentJourney ? uuid : contactId, outcomeType: type, request })
-          const res = mockRes({ reqUrl: `${baseOutcomeUrl}/${pageUrl}`, ...localsVars })
-          getBackLink(req, res, nextSpy)
-          expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/${url}`)
-        })
-      })
-    })
-  }
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  describe('Arrange appointment journey', () => {
-    describe('POST request', () => {
-      checkBackLinks({ requestMethod: 'POST' })
-    })
-    describe('GET request', () => {
-      checkBackLinks({ requestMethod: 'GET' })
+    it('should set the correct back link if failed to attend action is DIFFERENT_ACTION', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { failedToAttend: 'DIFFERENT_ACTION' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/failed-to-attend`)
     })
   })
 
-  describe('Manage appointment journey', () => {
-    describe('POST request', () => {
-      checkBackLinks({ arrangeAppointmentJourney: false, requestMethod: 'POST' })
+  describe('Send a letter page', () => {
+    const url = `${baseOutcomeUrl}/send-letter`
+    const req = buildRequest({ url })
+    it('should set the correct url if linked to from other enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { otherEnforcementAction: 'BREACH_LETTER_SENT' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/enforcement-action`)
     })
-    describe('GET request', () => {
-      checkBackLinks({ arrangeAppointmentJourney: false, requestMethod: 'GET' })
+    it('should set the correct url if linked to from update enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { updateEnforcementAction: 'BREACH_LETTER_SENT' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/update-enforcement-action`)
+    })
+    it('should set the correct url if attended failed to comply action is SEND_LETTER', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { attendedFailedToComply: 'SEND_LETTER' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/attended-failed-to-comply`)
+    })
+    it('should set the correct url if unacceptable absence action is SEND_LETTER', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { unacceptableAbsence: 'SEND_LETTER' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/unacceptable-absence`)
+    })
+    it('should set the correct url if failed to attend action is SEND_LETTER', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { failedToAttend: 'SEND_LETTER' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/failed-to-attend`)
+    })
+  })
+
+  describe('Initiate breach or recall page', () => {
+    const url = `${baseOutcomeUrl}/initiate-breach-or-recall`
+    const req = buildRequest({ url })
+    it('should set the correct url if linked to from other enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { otherEnforcementAction: 'BREACH_LETTER_SENT' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/enforcement-action`)
+    })
+    it('should set the correct url if linked to from update enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = { updateEnforcementAction: 'BREACH_LETTER_SENT' }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/update-enforcement-action`)
+    })
+    it('should set the correct url if attended failed to comply action is SEND_LETTER', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        attendedFailedToComply: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/attended-failed-to-comply`)
+    })
+    it('should set the correct url if unacceptable absence action is SEND_LETTER', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        unacceptableAbsence: 'BREACH_RECALL_INITIATED',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/unacceptable-absence`)
+    })
+  })
+
+  describe('Add note page', () => {
+    const url = `${baseOutcomeUrl}/add-note`
+    const req = buildRequest({ url })
+    it('should set the correct url if action is SEND_LETTER', () => {
+      const res = buildResponse({ sendLetter: true, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/send-letter`)
+    })
+    it('should set the correct url if linked to from initiate breach or recall page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        breachNSICreatedBy: 'USER',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/initiate-breach-or-recall`)
+    })
+    it('should set the correct url if linked to from other enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        otherEnforcementAction: 'NO_FURTHER_ACTION',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/enforcement-action`)
+    })
+    it('should set the correct url if linked to from update enforcement action page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        updateEnforcementAction: 'NO_FURTHER_ACTION',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/update-enforcement-action`)
+    })
+    it('should set the correct url if linked to from attended failed to comply page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        attendedFailedToComply: 'NO_FURTHER_ACTION',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/attended-failed-to-comply`)
+    })
+    it('should set the correct url if linked to from acceptable absence page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        acceptableAbsence: 'ACCEPTABLE_ABSENCE_EMPLOYMENT',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/acceptable-absence`)
+    })
+    it('should set the correct url if linked to from unacceptable absence page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        unacceptableAbsence: 'NO_FURTHER_ACTION',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/unacceptable-absence`)
+    })
+    it('should set the correct url if linked to from failed to attend page', () => {
+      const outcome: Partial<AppointmentSessionOutcome> = {
+        failedToAttend: 'NO_FURTHER_ACTION',
+      }
+      const res = buildResponse({ outcome, reqUrl: url })
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/failed-to-attend`)
+    })
+  })
+
+  describe('back link is in url query', () => {
+    it('should set the correct link if invalid url', () => {
+      const back = '/url/back/link'
+      const req = buildRequest({ url: baseOutcomeUrl, query: { back } })
+      const res = buildResponse()
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
+    })
+    it('should set the correct link if valid url', () => {
+      const back = '/case/X000001/appointments/appointment/12345/manage'
+      const req = buildRequest({ url: baseOutcomeUrl, query: { back } })
+      const res = buildResponse()
+      getBackLink(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(back)
     })
   })
 })
