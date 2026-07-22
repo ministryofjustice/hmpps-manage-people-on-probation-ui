@@ -3,7 +3,7 @@ import { appointmentOutcomesValidation } from '../../properties'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 import { validateWithSpec } from '../../utils/validationUtils'
 import config from '../../config'
-import {LocalParams} from "../../models/Appointments";
+import { LocalParams } from '../../models/Appointments'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
   const {
