@@ -2,11 +2,7 @@ import { Route } from '../../@types'
 import { appointmentOutcomesValidation } from '../../properties'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 import { validateWithSpec } from '../../utils/validationUtils'
-import {
-  LocalParams,
-  otherEnforcementActionLetterTypes,
-  type OtherEnforcementActionsLetterType,
-} from '../../models/Appointments'
+import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
@@ -143,6 +139,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateInitiateBreachRecall = (): void => {
     if (!req.url.includes(`${baseOutcomeUrl}/initiate-breach-or-recall`)) return
     render = 'pages/appointment-outcomes/initiate-breach-or-recall'
+    const { type } = res.locals.appointmentOutcome.sentence
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
@@ -152,11 +149,15 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/initiate-breach-or-recall`,
           msg: [
-            'Select who will create the breach NSI',
+            type === 'COMMUNITY' ? 'Select who will create the breach NSI' : 'Select who will create the recall',
             'Select who will send the letter',
             'Select the type of letter',
           ],
-          log: ['breach NSI created by not selected', 'letter sent by no selected', 'letter type not selected'],
+          log: [
+            type === 'COMMUNITY' ? 'breach NSI not selected' : 'recall not selected',
+            'letter sent by no selected',
+            'letter type not selected',
+          ],
           sendBreachOrRecallLetter,
           showLetterTypeOptions,
         }),

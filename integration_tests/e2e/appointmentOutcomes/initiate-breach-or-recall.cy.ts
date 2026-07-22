@@ -227,6 +227,29 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
     })
   })
+  it('should show validation errors when no options are selected for send letter enforcement action for a custody sentence', () => {
+    loadPage({ journey, sentenceType: 'CUSTODY', sendLetter: true })
+    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+
+    initiateBreachOrRecallPage.getSubmitBtn().click()
+
+    const custodyMsgs = [
+      'Select who will create the recall',
+      'Select who will send the letter',
+      'Select the type of letter',
+    ]
+
+    initiateBreachOrRecallPage.checkErrorSummaryBox(custodyMsgs)
+
+    getUuid(3).then(uuid => {
+      const id = journey === 'MANAGE' ? appointmentId : uuid
+
+      cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', custodyMsgs[0])
+      cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', custodyMsgs[1])
+      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', custodyMsgs[2])
+    })
+  })
+
   it('should show validation error when no option is selected for breach/recall enforcement action', () => {
     const msg = 'Select who will create the breach NSI'
     loadPage({ journey })
