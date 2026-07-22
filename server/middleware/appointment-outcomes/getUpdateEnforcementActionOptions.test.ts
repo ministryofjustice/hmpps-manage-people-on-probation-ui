@@ -75,7 +75,7 @@ const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.M
 >
 
 const nextSpy = jest.fn()
-const req = httpMocks.createRequest({ session: {} })
+const req = httpMocks.createRequest({ session: { data: {} } })
 
 describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', () => {
   it('should define the correct options if current enforcement action is LETTER related', () => {
@@ -166,9 +166,7 @@ describe('middleware/appointment-outcomes/getUpdateEnforcementActionOptions', ()
     const redirectSpy = jest.spyOn(res, 'redirect')
     validEnforcementActionOptionsSpy.mockReturnValueOnce(updateEnforcementActionOptions('COMMUNITY'))
     getUpdateEnforcementActionOptions(req, res, nextSpy)
-    expect(redirectSpy).toHaveBeenCalledWith(
-      `${baseOutcomeUrl}/enforcement-action?back=/case/${crn}/appointments/appointment/${id}/manage`,
-    )
+    expect(redirectSpy).toHaveBeenCalledWith(`${baseOutcomeUrl}/enforcement-action`)
     expect(setDataValueSpy).toHaveBeenCalledWith(
       req.session.data,
       ['appointments', crn, id, 'outcome', 'redirectFromUpdate'],

@@ -91,10 +91,11 @@ export const getUpdateEnforcementActionOptions: Route<void> = (req, res, next) =
     values = ['WITHDRAW_WARNING_LETTER']
   }
 
-  /* Any other enforcement action? */
+  /* Any other enforcement action */
+
   if (!values.length) {
     setDataValue(req.session.data, ['appointments', crn, id, 'outcome', 'redirectFromUpdate'], true)
-    return res.redirect(`${baseOutcomeUrl}/enforcement-action?back=/case/${crn}/appointments/appointment/${id}/manage`)
+    return res.redirect(`${baseOutcomeUrl}/enforcement-action`)
   }
 
   values = [...values, 'NO_FURTHER_ACTION', 'DIFFERENT_ACTION']
