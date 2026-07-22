@@ -1,7 +1,8 @@
 import { Route } from '../../@types'
 
-export const getBackLink: Route<void> = (_req, res, next) => {
+export const getBackLink: Route<void> = (req, res, next) => {
   const { baseOutcomeUrl, reqUrl, uuid, baseUrl, sendLetter, appointmentSession } = res.locals.appointmentOutcome
+  const { back } = req.query as Record<string, string>
   let backLink = null
 
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
@@ -85,6 +86,14 @@ export const getBackLink: Route<void> = (_req, res, next) => {
       backLink = `${baseOutcomeUrl}/failed-to-attend`
     } else if (['ATTENDED_COMPLIED', 'ATTENDED_SENT_HOME_SERVICE_ISSUES'].includes(outcomeType)) {
       backLink = baseOutcomeUrl
+    }
+  }
+
+  if (back) {
+    const regex = /^\/case\/[A-Z0-9]{7}\/.*$/
+    const isValidUrl = regex.test(back)
+    if (isValidUrl) {
+      backLink = back
     }
   }
 

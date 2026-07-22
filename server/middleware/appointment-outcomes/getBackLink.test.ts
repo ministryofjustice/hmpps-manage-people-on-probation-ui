@@ -240,21 +240,22 @@ describe('/middleware/appointment-outcomes/getBackLink', () => {
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/failed-to-attend`)
     })
-    it('should set the correct url if outcome type is ATTENDED_COMPLIED', () => {
-      const outcome: Partial<AppointmentSessionOutcome> = {
-        outcomeType: 'ATTENDED_COMPLIED',
-      }
-      const res = buildResponse({ outcome, reqUrl: url })
+  })
+
+  describe('back link is in url query', () => {
+    it('should set the correct link if invalid url', () => {
+      const back = '/url/back/link'
+      const req = buildRequest({ url: baseOutcomeUrl, query: { back } })
+      const res = buildResponse()
       getBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
-    it('should set the correct url if outcome type is ATTENDED_SENT_HOME_SERVICE_ISSUES', () => {
-      const outcome: Partial<AppointmentSessionOutcome> = {
-        outcomeType: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
-      }
-      const res = buildResponse({ outcome, reqUrl: url })
+    it('should set the correct link if valid url', () => {
+      const back = '/case/X000001/appointments/appointment/12345/manage'
+      const req = buildRequest({ url: baseOutcomeUrl, query: { back } })
+      const res = buildResponse()
       getBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(back)
     })
   })
 })
