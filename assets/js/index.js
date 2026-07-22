@@ -232,17 +232,15 @@ if (changeAttendeeLink) {
   })
 }
 
-class ServiceAlert {
+class DateTimeFormatting {
   constructor() {
     this.alert = document.querySelector('[data-module="serviceAlert"]')
-
-    if (!this.alert) return
 
     this.dateInput = document.querySelector('.moj-js-datepicker-input')
     this.startInput = document.querySelector('[data-qa="startTime"] input')
     this.endInput = document.querySelector('[data-qa="endTime"] input')
     this.status = document.querySelector('[data-qa="serviceAlertStatus"]')
-    this.dismissLink = this.alert.querySelector('.moj-alert__dismiss')
+    if (this.alert) this.dismissLink = this.alert.querySelector('.moj-alert__dismiss')
     this.dismissed = false
 
     this.handleDismiss = this.handleDismiss.bind(this)
@@ -258,7 +256,7 @@ class ServiceAlert {
   }
 
   init() {
-    if (!this.alert.classList.contains('display-none')) {
+    if (this.alert && !this.alert.classList.contains('display-none')) {
       this.dismissLink.addEventListener('click', this.handleDismiss)
     }
 
@@ -282,7 +280,7 @@ class ServiceAlert {
   }
 
   showAlert(show = false) {
-    if (this.dismissed) return
+    if (this.dismissed || !this.alert) return
 
     let statusMessage = ''
     const displayedStatus = 'Date selected is in the past, service alert displayed'
@@ -415,4 +413,4 @@ recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
 initGovUkBackLink()
-new ServiceAlert()
+new DateTimeFormatting()
