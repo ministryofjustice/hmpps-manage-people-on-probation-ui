@@ -4,7 +4,7 @@ import { getSendLetterOptions } from './getSendLetterOptions'
 import { SentenceType } from '../../data/model/sentenceDetails'
 import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../../models/Appointments'
 import { ContactOutcome, ContactEnforcementAction } from '../../data/model/schedule'
-import { letterTypeOptions } from '../../properties/appointment-outcomes'
+import { letterSentByOptions, letterTypeOptions } from '../../properties/appointment-outcomes'
 import { validEnforcementActionOptions } from '../../utils'
 
 interface Props {
@@ -181,5 +181,26 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
       expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
       expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
     ])
+  })
+
+  it('should not mutate the source letter option definitions', () => {
+    const res = buildResponse({
+      sendBreachOrRecallLetter: true,
+      sentenceType: 'COMMUNITY',
+    })
+
+    getSendLetterOptions(req, res, nextSpy)
+
+    // preserve display metadata while preventing mutation of shared option definitions
+    expect(res.locals.appointmentOutcome.letterSentByOptions[0]).toHaveProperty(
+      'hint.text',
+      'You need to follow your local process to request a letter.',
+    )
+
+    res.locals.appointmentOutcome.letterSentByOptions[0].checked = 'checked'
+    res.locals.appointmentOutcome.letterTypeOptions[0].checked = 'checked'
+
+    expect(letterSentByOptions[0]).not.toHaveProperty('checked')
+    expect(letterTypeOptions[0]).not.toHaveProperty('checked')
   })
 })

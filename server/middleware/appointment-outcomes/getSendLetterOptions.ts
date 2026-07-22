@@ -12,7 +12,7 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
     appointmentSession,
   } = res.locals.appointmentOutcome
 
-  let filteredLetterTypeOptions: Option<EnforcementActionLetterType>[]
+  let filteredLetterTypeOptions: Option<EnforcementActionLetterType>[] = []
 
   const letterTypeOptions = validEnforcementActionOptions<EnforcementActionLetterType>(
     appointmentSession?.outcome?.contactOutcomes,
@@ -43,8 +43,8 @@ export const getSendLetterOptions: Route<void> = (_req, res, next) => {
   }
   res.locals.appointmentOutcome = {
     ...res.locals.appointmentOutcome,
-    letterSentByOptions,
-    letterTypeOptions: filteredLetterTypeOptions,
+    letterSentByOptions: letterSentByOptions.map(({ text, value, hint }) => ({ text, value, hint })),
+    letterTypeOptions: filteredLetterTypeOptions.map(({ text, value }) => ({ text, value })),
   }
   return next()
 }
