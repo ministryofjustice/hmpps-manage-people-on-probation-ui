@@ -10,9 +10,8 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set alert = '' %}
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
-{% set sentence = sentences[0].order.description %}
 
-{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else
+{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else 
   'Log attended and complied appointment' %}
 {% set outcomeLink = null %}
 {% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
@@ -32,7 +31,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
-  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else
+  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else 
     "") + " on " + (
     nextAppointment.appointment.startDateTime | dateWithDayAndWithYear) + " at " + (
     nextAppointment.appointment.startDateTime | govukTime) + "."
@@ -261,6 +260,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         </section>
       {% endif %}
       <section data-qa="appointmentDetails">
+
         <h3 class="govuk-heading-m">Appointment details</h3>
         {% if not appointment.deliusManaged %}
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
@@ -295,18 +295,21 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         text: "Sentence"
       },
       value: {
-        html: '<span data-qa="sentenceValue">' + sentence | default('Details unavailable') + '</span>'
+        html: '<span data-qa="sentenceValue">' + sentence.order.description | default('Details unavailable') + '</span>'
       },
       actions: {
         classes: "govuk-!-white-space-nowrap",
         items: [
           {
-            href: "/case/" + crn + "/sentence",
-            text: "View sentence details"
+            href: "/case/" + crn + "/sentence?number=" + sentence.eventNumber,
+            text: "View sentence details",
+            attributes: {
+              'data-qa': 'sentenceLink'
+            }
           }
         ]
-      } if sentence
-    } if sentence and flags.enableNonCompliance and not appointment.deliusManaged,
+      } if sentence.eventNumber
+    } if flags.enableNonCompliance and not appointment.deliusManaged,
     {
       key: {
         text: "Date and time"
