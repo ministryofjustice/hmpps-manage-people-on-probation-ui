@@ -191,6 +191,12 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
 
     getSendLetterOptions(req, res, nextSpy)
 
+    // preserve display metadata while preventing mutation of shared option definitions
+    expect(res.locals.appointmentOutcome.letterSentByOptions[0]).toHaveProperty(
+      'hint.text',
+      'You need to follow your local process to request a letter.',
+    )
+
     res.locals.appointmentOutcome.letterSentByOptions[0].checked = 'checked'
     res.locals.appointmentOutcome.letterTypeOptions[0].checked = 'checked'
 
