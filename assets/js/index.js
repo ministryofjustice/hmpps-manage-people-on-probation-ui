@@ -326,6 +326,7 @@ class DateTimeFormatting {
 
   async handleRequest(dateEvent = false) {
     const [day, month, year] = this.dateInput.value.split('/')
+    if (!this.startInput) return
     const response = await fetch('/appointment/is-in-past', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
