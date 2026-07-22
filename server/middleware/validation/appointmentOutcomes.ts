@@ -155,7 +155,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           ],
           log: [
             type === 'COMMUNITY' ? 'breach NSI not selected' : 'recall not selected',
-            'letter sent by no selected',
+            'letter sent by not selected',
             'letter type not selected',
           ],
           sendBreachOrRecallLetter,
