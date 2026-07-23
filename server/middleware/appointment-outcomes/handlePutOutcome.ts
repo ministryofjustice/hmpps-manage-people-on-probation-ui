@@ -39,7 +39,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       if (notePrepend) {
         notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
       } else {
-        notes = appointmentSession?.notes
+        notes = appointmentSession?.notes || ''
       }
 
       if (notes) notes = handleQuotes(notes)
