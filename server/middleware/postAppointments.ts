@@ -116,30 +116,23 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           name = fallbackUserDetails
             ? { forename: fallbackUserDetails.firstName, surname: fallbackUserDetails.surname }
             : null
-          if (!name) {
-            const message = `Appointment ${uuid}: no name found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
-            logger.warn(message)
-            Sentry.captureException(new Error(message), {
-              tags: {
-                service: 'Probation Supervision Appointments Api',
-                operation: 'postAppointments.getUserDetails',
-              },
-            })
-          }
         }
 
         if (!email) {
           email = fallbackUserDetails?.email
-          if (!email) {
-            const message = `Appointment ${uuid}: no email found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
-            logger.warn(message)
-            Sentry.captureException(new Error(message), {
-              tags: {
-                service: 'Probation Supervision Appointments Api',
-                operation: 'postAppointments.getUserDetails',
-              },
-            })
-          }
+        }
+
+        const stillMissing = [!name && 'name', !email && 'email'].filter(Boolean)
+        if (stillMissing.length) {
+          const message = `Appointment ${uuid}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
+          logger.warn(message)
+          Sentry.captureException(new Error(message), {
+            tags: {
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: stillMissing.join(','),
+            },
+          })
         }
       }
 

@@ -612,6 +612,62 @@ describe('/middleware/postAppointments', () => {
           expect.stringContaining('missing=['),
         )
       })
+      it('should capture a single combined Sentry exception when both name and email are still missing after fallback', async () => {
+        jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, name: null, email: null },
+        })
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: 'name,email',
+            }),
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
+      it('should recover the name from the fallback user details lookup and still send the calendar invite', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+          userId: 123,
+          username,
+          firstName: 'Fallback',
+          surname: 'Person',
+          email: mockUser.email,
+          enabled: true,
+          roles: [],
+        })
+        const mockReq = buildMockReq()
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(postOutlookCalendarEventSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            recipients: [
+              {
+                emailAddress: mockUser.email,
+                name: 'Fallback Person',
+              },
+            ],
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toBeFalsy()
+        expect(Sentry.captureException).not.toHaveBeenCalled()
+      })
     })
 
     describe('SMS', () => {
