@@ -208,7 +208,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       time: start,
       sensitive: true,
       alert: false,
-      notes: '',
+      notes: 'Some added notes',
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
