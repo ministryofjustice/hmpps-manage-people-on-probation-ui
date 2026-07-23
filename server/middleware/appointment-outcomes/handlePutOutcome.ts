@@ -68,7 +68,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       }
       if (outcomeCode) request.outcomeCode = outcomeCode
       await masClient.putContact(contactId, request)
-      if (enforcementActionCode?.length) {
+      if (enforcementActionCode?.length && !put) {
         const enforcementActionsRequest: EnforcementActionsRequest = {
           enforcementActions: enforcementActionCode.map(code => ({ code })),
         }
