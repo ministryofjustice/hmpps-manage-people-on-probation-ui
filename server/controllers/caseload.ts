@@ -48,7 +48,8 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
-      const { sortBy: sortByQuery = 'nextContact.asc' } = req.query as Record<string, string>
+      const { sortBy: sortByQuery = res.locals?.flags?.enableCaseloadV2 ? 'nameOrCrn.asc' : 'nextContact.asc' } =
+        req.query as Record<string, string>
       const pageNum: number = req.query.page
         ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize)
         : 1
