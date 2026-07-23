@@ -38,8 +38,12 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       }
       if (notePrepend) {
         notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
+      } else {
+        notes = appointmentSession?.notes
       }
+
       if (notes) notes = handleQuotes(notes)
+
       const sensitive = appointmentSession?.sensitivity === 'Yes'
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -50,6 +54,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       ]
 
       // if outcome but no action, check the outcome type does not require an associated action 👇
+
       if (
         !put &&
         (!sensitivity ||
