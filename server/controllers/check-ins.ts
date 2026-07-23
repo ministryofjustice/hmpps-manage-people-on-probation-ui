@@ -286,7 +286,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
 
   getRationalePage: hmppsAuthClient => {
-    return async function getRationalPage(req, res) {
+    return async function getRationalePage(req, res) {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
