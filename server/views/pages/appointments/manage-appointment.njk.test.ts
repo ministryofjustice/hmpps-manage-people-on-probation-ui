@@ -357,7 +357,10 @@ describe('Manage an appointment', () => {
             enableNonCompliance: true,
           },
         })
-        expect($('[data-qa="appointmentActions"]').text()).toContain('Upload documents')
+        expect($('[data-qa="appointmentActions"] li:nth-child(3)').text()).toContain('Upload documents')
+        expect($('[data-qa="appointmentActions"] li:nth-child(3) a').attr('href')).toBe(
+          '/case/X000001/appointments/appointment/123456/add-note',
+        )
       })
 
       it('should display arrange next appointment action', () => {
