@@ -32,6 +32,7 @@ type TestModel = {
   url: string
   flags: {
     enableNonCompliance?: boolean
+    enableRescheduleFutureAppointmentWithOutcome?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -339,6 +340,28 @@ describe('Manage an appointment', () => {
           } as PersonAppointment,
         })
         expect($('[data-qa="appointmentActions"]').text()).not.toContain('Change enforcement action')
+      })
+
+      it('should not display the change outcome link if future appointment with outcome logged and enableRescheduleFutureAppointmentWithOutcome flag is disabled', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+            enableRescheduleFutureAppointmentWithOutcome: false,
+          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: false,
+              outcome: 'Acceptable absence - Holiday',
+              hasOutcome: true,
+              action: '',
+              didTheyComply: true,
+              isInPast: false,
+            } as Activity,
+          } as PersonAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).toContain(
+          'You cannot change this outcome until the appointment has passed.',
+        )
       })
 
       it('should display appointment notes action', () => {
