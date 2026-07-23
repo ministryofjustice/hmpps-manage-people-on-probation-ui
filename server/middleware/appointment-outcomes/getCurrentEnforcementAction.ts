@@ -30,10 +30,11 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
 
     if (responseByDate && actionCode !== 'NFA' && appointment?.didTheyComply === false) {
       evidenceDueDate = dateWithYear(responseByDate)
-      const date = DateTime.fromISO(responseByDate).startOf('day')
-      const today = DateTime.now().startOf('day')
-      const daysBetween = Math.max(0, Math.ceil(date.diff(today, 'days').days))
-      evidenceWarning = `${forename} has until ${DateTime.fromISO(responseByDate).toFormat('d MMMM')} to submit evidence (${daysBetween} day${daysBetween !== 1 ? 's' : ''} remaining)`
+      let daysLeftToRespond = Math.ceil(
+        DateTime.fromISO(responseByDate).startOf('day').diff(DateTime.now().startOf('day'), 'days').days + 1,
+      )
+      if (daysLeftToRespond < 0) daysLeftToRespond = 0
+      evidenceWarning = `${forename} has until ${DateTime.fromISO(responseByDate).toFormat('d MMMM')} to submit evidence (${daysLeftToRespond} day${daysLeftToRespond !== 1 ? 's' : ''} remaining)`
     }
     const map: Map = {
       NO_FURTHER_ACTION: 'GREEN',
