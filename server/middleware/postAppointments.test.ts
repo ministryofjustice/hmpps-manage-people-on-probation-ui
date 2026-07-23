@@ -636,6 +636,36 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
       })
+      it('should treat a fallback lookup with a blank firstName/surname as still missing a name, and still capture a Sentry exception', async () => {
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+          userId: 123,
+          username,
+          firstName: undefined,
+          surname: undefined,
+          email: mockUser.email,
+          enabled: true,
+          roles: [],
+        })
+        const mockReq = buildMockReq()
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: 'name',
+            }),
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
       it('should recover the name from the fallback user details lookup and still send the calendar invite', async () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')

@@ -122,7 +122,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           email = fallbackUserDetails?.email
         }
 
-        const stillMissing = [!name && 'name', !email && 'email'].filter(Boolean)
+        const stillMissing = [(!name?.forename || !name?.surname) && 'name', !email && 'email'].filter(Boolean)
         if (stillMissing.length) {
           const message = `Appointment ${uuid}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
           logger.warn(message)
@@ -148,7 +148,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
-    if (email && firstName) {
+    if (email && firstName && surname) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
