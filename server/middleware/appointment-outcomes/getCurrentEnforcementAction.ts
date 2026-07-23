@@ -9,8 +9,8 @@ import { dateWithYear, toSentenceCase } from '../../utils'
 
 type Map = { [K in AppointmentEnforcementAction]?: TagColour }
 
-export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void => {
-  const { forename, baseOutcomeUrl, appointmentSession } = res.locals
+export const getCurrentEnforcementAction: Route<void> = (req, res, next): void => {
+  const { forename, baseOutcomeUrl, appointmentSession, reqUrl } = res.locals
     .appointmentOutcome as AppointmentOutcomeProps<Activity>
   let tagColour: TagColour = 'YELLOW'
   let currentEnforcementAction: CurrentEnforcementAction = null
@@ -20,6 +20,7 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
 
   if (enforcementAction) {
     const { description = '', responseByDate = null, code: actionCode } = enforcementAction
+    let formattedDescription = toSentenceCase(description)
     let action: AppointmentEnforcementAction = null
     if (enforcementAction.code) {
       action =
@@ -45,8 +46,15 @@ export const getCurrentEnforcementAction: Route<void> = (_req, res, next): void 
     }
     const outcomeType = appointmentSession?.outcome?.outcomeType
     const link = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)?.[outcomeType] : baseOutcomeUrl
+    if (reqUrl.includes('/manage')) {
+      const words = formattedDescription.split(' ')
+      if (formattedDescription.length > 30) {
+        const half = Math.floor(words.length / 2)
+        formattedDescription = `${[...words.slice(0, half)].join(' ')}<br>${[...words.slice(half)].join(' ').toLowerCase()}`
+      }
+    }
     currentEnforcementAction = {
-      description: toSentenceCase(description),
+      description: formattedDescription,
       action,
       code: enforcementAction?.code,
       tagColour,

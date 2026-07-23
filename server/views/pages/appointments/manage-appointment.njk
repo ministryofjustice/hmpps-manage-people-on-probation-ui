@@ -212,8 +212,8 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       href: '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome/update-enforcement-action',
       status: {
         tag: {
-          text: appointmentOutcome.currentEnforcementAction.description,
-          classes: "govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
+          html: appointmentOutcome.currentEnforcementAction.description,
+          classes: "govuk-tag--auto-width govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
         }
       }
     } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action and not appointment.didTheyComply,
