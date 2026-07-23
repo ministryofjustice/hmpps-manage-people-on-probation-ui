@@ -9,7 +9,7 @@ import { postRescheduleAppointments } from './postRescheduleAppointments'
 import { renderError } from './renderError'
 
 export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function handlePostAppointmentInner(req, res, next) {
     const { data } = req.session
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     if (!isValidCrn(crn) || !isValidUUID(uuid)) {

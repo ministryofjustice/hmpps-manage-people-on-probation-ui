@@ -42,7 +42,7 @@ export const getTierDetails = (
     }
   }
 
-  return async (req, res, next) => {
+  return async function getTierDetailsInner(req, res, next) {
     // If the feature flag is not enabled, skip fetching tier details and proceed to the next middleware
     if (!res.locals.flags?.enableSupervisionPackage) return next()
 

@@ -36,12 +36,12 @@ export default function setUpWebSession(): Router {
 
   // Update a value in the cookie so that the set-cookie will be sent.
   // Only changes every minute so that it's not sent with every request.
-  router.use((req, res, next) => {
+  router.use(function updateCookieValue(req, res, next) {
     req.session.nowInMinutes = Math.floor(Date.now() / 60e3)
     next()
   })
 
-  router.use((req, res, next) => {
+  router.use(function setId(req, res, next) {
     const headerName = 'X-Request-Id'
     const oldValue = req.get(headerName)
     const id = oldValue === undefined ? uuidv4() : oldValue

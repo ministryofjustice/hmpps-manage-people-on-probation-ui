@@ -18,7 +18,7 @@ passport.deserializeUser((user, done) => {
 export type AuthenticationMiddleware = (tokenVerifier: TokenVerifier) => RequestHandler
 
 const authenticationMiddleware: AuthenticationMiddleware = verifyToken => {
-  return async (req, res, next) => {
+  return async function authenticationMiddlewareInner(req, res, next) {
     if (req.isAuthenticated() && (await verifyToken(req))) {
       return next()
     }

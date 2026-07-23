@@ -21,7 +21,7 @@ const isValidDir = (value: string): value is SortDir => value === 'asc' || value
 
 const enforcementContactsController: Controller<typeof routes, void> = {
   getAllEnforcementContacts: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAllEnforcementContacts(req, res) {
       const { user } = res.locals
       const { query, session, url } = req
       const { sortBy = '' } = query as Record<string, string>

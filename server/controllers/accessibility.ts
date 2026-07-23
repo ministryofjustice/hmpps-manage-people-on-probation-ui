@@ -5,7 +5,7 @@ const routes = ['getAccessibility'] as const
 
 const accessibilityController: Controller<typeof routes, void> = {
   getAccessibility: () => {
-    return async (_req, res) => {
+    return async function getAccessibility(_req, res) {
       await sendAuditMessage(res, 'VIEW_MAS_ACCESSIBILITY', res.locals.user.username, SubjectType.USER)
       return res.render('pages/accessibility')
     }

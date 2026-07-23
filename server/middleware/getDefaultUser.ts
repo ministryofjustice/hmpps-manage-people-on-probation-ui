@@ -8,7 +8,7 @@ import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
-  return async (req, res, next) => {
+  return async function getDefaultUserInner(req, res, next) {
     const { crn, id } = req.params as Record<string, string>
     const { username } = res.locals.user
     const { data } = req.session

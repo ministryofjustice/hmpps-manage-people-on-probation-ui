@@ -44,7 +44,7 @@ interface Args {
 
 const caseloadController: Controller<typeof routes, void, Args> = {
   showCaseload: hmppsAuthClient => {
-    return async (req, res, _next, args) => {
+    return async function showCaseload(req, res, _next, args) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
@@ -108,7 +108,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   postCase: hmppsAuthClient => {
-    return async (req, res, next) => {
+    return async function postCase(req, res, next) {
       req.session.caseFilter = {
         nameOrCrn: req.body.nameOrCrn,
         sentenceCode: req.body.sentenceCode,
@@ -120,7 +120,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   getCase: hmppsAuthClient => {
-    return async (req, res, next) => {
+    return async function getCase(req, res, next) {
       req.session.backLink = '/case'
       if (req.query.clear === 'true') {
         req.session.caseFilter = {
@@ -135,7 +135,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   userSchedule: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function userScheduleInner(req, res) {
       const { query, url } = req
       const type = url.split('/').pop().split('?')[0]
       const { sortBy: sortByQuery = '' } = query as Record<string, string>
@@ -203,7 +203,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   postOutcomesAppointmentsFilter: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postOutcomesAppointmentsFilter(req, res) {
       const { outcomesFilter } = req.body
       const [path, queryString = ''] = req.url.split('?')
       const query = new URLSearchParams(queryString)
@@ -214,7 +214,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   getTeams: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getTeams(req, res) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       if (req.session?.mas?.team === undefined) {
@@ -248,7 +248,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   getChangeTeam: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getChangeTeam(req, res) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const currentTeam = req.session?.mas?.team ?? req.session?.mas?.team
@@ -268,7 +268,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   getTeamCase: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getTeamCase(req, res) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       if (req.session.mas === undefined || (req.session.mas.teamCount > 0 && req.session.mas.team === undefined)) {
@@ -310,7 +310,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   postTeamCase: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postTeamCase(req, res) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const errorMessages: ErrorMessages = {}
@@ -329,7 +329,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   getRecentCases: () => {
-    return async (req, res) => {
+    return async function getRecentCases(req, res) {
       const currentNavSection = 'recentCases'
       req.session.backLink = '/recent-cases'
       await auditService.sendAuditMessage({
@@ -346,7 +346,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     }
   },
   checkAccess: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function checkAccess(req, res) {
       const recentlyViewed: RecentlyViewedCase[] = req.body
       let updated: RecentlyViewedCase[] = []
       if (recentlyViewed && recentlyViewed.length > 0) {

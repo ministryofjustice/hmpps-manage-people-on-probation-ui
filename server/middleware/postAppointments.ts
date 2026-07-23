@@ -18,7 +18,7 @@ import logger from '../../logger'
 import { logFieldPresence } from '../utils/logSessionCacheChange'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
-  return async (req, res) => {
+  return async function postAppointmentsInner(req, res) {
     const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)

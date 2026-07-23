@@ -12,7 +12,7 @@ export const allowedHosts = [
 if (process.env.ENVIRONMENT_NAME === 'local') allowedHosts.push('localhost', 'localhost:3000', 'localhost:3007')
 
 export default function validateHost(): Route<void> {
-  return (req, res, next): AppResponse | void => {
+  return function validateHostInner(req, res, next): AppResponse | void {
     const host = req.get('host')
     if (!allowedHosts.includes(host)) {
       return res.status(400).send('Invalid host')

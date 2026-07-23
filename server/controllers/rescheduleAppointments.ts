@@ -10,7 +10,7 @@ const routes = ['redirectToRescheduleAppointment', 'getRescheduleAppointment', '
 
 const rescheduleAppointmentController: Controller<typeof routes, void> = {
   redirectToRescheduleAppointment: () => {
-    return async (req, res) => {
+    return async function redirectToRescheduleAppointment(req, res) {
       const { crn, contactId } = req.params as Record<string, string>
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -21,7 +21,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
     }
   },
   getRescheduleAppointment: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getRescheduleAppointment(req, res) {
       let uploadedFiles: FileCache[] = []
       let errorMessages: Record<string, string> = null
       let body = null
@@ -61,7 +61,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
     }
   },
   postRescheduleAppointment: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postRescheduleAppointment(req, res) {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)

@@ -19,7 +19,7 @@ const absoluteBackUrl = (back: unknown): string | null => {
 // The manage online check-ins service mirrors this service's check-in URLs, so the
 // requested path is passed through as-is rather than rebuilt per journey.
 export const redirectToManageCheckInService = (flag: NewCheckInServiceFlag): Route<void> => {
-  return (req: Request, res: AppResponse, next: NextFunction): void => {
+  return function redirectToManageCheckInServiceInner(req: Request, res: AppResponse, next: NextFunction): void {
     if (res.locals.flags?.[flag] !== true) {
       return next()
     }

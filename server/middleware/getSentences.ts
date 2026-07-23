@@ -4,7 +4,7 @@ import { Route } from '../@types'
 import { Sentence, Sentences } from '../data/model/sentenceDetails'
 
 export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getSentencesInner(req, res, next) {
     const number = (req?.query?.number as string) || ''
     const { crn } = req.params as Record<string, string>
     let sentences: Sentence[]

@@ -26,7 +26,7 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 
 const activityLogController: Controller<typeof routes, void> = {
   redirectToActivityLog: () => {
-    return async (req, res) => {
+    return async function redirectToActivityLog(req, res) {
       const { keywords = '', compliance = [] } = req.query
       const { crn } = req.params as Record<string, string>
       req.session.activityLogFilters = {
@@ -38,7 +38,7 @@ const activityLogController: Controller<typeof routes, void> = {
     }
   },
   getOrPostActivityLog: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getOrPostActivityLog(req, res) {
       const { params } = req
       const { crn } = params as Record<string, string>
 
@@ -102,7 +102,7 @@ const activityLogController: Controller<typeof routes, void> = {
     }
   },
   getActivity: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getActivity(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       if (req.query?.showSuccessBanner) {

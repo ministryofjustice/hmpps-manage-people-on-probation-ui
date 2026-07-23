@@ -3,7 +3,7 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 
 export const getUserAlertsCount = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getUserAlertsCountInner(req, res, next) {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const response = await masClient.getUserAlertsCount()

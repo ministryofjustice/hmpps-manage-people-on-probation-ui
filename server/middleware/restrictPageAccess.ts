@@ -21,7 +21,7 @@ export const restrictPageAccess = ({
   requiredValues = [],
   route = 'appointments',
 }: { requiredValues?: (string | string[])[]; route?: PageRoute } = {}): Route<Promise<void>> => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async function restrictPageAccessInner(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { crn, id } = req.params as Record<string, string>
 
     const mapping: Mapping = {

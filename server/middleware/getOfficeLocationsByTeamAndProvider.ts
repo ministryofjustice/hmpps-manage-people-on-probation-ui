@@ -4,7 +4,7 @@ import { Route } from '../@types'
 import { getDataValue } from '../utils'
 
 export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next?) => {
+  return async function getOfficeLocationsByTeamAndProviderInner(req, res, next?) {
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const id = uuid ?? contactId
     const { data } = req.session

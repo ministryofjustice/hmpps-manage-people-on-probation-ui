@@ -10,7 +10,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 export const postCheckInDetails = (
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<{ setup: OffenderSetup; uploadLocation: UploadLocationResponse }>> => {
-  return async (req, res) => {
+  return async function postCheckInDetailsInner(req, res) {
     const { crn, id } = req.params as Record<string, string>
     // The browser sends a base64-encoded SHA-256 digest (see assets/js/photo.js sha256Base64).
     // S3 enforces the matching x-amz-checksum-sha256 on the PUT, so we only guard presence here.

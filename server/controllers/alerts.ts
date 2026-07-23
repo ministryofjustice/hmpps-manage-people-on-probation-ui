@@ -66,7 +66,7 @@ const getCrnRiskMap = async (
 
 const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAlerts(req, res) {
       const { user } = res.locals
       const url = encodeURIComponent(req.url)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
@@ -108,7 +108,7 @@ const alertsController: Controller<typeof routes, void> = {
   },
 
   getAlertNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAlertNote(req, res) {
       const { contactId, noteId } = req.params as Record<string, string>
       const { back } = req.query
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
@@ -138,7 +138,7 @@ const alertsController: Controller<typeof routes, void> = {
   },
 
   clearSelectedAlerts: hmppsAuthClient => {
-    return async (req, res, next) => {
+    return async function clearSelectedAlerts(req, res, next) {
       const { user } = res.locals
       const { selectedAlerts } = req.body
       await sendAuditMessage(res, 'EDIT_MAS_CLEAR_ALERT', res.locals.user.username, SubjectType.USER)

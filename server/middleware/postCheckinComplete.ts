@@ -5,7 +5,7 @@ import ESupervisionClient from '../data/eSupervisionClient'
 import logger from '../../logger'
 
 export const postCheckinInComplete = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res) => {
+  return async function postCheckInComplete(req, res) {
     const { id } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)

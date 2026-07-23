@@ -4,7 +4,7 @@ import { defaultName } from './utils/azureAppInsights'
 import { makePageTitle } from './utils'
 
 const baseController = () => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return function baseControllerInner(req: Request, res: Response, next: NextFunction): void {
     res.locals.applicationInsightsConnectionString = config.apis.appInsights.connectionString
     res.locals.applicationInsightsRoleName = defaultName()
     const url = req.url.split('/').filter(dir => dir)
