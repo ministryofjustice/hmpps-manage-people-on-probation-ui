@@ -38,7 +38,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
  %}
 {% endif %}
 {% if not nextAppointment.appointment and not nextAppointment.usernameIsCom %}
-  {% set nextAppointmentHint = nextAppointment.personManager.name.forename + ' does not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
+  {% set nextAppointmentHint = nextAppointment.personManager.name.forename | convertToTitleCase + ' does not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% endif %}
 {% if appointment.documents.length > 0 %}
   {% for document in appointment.documents %}
@@ -104,6 +104,10 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% endif %}
 {% if flags.enableNonCompliance and appointmentOutcome.currentOutcome.reason %}
   {% set outcomeHint = appointmentOutcome.currentOutcome.reason %}
+{% endif %}
+{% if flags.enableNonCompliance and appointment.hasOutcome and not appointment.isInPast and not flags.enableRescheduleFutureAppointmentWithOutcome %}
+  {% set outcomeLink = '' %}
+  {% set outcomeHint = outcomeHint + '<br>You cannot change this outcome until the appointment has passed.' %}
 {% endif %}
 
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
@@ -187,9 +191,10 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         html: '<span>' + outcomeLabel + '</span>'
       },
       hint: {
-        text: outcomeHint
+        html: outcomeHint
       } if outcomeHint,
       href: outcomeLink,
+      classes: 'govuk-link--no-underline',
       status: {
         tag: {
           text: compliedStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
