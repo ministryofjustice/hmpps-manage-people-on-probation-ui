@@ -8,6 +8,7 @@ import {
   AppointmentSession,
   AppointmentsPostResponse,
   AppointmentType,
+  MasUserDetails,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from '../data/model/OutlookEvent'
@@ -37,6 +38,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         eventId: appointmentSession?.eventId,
         teamCode: appointmentSession?.user?.teamCode,
         locationCode: appointmentSession?.user?.locationCode,
+        userName: appointmentSession?.user?.name,
+        userEmail: appointmentSession?.user?.email,
       },
       { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
     )
@@ -100,15 +103,47 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       ;({
         user: { name, email },
       } = appointmentSession)
-      ;({ forename: firstName, surname } = name)
 
-      if (!email) {
+      if (!name || !email) {
+        let fallbackUserDetails: MasUserDetails
         try {
-          email = (await masClient.getUserDetails(username))?.email
+          fallbackUserDetails = await masClient.getUserDetails(username)
         } catch (error) {
           logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
         }
+
+        if (!name) {
+          name = fallbackUserDetails
+            ? { forename: fallbackUserDetails.firstName, surname: fallbackUserDetails.surname }
+            : null
+          if (!name) {
+            const message = `Appointment ${uuid}: no name found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
+            logger.warn(message)
+            Sentry.captureException(new Error(message), {
+              tags: {
+                service: 'Probation Supervision Appointments Api',
+                operation: 'postAppointments.getUserDetails',
+              },
+            })
+          }
+        }
+
+        if (!email) {
+          email = fallbackUserDetails?.email
+          if (!email) {
+            const message = `Appointment ${uuid}: no email found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
+            logger.warn(message)
+            Sentry.captureException(new Error(message), {
+              tags: {
+                service: 'Probation Supervision Appointments Api',
+                operation: 'postAppointments.getUserDetails',
+              },
+            })
+          }
+        }
       }
+
+      ;({ forename: firstName, surname } = name ?? {})
 
       const bookingUserEmail = res.locals.user.email
       const isDifferentUser = Boolean(email) && Boolean(bookingUserEmail) && email !== bookingUserEmail
@@ -120,7 +155,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
-    if (email) {
+    if (email && firstName) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
