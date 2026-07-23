@@ -612,6 +612,31 @@ describe('/middleware/postAppointments', () => {
           expect.stringContaining('missing=['),
         )
       })
+      it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null) and email is already present', async () => {
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, name: { forename: '', surname: '' } },
+        })
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: 'name',
+            }),
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
       it('should capture a single combined Sentry exception when both name and email are still missing after fallback', async () => {
         jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = createMockReq({

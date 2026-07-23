@@ -104,7 +104,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         user: { name, email },
       } = appointmentSession)
 
-      if (!name || !email) {
+      const isNameIncomplete = (candidate: Name): boolean => !candidate?.forename || !candidate?.surname
+
+      if (isNameIncomplete(name) || !email) {
         let fallbackUserDetails: MasUserDetails
         try {
           fallbackUserDetails = await masClient.getUserDetails(username)
@@ -112,7 +114,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
         }
 
-        if (!name) {
+        if (isNameIncomplete(name)) {
           name = fallbackUserDetails
             ? { forename: fallbackUserDetails.firstName, surname: fallbackUserDetails.surname }
             : null
@@ -122,7 +124,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           email = fallbackUserDetails?.email
         }
 
-        const stillMissing = [(!name?.forename || !name?.surname) && 'name', !email && 'email'].filter(Boolean)
+        const stillMissing = [isNameIncomplete(name) && 'name', !email && 'email'].filter(Boolean)
         if (stillMissing.length) {
           const message = `Appointment ${uuid}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
           logger.warn(message)
