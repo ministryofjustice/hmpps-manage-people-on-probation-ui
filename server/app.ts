@@ -84,7 +84,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(routes(router, services))
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)
-  app.use(function PageNotFound(_req, _res, next) {
+  app.use(function pageNotFound(_req, _res, next) {
     return next(createError(404, 'Not found'))
   })
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
