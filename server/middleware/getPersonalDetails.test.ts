@@ -349,7 +349,6 @@ describe('/middleware/getPersonalDetails', () => {
   })
 
   it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan status and pop in user caseload', async () => {
-    process.env.NODE_ENV = 'development'
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
@@ -361,11 +360,7 @@ describe('/middleware/getPersonalDetails', () => {
         crn: 'X000001',
       },
       session: {
-        data: {
-          personalDetails: {
-            X000001: mock(),
-          },
-        },
+        data: {},
       },
     })
     res = mockAppResponse({
@@ -384,7 +379,6 @@ describe('/middleware/getPersonalDetails', () => {
   })
 
   it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop in user caseload', async () => {
-    process.env.NODE_ENV = 'development'
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
@@ -396,11 +390,7 @@ describe('/middleware/getPersonalDetails', () => {
         crn: 'X000001',
       },
       session: {
-        data: {
-          personalDetails: {
-            X000001: mock(),
-          },
-        },
+        data: {},
       },
     })
     res = mockAppResponse({
@@ -419,7 +409,6 @@ describe('/middleware/getPersonalDetails', () => {
   })
 
   it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan and pop not in user caseload', async () => {
-    process.env.NODE_ENV = 'development'
     const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
     jest
       .spyOn(MasApiClient.prototype, 'searchUserCaseload')
@@ -435,11 +424,7 @@ describe('/middleware/getPersonalDetails', () => {
         crn: 'X000001',
       },
       session: {
-        data: {
-          personalDetails: {
-            X000001: mock(),
-          },
-        },
+        data: {},
       },
     })
     res = mockAppResponse({
