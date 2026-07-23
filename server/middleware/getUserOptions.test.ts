@@ -34,7 +34,6 @@ jest.mock('../utils/logSessionCacheChange', () => ({
 }))
 
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
-const mockLogSessionCacheChange = logSessionCacheChange as jest.MockedFunction<typeof logSessionCacheChange>
 
 const crn = 'X000001'
 const uuid = 'a4615940-2808-4ab5-a8e0-feddecb8ae1a'
