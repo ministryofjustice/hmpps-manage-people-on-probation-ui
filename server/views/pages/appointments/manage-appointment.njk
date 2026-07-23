@@ -198,7 +198,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       status: {
         tag: {
           text: compliedStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
-          classes: "govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
+          classes: "govuk-tag--auto-width govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
         }
       }
     },
