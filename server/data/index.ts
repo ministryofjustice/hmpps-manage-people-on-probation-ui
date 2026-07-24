@@ -55,7 +55,11 @@ export const dataAccess = () => ({
   authClientMpop,
   mpopComponents: new MPoPComponents(
     authClientMpop,
-    { ...config.apis.tierApi, supervisionPackageApiConfig: config.apis.supervisionPackageApi },
+    {
+      ...config.apis.tierApi,
+      masApiConfig: config.apis.masApi,
+      supervisionPackageApiConfig: config.apis.supervisionPackageApi,
+    },
     logger,
   ),
 })

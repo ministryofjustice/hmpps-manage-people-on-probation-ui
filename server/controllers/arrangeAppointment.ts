@@ -135,6 +135,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           context,
         )
         setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
+        if (back) {
+          logSessionCacheChange('getSentence', data, ['backLink', 'sentence'], back, context)
+          setDataValue(data, ['backLink', 'sentence'], back)
+        }
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
       }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
@@ -194,6 +198,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           url,
           change,
           errors,
+          back: getDataValue(data, ['backLink', 'sentence']),
           allSentences: req?.session?.data?.sentences?.[crn],
         })
       }

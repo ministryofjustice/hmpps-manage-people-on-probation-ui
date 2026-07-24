@@ -8,7 +8,7 @@
 {% if change %}
   {% set backLink = change %}
 {% elif allSentences.length === 1 %}
-  {% set backLink = '/case/' + crn + '/appointments/' %}
+  {% set backLink = back | default('/case/' + crn + '/appointments/') %}
 {% else %}
   {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
 {% endif %}
