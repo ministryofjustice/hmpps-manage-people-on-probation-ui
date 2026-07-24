@@ -14,6 +14,13 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
     const { data } = req.session
+
+    const sessionCacheContext = {
+      uuid: id,
+      username,
+      crn,
+      enabled: res.locals.flags.enableSessionCacheLogging,
+    }
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
 
@@ -34,6 +41,13 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     if (selectedProvider === probationPractitioner.provider.code) {
       selectedProvider = defaultProvider
     }
+    logSessionCacheChange(
+      'getUserOptions.selectedProvider',
+      data,
+      ['appointments', crn, id, 'user', 'providerCode'],
+      selectedProvider,
+      sessionCacheContext,
+    )
 
     const { teams } = await masClient.getTeamsByProvider(selectedProvider)
 
@@ -55,6 +69,13 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     if (providerCodeQuery && !teamCodeQuery) {
       selectedTeam = teams[0].code
     }
+    logSessionCacheChange(
+      'getUserOptions.selectedTeam',
+      data,
+      ['appointments', crn, id, 'user', 'teamCode'],
+      selectedTeam,
+      sessionCacheContext,
+    )
 
     const { users } = await masClient.getStaffByTeam(selectedTeam)
 
@@ -66,6 +87,13 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     if (selectedUser?.toLowerCase() === probationPractitioner?.username?.toLowerCase()) {
       selectedUser = defaultUserDetails.username
     }
+    logSessionCacheChange(
+      'getUserOptions.selectedUser',
+      data,
+      ['appointments', crn, id, 'user', 'username'],
+      selectedUser,
+      sessionCacheContext,
+    )
 
     let providerOptions = providers.map(provider => {
       const { code, name } = provider
@@ -128,19 +156,15 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     res.locals.providerCode = selectedProvider
     res.locals.teamCode = selectedTeam
     logger.info(`[getUserOptions] uuid='${id}' username='${username}' calledWithNext=${Boolean(next)}`)
+    logSessionCacheChange('getUserOptions', data, ['providers', username], providerOptions, sessionCacheContext)
+    logSessionCacheChange('getUserOptions', data, ['teams', username], teamOptions, sessionCacheContext)
+    logSessionCacheChange('getUserOptions', data, ['staff', username], userOptions, sessionCacheContext)
+    setDataValue(data, ['providers', username], providerOptions)
+    setDataValue(data, ['teams', username], teamOptions)
+    setDataValue(data, ['staff', username], userOptions)
     if (!next) {
-      const context = { uuid: id, username, enabled: res.locals.flags.enableSessionCacheLogging }
-      logSessionCacheChange('getUserOptions', data, ['providers', username], providerOptions, context)
-      logSessionCacheChange('getUserOptions', data, ['teams', username], teamOptions, context)
-      logSessionCacheChange('getUserOptions', data, ['staff', username], userOptions, context)
-      setDataValue(data, ['providers', username], providerOptions)
-      setDataValue(data, ['teams', username], teamOptions)
-      setDataValue(data, ['staff', username], userOptions)
       return null
     }
-    logger.info(
-      `[getUserOptions] uuid='${id}' called as middleware - NOT adding staff cache to session for username='${username}'`,
-    )
     return next()
   }
 }

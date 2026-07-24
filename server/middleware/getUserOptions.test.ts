@@ -11,6 +11,7 @@ import {
 } from '../controllers/mocks'
 import { getUserOptions } from './getUserOptions'
 import { setDataValue } from '../utils'
+import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -27,6 +28,10 @@ jest.mock('../utils', () => {
     setDataValue: jest.fn(),
   }
 })
+
+jest.mock('../utils/logSessionCacheChange', () => ({
+  logSessionCacheChange: jest.fn(),
+}))
 
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 
@@ -72,7 +77,7 @@ const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} 
   return httpMocks.createRequest(request)
 }
 
-const checkDefaultUserSelection = () => {
+const checkDefaultUserSelection = (req: httpMocks.MockRequest<any>) => {
   it('should request the providers for the logged in user from the api', async () => {
     expect(getUserProvidersSpy).toHaveBeenCalledWith(loggedInUsername)
   })
@@ -150,6 +155,12 @@ const checkDefaultUserSelection = () => {
   })
   it('should call next()', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should still persist the providers, teams and staff to the session cache when called as middleware with next', () => {
+    const { data } = req.session
+    expect(mockSetDataValue).toHaveBeenCalledWith(data, ['providers', loggedInUsername], res.locals.userProviders)
+    expect(mockSetDataValue).toHaveBeenCalledWith(data, ['teams', loggedInUsername], res.locals.userTeams)
+    expect(mockSetDataValue).toHaveBeenCalledWith(data, ['staff', loggedInUsername], res.locals.userStaff)
   })
 }
 
@@ -256,6 +267,15 @@ describe('/middleware/getUserOptions()', () => {
     it('should set res.locals.teamCode as the session user team', () => {
       expect(res.locals.teamCode).toEqual(req.session.data.appointments[crn][uuid].user.teamCode)
     })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+    it('should still persist the providers, teams and staff to the session cache when called as middleware with next', () => {
+      const { data } = req.session
+      expect(mockSetDataValue).toHaveBeenCalledWith(data, ['providers', loggedInUsername], res.locals.userProviders)
+      expect(mockSetDataValue).toHaveBeenCalledWith(data, ['teams', loggedInUsername], res.locals.userTeams)
+      expect(mockSetDataValue).toHaveBeenCalledWith(data, ['staff', loggedInUsername], res.locals.userStaff)
+    })
   })
   describe('Attending user is in session and is probation practitioner', () => {
     const req = buildRequest({
@@ -268,7 +288,7 @@ describe('/middleware/getUserOptions()', () => {
     beforeEach(async () => {
       await getUserOptions(hmppsAuthClient)(req, res, nextSpy)
     })
-    checkDefaultUserSelection()
+    checkDefaultUserSelection(req)
   })
 
   describe('Attending user is in session and is the default user', () => {
@@ -282,7 +302,7 @@ describe('/middleware/getUserOptions()', () => {
     beforeEach(async () => {
       await getUserOptions(hmppsAuthClient)(req, res, nextSpy)
     })
-    checkDefaultUserSelection()
+    checkDefaultUserSelection(req)
   })
 
   describe('No attending user session or request url query', () => {
@@ -296,7 +316,7 @@ describe('/middleware/getUserOptions()', () => {
     beforeEach(async () => {
       await getUserOptions(hmppsAuthClient)(req, res, nextSpy)
     })
-    checkDefaultUserSelection()
+    checkDefaultUserSelection(req)
   })
 
   describe('Provider code is in request url query', () => {
