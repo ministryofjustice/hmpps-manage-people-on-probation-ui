@@ -1,0 +1,101 @@
+/* MOJ Experimental Modal Dialog Component Styles, used on Alerts page */
+
+/* 1. Base Modal Overlay wrapper */
+.govuk-modal-dialogue {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+}
+
+/* Active trigger state */
+.govuk-modal-dialogue--open {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2. Semi-transparent dark background backdrop overlay */
+.govuk-modal-dialogue__wrapper::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(11, 12, 12, 0.55); /* Standard GOV.UK dark tint */
+  z-index: -1;
+}
+
+/* 3. The Modal Dialog Container Box */
+dialog.govuk-modal-dialogue__box {
+  display: block;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important; /* Centers container */
+  margin: 0 !important;
+  width: 90%;
+  max-width: 540px;
+  padding: 30px;
+  background: #FFFFFF !important;
+  border: 5px solid #0B0C0C !important; /* Overrides browser user-agent defaults with GOVUK black style */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+
+/* Native backdrop styling handle for modern browser overrides */
+dialog.govuk-modal-dialogue__box::backdrop {
+  background: rgba(11, 12, 12, 0.55);
+}
+
+/* 4. Full-width Black Header Bar matching MoJ design system layout */
+.govuk-modal-dialogue__header {
+  background-color: #0B0C0C; /* govuk-black */
+  padding: 12px 20px;
+  margin: -30px -30px 25px -30px;
+  display: flex;
+  justify-content: flex-end; /* Aligns the 'X' close button to the right */
+  align-items: center;
+}
+
+/* The Close Icon 'X' Button styling inside the black header */
+.govuk-modal-dialogue__close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  font-size: 28px;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+}
+
+.govuk-modal-dialogue__close::before {
+  content: "\00d7"; /* Unicode multiplication sign creates 'X' */
+}
+
+.govuk-modal-dialogue__close:hover {
+  color: #DBDAD9;
+}
+
+.govuk-modal-dialogue__close:focus {
+  outline: 3px solid #FFDD00; /* GOV.UK Focus Yellow */
+  background-color: #FFDD00;
+  color: #0B0C0C;
+}
+
+.govuk-modal-dialogue__content {
+  margin-bottom: 0;
+}
+
+/* Suppress interactions with back elements while modal is active */
+.govuk-modal-dialogue-inert-container[inert] {
+  pointer-events: none;
+  user-select: none;
+}

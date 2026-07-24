@@ -28,7 +28,7 @@
 {% endblock %}
 
 {% block pageContent %}
-
+  <div class="govuk-modal-dialogue-inert-container">
     {% if alertsData.content.length > 0 %}
         {% for alert in alertsData.content %}
 
@@ -145,6 +145,9 @@
 
                 <form method="post" action="/alerts{{'?' + queryString if queryString else ''}}" id="alerts-form">
 
+                    <input type="hidden" name="clearedCount" id="clearedCountInput" value="0">
+                    <input type="hidden" name="clearedIds" id="clearedIdsInput" value="">
+
                     {{ govukTable({
                         firstCellIsHeader: false,
                         attributes: {
@@ -213,6 +216,38 @@
             {% else %}
                 <p>You do not have any alerts.</p>
             {% endif %}
+        </div>
+    </div>
+  </div>
+    <div class="govuk-modal-dialogue" id="clear-alerts-modal" data-inert-container=".govuk-modal-dialogue-inert-container"
+        data-previously-cleared="{{ clearedIds }}">
+        <div class="govuk-modal-dialogue__wrapper">
+            <dialog class="govuk-modal-dialogue__box" aria-labelledby="modal-title" aria-describedby="modal-description"
+                aria-modal="true" role="alertdialog" tabindex="-1">
+                <div class="govuk-modal-dialogue__header">
+                    <button type="button" class="govuk-modal-dialogue__close" id="close-modal-x-btn">
+                        <span class="govuk-visually-hidden">Close modal</span>
+                    </button>
+                </div>
+                <div class="govuk-modal-dialogue__content">
+
+                    <div id="modal-text-content" tabindex="-1">
+                        <h2 class="govuk-heading-m" id="modal-title">Are you sure you want to clear these alerts?</h2>
+                        <p class="govuk-body" id="modal-description">
+                            You have selected to clear <b id="selected-alerts-count">0</b> alerts.
+                        </p>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="button" class="govuk-button" id="confirm-clear-btn" data-module="govuk-button">
+                            Yes, clear
+                        </button>
+                        <button type="button" class="govuk-button govuk-button--secondary" id="close-modal-btn">
+                            Go back
+                        </button>
+                    </div>
+                </div>
+            </dialog>
         </div>
     </div>
 {% endblock %}

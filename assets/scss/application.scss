@@ -34,6 +34,7 @@ $mappa-colour: #4c2c92;
 @import './components/flex';
 @import './components/note';
 @import './components/checkboxes';
+@import './components/modal';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
