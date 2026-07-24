@@ -27,6 +27,7 @@ import {
   contactPrefMobileCheck,
   isValidMobileNumber,
   isFutureDate,
+  isValidFileName,
 } from './validationUtils'
 import {
   activityLogValidation,
@@ -1157,5 +1158,42 @@ describe('validates appointment enforcement action page', () => {
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
     expect(loggerSpy).toHaveBeenCalledWith('Action for failure to comply not selected')
+  })
+
+  describe('isValidFileName', () => {
+    it('returns true for a valid filename', () => {
+      expect(isValidFileName('document.txt')).toBe(true)
+      expect(isValidFileName('my_file-2026.pdf')).toBe(true)
+      expect(isValidFileName('photo (1).jpg')).toBe(true)
+    })
+
+    it.each([
+      'file!',
+      'file|',
+      'file$',
+      'file%',
+      'file&',
+      'file<',
+      'file>',
+      'file:',
+      'file?',
+      'file*',
+      'file#',
+      'file"',
+      'file/',
+      'file\\',
+      'file^',
+      'dummyWordDoc UPW Compliance Plan - Hereford & Worcester.docx',
+    ])('returns false when filename contains "%s"', fileName => {
+      expect(isValidFileName(fileName)).toBe(false)
+    })
+
+    it('returns true for an empty string', () => {
+      expect(isValidFileName('')).toBe(true)
+    })
+
+    it('returns true when none of the restricted characters are present', () => {
+      expect(isValidFileName('Report_2026-v1.0.txt')).toBe(true)
+    })
   })
 })
