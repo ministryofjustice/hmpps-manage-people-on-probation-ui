@@ -235,7 +235,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Upload documents"
       },
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note',
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true' if flags.enableNonCompliance),
       status: {
         tag: {
           text: 'No documents',
