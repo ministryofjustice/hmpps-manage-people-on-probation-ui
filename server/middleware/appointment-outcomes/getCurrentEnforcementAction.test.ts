@@ -8,10 +8,17 @@ const buildResponse = ({
   action = null,
   didTheyComply = false,
   enforcementAction = null,
-}: { action?: string; didTheyComply?: boolean; enforcementAction?: PersonAppointmentEnforcementAction } = {}) => {
+  reqUrl = '/case/X00001/appointments/appointment/1234/manage',
+}: {
+  action?: string
+  didTheyComply?: boolean
+  enforcementAction?: PersonAppointmentEnforcementAction
+  reqUrl?: string
+} = {}) => {
   const locals = {
     appointmentOutcome: {
       forename: 'James',
+      reqUrl,
       baseOutcomeUrl: '/base/outcome/url',
       appointment: {
         action,
@@ -114,6 +121,48 @@ describe('middleware/appointment-outcomes/getCurrentEnforcementAction', () => {
       evidenceWarning: 'James has until 23 May to submit evidence (0 days remaining)',
       link: '/base/outcome/url/attended-failed-to-comply',
       tagColour: 'GREEN',
+    })
+  })
+  it('should format the enforcement action title onto 2 lines if over 30 chars long and on manage page', () => {
+    const text = 'Decision pending response from person on probation'
+    const enforcementAction: PersonAppointmentEnforcementAction = {
+      code: 'EA12',
+      description: text,
+      responseByDate: '2026-05-23',
+    }
+    const res = buildResponse({ action: text, enforcementAction })
+    getCurrentEnforcementAction(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.currentEnforcementAction).toStrictEqual({
+      action: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+      code: 'EA12',
+      description: 'Decision pending response<br>from person on probation',
+      evidenceDueDate: '23 May 2026',
+      evidenceWarning: 'James has until 23 May to submit evidence (0 days remaining)',
+      link: '/base/outcome/url/attended-failed-to-comply',
+      tagColour: 'YELLOW',
+    })
+  })
+  it('should not format the enforcement action title onto 2 lines if over 30 chars long and not on manage page', () => {
+    const text = 'Decision pending response from person on probation'
+    const enforcementAction: PersonAppointmentEnforcementAction = {
+      code: 'EA12',
+      description: text,
+      responseByDate: '2026-05-23',
+    }
+    const res = buildResponse({
+      action: text,
+      enforcementAction,
+      reqUrl: '/case/X000001/appointments/appointment/12345/outcome/update-enforcement-action',
+    })
+    getCurrentEnforcementAction(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.currentEnforcementAction).toStrictEqual({
+      action: 'DECISION_PENDING_RESPONSE_FROM_PERSON_ON_PROBATION',
+      code: 'EA12',
+      description: 'Decision pending response from person on probation',
+      evidenceDueDate: '23 May 2026',
+      evidenceWarning: 'James has until 23 May to submit evidence (0 days remaining)',
+      link: '/base/outcome/url/attended-failed-to-comply',
+      tagColour: 'YELLOW',
     })
   })
 })
