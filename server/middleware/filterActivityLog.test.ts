@@ -16,6 +16,7 @@ interface Args {
   compliance?: string | string[]
   category?: string | string[]
   sparks?: string | string[]
+  supervisionPackage?: string | string[]
   hideContact?: string | string[]
   clearFilterKey?: string
   clearFilterValue?: string
@@ -119,6 +120,7 @@ describe('/middleware/filterActivityLog()', () => {
         compliance: ['no outcome', 'complied', 'not complied'],
         category: categeoryList,
         sparks: [],
+        supervisionPackage: [],
         hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '21/03/2025',
         dateTo: '22/03/2025',
@@ -173,6 +175,7 @@ describe('/middleware/filterActivityLog()', () => {
             },
           ],
           sparks: [],
+          supervisionPackage: [],
           hideContact: [
             {
               text: 'Hide NDelius system generated contacts',
@@ -187,6 +190,7 @@ describe('/middleware/filterActivityLog()', () => {
           checked: value === 'appointments',
         })),
         sparksOptions: [],
+        supervisionPackageOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({
           text,
           value,
@@ -197,6 +201,7 @@ describe('/middleware/filterActivityLog()', () => {
         compliance: [req.query.compliance] as string[],
         category: [req.query.category] as string[],
         sparks: [],
+        supervisionPackage: [],
         hideContact: [req.query.hideContact] as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
@@ -265,6 +270,61 @@ describe('/middleware/filterActivityLog()', () => {
     })
   })
 
+  describe('enableSupervisionPackageFilter feature flag is enabled', () => {
+    const flaggedRes = {
+      locals: {
+        user: { username: 'user-1' },
+        flags: { enableSupervisionPackageFilter: true },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
+    const req = getRequest({
+      submit: true,
+      keywords: '',
+      dateFrom: '',
+      dateTo: '',
+      compliance: 'complied',
+      category: 'appointments',
+      supervisionPackage: 'appointments in supervision package',
+      hideContact: 'hide NDelius system generated contacts',
+    })
+    beforeEach(() => {
+      filterActivityLog(req, flaggedRes, nextSpy)
+    })
+    it('should expose the supervision package filter in its own supervisionPackageOptions checkbox group', () => {
+      expect(flaggedRes.locals.filters.supervisionPackageOptions).toEqual([
+        {
+          text: 'Show appointments in supervision package',
+          value: 'appointments in supervision package',
+          checked: true,
+        },
+      ])
+    })
+    it('should show the supervision package filter as its own selected filter tag', () => {
+      expect(flaggedRes.locals.filters.selectedFilterItems.supervisionPackage).toEqual([
+        {
+          text: 'Show appointments in supervision package',
+          href: `/case/${crn}/activity-log?clearFilterKey=supervisionPackage&clearFilterValue=appointments%20in%20supervision%20package`,
+        },
+      ])
+    })
+  })
+
+  describe('Selected supervision package filter tag is clicked', () => {
+    const req = getRequest({
+      submit: true,
+      supervisionPackage: 'appointments in supervision package',
+      clearFilterKey: 'supervisionPackage',
+      clearFilterValue: 'appointments in supervision package',
+    })
+    beforeEach(() => {
+      filterActivityLog(req, res, nextSpy)
+    })
+    it('should remove the cleared value from the session', () => {
+      expect(req.session.activityLogFilters.supervisionPackage).toEqual([])
+    })
+  })
+
   describe('a session category value is not present in the current options (e.g. flag turned off after selecting SPARKS)', () => {
     const req = getRequest({
       submit: true,
@@ -326,6 +386,7 @@ describe('/middleware/filterActivityLog()', () => {
             })),
           ],
           sparks: [],
+          supervisionPackage: [],
           hideContact: [
             ...(query.hideContact as string[]).map((item, i) => ({
               text: hideContactsFilterOptions[i].text,
@@ -342,12 +403,14 @@ describe('/middleware/filterActivityLog()', () => {
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         sparksOptions: [],
+        supervisionPackageOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
         category: req.query.category as string[],
         sparks: [],
+        supervisionPackage: [],
         hideContact: req.query.hideContact as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
@@ -418,6 +481,7 @@ describe('/middleware/filterActivityLog()', () => {
             })),
           ],
           sparks: [],
+          supervisionPackage: [],
           hideContact: [
             ...(query.hideContact as string[]).map((item, i) => ({
               text: hideContactsFilterOptions[i].text,
@@ -428,12 +492,14 @@ describe('/middleware/filterActivityLog()', () => {
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         sparksOptions: [],
+        supervisionPackageOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
         category: req.query.category as string[],
         sparks: [],
+        supervisionPackage: [],
         hideContact: req.query.hideContact as string[],
         dateFrom: '',
         dateTo: '',
@@ -476,6 +542,7 @@ describe('/middleware/filterActivityLog()', () => {
             },
           ],
           sparks: [],
+          supervisionPackage: [],
           hideContact: [
             {
               text: 'Hide NDelius system generated contacts',
@@ -502,6 +569,7 @@ describe('/middleware/filterActivityLog()', () => {
           checked: value === 'appointments',
         })),
         sparksOptions: [],
+        supervisionPackageOptions: [],
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({
           text,
           value,
@@ -512,6 +580,7 @@ describe('/middleware/filterActivityLog()', () => {
         compliance: ['not complied'],
         category: ['appointments'],
         sparks: [],
+        supervisionPackage: [],
         hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '20/03/2025',
         dateTo: '23/03/2025',
