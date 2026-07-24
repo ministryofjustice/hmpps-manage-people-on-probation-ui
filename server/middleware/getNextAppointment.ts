@@ -73,7 +73,6 @@ export const getNextAppointment = (
 
     if (nextAppointmentResponse?.httpStatus === 200) {
       res.locals.nextAppointmentDetails = nextAppointmentResponse.personSchedule.personSchedule.appointments[0] || null
-      console.log('res.locals.nextAppointmentDetails', res.locals.nextAppointmentDetails)
     }
 
     return next()
