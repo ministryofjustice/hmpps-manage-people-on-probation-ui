@@ -12,7 +12,6 @@ type Map = { [K in AppointmentEnforcementAction]?: TagColour }
 export const getCurrentEnforcementAction: Route<void> = (req, res, next): void => {
   const { forename, baseOutcomeUrl, appointmentSession, reqUrl } = res.locals
     .appointmentOutcome as AppointmentOutcomeProps<Activity>
-  let tagColour: TagColour = 'YELLOW'
   let currentEnforcementAction: CurrentEnforcementAction = null
   let evidenceDueDate: string = null
   let evidenceWarning: string = null
@@ -22,7 +21,7 @@ export const getCurrentEnforcementAction: Route<void> = (req, res, next): void =
     const { description = '', responseByDate = null, code: actionCode } = enforcementAction
     let formattedDescription = toSentenceCase(description)
     let action: AppointmentEnforcementAction = null
-    if (enforcementAction.code) {
+    if (enforcementAction?.code) {
       action =
         (Object.entries(enforcementActionMap).find(
           ([_key, { code }]) => code === enforcementAction.code,
@@ -41,17 +40,15 @@ export const getCurrentEnforcementAction: Route<void> = (req, res, next): void =
       REFER_TO_OFFENDER_MANAGER: 'PURPLE',
       WITHDRAWAL_OF_WARNING: 'GREEN',
     }
-    if (map?.[action]) {
-      tagColour = map[action]
-    }
+
+    const tagColour: TagColour = map?.[action] || 'YELLOW'
+
     const outcomeType = appointmentSession?.outcome?.outcomeType
     const link = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)?.[outcomeType] : baseOutcomeUrl
-    if (reqUrl.includes('/manage')) {
+    if (reqUrl.includes('/manage') && formattedDescription.length > 30) {
       const words = formattedDescription.split(' ')
-      if (formattedDescription.length > 30) {
-        const half = Math.floor(words.length / 2)
-        formattedDescription = `${[...words.slice(0, half)].join(' ')}<br>${[...words.slice(half)].join(' ').toLowerCase()}`
-      }
+      const half = Math.floor(words.length / 2)
+      formattedDescription = `${words.slice(0, half).join(' ')}<br>${words.slice(half).join(' ').toLowerCase()}`
     }
     currentEnforcementAction = {
       description: formattedDescription,
