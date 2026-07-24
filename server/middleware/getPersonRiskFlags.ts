@@ -5,7 +5,7 @@ import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
 import { setDataValue, findReplace, getStaffRisk, getProbationRisk } from '../utils'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getPersonRiskFlagsInner(req, res, next) {
     const { crn } = req.params as Record<string, string>
     let personRisks: PersonRiskFlags
     if (!req.session?.data?.risks?.[crn]) {

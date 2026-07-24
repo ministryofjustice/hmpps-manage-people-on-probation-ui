@@ -28,12 +28,12 @@ export const appointmentOutcomeRequests = [
 
 const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequests, void | AppResponse> = {
   getOutcome: _hmppsAuthClient => {
-    return async (_req, res) => {
+    return async function getOutcome(_req, res) {
       return res.render('pages/appointment-outcomes/outcome')
     }
   },
   postOutcome: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postOutcome(req, res) {
       const { crn, contactId, isValidParams, baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
       const { change } = req.query
       if (!isValidParams) {
@@ -49,7 +49,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getAddNote: () => {
-    return async (req, res) => {
+    return async function getAddNote(req, res) {
       const { crn } = res.locals.appointmentOutcome
       let uploadedFiles: FileCache[] = []
       let errorMessages = null
@@ -80,7 +80,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   postAddNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postAddNote(req, res) {
       const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl } = res.locals.appointmentOutcome
       const { change, put } = req.query as Record<string, string>
       const { notes, sensitive } = req.body
@@ -127,13 +127,13 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getCheckYourAnswers(req, res) {
       const url = encodeURIComponent(req.url)
       return res.render('pages/appointment-outcomes/check-your-answers', { url })
     }
   },
   postCheckYourAnswers: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postCheckYourAnswers(req, res) {
       const { baseOutcomeUrl, crn, linkedContactId } = res.locals.appointmentOutcome
       if (linkedContactId) {
         setDataValue(req.session.data, ['temp', crn, 'linkedContactId'], null)
@@ -142,7 +142,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getConfirmation: _hmppsAuthClient => {
-    return async (_req, res) => {
+    return async function getConfirmation(_req, res) {
       return res.render('pages/appointment-outcomes/confirmation')
     }
   },

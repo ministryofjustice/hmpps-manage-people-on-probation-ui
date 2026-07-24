@@ -8,7 +8,7 @@ import { getDataValue } from '../../utils'
 import { youthSentences } from '../../properties/appointment-outcomes'
 
 export const getOutcomeSentence = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getOutcomeSentenceInner(req, res, next) {
     const { data } = req.session
     const { appointmentSession, crn } = res.locals.appointmentOutcome
     const sentences = getDataValue<Sentence[]>(data, ['sentences', crn]) ?? []

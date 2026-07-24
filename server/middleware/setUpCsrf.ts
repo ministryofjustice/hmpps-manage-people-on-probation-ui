@@ -22,7 +22,7 @@ export default function setUpCsrf(): Router {
     router.use(csrfSynchronisedProtection)
   }
 
-  router.use((req, res: AppResponse, next) => {
+  router.use(function setCsrfToken(req, res: AppResponse, next) {
     if (typeof req.csrfToken === 'function') {
       res.locals.csrfToken = req.csrfToken()
     }

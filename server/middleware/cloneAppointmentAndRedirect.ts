@@ -8,7 +8,7 @@ export const cloneAppointmentAndRedirect = (
   appointmentToClone: AppointmentSession = {},
   apptType: AppointmentSessionSelection = 'KEEP_TYPE',
 ) => {
-  return (req: Request, res: AppResponse): void => {
+  return function cloneAppointmentAndRedirectInner(req: Request, res: AppResponse): void {
     const { data } = req.session
     const { crn, id, contactId } = req.params as Record<string, string>
     const uuid = apptType === 'RESCHEDULE' ? id : uuidv4()

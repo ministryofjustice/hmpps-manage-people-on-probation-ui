@@ -8,7 +8,7 @@ import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 
 export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function checkAppointmentsInner(req, res, next) {
     const warningMessagesSeen = getUnderscoredFormValue('warningMessagesSeen') === 'true'
     function getUnderscoredFormValue(name: string) {
       return req.body[`_${name}`]

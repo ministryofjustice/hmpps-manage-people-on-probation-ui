@@ -24,7 +24,7 @@ interface QueryParams {
 
 const sentenceController: Controller<typeof routes, void> = {
   getSentence: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getSentence(req, res) {
       const { crn } = req.params as Record<string, string>
       const { activeSentence, number } = req.query
       const query: QueryParams = {
@@ -70,7 +70,7 @@ const sentenceController: Controller<typeof routes, void> = {
     }
   },
   getProbationHistory: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getProbationHistory(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
@@ -90,7 +90,7 @@ const sentenceController: Controller<typeof routes, void> = {
     }
   },
   getPreviousOrders: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getPreviousOrders(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
@@ -110,7 +110,7 @@ const sentenceController: Controller<typeof routes, void> = {
     }
   },
   getPreviousOrderDetails: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getPreviousOrderDetails(req, res) {
       const { crn, eventNumber } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
@@ -130,7 +130,7 @@ const sentenceController: Controller<typeof routes, void> = {
     }
   },
   getOffenceDetails: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getOffenceDetails(req, res) {
       const { crn, eventNumber } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
@@ -150,7 +150,7 @@ const sentenceController: Controller<typeof routes, void> = {
     }
   },
   getLicenceConditionNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getLicenceConditionNote(req, res) {
       const { crn, licenceConditionId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
@@ -170,7 +170,7 @@ const sentenceController: Controller<typeof routes, void> = {
     }
   },
   getRequirementNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getRequirementNote(req, res) {
       const { crn, requirementId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({

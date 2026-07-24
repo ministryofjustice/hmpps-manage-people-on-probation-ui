@@ -19,7 +19,7 @@ export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
   arnsComponents: ArnsComponents,
 ): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getPersonalDetailsInner(req, res, next) {
     const { crn } = req.params as Record<string, string>
     let sentencePlan: SentencePlan
     let overview: PersonalDetails

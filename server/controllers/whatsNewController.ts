@@ -8,7 +8,7 @@ const routes = ['getWhatsNew'] as const
 const whatsNewController: Controller<typeof routes, void> = {
   getWhatsNew: () => {
     const technicalUpdatesService = new TechnicalUpdatesService()
-    return async (req, res) => {
+    return async function getWhatsNew(req, res) {
       await sendAuditMessage(res, 'VIEW_MAS_WHATS_NEW', res.locals.user.username, SubjectType.USER)
       return res.render('pages/whats-new', {
         title: 'New features | Manage people on probation',

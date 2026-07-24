@@ -13,7 +13,7 @@ type EnforcementRedirectMap = {
 }
 
 export const handleOutcomePageRedirect = (pageKey: EnforcementActionPage | OutcomePage): Route<void> => {
-  return (req, res) => {
+  return function handleOutcomePageRedirectInner(req, res) {
     const { baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
     const { change: _change } = req.query as Record<string, string>
     const change = _change ? decodeURIComponent(_change) : undefined

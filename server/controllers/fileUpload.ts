@@ -6,7 +6,7 @@ const routes = ['postUploadFile', 'postDeleteFile'] as const
 
 const fileUploadController: Controller<typeof routes, any> = {
   postUploadFile: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postUploadFile(req, res) {
       const sleep = (ms: number) => {
         return new Promise(resolve => {
           setTimeout(resolve, ms)
@@ -55,7 +55,7 @@ const fileUploadController: Controller<typeof routes, any> = {
     }
   },
   postDeleteFile: _hmppsAuthClient => {
-    return async (_req, res) => {
+    return async function postDeleteFile(_req, res) {
       return res.json({
         success: true,
       })

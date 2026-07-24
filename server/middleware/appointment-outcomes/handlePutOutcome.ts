@@ -7,12 +7,12 @@ import { handleQuotes } from '../../utils'
 import { renderError } from '../renderError'
 
 export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = false): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function handlePutOutcomeInner(req, res, next) {
     const { appointmentSession, notePrepend, contactId, isValidParams, baseOutcomeUrl, responseContactId, isInPast } =
       res.locals.appointmentOutcome
 
     /*
-     only send request if putting outcome for arranged/rescheduled appt in the past or 
+     only send request if putting outcome for arranged/rescheduled appt in the past or
      managed appointment in past or future 👇
      */
 

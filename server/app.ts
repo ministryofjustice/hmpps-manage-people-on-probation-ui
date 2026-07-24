@@ -54,7 +54,7 @@ export default function createApp(services: Services): express.Application {
   app.use(sentryMiddleware())
   app.use(metricsMiddleware)
 
-  app.use((req, res, next) => {
+  app.use(function setSurveyLinks(req, res, next) {
     res.locals.pageUrl = encodeURI(`https://manage-people-on-probation.hmpps.service.justice.gov.uk${req.url}`) // ignores ENV
     res.locals.feedbackEmail = config.feedbackEmail
     next()
@@ -84,7 +84,9 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(routes(router, services))
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)
-  app.use((_req, _res, next) => next(createError(404, 'Not found')))
+  app.use(function pageNotFound(_req, _res, next) {
+    return next(createError(404, 'Not found'))
+  })
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
 
   return app
