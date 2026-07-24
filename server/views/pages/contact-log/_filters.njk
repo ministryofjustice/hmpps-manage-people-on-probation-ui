@@ -108,6 +108,26 @@
   }) }}
   {% endif %}
 
+  {% if filters.supervisionPackageOptions.length %}
+  {{ govukCheckboxes({
+    idPrefix: 'supervisionPackage',
+    name: 'supervisionPackage',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: 'Appointments in supervision package',
+        classes: 'govuk-fieldset__legend--s'
+      }
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'supervisionPackage'
+      }
+    },
+    items: filters.supervisionPackageOptions
+  }) }}
+  {% endif %}
+
   {{ govukCheckboxes({
     idPrefix: 'category',
     name: 'category',
@@ -181,6 +201,15 @@
     }), filterCategories) %}
 {% endif %}
 
+{% if filters.selectedFilterItems.supervisionPackage.length %}
+    {% set filterCategories = (filterCategories.push({
+        heading: {
+            text: 'Appointments in supervision package'
+        },
+        items: filters.selectedFilterItems.supervisionPackage
+    }), filterCategories) %}
+{% endif %}
+
 
 <div class="govuk-grid-column-one-third contact-activity__filter govuk-!-padding-bottom-4">
     <form role="region" aria-label="Filters" method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
@@ -234,7 +263,7 @@
       href: '/case/' + crn + '/activity-log' + clearLink
     },
     categories: filterCategories
-  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length or filters.selectedFilterItems.sparks.length,
+  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length or filters.selectedFilterItems.sparks.length or filters.selectedFilterItems.supervisionPackage.length,
   optionsHtml: filterOptionsHtml
 }) }}
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
