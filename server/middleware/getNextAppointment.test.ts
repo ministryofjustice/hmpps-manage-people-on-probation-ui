@@ -207,7 +207,7 @@ describe('getNextAppointment middleware', () => {
       }),
       'Failed to fetch next appointment from MPoP Components API.',
     )
-    expect(res.locals.nextAppointmentDetails).toBeUndefined()
+    expect(res.locals.nextAppointmentDetails).toBeNull()
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -225,7 +225,7 @@ describe('getNextAppointment middleware', () => {
       expect.objectContaining({ message: 'Connection refused' }),
       'Failed to connect to MPoP Components API.',
     )
-    expect(res.locals.nextAppointmentDetails).toBeUndefined()
+    expect(res.locals.nextAppointmentDetails).toBeNull()
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -239,7 +239,7 @@ describe('getNextAppointment middleware', () => {
       mpopComponents as unknown as MPoPComponents,
     )(req, res, nextSpy)
 
-    expect(res.locals.nextAppointmentDetails).toBeUndefined()
+    expect(res.locals.nextAppointmentDetails).toBeNull()
     expect(nextSpy).toHaveBeenCalled()
   })
 

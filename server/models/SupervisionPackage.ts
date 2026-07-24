@@ -1,4 +1,4 @@
-import { Activity } from '../data/model/schedule'
+import type { Activity } from '../data/model/schedule'
 
 export type SupervisionPackageResponse = {
   supervisionPackage: SupervisionPackage | null

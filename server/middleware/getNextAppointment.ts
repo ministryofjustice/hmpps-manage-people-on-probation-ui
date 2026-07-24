@@ -54,6 +54,8 @@ export const getNextAppointment = (
     const { crn } = req.params as Record<string, string>
     let nextAppointmentResponse: NextAppointmentResponse | undefined
 
+    res.locals.nextAppointmentDetails = null
+
     req.session.data.personalDetails ??= {}
     req.session.data.personalDetails[crn] ??= {} as any
     if (process.env.NODE_ENV === 'development') {
@@ -72,9 +74,9 @@ export const getNextAppointment = (
     }
 
     if (nextAppointmentResponse?.httpStatus === 200) {
-      res.locals.nextAppointmentDetails = nextAppointmentResponse.personSchedule.personSchedule.appointments[0] || null
+      res.locals.nextAppointmentDetails =
+        nextAppointmentResponse.personSchedule?.personSchedule?.appointments?.[0] || null
     }
-
     return next()
   }
 }

@@ -178,8 +178,6 @@
             }) }}
   {% endset %}
 
-  {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
-
   {% if flags.enableSupervisionPackage %}
     {% set tierCalculation = tierDetails.calculation if tierDetails else null %}
     {{ supervisionPackage({
@@ -191,11 +189,11 @@
       updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn),
       crn: crn,
       deliusBaseURL: deliusHomepageUrl(),
-      nextAppointment: {
+      nextAppointment: ({
         description: nextAppointmentDetails.type,
         date: nextAppointmentDetails.startDateTime,
         href: '/case/' + crn + '/appointments/appointment/' + nextAppointmentDetails.id + '/manage?back=' + url
-      },
+      } if nextAppointmentDetails else null),
       allAppointmentsHref: '/case/' + crn + '/appointments'
     } | merge(supervisionPackageDetails or {})) }}
   {% endif %}
