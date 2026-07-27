@@ -34,7 +34,7 @@ const setupAlertsPage = () => {
     }, 100)
   }
 
-  form.addEventListener('submit', function (event) {
+  form.addEventListener('submit', function clearAlerts(event) {
     const checkedBoxes = Array.from(alertCheckboxes).filter(cb => cb.checked)
     const checkedCount = checkedBoxes.length
 
@@ -88,7 +88,7 @@ const setupAlertsPage = () => {
     }
   }
 
-  dialog.addEventListener('keydown', function (e) {
+  dialog.addEventListener('keydown', function focusDialog(e) {
     if (e.key === 'Tab' || e.keyCode === 9) {
       const focusableElements = Array.from(dialog.querySelectorAll('button, [href], input, select, textarea'))
       const firstFocusable = focusableElements[0]
@@ -118,12 +118,12 @@ const setupAlertsPage = () => {
     closeModalXBtn.addEventListener('click', closeModal)
   }
 
-  dialog.addEventListener('cancel', function (e) {
+  dialog.addEventListener('cancel', function startCloseModal(e) {
     e.preventDefault()
     closeModal()
   })
 
-  confirmClearBtn.addEventListener('click', function () {
+  confirmClearBtn.addEventListener('click', function submitForm() {
     const checkedBoxes = Array.from(alertCheckboxes).filter(cb => cb.checked)
     const currentSelectionIds = checkedBoxes.map(cb => cb.value)
     const combinedIds = [...new Set([...previouslyCleared, ...currentSelectionIds])]
