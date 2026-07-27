@@ -10,6 +10,7 @@ const setupAlertsPage = () => {
   const dialog = modal.querySelector('dialog')
   const textContentGroup = document.getElementById('modal-text-content')
   const modalCountSpan = document.getElementById('selected-alerts-count')
+  const modalTextSpan = document.getElementById('alert-plural-check')
   const confirmClearBtn = document.getElementById('confirm-clear-btn')
   const closeModalBtn = document.getElementById('close-modal-btn')
   const closeModalXBtn = document.getElementById('close-modal-x-btn')
@@ -47,6 +48,11 @@ const setupAlertsPage = () => {
       modalCountSpan.textContent = 'all'
     } else {
       modalCountSpan.textContent = checkedCount
+    }
+    if (checkedCount === 1) {
+      modalTextSpan.textContent = 'alert.'
+    } else {
+      modalTextSpan.textContent = 'alerts.'
     }
 
     openModal()
