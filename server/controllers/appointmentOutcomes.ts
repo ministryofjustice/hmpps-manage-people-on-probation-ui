@@ -103,18 +103,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         }
       }
       let redirect = baseOutcomeUrl
-      /* Arrange or reschedule appointment journey */
-      if (uuid) {
-        redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
-      }
-      /* Manage appointment journey with no next appointment arranged */
-      if (contactId && !linkedContactId) {
-        redirect = `${baseOutcomeUrl}/next-appointment`
-      }
-      /* Manage appointment journey with next appointment arranged */
-      if (contactId && linkedContactId) {
-        redirect = `${baseOutcomeUrl}/check-your-answers`
-      }
+
+      redirect = uuid
+        ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
+        : `${baseOutcomeUrl}/next-appointment`
+
       if (change) redirect = change
       if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
       const backParam = `back=${baseOutcomeUrl}/add-note`
