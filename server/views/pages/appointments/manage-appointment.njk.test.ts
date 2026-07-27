@@ -379,10 +379,14 @@ describe('Manage an appointment', () => {
           flags: {
             enableNonCompliance: true,
           },
+          appointmentOutcome: {
+            crn: 'X000001',
+            contactId: '123456',
+          } as AppointmentOutcomeProps<Activity>,
         })
         expect($('[data-qa="appointmentActions"] li:nth-child(3)').text()).toContain('Upload documents')
         expect($('[data-qa="appointmentActions"] li:nth-child(3) a').attr('href')).toBe(
-          '/case/X000001/appointments/appointment/123456/outcome/add-note?put=true',
+          '/case/X000001/appointments/appointment/123456/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/123456/manage',
         )
       })
 
