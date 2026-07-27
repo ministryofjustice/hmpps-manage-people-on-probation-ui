@@ -45,14 +45,12 @@ const setupAlertsPage = () => {
     event.preventDefault()
 
     if (checkedCount === alertCheckboxes.length && previouslyCleared.length === 0) {
-      modalCountSpan.textContent = 'all'
+      modalCountSpan.textContent = `all ${checkedCount}`
+      modalTextSpan.textContent = 'alerts on this page.'
     } else {
       modalCountSpan.textContent = checkedCount
-    }
-    if (checkedCount === 1) {
-      modalTextSpan.textContent = 'alert.'
-    } else {
-      modalTextSpan.textContent = 'alerts.'
+      const plural = checkedCount === 1 ? 'alert.' : 'alerts.'
+      modalTextSpan.textContent = plural
     }
 
     openModal()

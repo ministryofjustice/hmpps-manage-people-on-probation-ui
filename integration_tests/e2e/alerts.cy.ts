@@ -154,7 +154,7 @@ context('Alerts Dashboard', () => {
     const page = Page.verifyOnPage(AlertsPage)
     cy.get('button[id="select-all-alerts"]').click()
     cy.get('[data-qa="clearSelectedAlerts"]').click()
-    cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear all alerts.')
+    cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear all 10 alerts on this page.')
     cy.get('button[id="confirm-clear-btn"]').click()
     cy.get('[class="moj-alert__content"]').should('contain.text', "You've cleared 10 alerts")
   })
