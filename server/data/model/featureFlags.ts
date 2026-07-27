@@ -24,5 +24,6 @@ export class FeatureFlags {
   enableESUPCheckinNewReview?: boolean = undefined
   enableESUPCheckinNewQuestions?: boolean = undefined
   enableSparksFilter?: boolean = undefined
+  enableSupervisionPackageFilter?: boolean = undefined
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
 }
