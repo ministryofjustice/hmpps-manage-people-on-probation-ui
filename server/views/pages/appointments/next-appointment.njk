@@ -3,7 +3,8 @@
 {% set pageTitle = makePageTitle({
   pageHeading: [title]
 }) %}
-{% set appointmentDisplayName = personAppointment.appointment.displayName or personAppointment.appointment.description or personAppointment.appointment.type %}
+{% set displayName = personAppointment.displayName if personAppointment.displayName else personAppointment.type %}
+{% set appointmentDescription = personAppointment.description + ' - ' + displayName if personAppointment.description else displayName %}
 {% set sentence = appointment.appointmentFor.sentence %}
 {% set backLink = back if back else
   '/case/' + crn + '/appointments/appointment/' + id + '/manage/' %}
@@ -26,7 +27,7 @@
   } if errorMessages.nextAppointment,
     items: [
     {
-        text: ("Yes - another " + appointmentDisplayName) | toSentenceCase,
+        text: ("Yes - another " + appointmentDescription) | toSentenceCase,
         value: "KEEP_TYPE",
         checked: body.nextAppointment == "KEEP_TYPE"
     },
@@ -51,7 +52,7 @@
 {% block afterHeading %}
   {% set nextAppointmentText = 'There are no upcoming supervision appointments for ' + personAppointment.personSummary.name.forename + '’s ' + sentence + '.' %}
   {% if nextAppointment.appointment %}
-    {% set nextAppointmentText = appointmentDisplayName | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + " with " + nextAppointment.appointment.officer.name | fullName + " for their " + sentence %}
+    {% set nextAppointmentText = appointmentDescription | toSentenceCase + " on " + nextAppointment.appointment.startDateTime | dateWithDayAndWithYear + " at " + nextAppointment.appointment.startDateTime | govukTime + " with " + nextAppointment.appointment.officer.name | fullName + " for their " + sentence %}
   {% endif %}
   {{ govukInsetText({
     html: nextAppointmentText

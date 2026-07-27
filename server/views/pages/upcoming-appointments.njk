@@ -19,7 +19,8 @@
 
 {% if upcomingAppointments.length > 0 %}
     {% for appointment in upcomingAppointments %}
-        {% set appointmentDescription = appointment.description if appointment.description else appointment.type %}
+        {% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
+        {% set appointmentDescription = appointment.description + ' - ' + displayName if appointment.description else displayName %}
         {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" + backQueryParam %}
         {% set appointmentDetails %}
         <a class='govuk-link' href={{ manageUrl }}>

@@ -2,8 +2,9 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
-{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
-{% set title = (('Manage ' + appointmentDisplayName) | toSentenceCase) + ' with ' + (
+{% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
+{% set appointmentDescription = appointment.description if appointment.description else displayName %}
+{% set title = (('Manage ' + appointmentDescription) | toSentenceCase) + ' with ' + (
 appointment.officer.name | fullName | convertToTitleCase) %}
 {% set pageTitle = makePageTitle({pageHeading: [title]}) %}
 {% set notes = '' %}
@@ -11,7 +12,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 
-{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else 
+{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else
   'Log attended and complied appointment' %}
 {% set outcomeLink = null %}
 {% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
@@ -31,7 +32,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
-  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else 
+  {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else
     "") + " on " + (
     nextAppointment.appointment.startDateTime | dateWithDayAndWithYear) + " at " + (
     nextAppointment.appointment.startDateTime | govukTime) + "."
@@ -50,7 +51,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         text: document.level if document.level else "Contact"
       },
       {
-        text: document.type if document.type else appointmentDisplayName
+        text: document.type if document.type else appointmentDescription
       },
       {
         text: document.createdAt | dateWithYear if document.createdAt else "",
@@ -148,7 +149,12 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDisplayName) | toSentenceCase }} with {{ appointment.officer.name | fullName | convertToTitleCase }}</h2>
+      {% if appointment.description %}
+        <span class="govuk-caption-l" data-qa="appointmentType">
+          {{displayName}}
+        </span>
+      {% endif %}
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointmentDescription) | toSentenceCase }} with {{ appointment.officer.name | fullName | convertToTitleCase }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "information",
@@ -354,6 +360,50 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         ]
       } if not appointment.deliusManaged
     } if appointment.location,
+    {
+      key: {
+        text: "Type"
+      },
+      value: {
+        html: '<span data-qa="typeValue">' + displayName + '</span>'
+      },
+      actions: {
+        classes: "govuk-!-white-space-nowrap",
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Description"
+      },
+      value: {
+        html: '<span data-qa="typeValue">' + appointment.description + '</span>'
+      },
+      actions: {
+        classes: "govuk-!-white-space-nowrap",
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      }
+    } if appointment.description,
     {
       key: {
         text: "Attending"

@@ -14,7 +14,7 @@
 
 {% macro rendersummaryText(activity) %}
   <span>
-    {{ (activity.description or activity.displayName or activity.type) | toSentenceCase }}
+    {{ ((activity.description + ' - ' + activity.displayName) if activity.description else activity.displayName) | toSentenceCase }}
   </span>
 {% endmacro %}
 
