@@ -109,7 +109,7 @@ describe('contactDisplayNames', () => {
     } as any
     const result = mapScheduleWithApprovedContactDisplayNames(schedule)
     expect(result.personSchedule.appointments[0].displayName).toBe('Telephone contact from person on probation')
-    expect(result.personSchedule.appointments[1].displayName).toBe(undefined)
+    expect(result.personSchedule.appointments[1].displayName).toBeUndefined()
   })
 
   it('normalizeContactDisplayNameKey normalizes various strings', () => {

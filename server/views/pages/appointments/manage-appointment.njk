@@ -51,7 +51,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         text: document.level if document.level else "Contact"
       },
       {
-        text: document.type if document.type else appointmentDescription
+        text: document.type | default(appointmentDescription)
       },
       {
         text: document.createdAt | dateWithYear if document.createdAt else "",
