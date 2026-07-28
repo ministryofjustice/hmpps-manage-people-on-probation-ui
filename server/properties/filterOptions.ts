@@ -566,6 +566,14 @@ export const sparksCategoryFilterOption = {
   codes: [SPARKS_FILTER_VALUE],
 }
 
+export const SUPERVISION_PACKAGE_FILTER_VALUE = 'supervisionPackage'
+
+export const supervisionPackageCategoryFilterOption = {
+  text: 'Show appointments in supervision package',
+  value: 'appointments in supervision package',
+  codes: [SUPERVISION_PACKAGE_FILTER_VALUE],
+}
+
 export const categoryFilterOptions = [
   { text: 'Appointments', value: 'appointments', codes: APPOINTMENTS_CODES },
   { text: 'Approved Premises', value: 'Approved Premises', codes: APPROVED_PREMISES_CODES },

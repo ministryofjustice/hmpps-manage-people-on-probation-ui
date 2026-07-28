@@ -48,6 +48,9 @@ export const cloneAppointmentAndRedirect = (
       clonedAppt.sensitivity = null
       clonedAppt.sensitivityLocked = false
     }
+    if (clonedAppt?.outcome) {
+      clonedAppt.outcome = null
+    }
     if (req.url.includes('/outcome/next-appointment')) {
       setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
     }

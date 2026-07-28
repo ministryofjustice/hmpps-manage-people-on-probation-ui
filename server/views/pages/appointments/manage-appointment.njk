@@ -198,7 +198,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       status: {
         tag: {
           text: compliedStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
-          classes: "govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
+          classes: "govuk-tag--auto-width govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
         }
       }
     },
@@ -235,7 +235,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Upload documents"
       },
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true' if flags.enableNonCompliance),
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage' if flags.enableNonCompliance),
       status: {
         tag: {
           text: 'No documents',
