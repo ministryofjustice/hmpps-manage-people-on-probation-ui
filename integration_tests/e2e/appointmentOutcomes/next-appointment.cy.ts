@@ -20,7 +20,6 @@ import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-anot
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
-import { dateWithYear } from '../../../server/utils'
 import { AppointmentSessionSelection } from '../../../server/models/Appointments'
 
 const crn = 'X000001'
@@ -32,7 +31,6 @@ let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
 let checkYourAnswersPage: AppointmentCheckYourAnswersPage
 let confirmationPage: AppointmentConfirmationPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
-const expectedDate = dateWithYear(DateTime.now().toFormat('yyyy-MM-dd'))
 
 const loadNextAppointmentPage = (): void => {
   cy.task('stubAppointment', { isFuture: false })
@@ -122,7 +120,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         confirmationPage.checkPageTitle('Past appointment arranged')
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
-          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}.`)
+          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on 21 February 2024.`)
         cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       })
@@ -141,7 +139,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         confirmationPage.checkPageTitle('Appointment arranged')
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
-          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on ${expectedDate}.`)
+          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on 21 February 2024.`)
         cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       })

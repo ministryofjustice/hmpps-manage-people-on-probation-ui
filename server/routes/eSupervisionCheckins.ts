@@ -19,6 +19,32 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
       return next()
     },
   )
+
+  // Check these routes against the enableESUPCheckinNewSetup flag
+  // and redirect to the manage online check-ins service if set
+  router.use(
+    [
+      '/case/:crn/appointments/check-in/eligibility-check',
+      '/case/:crn/appointments/:id/check-in/eligibility-check',
+      '/case/:crn/appointments/:id/check-in/denied-eligibility',
+      '/case/:crn/appointments/:id/check-in/full-eligibility',
+      '/case/:crn/appointments/:id/check-in/supplementary-eligibility',
+      '/case/:crn/appointments/:id/check-in/spo-approval',
+      '/case/:crn/appointments/:id/check-in/rationale',
+      '/case/:crn/appointments/:id/check-in/date-frequency',
+      '/case/:crn/appointments/:id/check-in/contact-preference',
+      '/case/:crn/appointments/:id/check-in/edit-contact-preference',
+      '/case/:crn/appointments/:id/check-in/photo-options',
+      '/case/:crn/appointments/:id/check-in/take-a-photo',
+      '/case/:crn/appointments/:id/check-in/upload-a-photo',
+      '/case/:crn/appointments/:id/check-in/photo-rules',
+      '/case/:crn/appointments/:id/check-in/checkin-summary',
+      '/case/:crn/appointments/:id/check-in/confirm-start',
+      '/case/:crn/appointments/:id/check-in/confirm-end',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewSetup'),
+  )
+
   router.get('/case/:crn/appointments/check-in/eligibility-check', [
     controllers.checkIns.getStartSetup(hmppsAuthClient),
   ])
@@ -176,8 +202,21 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/check-in/manage/:id', [
+    // Individually checking this route against the enableESUPCheckinNewSettings flag
+    redirectToManageCheckInService('enableESUPCheckinNewSettings'),
     controllers.checkIns.getManageCheckinPage(hmppsAuthClient),
   ])
+
+  // Check these routes against the enableESUPCheckinNewSettings flag
+  // and redirect to the manage online check-ins service if set
+  router.use(
+    [
+      '/case/:crn/appointments/check-in/manage/:id/settings',
+      '/case/:crn/appointments/check-in/manage/:id/contact',
+      '/case/:crn/appointments/check-in/manage/:id/edit-contact',
+    ],
+    redirectToManageCheckInService('enableESUPCheckinNewSettings'),
+  )
 
   router.get('/case/:crn/appointments/check-in/manage/:id/settings', [
     controllers.checkIns.getManageCheckinDatePage(hmppsAuthClient),
