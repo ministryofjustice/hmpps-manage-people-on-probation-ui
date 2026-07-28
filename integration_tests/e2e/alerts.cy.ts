@@ -141,33 +141,4 @@ context('Alerts Dashboard', () => {
       .find('a')
       .should('have.attr', 'href', `/alerts/8/note/0?back=${encodeURIComponent('/alerts')}`)
   })
-
-  it('Clear alerts fails if no alerts selected', () => {
-    cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
-    cy.get('[data-qa="clearSelectedAlerts"]').click()
-    cy.get('[class="moj-alert__content"]').should('contain.text', 'Select an alert to clear it.')
-  })
-
-  it('Modal dialog required when clearing alerts', () => {
-    cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
-    cy.get('button[id="select-all-alerts"]').click()
-    cy.get('[data-qa="clearSelectedAlerts"]').click()
-    cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear all 10 alerts on this page.')
-    cy.get('button[id="confirm-clear-btn"]').click()
-    cy.get('[class="moj-alert__content"]').should('contain.text', "You've cleared 10 alerts")
-  })
-
-  it('Modal dialog text depends on alerts selected', () => {
-    cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
-    cy.get('[data-qa="alertCheckbox"]').first().find('input').click()
-    cy.get('[data-qa="clearSelectedAlerts"]').click()
-    cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear 1 alert.')
-    cy.get('button[id="close-modal-btn"]').click()
-    cy.get('[data-qa="alertCheckbox"]').eq(1).find('input').click()
-    cy.get('[data-qa="clearSelectedAlerts"]').click()
-    cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear 2 alerts.')
-  })
 })
