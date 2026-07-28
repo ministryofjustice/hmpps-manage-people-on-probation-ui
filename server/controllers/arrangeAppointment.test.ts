@@ -1146,7 +1146,7 @@ describe('controllers/arrangeAppointment', () => {
         appointments: {
           '1234': {
             eventId: '10',
-            start: '2026-05-23',
+            date: '2026-05-23',
             type: 'A1',
           },
         },
