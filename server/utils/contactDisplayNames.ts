@@ -181,7 +181,7 @@ export function withApprovedContactDisplayName<T extends Activity>(activity: T):
   const displayName = getApprovedContactDisplayName(activity.action) ?? getApprovedContactDisplayName(activity.type)
 
   if (!displayName) {
-    return { ...activity, displayName: activity.type }
+    return activity
   }
 
   return { ...activity, displayName }

@@ -31,7 +31,7 @@ describe('contactDisplayNames', () => {
     expect(mapPersonActivityWithApprovedContactDisplayNames(personActivity).activities).toEqual([
       { id: '1', type: 'Phone Contact from PoP', displayName: 'Telephone contact from person on probation' },
       { id: '2', type: 'Phone call', action: 'eMail/Text from Other', displayName: 'Email or text from other' },
-      { id: '3', type: 'Legacy NDelius name', displayName: 'Legacy NDelius name' },
+      { id: '3', type: 'Legacy NDelius name' },
     ])
   })
 
@@ -109,7 +109,7 @@ describe('contactDisplayNames', () => {
     } as any
     const result = mapScheduleWithApprovedContactDisplayNames(schedule)
     expect(result.personSchedule.appointments[0].displayName).toBe('Telephone contact from person on probation')
-    expect(result.personSchedule.appointments[1].displayName).toBe('Unknown')
+    expect(result.personSchedule.appointments[1].displayName).toBe(undefined)
   })
 
   it('normalizeContactDisplayNameKey normalizes various strings', () => {
