@@ -17,6 +17,7 @@ export const mockActivities = {
     {
       id: 11,
       type: 'Phone call',
+      displayName: 'Phone call',
       startDateTime: '2044-12-22T09:15:00.382936Z[Europe/London]',
       endDateTime: '2044-12-22T09:30:00.382936Z[Europe/London]',
       rarToolKit: 'Choices and Changes',
@@ -28,6 +29,7 @@ export const mockActivities = {
       isAppointment: false,
       isCommunication: true,
       isPhoneCallFromPop: true,
+      isUpdatableContact: false,
     },
   ],
 } as unknown as PersonActivity
