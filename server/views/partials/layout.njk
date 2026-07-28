@@ -39,7 +39,6 @@
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% block head %}
-  <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
   {% if feComponents.cssIncludes %}
     {% for css in feComponents.cssIncludes %}
       <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet"/>
@@ -48,6 +47,7 @@
     <link href="/assets/css/fallback_prob_fe_app_header.css" nonce="{{ cspNonce }}" rel="stylesheet"/>
     <link href="/assets/css/fallback_prob_fe_app_footer.css" nonce="{{ cspNonce }}" rel="stylesheet"/>
   {% endif %}
+  <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
 {% endblock %}
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}
