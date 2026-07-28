@@ -666,10 +666,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       let linkedAppointment = null
       if (res?.locals?.flags?.enableNonCompliance && linkedContactId) {
-        const { start, type: typeCode } = getDataValue<AppointmentSession>(data, ['appointments', crn, linkedContactId])
+        const { date, type: typeCode } = getDataValue<AppointmentSession>(data, ['appointments', crn, linkedContactId])
         linkedAppointment = {
           contactId: linkedContactId,
-          date: dateWithYear(start),
+          date: dateWithYear(date),
           type: res.locals.appointmentTypes.find((type: any) => type.code === typeCode)?.description || null,
         }
       }
