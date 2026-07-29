@@ -184,8 +184,8 @@
     "util": "^0.12.5",
     "util.inherits": "^1.0.3",
     "uuid": "14.0.1",
-    "webpack": "^5.109.0",
-    "webpack-cli": "^7.2.1",
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2",
     "wiremock": "^3.13.1"
   },
   "devDependencies": {
