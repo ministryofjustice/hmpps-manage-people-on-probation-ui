@@ -15,6 +15,10 @@ export const cloneAppointmentAndRedirect = (
     const { url } = req
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
 
+    if (req.url.includes('/outcome/next-appointment')) {
+      setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
+    }
+
     if (apptType === 'CHANGE_TYPE') {
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
     }
@@ -51,10 +55,6 @@ export const cloneAppointmentAndRedirect = (
 
     if (clonedAppt?.outcome) {
       clonedAppt.outcome = null
-    }
-
-    if (req.url.includes('/outcome/next-appointment')) {
-      setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
     }
 
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
