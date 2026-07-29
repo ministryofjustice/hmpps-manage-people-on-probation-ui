@@ -16,7 +16,7 @@ export const cloneAppointmentAndRedirect = (
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
 
     if (apptType === 'CHANGE_TYPE') {
-      redirectURL = `/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`
+      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
     }
 
     let clonedAppt: AppointmentSession = {
@@ -41,19 +41,22 @@ export const cloneAppointmentAndRedirect = (
         },
       }
       clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
-
       redirectURL = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
     }
+
     if (apptType !== 'RESCHEDULE') {
       clonedAppt.sensitivity = null
       clonedAppt.sensitivityLocked = false
     }
+
     if (clonedAppt?.outcome) {
       clonedAppt.outcome = null
     }
+
     if (req.url.includes('/outcome/next-appointment')) {
       setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
     }
+
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)
   }

@@ -88,6 +88,12 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
 
+  it('should only redirect and not clone the current appointment if the apptType is CHANGE_TYPE', () => {
+    cloneAppointmentAndRedirect(mockAppt, 'CHANGE_TYPE')(req, res)
+    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${req.url}`)
+    expect(mockedSetDataValue).not.toHaveBeenCalled()
+  })
+
   it('should reuse existing id and redirect to check answers when apptType is RESCHEDULE', () => {
     const { req: request, res: response } = setup()
     const crn2 = request.params.crn
