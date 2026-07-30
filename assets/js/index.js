@@ -8,6 +8,7 @@ import './predictors'
 import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
+import criss from './criss'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
 import initGovUkBackLink from './back-link'
@@ -91,21 +92,6 @@ const homeSearch = () => {
       if (e.target.dataset.suggestedQuery) {
         document.getElementById('search').value = e.target.dataset.suggestedQuery
         document.getElementById('homepage-search-form').submit()
-      }
-    })
-  }
-}
-
-const crissHeaders = () => {
-  const btn = document.getElementById('crissButton')
-  if (btn) {
-    const textarea = document.querySelector('textarea')
-    const status = document.getElementById('crissStatus')
-    btn.addEventListener('click', () => {
-      if (textarea.value.trim() === '') {
-        textarea.value = `Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks`
-        status.textContent = 'CRISS headers inserted'
-        textarea.focus()
       }
     })
   }
@@ -409,9 +395,9 @@ setNoFixedAddressConditional()
 resetConditionals()
 attendanceSelectors()
 homeSearch()
-crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
 initGovUkBackLink()
+criss()
 new DateTimeFormatting()
