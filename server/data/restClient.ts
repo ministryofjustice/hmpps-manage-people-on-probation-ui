@@ -11,9 +11,6 @@ import { isValidPath } from '../utils/isValidPath'
 import 'multer'
 import isTimeoutError from '../utils/isTimeoutError'
 
-// allow timeout override
-type RequestTimeout = ApiConfig['timeout']
-
 interface Request {
   path: string
   query?: object | string
@@ -28,7 +25,6 @@ interface Request {
   file?: Express.Multer.File
   isMultipart?: boolean
   retry?: boolean
-  timeout?: RequestTimeout
 }
 
 interface RequestWithBody extends Request {
@@ -66,7 +62,6 @@ export default class RestClient {
     handle401 = false,
     errorMessage = '',
     retry = true,
-    timeout,
   }: Request): Promise<TResponse | null> {
     logger.info(escapeForLog(`${this.name} GET: ${path}`))
 
@@ -94,7 +89,7 @@ export default class RestClient {
         .auth(this.token, { type: 'bearer' })
         .set(headers)
         .responseType(responseType)
-        .timeout(timeout ?? this.timeoutConfig())
+        .timeout(this.timeoutConfig())
 
       return raw ? (result as TResponse) : result.body
     } catch (error: any) {
@@ -138,7 +133,6 @@ export default class RestClient {
       file,
       isMultipart = false,
       errorMessage = '',
-      timeout,
     }: RequestWithBody,
   ): Promise<Response | null> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
@@ -159,7 +153,7 @@ export default class RestClient {
         .auth(this.token, { type: 'bearer' })
         .set(headers)
         .responseType(responseType)
-        .timeout(timeout ?? this.timeoutConfig())
+        .timeout(this.timeoutConfig())
 
       if (file) {
         const { buffer, originalname } = file
@@ -235,7 +229,6 @@ export default class RestClient {
     responseType = '',
     raw = false,
     retry = true,
-    timeout,
   }: Request): Promise<Response> {
     logger.info(escapeForLog(`${this.name} DELETE: ${path}`))
 
@@ -262,7 +255,7 @@ export default class RestClient {
         .auth(this.token, { type: 'bearer' })
         .set(headers)
         .responseType(responseType)
-        .timeout(timeout ?? this.timeoutConfig())
+        .timeout(this.timeoutConfig())
 
       return raw ? (result as Response) : result.body
     } catch (error) {

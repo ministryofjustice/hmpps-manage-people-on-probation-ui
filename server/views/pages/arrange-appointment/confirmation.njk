@@ -117,6 +117,19 @@
           <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
           <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
             {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
+        {% elif isOutlookEventPending %}
+          {{ mojAlert({
+            variant: "error",
+            title: "There may be a problem sending your calendar invitation",
+            showTitleAsHeading: true,
+            dismissible: false,
+            text: "You may not receive a calendar invitation. If it does not arrive within a few minutes, create your own calendar event.",
+            attributes: {
+              'data-qa': 'outlook-pending-msg'
+            }
+          }) }}
+          <p class="govuk-body" data-qa="outlook-pending-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
+            {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
         {% else %}
           {% if not isInPast %}
             <p class="govuk-!-margin-bottom-0" data-qa="">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on{% else %} has been added to{% endif %}:</p>

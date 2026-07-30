@@ -1107,6 +1107,7 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         responseContactId: '1234',
         isOutLookEventFailed: false,
+        isOutlookEventPending: null,
         appointmentType: null,
         isEnglishNotificationFailed: null,
         isWelshNotificationFailed: null,
@@ -1115,6 +1116,28 @@ describe('controllers/arrangeAppointment', () => {
         linkedAppointment: null,
         url: '',
       })
+    })
+    it('should pass isOutlookEventPending to the view and clear it from the session when set', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: { user: { username: '' }, smsOptIn: 'YES' },
+        dataSession: {
+          temp: { [crn]: { responseContactId: '1234' } },
+          isOutLookEventFailed: false,
+          isOutlookEventPending: true,
+        },
+      })
+      const mockRes = createMockResponse({
+        contactResponse: {
+          content: [],
+        },
+      })
+      const mockRenderSpy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockRenderSpy).toHaveBeenCalledWith(
+        `pages/arrange-appointment/confirmation`,
+        expect.objectContaining({ isOutlookEventPending: true }),
+      )
+      expect(mockReq.session.data.isOutlookEventPending).toBeUndefined()
     })
     it('should render the reschedule appointment confirmation page', async () => {
       const mockReq = createMockRequest({
@@ -1128,6 +1151,7 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         responseContactId: '1234',
         isOutLookEventFailed: false,
+        isOutlookEventPending: null,
         appointmentType: 'RESCHEDULE',
         attendingName: 'First’s',
         url: encodeURIComponent('/reschedule/url'),
@@ -1162,6 +1186,7 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         responseContactId: '1234',
         isOutLookEventFailed: false,
+        isOutlookEventPending: null,
         appointmentType: 'RESCHEDULE',
         attendingName: 'First’s',
         url: encodeURIComponent('/reschedule/url'),
