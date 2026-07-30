@@ -1,76 +1,106 @@
 import { Route } from '../../@types'
-import {
-  AppointmentEnforcementAction,
-  AppointmentOutcomeType,
-  AppointmentSessionOutcome,
-} from '../../models/Appointments'
-import { getDataValue } from '../../utils'
 
 export const getBackLink: Route<void> = (req, res, next) => {
-  const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id, sendLetter, appointmentSession } =
-    res.locals.appointmentOutcome
-  let backLink = baseOutcomeUrl
+  const { baseOutcomeUrl, reqUrl, uuid, baseUrl, sendLetter, appointmentSession } = res.locals.appointmentOutcome
+  const { back } = req.query as Record<string, string>
+  let backLink = null
+
+  const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
+  const acceptableAbsence = appointmentSession?.outcome?.acceptableAbsence
+  const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
+  const failedToAttend = appointmentSession?.outcome?.failedToAttend
+  const breachNSICreatedBy = appointmentSession?.outcome?.breachNSICreatedBy
+  const redirectFromUpdate = appointmentSession?.outcome?.redirectFromUpdate
+  const otherEnforcementAction = appointmentSession?.outcome?.otherEnforcementAction
+  const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction
+  const outcomeType = appointmentSession?.outcome?.outcomeType
+
   if ([baseOutcomeUrl, `${baseOutcomeUrl}/update-enforcement-action`].includes(reqUrl)) {
     backLink = uuid ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`
   }
-  let outcomeType: AppointmentOutcomeType
-  let otherEnforcementAction: AppointmentEnforcementAction
-  let updateEnforcementAction: AppointmentEnforcementAction
-  if (req?.body?.appointments?.[crn]?.[id]?.outcome?.outcomeType) {
-    outcomeType = req.body.appointments[crn][id].outcome.outcomeType
-    otherEnforcementAction = req.body.appointments[crn][id].outcome.otherEnforcementAction
-    updateEnforcementAction = req.body.appointments[crn][id].outcome.updateEnforcementAction
-  } else {
-    const outcome = getDataValue<AppointmentSessionOutcome>(req.session.data, ['appointments', crn, id, 'outcome'])
-    if (outcome) {
-      outcomeType = outcome?.outcomeType || null
-      otherEnforcementAction = outcome?.otherEnforcementAction || null
-      updateEnforcementAction = outcome?.updateEnforcementAction || null
+
+  // other enforcement action 👇
+
+  if (reqUrl === `${baseOutcomeUrl}/enforcement-action`) {
+    if (updateEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/update-enforcement-action`
+    } else if (redirectFromUpdate) {
+      backLink = `${baseUrl}/manage`
+    } else if (attendedFailedToComply === 'DIFFERENT_ACTION') {
+      backLink = `${baseOutcomeUrl}/attended-failed-to-comply`
+    } else if (unacceptableAbsence === 'DIFFERENT_ACTION') {
+      backLink = `${baseOutcomeUrl}/unacceptable-absence`
+    } else if (failedToAttend === 'DIFFERENT_ACTION') {
+      backLink = `${baseOutcomeUrl}/failed-to-attend`
     }
   }
-  if (
-    [
-      `${baseOutcomeUrl}/enforcement-action`,
-      `${baseOutcomeUrl}/send-letter`,
-      `${baseOutcomeUrl}/initiate-breach-or-recall`,
-    ].some(route => route === reqUrl) &&
-    outcomeType
-  ) {
-    switch (outcomeType) {
-      case 'ATTENDED_SENT_HOME_BEHAVIOUR':
-      case 'ATTENDED_FAILED_TO_COMPLY':
-      case 'ATTENDED_SENT_HOME_SERVICE_ISSUES':
-        backLink = `${baseOutcomeUrl}/attended-failed-to-comply` // used for all 3 pages
-        break
-      case 'UNACCEPTABLE_ABSENCE':
-        backLink = `${baseOutcomeUrl}/unacceptable-absence` // used for all 3 pages
-        break
-      case 'FAILED_TO_ATTEND':
-        backLink = `${baseOutcomeUrl}/failed-to-attend` // <-- only used for EVIDENCE_REQUESTED type
-        break
-      default:
-        backLink = `/case/${crn}/appointments/appointment/${id}/manage`
+
+  // send letter 👇
+
+  if (reqUrl === `${baseOutcomeUrl}/send-letter`) {
+    if (otherEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/enforcement-action`
+    } else if (updateEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/update-enforcement-action`
+    } else if (attendedFailedToComply) {
+      backLink = `${baseOutcomeUrl}/attended-failed-to-comply`
+    } else if (unacceptableAbsence) {
+      backLink = `${baseOutcomeUrl}/unacceptable-absence`
+    } else if (failedToAttend) {
+      backLink = `${baseOutcomeUrl}/failed-to-attend`
     }
   }
-  if (otherEnforcementAction && reqUrl !== `${baseOutcomeUrl}/enforcement-action` && reqUrl !== baseOutcomeUrl) {
-    backLink = `${baseOutcomeUrl}/enforcement-action`
+
+  // initiate breach or recall 👇
+
+  if (reqUrl === `${baseOutcomeUrl}/initiate-breach-or-recall`) {
+    if (otherEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/enforcement-action`
+    } else if (updateEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/update-enforcement-action`
+    } else if (attendedFailedToComply) {
+      backLink = `${baseOutcomeUrl}/attended-failed-to-comply`
+    } else if (unacceptableAbsence) {
+      backLink = `${baseOutcomeUrl}/unacceptable-absence`
+    }
   }
-  if (
-    updateEnforcementAction &&
-    reqUrl !== `${baseOutcomeUrl}/update-enforcement-action` &&
-    reqUrl !== baseOutcomeUrl
-  ) {
-    backLink = `${baseOutcomeUrl}/update-enforcement-action`
-  }
-  if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
-    // every journey goes to add note
+
+  // add note 👇
+
+  if (reqUrl === `${baseOutcomeUrl}/add-note`) {
     if (sendLetter) {
       backLink = `${baseOutcomeUrl}/send-letter`
-    }
-    if (appointmentSession?.outcome?.breachNSICreatedBy) {
+    } else if (breachNSICreatedBy) {
       backLink = `${baseOutcomeUrl}/initiate-breach-or-recall`
+    } else if (otherEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/enforcement-action`
+    } else if (updateEnforcementAction) {
+      backLink = `${baseOutcomeUrl}/update-enforcement-action`
+    } else if (attendedFailedToComply) {
+      backLink = `${baseOutcomeUrl}/attended-failed-to-comply`
+    } else if (acceptableAbsence) {
+      backLink = `${baseOutcomeUrl}/acceptable-absence`
+    } else if (unacceptableAbsence) {
+      backLink = `${baseOutcomeUrl}/unacceptable-absence`
+    } else if (failedToAttend) {
+      backLink = `${baseOutcomeUrl}/failed-to-attend`
+    } else if (['ATTENDED_COMPLIED', 'ATTENDED_SENT_HOME_SERVICE_ISSUES'].includes(outcomeType)) {
+      backLink = baseOutcomeUrl
     }
   }
+
+  if (back) {
+    const regex = /^\/case\/[A-Z0-9]{7}\/.*$/
+    const isValidUrl = regex.test(back)
+    if (isValidUrl) {
+      backLink = back
+    }
+  }
+
+  if (!backLink) {
+    backLink = baseOutcomeUrl
+  }
+
   res.locals.appointmentOutcome.backLink = backLink
   return next()
 }

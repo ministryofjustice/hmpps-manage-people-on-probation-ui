@@ -526,6 +526,203 @@ describe('/middleware/postAppointments', () => {
       it('should set req.session.data.isOutLookEventFailed to true', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
+      it('should capture a Sentry exception when no email can be found for the attending user after the fallback lookup', () => {
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+            }),
+          }),
+        )
+      })
+    })
+
+    describe('Attending user does not have email, and the fallback user details lookup also has no email', () => {
+      // Reproduces a real scenario found in the dev environment: the fallback getUserDetails(username)
+      // call succeeds (no error thrown) but the staff record itself has no email recorded at all
+      // (e.g. a system/test account), so email remains blank even after the fallback lookup.
+      it('should capture a Sentry exception without needing an error from the api call', async () => {
+        jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+          userId: 123,
+          username,
+          firstName: 'Mock',
+          surname: 'User',
+          email: undefined,
+          enabled: true,
+          roles: [],
+        })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, email: null },
+          smsOptIn: 'YES',
+        })
+        const locals = { user: { ...mockUser, email: null as string } }
+        const res = buildResponse({ locals })
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+            }),
+          }),
+        )
+      })
+    })
+
+    describe('Attending user name is missing from the appointment session (stale staff cache lookup)', () => {
+      const buildMockReq = () =>
+        createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, name: null },
+        })
+
+      it('should resolve and return the created appointment instead of throwing, when a fresh user lookup also has no name', async () => {
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = buildMockReq()
+        const res = buildResponse()
+
+        const response = await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(response).toEqual(mockAppointmentsPostResponse)
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
+      it('should log userName as missing, when session-cache logging is enabled', async () => {
+        jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = buildMockReq()
+        const loggingRes = buildResponse({ flags: { enableSessionCacheLogging: true } })
+
+        await postAppointments(hmppsAuthClient)(mockReq, loggingRes)
+
+        expect(logger.info).toHaveBeenCalledWith(
+          expect.objectContaining({
+            event: 'sessionCachePresence',
+            userPresent: true,
+            userNamePresent: false,
+            missing: expect.arrayContaining(['userName']),
+          }),
+          expect.stringContaining('missing=['),
+        )
+      })
+      it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null) and email is already present', async () => {
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, name: { forename: '', surname: '' } },
+        })
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: 'name',
+            }),
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
+      it('should capture a single combined Sentry exception when both name and email are still missing after fallback', async () => {
+        jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          user: { ...mockAppointment.user, name: null, email: null },
+        })
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: 'name,email',
+            }),
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
+      it('should treat a fallback lookup with a blank firstName/surname as still missing a name, and still capture a Sentry exception', async () => {
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+          userId: 123,
+          username,
+          firstName: undefined,
+          surname: undefined,
+          email: mockUser.email,
+          enabled: true,
+          roles: [],
+        })
+        const mockReq = buildMockReq()
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+        expect(Sentry.captureException).toHaveBeenCalledWith(
+          expect.any(Error),
+          expect.objectContaining({
+            tags: expect.objectContaining({
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: 'name',
+            }),
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
+      it('should recover the name from the fallback user details lookup and still send the calendar invite', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+          userId: 123,
+          username,
+          firstName: 'Fallback',
+          surname: 'Person',
+          email: mockUser.email,
+          enabled: true,
+          roles: [],
+        })
+        const mockReq = buildMockReq()
+        const res = buildResponse()
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        expect(postOutlookCalendarEventSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            recipients: [
+              {
+                emailAddress: mockUser.email,
+                name: 'Fallback Person',
+              },
+            ],
+          }),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toBeFalsy()
+        expect(Sentry.captureException).not.toHaveBeenCalled()
+      })
     })
 
     describe('SMS', () => {

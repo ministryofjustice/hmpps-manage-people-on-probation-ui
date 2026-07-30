@@ -8,15 +8,19 @@ export const cloneAppointmentAndRedirect = (
   appointmentToClone: AppointmentSession = {},
   apptType: AppointmentSessionSelection = 'KEEP_TYPE',
 ) => {
-  return (req: Request, res: AppResponse): void => {
+  return function cloneAppointmentAndRedirectInner(req: Request, res: AppResponse): void {
     const { data } = req.session
     const { crn, id, contactId } = req.params as Record<string, string>
     const uuid = apptType === 'RESCHEDULE' ? id : uuidv4()
     const { url } = req
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
 
+    if (req.url.includes('/outcome/next-appointment')) {
+      setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
+    }
+
     if (apptType === 'CHANGE_TYPE') {
-      redirectURL = `/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`
+      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
     }
 
     let clonedAppt: AppointmentSession = {
@@ -41,16 +45,18 @@ export const cloneAppointmentAndRedirect = (
         },
       }
       clonedAppt.sensitivityLocked = clonedAppt?.sensitivity === 'Yes'
-
       redirectURL = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
     }
+
     if (apptType !== 'RESCHEDULE') {
       clonedAppt.sensitivity = null
       clonedAppt.sensitivityLocked = false
     }
-    if (req.url.includes('/outcome/next-appointment')) {
-      setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
+
+    if (clonedAppt?.outcome) {
+      clonedAppt.outcome = null
     }
+
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(redirectURL)
   }

@@ -10,7 +10,7 @@ const setMockedTime = (time: string) => {
 export const getMockedTime = () => mockedTime
 
 export default function testRoutes(router: Router) {
-  router.post('/__test/set-mocked-time', (req, res) => {
+  router.post('/__test/set-mocked-time', function setMockedTimeSession(req, res) {
     const { time } = req.body
     if (!time) return res.status(400).send('Missing time')
     setMockedTime(time)

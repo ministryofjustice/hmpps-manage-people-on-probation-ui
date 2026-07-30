@@ -12,7 +12,7 @@ export default function setUpWebSecurity(): Router {
   // 1. https://expressjs.com/en/advanced/best-practice-security.html,
   // 2. https://www.npmjs.com/package/helmet
   router.use(validateHost())
-  router.use((_req: Request, res: AppResponse, next: NextFunction) => {
+  router.use(function setNonce(_req: Request, res: AppResponse, next: NextFunction) {
     res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
     next()
   })

@@ -3,7 +3,7 @@
 {% set documentsHtml = '' %}
  {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
  {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
-{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
+{% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
 {% set _docs = appointmentDocuments if appointmentDocuments else appointment.documents %}
@@ -35,7 +35,7 @@
         items: [
           {
             classes: "govuk-link--no-visited-state",
-            attributes: { "target": "_blank", "aria-label":"Change '" + appointmentDisplayName | lower + " appointment on NDelius" },
+            attributes: { "target": "_blank", "aria-label":"Change '" + displayName | lower + " appointment on NDelius" },
             href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
             text:'Change',
             visuallyHiddenText: '(opens in new tab)'
@@ -45,7 +45,7 @@
     } if appointment.rearrangeOrCancelReason,
     {
       key: { html: '<span data-qa="typeLabel">' + headings[0] + '</span>' },
-      value: { html: '<span data-qa="typeValue">' + appointmentDisplayName + '</span>' }
+      value: { html: '<span data-qa="typeValue">' + displayName + '</span>' }
     },
     {
       key: { html: '<span data-qa="descriptionLabel">Description</span>' },

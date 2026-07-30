@@ -7,7 +7,7 @@ import { AppResponse } from './models/Locals'
 import isTimeoutError from './utils/isTimeoutError'
 
 export default function createErrorHandler(production: boolean) {
-  return (error: HTTPError, req: Request, res: AppResponse, _next: NextFunction): void => {
+  return function createErrorHandlerInner(error: HTTPError, req: Request, res: AppResponse, _next: NextFunction): void {
     const { status } = error
     logger.error(`Error handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`, error)
 

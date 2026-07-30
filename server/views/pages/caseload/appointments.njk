@@ -23,7 +23,8 @@
             {% if userSchedule.appointments.length > 0 %}
                 {% set rows = [] %}
                 {% for appointment in userSchedule.appointments %}
-                    {% set appointmentDescription = appointment.description if appointment.description else appointment.type %}
+                    {% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
+                    {% set appointmentDescription = appointment.description + ' - ' + displayName if appointment.description else displayName %}
                     {% set fullName %}
                     {{ appointment.caseName.surname }}, {{ appointment.caseName.forename }}
                     {% endset %}

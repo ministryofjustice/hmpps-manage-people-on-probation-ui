@@ -4,7 +4,7 @@ import { getSendLetterOptions } from './getSendLetterOptions'
 import { SentenceType } from '../../data/model/sentenceDetails'
 import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../../models/Appointments'
 import { ContactOutcome, ContactEnforcementAction } from '../../data/model/schedule'
-import { letterTypeOptions } from '../../properties/appointment-outcomes'
+import { letterSentByOptions, letterTypeOptions } from '../../properties/appointment-outcomes'
 import { validEnforcementActionOptions } from '../../utils'
 
 interface Props {
@@ -77,10 +77,22 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  it('should define the correct options if sentence type is CUSTODY and enforcement action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
+  it('should set the correct options if action is BREACH_RECALL_INITIATED_AND_SEND_LETTER and sentence type is COMMUNITY', () => {
+    const res = buildResponse({ sendBreachOrRecallLetter: true, sentenceType: 'COMMUNITY' })
+    getSendLetterOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
+    checkLetterSentByOptions(res)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should set the correct options if action is BREACH_RECALL_INITIATED_AND_SEND_LETTER and sentence type is CUSTODY', () => {
     const res = buildResponse({ sendBreachOrRecallLetter: true, sentenceType: 'CUSTODY' })
     getSendLetterOptions(req, res, nextSpy)
-    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactOutcomes, letterTypeOptions)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
@@ -88,65 +100,9 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
       ]),
     )
     expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
-    checkLetterSentByOptions(res)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
-  it('should define the correct options if sentence type is COMMUNITY and enforcement action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
-    const res = buildResponse({ sendBreachOrRecallLetter: true })
-    getSendLetterOptions(req, res, nextSpy)
-    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactOutcomes, letterTypeOptions)
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
-        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
-      ]),
-    )
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
-    checkLetterSentByOptions(res)
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-  it('should define the correct options if sentence type is YOUTH COMMUNITY and enforcement action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
-    const res = buildResponse({ sendBreachOrRecallLetter: true, youth: true })
-    getSendLetterOptions(req, res, nextSpy)
-    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactOutcomes, letterTypeOptions)
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
-        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
-      ]),
-    )
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
-    checkLetterSentByOptions(res)
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-  it('should define the correct options if sentence type is PSS and enforcement action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
-    const res = buildResponse({ sendBreachOrRecallLetter: true, pss: true })
-    getSendLetterOptions(req, res, nextSpy)
-    expect(validEnforcementActionOptionsSpy).toHaveBeenCalledWith(contactOutcomes, letterTypeOptions)
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
-        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
-      ]),
-    )
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
-    checkLetterSentByOptions(res)
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-  it('should define the correct options if enforcement action is SEND_LETTER and sentence type is CUSTODY', () => {
-    const res = buildResponse({ sentenceType: 'CUSTODY', sendLetter: true })
-    getSendLetterOptions(req, res, nextSpy)
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
-        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
-      ]),
-    )
-    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
-    checkLetterSentByOptions(res)
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-  it('should define the correct options if enforcement action is SEND_LETTER and sentence type is COMMUNITY', () => {
+  it('should set the correct options if action is SEND_LETTER and sentence type is COMMUNITY and not YOUTH or PSS', () => {
     const res = buildResponse({ sendLetter: true, sentenceType: 'COMMUNITY' })
     getSendLetterOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
@@ -157,29 +113,95 @@ describe('/middleware/appointment-outcomes/getSendLetterOptions', () => {
       ]),
     )
     expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(3)
-    checkLetterSentByOptions(res)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should set the correct options if action is SEND_LETTER and sentence type is COMMUNITY and is YOUTH', () => {
+    const res = buildResponse({ sendLetter: true, sentenceType: 'COMMUNITY', youth: true, pss: false })
+    getSendLetterOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
+        expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
+        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(4)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should set the correct options if action is SEND_LETTER and sentence type is COMMUNITY and is PSS', () => {
+    const res = buildResponse({ sendLetter: true, sentenceType: 'COMMUNITY', youth: false, pss: true })
+    getSendLetterOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
+        expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
+        expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(4)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should set the correct options if action is SEND_LETTER and sentence type is CUSTODY and not YOUTH or PSS', () => {
+    const res = buildResponse({ sendLetter: true, sentenceType: 'CUSTODY' })
+    getSendLetterOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(2)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should set the correct options if action is SEND_LETTER and sentence type is CUSTODY and is YOUTH', () => {
+    const res = buildResponse({ sendLetter: true, sentenceType: 'CUSTODY', youth: true, pss: false })
+    getSendLetterOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
+        expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
+        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(4)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+  it('should set the correct options if action is SEND_LETTER and sentence type is CUSTODY and is PSS', () => {
+    const res = buildResponse({ sendLetter: true, sentenceType: 'CUSTODY', youth: false, pss: true })
+    getSendLetterOptions(req, res, nextSpy)
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
+        expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
+        expect.objectContaining({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' }),
+        expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
+      ]),
+    )
+    expect(res.locals.appointmentOutcome.letterTypeOptions).toHaveLength(4)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should define the correct options if enforcement action is SEND_LETTER, sentence type is CUSTODY and youth sentence', () => {
-    const res = buildResponse({ sendLetter: true, sentenceType: 'CUSTODY', youth: true })
-    getSendLetterOptions(req, res, nextSpy)
-    expect.arrayContaining([
-      expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
-      expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
-      expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
-      expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
-    ])
-  })
+  it('should not mutate the source letter option definitions', () => {
+    const res = buildResponse({
+      sendBreachOrRecallLetter: true,
+      sentenceType: 'COMMUNITY',
+    })
 
-  it('should define the correct options if enforcement action is SEND_LETTER and pss sentence', () => {
-    const res = buildResponse({ sendLetter: true, sentenceType: 'CUSTODY', pss: true })
     getSendLetterOptions(req, res, nextSpy)
-    expect.arrayContaining([
-      expect.objectContaining({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' }),
-      expect.objectContaining({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' }),
-      expect.objectContaining({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' }),
-      expect.objectContaining({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: `A different enforcement letter` }),
-    ])
+
+    // preserve display metadata while preventing mutation of shared option definitions
+    expect(res.locals.appointmentOutcome.letterSentByOptions[0]).toHaveProperty(
+      'hint.text',
+      'You need to follow your local process to request a letter.',
+    )
+
+    res.locals.appointmentOutcome.letterSentByOptions[0].checked = 'checked'
+    res.locals.appointmentOutcome.letterTypeOptions[0].checked = 'checked'
+
+    expect(letterSentByOptions[0]).not.toHaveProperty('checked')
+    expect(letterTypeOptions[0]).not.toHaveProperty('checked')
   })
 })

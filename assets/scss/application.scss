@@ -34,6 +34,7 @@ $mappa-colour: #4c2c92;
 @import './components/flex';
 @import './components/note';
 @import './components/checkboxes';
+@import './components/modal';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
@@ -813,13 +814,22 @@ body.feature-disabled {
 
 .app-back-to-top__icon {
   display: inline-block;
-  width: .8em;
+  width: 0.8em;
   height: 1em;
   margin-top: -5px;
   margin-right: 10px;
   vertical-align: middle;
 }
 
-.arns-summary-card-expanded-badge-spacing{
+.arns-summary-card-expanded-badge-spacing {
   padding-bottom: 15px;
+}
+
+.govuk-tag--auto-width {
+  max-width: none !important;
+}
+
+.guidance-panel {
+  border-left-color: govuk-colour('blue');
+  background-color: #eaf4f9;
 }

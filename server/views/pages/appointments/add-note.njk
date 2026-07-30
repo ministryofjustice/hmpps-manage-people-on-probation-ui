@@ -2,9 +2,10 @@
 {% from "_components/note/macro.njk" import appNote %}
 {% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
-{% set appointmentDisplayName = appointment.displayName or appointment.description or appointment.type %}
+{% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
+{% set appointmentDescription = appointment.description + ' - ' + displayName if appointment.description else displayName %}
 {% set pageTitle = makePageTitle({
-  pageHeading: [title, appointmentDisplayName]
+  pageHeading: [title, appointmentDescription]
 }) %}
 {% set multipartForm = true %}
 {% if useDecorator %}

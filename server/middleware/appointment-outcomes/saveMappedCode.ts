@@ -15,7 +15,7 @@ import {
 import { setDataValue } from '../../utils'
 
 export const saveMappedCode = (type: 'OUTCOME' | 'ACCEPTABLE_ABSENCE_OUTCOME' | 'ACTION'): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function saveMappedCodeInner(req, res, next) {
     const { crn, id, appointmentSession, reqUrl } = res.locals.appointmentOutcome
     if (
       !['/add-note', '/next-appointment', '/check-your-answers', '/confirmation'].some(url => reqUrl?.includes(url))

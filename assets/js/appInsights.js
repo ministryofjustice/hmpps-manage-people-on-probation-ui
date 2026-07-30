@@ -5,7 +5,12 @@ import { ApplicationInsights } from '@microsoft/applicationinsights-web'
 import { ClickAnalyticsPlugin } from '@microsoft/applicationinsights-clickanalytics-js'
 import * as arnsCustomAppInsights from '@ministryofjustice/hmpps-arns-frontend-components-lib/dist/js/arns-custom-app-insights'
 
-document.initialiseTelemetry = (applicationInsightsConnectionString, applicationInsightsRoleName, userName) => {
+document.initialiseTelemetry = (
+  applicationInsightsConnectionString,
+  applicationInsightsRoleName,
+  userName,
+  serverTraceId,
+) => {
   if (!applicationInsightsConnectionString) {
     console.log('AppInsights not configured')
     return
@@ -62,6 +67,17 @@ document.initialiseTelemetry = (applicationInsightsConnectionString, application
 
   appInsights.loadAppInsights()
   appInsights.addTelemetryInitializer(telemetryInitializer)
+
+  // Adopt the server-side OpenTelemetry trace id for the page render that served this
+  // page, so this pageView (and the request/dependency spans recorded server-side for
+  // the same render) share a single trace_Id and can be correlated in App Insights.
+  if (serverTraceId) {
+    const traceCtx = appInsights.core.getTraceCtx(true)
+    if (traceCtx) {
+      traceCtx.traceId = serverTraceId
+    }
+  }
+
   appInsights.trackPageView()
   appInsights.trackEvent({ name: 'screenSize', properties: { width: window.innerWidth, height: window.innerHeight } })
   arnsCustomAppInsights.init(appInsights)

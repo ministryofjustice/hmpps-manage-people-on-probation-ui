@@ -16,12 +16,12 @@ export default function setUpAuth(): Router {
   router.use(passport.session())
   router.use(flash())
 
-  router.get('/autherror', (_req, res) => {
+  router.get('/autherror', function authError(_req, res) {
     res.status(401)
     return res.render('autherror')
   })
 
-  router.get('/no-perm-autherror', (req, res) => {
+  router.get('/no-perm-autherror', function noPermError(req, res) {
     res.locals.backLink = req.query.backLink
     res.status(403)
     return res.render('no-perm-autherror')
@@ -29,17 +29,17 @@ export default function setUpAuth(): Router {
 
   router.get('/sign-in', passport.authenticate('oauth2'))
 
-  router.get('/sign-in/callback', (req, res, next) =>
+  router.get('/sign-in/callback', function signInCallback(req, res, next) {
     passport.authenticate('oauth2', {
       successReturnToOrRedirect: req.session.returnTo ?? '/',
       failureRedirect: '/autherror',
-    })(req, res, next),
-  )
+    })(req, res, next)
+  })
 
   const authUrl = config.apis.hmppsAuth.externalUrl
   const authParameters = `client_id=${config.apis.hmppsAuth.apiClientId}&redirect_uri=${config.domain}`
 
-  router.use('/sign-out', (req, res, next) => {
+  router.use('/sign-out', function signOut(req, res, next) {
     const authSignOutUrl = `${authUrl}/sign-out?${authParameters}`
     if (req.user) {
       req.logout(err => {
@@ -49,11 +49,11 @@ export default function setUpAuth(): Router {
     } else res.redirect(authSignOutUrl)
   })
 
-  router.use('/account-details', (req, res) => {
+  router.use('/account-details', function accountDetails(req, res) {
     res.redirect(`${authUrl}/account-details?${authParameters}`)
   })
 
-  router.use((req, res: AppResponse, next) => {
+  router.use(function setUser(req, res: AppResponse, next) {
     if (req.isAuthenticated()) Sentry.setUser({ username: req.user.username })
     res.locals.user = req.user
     next()

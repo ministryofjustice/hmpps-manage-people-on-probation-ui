@@ -1,19 +1,8 @@
-/* eslint-disable import/first */
-/*
- * Do appinsights first as it does some magic instrumentation work, i.e. it affects other 'require's
- * In particular, applicationinsights automatically collects bunyan logs
- */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
-import { initialiseAppInsights, buildAppInsightsClient } from '../utils/azureAppInsights'
 import applicationInfoSupplier from '../applicationInfo'
-
-const applicationInfo = applicationInfoSupplier()
-initialiseAppInsights()
-buildAppInsightsClient(applicationInfo.applicationName)
-
 import HmppsAuthClient from './hmppsAuthClient'
 import ManageUsersApiClient from './manageUsersApiClient'
 import { createRedisClient } from './redisClient'
@@ -22,6 +11,8 @@ import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
 import config from '../config'
 import ProbationFrontendComponentsApiClient from './probationFrontendComponentsClient'
 import logger from '../../logger'
+
+const applicationInfo = applicationInfoSupplier()
 
 type RestClientBuilder<T> = (token: string) => T
 
@@ -55,7 +46,11 @@ export const dataAccess = () => ({
   authClientMpop,
   mpopComponents: new MPoPComponents(
     authClientMpop,
-    { ...config.apis.tierApi, supervisionPackageApiConfig: config.apis.supervisionPackageApi },
+    {
+      ...config.apis.tierApi,
+      masApiConfig: config.apis.masApi,
+      supervisionPackageApiConfig: config.apis.supervisionPackageApi,
+    },
     logger,
   ),
 })

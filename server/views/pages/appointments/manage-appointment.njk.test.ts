@@ -4,9 +4,25 @@ import { Activity, LinkedContactResponse, PersonAppointment } from '../../../dat
 import { PersonSummary } from '../../../data/model/personalDetails'
 import { AppointmentOutcomeProps } from '../../../models/Locals'
 import { NextAppointmentResponse } from '../../../models/Appointments'
+import { Sentence } from '../../../data/model/sentenceDetails'
 
 const crn = 'X000001'
 const appointmentId = '123456'
+
+const sentence: Sentence = {
+  id: 2501085207,
+  eventNumber: '7654321',
+  order: {
+    description: 'Adult Custody < 12m (3 Months)',
+    sentenceType: 'CUSTODY',
+    startDate: '2024-06-04',
+    endDate: '2025-09-02',
+    pss: true,
+  },
+  nsis: [],
+  licenceConditions: [],
+  requirements: [],
+}
 
 type TestModel = {
   crn: string
@@ -16,11 +32,13 @@ type TestModel = {
   url: string
   flags: {
     enableNonCompliance?: boolean
+    enableRescheduleFutureAppointmentWithOutcome?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
   appointmentOutcome: AppointmentOutcomeProps<Activity>
-  sentences: Array<{ order: { description: string } }>
+  sentence: Partial<Sentence>
+  sentences: Partial<Sentence>[]
   nextAppointment: Partial<NextAppointmentResponse>
   canReschedule: boolean
   hasDeceased: boolean
@@ -135,13 +153,8 @@ const baseModel: TestModel = {
     enforcementAction: { code: 'IBR', description: '', responseByDate: '' },
   },
   appointmentOutcome: {} as AppointmentOutcomeProps<Activity>,
-  sentences: [
-    {
-      order: {
-        description: 'Sentence description',
-      },
-    },
-  ],
+  sentence,
+  sentences: [sentence],
   nextAppointment: {
     usernameIsCom: true,
   },
@@ -174,6 +187,7 @@ const render = (model = {} as Partial<TestModel>) => {
       ...baseModel.appointmentOutcome,
       ...model.appointmentOutcome,
     },
+    sentences: [...baseModel.sentences, ...(model?.sentences || [])],
   }
   const env = createNunjucksTestEnv()
   return cheerio.load(env.render('pages/appointments/manage-appointment.njk', input))
@@ -328,6 +342,28 @@ describe('Manage an appointment', () => {
         expect($('[data-qa="appointmentActions"]').text()).not.toContain('Change enforcement action')
       })
 
+      it('should not display the change outcome link if future appointment with outcome logged and enableRescheduleFutureAppointmentWithOutcome flag is disabled', () => {
+        const $ = render({
+          flags: {
+            enableNonCompliance: true,
+            enableRescheduleFutureAppointmentWithOutcome: false,
+          },
+          personAppointment: {
+            appointment: {
+              deliusManaged: false,
+              outcome: 'Acceptable absence - Holiday',
+              hasOutcome: true,
+              action: '',
+              didTheyComply: true,
+              isInPast: false,
+            } as Activity,
+          } as PersonAppointment,
+        })
+        expect($('[data-qa="appointmentActions"]').text()).toContain(
+          'You cannot change this outcome until the appointment has passed.',
+        )
+      })
+
       it('should display appointment notes action', () => {
         const $ = render({
           flags: {
@@ -343,8 +379,15 @@ describe('Manage an appointment', () => {
           flags: {
             enableNonCompliance: true,
           },
+          appointmentOutcome: {
+            crn: 'X000001',
+            contactId: '123456',
+          } as AppointmentOutcomeProps<Activity>,
         })
-        expect($('[data-qa="appointmentActions"]').text()).toContain('Upload documents')
+        expect($('[data-qa="appointmentActions"] li:nth-child(3)').text()).toContain('Upload documents')
+        expect($('[data-qa="appointmentActions"] li:nth-child(3) a').attr('href')).toBe(
+          '/case/X000001/appointments/appointment/123456/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/123456/manage',
+        )
       })
 
       it('should display arrange next appointment action', () => {
@@ -427,11 +470,14 @@ describe('Manage an appointment', () => {
             personAppointment: {
               appointment: {
                 deliusManaged: false,
+                eventNumber: '7654321',
               } as Activity,
             } as PersonAppointment,
           })
-
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
+          expect($('[data-qa="sentenceValue"]').text()).toContain('Adult Custody < 12m (3 Months)')
+          expect($('[data-qa="sentenceLink"]').text()).toContain('View sentence details')
+          expect($('[data-qa="sentenceLink"]').attr('href')).toBe('/case/X000001/sentence?number=7654321')
         })
       })
 

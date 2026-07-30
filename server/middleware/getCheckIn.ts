@@ -6,7 +6,7 @@ import ESupervisionClient from '../data/eSupervisionClient'
 import { ESupervisionLog } from '../data/model/esupervision'
 
 export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
-  return async (req: Request, res: AppResponse, next: NextFunction): Promise<void> => {
+  return async function getCheckInInner(req: Request, res: AppResponse, next: NextFunction): Promise<void> {
     const { id } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)

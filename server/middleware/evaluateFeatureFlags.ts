@@ -4,7 +4,7 @@ import FlagService from '../services/flagService'
 import { AppResponse } from '../models/Locals'
 
 export default function evaluateFeatureFlags(flagService: FlagService): RequestHandler {
-  return async (req, res: AppResponse, next) => {
+  return async function evaluateFeatureFlagsInner(req, res: AppResponse, next) {
     try {
       const pduCodes = (res.locals.user.probationDeliveryUnits || []).map(p => p.code)
       const flags = await flagService.getFlags({

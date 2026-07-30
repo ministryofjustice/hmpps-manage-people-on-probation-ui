@@ -15,12 +15,28 @@ import { Activity, PersonAppointment } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { SubjectType } from '../middleware/sendAuditMessage'
+import { Sentence } from '../data/model/sentenceDetails'
 
 const crn = 'X000001'
 const id = '1234'
 const noteId = '1'
 const contactId = '1234'
 const actionType = 'mockType'
+
+const sentence: Sentence = {
+  id: 2501085207,
+  eventNumber: '4',
+  order: {
+    description: 'Adult Custody < 12m (3 Months)',
+    sentenceType: 'CUSTODY',
+    startDate: '2024-06-04',
+    endDate: '2025-09-02',
+    pss: true,
+  },
+  nsis: [],
+  licenceConditions: [],
+  requirements: [],
+}
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -137,6 +153,8 @@ const res = mockAppResponse({
     surname: 'Surname',
     appointment: mockAppointment,
   },
+  sentences: [sentence],
+  personAppointment: mockPersonAppointment,
 })
 
 const renderSpy = jest.spyOn(res, 'render')
@@ -317,9 +335,6 @@ describe('controllers/appointments', () => {
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
-    it('should request the person appointment', () => {
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
-    })
     it('should request the next appointment', () => {
       expect(getNextAppointmentSpy).toHaveBeenCalledWith('user-1', crn, id)
     })
@@ -328,7 +343,6 @@ describe('controllers/appointments', () => {
     })
     it('should render the manage appointment page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
-        personAppointment: mockPersonAppointment,
         crn,
         back: undefined,
         nextAppointment: nextApptResponse(),
@@ -337,6 +351,7 @@ describe('controllers/appointments', () => {
         canReschedule: true,
         contactId: '1234',
         relatedContacts: mockRelatedContacts,
+        sentence,
       })
     })
 
@@ -540,6 +555,7 @@ describe('controllers/appointments', () => {
         crn,
         errorMessages: null,
         url: '',
+        isSensitive: false,
         maxCharCount: 12000,
       })
     })

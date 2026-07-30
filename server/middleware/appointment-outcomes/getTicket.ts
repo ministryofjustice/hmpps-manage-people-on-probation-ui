@@ -11,7 +11,7 @@ type PriorBreachOrRecallCountKey = keyof Pick<
 >
 
 export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (_req, res, next) => {
+  return async function getTicketInner(_req, res, next) {
     let ticket: OutcomeTicket | null = null
     const { forename, sentence, crn, reqUrl } = res.locals.appointmentOutcome
     if (!sentence) {

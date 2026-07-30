@@ -11,7 +11,7 @@ export default function setUpWebRequestParsing(): Router {
       },
     }),
   )
-  router.use((req: any, res, next) => {
+  router.use(function parseRawBody(req: any, res, next) {
     if (req.rawBody) {
       req.body = qs.parse(req.rawBody, { parseArrays: false })
     }

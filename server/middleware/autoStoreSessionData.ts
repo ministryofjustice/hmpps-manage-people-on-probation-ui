@@ -7,7 +7,7 @@ import { Route } from '../@types'
 import '../@types/express/index.d'
 
 export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, _res, next) => {
+  return async function autoStoreSessionDataInner(req, _res, next) {
     const newSessionData: Data = req?.session?.data ?? {}
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const inputs: Record<string, any> = req.body ?? {}

@@ -75,6 +75,15 @@ describe('middleware/appointment-outcomes/restrictPageAccess', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+  describe('Add notes page linked to from manage appointment page', () => {
+    const url = '/outcome/add-note?put=true'
+    it('should only call next()', () => {
+      const req = buildRequest({ _contactId: contactId, url })
+      restrictPageAccess(req, res, nextSpy)
+      expect(redirectSpy).not.toHaveBeenCalled()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+  })
 
   describe('No required default values in session', () => {
     it('should redirect to the sentence page if arrange appointment journey', () => {

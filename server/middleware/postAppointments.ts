@@ -8,6 +8,7 @@ import {
   AppointmentSession,
   AppointmentsPostResponse,
   AppointmentType,
+  MasUserDetails,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from '../data/model/OutlookEvent'
@@ -19,7 +20,7 @@ import isTimeoutError from '../utils/isTimeoutError'
 import { logFieldPresence } from '../utils/logSessionCacheChange'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
-  return async (req, res) => {
+  return async function postAppointmentsInner(req, res) {
     const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
@@ -38,6 +39,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         eventId: appointmentSession?.eventId,
         teamCode: appointmentSession?.user?.teamCode,
         locationCode: appointmentSession?.user?.locationCode,
+        userName: appointmentSession?.user?.name,
+        userEmail: appointmentSession?.user?.email,
       },
       { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
     )
@@ -101,15 +104,42 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       ;({
         user: { name, email },
       } = appointmentSession)
-      ;({ forename: firstName, surname } = name)
 
-      if (!email) {
+      const isNameIncomplete = (candidate: Name): boolean => !candidate?.forename || !candidate?.surname
+
+      if (isNameIncomplete(name) || !email) {
+        let fallbackUserDetails: MasUserDetails
         try {
-          email = (await masClient.getUserDetails(username))?.email
+          fallbackUserDetails = await masClient.getUserDetails(username)
         } catch (error) {
           logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
         }
+
+        if (isNameIncomplete(name)) {
+          name = fallbackUserDetails
+            ? { forename: fallbackUserDetails.firstName, surname: fallbackUserDetails.surname }
+            : null
+        }
+
+        if (!email) {
+          email = fallbackUserDetails?.email
+        }
+
+        const stillMissing = [isNameIncomplete(name) && 'name', !email && 'email'].filter(Boolean)
+        if (stillMissing.length) {
+          const message = `Appointment ${uuid}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
+          logger.warn(message)
+          Sentry.captureException(new Error(message), {
+            tags: {
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postAppointments.getUserDetails',
+              missingFields: stillMissing.join(','),
+            },
+          })
+        }
       }
+
+      ;({ forename: firstName, surname } = name ?? {})
 
       const bookingUserEmail = res.locals.user.email
       const isDifferentUser = Boolean(email) && Boolean(bookingUserEmail) && email !== bookingUserEmail
@@ -121,7 +151,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
-    if (email) {
+    if (email && firstName && surname) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])

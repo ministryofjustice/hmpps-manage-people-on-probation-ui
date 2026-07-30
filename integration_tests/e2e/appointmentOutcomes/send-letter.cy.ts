@@ -137,21 +137,19 @@ const getExpectedOptions = ({
       },
     ]
   }
+
   if (optionsFor === 'LETTER_TYPE') {
-    if (sentenceType === 'CUSTODY' && !youth && !pss) {
-      expectedOptions.push({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' })
+    if (sentenceType === 'COMMUNITY' || youth || pss) {
+      expectedOptions.push({ value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' })
+    }
+    if (youth || pss) {
+      expectedOptions.push({ value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' })
     }
     if (sentenceType === 'COMMUNITY') {
-      expectedOptions.push(
-        { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
-        { value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' },
-      )
+      expectedOptions.push({ value: 'BREACH_LETTER_SENT', text: 'Breach warning letter' })
     }
-    if (pss || youth) {
-      expectedOptions.push(
-        { value: 'FIRST_WARNING_LETTER_SENT', text: 'First warning letter' },
-        { value: 'SECOND_WARNING_LETTER_SENT', text: 'Second warning letter' },
-      )
+    if (sentenceType === 'CUSTODY') {
+      expectedOptions.push({ value: 'LICENCE_COMPLIANCE_LETTER_SENT', text: 'Licence compliance letter' })
     }
     expectedOptions.push({ value: 'OTHER_ENFORCEMENT_LETTER_SENT', text: 'A different enforcement letter' })
   }
@@ -184,7 +182,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     cy.get('[data-module="govuk-radios"]').should('have.length', 2)
   })
 
-  it('should render the page if youth custody sentence', () => {
+  it('should render the page if sentence type is custody and youth custody', () => {
     loadPage({ journey, sentenceType: 'CUSTODY', description: '204 C JA - Youth Rehabilitation Order' })
     sendLetterPage = new SendLetterPage()
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
@@ -195,7 +193,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     cy.get('[data-module="govuk-radios"]').should('have.length', 2)
   })
 
-  it('should render the page if pss sentence', () => {
+  it('should render the page if sentence type is CUSTODY and is PSS', () => {
     loadPage({ journey, sentenceType: 'CUSTODY', pss: true })
     sendLetterPage = new SendLetterPage()
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })

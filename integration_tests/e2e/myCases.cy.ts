@@ -68,7 +68,7 @@ context('Cases', () => {
     page.getNavigationLink(4).get('.moj-notification-badge').should('contain.text', 12)
     page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
     cy.get('.govuk-tag--yellow').should('contain.text', 'New case')
-    cy.get('.predictor-timeline-item-v1').should('contain.text', 'TIER')
+    cy.get('.predictor-timeline-item-v1').should('contain.text', 'Tier')
   })
 
   const sortableColumns = ['Cases', 'Sentence', 'Last Appointment', 'Next Appointment']

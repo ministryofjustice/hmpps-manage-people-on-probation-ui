@@ -170,6 +170,7 @@ interface Locals {
   action?: string
   personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
+  nextAppointmentDetails: Activity | null
 }
 
 export interface AppointmentOutcomeSentence {
@@ -294,6 +295,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   compliance?: OutcomeCompliance
   responseContactId?: string
   linkedContactId?: string
+  redirectFromUpdate?: boolean
 }
 
 export interface AppResponse extends Response {

@@ -6,7 +6,7 @@ import { AppointmentSession } from '../../models/Appointments'
 import { getDataValue, setDataValue } from '../../utils'
 
 export const getContactOutcomes = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getContactOutcomesInner(req, res, next) {
     const { crn, contactId, id: uuid } = req.params as Record<string, string>
     const { data } = req.session
     const id = contactId || uuid

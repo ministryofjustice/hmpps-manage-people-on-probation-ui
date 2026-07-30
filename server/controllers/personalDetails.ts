@@ -34,7 +34,7 @@ const routes = [
 
 const personalDetailsController: Controller<typeof routes, void> = {
   getPersonalDetails: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getPersonalDetails(req, res) {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -116,7 +116,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   postEditDetails: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postEditDetails(req, res) {
       const editingMainAddress = req.path.includes('personal-details/edit-main-address')
       const { origin = '' } = req.query as Record<string, string>
       const errorMessages = validateWithSpec(req, personDetailsValidation({ ...req.body, editingMainAddress, origin }))
@@ -249,7 +249,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getStaffContacts: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getStaffContacts(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
@@ -275,7 +275,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getPersonalContact: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getPersonalContact(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -295,7 +295,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getPersonalContactNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getPersonalContactNote(req, res) {
       const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
@@ -318,7 +318,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getMainAddressNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getMainAddressNote(req, res) {
       const { crn, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -338,7 +338,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getAddresses: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAddresses(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -358,7 +358,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getAddressesNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAddressesNote(req, res) {
       const { crn, addressId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -378,7 +378,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getDocumentsDownload: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getDocumentsDownload(req, res) {
       const { crn } = req.params as Record<string, string>
       const { documentId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -397,7 +397,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getHandoff: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getHandoff(req, res) {
       const { crn } = req.params as Record<string, string>
       const { system } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -418,7 +418,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getDisabilities: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getDisabilities(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -438,7 +438,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getDisabilitiesNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getDisabilitiesNote(req, res) {
       const { crn, disabilityId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -458,7 +458,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getAdjustments: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAdjustments(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -478,7 +478,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getAdjustmentsNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAdjustmentsNote(req, res) {
       const { crn, adjustmentId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -498,7 +498,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getCircumstances: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getCircumstances(req, res) {
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -518,7 +518,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     }
   },
   getCircumstancesNote: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getCircumstancesNote(req, res) {
       const { crn, circumstanceId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)

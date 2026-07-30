@@ -4,7 +4,7 @@ import logger from '../../logger'
 import config from '../config'
 
 export default function getFrontendComponents(probationComponentsService: ProbationComponentsService): RequestHandler {
-  return async (req, res, next) => {
+  return async function getFrontendComponentsInner(req, res, next) {
     // Check if FE components are already cached in the session
     const cached = (req.session as any)?.feComponents
     if (cached?.header && cached?.footer) {

@@ -4,7 +4,7 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 
 export const getAppointmentTypes = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getAppointmentTypesInner(req, res, next) {
     let appointmentTypes: AppointmentType[] = []
     if (!req?.session?.data?.appointmentTypes) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

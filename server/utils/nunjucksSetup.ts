@@ -118,7 +118,7 @@ export default function nunjucksSetup(
   if (production) {
     app.locals.version = applicationInfo.gitShortHash
   } else {
-    app.use((_req, res: AppResponse, next) => {
+    app.use(function setVersion(_req, res: AppResponse, next) {
       res.locals.version = Date.now().toString()
       return next()
     })
@@ -126,7 +126,7 @@ export default function nunjucksSetup(
 
   const requestContext = new AsyncLocalStorage<{ req: Request; res: AppResponse }>()
 
-  app.use((req: Request, res: AppResponse, next: NextFunction) => {
+  app.use(function runRequestContext(req: Request, res: AppResponse, next: NextFunction) {
     requestContext.run({ req, res }, next)
   })
 

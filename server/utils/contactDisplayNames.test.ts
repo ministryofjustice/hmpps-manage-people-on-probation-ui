@@ -19,7 +19,7 @@ describe('contactDisplayNames', () => {
     )
   })
 
-  it('maps activity log entries from action or type and falls back when unmatched', () => {
+  it('maps activity log entries from action or type and falls back to type when unmatched', () => {
     const personActivity = {
       activities: [
         { id: '1', type: 'Phone Contact from PoP' },

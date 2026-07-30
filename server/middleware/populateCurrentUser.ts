@@ -8,7 +8,7 @@ export default function populateCurrentUser(
   userService: UserService,
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<void>> {
-  return async (_req, res, next) => {
+  return async function populateCurrentUserInner(_req, res, next) {
     try {
       if (res.locals.user) {
         let localsUser = res.locals.user

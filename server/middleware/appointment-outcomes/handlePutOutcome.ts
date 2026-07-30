@@ -7,12 +7,12 @@ import { handleQuotes } from '../../utils'
 import { renderError } from '../renderError'
 
 export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = false): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function handlePutOutcomeInner(req, res, next) {
     const { appointmentSession, notePrepend, contactId, isValidParams, baseOutcomeUrl, responseContactId, isInPast } =
       res.locals.appointmentOutcome
 
     /*
-     only send request if putting outcome for arranged/rescheduled appt in the past or 
+     only send request if putting outcome for arranged/rescheduled appt in the past or
      managed appointment in past or future 👇
      */
 
@@ -38,8 +38,12 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       }
       if (notePrepend) {
         notes = `${notePrepend}${notes ? `\n${notes}` : ''}`
+      } else {
+        notes = appointmentSession?.notes || ''
       }
+
       if (notes) notes = handleQuotes(notes)
+
       const sensitive = appointmentSession?.sensitivity === 'Yes'
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -50,6 +54,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       ]
 
       // if outcome but no action, check the outcome type does not require an associated action 👇
+
       if (
         !put &&
         (!sensitivity ||
@@ -68,7 +73,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       }
       if (outcomeCode) request.outcomeCode = outcomeCode
       await masClient.putContact(contactId, request)
-      if (enforcementActionCode?.length) {
+      if (enforcementActionCode?.length && !put) {
         const enforcementActionsRequest: EnforcementActionsRequest = {
           enforcementActions: enforcementActionCode.map(code => ({ code })),
         }

@@ -21,7 +21,7 @@ import logger from '../../logger'
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<RescheduleAppointmentResponse>> => {
-  return async (req, res) => {
+  return async function postRescheduleAppointmentsInner(req, res) {
     const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)

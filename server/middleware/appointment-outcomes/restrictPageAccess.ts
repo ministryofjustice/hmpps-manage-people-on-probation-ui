@@ -8,11 +8,12 @@ import {
 import { AppointmentSession } from '../../models/Appointments'
 
 export const restrictPageAccess = (req: Request, res: Response, next: NextFunction) => {
-  const { url, session, params } = req
+  const { url, session, params, query } = req
   const { crn, id: uuid, contactId } = params
   const id = uuid || contactId
   const { data } = session
   const path = ['appointments', crn, id]
+  const { put } = query
   const appointmentSession = getDataValue<AppointmentSession>(data, path)
   const baseUrl = uuid
     ? `/case/${crn}/arrange-appointment/${uuid}`
@@ -53,20 +54,22 @@ export const restrictPageAccess = (req: Request, res: Response, next: NextFuncti
     return true
   }
 
-  for (const rule of pageAccessRules) {
-    if (url.includes(`outcome/${rule.url}`)) {
-      if (rule?.required) {
-        for (const [key, value] of Object.entries(rule.required) as [keyof PageAccessRuleItem, string][]) {
-          restricted = checkRequiredValue(key, value)
+  if (!put) {
+    for (const rule of pageAccessRules) {
+      if (url.includes(`outcome/${rule.url}`)) {
+        if (rule?.required) {
+          for (const [key, value] of Object.entries(rule.required) as [keyof PageAccessRuleItem, string][]) {
+            restricted = checkRequiredValue(key, value)
+          }
+        }
+        if (rule?.oneRequired && !restricted) {
+          restricted = checkPageAccessRules(rule.oneRequired)
         }
       }
-      if (rule?.oneRequired && !restricted) {
-        restricted = checkPageAccessRules(rule.oneRequired)
-      }
     }
-  }
-  if (restricted) {
-    return res.redirect(outcomeUrl)
+    if (restricted) {
+      return res.redirect(outcomeUrl)
+    }
   }
   return next()
 }

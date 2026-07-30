@@ -208,7 +208,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       time: start,
       sensitive: true,
       alert: false,
-      notes: '',
+      notes: 'Some added notes',
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
@@ -364,6 +364,31 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     }
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should not post the enforcement actions if adding appointment notes', async () => {
+    const appointment: Partial<AppointmentSession> = { notes }
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED',
+      enforcementActionCode: ['IBR'],
+    }
+    const req = buildRequest({ put: 'true' })
+    const res = buildResponse({ appointment, outcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: `${notePrepend}\n${notes}`,
+      sensitive: true,
+      alert: false,
+    }
+    expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
+    expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

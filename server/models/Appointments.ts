@@ -150,6 +150,7 @@ export interface AppointmentSessionOutcome {
   contactOutcomes?: ContactOutcome[]
   contactEnforcementActions?: ContactEnforcementAction[]
   nextAppointment?: AppointmentSessionSelection
+  redirectFromUpdate?: boolean
 }
 
 export interface AppointmentSessionUser {

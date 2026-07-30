@@ -97,7 +97,7 @@ const resetSessionValues = (req: Request, res: Response) => {
 
 const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
   redirectToSentence: () => {
-    return async (req, res) => {
+    return async function redirectToSentence(req, res) {
       const uuid = uuidv4()
       const { crn } = req.params as Record<string, string>
       const { back } = req.query
@@ -111,7 +111,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getSentence: () => {
-    return async (req, res) => {
+    return async function getSentence(req, res) {
       const errors = req?.session?.data?.errors
       if (errors) {
         delete req.session.data.errors
@@ -135,6 +135,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           context,
         )
         setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
+        if (back) {
+          logSessionCacheChange('getSentence', data, ['backLink', 'sentence'], back, context)
+          setDataValue(data, ['backLink', 'sentence'], back)
+        }
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/type-attendance`)
       }
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
@@ -149,7 +153,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postSentence: () => {
-    return async (req, res) => {
+    return async function postSentence(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -168,7 +172,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getTypeAttendance: () => {
-    return async (req, res) => {
+    return async function getTypeAttendance(req, res) {
       const errors = req?.session?.data?.errors
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
@@ -194,6 +198,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           url,
           change,
           errors,
+          back: getDataValue(data, ['backLink', 'sentence']),
           allSentences: req?.session?.data?.sentences?.[crn],
         })
       }
@@ -201,7 +206,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postTypeAttendance: () => {
-    return async (req, res) => {
+    return async function postTypeAttendance(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       const { number } = req.query as Record<string, string>
@@ -217,7 +222,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getWhoWillAttend: () => {
-    return async (req, res) => {
+    return async function getWhoWillAttend(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       const errors = req?.session?.data?.errors
@@ -229,7 +234,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postWhoWillAttend: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postWhoWillAttend(req, res) {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -307,7 +312,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
 
   getLocationDateTime: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getLocationDateTime(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
       const { change, validation } = req.query as Record<string, string>
@@ -357,7 +362,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postLocationDateTime: () => {
-    return async (req, res) => {
+    return async function postLocationDateTime(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query as Record<string, string>
       const { data } = req.session
@@ -391,7 +396,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getAttendedComplied: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getAttendedComplied(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { alertDismissed = false } = req.session
       const { forename, surname, appointment } = res.locals.appointmentOutcome
@@ -412,14 +417,14 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postAttendedComplied: () => {
-    return async (req, res) => {
+    return async function postAttendedComplied(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query as Record<string, string>
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/add-note${change ? `?change=${change}` : ''}`)
     }
   },
   getLocationNotInList: () => {
-    return async (req, res) => {
+    return async function getLocationNotInList(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { change = undefined, noLocations = '' } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_UNLISTED_LOCATION', crn, SubjectType.CRN)
@@ -427,7 +432,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getAddNote: () => {
-    return async (req, res) => {
+    return async function getAddNote(req, res) {
       const { crn, id } = req.params as Record<string, string>
       let uploadedFiles: FileCache[] = []
       let errorMessages = null
@@ -468,7 +473,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postAddNote: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postAddNote(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -478,7 +483,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getTextMessageConfirmation: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getTextMessageConfirmation(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRM_TEXT_MSG', crn, SubjectType.CRN)
@@ -489,7 +494,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postTextMessageConfirmation: _hmppsAuthClient => {
-    return async (req, res) => {
+    return async function postTextMessageConfirmation(req, res) {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -510,7 +515,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getSupportingInformation: () => {
-    return async (req, res) => {
+    return async function getSupportingInformation(req, res) {
       const { maxCharCount } = config
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
@@ -533,7 +538,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postSupportingInformation: () => {
-    return async (req, res) => {
+    return async function postSupportingInformation(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -547,7 +552,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getCheckYourAnswers: () => {
-    return async (req, res) => {
+    return async function getCheckYourAnswers(req, res) {
       const url = encodeURIComponent(req.url)
       const { crn, id: uuid } = req.params as Record<string, string>
       let { contactId } = req.params as Record<string, string>
@@ -589,13 +594,13 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
 
   postCheckYourAnswers: () => {
-    return async (req, res) => {
+    return async function postCheckYourAnswers(req, res) {
       const { crn, id } = req.params as Record<string, string>
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }
   },
   getConfirmation: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getConfirmation(req, res) {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
       const url = encodeURIComponent(req.url)
@@ -661,10 +666,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       let linkedAppointment = null
       if (res?.locals?.flags?.enableNonCompliance && linkedContactId) {
-        const { start, type: typeCode } = getDataValue<AppointmentSession>(data, ['appointments', crn, linkedContactId])
+        const { date, type: typeCode } = getDataValue<AppointmentSession>(data, ['appointments', crn, linkedContactId])
         linkedAppointment = {
           contactId: linkedContactId,
-          date: dateWithYear(start),
+          date: dateWithYear(date),
           type: res.locals.appointmentTypes.find((type: any) => type.code === typeCode)?.description || null,
         }
       }
@@ -690,7 +695,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postConfirmation: () => {
-    return async (req, res) => {
+    return async function postConfirmation(req, res) {
       const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { _linkedContactId } = req.body
@@ -706,7 +711,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   getArrangeAnotherAppointment: () => {
-    return async (req, res) => {
+    return async function getArrangeAnotherAppointment(req, res) {
       const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
@@ -724,7 +729,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
   postArrangeAnotherAppointment: () => {
-    return async (req, res) => {
+    return async function postArrangeAnotherAppointment(req, res) {
       const { crn, id } = req.params as Record<string, string>
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }

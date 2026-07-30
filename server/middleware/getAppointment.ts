@@ -9,7 +9,7 @@ import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sent
 import { Location, Provider, Team, User } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getAppointmentInner(req, res, next) {
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const id = uuid ?? contactId
     const { username: loggedInUsername = '' } = res.locals.user

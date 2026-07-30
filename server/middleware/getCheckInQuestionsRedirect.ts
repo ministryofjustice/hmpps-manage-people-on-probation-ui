@@ -6,7 +6,11 @@ import logger from '../../logger'
 import ESupervisionClient from '../data/eSupervisionClient'
 
 export const getCheckInQuestionsRedirect = (hmppsAuthClient: any): Route<Promise<void>> => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async function getCheckInQuestionsRedirectInner(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     const { crn, id } = req.params as Record<string, string>
 
     if (!isValidCrn(crn) || !isValidUUID(id)) {

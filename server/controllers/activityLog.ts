@@ -6,6 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
+import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/contactDisplayNames'
 
 const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
@@ -26,7 +27,7 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 
 const activityLogController: Controller<typeof routes, void> = {
   redirectToActivityLog: () => {
-    return async (req, res) => {
+    return async function redirectToActivityLog(req, res) {
       const { keywords = '', compliance = [] } = req.query
       const { crn } = req.params as Record<string, string>
       req.session.activityLogFilters = {
@@ -38,7 +39,7 @@ const activityLogController: Controller<typeof routes, void> = {
     }
   },
   getOrPostActivityLog: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getOrPostActivityLog(req, res) {
       const { params } = req
       const { crn } = params as Record<string, string>
 
@@ -61,7 +62,8 @@ const activityLogController: Controller<typeof routes, void> = {
         res.locals.defaultView = true
       }
 
-      const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
+      const [tierCalculation, personActivityResponse] = await getPersonActivity(req, res, hmppsAuthClient)
+      let personActivity = personActivityResponse
       const queryParams = getQueryString(body)
       const currentPage = parseInt(page as string, 10)
       const pageSize = ACTIVITY_LOG_PAGE_SIZE
@@ -70,6 +72,7 @@ const activityLogController: Controller<typeof routes, void> = {
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
+      personActivity = mapPersonActivityWithApprovedContactDisplayNames(personActivity)
       personActivity.activities = personActivity.activities.map(activity => ({
         ...activity,
         isUpdatableContact: checkIsUpdatableContact(activity.type),
@@ -102,7 +105,7 @@ const activityLogController: Controller<typeof routes, void> = {
     }
   },
   getActivity: hmppsAuthClient => {
-    return async (req, res) => {
+    return async function getActivity(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       if (req.query?.showSuccessBanner) {

@@ -4,7 +4,7 @@ import ESupervisionClient from '../data/eSupervisionClient'
 import logger from '../../logger'
 
 export const getUpcomingCheckinDetails = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async function getUpcomingCheckinDetailsInner(req, res, next) {
     const { crn } = req.params as Record<string, string>
     const checkinStatus = res.locals.offenderCheckinsByCRNResponse?.status
     if (checkinStatus !== 'VERIFIED') {
