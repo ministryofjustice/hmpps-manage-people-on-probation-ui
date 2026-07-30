@@ -2,6 +2,9 @@ const criss = () => {
   const MAX_LIMIT = 12000
 
   const radioFreeform = document.getElementById('format-freeform')
+  if (!radioFreeform) {
+    return
+  }
   const radioStructured = document.getElementById('format-structured')
   const freeformContainer = document.getElementById('freeform-container')
   const structuredContainer = document.getElementById('structured-container')
