@@ -82,25 +82,16 @@ describe('Add a note', () => {
 
       cy.get('.govuk-back-link').should('not.exist')
       cy.contains('Use paragraphs and formatting').should('be.visible')
-      cy.get('[data-qa="crissButton"]').should('contain.text', 'Show CRISS headers')
+      cy.get('[data-qa="crissRadio"]').find('.govuk-radios__input').first().should('be.checked')
       cy.get('textarea#notes').should('have.value', '')
       cy.get('label[for="fileUpload"]').should('contain.text', 'Upload a file (optional)')
     })
 
     it('adds CRISS headers when textarea is empty', () => {
       loadPage()
-      addNotePage.getCrissButton().click()
-
-      addNotePage
-        .getNotesTextarea()
-        .should('have.value', 'Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks')
-    })
-
-    it('does not overwrite existing notes with CRISS headers', () => {
-      loadPage()
-      addNotePage.getNotesTextarea().type('Some notes')
-      addNotePage.getCrissButton().click()
-      addNotePage.getNotesTextarea().should('have.value', 'Some notes')
+      addNotePage.getCrissRadio().eq(1).click()
+      cy.get(`[id="freeform-container"]`).should('have.class', 'govuk-!-display-none')
+      cy.get(`[id="structured-container"]`).should('not.have.class', 'govuk-!-display-none')
     })
 
     checkValidation(loadPage, true)
