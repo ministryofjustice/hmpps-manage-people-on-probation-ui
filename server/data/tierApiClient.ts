@@ -36,6 +36,15 @@ export default class TierApiClient extends RestClient {
     })
   }
 
+  async getTierHistory(crn: string): Promise<TierHistoryEntry[] | null> {
+    return this.get<TierHistoryEntry[]>({
+      path: `/v3/crn/${crn}/tier/history`,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Tier history is currently unavailable.',
+    })
+  }
+
   async getTiers(crns: string[]): Promise<TierCalculations> {
     return this.post({
       path: `/v2/crns/tier`,
@@ -72,6 +81,14 @@ export interface TierCalculation {
 
 export interface TierCalculations {
   [key: string]: TierCalculation
+}
+
+export interface TierHistoryEntry {
+  tierScore: string
+  calculationId: string
+  calculationDate: string
+  changeReason?: string
+  provisional?: boolean
 }
 
 export interface TierLevel {
