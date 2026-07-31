@@ -213,7 +213,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           crn,
           id,
           page: `outcome/add-note`,
-          notes: req.body.appointments[crn][id].notes,
+          notes: req?.body?.appointments?.[crn]?.[id]?.notes || '',
           maxCharCount: maxCharCount as number,
           sensitivityLocked: appointmentSession?.sensitivityLocked || null,
         }),
