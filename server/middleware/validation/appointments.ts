@@ -2,7 +2,7 @@
 import { DateTime } from 'luxon'
 import { Request } from 'express'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes, setDataValue, unflattenBracketKeys } from '../../utils'
+import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
@@ -204,7 +204,7 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           contactId,
           page: 'supporting-information',
-          notes: req?.body?.appointments?.[crn]?.[id]?.notes || '',
+          notes: unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? '',
           maxCharCount: maxCharCount as number,
           isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
         }),
