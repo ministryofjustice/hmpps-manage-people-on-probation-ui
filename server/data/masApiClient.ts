@@ -271,7 +271,7 @@ export default class MasApiClient extends RestClient {
     size: string = '5',
     filterDueDate: string = 'false',
     months: string = '12',
-    sortBy: string = 'contactDate',
+    sortBy: string = 'lastModifiedDate',
     direction: string = 'DESC',
   ): Promise<EnforcementContactsResponse> {
     const queryParameters = new URLSearchParams({
