@@ -102,6 +102,14 @@
                 {% set rows = (rows.push(row), rows) %}
             {% endfor %}
 
+
+        {{ govukTable({
+            captionClasses: 'govuk-visually-hidden',
+            head: head,
+            rows: rows
+            })
+        }}
+
             {% if pagination.items | length > 1 %}
                 {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
             {% endif %}
