@@ -29,4 +29,5 @@ export class FeatureFlags {
   enableSparksFilter?: boolean = undefined
   enableSupervisionPackageFilter?: boolean = undefined
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
+  enablePreSentence?: boolean = undefined
 }

@@ -123,6 +123,7 @@ interface Locals {
   stack?: boolean | number | string
   flags?: FeatureFlags
   sentences?: Sentence[]
+  sentenceList?: Sentence[]
   timeOptions?: Option[]
   endTimeOptions?: Option[]
   userLocations?: Location[]

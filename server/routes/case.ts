@@ -9,6 +9,7 @@ import {
   getTierDetails,
   getSupervisionPackage,
   getNextAppointment,
+  getSentences,
 } from '../middleware'
 
 export default function caseRoutes(router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) {
