@@ -5,7 +5,16 @@ export const overrideDeliusManagedFlag = (appointments: Activity[]): Route<Activ
   return (_req, res) => {
     return appointments.reduce((acc, appointment) => {
       const sentence = res.locals?.sentences?.find(s => s.eventNumber === appointment.eventNumber)
-      return [...acc, { ...appointment, deliusManaged: sentence?.order?.sentenceType === 'PRE_SENTENCE' }]
+      return [
+        ...acc,
+        {
+          ...appointment,
+          deliusManaged:
+            appointment?.deliusManaged !== true
+              ? sentence?.order?.sentenceType === 'PRE_SENTENCE'
+              : appointment?.deliusManaged,
+        },
+      ]
     }, [] as Activity[])
   }
 }

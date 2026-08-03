@@ -21,6 +21,14 @@ const mockAppointments: Activity[] = [
     endDateTime: '2024-02-21T10:30:00.382936Z[Europe/London]',
     deliusManaged: false,
   },
+  {
+    id: '8',
+    eventNumber: '9101',
+    type: 'Phone call',
+    startDateTime: '2024-02-21T10:15:00.382936Z[Europe/London]',
+    endDateTime: '2024-02-21T10:30:00.382936Z[Europe/London]',
+    deliusManaged: true,
+  },
 ]
 
 const mockSentences: Partial<Sentence>[] = [
@@ -46,6 +54,16 @@ const mockSentences: Partial<Sentence>[] = [
       startDate: '2023-12-01',
     },
   },
+  {
+    id: 2501192726,
+    eventNumber: '9101',
+    order: {
+      description: 'Custodial sentence',
+      sentenceType: 'CUSTODY',
+      endDate: '2024-12-01',
+      startDate: '2023-12-01',
+    },
+  },
 ]
 
 const req = httpMocks.createRequest()
@@ -58,8 +76,12 @@ describe('middleware/overrideDeliusManagedFlag', () => {
   it('should accept one parameter', () => {
     expect(overrideDeliusManagedFlag.length).toEqual(1)
   })
-  it('should add delius managed flag if appointment sentence is PRE_SENTENCE', () => {
+  it('should override deliusManaged flag to true if appointment sentence is PRE_SENTENCE and deliusManaged is false', () => {
     const result = overrideDeliusManagedFlag(mockAppointments)(req, res)
-    expect(result).toStrictEqual([{ ...mockAppointments[0], deliusManaged: true }, mockAppointments[1]])
+    expect(result).toStrictEqual([
+      { ...mockAppointments[0], deliusManaged: true },
+      mockAppointments[1],
+      mockAppointments[2],
+    ])
   })
 })
