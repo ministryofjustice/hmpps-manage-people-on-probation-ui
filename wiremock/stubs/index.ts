@@ -26,6 +26,7 @@ import relatedContacts from './relatedContacts'
 import compliance from './compliance'
 import contactOutcomes from './contactOutcomes'
 import emdi from './emdi'
+import tier from './tier'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -56,6 +57,7 @@ export default {
   ...compliance,
   ...contactOutcomes,
   ...emdi,
+  ...tier,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({
       request: {
