@@ -37,11 +37,11 @@ export default class TierApiClient extends RestClient {
   }
 
   async getTierHistory(crn: string): Promise<TierHistoryEntry[] | null> {
+    // 404 (no history) returns null; let 500s throw so the caller's catch logs and renders
+    // without the prompt, keeping the return type accurate at runtime.
     return this.get<TierHistoryEntry[]>({
       path: `/v3/crn/${crn}/tier/history`,
       handle404: true,
-      handle500: true,
-      errorMessage: 'Tier history is currently unavailable.',
     })
   }
 
