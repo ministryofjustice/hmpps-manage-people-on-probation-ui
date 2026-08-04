@@ -1,8 +1,6 @@
 import { type Router } from 'express'
-import asyncMiddleware from '../middleware/asyncMiddleware'
 import { type Services } from '../services'
 import { filterActivityLog, getSentences } from '../middleware'
-import type { Route } from '../@types'
 import controllers from '../controllers'
 import validate from '../middleware/validation/index'
 
@@ -15,6 +13,10 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
     controllers.activityLog.getOrPostActivityLog(hmppsAuthClient),
   )
 
-  router.get('/case/:crn/activity/:id', controllers.activityLog.getActivity(hmppsAuthClient))
+  router.get(
+    '/case/:crn/activity/:id',
+    getSentences(hmppsAuthClient),
+    controllers.activityLog.getActivity(hmppsAuthClient),
+  )
   router.get(`/case/:crn/activitylog/redirect`, controllers.activityLog.redirectToActivityLog(hmppsAuthClient))
 }

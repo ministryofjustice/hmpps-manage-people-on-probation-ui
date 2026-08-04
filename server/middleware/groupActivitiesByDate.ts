@@ -10,22 +10,21 @@ interface Group {
 
 export const groupActivitiesByDate = (activities: Activity[]): Route<Group[]> => {
   return (req, res) => {
-    const groups: { date: string; activities: Activity[] }[] = []
-    const seenDates = new Set<string>()
+    const grouped = new Map<string, Activity[]>()
     for (const activity of activities) {
       const date = compactActivityLogDate(activity.startDateTime)
-      if (date && !seenDates.has(date)) {
-        const filteredActivities = activities.filter(a => compactActivityLogDate(a.startDateTime) === date)
-        seenDates.add(date)
-        groups.push({
-          date,
-          activities:
-            res.locals?.flags?.enablePreSentence === false
-              ? overrideDeliusManagedFlag(filteredActivities)(req, res)
-              : filteredActivities,
-        })
-      }
+      // eslint-disable-next-line no-continue
+      if (!date) continue
+      const list = grouped.get(date)
+      if (list) list.push(activity)
+      else grouped.set(date, [activity])
     }
-    return groups
+    return Array.from(grouped.entries()).map(([date, dateActivities]) => ({
+      date,
+      activities:
+        res.locals?.flags?.enablePreSentence === false
+          ? overrideDeliusManagedFlag(dateActivities)(req, res)
+          : dateActivities,
+    }))
   }
 }

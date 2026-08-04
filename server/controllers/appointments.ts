@@ -56,11 +56,14 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      let [upcomingAppointments, pastAppointments] = await Promise.all([
+      const [upcomingAppointmentsResponse, pastAppointmentsResponse, practitioner] = await Promise.all([
         masClient.getPersonSchedule(crn, 'upcoming', '0'),
         masClient.getPersonSchedule(crn, 'previous', '0'),
+        masClient.getProbationPractitioner(crn),
       ])
-      const practitioner = await masClient.getProbationPractitioner(crn)
+
+      let pastAppointments = pastAppointmentsResponse
+      let upcomingAppointments = upcomingAppointmentsResponse
 
       if (res.locals?.flags?.enablePreSentence === false) {
         pastAppointments = {

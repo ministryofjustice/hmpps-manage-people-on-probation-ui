@@ -51,7 +51,7 @@ describe('middleware/getSentenceList', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  it('should assign an empty array to res.locals.sentenceList when res.locals.sentences is undefined', async () => {
+  it('should assign unfiltered sentences to res.locals.sentenceList when enablePreSentence flag is undefined', async () => {
     const req = httpMocks.createRequest()
     const res = mockAppResponse({ sentences: undefined })
     await getSentenceList(req, res, nextSpy)
