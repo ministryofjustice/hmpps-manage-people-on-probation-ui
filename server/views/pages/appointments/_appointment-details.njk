@@ -107,7 +107,7 @@
     } if hasNote and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
-      value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo(true) + '</span>' }
+            value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo(true) + '</span>' }
     } if not appointment.hasOutcome and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="relatedDocumentsLabel">Related documents</span>' },
