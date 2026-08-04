@@ -43,7 +43,7 @@
     } if appointment.documents.length > 0,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
-      value: { html: '<span data-qa="sensitiveValue">' + appointment.isSensitive | toYesNo + '</span>' }
+      value: { html: '<span data-qa="sensitiveValue">' + appointment.isSensitive | toYesNo(true) + '</span>' }
     },
     {
       key: { html: '<span data-qa="noteAddedByLabel">Note added by</span>' },

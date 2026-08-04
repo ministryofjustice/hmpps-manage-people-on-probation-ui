@@ -1,5 +1,5 @@
-export const toYesNo = (value: boolean) => {
-  if (value == null) return 'Not provided'
+export const toYesNo = (value: boolean, nullIsNo = false) => {
+  if (!nullIsNo && value == null) return 'Not provided'
   if (!value) {
     return 'No'
   }
