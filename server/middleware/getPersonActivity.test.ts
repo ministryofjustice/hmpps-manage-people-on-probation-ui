@@ -390,4 +390,43 @@ describe('/middleware/getPersonActivity', () => {
       String(ACTIVITY_LOG_PAGE_SIZE),
     )
   })
+
+  it('should set both filterBySparksContacts and filterBySupervisionPackageContacts to true when both flags are enabled and both values are selected', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSparksFilter: true, enableSupervisionPackageFilter: true }
+    res.locals.filters = {
+      ...filterVals,
+      compliance: [],
+      category: [],
+      sparks: ['appointments with sparks activity'],
+      supervisionPackage: ['appointments in supervision package'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      supervisionPackageOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({
+        filters: [],
+        filterBySparksContacts: true,
+        filterBySupervisionPackageContacts: true,
+        typeCodes: [],
+      }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
+    res.locals.flags = {}
+  })
 })
