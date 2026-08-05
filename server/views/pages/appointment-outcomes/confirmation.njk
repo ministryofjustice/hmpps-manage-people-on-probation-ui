@@ -3,7 +3,7 @@
 {% set buttonText = "Return to " + appointmentOutcome.forename + "’s overview" %}
 {% set title = appointmentOutcome.confirmation.title %}
 {% set pageTitle = makePageTitle({
-  pageHeading: [title, "Record an outcome"]
+    pageHeading: [title, "Record an outcome"]
 }) %}
 {% set notStandardForm = true %}
 {% set panelHtml %}
@@ -22,7 +22,7 @@
 }) }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
-            <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+            <h2 class="govuk-heading-m {{ 'govuk-!-margin-top-2' if linkedAppointment else 'govuk-!-margin-top-6' }}">What happens next</h2>
             {% for text in appointmentOutcome.confirmation.text %}
                 <p class="govuk-body">{{ text }}</p>
             {% endfor %}
