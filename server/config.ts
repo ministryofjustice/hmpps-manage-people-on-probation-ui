@@ -12,6 +12,13 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 
 const requiredInProduction = { requireInProduction: true }
 
+// Resolve an env var to a positive integer, falling back to `fallback` for anything
+// that isn't one (missing, non-numeric, zero, negative, or fractional).
+function getPositiveIntOr(name: string, fallback: number): number {
+  const parsed = Number.parseInt(String(get(name, fallback)), 10)
+  return parsed > 0 ? parsed : fallback
+}
+
 export class AgentConfig {
   // Sets the working socket to timeout after timeout milliseconds of inactivity on the working socket.
   timeout: number
@@ -79,7 +86,7 @@ export default {
   },
   tier: {
     link: get('TIER_LINK', 'https://tier-dummy-url', requiredInProduction),
-    changePromptWindowDays: Number(get('TIER_CHANGE_PROMPT_WINDOW_DAYS', 7)) || 7,
+    changePromptWindowDays: getPositiveIntOr('TIER_CHANGE_PROMPT_WINDOW_DAYS', 7),
   },
   tierUrl: {
     link: get('TIER_URL', 'https://tier-dummy-url', requiredInProduction),
