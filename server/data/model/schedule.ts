@@ -159,6 +159,7 @@ export interface Activity {
   esupervisionId?: string
   externalReference?: string
   isUpdatableContact?: boolean
+  isPreSentence?: boolean
 }
 
 export interface PersonAppointmentEnforcementAction {

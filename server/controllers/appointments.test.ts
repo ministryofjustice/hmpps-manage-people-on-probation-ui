@@ -9,9 +9,9 @@ import MasApiClient from '../data/masApiClient'
 import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment, isMatchingAddress } from '../utils'
 import { mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError, overrideDeliusManagedFlag } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
-import { Activity, PersonAppointment } from '../data/model/schedule'
+import { Activity, PersonAppointment, Schedule } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { SubjectType } from '../middleware/sendAuditMessage'
@@ -68,11 +68,27 @@ jest.mock('../utils', () => {
     canRescheduleAppointment: jest.fn(),
   }
 })
+
+const mockScheduleWithFlag = {
+  ...mockPersonSchedule,
+  personSchedule: {
+    ...mockPersonSchedule.personSchedule,
+    appointments: [
+      {
+        ...mockPersonSchedule.personSchedule.appointments[0],
+        deliusManaged: true,
+      },
+    ],
+  },
+} as unknown as Schedule
+
 const mockMiddlewareFn = jest.fn()
+
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
   getCheckinOffenderDetails: jest.fn(() => mockMiddlewareFn),
+  overrideDeliusManagedFlag: jest.fn(() => jest.fn(() => mockScheduleWithFlag.personSchedule.appointments)),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -81,7 +97,7 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
-
+const mockOverrideDeliusManagedFlag = overrideDeliusManagedFlag as jest.MockedFunction<typeof overrideDeliusManagedFlag>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNumericString>
@@ -90,7 +106,6 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
 >
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
-const mockIsMatchingAddress = isMatchingAddress as jest.MockedFunction<typeof isMatchingAddress>
 
 const reqObject = {
   params: {
@@ -187,8 +202,6 @@ const getNextAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getNextAppointment')
   .mockImplementation(() => Promise.resolve(nextApptResponse()))
 
-let getRelatedContactsSpy: jest.SpiedFunction<MasApiClient['getRelatedContacts']>
-
 const patchAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'patchAppointment')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
@@ -205,19 +218,33 @@ describe('controllers/appointments', () => {
     })
   })
   describe('get appointments', () => {
-    beforeEach(async () => {
+    it('should request previous and upcoming appointments from the api', async () => {
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
-    })
-    checkAuditMessage(res, 'VIEW_MAS_APPOINTMENTS', uuidv4(), crn, 'CRN')
-    it('should request previous and upcoming appointments from the api', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
 
-    it('should render the appointments page', () => {
+    it('should render the appointments page', async () => {
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
+        crn,
+        personRisks: undefined,
+        hasDeceased: false,
+        hasPractitioner: true,
+        canAccessCheckins: false,
+        url: '',
+      })
+    })
+    it('should override deliusManaged flag when enablePreSentence flag is false', async () => {
+      const mockRes = mockAppResponse({ flags: { enablePreSentence: false } })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
+      expect(mockOverrideDeliusManagedFlag).toHaveBeenCalledTimes(2)
+      expect(spy).toHaveBeenCalledWith('pages/appointments', {
+        upcomingAppointments: mockScheduleWithFlag,
+        pastAppointments: mockScheduleWithFlag,
         crn,
         personRisks: undefined,
         hasDeceased: false,
