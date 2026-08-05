@@ -5,6 +5,7 @@ import { HmppsAuthClient } from '../data'
 import TierApiClient from '../data/tierApiClient'
 import { getMostRecentTierChange, isTierChangeInWindow } from '../utils/tierChange'
 import { tierUrlV3 } from '../utils'
+import config from '../config'
 
 export const getTierChangePrompt = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getTierChangePromptInner(req, res, next) {
@@ -17,7 +18,7 @@ export const getTierChangePrompt = (hmppsAuthClient: HmppsAuthClient): Route<Pro
       const history = await new TierApiClient(token).getTierHistory(crn)
 
       const change = getMostRecentTierChange(history)
-      if (change && isTierChangeInWindow(change.changeDate, DateTime.now())) {
+      if (change && isTierChangeInWindow(change.changeDate, DateTime.now(), config.tier.changePromptWindowDays)) {
         res.locals.tierChangePrompt = {
           oldTier: change.oldTier,
           newTier: change.newTier,

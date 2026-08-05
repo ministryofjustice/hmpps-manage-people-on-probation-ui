@@ -79,6 +79,7 @@ export default {
   },
   tier: {
     link: get('TIER_LINK', 'https://tier-dummy-url', requiredInProduction),
+    changePromptWindowDays: Number(get('TIER_CHANGE_PROMPT_WINDOW_DAYS', 7)) || 7,
   },
   tierUrl: {
     link: get('TIER_URL', 'https://tier-dummy-url', requiredInProduction),
