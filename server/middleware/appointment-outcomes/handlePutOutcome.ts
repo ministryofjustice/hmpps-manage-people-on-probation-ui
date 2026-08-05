@@ -93,7 +93,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
 
 export function getMappedEnforcementActionCodes(
   enforcementActionCodes: EnforcementActionCode[] = [],
-  letterSentBy?: string,
+  letterSentBy?: EnforcementActionCreatedBy,
 ): EnforcementActionCode[] {
   return enforcementActionCodes.map(code =>
     letterSentBy === 'CASE_ADMIN' && ENFORCEMENT_LETTER_REQUEST_CODES.includes(code) ? 'WLS' : code,
