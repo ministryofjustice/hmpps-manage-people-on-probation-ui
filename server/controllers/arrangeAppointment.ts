@@ -648,9 +648,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         })
         setDataValue(data, ['temp', crn, 'responseContactId'], null)
       }
-      const { isOutLookEventFailed = null, isEnglishNotificationFailed = null, isWelshNotificationFailed = null } = data
+      const {
+        isOutLookEventFailed = null,
+        isOutlookEventPending = null,
+        isEnglishNotificationFailed = null,
+        isWelshNotificationFailed = null,
+      } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
+      delete req.session.data.isOutlookEventPending
       delete req.session.data.isEnglishNotificationFailed
       delete req.session.data.isWelshNotificationFailed
       let appointmentType = null
@@ -683,6 +689,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         crn,
         responseContactId,
         isOutLookEventFailed,
+        isOutlookEventPending,
         attendingName,
         linkedAppointment,
         url,

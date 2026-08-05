@@ -26,6 +26,7 @@ export interface PersonalDetailsSession {
 }
 
 export interface Data {
+  isOutlookEventPending?: boolean
   isOutLookEventFailed?: any
   isEnglishNotificationFailed?: boolean
   isWelshNotificationFailed?: boolean
