@@ -7,12 +7,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { Document } from '../data/model/personalDetails'
-import {
-  APPOINTMENTS_CODES,
-  SPARKS_FILTER_VALUE,
-  SUPERVISION_PACKAGE_FILTER_VALUE,
-  ACTIVITY_LOG_PAGE_SIZE,
-} from '../properties'
+import { APPOINTMENTS_CODES, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -183,6 +178,8 @@ describe('/middleware/getPersonActivity', () => {
       dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
+      filterBySparksContacts: false,
+      filterBySupervisionPackageContacts: false,
       includeSystemGenerated: false,
       typeCodes: APPOINTMENTS_CODES,
     }
@@ -194,7 +191,7 @@ describe('/middleware/getPersonActivity', () => {
     expect(tierCalculation).toEqual(mockTierCalculationResponse)
   })
 
-  it('should map the SPARKS filter to the request body filters (not typeCodes) when enableSparksFilter is enabled', async () => {
+  it('should set filterBySparksContacts to true (not typeCodes or filters) when enableSparksFilter is enabled', async () => {
     req.params = { crn }
     req.query = { page: '0' }
     res.locals.flags = { enableSparksFilter: true }
@@ -220,14 +217,14 @@ describe('/middleware/getPersonActivity', () => {
     await getPersonActivity(req, res, hmppsAuthClient)
     expect(masSpy).toHaveBeenCalledWith(
       crn,
-      expect.objectContaining({ filters: [SPARKS_FILTER_VALUE], typeCodes: [] }),
+      expect.objectContaining({ filters: [], filterBySparksContacts: true, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
     )
     res.locals.flags = {}
   })
 
-  it('should keep category filters in typeCodes while routing SPARKS to filters', async () => {
+  it('should keep category filters in typeCodes while setting filterBySparksContacts to true', async () => {
     req.params = { crn }
     req.query = { page: '0' }
     res.locals.flags = { enableSparksFilter: true }
@@ -253,7 +250,7 @@ describe('/middleware/getPersonActivity', () => {
     await getPersonActivity(req, res, hmppsAuthClient)
     expect(masSpy).toHaveBeenCalledWith(
       crn,
-      expect.objectContaining({ filters: ['complied', SPARKS_FILTER_VALUE], typeCodes: APPOINTMENTS_CODES }),
+      expect.objectContaining({ filters: ['complied'], filterBySparksContacts: true, typeCodes: APPOINTMENTS_CODES }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
     )
@@ -286,13 +283,13 @@ describe('/middleware/getPersonActivity', () => {
     await getPersonActivity(req, res, hmppsAuthClient)
     expect(masSpy).toHaveBeenCalledWith(
       crn,
-      expect.objectContaining({ filters: ['complied'], typeCodes: [] }),
+      expect.objectContaining({ filters: ['complied'], filterBySparksContacts: false, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
     )
   })
 
-  it('should map the supervision package filter to the request body filters (not typeCodes) when enableSupervisionPackageFilter is enabled', async () => {
+  it('should set filterBySupervisionPackageContacts to true (not typeCodes or filters) when enableSupervisionPackageFilter is enabled', async () => {
     req.params = { crn }
     req.query = { page: '0' }
     res.locals.flags = { enableSupervisionPackageFilter: true }
@@ -318,14 +315,14 @@ describe('/middleware/getPersonActivity', () => {
     await getPersonActivity(req, res, hmppsAuthClient)
     expect(masSpy).toHaveBeenCalledWith(
       crn,
-      expect.objectContaining({ filters: [SUPERVISION_PACKAGE_FILTER_VALUE], typeCodes: [] }),
+      expect.objectContaining({ filters: [], filterBySupervisionPackageContacts: true, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
     )
     res.locals.flags = {}
   })
 
-  it('should keep category filters in typeCodes while routing the supervision package filter to filters', async () => {
+  it('should keep category filters in typeCodes while setting filterBySupervisionPackageContacts to true', async () => {
     req.params = { crn }
     req.query = { page: '0' }
     res.locals.flags = { enableSupervisionPackageFilter: true }
@@ -352,7 +349,8 @@ describe('/middleware/getPersonActivity', () => {
     expect(masSpy).toHaveBeenCalledWith(
       crn,
       expect.objectContaining({
-        filters: ['complied', SUPERVISION_PACKAGE_FILTER_VALUE],
+        filters: ['complied'],
+        filterBySupervisionPackageContacts: true,
         typeCodes: APPOINTMENTS_CODES,
       }),
       '0',
@@ -387,9 +385,48 @@ describe('/middleware/getPersonActivity', () => {
     await getPersonActivity(req, res, hmppsAuthClient)
     expect(masSpy).toHaveBeenCalledWith(
       crn,
-      expect.objectContaining({ filters: ['complied'], typeCodes: [] }),
+      expect.objectContaining({ filters: ['complied'], filterBySupervisionPackageContacts: false, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
     )
+  })
+
+  it('should set both filterBySparksContacts and filterBySupervisionPackageContacts to true when both flags are enabled and both values are selected', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSparksFilter: true, enableSupervisionPackageFilter: true }
+    res.locals.filters = {
+      ...filterVals,
+      compliance: [],
+      category: [],
+      sparks: ['appointments with sparks activity'],
+      supervisionPackage: ['appointments in supervision package'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      supervisionPackageOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({
+        filters: [],
+        filterBySparksContacts: true,
+        filterBySupervisionPackageContacts: true,
+        typeCodes: [],
+      }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+    )
+    res.locals.flags = {}
   })
 })

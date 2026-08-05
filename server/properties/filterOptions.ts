@@ -558,20 +558,14 @@ export const ENFORCEMENT_CODES: string[] = [
   'C145',
 ]
 
-export const SPARKS_FILTER_VALUE = 'sparks'
-
 export const sparksCategoryFilterOption = {
   text: 'Show appointments with SPARKS activity',
   value: 'appointments with sparks activity',
-  codes: [SPARKS_FILTER_VALUE],
 }
-
-export const SUPERVISION_PACKAGE_FILTER_VALUE = 'supervisionPackage'
 
 export const supervisionPackageCategoryFilterOption = {
   text: 'Show appointments in supervision package',
   value: 'appointments in supervision package',
-  codes: [SUPERVISION_PACKAGE_FILTER_VALUE],
 }
 
 export const categoryFilterOptions = [
