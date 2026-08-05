@@ -404,7 +404,7 @@ describe('getMappedEnforcementActionCodes', () => {
   })
 
   it('should not map enforcement actions when letter is not sent by CASE_ADMIN', () => {
-    expect(getMappedEnforcementActionCodes(['EA02'], 'PROBATION_OFFICER')).toEqual(['EA02'])
+    expect(getMappedEnforcementActionCodes(['EA02'], 'USER')).toEqual(['EA02'])
   })
 
   it('should not map enforcement actions when letterSentBy is undefined', () => {
