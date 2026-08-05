@@ -118,6 +118,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         completeNextAppointment({ dateInPast: true })
         confirmationPage = new AppointmentConfirmationPage()
         confirmationPage.checkPageTitle('Past appointment arranged')
+        cy.get('.govuk-panel').should('not.exist')
         cy.get('[data-qa="appointment-type"]').should('contain.text', '3 way meeting (NS)')
         cy.get('[data-qa="appointment-date"]')
           .invoke('text')
