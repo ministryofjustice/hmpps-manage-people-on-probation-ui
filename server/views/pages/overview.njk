@@ -151,7 +151,7 @@
     {% if hasTierChangeItem %}{% set itemCount = itemCount + 1 %}{% endif %}
 
     {% set outcomesItem %}<a href="/case/{{ crn }}/record-an-outcome/outcome">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }} {{ 'appointment' if appointmentsWithoutAnOutcomeCount == 1 else 'appointments' }}</a>.{% endset %}
-    {% set tierChangeItem %}<a href="{{ tierChangePrompt.historyHref }}" data-qa="tierChangePromptLink">{{ personForename }}’s tier has changed from {{ tierChangePrompt.oldTier }} to {{ tierChangePrompt.newTier }}</a> and their supervision package has been recalculated.{% endset %}
+    {% set tierChangeItem %}<a href="{{ tierChangePrompt.historyHref }}" data-qa="tierChangePromptLink">{{ personForename }}’s tier has changed from {{ tierChangePrompt.oldTier }} to {{ tierChangePrompt.newTier }}</a>.{% endset %}
 
     {% if itemCount > 0 %}
       {% set html %}
