@@ -399,9 +399,12 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
 })
 
 describe('getMappedEnforcementActionCodes', () => {
-  it.each([['EA05'], ['EA02'], ['EA08'], ['LCL']])('should map %s to WLS when letter is sent by CASE_ADMIN', code => {
-    expect(getMappedEnforcementActionCodes([code as EnforcementActionCode], 'CASE_ADMIN')).toEqual(['WLS'])
-  })
+  it.each([['EA05'], ['EA02'], ['EA03'], ['EA08'], ['LCL']])(
+    'should map %s to WLS when letter is sent by CASE_ADMIN',
+    code => {
+      expect(getMappedEnforcementActionCodes([code as EnforcementActionCode], 'CASE_ADMIN')).toEqual(['WLS'])
+    },
+  )
 
   it('should not map enforcement actions when letter is not sent by CASE_ADMIN', () => {
     expect(getMappedEnforcementActionCodes(['EA02'], 'USER')).toEqual(['EA02'])

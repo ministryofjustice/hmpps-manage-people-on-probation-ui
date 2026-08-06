@@ -7,7 +7,7 @@ import { handleQuotes } from '../../utils'
 import { renderError } from '../renderError'
 import { EnforcementActionCode } from '../../properties/appointment-outcomes'
 
-const ENFORCEMENT_LETTER_REQUEST_CODES: EnforcementActionCode[] = ['EA05', 'EA02', 'EA08', 'LCL']
+const ENFORCEMENT_LETTER_REQUEST_CODES: EnforcementActionCode[] = ['EA05', 'EA02', 'EA03', 'EA08', 'LCL']
 
 export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = false): Route<Promise<void>> => {
   return async function handlePutOutcomeInner(req, res, next) {
