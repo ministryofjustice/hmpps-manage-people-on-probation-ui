@@ -2,8 +2,8 @@ import type { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-comp
 import type { Activity } from '../data/model/schedule'
 
 // Derived from the library's own method signature so the shapes never drift apart
-export type SupervisionPackageResponse = Awaited<ReturnType<MPoPComponents['getSupervisionPackage']>>
-export type SupervisionPackage = NonNullable<SupervisionPackageResponse['supervisionPackage']>
+export type SupervisionPackageResponse = Awaited<ReturnType<MPoPComponents['getSupervisionPackageFrontendContext']>>
+export type SupervisionPackage = NonNullable<SupervisionPackageResponse>
 
 export type NextAppointmentResponse = {
   personSchedule: PersonSchedule | null

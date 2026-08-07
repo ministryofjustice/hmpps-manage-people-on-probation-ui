@@ -19,11 +19,13 @@ const SYSTEM_TOKEN = 'mock-system-token'
 
 const makeSupervisionPackageResponse = (
   overrides: Partial<SupervisionPackageResponse> = {},
-): SupervisionPackageResponse => ({
-  httpStatus: 200,
-  supervisionPackage: null,
-  ...overrides,
-})
+): SupervisionPackageResponse =>
+  ({
+    currentPhase: { phase: { code: 'STD', description: 'Standard' } },
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01',
+    ...overrides,
+  }) as SupervisionPackageResponse
 
 const makeSessionEntry = (supervisionPackageResponse?: any): PersonalDetailsSession =>
   ({
@@ -55,7 +57,7 @@ const buildRes = (enableSupervisionPackage: boolean): AppResponse =>
 describe('getSupervisionPackage middleware', () => {
   const ORIGINAL_ENV = process.env
 
-  let mpopComponents: jest.Mocked<Pick<MPoPComponents, 'getSupervisionPackage'>>
+  let mpopComponents: jest.Mocked<Pick<MPoPComponents, 'getSupervisionPackageFrontendContext'>>
   let hmppsAuthClient: jest.Mocked<Pick<HmppsAuthClient, 'getSystemClientToken'>>
   let nextSpy: jest.Mock
 
@@ -63,7 +65,7 @@ describe('getSupervisionPackage middleware', () => {
     jest.clearAllMocks()
     process.env = { ...ORIGINAL_ENV, NODE_ENV: 'production' }
     nextSpy = jest.fn()
-    mpopComponents = { getSupervisionPackage: jest.fn() }
+    mpopComponents = { getSupervisionPackageFrontendContext: jest.fn() }
     hmppsAuthClient = { getSystemClientToken: jest.fn().mockResolvedValue(SYSTEM_TOKEN) }
   })
 
@@ -81,7 +83,7 @@ describe('getSupervisionPackage middleware', () => {
     )(req, res, nextSpy)
 
     expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
-    expect(mpopComponents.getSupervisionPackage).not.toHaveBeenCalled()
+    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -95,14 +97,14 @@ describe('getSupervisionPackage middleware', () => {
       mpopComponents as unknown as MPoPComponents,
     )(req, res, nextSpy)
 
-    expect(mpopComponents.getSupervisionPackage).not.toHaveBeenCalled()
-    expect(res.locals.supervisionPackageDetails).toEqual(cached.supervisionPackage)
+    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
+    expect(res.locals.supervisionPackageDetails).toEqual(cached)
     expect(nextSpy).toHaveBeenCalled()
   })
 
   it('should fetch and store supervisionPackage in session when not cached', async () => {
     const packageResponse = makeSupervisionPackageResponse()
-    mpopComponents.getSupervisionPackage.mockResolvedValue(packageResponse)
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
     const req = buildReq({ [CRN]: makeSessionEntry() })
     const res = buildRes(true)
 
@@ -112,17 +114,17 @@ describe('getSupervisionPackage middleware', () => {
     )(req, res, nextSpy)
 
     expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
-    expect(mpopComponents.getSupervisionPackage).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
     expect(req.session.data.personalDetails[CRN].supervisionPackageResponse).toEqual(packageResponse)
-    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse.supervisionPackage)
+    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
     expect(nextSpy).toHaveBeenCalled()
   })
 
   it('should re-fetch supervisionPackage in development mode even when cached', async () => {
     process.env.NODE_ENV = 'development'
     const cached = makeSupervisionPackageResponse()
-    const fresh = makeSupervisionPackageResponse({ supervisionPackage: {} as any })
-    mpopComponents.getSupervisionPackage.mockResolvedValue(fresh)
+    const fresh = makeSupervisionPackageResponse({ createdAt: '2024-02-01' })
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(fresh)
     const req = buildReq({ [CRN]: makeSessionEntry(cached) })
     const res = buildRes(true)
 
@@ -131,13 +133,13 @@ describe('getSupervisionPackage middleware', () => {
       mpopComponents as unknown as MPoPComponents,
     )(req, res, nextSpy)
 
-    expect(mpopComponents.getSupervisionPackage).toHaveBeenCalledTimes(1)
-    expect(res.locals.supervisionPackageDetails).toEqual(fresh.supervisionPackage)
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledTimes(1)
+    expect(res.locals.supervisionPackageDetails).toEqual(fresh)
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should send error to the logger when the API returns a non-200 status', async () => {
-    mpopComponents.getSupervisionPackage.mockResolvedValue({ supervisionPackage: null, httpStatus: 500 })
+  it('should send error to the logger when the API returns null', async () => {
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(null)
     const req = buildReq({ [CRN]: makeSessionEntry() })
     const res = buildRes(true)
 
@@ -148,15 +150,16 @@ describe('getSupervisionPackage middleware', () => {
 
     expect(logger.error).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: `Failed to fetch supervision package for CRN ${CRN}. HTTP status: 500`,
+        message: `Failed to fetch supervision package for CRN ${CRN}`,
       }),
       'Failed to fetch supervision package from MPoP Components API.',
     )
+    expect(res.locals.supervisionPackageDetails).toBeUndefined()
     expect(nextSpy).toHaveBeenCalled()
   })
 
   it('should send error to the logger when the API call throws an error', async () => {
-    mpopComponents.getSupervisionPackage.mockRejectedValue(new Error('Connection refused'))
+    mpopComponents.getSupervisionPackageFrontendContext.mockRejectedValue(new Error('Connection refused'))
     const req = buildReq({ [CRN]: makeSessionEntry() })
     const res = buildRes(true)
 
@@ -174,7 +177,7 @@ describe('getSupervisionPackage middleware', () => {
   })
 
   it('should set supervisionPackage to undefined when the API throws a non-Error object', async () => {
-    mpopComponents.getSupervisionPackage.mockRejectedValue('unexpected string error')
+    mpopComponents.getSupervisionPackageFrontendContext.mockRejectedValue('unexpected string error')
     const req = buildReq({ [CRN]: makeSessionEntry() })
     const res = buildRes(true)
 
@@ -189,7 +192,7 @@ describe('getSupervisionPackage middleware', () => {
 
   it('should initialise session personal details for CRN if not already present', async () => {
     const packageResponse = makeSupervisionPackageResponse()
-    mpopComponents.getSupervisionPackage.mockResolvedValue(packageResponse)
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
     const req = buildReq({})
     const res = buildRes(true)
 

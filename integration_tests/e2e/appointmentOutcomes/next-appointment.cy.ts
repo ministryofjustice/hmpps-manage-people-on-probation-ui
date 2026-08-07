@@ -97,6 +97,11 @@ const completeNextAppointment = ({
   })
 }
 
+const past = DateTime.now().minus({ days: 1 })
+const future = DateTime.now().plus({ days: 2 })
+const expectedPastDate = `${past.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
+const expectedFutureDate = `${future.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
+
 const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   if (journey === 'MANAGE') {
     describe('Arrange next supervision appointment in the past', () => {
@@ -124,7 +129,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .invoke('text')
           .then(text => {
             const formatted = text.replace(/\s+/g, ' ').trim()
-            expect(formatted).to.equal('Tuesday 4 August 2026 from 9am to 10am')
+            expect(formatted).to.equal(expectedPastDate)
           })
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
@@ -150,7 +155,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .invoke('text')
           .then(text => {
             const formatted = text.replace(/\s+/g, ' ').trim()
-            expect(formatted).to.equal('Friday 7 August 2026 from 9am to 10am')
+            expect(formatted).to.equal(expectedFutureDate)
           })
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
