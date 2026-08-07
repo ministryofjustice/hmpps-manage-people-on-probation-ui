@@ -1,3 +1,5 @@
+import { getPositiveIntOr } from './utils/getPositiveIntOr'
+
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -11,13 +13,6 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 }
 
 const requiredInProduction = { requireInProduction: true }
-
-// Resolve an env var to a positive integer, falling back to `fallback` for anything
-// that isn't one (missing, non-numeric, zero, negative, or fractional).
-function getPositiveIntOr(name: string, fallback: number): number {
-  const parsed = Number.parseInt(String(get(name, fallback)), 10)
-  return parsed > 0 ? parsed : fallback
-}
 
 export class AgentConfig {
   // Sets the working socket to timeout after timeout milliseconds of inactivity on the working socket.
