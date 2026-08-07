@@ -251,14 +251,12 @@ export function mapEnforcementContactsWithApprovedContactDisplayNames(
 
   return {
     ...enforcementContacts,
-    enforcementContacts: enforcementContacts.enforcementContacts
-      .filter(contact => contact.enforcementAction !== 'No Further Action')
-      .map(contact => {
-        const displayName = getApprovedContactDisplayName(contact.appointmentType)
-        return {
-          ...contact,
-          displayName: displayName || contact.appointmentType,
-        }
-      }),
+    enforcementContacts: enforcementContacts.enforcementContacts.map(contact => {
+      const displayName = getApprovedContactDisplayName(contact.appointmentType)
+      return {
+        ...contact,
+        displayName: displayName || contact.appointmentType,
+      }
+    }),
   }
 }
