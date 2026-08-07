@@ -1,5 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
+import * as Sentry from '@sentry/node'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
@@ -9,6 +10,7 @@ import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetai
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
 import { PersonExistsResponse } from '../data/emdiClient'
+import logger from '../../logger'
 
 const routes = ['getCase'] as const
 
@@ -20,6 +22,19 @@ const caseController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
+      // Preloads semantic search data into OpenSearch for this CRN; fire-and-forget, non-blocking.
+      if (res.locals.flags.enableSemanticSearch) {
+        masClient.preloadActivitySearch(crn).catch(err => {
+          const eventId = Sentry.captureException(err, {
+            tags: {
+              service: 'Manage a Supervision API',
+              operation: 'preloadActivitySearch',
+            },
+            extra: { crn },
+          })
+          logger.error(err, `Failed to preload activity search data for crn: ${crn}. Sentry eventId: ${eventId}`)
+        })
+      }
       const sentenceNumber = (req?.query?.sentenceNumber ?? '') as string
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_OVERVIEW',

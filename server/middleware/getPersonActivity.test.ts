@@ -185,7 +185,7 @@ describe('/middleware/getPersonActivity', () => {
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
-    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', String(ACTIVITY_LOG_PAGE_SIZE))
+    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', String(ACTIVITY_LOG_PAGE_SIZE), false)
     expect(tierSpy).toHaveBeenCalledWith(crn)
     expect(personActivity).toEqual(mockPersonActivityResponse)
     expect(tierCalculation).toEqual(mockTierCalculationResponse)
@@ -220,6 +220,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: [], filterBySparksContacts: true, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
     res.locals.flags = {}
   })
@@ -253,6 +254,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: ['complied'], filterBySparksContacts: true, typeCodes: APPOINTMENTS_CODES }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
     res.locals.flags = {}
   })
@@ -286,6 +288,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: ['complied'], filterBySparksContacts: false, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
   })
 
@@ -318,6 +321,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: [], filterBySupervisionPackageContacts: true, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
     res.locals.flags = {}
   })
@@ -355,6 +359,7 @@ describe('/middleware/getPersonActivity', () => {
       }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
     res.locals.flags = {}
   })
@@ -388,6 +393,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: ['complied'], filterBySupervisionPackageContacts: false, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
   })
 
@@ -426,6 +432,7 @@ describe('/middleware/getPersonActivity', () => {
       }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
     )
     res.locals.flags = {}
   })
