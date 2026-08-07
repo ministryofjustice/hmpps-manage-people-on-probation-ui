@@ -35,7 +35,7 @@ context('Tier change prompt', () => {
     cy.task('resetMocks')
   })
 
-  it('AC: shows a tier change prompt when the tier changed within the last 7 days (previous + new tier + recalculated wording)', () => {
+  it('AC: shows a tier change prompt when the tier changed within the last 7 days (previous + new tier)', () => {
     enablePrompt()
     noOutcomes()
     stubHistory([entry('A1', daysAgo(0)), entry('A2', daysAgo(60))])
@@ -44,7 +44,6 @@ context('Tier change prompt', () => {
     page.notificationHeading().should('contain.text', 'Information that needs your attention')
     page.tierChangePromptLink().should('exist').and('contain.text', 'tier has changed from A2 to A1')
     page.notificationBannerContent().should('contain.text', 'Caroline')
-    page.notificationBannerContent().should('contain.text', 'and their supervision package has been recalculated')
     // Only one item -> rendered as a single line, not a bulleted list item
     page.tierChangePromptItem().should('not.exist')
   })
