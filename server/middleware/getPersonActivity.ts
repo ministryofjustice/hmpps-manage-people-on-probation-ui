@@ -67,8 +67,9 @@ export const getPersonActivity = async (
     typeCodes: combinedCategoryCodes,
   }
   const size = String(ACTIVITY_LOG_PAGE_SIZE)
+  const useSemanticSearch = res.locals.flags?.enableSemanticSearch === true
   const [personActivity, tierCalculation] = await Promise.all([
-    masClient.postPersonActivityLog(crn, body, page as string, size),
+    masClient.postPersonActivityLog(crn, body, page as string, size, useSemanticSearch),
     tierClient.getCalculationDetails(crn),
   ])
 
