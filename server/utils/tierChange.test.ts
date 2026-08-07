@@ -100,6 +100,19 @@ describe('utils/tierChange', () => {
     it('hides an invalid date', () => {
       expect(isTierChangeInWindow('not-a-date', now)).toBe(false)
     })
+
+    it('honours a custom window: shows a change today when days is 1', () => {
+      expect(isTierChangeInWindow('2026-07-29T08:00:00', now, 1)).toBe(true)
+    })
+
+    it('honours a custom window: hides a change from the previous day when days is 1', () => {
+      expect(isTierChangeInWindow('2026-07-28T23:00:00', now, 1)).toBe(false)
+    })
+
+    it('honours a custom window: shows a change on the boundary day when days is 3', () => {
+      expect(isTierChangeInWindow('2026-07-27T01:00:00', now, 3)).toBe(true)
+      expect(isTierChangeInWindow('2026-07-26T23:00:00', now, 3)).toBe(false)
+    })
   })
 
   it('does not prompt for the provided sample (change on 2026-06-10, well outside the window)', () => {
