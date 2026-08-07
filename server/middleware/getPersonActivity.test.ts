@@ -434,6 +434,30 @@ describe('/middleware/getPersonActivity', () => {
       String(ACTIVITY_LOG_PAGE_SIZE),
       false,
     )
+  })
+
+  it('should pass useSemanticSearch as true to postPersonActivityLog when enableSemanticSearch is enabled', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSemanticSearch: true }
+    res.locals.filters = {
+      ...filterVals,
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      supervisionPackageOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(crn, expect.objectContaining({}), '0', String(ACTIVITY_LOG_PAGE_SIZE), true)
     res.locals.flags = {}
   })
 })

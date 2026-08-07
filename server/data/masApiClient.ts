@@ -339,8 +339,8 @@ export default class MasApiClient extends RestClient {
     return personActivity ? mapPersonActivityWithApprovedContactDisplayNames(personActivity) : personActivity
   }
 
-  async preloadActivitySearch(crn: string): Promise<void> {
-    await this.get({ path: `/activity/${crn}/preload`, handle404: false })
+  async preloadActivitySearch(crn: string): Promise<unknown> {
+    return this.get({ path: `/activity/${crn}/preload`, handle404: false })
   }
 
   async getPersonRiskFlags(crn: string): Promise<PersonRiskFlags> {

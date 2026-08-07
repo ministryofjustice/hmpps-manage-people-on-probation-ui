@@ -209,6 +209,7 @@ describe('masApiClient', () => {
           ),
         'post',
       ],
+      ['preloadActivitySearch', '/activity/X000001/preload', () => masApiClient.preloadActivitySearch('X000001')],
       ['getPersonRiskFlags', '/risk-flags/X000001', () => masApiClient.getPersonRiskFlags('X000001')],
       [
         'getDocuments',
