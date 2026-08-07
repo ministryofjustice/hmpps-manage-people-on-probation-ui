@@ -151,7 +151,7 @@
     {% if hasTierChangeItem %}{% set itemCount = itemCount + 1 %}{% endif %}
 
     {% set outcomesItem %}<a href="/case/{{ crn }}/record-an-outcome/outcome">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }} {{ 'appointment' if appointmentsWithoutAnOutcomeCount == 1 else 'appointments' }}</a>.{% endset %}
-    {% set tierChangeItem %}<a href="{{ tierChangePrompt.historyHref }}" data-qa="tierChangePromptLink">{{ personForename }}’s tier has changed from {{ tierChangePrompt.oldTier }} to {{ tierChangePrompt.newTier }}</a> and their supervision package has been recalculated.{% endset %}
+    {% set tierChangeItem %}<a href="{{ tierChangePrompt.historyHref }}" data-qa="tierChangePromptLink">{{ personForename }}’s tier has changed from {{ tierChangePrompt.oldTier }} to {{ tierChangePrompt.newTier }}</a>.{% endset %}
 
     {% if itemCount > 0 %}
       {% set html %}
@@ -210,17 +210,12 @@
     {{ supervisionPackage({
       tierScore: (tierCalculation.tierScore if tierCalculation.tierScore !== 'MISSING' else null) if tierCalculation else null,
       tag: tierCalculation.tag if tierCalculation else null,
-      historyHref: tierUrlV3,
-      forename: overview.personalDetails.name.forename,
+      historyHref: tierUrlV3 + '/history',
       arrangeAppointmentHref: '/case/' + crn + '/arrange-appointment/sentence?back=' + url,
       updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn),
       crn: crn,
       deliusBaseURL: deliusHomepageUrl(),
-      nextAppointment: ({
-        description: nextAppointmentDetails.type,
-        date: nextAppointmentDetails.startDateTime,
-        href: '/case/' + crn + '/appointments/appointment/' + nextAppointmentDetails.id + '/manage?back=' + url
-      } if nextAppointmentDetails else null),
+      nextAppointmentHref: ('/case/' + crn + '/appointments/appointment/' + supervisionPackageDetails.nextAppointment.id + '/manage?back=' + url) if supervisionPackageDetails.nextAppointment.id else '',
       allAppointmentsHref: '/case/' + crn + '/appointments'
     } | merge(supervisionPackageDetails or {})) }}
   {% endif %}

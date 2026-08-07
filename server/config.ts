@@ -1,3 +1,5 @@
+import { getPositiveIntOr } from './utils/getPositiveIntOr'
+
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -79,6 +81,7 @@ export default {
   },
   tier: {
     link: get('TIER_LINK', 'https://tier-dummy-url', requiredInProduction),
+    changePromptWindowDays: getPositiveIntOr('TIER_CHANGE_PROMPT_WINDOW_DAYS', 7),
   },
   tierUrl: {
     link: get('TIER_URL', 'https://tier-dummy-url', requiredInProduction),

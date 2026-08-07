@@ -60,7 +60,8 @@ export const getMostRecentTierChange = (history: TierHistoryEntry[] | null | und
 
 /**
  * Whether a tier change should still be displayed: the day the change occurred plus the
- * following 6 calendar days (7 calendar days total). Comparison is date-only.
+ * following `days - 1` calendar days (`days` calendar days total, defaulting to 7).
+ * Comparison is date-only.
  */
 export const isTierChangeInWindow = (changeDate: string, now: DateTime = DateTime.now(), days = 7): boolean => {
   const changeDay = DateTime.fromISO(changeDate).startOf('day')

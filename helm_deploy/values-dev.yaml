@@ -72,6 +72,7 @@ generic-service:
     EPF2_LINK: '/'
     TIER_LINK: 'https://tier-dev.hmpps.service.justice.gov.uk/case'
     TIER_URL: 'https://tier-dev.hmpps.service.justice.gov.uk'
+    TIER_CHANGE_PROMPT_WINDOW_DAYS: 1
     SENTENCE_PLAN_LINK: 'https://sentence-plan-dev.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_LINK_V2: 'https://arns-assessment-platform-dev.hmpps.service.justice.gov.uk/access/sentence-plan/crn'
     E_SUPERVISION_API_URL: 'https://esupervision-api-dev.hmpps.service.justice.gov.uk'

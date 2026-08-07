@@ -97,6 +97,11 @@ const completeNextAppointment = ({
   })
 }
 
+const past = DateTime.now().minus({ days: 1 })
+const future = DateTime.now().plus({ days: 2 })
+const expectedPastDate = `${past.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
+const expectedFutureDate = `${future.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
+
 const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   if (journey === 'MANAGE') {
     describe('Arrange next supervision appointment in the past', () => {
@@ -118,6 +123,14 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         completeNextAppointment({ dateInPast: true })
         confirmationPage = new AppointmentConfirmationPage()
         confirmationPage.checkPageTitle('Past appointment arranged')
+        cy.get('.govuk-panel').should('not.exist')
+        cy.get('[data-qa="appointment-type"]').should('contain.text', '3 way meeting (NS)')
+        cy.get('[data-qa="appointment-date"]')
+          .invoke('text')
+          .then(text => {
+            const formatted = text.replace(/\s+/g, ' ').trim()
+            expect(formatted).to.equal(expectedPastDate)
+          })
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
           .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on 21 February 2024.`)
@@ -137,6 +150,13 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         completeNextAppointment({ type: 'CHANGE_TYPE', dateInPast: false })
         confirmationPage = new AppointmentConfirmationPage()
         confirmationPage.checkPageTitle('Appointment arranged')
+        cy.get('[data-qa="appointment-type"]').should('contain.text', 'Planned office visit (NS)')
+        cy.get('[data-qa="appointment-date"]')
+          .invoke('text')
+          .then(text => {
+            const formatted = text.replace(/\s+/g, ' ').trim()
+            expect(formatted).to.equal(expectedFutureDate)
+          })
         cy.get('[data-qa=logAppointmentOutcome]')
           .find('p')
           .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on 21 February 2024.`)

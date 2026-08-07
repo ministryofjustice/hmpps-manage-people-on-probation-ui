@@ -31,4 +31,5 @@ export class FeatureFlags {
   enableSupervisionPackageFilter?: boolean = undefined
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
   enableSemanticSearch?: boolean = undefined
+  enablePreSentence?: boolean = undefined
 }

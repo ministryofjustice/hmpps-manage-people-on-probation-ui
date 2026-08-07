@@ -3,6 +3,7 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { getDataValue } from '../utils'
 import { AppointmentSession } from '../models/Appointments'
+import { overrideDeliusManagedFlag } from './overrideDeliusManagedFlag'
 
 export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getPersonAppointmentInner(req, res, next) {
@@ -22,7 +23,15 @@ export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Pr
     if (contactId && crn) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      res.locals.personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      const response = await masClient.getPersonAppointment(crn, contactId)
+      const personAppointment = {
+        ...response,
+        appointment:
+          res.locals.flags?.enablePreSentence === false
+            ? overrideDeliusManagedFlag([response?.appointment])(req, res)[0]
+            : response?.appointment,
+      }
+      res.locals.personAppointment = personAppointment
     }
     return next()
   }

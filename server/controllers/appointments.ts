@@ -15,7 +15,12 @@ import {
   canRescheduleAppointment,
   addressToList,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
+import {
+  renderError,
+  cloneAppointmentAndRedirect,
+  getCheckinOffenderDetails,
+  overrideDeliusManagedFlag,
+} from '../middleware'
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
@@ -51,11 +56,32 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, pastAppointments, practitioner] = await Promise.all([
+      const [upcomingAppointmentsResponse, pastAppointmentsResponse, practitioner] = await Promise.all([
         masClient.getPersonSchedule(crn, 'upcoming', '0'),
         masClient.getPersonSchedule(crn, 'previous', '0'),
         masClient.getProbationPractitioner(crn),
       ])
+
+      let pastAppointments = pastAppointmentsResponse
+      let upcomingAppointments = upcomingAppointmentsResponse
+
+      if (res.locals?.flags?.enablePreSentence === false) {
+        pastAppointments = {
+          ...pastAppointments,
+          personSchedule: {
+            ...pastAppointments.personSchedule,
+            appointments: overrideDeliusManagedFlag(pastAppointments.personSchedule?.appointments)(req, res),
+          },
+        }
+
+        upcomingAppointments = {
+          ...upcomingAppointments,
+          personSchedule: {
+            ...upcomingAppointments.personSchedule,
+            appointments: overrideDeliusManagedFlag(upcomingAppointments.personSchedule?.appointments)(req, res),
+          },
+        }
+      }
 
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false

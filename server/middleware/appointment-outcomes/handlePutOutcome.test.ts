@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { handlePutOutcome } from './handlePutOutcome'
+import { getMappedEnforcementActionCodes, handlePutOutcome } from './handlePutOutcome'
 import { mockAppResponse } from '../../controllers/mocks'
 import { AppointmentSession, AppointmentSessionOutcome } from '../../models/Appointments'
 import { renderError } from '../renderError'
@@ -8,6 +8,7 @@ import MasApiClient from '../../data/masApiClient'
 import { EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
 import TokenStore from '../../data/tokenStore/redisTokenStore'
 import { AppointmentOutcomeProps } from '../../models/Locals'
+import { EnforcementActionCode } from '../../properties/appointment-outcomes'
 
 const id = '304bddc2-cfa5-4a33-92e2-ee31fc93d627'
 const contactId = '1234'
@@ -161,7 +162,11 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
   })
 
   it('should redirect to the outcome page if selected outcome requires an enforcement action but none selected', async () => {
-    const outcome: Partial<AppointmentSessionOutcome> = { outcomeType: 'ATTENDED_FAILED_TO_COMPLY' }
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      letterSentBy: 'CASE_ADMIN',
+      enforcementActionCode: [],
+    }
     const req = buildRequest()
     const res = buildResponse({ outcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
@@ -390,5 +395,34 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).not.toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('getMappedEnforcementActionCodes', () => {
+  it.each([['EA05'], ['EA02'], ['EA03'], ['EA08'], ['LCL']])(
+    'should map %s to WLS when letter is sent by CASE_ADMIN',
+    code => {
+      expect(getMappedEnforcementActionCodes([code as EnforcementActionCode], 'CASE_ADMIN')).toEqual(['WLS'])
+    },
+  )
+
+  it('should not map enforcement actions when letter is not sent by CASE_ADMIN', () => {
+    expect(getMappedEnforcementActionCodes(['EA02'], 'USER')).toEqual(['EA02'])
+  })
+
+  it('should not map enforcement actions when letterSentBy is undefined', () => {
+    expect(getMappedEnforcementActionCodes(['EA02'])).toEqual(['EA02'])
+  })
+
+  it('should keep non-letter enforcement actions unchanged', () => {
+    expect(getMappedEnforcementActionCodes(['ROM'], 'CASE_ADMIN')).toEqual(['ROM'])
+  })
+
+  it('should handle multiple enforcement actions', () => {
+    expect(getMappedEnforcementActionCodes(['EA02', 'ROM', 'LCL'], 'CASE_ADMIN')).toEqual(['WLS', 'ROM', 'WLS'])
+  })
+
+  it('should return an empty array when no enforcement actions are provided', () => {
+    expect(getMappedEnforcementActionCodes([], 'CASE_ADMIN')).toEqual([])
   })
 })
