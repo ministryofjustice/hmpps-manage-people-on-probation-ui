@@ -34,6 +34,8 @@ export default abstract class Page {
 
   headerCrn = (): PageElement => cy.get('[data-qa=crn]')
 
+  headerTier = (): PageElement => cy.get('[data-qa=tierLink]')
+
   headerName = (): PageElement => cy.get('[data-qa=name]')
 
   pageHeading = (): PageElement => cy.get('[data-qa=pageHeading]')
