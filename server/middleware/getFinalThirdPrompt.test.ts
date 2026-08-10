@@ -10,7 +10,6 @@ jest.mock('../../logger', () => ({
   __esModule: true,
   default: {
     error: jest.fn(),
-    info: jest.fn(),
   },
 }))
 
@@ -36,6 +35,14 @@ const buildRes = (enableFinalThirdPrompt: boolean): AppResponse =>
 describe('getFinalThirdPrompt middleware', () => {
   let hmppsAuthClient: jest.Mocked<Pick<HmppsAuthClient, 'getSystemClientToken'>>
   let nextSpy: jest.Mock
+
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-07-29T09:00:00Z'))
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()

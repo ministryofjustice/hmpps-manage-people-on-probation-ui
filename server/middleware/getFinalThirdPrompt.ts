@@ -14,7 +14,6 @@ export const getFinalThirdPrompt = (hmppsAuthClient: HmppsAuthClient): Route<Pro
     try {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
       const currentPhase = await new SupervisionPackageApiClient(token).getCurrentPhase(crn)
-      logger.info(`[getFinalThirdPrompt] CRN ${crn} current-phase response: ${JSON.stringify(currentPhase)}`)
       const { finalThirdEligibility } = currentPhase ?? {}
 
       if (
