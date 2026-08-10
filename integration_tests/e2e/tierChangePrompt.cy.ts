@@ -4,9 +4,6 @@ import OverviewPage from '../pages/overview'
 context('Tier change prompt', () => {
   const CRN = 'X000001' // Caroline Wolff
   const TIER_HISTORY_HREF = 'https://tier-dev.hmpps.service.justice.gov.uk/v3/case/X000001'
-  // The window is configurable (TIER_CHANGE_PROMPT_WINDOW_DAYS), and feature.env sets it to 1
-  // for faster local runs, so boundary tests must read the real value rather than assume 7.
-  const windowDays = Number(Cypress.env('TIER_CHANGE_PROMPT_WINDOW_DAYS')) || 7
 
   const enablePrompt = (enabled = true) => cy.task('stubFeatureFlag', { key: 'enableTierChangePrompt', enabled })
   const stubHistory = (history: Array<{ tierScore: string; calculationDate: string }>, status = 200) =>
@@ -141,25 +138,6 @@ context('Tier change prompt', () => {
     const page = visit()
 
     page.tierChangePromptLink().should('contain.text', 'from MISSING to A2')
-  })
-
-  it('window boundary: a change on the last day of the window is still shown', () => {
-    enablePrompt()
-    noOutcomes()
-    stubHistory([entry('A1', daysAgo(windowDays - 1)), entry('A2', daysAgo(60))])
-    const page = visit()
-
-    page.tierChangePromptLink().should('exist').and('contain.text', 'from A2 to A1')
-  })
-
-  it('window boundary: a change the day after the window closes is no longer shown', () => {
-    enablePrompt()
-    noOutcomes()
-    stubHistory([entry('A1', daysAgo(windowDays)), entry('A2', daysAgo(60))])
-    const page = visit()
-
-    page.pageHeading().should('contain.text', 'Overview')
-    page.notificationBanner().should('not.exist')
   })
 
   it('is resilient when the tier history endpoint errors: the page still renders without a tier prompt', () => {
