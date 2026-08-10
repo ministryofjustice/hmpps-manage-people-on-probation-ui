@@ -1,6 +1,13 @@
+import fs from 'fs'
 import { defineConfig } from 'cypress'
+import dotenv from 'dotenv'
 import coverageTask from '@cypress/code-coverage/task'
 import stubs from './wiremock/stubs'
+
+// Read directly from feature.env rather than process.env: the app itself is started with
+// `node --env-file=feature.env`, a separate process whose environment isn't inherited by
+// whatever shell later runs Cypress (locally or in CI), so process.env can't be relied on here.
+const featureEnv = fs.existsSync('feature.env') ? dotenv.parse(fs.readFileSync('feature.env')) : {}
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -27,7 +34,10 @@ export default defineConfig({
           return null
         },
       })
-      return config
+      return {
+        ...config,
+        env: { ...config.env, TIER_CHANGE_PROMPT_WINDOW_DAYS: featureEnv.TIER_CHANGE_PROMPT_WINDOW_DAYS },
+      }
     },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',

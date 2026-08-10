@@ -81,8 +81,13 @@ context('Final third eligibility prompt', () => {
   })
 
   it('AC: missing appointment outcomes, tier changes and Final Third all display together in priority order', () => {
-    enableTierChangePrompt(true)
-    enablePrompt(true)
+    // Both custom flags must be set in one snapshot response: stubFeatureFlag rebuilds the
+    // whole flags list from the static base fixture each call, so two separate calls for two
+    // different keys would leave only the second key's flag in the response.
+    cy.task('stubFeatureFlags', [
+      { key: 'enableTierChangePrompt', enabled: true },
+      { key: 'enableFinalThirdPrompt', enabled: true },
+    ])
     singleOutcome()
     cy.task('stubTierHistory', {
       crn: CRN,
