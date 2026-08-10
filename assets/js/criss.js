@@ -1,23 +1,30 @@
 const criss = () => {
-  const MAX_LIMIT = 12000
-
   const radioFreeform = document.getElementById('format-freeform')
-  if (!radioFreeform) {
-    return
-  }
   const radioStructured = document.getElementById('format-structured')
   const freeformContainer = document.getElementById('freeform-container')
   const structuredContainer = document.getElementById('structured-container')
-  const urlParts = window.location.href.split('?')[0].split('/')
-  const crn = urlParts[4]
-  const uuid = urlParts[7]
-  let mainTextarea = document.getElementById(`appointments-${crn}-${uuid}-notes`)
-  if (!mainTextarea) {
-    mainTextarea = document.getElementById('notes')
-  }
   const statusAnnouncer = document.getElementById('format-status')
   const crissCharCountMsg = document.getElementById('criss-character-count-info')
+  const form = document.getElementById('note-form')
 
+  if (
+    !radioFreeform ||
+    !radioStructured ||
+    !freeformContainer ||
+    !structuredContainer ||
+    !statusAnnouncer ||
+    !crissCharCountMsg ||
+    !form
+  ) {
+    return
+  }
+
+  const mainTextarea = freeformContainer.querySelector('textarea')
+  if (!mainTextarea) {
+    return
+  }
+
+  const MAX_LIMIT = Number.parseInt(mainTextarea.getAttribute('maxlength') || '', 10) || 12000
   const crissInputs = [
     { id: 'criss-check-in', label: '1. Check in' },
     { id: 'criss-review', label: '2. Review' },
@@ -147,7 +154,9 @@ const criss = () => {
   // Recalculate character count on typing in any CRISS input
   crissInputs.forEach(input => {
     const el = document.getElementById(input.id)
-    el.addEventListener('input', updateCrissCharacterCount)
+    if (el) {
+      el.addEventListener('input', updateCrissCharacterCount)
+    }
   })
 
   // Ensure combined text is saved to mainTextarea on submit if in CRISS mode

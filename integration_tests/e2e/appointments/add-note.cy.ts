@@ -87,7 +87,7 @@ describe('Add a note', () => {
       cy.get('label[for="fileUpload"]').should('contain.text', 'Upload a file (optional)')
     })
 
-    it('adds CRISS headers when textarea is empty', () => {
+    it('switches to CRISS format when the option is selected', () => {
       loadPage()
       addNotePage.getCrissRadio().eq(1).click()
       cy.get(`[id="freeform-container"]`).should('have.class', 'govuk-!-display-none')
