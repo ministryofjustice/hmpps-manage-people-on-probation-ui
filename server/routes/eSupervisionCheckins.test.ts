@@ -25,9 +25,6 @@ jest.mock('../middleware/getCheckIn', () => ({
 jest.mock('../middleware/checkinCyaRedirect', () => ({
   postRedirectWizard: () => (_req: unknown, _res: unknown, next: () => void) => next(),
 }))
-jest.mock('../middleware/getCheckInQuestionsRedirect', () => ({
-  getCheckInQuestionsRedirect: () => (_req: unknown, _res: unknown, next: () => void) => next(),
-}))
 
 const { link } = config.eSupervisionManageCheckins
 const crn = 'X000001'
@@ -74,49 +71,10 @@ const settingsPaths = [
 ]
 
 describe('eSupervisionCheckInsRoutes redirect guards', () => {
-  describe('enableESUPCheckinNewSetup', () => {
-    it.each(setupPaths)('redirects %s to the manage check-ins service when the flag is on', async path => {
-      const res = await request(appWith({ enableESUPCheckinNewSetup: true })).get(path)
+  it.each(setupPaths)('redirects %s to the manage check-ins service when the flag is on', async path => {
+    const res = await request(appWith({ enableESUPCheckinNewSetup: true })).get(path)
 
-      expect(res.status).toBe(302)
-      expect(res.headers.location).toBe(`${link}${path}`)
-    })
-
-    it.each(setupPaths)('serves %s locally when the flag is off', async path => {
-      const res = await request(appWith({ enableESUPCheckinNewSetup: false })).get(path)
-
-      expect(res.status).toBe(200)
-    })
-
-    it('does not affect the manage settings routes', async () => {
-      const res = await request(appWith({ enableESUPCheckinNewSetup: true })).get(
-        `/case/${crn}/appointments/check-in/manage/${id}/settings`,
-      )
-
-      expect(res.status).toBe(200)
-    })
-  })
-
-  describe('enableESUPCheckinNewSettings', () => {
-    it.each(settingsPaths)('redirects %s to the manage check-ins service when the flag is on', async path => {
-      const res = await request(appWith({ enableESUPCheckinNewSettings: true })).get(path)
-
-      expect(res.status).toBe(302)
-      expect(res.headers.location).toBe(`${link}${path}`)
-    })
-
-    it.each(settingsPaths)('serves %s locally when the flag is off', async path => {
-      const res = await request(appWith({ enableESUPCheckinNewSettings: false })).get(path)
-
-      expect(res.status).toBe(200)
-    })
-
-    it('does not redirect sibling manage routes owned by other flags', async () => {
-      const app = appWith({ enableESUPCheckinNewSettings: true })
-
-      await request(app).get(`/case/${crn}/appointments/check-in/manage/${id}/stop-checkin`).expect(200)
-      await request(app).get(`/case/${crn}/appointments/check-in/manage/${id}/restart-checkin`).expect(200)
-      await request(app).get(`/case/${crn}/appointments/check-in/manage/${id}/questions/start`).expect(200)
-    })
+    expect(res.status).toBe(302)
+    expect(res.headers.location).toBe(`${link}${path}`)
   })
 })

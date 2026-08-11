@@ -11,44 +11,11 @@ const path = `/case/${crn}/appointments/${id}/check-in/update`
 const createReq = (query: Record<string, string> = {}, url = path) =>
   httpMocks.createRequest({ params: { crn, id }, query, originalUrl: url })
 
-const redirect = () => redirectToManageCheckInService('enableESUPCheckinNewReview')
+const redirect = () => redirectToManageCheckInService()
 
 describe('redirectToManageCheckInService', () => {
-  it('calls next when the flag is not enabled', () => {
-    const res = mockAppResponse({ flags: { enableESUPCheckinNewReview: false } })
-    const redirectSpy = jest.spyOn(res, 'redirect')
-    const nextSpy = jest.fn()
-
-    redirect()(createReq(), res, nextSpy)
-
-    expect(redirectSpy).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('calls next when there are no flags', () => {
-    const res = mockAppResponse({})
-    const redirectSpy = jest.spyOn(res, 'redirect')
-    const nextSpy = jest.fn()
-
-    redirect()(createReq(), res, nextSpy)
-
-    expect(redirectSpy).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('only reacts to the flag it was given', () => {
-    const res = mockAppResponse({ flags: { enableESUPCheckinNewStop: true } })
-    const redirectSpy = jest.spyOn(res, 'redirect')
-    const nextSpy = jest.fn()
-
-    redirect()(createReq(), res, nextSpy)
-
-    expect(redirectSpy).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it('redirects to the manage check-ins service when the flag is enabled', () => {
-    const res = mockAppResponse({ flags: { enableESUPCheckinNewReview: true } })
+  it('redirects to the manage check-ins service', () => {
+    const res = mockAppResponse()
     const redirectSpy = jest.spyOn(res, 'redirect')
     const nextSpy = jest.fn()
 
@@ -102,7 +69,7 @@ describe('redirectToManageCheckInService', () => {
     const res = mockAppResponse({ flags: { enableESUPCheckinNewQuestions: true } })
     const redirectSpy = jest.spyOn(res, 'redirect')
 
-    redirectToManageCheckInService('enableESUPCheckinNewQuestions')(createReq(), res, jest.fn())
+    redirectToManageCheckInService()(createReq(), res, jest.fn())
 
     expect(redirectSpy).toHaveBeenCalledWith(`${link}${path}`)
   })
