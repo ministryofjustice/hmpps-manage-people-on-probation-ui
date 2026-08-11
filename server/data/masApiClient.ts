@@ -326,15 +326,21 @@ export default class MasApiClient extends RestClient {
     body: ActivityLogRequestBody,
     page: string,
     size = '10',
+    useSemanticSearch = false,
   ): Promise<PersonActivity | null> {
     const pageQuery = `?${new URLSearchParams({ size, page }).toString()}`
+    const path = useSemanticSearch ? `/activity/${crn}/v2${pageQuery}` : `/activity/${crn}${pageQuery}`
     const personActivity = (await this.post({
       data: body,
-      path: `/activity/${crn}${pageQuery}`,
+      path,
       handle404: false,
       handle500: false,
     })) as PersonActivity | null
     return personActivity ? mapPersonActivityWithApprovedContactDisplayNames(personActivity) : personActivity
+  }
+
+  async preloadActivitySearch(crn: string): Promise<unknown> {
+    return this.get({ path: `/activity/${crn}/preload`, handle404: false })
   }
 
   async getPersonRiskFlags(crn: string): Promise<PersonRiskFlags> {

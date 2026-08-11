@@ -122,7 +122,7 @@ describe('/controllers/activityLogController', () => {
         includeSystemGenerated: false,
         typeCodes: [] as string[],
       }
-      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25')
+      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25', false)
       expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
     })
 

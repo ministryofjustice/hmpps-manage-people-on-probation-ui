@@ -122,6 +122,9 @@ const getProbationPractitionerSpy = jest
 const getSentencesSpy = getSentences as jest.Mock
 const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
 const existsInEMDISpy = existsInEMDI as jest.Mock
+const preloadActivitySearchSpy = jest
+  .spyOn(MasApiClient.prototype, 'preloadActivitySearch')
+  .mockImplementation(() => Promise.resolve(undefined))
 
 const res = mockAppResponse({
   flags: {
@@ -396,6 +399,40 @@ describe('caseController', () => {
 
       expect(getSentencesSpy).not.toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCase - semantic search preload', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    afterEach(() => {
+      res.locals.flags = { enableOutcomesV1: true }
+    })
+
+    it('should call preloadActivitySearch when enableSemanticSearch is enabled', async () => {
+      res.locals.flags = { enableSemanticSearch: true, enableOutcomesV1: true }
+
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+      expect(preloadActivitySearchSpy).toHaveBeenCalledWith(crn)
+    })
+
+    it('should NOT call preloadActivitySearch when enableSemanticSearch is disabled', async () => {
+      res.locals.flags = { enableOutcomesV1: true }
+
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+      expect(preloadActivitySearchSpy).not.toHaveBeenCalled()
     })
   })
 })
