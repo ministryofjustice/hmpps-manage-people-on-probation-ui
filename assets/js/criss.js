@@ -67,7 +67,7 @@ const criss = () => {
       sectionValues[input.id] = ''
     })
 
-    const hasHeaders = crissInputs.some(input => text.includes(`${input.label}:`))
+    const hasHeaders = crissInputs.some(input => text.startsWith(`${input.label}:`))
 
     if (hasHeaders) {
       for (let i = 0; i < crissInputs.length; i += 1) {
@@ -120,6 +120,9 @@ const criss = () => {
           statusAnnouncer.textContent = 'Switched to CRISS format. Your note text was placed in section 1, Check in.'
         }
       } else {
+        crissInputs.forEach(input => {
+          document.getElementById(input.id).value = ''
+        })
         statusAnnouncer.textContent = 'Switched to CRISS format with 5 sections.'
       }
 
@@ -135,6 +138,7 @@ const criss = () => {
         statusAnnouncer.textContent =
           'Switched to freeform note. All sections have been combined with headings into the main text area.'
       } else {
+        mainTextarea.value = ''
         statusAnnouncer.textContent = 'Switched to freeform note.'
       }
 
