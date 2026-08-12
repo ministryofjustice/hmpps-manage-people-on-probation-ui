@@ -1,12 +1,14 @@
 {% from "_components/document/macro.njk" import appDocument %}
 {% set notes = '' %}
 {% set documentsHtml = '' %}
- {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
- {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
-{% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
+{% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
+{% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
+{% set displayName = appointment.displayName if appointment.displayName else 
+  appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
-{% set _docs = appointmentDocuments if appointmentDocuments else appointment.documents %}
+{% set _docs = appointmentDocuments if appointmentDocuments else 
+  appointment.documents %}
 {% if _docs and _docs.length > 0 %}
   {% for document in _docs %}
     {% set documentsHtml = documentsHtml ~ appDocument(document, crn) %}
@@ -19,7 +21,7 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else
+{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else 
   ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
@@ -85,7 +87,7 @@
     } if appointment.isUpdatableContact and appointment.outcome,
     {
     key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
-    value: { html: '<span data-qa="sensitiveValue">' + appointment.isSensitive | toYesNo + '</span>' }
+    value: { html: '<span data-qa="sensitiveValue">' + appointment.isSensitive | toYesNo(true) + '</span>' }
     } if appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="noteAddedByLabel">Note added by</span>' },
@@ -105,7 +107,7 @@
     } if hasNote and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
-      value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo + '</span>' }
+            value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo(true) + '</span>' }
     } if not appointment.hasOutcome and not appointment.isUpdatableContact,
     {
       key: { html: '<span data-qa="relatedDocumentsLabel">Related documents</span>' },

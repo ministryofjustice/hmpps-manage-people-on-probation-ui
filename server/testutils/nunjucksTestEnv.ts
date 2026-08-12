@@ -15,10 +15,12 @@ import {
   yearsSince,
   makePageTitle,
   dateWithDayAndWithYear,
+  dayOfWeek,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
 import { activityLinkUrl } from '../utils/activityContactLinkUrl'
+import { to12HourTimeCompact } from '../utils/to12HourTimeCompact'
 
 export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   const env = nunjucks.configure(
@@ -58,6 +60,8 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   })
   env.addFilter('convertToTitleCase', convertToTitleCase)
   env.addFilter('formatEnforcementActionNote', formatEnforcementActionNote)
+  env.addFilter('dayOfWeek', dayOfWeek)
+  env.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   env.addGlobal('makePageTitle', makePageTitle)
 
   return env

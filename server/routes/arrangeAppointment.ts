@@ -17,6 +17,7 @@ import {
   handlePostAppointment,
   forceValidation,
   restrictPageAccess,
+  getSentenceList,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -45,7 +46,11 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getAppointment(hmppsAuthClient),
   )
-  router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
+  router.all(
+    ['/case/:crn/arrange-appointment/:id/sentence', '/case/:crn/arrange-appointment/:id/appointments'],
+    getSentences(hmppsAuthClient),
+    getSentenceList,
+  )
   router.get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
   router.get(
     '/case/:crn/arrange-appointment/:id/sentence',

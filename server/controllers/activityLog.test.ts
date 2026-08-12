@@ -117,10 +117,12 @@ describe('/controllers/activityLogController', () => {
         dateFrom: '',
         dateTo: '',
         filters: [] as string[],
+        filterBySparksContacts: false,
+        filterBySupervisionPackageContacts: false,
         includeSystemGenerated: false,
         typeCodes: [] as string[],
       }
-      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25')
+      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25', false)
       expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
     })
 

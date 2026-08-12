@@ -1,9 +1,8 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { Controller } from '../@types'
-import { groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
-import { getPersonActivity } from '../middleware'
+import { getPersonActivity, overrideDeliusManagedFlag, groupActivitiesByDate } from '../middleware'
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
 import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/contactDisplayNames'
@@ -100,7 +99,7 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsStart,
         resultsEnd,
         errorMessages: req.session.errorMessages,
-        groupedActivities: groupActivitiesByDate(personActivity.activities),
+        groupedActivities: groupActivitiesByDate(personActivity.activities)(req, res),
       })
     }
   },
@@ -124,7 +123,14 @@ const activityLogController: Controller<typeof routes, void> = {
       url = encodeURIComponent(url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const personAppointment = await masClient.getPersonAppointment(crn, id)
+      const response = await masClient.getPersonAppointment(crn, id)
+      const personAppointment = {
+        ...response,
+        appointment:
+          res.locals.flags?.enablePreSentence === false
+            ? overrideDeliusManagedFlag([response?.appointment])(req, res)[0]
+            : response?.appointment,
+      }
 
       const isUpdatableContact = checkIsUpdatableContact(personAppointment?.appointment?.type)
 
@@ -133,7 +139,7 @@ const activityLogController: Controller<typeof routes, void> = {
       } else {
         personAppointment.appointment.isUpdatableContact = false
       }
-      if (personAppointment.appointment.isAppointment) {
+      if (personAppointment.appointment.isAppointment && !personAppointment.appointment.deliusManaged) {
         if (back) {
           return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage?back=${back}`)
         }

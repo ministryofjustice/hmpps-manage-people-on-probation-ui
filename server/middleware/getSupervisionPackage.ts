@@ -16,17 +16,15 @@ export const getSupervisionPackage = (
     supervisionPackageDataIsLoading: boolean
     supervisionPackageDataError: Error | undefined
   }> => {
-    let supervisionPackageData: SupervisionPackageResponse = { supervisionPackage: null, httpStatus: 500 }
+    let supervisionPackageData: SupervisionPackageResponse = null
     let supervisionPackageDataIsLoading: boolean = false
     let supervisionPackageDataError: Error | undefined
 
     try {
       supervisionPackageDataIsLoading = true
-      supervisionPackageData = await mpopComponents.getSupervisionPackage(token, crn)
-      if (supervisionPackageData?.httpStatus !== 200) {
-        supervisionPackageDataError = new Error(
-          `Failed to fetch supervision package for CRN ${crn}. HTTP status: ${supervisionPackageData?.httpStatus}`,
-        )
+      supervisionPackageData = await mpopComponents.getSupervisionPackageFrontendContext(token, crn)
+      if (!supervisionPackageData) {
+        supervisionPackageDataError = new Error(`Failed to fetch supervision package for CRN ${crn}`)
         logger.error(supervisionPackageDataError, 'Failed to fetch supervision package from MPoP Components API.')
       }
     } catch (err) {
@@ -69,8 +67,8 @@ export const getSupervisionPackage = (
       }
     }
 
-    if (supervisionPackageResponse?.httpStatus === 200) {
-      res.locals.supervisionPackageDetails = supervisionPackageResponse.supervisionPackage
+    if (supervisionPackageResponse) {
+      res.locals.supervisionPackageDetails = supervisionPackageResponse
     }
 
     return next()

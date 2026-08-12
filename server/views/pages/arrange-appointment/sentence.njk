@@ -12,7 +12,7 @@
 {% block heading %}{% endblock %}
 {% block form %}
   {% set allSentences = [] %}
-  {% for sentence in sentences %}
+  {% for sentence in sentenceList %}
     {% set sentenceReveal = '' %}
     {% set reveal = '' %}
     {% if sentence.requirements.length %}

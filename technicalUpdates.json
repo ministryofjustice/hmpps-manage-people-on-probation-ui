@@ -1,5 +1,27 @@
 [
   {
+    "heading": "Log non-compliant outcomes",
+    "summary": "10 August 2026",
+    "whatsNew": [
+      "Log non-compliant outcomes ",
+      [
+        "You can now use Manage people on probation to log non-compliant outcomes for appointments created in this service. This means you can record compliant and non-compliant outcomes in one place.\n\nThe simplified process saves you time by only showing relevant enforcement actions, while still allowing access to the full list.\n\nYou can see:\nhints on what different appointment outcomes mean, to support better practice\ncontextual information for scenarios such as recall, breach, non-compliance and acceptable absences\ncolour-coded statuses showing the current enforcement status\nwhen a person on probation has to submit any required evidence\nclearer information about when actions are completed automatically and when you need to take manual action\nrelated contacts, so you do not have to search contacts for relevant enforcement actions\n"
+      ],
+      "Sensitivity question not repeated for sensitive appointments",
+      [
+      "After an appointment is marked as sensitive, we will not show the sensitivity question again. If an appointment is not marked as sensitive, we'll ask the question each time you manage it."
+      ],
+      "Clearer ViSOR report hint",
+      [
+        "We’ve improved the hint for the ViSOR report question to make it clearer that it asks about adding the appointment to the NDelius ViSOR report. The appointment must still be added manually to the ViSOR secure national database."
+      ],
+      "See year and attending officer on record an outcome page",
+      [
+        "We've added the appointment year and attending officer to the appointment list on the 'Which appointment are you recording an outcome for?' page. This makes it easier to identify the correct appointment.\n\nThanks to everyone who has requested these changes. "
+      ]
+    ]
+  },
+  {
     "heading": "Add and update more contact types",
     "summary": "19 June 2026",
     "whatsNew": [

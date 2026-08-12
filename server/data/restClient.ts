@@ -1,6 +1,5 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
-import { uncork } from 'bunyan-format'
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'

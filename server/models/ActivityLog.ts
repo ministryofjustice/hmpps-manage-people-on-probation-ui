@@ -18,6 +18,8 @@ export interface ActivityLogRequestBody {
   dateFrom: string
   dateTo: string
   filters: string[]
+  filterBySparksContacts?: boolean
+  filterBySupervisionPackageContacts?: boolean
   includeSystemGenerated?: boolean
   typeCodes: string[]
 }

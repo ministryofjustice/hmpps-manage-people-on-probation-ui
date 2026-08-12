@@ -23,6 +23,8 @@ import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
+import { TierChangePrompt } from '../utils/tierChange'
+import { FinalThirdPrompt } from '../utils/finalThird'
 import { SupervisionPackage } from './SupervisionPackage'
 import { ErrorSummary } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
@@ -112,6 +114,8 @@ interface Locals {
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   tierDetails?: LatestTierResponse
+  tierChangePrompt?: TierChangePrompt
+  finalThirdPrompt?: FinalThirdPrompt
   supervisionPackageDetails?: SupervisionPackage | null
   predictorScores?: TimelineItem
   riskData?: RiskData
@@ -123,6 +127,7 @@ interface Locals {
   stack?: boolean | number | string
   flags?: FeatureFlags
   sentences?: Sentence[]
+  sentenceList?: Sentence[]
   timeOptions?: Option[]
   endTimeOptions?: Option[]
   userLocations?: Location[]

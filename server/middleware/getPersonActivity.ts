@@ -34,23 +34,15 @@ export const getPersonActivity = async (
     }
   }
 
-  const sparksFilters: string[] = []
-  if (
-    res.locals.flags?.enableSparksFilter &&
+  const filterBySparksContacts =
+    res.locals.flags?.enableSparksFilter === true &&
     Array.isArray(sparks) &&
     sparks.includes(sparksCategoryFilterOption.value)
-  ) {
-    sparksFilters.push(...sparksCategoryFilterOption.codes)
-  }
 
-  const supervisionPackageFilters: string[] = []
-  if (
-    res.locals.flags?.enableSupervisionPackageFilter &&
+  const filterBySupervisionPackageContacts =
+    res.locals.flags?.enableSupervisionPackageFilter === true &&
     Array.isArray(supervisionPackage) &&
     supervisionPackage.includes(supervisionPackageCategoryFilterOption.value)
-  ) {
-    supervisionPackageFilters.push(...supervisionPackageCategoryFilterOption.codes)
-  }
 
   const formatCompliance = (): Array<string> => {
     const complianceArray: string[] = []
@@ -68,13 +60,16 @@ export const getPersonActivity = async (
     keywords,
     dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
-    filters: [...formatCompliance(), ...sparksFilters, ...supervisionPackageFilters],
+    filters: [...formatCompliance()],
+    filterBySparksContacts,
+    filterBySupervisionPackageContacts,
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
   const size = String(ACTIVITY_LOG_PAGE_SIZE)
+  const useSemanticSearch = res.locals.flags?.enableSemanticSearch === true
   const [personActivity, tierCalculation] = await Promise.all([
-    masClient.postPersonActivityLog(crn, body, page as string, size),
+    masClient.postPersonActivityLog(crn, body, page as string, size, useSemanticSearch),
     tierClient.getCalculationDetails(crn),
   ])
 

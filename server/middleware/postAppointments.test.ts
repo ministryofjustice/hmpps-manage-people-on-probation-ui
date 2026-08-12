@@ -507,6 +507,38 @@ describe('/middleware/postAppointments', () => {
           'Failed to create calendar event',
         )
       })
+      it('should set req.session.data.isOutlookEventPending to true and return the appointment response if postOutlookCalendarEvent times out', async () => {
+        const timeoutError: any = new Error('Timeout of 5000ms exceeded')
+        timeoutError.code = 'ECONNABORTED'
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockRejectedValueOnce(timeoutError)
+
+        const mockReq = createMockReq(mockAppointment)
+        const res = buildResponse()
+
+        const response = await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(response).toEqual(mockAppointmentsPostResponse)
+        expect(mockReq.session.data.isOutlookEventPending).toEqual(true)
+        expect(logger.warn).toHaveBeenCalledWith(
+          expect.objectContaining({ err: timeoutError }),
+          expect.stringContaining('Outlook calendar event creation timed out'),
+        )
+        expect(mockReq.session.data.isOutLookEventFailed).toBeFalsy()
+      })
+      it('should rethrow the error if postOutlookCalendarEvent rejects with a non-timeout error', async () => {
+        const otherError = new Error('Some other failure')
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockRejectedValueOnce(otherError)
+
+        const mockReq = createMockReq(mockAppointment)
+        const res = buildResponse()
+
+        await expect(postAppointments(hmppsAuthClient)(mockReq, res)).rejects.toThrow(otherError)
+        expect(mockReq.session.data.isOutlookEventPending).toBeFalsy()
+      })
     })
     describe('Attending user does not have email', () => {
       const mockReq = createMockReq({

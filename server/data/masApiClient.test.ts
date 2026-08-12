@@ -155,7 +155,7 @@ describe('masApiClient', () => {
       ],
       [
         'getEnforcementContacts',
-        '/contact/USER1/enforcements?page=0&size=10&filterDueDate=false&months=12&sortBy=contactDate&direction=DESC',
+        '/contact/USER1/enforcements?page=0&size=10&filterDueDate=false&months=12&sortBy=lastModifiedDate&direction=DESC',
         () => masApiClient.getEnforcementContacts('USER1', '0', '10'),
       ],
       [
@@ -196,6 +196,20 @@ describe('masApiClient', () => {
           ),
         'post',
       ],
+      [
+        'postPersonActivityLog with semantic search',
+        '/activity/X000001/v2?size=10&page=1',
+        () =>
+          masApiClient.postPersonActivityLog(
+            'X000001',
+            { keywords: '', dateFrom: '', dateTo: '', filters: [], typeCodes: [] },
+            '1',
+            '10',
+            true,
+          ),
+        'post',
+      ],
+      ['preloadActivitySearch', '/activity/X000001/preload', () => masApiClient.preloadActivitySearch('X000001')],
       ['getPersonRiskFlags', '/risk-flags/X000001', () => masApiClient.getPersonRiskFlags('X000001')],
       [
         'getDocuments',

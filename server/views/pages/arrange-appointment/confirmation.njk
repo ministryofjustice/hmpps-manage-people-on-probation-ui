@@ -44,14 +44,22 @@
 
 {% block beforeContent %}{% endblock %}
 {% block primary %}
-  {{ govukPanel({
+  {% if not linkedAppointment %}
+    {{ govukPanel({
   titleHtml: '<span data-qa="pageHeading">' + title + '</span>',
   headingLevel: 2,
   html: panelHtml
 }) }}
+  {% else %}
+    <h2 class="govuk-heading-l govuk-!-margin-top-6" data-qa="pageHeading">{{ title }}</h2>
+    <p class="govuk-body">
+      <span data-qa="appointment-type">{{ appointment.type.description | toSentenceCase }}</span><br>
+      {{ appointmentDatesHtml | safe }}
+    </p>
+  {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
-      <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+      <h2 class="govuk-heading-m {{ 'govuk-!-margin-top-2' if linkedAppointment else 'govuk-!-margin-top-6' }}">What happens next</h2>
 
       {% if flags.enableSmsReminders == true %}
         {% if smsSent %}
@@ -116,6 +124,19 @@
         {% if isOutLookEventFailed %}
           <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
           <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
+            {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
+        {% elif isOutlookEventPending %}
+          {{ mojAlert({
+            variant: "error",
+            title: "There may be a problem sending your calendar invitation",
+            showTitleAsHeading: true,
+            dismissible: false,
+            text: "You may not receive a calendar invitation. If it does not arrive within a few minutes, create your own calendar event.",
+            attributes: {
+              'data-qa': 'outlook-pending-msg'
+            }
+          }) }}
+          <p class="govuk-body" data-qa="outlook-pending-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
             {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
         {% else %}
           {% if not isInPast %}

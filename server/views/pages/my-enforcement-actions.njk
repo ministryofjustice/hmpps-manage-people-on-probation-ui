@@ -30,22 +30,18 @@
             {% set head = [
             {
                 text: "Name / CRN",
-                attributes: {"aria-sort": sortByOrder.surname, "data-sort-name": "surname", "data-sort-action": sortUrl  },
                 classes: "nowrap"
             },
             {
                 text: "Appointment details",
-                attributes: {"aria-sort": sortByOrder.details, "data-sort-name": "details", "data-sort-action": sortUrl  },
                 classes: "nowrap"
             },
             {
                 text: "Appointment outcome",
-                attributes: {"aria-sort": sortByOrder.outcome, "data-sort-name": "outcome", "data-sort-action": sortUrl  },
                 classes: "nowrap"
             },
             {
                 text: "Enforcement action",
-                attributes: {"aria-sort": sortByOrder.action, "data-sort-name": "action", "data-sort-action": sortUrl  },
                 classes: "nowrap"
             },
             {
@@ -108,10 +104,6 @@
 
 
         {{ govukTable({
-            attributes: {
-               'data-module': 'moj-backend-sortable-table'
-            },
-            caption: 'Column headers with buttons are sortable',
             captionClasses: 'govuk-visually-hidden',
             head: head,
             rows: rows

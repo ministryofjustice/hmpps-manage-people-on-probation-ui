@@ -2,9 +2,12 @@ import { Route } from '../../@types'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
 import { EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
-import { AppointmentOutcomeType } from '../../models/Appointments'
+import { AppointmentOutcomeType, EnforcementActionCreatedBy } from '../../models/Appointments'
 import { handleQuotes } from '../../utils'
 import { renderError } from '../renderError'
+import { EnforcementActionCode } from '../../properties/appointment-outcomes'
+
+const ENFORCEMENT_LETTER_REQUEST_CODES: EnforcementActionCode[] = ['EA05', 'EA02', 'EA03', 'EA08', 'LCL']
 
 export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = false): Route<Promise<void>> => {
   return async function handlePutOutcomeInner(req, res, next) {
@@ -30,7 +33,11 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       const outcomeType = appointmentSession?.outcome?.outcomeType
       const outcomeCode = appointmentSession?.outcome?.outcomeCode
       const sensitivity = appointmentSession?.sensitivity
-      const enforcementActionCode = appointmentSession?.outcome?.enforcementActionCode
+
+      const enforcementActionCode = getMappedEnforcementActionCodes(
+        appointmentSession?.outcome?.enforcementActionCode,
+        appointmentSession?.outcome?.letterSentBy,
+      )
       const alert = enforcementActionCode?.includes('ROM') || false
       let notes = ''
       if (!responseContactId) {
@@ -54,12 +61,12 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       ]
 
       // if outcome but no action, check the outcome type does not require an associated action 👇
-
+      const hasEnforcementActions = (enforcementActionCode?.length ?? 0) > 0
       if (
         !put &&
         (!sensitivity ||
           !outcomeCode ||
-          (outcomeCode && !enforcementActionCode && outcomeType && !outcomeOnly.includes(outcomeType)))
+          (outcomeCode && !hasEnforcementActions && outcomeType && !outcomeOnly.includes(outcomeType)))
       ) {
         return res.redirect(`${baseOutcomeUrl}?validation=true`)
       }
@@ -82,4 +89,13 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
     }
     return next()
   }
+}
+
+export function getMappedEnforcementActionCodes(
+  enforcementActionCodes: EnforcementActionCode[] = [],
+  letterSentBy?: EnforcementActionCreatedBy,
+): EnforcementActionCode[] {
+  return enforcementActionCodes.map(code =>
+    letterSentBy === 'CASE_ADMIN' && ENFORCEMENT_LETTER_REQUEST_CODES.includes(code) ? 'WLS' : code,
+  )
 }

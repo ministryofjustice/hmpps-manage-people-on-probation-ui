@@ -1,3 +1,5 @@
+import { getPositiveIntOr } from './utils/getPositiveIntOr'
+
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -79,6 +81,7 @@ export default {
   },
   tier: {
     link: get('TIER_LINK', 'https://tier-dummy-url', requiredInProduction),
+    changePromptWindowDays: getPositiveIntOr('TIER_CHANGE_PROMPT_WINDOW_DAYS', 7),
   },
   tierUrl: {
     link: get('TIER_URL', 'https://tier-dummy-url', requiredInProduction),
@@ -233,8 +236,8 @@ export default {
     masAppointmentsApi: {
       url: get('SUPERVISION_API_URL', 'http://localhost:8100', requiredInProduction),
       timeout: {
-        response: Number(get('SUPERVISION_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('SUPERVISION_API_TIMEOUT_DEADLINE', 10000)),
+        response: Number(get('SUPERVISION_API_TIMEOUT_RESPONSE', 5000)),
+        deadline: Number(get('SUPERVISION_API_TIMEOUT_DEADLINE', 5000)),
       },
       agent: new AgentConfig(Number(get('SVA_CLIENT_API_TIMEOUT_RESPONSE', 10000))),
     },
