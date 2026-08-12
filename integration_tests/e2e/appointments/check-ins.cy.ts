@@ -945,7 +945,7 @@ context('check-ins error scenario ', () => {
     cy.get('h1').should('contain.text', 'Sorry, there is a problem with the service')
     cy.get('[data-qa="errorMessage"]').should(
       'contain.html',
-      '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p>',
+      '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p><p><strong>There is an ongoing issue with search on this service. This affects searching for a case and the contact list. Use the NDelius search and contact list for now.</strong></p>',
     )
   })
 })
