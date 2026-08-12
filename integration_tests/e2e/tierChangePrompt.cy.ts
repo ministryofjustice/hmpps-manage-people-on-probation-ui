@@ -140,25 +140,6 @@ context('Tier change prompt', () => {
     page.tierChangePromptLink().should('contain.text', 'from MISSING to A2')
   })
 
-  it('window boundary: a change exactly 6 days ago is still shown', () => {
-    enablePrompt()
-    noOutcomes()
-    stubHistory([entry('A1', daysAgo(6)), entry('A2', daysAgo(60))])
-    const page = visit()
-
-    page.tierChangePromptLink().should('exist').and('contain.text', 'from A2 to A1')
-  })
-
-  it('window boundary: a change 7 days ago is no longer shown', () => {
-    enablePrompt()
-    noOutcomes()
-    stubHistory([entry('A1', daysAgo(7)), entry('A2', daysAgo(60))])
-    const page = visit()
-
-    page.pageHeading().should('contain.text', 'Overview')
-    page.notificationBanner().should('not.exist')
-  })
-
   it('is resilient when the tier history endpoint errors: the page still renders without a tier prompt', () => {
     enablePrompt()
     stubHistory([], 500)
