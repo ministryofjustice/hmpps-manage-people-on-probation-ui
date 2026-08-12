@@ -1,0 +1,40 @@
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+<div id="{{ params.id }}-results-container"
+     class="probation-search__results-container{{ ' probation-search__has-results' if params.results.results else '' }}">
+    {% if params.results.response.totalElements > 0 %}
+        <p>Showing {{ params.results.pagination.from }} to {{ params.results.pagination.to }}
+            of {{ params.results.pagination.total }} results.</p>
+
+        <table class="govuk-table">
+            <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Name</th>
+                <th scope="col" class="govuk-table__header"><abbr title="Case Reference Number">CRN</abbr></th>
+                <th scope="col" class="govuk-table__header">Date of Birth</th>
+                {% for column in params.results.extraColumns %}
+                    <th scope="col" class="govuk-table__header">{{ column.header }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+            {%- set fn = params.results.fn -%}
+            {% for result in params.results.response.content %}
+                {% if result.accessDenied %}
+                    {%- include "./restrictedResult.njk" -%}
+                {% else %}
+                    {%- include "./result.njk" -%}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        {{ govukTable({ firstCellIsHeader: true, head: params.results.results.head, rows: params.results.results.rows }) }}
+
+        {% if params.results.pagination.items | length > 1 %}
+            {{ govukPagination({ previous: { href: params.results.pagination.prev }, next: { href: params.results.pagination.next }, items: params.results.pagination.items }) }}
+        {% endif %}
+        {% elif params.results.query != null and params.results.errorMessage == null %}
+        <p>There are no results for your search. Try refining your query above.</p>
+    {% endif %}
+</div>
