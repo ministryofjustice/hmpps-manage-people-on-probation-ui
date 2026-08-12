@@ -59,10 +59,10 @@
 
             {% set alertActivity %}
                 <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
-                        {{ alert.type.description }}
+                        {{ alert.description + ' - ' + alert.type.description if alert.description else alert.type.description }}
                     </a></p>
 
-                {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
+                {% if alert.alertNotes.length > 0 or alert.alertNote %}
                     {{ govukDetails({
                         summaryText: "More information",
                         classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
@@ -253,13 +253,6 @@
 {% endblock %}
 
 {% macro renderAlertDetails(alert) %}
-    {% if alert.description %}
-        <span class="govuk-heading-s govuk-!-margin-bottom-0">Description</span>
-        <div class={{"govuk-!-margin-bottom-5" if alert.alertNotes.length > 0 or alert.alertNote else ""}} data-qa="alertDescription-{{ alert.id }}">
-            {{ alert.description }}
-        </div>
-    {% endif %}
-
     {% if alert.alertNotes.length > 0 or alert.alertNote %}
         {% set notes = '' %}
         {% for note in alert.alertNotes %}
