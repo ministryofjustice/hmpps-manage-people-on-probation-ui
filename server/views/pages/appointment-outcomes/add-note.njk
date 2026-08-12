@@ -32,7 +32,7 @@
         label: {
             text: "Note",
             classes: "govuk-label--s"
-        },
+        } if flags.enableCRISSV2,
         attributes: {
             "aria-labelledby": "title"
         },
@@ -109,31 +109,43 @@
             }) }}
     {% endif %}
 
-    {{ govukRadios({
-        name: "noteFormat",
-        fieldset: {
-            legend: {
-                text: "Select note format",
-                classes: "govuk-fieldset__legend--m"
-            }
-        },
-        items: [
-            {
-                value: "freeform",
-                text:"Plain text",
-                id:"format-freeform",
-                checked: true
+    {% if flags.enableCRISSV2 %}
+        {{ govukRadios({
+            name: "noteFormat",
+            fieldset: {
+                legend: {
+                    text: "Select note format",
+                    classes: "govuk-fieldset__legend--m"
+                }
             },
-            {
-                value: "structured",
-                text:"CRISS",
-                id:"format-structured"
+            items: [
+                {
+                    value: "freeform",
+                    text:"Plain text",
+                    id:"format-freeform",
+                    checked: true
+                },
+                {
+                    value: "structured",
+                    text:"CRISS",
+                    id:"format-structured"
+                }
+            ],
+            attributes: {
+                "data-qa": "crissRadio"
             }
-        ],
-        attributes: {
-            "data-qa": "crissRadio"
-        }
-    }) }}
+        }) }}
+    {% else %}
+        {{ govukButton({
+            text: "Show CRISS headers",
+            classes: "govuk-button--secondary",
+            id: "crissButton",
+            attributes: {
+                'data-qa': 'crissButton'
+            },
+            type: 'button'
+        }) }}
+    {% endif %}
 
     {% if errorMessages.fileOrNote %}
         <div class="govuk-form-group govuk-form-group--error" id="fileOrNote" data-qa="fileOrNote">
@@ -145,6 +157,7 @@
         <div class="govuk-form-group" id="fileOrNote" data-qa="fileOrNote">
     {% endif %}
 
+    {% if flags.enableCRISSV2 %}
     <!-- Screen reader announcement -->
     <div id="format-status" class="govuk-visually-hidden" aria-live="polite" role="status"></div>
 
@@ -195,6 +208,11 @@
     <div class="govuk-character-count__message govuk-hint" id="criss-character-count-info" aria-live="polite">
         You have {{ maxCharCount }} characters remaining
     </div>
+
+    {% else %}
+        {{ govukCharacterCount(notesConfig) }}
+        <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
+    {% endif %}
 
     {% if appointmentOutcome.contactId %}
     <div class="govuk-!-margin-bottom-6">
