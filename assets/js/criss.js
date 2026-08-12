@@ -26,11 +26,11 @@ const criss = () => {
 
   const MAX_LIMIT = Number.parseInt(mainTextarea.getAttribute('maxlength') || '', 10) || 12000
   const crissInputs = [
-    { id: 'criss-check-in', label: '1. Check in' },
-    { id: 'criss-review', label: '2. Review' },
-    { id: 'criss-intervention', label: '3. Intervention' },
-    { id: 'criss-summarise', label: '4. Summarise' },
-    { id: 'criss-set-tasks', label: '5. Set tasks' },
+    { id: 'criss-check-in', label: 'Check in' },
+    { id: 'criss-review', label: 'Review' },
+    { id: 'criss-intervention', label: 'Intervention' },
+    { id: 'criss-summarise', label: 'Summarise' },
+    { id: 'criss-set-tasks', label: 'Set tasks' },
   ]
 
   // Helper function to build freeform text from CRISS inputs
