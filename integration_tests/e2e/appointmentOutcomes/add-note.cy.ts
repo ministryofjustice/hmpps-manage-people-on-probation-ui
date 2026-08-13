@@ -104,7 +104,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     getUuid(3).then(uuid => {
       cy.get('.govuk-back-link').should('exist')
       cy.contains('Use paragraphs and formatting').should('be.visible')
-      cy.get('[data-qa="crissButton"]').should('contain.text', 'Show CRISS headers')
+      cy.get('[data-qa="crissRadio"]').find('.govuk-radios__input').first().should('be.checked')
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', '')
       if (journey === 'MANAGE') {
@@ -114,24 +114,13 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
   })
   if (journey === 'MANAGE') {
-    it('adds CRISS headers when textarea is empty', () => {
+    it('switch to criss headers format when option selected', () => {
       loadPage({ journey })
       getUuid(3).then(uuid => {
         const id = journey === 'MANAGE' ? appointmentId : uuid
-        addNotePage.getCrissButton().click()
-        cy.get(`textarea#appointments-${crn}-${id}-notes`).should(
-          'have.value',
-          'Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks',
-        )
-      })
-    })
-    it('does not overwrite existing notes with CRISS headers', () => {
-      loadPage({ journey })
-      getUuid(3).then(uuid => {
-        const id = journey === 'MANAGE' ? appointmentId : uuid
-        cy.get(`textarea#appointments-${crn}-${id}-notes`).type('Some notes')
-        addNotePage.getCrissButton().click()
-        cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', 'Some notes')
+        addNotePage.getCrissRadio().eq(1).check()
+        cy.get(`[id="freeform-container"]`).should('have.class', 'govuk-!-display-none')
+        cy.get(`[id="structured-container"]`).should('not.have.class', 'govuk-!-display-none')
       })
     })
     it('should not display the sensitivity question if already set to true', () => {
@@ -168,7 +157,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         cy.intercept('POST', '/case/*/appointments/appointment/*/outcome/add-note').as('submit')
         loadPage({ journey })
         addNotePage.getFileUploadInput().attachFile(createFakeFile(1, filetype))
-        cy.get('textarea').type('Test note')
+        cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
         addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
         addNotePage.getSubmitBtn().click()
         cy.wait('@submit')

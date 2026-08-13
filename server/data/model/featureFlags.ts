@@ -31,6 +31,7 @@ export class FeatureFlags {
   enableSparksFilter?: boolean = undefined
   enableSupervisionPackageFilter?: boolean = undefined
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
+  enableCRISSV2?: boolean = undefined
   enableSemanticSearch?: boolean = undefined
   enablePreSentence?: boolean = undefined
 }

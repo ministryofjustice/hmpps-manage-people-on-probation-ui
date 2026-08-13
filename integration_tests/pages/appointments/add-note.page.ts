@@ -21,6 +21,10 @@ export default class AddNotePage extends Page {
     return cy.get('textarea#notes')
   }
 
+  getCrissRadio = () => {
+    return cy.get('[data-qa="crissRadio"]').find('.govuk-radios__input')
+  }
+
   getFilesAdded = () => {
     return cy.get('[data-qa="filesAdded"]')
   }
