@@ -23,13 +23,18 @@ const activityLog: Route<void> = (req, res, next): void => {
     clearSession()
     const dateToIsEmpty = isEmpty(req?.query?.dateTo as string)
     const dateFromIsEmpty = isEmpty(req?.query?.dateFrom as string)
-    errorMessages = validateWithSpec( { ...req, body: req.query } as typeof req, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
+    errorMessages = validateWithSpec(
+      { ...req, body: req.query } as typeof req,
+      activityLogValidation(dateToIsEmpty, dateFromIsEmpty),
+    )
 
     if (Object.keys(errorMessages).length) {
       req.session.errorMessages = errorMessages
       const complianceFilters: Array<string> = req.query.compliance ? ([req.query.compliance].flat() as string[]) : []
       const categoryFilters: Array<string> = req.query.category ? ([req.query.category].flat() as string[]) : []
-      const hideContactFilters: Array<string> = req.query.hideContact ? ([req.query.hideContact].flat() as string[]) : []
+      const hideContactFilters: Array<string> = req.query.hideContact
+        ? ([req.query.hideContact].flat() as string[])
+        : []
       req.session.activityLogFilters = {
         keywords: (req.query.keywords as string) ?? '',
         dateFrom: (req.query.dateFrom as string) ?? '',
@@ -40,7 +45,6 @@ const activityLog: Route<void> = (req, res, next): void => {
         supervisionPackage: [],
         hideContact: hideContactFilters,
         crn: req.params?.crn as string,
-
       }
       const view = req?.query?.view
       if (view && view !== 'compact') {

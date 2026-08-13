@@ -8,7 +8,7 @@ const req = httpMocks.createRequest({
   params: {
     crn,
   },
-  query: { page: '', view: 'other',submit: true, dateTo: '01/12/2024' },
+  query: { page: '', view: 'other', submit: true, dateTo: '01/12/2024' },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -20,7 +20,14 @@ const reqCompact = httpMocks.createRequest({
   params: {
     crn,
   },
-  query: { page: '',submit: true,dateTo: '01/12/2024', dateFrom: '', view: 'compact', compliance: ['no outcome', 'complied', 'not complied'] },
+  query: {
+    page: '',
+    submit: true,
+    dateTo: '01/12/2024',
+    dateFrom: '',
+    view: 'compact',
+    compliance: ['no outcome', 'complied', 'not complied'],
+  },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -32,7 +39,7 @@ const reqNoView = httpMocks.createRequest({
   params: {
     crn,
   },
-  query: { page: '',submit: true, dateTo: '01/12/2024', dateFrom: ''},
+  query: { page: '', submit: true, dateTo: '01/12/2024', dateFrom: '' },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -55,7 +62,7 @@ const reqValid = httpMocks.createRequest({
   params: {
     crn,
   },
-  query: { page: '', submit: true, dateTo: '01/12/2024', dateFrom: '01/11/2024'  },
+  query: { page: '', submit: true, dateTo: '01/12/2024', dateFrom: '01/11/2024' },
   session: {
     activityLogFilters: { page: '', view: 'default', requirement: '' },
     errorMessages: [{ dateTo: 'error' }],
