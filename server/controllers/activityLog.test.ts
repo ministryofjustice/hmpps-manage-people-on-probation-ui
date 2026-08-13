@@ -433,6 +433,8 @@ describe('/controllers/activityLogController', () => {
         query: {
           keywords: 'appointment',
           compliance: ['acceptable absence'],
+          dateFrom: '30/6/2025',
+          dateTo: '30/6/2026',
         },
         session: {},
       })
@@ -445,6 +447,8 @@ describe('/controllers/activityLogController', () => {
       expect(request.session.activityLogFilters).toEqual({
         keywords: 'appointment',
         compliance: ['acceptable absence'],
+        dateFrom: '30/6/2025',
+        dateTo: '30/6/2026',
         crn,
       })
 
@@ -466,6 +470,8 @@ describe('/controllers/activityLogController', () => {
       expect(request.session.activityLogFilters).toEqual({
         keywords: '',
         compliance: [],
+        dateFrom: '30/6/2025',
+        dateTo: '30/6/2026',
         crn,
       })
 
@@ -490,6 +496,8 @@ describe('/controllers/activityLogController', () => {
       expect(request.session.activityLogFilters).toEqual({
         keywords: '',
         compliance: ['acceptable absence', 'not complied'],
+        dateFrom: '30/6/2025',
+        dateTo: '30/6/2026',
         crn,
       })
 
