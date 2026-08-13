@@ -52,7 +52,8 @@ const activityLogController: Controller<typeof routes, void> = {
       }
 
       const { query } = req
-      const { page = '0', view = '' } = query
+      const { view = '' } = query
+       const page = query.submit ? '0' : (query.page ?? '0')
       let currentView = view
       if (req?.query?.view === 'compact') {
         res.locals.compactView = true

@@ -6,7 +6,7 @@ import { Route } from '../../@types'
 
 const activityLog: Route<void> = (req, res, next): void => {
   let errorMessages: Record<string, string> = {}
-  const { url } = req
+  const { path } = req
   if (Object.keys(req.query).length === 0 && req.method === 'GET') {
     delete req.session.errorMessages
   }
@@ -41,8 +41,8 @@ const activityLog: Route<void> = (req, res, next): void => {
         dateTo: (req.query.dateTo as string) ?? '',
         compliance: complianceFilters,
         category: categoryFilters,
-        sparks: [],
-        supervisionPackage: [],
+        sparks: req.query.sparks ? ([req.query.sparks].flat() as string[]) : [],
+        supervisionPackage: req.query.supervisionPackage? ([req.query.supervisionPackage].flat() as string[]): [],
         hideContact: hideContactFilters,
         crn: req.params?.crn as string,
       }
@@ -51,7 +51,7 @@ const activityLog: Route<void> = (req, res, next): void => {
         return renderError(404)(req, res)
       }
       const query = view ? `error=true&view=${view}` : `error=true`
-      return res.redirect(`${url}?${query}`)
+      return res.redirect(`${path}?${query}`)
     }
   }
   return next()
