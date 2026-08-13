@@ -833,3 +833,16 @@ body.feature-disabled {
   border-left-color: govuk-colour('blue');
   background-color: #eaf4f9;
 }
+
+.app-avatar-img {
+    display: block;
+    object-fit: cover;
+    border: 1px solid #B1B4B6;
+    height: 120px;
+}
+
+.app-avatar-column {
+    width: 90px !important;
+    vertical-align: top !important;
+    padding-top: 10px !important;
+}

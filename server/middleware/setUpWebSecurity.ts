@@ -20,6 +20,7 @@ export default function setUpWebSecurity(): Router {
     helmet({
       contentSecurityPolicy: {
         directives: {
+          upgradeInsecureRequests: config.environmentName === 'local' ? null : [],
           mediaSrc: [
             "'self'",
             // This is required for the S3 bucket to upload checkin images

@@ -40,6 +40,7 @@ import {
   OffenderCheckinsByCRNResponse,
 } from '../data/model/esupervision'
 import { PersonExistsResponse } from '../data/emdiClient'
+import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
 
 export interface AppointmentLocals {
   meta: {
@@ -176,6 +177,9 @@ interface Locals {
   personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
   nextAppointmentDetails: Activity | null
+  searchResponse?: ProbationSearchResponse
+  searchRequest?: ProbationSearchRequest
+  searchResults?: ProbationSearchResults
 }
 
 export interface AppointmentOutcomeSentence {
