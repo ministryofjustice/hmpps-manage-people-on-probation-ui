@@ -42,7 +42,7 @@ const activityLog: Route<void> = (req, res, next): void => {
         compliance: complianceFilters,
         category: categoryFilters,
         sparks: req.query.sparks ? ([req.query.sparks].flat() as string[]) : [],
-        supervisionPackage: req.query.supervisionPackage? ([req.query.supervisionPackage].flat() as string[]): [],
+        supervisionPackage: req.query.supervisionPackage ? ([req.query.supervisionPackage].flat() as string[]) : [],
         hideContact: hideContactFilters,
         crn: req.params?.crn as string,
       }
