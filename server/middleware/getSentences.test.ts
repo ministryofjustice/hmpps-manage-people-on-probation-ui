@@ -64,6 +64,7 @@ const req = httpMocks.createRequest({
   session: {
     data: {
       sentences: {
+        [crn]: [],
         X000002: sentencesMock.sentences,
       },
     },
