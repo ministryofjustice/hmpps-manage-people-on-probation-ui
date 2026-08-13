@@ -67,11 +67,17 @@ runs:
 
           jq -nc --arg query "$query" '{query: $query}' > request.json
 
-          curl -fsSL \
+          http_status=$(curl -sSL -o result.json -w "%{http_code}" \
             -H "Authorization: Bearer $token" \
             -H "Content-Type: application/json" \
             --data @request.json \
-            "$url" > result.json
+            "$url")
+
+          if [[ "$http_status" -lt 200 || "$http_status" -ge 300 ]]; then
+            echo "Application Insights query failed with HTTP status $http_status"
+            cat result.json
+            exit 1
+          fi
       env:
         query: ${{ inputs.query }}
         url: https://api.applicationinsights.io/v1/apps/${{ inputs.azure_app_id }}/query
@@ -102,9 +108,9 @@ runs:
           echo 'payload<<EOF'
 
           jq -c \
-            --arg slack_channel "${{ inputs.slack_channel }}" \
-            --arg title "${{ inputs.title }}" \
-            --arg summary "${{ inputs.summary }}" \
+            --arg slack_channel "$slack_channel" \
+            --arg title "$title" \
+            --arg summary "$summary" \
             '
             .tables[0] as $table |
             ($table.columns | map(.name)) as $columns |
@@ -179,6 +185,10 @@ runs:
 
           echo EOF
         } >> "$GITHUB_OUTPUT"
+      env:
+        slack_channel: ${{ inputs.slack_channel }}
+        title: ${{ inputs.title }}
+        summary: ${{ inputs.summary }}
 
     - name: Send message to Slack
       if: steps.transform.outputs.payload != ''

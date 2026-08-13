@@ -162,3 +162,4 @@ authorized_keys
 
 # Azure query output
 azure-queries/*json
+azure-queries/*csv

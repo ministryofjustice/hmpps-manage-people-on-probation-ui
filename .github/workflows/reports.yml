@@ -2,7 +2,7 @@ name: Application Insights reports
 
 on:
   schedule:
-    - cron: "30 7 * * *"
+    - cron: "30 7 * * *" # Every day at 07:30 UTC (08:30 Europe/London during BST)
   workflow_dispatch:
 
 jobs:
@@ -21,20 +21,20 @@ jobs:
         run: |
           echo "date=$(TZ=Europe/London date -d 'yesterday' +'%A %d-%m-%Y')" >> "$GITHUB_OUTPUT"
 
+      - name: Read query
+        id: query
+        run: |
+          {
+            echo 'query<<EOF'
+            cat azure-queries/service-unavailable-page-views.kql
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
       - uses: ./.github/actions/app-insights-to-slack
         with:
           title: Manage People on Probation - Sorry, there is a problem with the service
           summary: Number of times users saw the "Sorry, there is a problem with the service" error page on ${{ steps.report-date.outputs.date }}.
-          query: |
-            let startOfTodayLocal = startofday(datetime_utc_to_local(now(), "Europe/London"));
-            let startOfYesterdayLocal = startOfTodayLocal - 1d;
-            let startOfYesterdayUtc = datetime_local_to_utc(startOfYesterdayLocal, "Europe/London");
-            let startOfTodayUtc = datetime_local_to_utc(startOfTodayLocal, "Europe/London");
-            pageViews
-            | where timestamp >= startOfYesterdayUtc and timestamp < startOfTodayUtc
-            | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
-            | where name == "Sorry, there is a problem with the service - Manage people on probation"
-            | summarize ["Times shown"] = count()
+          query: ${{ steps.query.outputs.query }}
           slack_channel: manage-people-on-probation-alerts
           slack_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
           azure_app_id: ${{ secrets.AZURE_APPLICATION_INSIGHTS_APP_ID }}
