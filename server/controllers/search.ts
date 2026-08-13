@@ -5,7 +5,6 @@ import { ProbationSearchRequest, ProbationSearchResponse } from '../data/model/s
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { HmppsAuthClient } from '../data'
 import PrisonApiClient from '../data/prisonApiClient'
-import { AppResponse } from '../models/Locals'
 
 const routes = ['getSearch', 'getPhoto'] as const
 
