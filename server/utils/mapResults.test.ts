@@ -36,7 +36,6 @@ describe('mapResults()', () => {
     } as unknown as ProbationSearchResponse
     const request = {} as unknown as ProbationSearchRequest
     const results = mapResults(response, request)
-    console.log(results)
     expect(results.content[0].formattedDateOfBirth).toEqual('01/01/2000')
   })
   it('should give imageUrl if nomsNumber exists', () => {
@@ -45,7 +44,6 @@ describe('mapResults()', () => {
     } as unknown as ProbationSearchResponse
     const request = {} as unknown as ProbationSearchRequest
     const results = mapResults(response, request)
-    console.log(results)
     expect(results.content[0].imageUrl).toEqual('/search/prisoner-image/ABC123')
   })
   it('should give NoPhoto imageUrl if nomsNumber does not exist', () => {
@@ -54,7 +52,6 @@ describe('mapResults()', () => {
     } as unknown as ProbationSearchResponse
     const request = {} as unknown as ProbationSearchRequest
     const results = mapResults(response, request)
-    console.log(results)
     expect(results.content[0].imageUrl).toEqual('/assets/images/NoPhoto@2x.png')
   })
   it('should give manager details if they exist', () => {
@@ -73,7 +70,6 @@ describe('mapResults()', () => {
     } as unknown as ProbationSearchResponse
     const request = {} as unknown as ProbationSearchRequest
     const results = mapResults(response, request)
-    console.log(results)
     expect(results.content[0].officer).toEqual('Smith, John')
     expect(results.content[0].provider).toEqual('Provider 1')
   })
