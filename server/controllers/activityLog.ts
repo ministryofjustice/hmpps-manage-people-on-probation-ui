@@ -1,5 +1,6 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
+import type { ParsedQs } from 'qs'
 import type { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { getPersonActivity, overrideDeliusManagedFlag, groupActivitiesByDate } from '../middleware'
@@ -9,7 +10,7 @@ import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/conta
 
 const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
-export const getQueryString = (params: qs.ParsedQs): string[] => {
+export const getQueryString = (params: ParsedQs): string[] => {
   const queryParams: string[] = []
   const usedParams = ['view', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page', 'category', 'hideContact']
   for (const usedParam of usedParams) {
