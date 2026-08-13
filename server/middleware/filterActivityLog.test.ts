@@ -115,8 +115,6 @@ describe('/middleware/filterActivityLog()', () => {
     })
     it('should load the page setting the session activityLogFilters to undefined', () => {
       expect(req.session.activityLogFilters).toEqual({
-        clearFilterKey: '',
-        clearFilterValue: '',
         compliance: ['no outcome', 'complied', 'not complied'],
         category: categeoryList,
         sparks: [],
@@ -124,9 +122,7 @@ describe('/middleware/filterActivityLog()', () => {
         hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '21/03/2025',
         dateTo: '22/03/2025',
-        errors: false,
         keywords: 'test',
-        submit: true,
         crn: 'X000001',
       })
     })
@@ -208,6 +204,7 @@ describe('/middleware/filterActivityLog()', () => {
         maxDate,
         crn,
       }
+
       expect(res.locals.filters).toEqual(expectedResponse)
     })
   })

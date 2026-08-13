@@ -9,7 +9,7 @@ import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/conta
 
 const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
-export const getQueryString = (params: Record<string, string>): string[] => {
+export const getQueryString = (params: qs.ParsedQs): string[] => {
   const queryParams: string[] = []
   const usedParams = ['view', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page', 'category', 'hideContact']
   for (const usedParam of usedParams) {
@@ -51,10 +51,10 @@ const activityLogController: Controller<typeof routes, void> = {
         return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
       }
 
-      const { query, body } = req
+      const { query } = req
       const { page = '0', view = '' } = query
-      let currentView = view ?? req?.body?.view
-      if (req?.query?.view === 'compact' || req?.body?.view === 'compact') {
+      let currentView = view
+      if (req?.query?.view === 'compact') {
         res.locals.compactView = true
         currentView = 'compact'
       } else {
@@ -63,7 +63,7 @@ const activityLogController: Controller<typeof routes, void> = {
 
       const [tierCalculation, personActivityResponse] = await getPersonActivity(req, res, hmppsAuthClient)
       let personActivity = personActivityResponse
-      const queryParams = getQueryString(body)
+      const queryParams = getQueryString(query)
       const currentPage = parseInt(page as string, 10)
       const pageSize = ACTIVITY_LOG_PAGE_SIZE
       const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1

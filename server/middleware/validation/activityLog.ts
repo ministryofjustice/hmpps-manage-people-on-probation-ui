@@ -19,22 +19,30 @@ const activityLog: Route<void> = (req, res, next): void => {
     }
   }
 
-  if (req.method === 'POST') {
+  if (req.query?.submit && !req?.query?.error) {
     clearSession()
-    const dateToIsEmpty = isEmpty(req?.body?.dateTo)
-    const dateFromIsEmpty = isEmpty(req?.body?.dateFrom)
-    errorMessages = validateWithSpec(req, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
+    const dateToIsEmpty = isEmpty(req?.query?.dateTo as string)
+    const dateFromIsEmpty = isEmpty(req?.query?.dateFrom as string)
+    errorMessages = validateWithSpec( { ...req, body: req.query } as typeof req, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
 
     if (Object.keys(errorMessages).length) {
       req.session.errorMessages = errorMessages
-      const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
-      const categoryFilters: Array<string> = req.body.category ? [req.body.category].flat() : []
-      const hideContactFilters: Array<string> = req.body.category ? [req.body.hideContact].flat() : []
-      req.session.activityLogFilters = req.body as ActivityLogFilters
-      req.session.activityLogFilters.compliance = complianceFilters
-      req.session.activityLogFilters.category = categoryFilters
-      req.session.activityLogFilters.hideContact = hideContactFilters
-      const view = req?.query?.view ?? req?.body?.view
+      const complianceFilters: Array<string> = req.query.compliance ? ([req.query.compliance].flat() as string[]) : []
+      const categoryFilters: Array<string> = req.query.category ? ([req.query.category].flat() as string[]) : []
+      const hideContactFilters: Array<string> = req.query.hideContact ? ([req.query.hideContact].flat() as string[]) : []
+      req.session.activityLogFilters = {
+        keywords: (req.query.keywords as string) ?? '',
+        dateFrom: (req.query.dateFrom as string) ?? '',
+        dateTo: (req.query.dateTo as string) ?? '',
+        compliance: complianceFilters,
+        category: categoryFilters,
+        sparks: [],
+        supervisionPackage: [],
+        hideContact: hideContactFilters,
+        crn: req.params?.crn as string,
+
+      }
+      const view = req?.query?.view
       if (view && view !== 'compact') {
         return renderError(404)(req, res)
       }
