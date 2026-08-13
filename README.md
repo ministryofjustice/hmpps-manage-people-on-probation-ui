@@ -167,3 +167,44 @@ You can also tail the log while reproducing the request:
 ```shell
 tail -f waf-logs/audit.log
 ```
+
+### Running azure query locally
+
+### Prerequisites
+
+Install:
+
+- Azure CLI
+- jq
+- curl
+
+MacOS:
+
+```bash
+brew install azure-cli jq curl
+```
+
+### Azure login: complete 2-factor authentication and then pick subscription if prompted
+
+```bash
+az login
+```
+
+### set application id, get value from Application Insights
+
+```bash
+export APP_ID="<application-insights-app-id>"
+```
+
+### set application id fish shell, get value from Application Insights
+
+```bash
+set -x APP_ID "<application-insights-app-id>"
+```
+
+### execute query and output to console
+
+```bash
+cd azure-queries
+./run-query.sh service-unavailable-page-views.kql
+```

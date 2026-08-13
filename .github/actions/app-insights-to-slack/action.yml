@@ -1,0 +1,189 @@
+name: Report Application Insights query to Slack
+description: Run an Application Insights KQL query and publish the result to Slack
+
+inputs:
+  title:
+    description: Report title
+    required: true
+
+  summary:
+    description: Report summary
+    required: true
+
+  query:
+    description: KQL query to execute
+    required: true
+
+  slack_channel:
+    description: Slack channel to post to
+    required: true
+
+  slack_token:
+    description: Slack bot token
+    required: true
+
+  azure_app_id:
+    description: Azure Application Insights Application ID
+    required: true
+
+  azure_client_id:
+    description: Azure Client ID
+    required: true
+
+  azure_tenant_id:
+    description: Azure Tenant ID
+    required: true
+
+  azure_subscription_id:
+    description: Azure Subscription ID
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Show query being executed
+      shell: bash
+      run: |
+        echo "$query"
+      env:
+        query: ${{ inputs.query }}
+
+    - name: Azure CLI Login
+      uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43
+      with:
+        client-id: ${{ inputs.azure_client_id }}
+        tenant-id: ${{ inputs.azure_tenant_id }}
+        subscription-id: ${{ inputs.azure_subscription_id }}
+
+    - name: Search Application Insights
+      uses: azure/cli@9eb25b8360668fb0ecbafa808d40e2197b2f5f52
+      with:
+        inlineScript: |
+          token=$(az account get-access-token \
+            --resource https://api.applicationinsights.io \
+            --query accessToken \
+            -o tsv)
+
+          jq -nc --arg query "$query" '{query: $query}' > request.json
+
+          curl -fsSL \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/json" \
+            --data @request.json \
+            "$url" > result.json
+      env:
+        query: ${{ inputs.query }}
+        url: https://api.applicationinsights.io/v1/apps/${{ inputs.azure_app_id }}/query
+
+    - name: Validate Application Insights response
+      shell: bash
+      run: |
+        if jq -e '.error' result.json > /dev/null; then
+          echo "Application Insights query failed:"
+          jq '.error' result.json
+          exit 1
+        fi
+
+        jq '{
+          columns: (.tables[0].columns | map(.name)),
+          rowCount: (.tables[0].rows | length)
+        }' result.json
+
+    - name: Transform results into Slack message
+      id: transform
+      shell: bash
+      run: |
+        count=$(jq -r '.tables[0].rows | length // 0' result.json)
+
+        echo "Found $count results."
+
+        {
+          echo 'payload<<EOF'
+
+          jq -c \
+            --arg slack_channel "${{ inputs.slack_channel }}" \
+            --arg title "${{ inputs.title }}" \
+            --arg summary "${{ inputs.summary }}" \
+            '
+            .tables[0] as $table |
+            ($table.columns | map(.name)) as $columns |
+            ($table.rows) as $rows |
+
+            {
+              channel: $slack_channel,
+              unfurl_links: false,
+              unfurl_media: false,
+              text: $title,
+
+              blocks: (
+                [
+                  {
+                    type: "header",
+                    text: {
+                      type: "plain_text",
+                      text: ":information_source: \($title)",
+                      emoji: true
+                    }
+                  },
+
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: $summary
+                    }
+                  },
+
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text:
+                        (
+                          if ($rows | length) == 0 then
+                            "No results found."
+                          else
+                            (
+                              ("*" + ($columns | join("* | *")) + "*\n") +
+                              (
+                                $rows
+                                | map(
+                                    [ .[] | tostring ] | join(" | ")
+                                  )
+                                | join("\n")
+                              )
+                            )
+                          end
+                        )
+                    }
+                  }
+                ]
+
+                +
+
+                [
+                  {
+                    type: "context",
+                    elements: [
+                      {
+                        type: "mrkdwn",
+                        text: ">This report was generated automatically from Application Insights."
+                      }
+                    ]
+                  }
+                ]
+              )
+            }
+            ' result.json
+
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Send message to Slack
+      if: steps.transform.outputs.payload != ''
+      uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c
+      with:
+        method: chat.postMessage
+        token: ${{ inputs.slack_token }}
+        payload: ${{ steps.transform.outputs.payload }}

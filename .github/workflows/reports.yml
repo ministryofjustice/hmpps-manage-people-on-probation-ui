@@ -1,0 +1,43 @@
+name: Application Insights reports
+
+on:
+  schedule:
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  service-unavailable-page-views:
+    environment: azure-prod
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Get report date
+        id: report-date
+        run: |
+          echo "date=$(TZ=Europe/London date -d 'yesterday' +'%A %d-%m-%Y')" >> "$GITHUB_OUTPUT"
+
+      - uses: ./.github/actions/app-insights-to-slack
+        with:
+          title: Manage People on Probation - Sorry, there is a problem with the service
+          summary: Number of times users saw the "Sorry, there is a problem with the service" error page on ${{ steps.report-date.outputs.date }}.
+          query: |
+            let startOfTodayLocal = startofday(datetime_utc_to_local(now(), "Europe/London"));
+            let startOfYesterdayLocal = startOfTodayLocal - 1d;
+            let startOfYesterdayUtc = datetime_local_to_utc(startOfYesterdayLocal, "Europe/London");
+            let startOfTodayUtc = datetime_local_to_utc(startOfTodayLocal, "Europe/London");
+            pageViews
+            | where timestamp >= startOfYesterdayUtc and timestamp < startOfTodayUtc
+            | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+            | where name == "Sorry, there is a problem with the service - Manage people on probation"
+            | summarize ["Times shown"] = count()
+          slack_channel: manage-people-on-probation-alerts
+          slack_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+          azure_app_id: ${{ secrets.AZURE_APPLICATION_INSIGHTS_APP_ID }}
+          azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}

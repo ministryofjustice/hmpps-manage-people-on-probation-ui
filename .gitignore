@@ -159,3 +159,6 @@ id_ed25519
 id_ed25519.pub
 known_hosts
 authorized_keys
+
+# Azure query output
+azure-queries/*json
