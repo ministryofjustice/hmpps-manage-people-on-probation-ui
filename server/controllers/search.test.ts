@@ -40,7 +40,7 @@ describe('searchController', () => {
     })
     it('should render the search page', () => {
       checkSendAuditMessage(res, 'VIEW_MAS_SEARCH', res.locals.user.username, SubjectType.USER)
-      expect(renderSpy).toHaveBeenCalledWith('pages/search')
+      expect(renderSpy).toHaveBeenCalledWith('pages/search', { results: { response: {} } })
     })
   })
 })

@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
-import { Controller } from '../@types'
 import { Readable } from 'stream'
+import { Controller } from '../@types'
 import { ProbationSearchRequest, ProbationSearchResponse } from '../data/model/search'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { HmppsAuthClient } from '../data'
@@ -18,13 +18,10 @@ const searchController: Controller<typeof routes, void> = {
         results: {
           ...res.locals.searchResults,
           response: {
-            ...res.locals.searchResults.response,
-            ...(res.locals.searchResponse
-            ? mapResults(res.locals.searchResponse, res.locals.searchRequest)
-            : {}),
-          }
-        }
-
+            ...res.locals.searchResults?.response,
+            ...(res.locals.searchResponse ? mapResults(res.locals.searchResponse, res.locals.searchRequest) : {}),
+          },
+        },
       })
     }
   },
@@ -32,9 +29,8 @@ const searchController: Controller<typeof routes, void> = {
   getPhoto: (hmppsAuthClient: HmppsAuthClient) => {
     return async function getPhoto(req, res) {
       let data: Readable
-      let token = await hmppsAuthClient.getSystemClientToken(req.user.username)
+      const token = await hmppsAuthClient.getSystemClientToken(req.user.username)
       if (req.params.prisonerId) {
-        console.log("CALLING API")
         data = await new PrisonApiClient(token).getImageData(req.params.prisonerId as string)
       }
 
@@ -44,11 +40,10 @@ const searchController: Controller<typeof routes, void> = {
         res.type('image/jpeg')
         Readable.from(data).pipe(res)
       } else {
-        console.log("HERE")
         res.redirect('/assets/images/NoPhoto@2x.png')
       }
     }
-  }
+  },
 }
 
 function mapResults(response: ProbationSearchResponse, request: ProbationSearchRequest) {
@@ -71,7 +66,7 @@ function mapResults(response: ProbationSearchResponse, request: ProbationSearchR
         ...result,
         formattedDateOfBirth: result.dateOfBirth ? DateTime.fromISO(result.dateOfBirth).toFormat('dd/MM/yyyy') : '',
         imageUrl: result.otherIds.nomsNumber
-          ? (`/search/prisoner-image/${result.otherIds.nomsNumber}`)
+          ? `/search/prisoner-image/${result.otherIds.nomsNumber}`
           : '/assets/images/NoPhoto@2x.png',
         officer: `${activeManager?.staff?.surname}, ${activeManager?.staff?.forenames}`,
         provider: activeManager?.probationArea?.description,
