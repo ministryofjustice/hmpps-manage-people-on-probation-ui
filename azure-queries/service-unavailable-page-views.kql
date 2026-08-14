@@ -14,7 +14,7 @@ pageViews
 
 // The three "extend" steps above replace the unique parts of each page path with a placeholder so that
 // different cases/appointments hitting the same type of page are grouped together, e.g.
-// /case/E595675/appointments/appointment/2013239864/outcome
+// /case/X123456/appointments/appointment/1234567890/outcome
 // becomes
 // /case/{crn}/appointments/appointment/{id}/outcome
 // 1. Replace any UUID (used for appointment/arrange-appointment IDs) with "{id}"
