@@ -12,15 +12,18 @@ const searchController: Controller<typeof routes, void> = {
     return async function getSearch(req, res) {
       req.session.backLink = '/search'
       await sendAuditMessage(res, 'VIEW_MAS_SEARCH', res.locals.user.username, SubjectType.USER)
-      return res.render('pages/search', {
-        results: {
-          ...res.locals.searchResults,
-          response: {
-            ...res.locals.searchResults?.response,
-            ...(res.locals.searchResponse ? mapResults(res.locals.searchResponse, res.locals.searchRequest) : {}),
+      if (res.locals.flags.enableSearchV2) {
+        return res.render('pages/search-new', {
+          results: {
+            ...res.locals.searchResults,
+            response: {
+              ...res.locals.searchResults?.response,
+              ...(res.locals.searchResponse ? mapResults(res.locals.searchResponse, res.locals.searchRequest) : {}),
+            },
           },
-        },
-      })
+        })
+      }
+      return res.render('pages/search')
     }
   },
 

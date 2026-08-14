@@ -33,4 +33,5 @@ export class FeatureFlags {
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
   enableSemanticSearch?: boolean = undefined
   enablePreSentence?: boolean = undefined
+  enableSearchV2?: boolean = undefined
 }

@@ -38,7 +38,6 @@ const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 const res = mockAppResponse()
-const renderSpy = jest.spyOn(res, 'render')
 const redirectSpy = jest.spyOn(res, 'redirect')
 const req = httpMocks.createRequest({
   session: {},
@@ -55,15 +54,27 @@ const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
 describe('searchController', () => {
   describe('getSearch', () => {
-    beforeEach(async () => {
-      await controllers.search.getSearch()(req, res)
+    it('should render the new search page when feature flag enabled', async () => {
+      const resFlag = mockAppResponse({
+        flags: {
+          enableSearchV2: true,
+        },
+      })
+      const renderSpy = jest.spyOn(resFlag, 'render')
+      await controllers.search.getSearch()(req, resFlag)
+      checkSendAuditMessage(resFlag, 'VIEW_MAS_SEARCH', resFlag.locals.user.username, SubjectType.USER)
+      expect(renderSpy).toHaveBeenCalledWith('pages/search-new', { results: { response: {} } })
     })
-    it('should set the back link session value', () => {
-      expect(req.session.backLink).toEqual('/search')
-    })
-    it('should render the search page', () => {
-      checkSendAuditMessage(res, 'VIEW_MAS_SEARCH', res.locals.user.username, SubjectType.USER)
-      expect(renderSpy).toHaveBeenCalledWith('pages/search', { results: { response: {} } })
+    it('should render the old search page when feature flag disabled', async () => {
+      const resFlag = mockAppResponse({
+        flags: {
+          enableSearchV2: false,
+        },
+      })
+      const renderSpy = jest.spyOn(resFlag, 'render')
+      await controllers.search.getSearch()(req, resFlag)
+      checkSendAuditMessage(resFlag, 'VIEW_MAS_SEARCH', resFlag.locals.user.username, SubjectType.USER)
+      expect(renderSpy).toHaveBeenCalledWith('pages/search')
     })
   })
 
