@@ -9,6 +9,7 @@ import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
+import setupSearch from './delius'
 import './photo'
 import initGovUkBackLink from './back-link'
 
@@ -414,4 +415,5 @@ recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
 initGovUkBackLink()
+setupSearch()
 new DateTimeFormatting()

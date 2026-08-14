@@ -87,8 +87,6 @@
                 value: params.results.query
             }) }}
 
-            {{ govukButton({ text: "Search", classes: "moj-search__button" }) }}
-
             <p id="{{ params.id }}-suggestions" class="probation-search__suggestions govuk-!-margin-top-1">
                 {% if params.results.suggestions | length %}
                     Did you mean
