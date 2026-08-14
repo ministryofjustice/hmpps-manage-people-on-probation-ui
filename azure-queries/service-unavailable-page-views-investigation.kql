@@ -6,6 +6,5 @@ pageViews
 | where timestamp >= startOfYesterdayUtc and timestamp < startOfTodayUtc
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
 | where name == "Sorry, there is a problem with the service - Manage people on probation"
-| extend Path = tostring(parse_url(url).Path)
 | order by timestamp asc
-| project timestamp, user_Id, operation_Id, Path
+| project timestamp, user_Id, operation_Id, operation_Name
