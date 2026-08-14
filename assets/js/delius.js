@@ -62,6 +62,8 @@ function doSearch() {
 function setupSearch() {
   // Focus on input
   const search = document.getElementById('search')
+  const form = document.getElementById('search-form')
+  if (!form || !search) return
   search.focus() // the autofocus attribute doesn't work in a cross-origin iframe
   search.setSelectionRange(search.value.length, search.value.length) // focus at end of field
 
