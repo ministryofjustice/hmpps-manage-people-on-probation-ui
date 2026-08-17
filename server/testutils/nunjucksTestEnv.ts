@@ -16,6 +16,7 @@ import {
   makePageTitle,
   dateWithDayAndWithYear,
   dayOfWeek,
+  timeFromTo,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -51,6 +52,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('fullName', fullName)
   env.addFilter('govukTime', govukTime)
   env.addFilter('handleQuotes', handleQuotes)
+  env.addGlobal('timeFromTo', timeFromTo)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
     if (!req || !res) {
       logger.warn('decorateFormAttributes called without request context')
