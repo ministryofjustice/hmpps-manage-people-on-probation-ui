@@ -283,3 +283,9 @@ export interface Suggestion {
 export interface ProbationSearchResults {
   response: ProbationSearchResponse
 }
+
+export interface ProbationSearch {
+  matchAllTerms?: boolean
+  providers?: string[]
+  query?: string
+}

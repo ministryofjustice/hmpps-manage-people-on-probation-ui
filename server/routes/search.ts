@@ -14,5 +14,13 @@ export default function searchRoutes(router: Router, { hmppsAuthClient, searchSe
     controllers.search.getSearch(),
   )
 
+  router.post('/search/filters', (req, res) => {
+    if (!req.session.probationSearch) req.session.probationSearch = {}
+    const session = req.session.probationSearch
+    session.matchAllTerms = req.body.matchAllTerms
+    session.providers = req.body.providers
+    res.sendStatus(200)
+  })
+
   router.get('/search/prisoner-image/:prisonerId', controllers.search.getPhoto(hmppsAuthClient))
 }

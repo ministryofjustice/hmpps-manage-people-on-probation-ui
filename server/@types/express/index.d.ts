@@ -3,6 +3,7 @@ import type { ActivityLogCache } from '../index'
 import { Errors } from '../../models/Errors'
 import { DocumentLevel } from '../../data/model/documents'
 import { Data } from '../../models/Data'
+import { ProbationSearch } from '../../data/model/search'
 
 export default {}
 
@@ -40,6 +41,7 @@ declare module 'express-session' {
       uploadedFiles?: FileCache[]
     }
     body?: Record<string, any>
+    probationSearch?: ProbationSearch
   }
 
   interface DocumentFilters {
