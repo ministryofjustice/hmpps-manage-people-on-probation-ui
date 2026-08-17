@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import type { Services } from '../services'
 import controllers from '../controllers'
+import { setSearchFilters } from '../middleware/setSearchFilters'
 
 export default function searchRoutes(router: Router, { hmppsAuthClient, searchService }: Services) {
   router.post('/search', (req, res, next) => {
@@ -14,13 +15,7 @@ export default function searchRoutes(router: Router, { hmppsAuthClient, searchSe
     controllers.search.getSearch(),
   )
 
-  router.post('/search/filters', (req, res) => {
-    if (!req.session.probationSearch) req.session.probationSearch = {}
-    const session = req.session.probationSearch
-    session.matchAllTerms = req.body.matchAllTerms
-    session.providers = req.body.providers
-    res.sendStatus(200)
-  })
+  router.post('/search/filters', setSearchFilters)
 
   router.get('/search/prisoner-image/:prisonerId', controllers.search.getPhoto(hmppsAuthClient))
 }
