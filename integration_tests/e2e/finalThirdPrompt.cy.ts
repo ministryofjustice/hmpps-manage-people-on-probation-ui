@@ -4,17 +4,14 @@ import OverviewPage from '../pages/overview'
 context('Final third eligibility prompt', () => {
   const CRN = 'X000001' // Caroline Wolff
 
-const setFlags = (enableFinalThirdPrompt = true, enableSupervisionPackage = true) =>
-  cy.task('stubFeatureFlags', [
-    { key: 'enableFinalThirdPrompt', enabled: enableFinalThirdPrompt },
-    { key: 'enableSupervisionPackage', enabled: enableSupervisionPackage },
-  ])  
+  const setFlags = (enableFinalThirdPrompt = true, enableSupervisionPackage = true) =>
+    cy.task('stubFeatureFlags', [
+      { key: 'enableFinalThirdPrompt', enabled: enableFinalThirdPrompt },
+      { key: 'enableSupervisionPackage', enabled: enableSupervisionPackage },
+    ])
   const enableTierChangePrompt = (enabled = false) =>
     cy.task('stubFeatureFlag', { key: 'enableTierChangePrompt', enabled })
-  const stubSupervisionPackage = (
-    finalThirdEligibility?: { eligible: boolean; since: string } | null,
-    status = 200,
-  ) =>
+  const stubSupervisionPackage = (finalThirdEligibility?: { eligible: boolean; since: string } | null, status = 200) =>
     cy.task('stubSupervisionPackageFrontendContext', {
       crn: CRN,
       status,
