@@ -1,5 +1,14 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% set baseDropdown = [
+  {
+    value: "choose",
+    text: "Select provider",
+    selected: true
+  }]
+%}
 
 {%- set filterOptionsHtml %}
 {{ govukRadios({
@@ -11,7 +20,7 @@
       legend: {
         text: "Match all terms?",
         isPageHeading: false,
-        classes: "govuk-fieldset__legend--m"
+        classes: "govuk-fieldset__legend--s"
       }
     },
     classes: "govuk-radios--small govuk-radios--inline",
@@ -28,6 +37,18 @@
         }
     ]
   }) }}
+
+{{ govukSelect({
+    name: "providers-filter",
+    attributes: {
+      'data-qa': 'providersFilter'
+    },
+    label: {
+        text: "Provider",
+        classes: "govuk-fieldset__legend--s"
+    },
+    items: baseDropdown.concat(params.results.response.providers)
+}) }}
 {% endset %}
 
 {{ mojFilter({
