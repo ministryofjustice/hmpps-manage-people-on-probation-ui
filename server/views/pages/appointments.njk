@@ -240,7 +240,7 @@
       </div>
 {% endif %}
 
-{% if flags.enableSupervisionPackage and supervisionPackageDetails %}
+{% if flags.enableSupervisionPackage and supervisionPackageDetails and not hasDeceased %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     {% endif %}
@@ -325,7 +325,7 @@
           <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the contacts page</a>.</p>
       </section>
     </div>
-    {% if flags.enableSupervisionPackage and supervisionPackageDetails %}
+    {% if flags.enableSupervisionPackage and supervisionPackageDetails and not hasDeceased %}
     <aside class="govuk-grid-column-one-quarter">
 {{ supervisionPackageSummary(supervisionPackageDetails) }}
     </aside>

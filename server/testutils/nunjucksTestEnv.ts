@@ -1,6 +1,8 @@
 import nunjucks from 'nunjucks'
 import path from 'path'
 import { Request } from 'express-serve-static-core'
+import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { mpopNunjucksSetup } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import {
   addressToList,
   convertToTitleCase,
@@ -17,6 +19,7 @@ import {
   dateWithDayAndWithYear,
   dayOfWeek,
   timeFromTo,
+  riskLevelLabel,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -50,6 +53,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('yearsSince', yearsSince)
   env.addFilter('toSentenceCase', toSentenceCase)
   env.addFilter('fullName', fullName)
+  env.addGlobal('riskLevelLabel', riskLevelLabel)
   env.addFilter('govukTime', govukTime)
   env.addFilter('handleQuotes', handleQuotes)
   env.addGlobal('timeFromTo', timeFromTo)
@@ -65,6 +69,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('dayOfWeek', dayOfWeek)
   env.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   env.addGlobal('makePageTitle', makePageTitle)
-
+  arnsNunjucksSetup(env)
+  mpopNunjucksSetup(env)
   return env
 }

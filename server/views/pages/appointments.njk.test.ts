@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio'
-import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
 import { Schedule } from '../../data/model/schedule'
+import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
+import { RiskFlag } from '../../data/model/risk'
 
 type TestModel = {
   flags: {
@@ -12,10 +13,9 @@ type TestModel = {
   offenderCheckinsByCRNResponse: any
   headerPersonName: any
   hasDeceased: boolean
-  crn: string
-  url: string
-  hasPractitioner: boolean
   canAccessCheckins: boolean
+  riskToStaff: Partial<RiskFlag>
+  riskToProbationStaff: Partial<RiskFlag>
 }
 
 const baseModel: TestModel = {
@@ -26,10 +26,9 @@ const baseModel: TestModel = {
     forename: 'James',
   },
   hasDeceased: false,
-  crn: 'X000001',
-  url: '',
-  hasPractitioner: false,
   canAccessCheckins: false,
+  riskToStaff: null,
+  riskToProbationStaff: null,
   offenderCheckinsByCRNResponse: {
     uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
     crn: 'X778160',
@@ -186,30 +185,71 @@ const render = (model = {} as Partial<TestModel>) => {
   return cheerio.load(env.render('pages/appointments.njk', input))
 }
 
-xdescribe('Appointments', () => {
-  it('should render the page with supervision package summary', () => {
+describe('Appointments', () => {
+  it('should render the page', () => {
     const $ = render()
-    expect($('.govuk-grid-column-three-quarters')).toBeDefined()
-    expect($('.govuk-grid-column-one-quarter')).toBeDefined()
-    expect($('aside')).toBeDefined()
+    expect($('.govuk-grid-column-three-quarters').length).toBe(1)
+    expect($('.govuk-grid-column-one-quarter').length).toBe(1)
+    expect($('aside').length).toBe(1)
+    expect($('[data-qa=upcomingAppointmentsSection]').find('h3').text()).toContain('Upcoming appointments')
+    expect($('[data-qa=upcomingAppointmentsSection]').find('p').text()).toContain('There are no upcoming appointments.')
+    expect($('[data-qa=pastAppointmentsSection]').find('h3').text()).toContain('Past appointments')
+    expect($('[data-qa=pastAppointmentsSection]').find('table.appointments tbody tr').length).toBe(1)
+    expect($('[data-qa=pastAppointmentType1]').text()).toContain('Planned office visit (NS)')
+    expect($('[data-qa=pastAppointmentDate1]').text()).toContain('13 August 2026')
+    expect($('[data-qa=pastAppointmentTime1]').text()).toContain('12pm to 12:01pm')
+    expect(
+      $('[data-qa=pastAppointmentsSection]').find('table.appointments tbody tr:nth-child(1) td:nth-child(4)').text(),
+    ).toContain('Manage')
     expect($('.supervision-package-summary').find('h3').text()).toContain('Supervision package summary')
-    expect($('[data-qa=pastAppointmentNotes1]')).toBeDefined()
-    expect($('[data-qa=pastAppointmentTags1]')).toBeDefined()
+    expect($('[data-qa=pastAppointmentNotes1]').length).toBe(1)
+    expect($('[data-qa=pastAppointmentTags1]').length).toBe(1)
   })
   it('should render the page with no supervision package summary', () => {
     const $ = render({ supervisionPackageDetails: null })
-    expect($('aside')).toBeUndefined()
-    expect($('.govuk-grid-column-three-quarters')).toBeUndefined()
-    expect($('.govuk-grid-column-one-quarter')).toBeUndefined()
-    expect($('.supervision-package-summary')).toBeUndefined()
+    expect($('aside').length).toBe(0)
+    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
+    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
+    expect($('.supervision-package-summary').length).toBe(0)
+  })
+  it('should render the page with no supervision package summary if deceased', () => {
+    const $ = render({ hasDeceased: true })
+    expect($('aside').length).toBe(0)
+    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
+    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
+    expect($('.supervision-package-summary').length).toBe(0)
   })
   it('should render the page with supervision packages disabled', () => {
     const $ = render({ flags: { enableSupervisionPackage: false } })
-    expect($('[data-qa=pastAppointmentNotes1]')).toBeUndefined()
-    expect($('[data-qa=pastAppointmentTags1]')).toBeUndefined()
-    expect($('aside')).toBeUndefined()
-    expect($('.govuk-grid-column-three-quarters')).toBeUndefined()
-    expect($('.govuk-grid-column-one-quarter')).toBeUndefined()
-    expect($('.supervision-package-summary')).toBeUndefined()
+    expect($('[data-qa=pastAppointmentNotes1]').length).toBe(0)
+    expect($('[data-qa=pastAppointmentTags1]').length).toBe(0)
+    expect($('aside').length).toBe(0)
+    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
+    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
+    expect($('.supervision-package-summary').length).toBe(0)
+  })
+  it('should render the page with risk to staff banner', () => {
+    const $ = render({ riskToStaff: { id: 2500930998, level: 'HIGH' } })
+    expect($('[data-qa=riskToStaffAlert]').text()).toContain('James may be a risk to probation staff')
+  })
+  it('should render the page with risk to probation staff banner', () => {
+    const $ = render({ riskToProbationStaff: { id: 2500930998, level: 'HIGH' } })
+    expect($('[data-qa=riskToStaffAlert]').text()).toContain('James is a risk to probation staff')
+  })
+  it('should render the page with manage check-ins button', () => {
+    const $ = render({ canAccessCheckins: true })
+    expect($('[data-qa="online-manage-btn"]').length).toBe(1)
+    expect($('[data-qa="online-manage-btn"]').text()).toContain('Manage online check ins')
+  })
+  it('should render the page with set up check-ins button', () => {
+    const $ = render({ canAccessCheckins: true, offenderCheckinsByCRNResponse: null })
+    expect($('[data-qa="online-checkin-btn"]').length).toBe(1)
+    expect($('[data-qa="online-checkin-btn"]').text()).toContain('Set up online check ins')
+  })
+  it('should render the page with no buttons', () => {
+    const $ = render({ hasDeceased: true })
+    expect($('[data-qa="arrange-appointment-btn"]').length).toBe(0)
+    expect($('[data-qa="online-checkin-btn"]').length).toBe(0)
+    expect($('[data-qa="online-manage-btn"]').length).toBe(0)
   })
 })
