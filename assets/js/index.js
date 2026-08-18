@@ -10,6 +10,7 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import criss from './criss'
 import setupTechnicalUpdates from './technical-updates'
+import setupSearch from './delius'
 import './photo'
 import initGovUkBackLink from './back-link'
 
@@ -417,5 +418,6 @@ recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
 initGovUkBackLink()
+setupSearch()
 criss()
 new DateTimeFormatting()
