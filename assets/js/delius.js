@@ -39,8 +39,11 @@ function resetPageNumber() {
 
 function saveFilters(selectedProviders) {
   const matchAllTerms = document.querySelector('input[name="matchAllTerms"]:checked')
-  const providers =
-    selectedProviders ?? [...document.querySelectorAll('input[name="providers-filter"]:checked')].map(el => el.value)
+  const provider = document.querySelector('select[name="providers-filter"]')
+  let providers = selectedProviders
+  if (provider.value !== 'choose') {
+    providers = [provider].map(el => el.value)
+  }
   localStorage.setItem('providers', JSON.stringify(providers))
   return fetch(`${window.location.pathname}/filters`, {
     method: 'POST',

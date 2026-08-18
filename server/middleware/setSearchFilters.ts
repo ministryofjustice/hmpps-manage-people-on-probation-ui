@@ -5,6 +5,7 @@ export const setSearchFilters = () => {
     if (!req.session.probationSearch) req.session.probationSearch = {}
     const session = req.session.probationSearch
     session.matchAllTerms = req.body.matchAllTerms
+    console.log(req.body.providers)
     session.providers = req.body.providers
     res.sendStatus(200)
   }
