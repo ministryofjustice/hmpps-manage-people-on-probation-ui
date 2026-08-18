@@ -15,7 +15,7 @@ export default function searchRoutes(router: Router, { hmppsAuthClient, searchSe
     controllers.search.getSearch(),
   )
 
-  router.post('/search/filters', setSearchFilters)
+  router.post('/search/filters', setSearchFilters())
 
   router.get('/search/prisoner-image/:prisonerId', controllers.search.getPhoto(hmppsAuthClient))
 }
