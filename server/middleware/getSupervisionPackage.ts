@@ -1,8 +1,10 @@
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { DateTime } from 'luxon'
 import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { SupervisionPackageResponse } from '../models/SupervisionPackage'
+import { isFinalThirdEligibilityInWindow } from '../utils/finalThird'
 
 export const getSupervisionPackage = (
   hmppsAuthClient: HmppsAuthClient,
@@ -69,6 +71,15 @@ export const getSupervisionPackage = (
 
     if (supervisionPackageResponse) {
       res.locals.supervisionPackageDetails = supervisionPackageResponse
+      if (supervisionPackageResponse.context?.finalThirdEligibility) {
+        const finalThirdEligibility = supervisionPackageResponse.context?.finalThirdEligibility
+        if (
+          finalThirdEligibility?.since &&
+          isFinalThirdEligibilityInWindow(finalThirdEligibility.since, DateTime.now())
+        ) {
+          res.locals.finalThirdPrompt = { eligible: finalThirdEligibility.eligible }
+        }
+      }
     }
 
     return next()

@@ -7,7 +7,6 @@ import {
   getPersonRiskFlags,
   getTierDetails,
   getTierChangePrompt,
-  getFinalThirdPrompt,
   getSupervisionPackage,
   getNextAppointment,
 } from '../middleware'
@@ -24,7 +23,6 @@ export default function caseRoutes(router: Router, { hmppsAuthClient, arnsCompon
   router.get(
     '/case/:crn',
     getTierChangePrompt(hmppsAuthClient),
-    getFinalThirdPrompt(hmppsAuthClient),
     asyncMiddleware(controllers.case.getCase(hmppsAuthClient)),
   )
 }

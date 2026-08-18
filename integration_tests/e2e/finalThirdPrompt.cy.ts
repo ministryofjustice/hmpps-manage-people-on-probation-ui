@@ -4,11 +4,34 @@ import OverviewPage from '../pages/overview'
 context('Final third eligibility prompt', () => {
   const CRN = 'X000001' // Caroline Wolff
 
-  const enablePrompt = (enabled = true) => cy.task('stubFeatureFlag', { key: 'enableFinalThirdPrompt', enabled })
+  const setFlags = (enableFinalThirdPrompt = true, enableSupervisionPackage = true) =>
+    cy.task('stubFeatureFlags', [
+      { key: 'enableFinalThirdPrompt', enabled: enableFinalThirdPrompt },
+      { key: 'enableSupervisionPackage', enabled: enableSupervisionPackage },
+    ])
   const enableTierChangePrompt = (enabled = false) =>
     cy.task('stubFeatureFlag', { key: 'enableTierChangePrompt', enabled })
-  const stubCurrentPhase = (finalThirdEligibility?: { eligible: boolean; since: string } | null, status = 200) =>
-    cy.task('stubCurrentPhase', { crn: CRN, finalThirdEligibility, status })
+  const stubSupervisionPackage = (finalThirdEligibility?: { eligible: boolean; since: string } | null, status = 200) =>
+    cy.task('stubSupervisionPackageFrontendContext', {
+      crn: CRN,
+      status,
+      frontendContext: {
+        currentPhase: {
+          supervisionPackage: { code: 'STD', description: 'Standard' },
+          phase: { code: 'STD', description: 'Standard supervision' },
+          eventNumber: '1',
+          startDate: '2024-01-01',
+          endDate: '2025-01-01',
+        },
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+        context: {
+          name: { forename: 'Caroline', middleNames: '', surname: 'Wolff' },
+          gender: 'Female',
+          finalThirdEligibility,
+        },
+      },
+    })
   const noOutcomes = () => cy.task('stubNoOverdueOutcomes')
   const singleOutcome = () => cy.task('stubSingleOverdueOutcome')
   const noTierHistory = () => cy.task('stubTierHistory', { crn: CRN, history: [] })
@@ -33,8 +56,8 @@ context('Final third eligibility prompt', () => {
   })
 
   it('AC: shows a Final Third prompt when eligible became true within the last 7 days', () => {
-    enablePrompt()
-    stubCurrentPhase({ eligible: true, since: daysAgo(0) })
+    setFlags()
+    stubSupervisionPackage({ eligible: true, since: daysAgo(0) })
     const page = visit()
 
     page.notificationHeading().should('contain.text', 'Information that needs your attention')
@@ -42,8 +65,8 @@ context('Final third eligibility prompt', () => {
   })
 
   it('AC: shows a Final Third prompt when eligible became false within the last 7 days', () => {
-    enablePrompt()
-    stubCurrentPhase({ eligible: false, since: daysAgo(0) })
+    setFlags()
+    stubSupervisionPackage({ eligible: false, since: daysAgo(0) })
     const page = visit()
 
     page.notificationHeading().should('contain.text', 'Information that needs your attention')
@@ -51,8 +74,8 @@ context('Final third eligibility prompt', () => {
   })
 
   it('AC: no prompt when since is more than 6 calendar days before today', () => {
-    enablePrompt()
-    stubCurrentPhase({ eligible: true, since: daysAgo(7) })
+    setFlags()
+    stubSupervisionPackage({ eligible: true, since: daysAgo(7) })
     const page = visit()
 
     page.pageHeading().should('contain.text', 'Overview')
@@ -60,17 +83,17 @@ context('Final third eligibility prompt', () => {
   })
 
   it('window boundary: since exactly 6 days ago is still shown', () => {
-    enablePrompt()
-    stubCurrentPhase({ eligible: true, since: daysAgo(6) })
+    setFlags()
+    stubSupervisionPackage({ eligible: true, since: daysAgo(6) })
     const page = visit()
 
     page.notificationBannerContent().should('contain.text', 'Caroline is eligible for the final third stage.')
   })
 
   it('AC: a Final Third prompt co-exists with an outcomes prompt, in priority order (outcomes first)', () => {
-    enablePrompt()
+    setFlags()
     singleOutcome()
-    stubCurrentPhase({ eligible: true, since: daysAgo(0) })
+    stubSupervisionPackage({ eligible: true, since: daysAgo(0) })
     const page = visit()
 
     page.notificationItems().should('have.length', 2)
@@ -87,6 +110,7 @@ context('Final third eligibility prompt', () => {
     cy.task('stubFeatureFlags', [
       { key: 'enableTierChangePrompt', enabled: true },
       { key: 'enableFinalThirdPrompt', enabled: true },
+      { key: 'enableSupervisionPackage', enabled: true },
     ])
     singleOutcome()
     cy.task('stubTierHistory', {
@@ -96,7 +120,7 @@ context('Final third eligibility prompt', () => {
         { tierScore: 'A2', calculationId: 'calc-2', calculationDate: `${daysAgo(60)}T10:00:00`, provisional: false },
       ],
     })
-    stubCurrentPhase({ eligible: false, since: daysAgo(0) })
+    stubSupervisionPackage({ eligible: false, since: daysAgo(0) })
     const page = visit()
 
     page.notificationItems().should('have.length', 3)
@@ -106,8 +130,8 @@ context('Final third eligibility prompt', () => {
   })
 
   it('AC: the Final Third prompt is not a link', () => {
-    enablePrompt()
-    stubCurrentPhase({ eligible: true, since: daysAgo(0) })
+    setFlags()
+    stubSupervisionPackage({ eligible: true, since: daysAgo(0) })
     const page = visit()
 
     page.notificationBannerContent().should('contain.text', 'is eligible for the final third stage')
@@ -115,8 +139,8 @@ context('Final third eligibility prompt', () => {
   })
 
   it('AC: the prompt cannot be dismissed', () => {
-    enablePrompt()
-    stubCurrentPhase({ eligible: true, since: daysAgo(0) })
+    setFlags()
+    stubSupervisionPackage({ eligible: true, since: daysAgo(0) })
     const page = visit()
 
     page.notificationBanner().should('exist')
@@ -124,8 +148,8 @@ context('Final third eligibility prompt', () => {
   })
 
   it('with the flag off, no Final Third prompt appears', () => {
-    enablePrompt(false)
-    stubCurrentPhase({ eligible: true, since: daysAgo(0) })
+    setFlags(false)
+    stubSupervisionPackage({ eligible: true, since: daysAgo(0) })
     const page = visit()
 
     page.pageHeading().should('contain.text', 'Overview')
@@ -133,9 +157,9 @@ context('Final third eligibility prompt', () => {
   })
 
   it('is resilient when the current-phase endpoint errors: the page still renders without a Final Third prompt', () => {
-    enablePrompt()
+    setFlags()
     singleOutcome()
-    stubCurrentPhase(null, 500)
+    stubSupervisionPackage(null, 500)
     const page = visit()
 
     page.pageHeading().should('contain.text', 'Overview')
