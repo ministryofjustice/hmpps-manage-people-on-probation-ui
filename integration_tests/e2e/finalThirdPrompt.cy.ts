@@ -110,6 +110,7 @@ context('Final third eligibility prompt', () => {
     cy.task('stubFeatureFlags', [
       { key: 'enableTierChangePrompt', enabled: true },
       { key: 'enableFinalThirdPrompt', enabled: true },
+      { key: 'enableSupervisionPackage', enabled: true },
     ])
     singleOutcome()
     cy.task('stubTierHistory', {
