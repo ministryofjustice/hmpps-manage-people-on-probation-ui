@@ -1,5 +1,7 @@
-import { DateTime, DateTimeMaybeValid } from 'luxon'
+import { DateTime } from 'luxon'
 import { fromIsoDateToPicker } from './fromIsoDateToPicker'
+
+type DateTimeMaybeValid = DateTime<true> | DateTime<false>
 
 describe('utils/fromIsoDateToPicker', () => {
   it.each([
