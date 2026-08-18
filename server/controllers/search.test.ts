@@ -53,7 +53,6 @@ const req = httpMocks.createRequest({
     username: 'user1',
   },
 })
-const fromSpy = jest.spyOn(Readable, 'from')
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
