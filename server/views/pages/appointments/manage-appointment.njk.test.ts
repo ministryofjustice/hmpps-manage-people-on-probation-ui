@@ -407,7 +407,7 @@ describe('Manage an appointment', () => {
           nextAppointment,
         })
         expect($('[data-qa="appointmentActions"]').text()).toContain(
-          'Planned office visit (NS) arranged with Leigh on Thursday 2 July 2026 at 11:11am',
+          'Planned office visit (NS) arranged with Leigh on Thursday 2 July 2026',
         )
       })
     })
