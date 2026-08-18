@@ -1,4 +1,11 @@
 {% macro caseSearch(params) %}
     {%- include "./form.njk" -%}
-    {%- include "./results.njk" -%}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+            {%- include "./filters.njk" -%}
+        </div>
+        <div class="govuk-grid-column-three-quarters">
+            {%- include "./results.njk" -%}
+        </div>
+    </div>
 {% endmacro %}
