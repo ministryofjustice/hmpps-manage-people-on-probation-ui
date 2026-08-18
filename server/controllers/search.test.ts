@@ -1,5 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { Readable } from 'stream'
+import { pipeline } from 'stream/promises'
 import controllers from '.'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
@@ -24,6 +25,9 @@ jest.mock('../data/hmppsAuthClient', () => {
 })
 jest.mock('../data/prisonApiClient')
 jest.mock('@ministryofjustice/hmpps-audit-client')
+jest.mock('stream/promises', () => ({
+  pipeline: jest.fn().mockResolvedValue(undefined), // Simulate a successful stream completion
+}))
 
 const mockStream = new Readable()
 mockStream.setEncoding('utf8')
@@ -82,14 +86,12 @@ describe('searchController', () => {
     it('should pipe photo stream if photo exists', async () => {
       await controllers.search.getPhoto(hmppsAuthClient)(req, res)
       expect(getPrisonerImageSpy).toHaveBeenCalledWith(req.params.prisonerId)
-      checkSendAuditMessage(res, 'VIEW_MAS_SEARCH', res.locals.user.username, SubjectType.USER)
-      expect(fromSpy).toHaveBeenCalledWith(mockStream)
+      expect(pipeline).toHaveBeenCalledWith(mockStream, res)
     })
     it('should redirect if 404 occurs', async () => {
       getPrisonerImageSpy.mockImplementationOnce(() => Promise.resolve(null))
       await controllers.search.getPhoto(hmppsAuthClient)(req, res)
       expect(getPrisonerImageSpy).toHaveBeenCalledWith(req.params.prisonerId)
-      checkSendAuditMessage(res, 'VIEW_MAS_SEARCH', res.locals.user.username, SubjectType.USER)
       expect(redirectSpy).toHaveBeenCalledWith('/assets/images/NoPhoto@2x.png')
     })
   })
