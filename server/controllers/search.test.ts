@@ -37,6 +37,7 @@ mockStream.push(null)
 const getPrisonerImageSpy = jest
   .spyOn(PrisonApiClient.prototype, 'getImageData')
   .mockImplementation(() => Promise.resolve(mockStream))
+const fromSpy = jest.spyOn(Readable, 'from')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -86,7 +87,8 @@ describe('searchController', () => {
     it('should pipe photo stream if photo exists', async () => {
       await controllers.search.getPhoto(hmppsAuthClient)(req, res)
       expect(getPrisonerImageSpy).toHaveBeenCalledWith(req.params.prisonerId)
-      expect(pipeline).toHaveBeenCalledWith(mockStream, res)
+      expect(fromSpy).toHaveBeenCalledWith(mockStream)
+      expect(pipeline).toHaveBeenCalledWith(expect.any(Readable), res)
     })
     it('should redirect if 404 occurs', async () => {
       getPrisonerImageSpy.mockImplementationOnce(() => Promise.resolve(null))

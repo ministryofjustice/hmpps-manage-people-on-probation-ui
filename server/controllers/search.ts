@@ -41,7 +41,7 @@ const searchController: Controller<typeof routes, void> = {
         res.set('Cache-Control', 'private, max-age=86400')
         res.removeHeader('pragma')
         res.type('image/jpeg')
-        await pipeline(data, res)
+        await pipeline(Readable.from(data), res)
       } else {
         res.redirect('/assets/images/NoPhoto@2x.png')
       }
