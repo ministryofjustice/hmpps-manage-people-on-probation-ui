@@ -2,7 +2,7 @@ import { Router } from 'express'
 import type { Services } from '../services'
 import controllers from '../controllers'
 
-export default function searchRoutes(router: Router, { searchService }: Services) {
+export default function searchRoutes(router: Router, { hmppsAuthClient, searchService }: Services) {
   router.post('/search', (req, res, next) => {
     return searchService.post(req, res, next)
   })
@@ -13,4 +13,6 @@ export default function searchRoutes(router: Router, { searchService }: Services
     },
     controllers.search.getSearch(),
   )
+
+  router.get('/search/prisoner-image/:prisonerId', controllers.search.getPhoto(hmppsAuthClient))
 }

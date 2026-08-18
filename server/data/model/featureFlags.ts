@@ -34,4 +34,5 @@ export class FeatureFlags {
   enableCRISSV2?: boolean = undefined
   enableSemanticSearch?: boolean = undefined
   enablePreSentence?: boolean = undefined
+  enableSearchV2?: boolean = undefined
 }

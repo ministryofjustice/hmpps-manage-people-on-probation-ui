@@ -1,0 +1,14 @@
+<tr class="govuk-table__row">
+    <td class="govuk-table__cell app-avatar-column">
+    </td>
+    <th scope="row" class="govuk-table__header">
+        <a class="govuk-link--text-colour"
+           href="{% if params.resultPath %}{{ params.resultPath | replace(':crn', result.otherIds.crn) }}{% else %}{{ fn.resultPath(result.otherIds.crn) }}{% endif %}"
+           title="Restricted access">Restricted access</a>
+    </th>
+    <td class="govuk-table__cell">{{ result.otherIds.crn }}</td>
+    <td class="govuk-table__cell">Restricted</td>
+    {% for column in params.results.extraColumns %}
+        <td class="govuk-table__cell">Restricted</td>
+    {% endfor %}
+</tr>
