@@ -71,7 +71,7 @@ jest.mock('@ministryofjustice/hmpps-rest-client', () => ({
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 const authClient = new AuthenticationClient(config.apis.hmppsAuth, logger, tokenStore)
-const arnsComponents = new ArnsComponents(authClient, config.apis.arnsApi, logger)
+const arnsComponents = new ArnsComponents(authClient as any, config.apis.arnsApi, logger)
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))

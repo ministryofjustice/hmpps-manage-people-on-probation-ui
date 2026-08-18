@@ -4,7 +4,12 @@ import controllers from '.'
 import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
-import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentSessionOutcome } from '../models/Appointments'
+import {
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+  AppointmentSession,
+  AppointmentSessionOutcome,
+} from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -67,9 +72,11 @@ const completedUrl = `/completed/route`
 const mockRes = ({
   appointmentOutcome,
   appointmentCase,
+  appointmentSession = {},
 }: {
   appointmentOutcome?: Partial<AppointmentOutcomeProps<Activity>>
   appointmentCase?: Record<string, any>
+  appointmentSession?: Partial<AppointmentSession>
 } = {}) => {
   return mockAppResponse({
     user: { username: 'user1' },
@@ -86,6 +93,7 @@ const mockRes = ({
       forename: 'Forename',
       surname: 'Surname',
       ...(appointmentOutcome ?? {}),
+      appointmentSession,
     },
   })
 }
@@ -164,7 +172,7 @@ const expectedRedirect: ExpectedRedirect = {
 const checkOutcomeRedirects = (expectedOptions: AppointmentOutcomeType[]): void => {
   expectedOptions.forEach(option => {
     const req = mockReq()
-    const res = mockRes({ appointmentOutcome: { appointmentSession: { outcome: { outcomeType: option } } } })
+    const res = mockRes({ appointmentSession: { outcome: { outcomeType: option } } })
     const spy = jest.spyOn(res, 'redirect')
     controllers.appointmentOutcomes.postOutcome()(req, res)
     expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
@@ -292,6 +300,14 @@ describe('controllers/appointmentOutcomes', () => {
       const res = mockRes({ appointmentOutcome: { isValidParams: false } })
       controllers.appointmentOutcomes.postOutcome()(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
+    })
+
+    it('should redirect to the outcome page  when postOutcome and outcome type session is undefined', () => {
+      const req = mockReq()
+      const res = mockRes({ appointmentSession: { outcome: { outcomeType: undefined } } })
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postOutcome()(req, res)
+      expect(spy).toHaveBeenCalledWith(baseOutcomeUrl)
     })
 
     it('should redirect to the correct page when postOutcome is called', () => {

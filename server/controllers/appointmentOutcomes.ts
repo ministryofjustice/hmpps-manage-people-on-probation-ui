@@ -40,6 +40,9 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         return renderError(404)(req, res)
       }
       const outcomeType = appointmentSession?.outcome?.outcomeType
+      if (!outcomeType) {
+        return res.redirect(baseOutcomeUrl)
+      }
       const map: OutcomeRedirectMap = {
         ...outcomeRedirectMap(baseOutcomeUrl),
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,

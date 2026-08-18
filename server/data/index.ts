@@ -42,10 +42,10 @@ export const dataAccess = () => ({
   manageUsersApiClient: new ManageUsersApiClient(),
   probationFrontendComponentsApiClient: new ProbationFrontendComponentsApiClient(),
   authClientArns,
-  arnsComponents: new ArnsComponents(authClientArns, config.apis.arnsApi, logger),
+  arnsComponents: new ArnsComponents(authClientArns as any, config.apis.arnsApi, logger),
   authClientMpop,
   mpopComponents: new MPoPComponents(
-    authClientMpop,
+    authClientMpop as any,
     {
       ...config.apis.tierApi,
       masApiConfig: config.apis.masApi,
