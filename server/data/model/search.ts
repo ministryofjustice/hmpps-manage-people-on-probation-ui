@@ -285,7 +285,7 @@ export interface ProbationSearchResults {
 }
 
 export interface ProbationSearch {
-  matchAllTerms?: boolean
+  matchAllTerms?: string
   providers?: string[]
   query?: string
 }
