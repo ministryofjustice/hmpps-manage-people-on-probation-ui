@@ -1,6 +1,6 @@
 {% extends "../partials/layout.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "probation/case-search/macro.njk" import caseSearch %}
+{% from "./case-search/macro.njk" import caseSearch %}
 
 {% set pageTitle = makePageTitle({ pageHeading: "Search" }) %}
 {% set mainClasses = "app-container govuk-body" %}
@@ -8,7 +8,7 @@
 {% block content %}
     {{ caseSearch({
         id: "search",
-        results: searchResults,
+        results: results,
         label: {
             html: '<h1 class="govuk-label-wrapper" data-qa="pageHeading"><label class="govuk-label moj-search__label govuk-label--l" for="search">Find a person on probation</label></h1>'
         }
