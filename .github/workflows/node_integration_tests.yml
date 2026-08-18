@@ -20,7 +20,7 @@ jobs:
       matrix:
         shard: [1, 2, 3]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
       - name: Use Node.js ${{ inputs.node_version_file }}
         uses: actions/setup-node@v7
         with:
