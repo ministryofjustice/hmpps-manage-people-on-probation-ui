@@ -147,8 +147,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       } else {
         back = getDataValue(data, ['backLink', 'sentence'])
       }
-      console.log('length=', res.locals.sentenceList.length)
-
       return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors, back })
     }
   },
