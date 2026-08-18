@@ -273,6 +273,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('EMDI_API_TIMEOUT_RESPONSE', 10000))),
     },
+    prisonApi: {
+      url: get('PRISON_API_URL', 'http://localhost:8100', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('PRISON_API_TIMEOUT_RESPONSE', 5000)),
+        deadline: Number(get('PRISON_API_TIMEOUT_DEADLINE', 5000)),
+      },
+      agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_RESPONSE', 5000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
