@@ -90,11 +90,7 @@
         html:  govukDetails({
                         summaryText: "Notes",
                         classes: "govuk-!-margin-bottom-0",
-                        attributes: {
-                            "data-qa": ""
-                        },
-                        html: notes,
-                        open: note
+                        html: notes
                     }),
         classes: "notes",
         attributes: { "data-qa":"upcomingAppointmentNotes" + loop.index }
@@ -176,11 +172,7 @@
         html:  govukDetails({
                         summaryText: "Notes",
                         classes: "govuk-!-margin-bottom-0",
-                        attributes: {
-                            "data-qa": ""
-                        },
-                        html: notes,
-                        open: note
+                        html: notes
                     }),
         classes: "notes",
         attributes: { "data-qa":"pastAppointmentNotes" + loop.index }
