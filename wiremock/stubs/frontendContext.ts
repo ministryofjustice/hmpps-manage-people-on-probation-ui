@@ -16,7 +16,7 @@ const stubCurrentPhase = ({
 }): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: `/supervision-packages/case/${crn}/current-phase`,
+      urlPathPattern: `/supervision-packages/frontend-context/${crn}`,
       method: 'GET',
     },
     response: {
