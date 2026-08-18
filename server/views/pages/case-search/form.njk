@@ -1,7 +1,68 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% set tooltipsHtml %}
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Use the 'Match all terms?' filter after
+        searching to narrow or widen your results</h2>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        Select 'Yes' to show only results that match all the words or details you enter.
+    </p>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        Select 'No' to show all results that match any of the words or details you enter.
+    </p>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Enter a name and date of birth</h2>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        For example, 'John Smith, 23/06/1986'. Use the format dd/mm/yyyy.
+    </p>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search by name and address</h2>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        For example, 'John Smith, Sheffield' or include the first line of the address, county or a
+        full or partial postcode.
+    </p>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Include a <abbr
+            title="Case Reference Number">CRN</abbr>, <abbr
+            title="National Offender Management Service">NOMS</abbr>, <abbr
+            title="Police National Computer Identifier">PNC</abbr>, <abbr
+            title="Criminal Records Office">CRO</abbr> or <abbr title="National Insurance">NI</abbr>
+        number</h2>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        Unique identifiers usually return exact matches.
+    </p>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Search by phone number</h2>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        You can search for a phone number on its own or with a name or other identifier. Remove
+        spaces from the number before searching.
+    </p>
+
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Names and genders</h2>
+    <p class="govuk-body govuk-!-margin-bottom-0">
+        You can search for first names, middle names, alias names, surnames and recorded gender.
+    </p>
+{% endset %}
+
+{% set labelHtml %}
+
+    You can search by name, date of birth or any other identifier (for example <abbr title="Case Reference Number">CRN</abbr> or <abbr title="Police National Computer Identifier">PNC id</abbr>).
+
+    {{ govukDetails({
+        summaryText: "Tips for searching",
+        classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
+        attributes: {
+            "data-qa": "searchTips"
+        },
+        html: tooltipsHtml,
+        open: false
+    }) }}
+
+{% endset %}
 
 <div class="moj-search">
+
     <form id="{{ params.id }}-form" class="probation-search__form" method="POST">
         <input type="hidden" name="_csrf" value="{{ params.results.csrfToken }}">
 
@@ -13,7 +74,7 @@
                 errorMessage: params.results.errorMessage,
                 hint: params.hint if params.hint else {
                     classes: 'moj-search__hint',
-                    html: 'You can search by name, date of birth or any other identifier (for example <abbr title="Case Reference Number">CRN</abbr> or <abbr title="Police National Computer Identifier">PNC id</abbr>).'
+                    html: labelHtml
                 },
                 id: params.id if params.id else "search",
                 label: params.label if params.label else {
