@@ -27,7 +27,7 @@ import compliance from './compliance'
 import contactOutcomes from './contactOutcomes'
 import emdi from './emdi'
 import tier from './tier'
-import currentPhase from './currentPhase'
+import frontendContext from './frontendContext'
 import supervisionPackage from './supervisionPackage'
 
 export default {
@@ -60,7 +60,7 @@ export default {
   ...contactOutcomes,
   ...emdi,
   ...tier,
-  ...currentPhase,
+  ...frontendContext,
   ...supervisionPackage,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({

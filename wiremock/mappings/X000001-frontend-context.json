@@ -1,0 +1,28 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/supervision-packages/frontend-context/X000001"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "createdAt": "2024-01-01",
+      "updatedAt": "2024-01-01",
+      "context": {
+        "name": {
+          "forename": "Caroline",
+          "middleNames": "",
+          "surname": "Wolf"
+        },
+        "gender": "Male",
+        "finalThirdEligibility": {
+          "eligible": true,
+          "since": "2026-08-15T09:00:00.000Z"
+        }
+      }
+    }
+  }
+}
