@@ -1,0 +1,24 @@
+let startOfTodayLocal = startofday(datetime_utc_to_local(now(), "Europe/London"));
+let startOfYesterdayLocal = startOfTodayLocal - 1d;
+let startOfYesterdayUtc = datetime_local_to_utc(startOfYesterdayLocal, "Europe/London");
+let startOfTodayUtc = datetime_local_to_utc(startOfTodayLocal, "Europe/London");
+pageViews
+| where timestamp >= startOfYesterdayUtc and timestamp < startOfTodayUtc
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| where name == "Sorry, there is a problem with the service - Manage people on probation"
+| extend NormalisedPage = replace_regex(operation_Name, @"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", "{id}")
+| extend NormalisedPage = replace_regex(NormalisedPage, @"/[A-Za-z][0-9]{6}(/|$)", @"/{crn}\1")
+| extend NormalisedPage = replace_regex(NormalisedPage, @"/[0-9]{6,}", "/{id}")
+| summarize ["Times shown"] = count() by ["Page"] = NormalisedPage
+| order by ["Times shown"] desc
+
+// The three "extend" steps above replace the unique parts of each page path with a placeholder so that
+// different cases/appointments hitting the same type of page are grouped together, e.g.
+// /case/X123456/appointments/appointment/1234567890/outcome
+// becomes
+// /case/{crn}/appointments/appointment/{id}/outcome
+// 1. Replace any UUID (used for appointment/arrange-appointment IDs) with "{id}"
+// 2. Replace a CRN (Case Reference Number: one letter followed by 6 digits) with "{crn}",
+//    only when it's a full path segment (followed by "/" or end of string)
+// 3. Replace any run of 6+ plain digits (e.g. appointment IDs) with "{id}"
+

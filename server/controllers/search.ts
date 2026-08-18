@@ -1,4 +1,5 @@
 import { Readable } from 'stream'
+import { pipeline } from 'stream/promises'
 import { Controller } from '../@types'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { HmppsAuthClient } from '../data'
@@ -39,7 +40,7 @@ const searchController: Controller<typeof routes, void> = {
         res.set('Cache-Control', 'private, max-age=86400')
         res.removeHeader('pragma')
         res.type('image/jpeg')
-        Readable.from(data).pipe(res)
+        await pipeline(data, res)
       } else {
         res.redirect('/assets/images/NoPhoto@2x.png')
       }

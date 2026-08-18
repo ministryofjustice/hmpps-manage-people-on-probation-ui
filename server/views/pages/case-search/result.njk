@@ -1,9 +1,9 @@
 <tr class="govuk-table__row">
-    <th scope="row" class="govuk-table__header app-avatar-column">
+    <td class="govuk-table__cell app-avatar-column">
         <img nonce="{{ cspNonce }}" alt="Prisoner image for {{ result.surname }}, {{ result.firstName }}" class="app-avatar-img"
             src="{{ result.imageUrl }}">
-    </th>
-    <td class="govuk-table__cell">
+    </td>
+    <th scope="row" class="govuk-table__header">
         <a class="govuk-link"
            href="{% if params.resultPath %}{{ params.resultPath | replace(':crn', result.otherIds.crn) }}{% else %}{{ fn.resultPath(result.otherIds.crn) }}{% endif %}"
            title="Select case record for {{ result.surname }}, {{ result.firstName }}">

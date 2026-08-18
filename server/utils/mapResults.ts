@@ -23,9 +23,10 @@ export function mapResults(response: ProbationSearchResponse, request: Probation
       return {
         ...result,
         formattedDateOfBirth: result.dateOfBirth ? DateTime.fromISO(result.dateOfBirth).toFormat('dd/MM/yyyy') : '',
-        imageUrl: result.otherIds?.nomsNumber
-          ? `/search/prisoner-image/${result.otherIds?.nomsNumber}`
-          : '/assets/images/NoPhoto@2x.png',
+        imageUrl:
+          result.otherIds?.nomsNumber && result.accessDenied !== true
+            ? `/search/prisoner-image/${result.otherIds?.nomsNumber}`
+            : '/assets/images/NoPhoto@2x.png',
         officer: `${activeManager?.staff?.surname}, ${activeManager?.staff?.forenames}`,
         provider: activeManager?.probationArea?.description,
       }

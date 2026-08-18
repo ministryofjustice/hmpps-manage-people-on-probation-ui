@@ -1,4 +1,6 @@
 <tr class="govuk-table__row">
+    <td class="govuk-table__cell app-avatar-column">
+    </td>
     <th scope="row" class="govuk-table__header">
         <a class="govuk-link--text-colour"
            href="{% if params.resultPath %}{{ params.resultPath | replace(':crn', result.otherIds.crn) }}{% else %}{{ fn.resultPath(result.otherIds.crn) }}{% endif %}"

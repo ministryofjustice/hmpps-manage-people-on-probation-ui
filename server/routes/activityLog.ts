@@ -5,7 +5,7 @@ import controllers from '../controllers'
 import validate from '../middleware/validation/index'
 
 export default function activityLogRoutes(router: Router, { hmppsAuthClient }: Services) {
-  router.all(
+  router.get(
     '/case/:crn/activity-log',
     validate.activityLog,
     filterActivityLog,

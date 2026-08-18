@@ -10,7 +10,7 @@
         <table class="govuk-table">
             <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header app-avatar-column"></th>
+                <th scope="col" class="govuk-table__header app-avatar-column"><span class="govuk-visually-hidden">Photo</span></th>
                 <th scope="col" class="govuk-table__header">Name</th>
                 <th scope="col" class="govuk-table__header"><abbr title="Case Reference Number">CRN</abbr></th>
                 <th scope="col" class="govuk-table__header">Date of Birth</th>
@@ -30,7 +30,6 @@
             {% endfor %}
             </tbody>
         </table>
-        {{ govukTable({ firstCellIsHeader: true, head: params.results.results.head, rows: params.results.results.rows }) }}
 
         {% if params.results.pagination.items | length > 1 %}
             {{ govukPagination({ previous: { href: params.results.pagination.prev }, next: { href: params.results.pagination.next }, items: params.results.pagination.items }) }}

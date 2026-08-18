@@ -143,7 +143,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
   })
   it('should show validation error when no option is selected', () => {
-    const msg = 'Select an action for this failure to comply'
+    const msg = 'Select an action for their failure to comply'
     loadPage({ journey })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
     uncheckAllRadios()

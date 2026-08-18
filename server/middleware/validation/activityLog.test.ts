@@ -5,11 +5,10 @@ import { mockAppResponse } from '../../controllers/mocks'
 const crn = 'X000001'
 const req = httpMocks.createRequest({
   method: 'POST',
-  body: { dateTo: '01/12/2024' },
   params: {
     crn,
   },
-  query: { page: '', view: 'other' },
+  query: { page: '', view: 'other', submit: true, dateTo: '01/12/2024' },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -18,11 +17,17 @@ const req = httpMocks.createRequest({
 
 const reqCompact = httpMocks.createRequest({
   method: 'POST',
-  body: { dateTo: '01/12/2024', dateFrom: '', view: 'compact', compliance: ['no outcome', 'complied', 'not complied'] },
   params: {
     crn,
   },
-  query: { page: '' },
+  query: {
+    page: '',
+    submit: true,
+    dateTo: '01/12/2024',
+    dateFrom: '',
+    view: 'compact',
+    compliance: ['no outcome', 'complied', 'not complied'],
+  },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -31,11 +36,10 @@ const reqCompact = httpMocks.createRequest({
 
 const reqNoView = httpMocks.createRequest({
   method: 'POST',
-  body: { dateTo: '01/12/2024', dateFrom: '' },
   params: {
     crn,
   },
-  query: { page: '' },
+  query: { page: '', submit: true, dateTo: '01/12/2024', dateFrom: '' },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -43,7 +47,6 @@ const reqNoView = httpMocks.createRequest({
 })
 
 const getRequest = httpMocks.createRequest({
-  body: { dateTo: '01/12/2024', dateFrom: '' },
   params: {
     crn,
   },
@@ -56,11 +59,10 @@ const getRequest = httpMocks.createRequest({
 
 const reqValid = httpMocks.createRequest({
   method: 'POST',
-  body: { dateTo: '01/12/2024', dateFrom: '01/11/2024' },
   params: {
     crn,
   },
-  query: { page: '' },
+  query: { page: '', submit: true, dateTo: '01/12/2024', dateFrom: '01/11/2024' },
   session: {
     activityLogFilters: { page: '', view: 'default', requirement: '' },
     errorMessages: [{ dateTo: 'error' }],

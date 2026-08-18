@@ -167,3 +167,63 @@ You can also tail the log while reproducing the request:
 ```shell
 tail -f waf-logs/audit.log
 ```
+
+## Running Azure query locally
+
+### Pre-requisites
+
+Install:
+
+- Azure CLI
+- jq
+- curl
+
+MacOS:
+
+```bash
+brew install azure-cli jq curl
+```
+
+### Azure login: complete 2-factor authentication and then pick subscription if prompted
+
+```bash
+az login
+```
+
+### Set application ID, get value from Application Insights
+
+```bash
+export APP_ID="<application-insights-app-id>"
+```
+
+### Set application ID (fish shell), get value from Application Insights
+
+```bash
+set -x APP_ID "<application-insights-app-id>"
+```
+
+### Execute query and output to console
+
+This runs the same count query used by the scheduled Slack report (`.github/workflows/reports.yml`), which reads directly from this `.kql` file:
+
+```bash
+cd azure-queries
+./run-query.sh service-unavailable-page-views.kql
+```
+
+For investigating individual occurrences (timestamp, user ID, operation ID and page path), run the investigation query instead:
+
+```bash
+cd azure-queries
+./run-query.sh service-unavailable-page-views-investigation.kql
+```
+
+### Export results as CSV
+
+`run-query.sh` writes the raw Application Insights response to `azure-queries/result.json`. To export the results as CSV, run the query first and then pipe `result.json` through `jq`:
+
+```bash
+cd azure-queries
+./run-query.sh service-unavailable-page-views-investigation.kql
+jq -r '.tables[0].rows[] | @csv' result.json > results.csv
+```
