@@ -125,16 +125,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         username: res.locals.user?.username,
         enabled: res.locals.flags.enableSessionCacheLogging,
       }
-
-      if (data?.sentences?.[crn] && data?.sentences?.[crn].length === 1) {
+      if (res?.locals?.sentenceList?.length === 1) {
         logSessionCacheChange(
           'getSentence',
           data,
           ['appointments', crn, id, 'eventId'],
-          data?.sentences?.[crn][0].id,
+          res.locals.sentenceList[0].id,
           context,
         )
-        setDataValue(data, ['appointments', crn, id, 'eventId'], data?.sentences?.[crn][0].id)
+        setDataValue(data, ['appointments', crn, id, 'eventId'], res.locals.sentenceList[0].id)
         if (back) {
           logSessionCacheChange('getSentence', data, ['backLink', 'sentence'], back, context)
           setDataValue(data, ['backLink', 'sentence'], back)
@@ -148,6 +147,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       } else {
         back = getDataValue(data, ['backLink', 'sentence'])
       }
+      console.log('length=', res.locals.sentenceList.length)
 
       return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors, back })
     }
