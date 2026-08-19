@@ -302,7 +302,7 @@ describe('controllers/appointmentOutcomes', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
 
-    it('should redirect to the outcome page  when postOutcome and outcome type session is undefined', () => {
+    it('should redirect to the outcome page when postOutcome is called without an outcome type in the session', () => {
       const req = mockReq()
       const res = mockRes({ appointmentSession: { outcome: { outcomeType: undefined } } })
       const spy = jest.spyOn(res, 'redirect')

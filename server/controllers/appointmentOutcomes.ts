@@ -41,13 +41,13 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       }
       const outcomeType = appointmentSession?.outcome?.outcomeType
       if (!outcomeType) {
-        return res.redirect(baseOutcomeUrl)
+        return res.redirect(`${baseOutcomeUrl}${change ? `?change=${encodeURIComponent(String(change))}` : ''}`)
       }
       const map: OutcomeRedirectMap = {
         ...outcomeRedirectMap(baseOutcomeUrl),
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
-      const redirect = `${map[outcomeType]}${change ? `?change=${change}` : ''}`
+      const redirect = `${map[outcomeType]}${change ? `?change=${encodeURIComponent(String(change))}` : ''}`
       return res.redirect(redirect)
     }
   },
