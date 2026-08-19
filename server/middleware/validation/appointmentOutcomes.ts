@@ -215,6 +215,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/add-note`,
           notes: unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? '',
+          fileOrNote: req.body.fileOrNote,
           maxCharCount: maxCharCount as number,
           sensitivityLocked: appointmentSession?.sensitivityLocked || null,
         }),

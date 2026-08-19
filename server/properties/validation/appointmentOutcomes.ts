@@ -144,6 +144,16 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
         },
       ],
     },
+    fileOrNote: {
+      optional: page !== `outcome/add-note`,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: `Add a note or upload a file to continue`,
+          log: `No content included for appointment patch`,
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
       optional: page !== `outcome/add-note` || sensitivityLocked === true,
       checks: [
