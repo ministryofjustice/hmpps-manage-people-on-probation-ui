@@ -835,16 +835,44 @@ body.feature-disabled {
 }
 
 .app-avatar-img {
-    display: block;
-    object-fit: cover;
-    border: 1px solid #B1B4B6;
-    height: 120px;
+  display: block;
+  object-fit: cover;
+  border: 1px solid #b1b4b6;
+  height: 120px;
 }
 
 .app-avatar-column {
-    width: 90px !important;
-    vertical-align: top !important;
-    padding-top: 10px !important;
+  width: 90px !important;
+  vertical-align: top !important;
+  padding-top: 10px !important;
+}
+
+.app-\!-no-border {
+  border: 0;
+}
+
+table.appointments tr {
+  display: grid !important;
+  grid-template-columns: 2.5fr 1.5fr 1.5fr 1fr;
+}
+
+table.appointments tr {
+  th,
+  td {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 10px 0 10px 10px;
+    &:first-child {
+      padding: 10px 10px 10px 0;
+    }
+    &.notes {
+      padding: 10px 0;
+    }
+  }
+}
+
+table.appointments tr > .notes {
+  grid-column: 1 / -1;
 }
 
 .probation-search__input-container .govuk-details__text {

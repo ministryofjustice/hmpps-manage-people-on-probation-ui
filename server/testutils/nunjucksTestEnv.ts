@@ -1,6 +1,8 @@
 import nunjucks from 'nunjucks'
 import path from 'path'
 import { Request } from 'express-serve-static-core'
+import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { mpopNunjucksSetup } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import {
   addressToList,
   convertToTitleCase,
@@ -16,6 +18,9 @@ import {
   makePageTitle,
   dateWithDayAndWithYear,
   dayOfWeek,
+  timeFromTo,
+  riskLevelLabel,
+  shortTime,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -43,14 +48,16 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('addressToList', addressToList)
   env.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
   env.addGlobal('activityLinkUrl', activityLinkUrl)
-
   env.addFilter('dateWithYear', dateWithYear)
   env.addFilter('dateWithDayAndWithYear', dateWithDayAndWithYear)
   env.addFilter('yearsSince', yearsSince)
   env.addFilter('toSentenceCase', toSentenceCase)
   env.addFilter('fullName', fullName)
+  env.addGlobal('riskLevelLabel', riskLevelLabel)
   env.addFilter('govukTime', govukTime)
+  env.addFilter('shortTime', shortTime)
   env.addFilter('handleQuotes', handleQuotes)
+  env.addGlobal('timeFromTo', timeFromTo)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
     if (!req || !res) {
       logger.warn('decorateFormAttributes called without request context')
@@ -63,6 +70,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('dayOfWeek', dayOfWeek)
   env.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   env.addGlobal('makePageTitle', makePageTitle)
-
+  arnsNunjucksSetup(env)
+  mpopNunjucksSetup(env)
   return env
 }
