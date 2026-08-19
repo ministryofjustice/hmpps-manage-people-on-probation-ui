@@ -7,7 +7,7 @@ export function mapResults(response: ProbationSearchResponse, request: Probation
     response.probationAreaAggregations?.map(p => ({
       value: `${p.code}-${p.description}`,
       text: `${p.description} (${p.count})`,
-      checked: request.providersFilter?.includes(`${p.code}-${p.description}`),
+      selected: request.providersFilter?.includes(`${p.code}-${p.description}`),
     })) ?? []
   const selectedProviders =
     request.providersFilter
@@ -15,7 +15,7 @@ export function mapResults(response: ProbationSearchResponse, request: Probation
       .map(p => ({
         value: p,
         text: `${p.substring(4)} (0)`,
-        checked: true,
+        selected: true,
       })) ?? []
   return {
     content: response.content?.map(result => {
@@ -33,7 +33,7 @@ export function mapResults(response: ProbationSearchResponse, request: Probation
     }),
     query: request.query,
     providers: [...selectedProviders, ...returnedProviders].sort(
-      (a, b) => +b.checked - +a.checked || a.text?.localeCompare(b.text),
+      (a, b) => +b.selected - +a.selected || a.text?.localeCompare(b.text),
     ),
     matchAllTerms: request.matchAllTerms,
   }

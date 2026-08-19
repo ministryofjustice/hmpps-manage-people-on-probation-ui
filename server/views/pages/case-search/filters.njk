@@ -37,32 +37,32 @@
     ]
   }) }}
 
-{{ govukSelect({
-    name: "providers-filter",
-    attributes: {
-      'data-qa': 'providersFilter'
-    },
-    label: {
-        text: "Provider",
-        classes: "govuk-fieldset__legend--s"
-    },
-    items: baseDropdown.concat(params.results.response.providers)
-}) }}
-{% endset %}
-
 {% if params.results.response.providers | length > 0 %}
-  {{ mojFilter({
-    heading: {
-      html: 'Filter results',
-      classes: 'govuk-heading-s'
-    },
-    submit: {
-      value: "Apply filters",
+  {{ govukSelect({
+      name: "providers-filter",
       attributes: {
-          "data-qa": "submit-button",
-          "id": "apply-filters"
-      }
-    },
-    optionsHtml: filterOptionsHtml
+        'data-qa': 'providersFilter'
+      },
+      label: {
+          text: "Provider",
+          classes: "govuk-fieldset__legend--s"
+      },
+      items: baseDropdown.concat(params.results.response.providers)
   }) }}
 {% endif %}
+{% endset %}
+
+{{ mojFilter({
+  heading: {
+    html: 'Filter results',
+    classes: 'govuk-heading-s'
+  },
+  submit: {
+    value: "Apply filters",
+    attributes: {
+        "data-qa": "submit-button",
+        "id": "apply-filters"
+    }
+  },
+  optionsHtml: filterOptionsHtml
+}) }}

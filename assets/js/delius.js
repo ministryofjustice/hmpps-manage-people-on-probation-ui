@@ -45,7 +45,6 @@ function saveFilters(selectedProviders) {
     providers = [provider].map(el => el.value)
   }
   localStorage.setItem('providers', JSON.stringify(providers))
-  console.log(`${window.location.pathname}/filters`)
   return fetch(`${window.location.pathname}/filters`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -78,6 +77,10 @@ function doSearch() {
           doc.getElementById('search-results-container').classList
         document.getElementById('search-suggestions').innerHTML = doc.getElementById('search-suggestions').innerHTML
         document.getElementsByName('_csrf')[0].value = doc.getElementsByName('_csrf')[0].value
+        document.getElementById('apply-filters').addEventListener('click', e => {
+          saveFilters().then(resetPageNumber)
+          e.preventDefault()
+        })
       } else {
         handleError(new Error(`Search request failed with status ${response.status}`))
       }
@@ -92,19 +95,12 @@ function setupSearch() {
   if (!form || !search) return
 
   // Load filters from local storage
-  // saveFilters(JSON.parse(localStorage.getItem('providers')))
+  saveFilters(JSON.parse(localStorage.getItem('providers')))
 
-  const applyFilters = document.getElementById('apply-filters')
-  if (applyFilters) {
-    applyFilters.addEventListener('click', e => {
-      saveFilters().then(resetPageNumber)
-    })
-  }
-  // document.getElementById('search-results-container').addEventListener('click', e => {
-  //   if (e.target.name === 'apply-filters') {
-  //     saveFilters().then(resetPageNumber)
-  //   }
-  // })
+  document.getElementById('apply-filters').addEventListener('click', e => {
+    saveFilters().then(resetPageNumber)
+    e.preventDefault()
+  })
 
   search.focus() // the autofocus attribute doesn't work in a cross-origin iframe
   search.setSelectionRange(search.value.length, search.value.length) // focus at end of field
