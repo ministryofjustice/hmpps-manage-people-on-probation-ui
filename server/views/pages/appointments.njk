@@ -41,11 +41,15 @@
     {% set appointmentDetails %}
     <a class='govuk-link' href={{ manageUrl }}>
       {{ appointmentDescription | toSentenceCase }}
+      {% if not flags.enableSupervisionPackage %}
+       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+       {% endif %}
     </a>
+    {% if flags.enableSupervisionPackage %}
     <div class="tags" data-qa="upcomingAppointmentTags{{ loop.index }}">
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-top-2 govuk-!-margin-right-1', compact: false }) }}
-
     </div>
+    {% endif %}
     {% endset %}
     {% set actionsButton %}
     {{ manageAppointmentLink(appointment, crn, manageUrl) }}

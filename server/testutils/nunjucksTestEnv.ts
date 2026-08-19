@@ -20,6 +20,7 @@ import {
   dayOfWeek,
   timeFromTo,
   riskLevelLabel,
+  shortTime,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -47,7 +48,6 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('addressToList', addressToList)
   env.addGlobal('deliusDeepLinkUrl', deliusDeepLinkUrl)
   env.addGlobal('activityLinkUrl', activityLinkUrl)
-
   env.addFilter('dateWithYear', dateWithYear)
   env.addFilter('dateWithDayAndWithYear', dateWithDayAndWithYear)
   env.addFilter('yearsSince', yearsSince)
@@ -55,6 +55,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('fullName', fullName)
   env.addGlobal('riskLevelLabel', riskLevelLabel)
   env.addFilter('govukTime', govukTime)
+  env.addFilter('shortTime', shortTime)
   env.addFilter('handleQuotes', handleQuotes)
   env.addGlobal('timeFromTo', timeFromTo)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
