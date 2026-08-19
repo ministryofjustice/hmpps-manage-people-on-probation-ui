@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
@@ -42,10 +41,10 @@ export const dataAccess = () => ({
   manageUsersApiClient: new ManageUsersApiClient(),
   probationFrontendComponentsApiClient: new ProbationFrontendComponentsApiClient(),
   authClientArns,
-  arnsComponents: new ArnsComponents(authClientArns as any, config.apis.arnsApi, logger),
+  arnsComponents: new ArnsComponents(authClientArns, config.apis.arnsApi, logger),
   authClientMpop,
   mpopComponents: new MPoPComponents(
-    authClientMpop as any,
+    authClientMpop,
     {
       ...config.apis.tierApi,
       masApiConfig: config.apis.masApi,
