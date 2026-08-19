@@ -41,10 +41,11 @@ function saveFilters(selectedProviders) {
   const matchAllTerms = document.querySelector('input[name="matchAllTerms"]:checked')
   const provider = document.querySelector('select[name="providers-filter"]')
   let providers = selectedProviders
-  if (provider.value !== 'choose') {
+  if (provider && provider.value !== 'choose') {
     providers = [provider].map(el => el.value)
   }
   localStorage.setItem('providers', JSON.stringify(providers))
+  console.log(`${window.location.pathname}/filters`)
   return fetch(`${window.location.pathname}/filters`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -90,10 +91,15 @@ function setupSearch() {
   const form = document.getElementById('search-form')
   if (!form || !search) return
 
-  document.getElementById('apply-filters').addEventListener('click', e => {
-    saveFilters().then(resetPageNumber)
-    e.preventDefault()
-  })
+  // Load filters from local storage
+  saveFilters(JSON.parse(localStorage.getItem('providers')))
+
+  const applyFilters = document.getElementById('apply-filters')
+  if (applyFilters) {
+    applyFilters.addEventListener('click', e => {
+      saveFilters().then(resetPageNumber)
+    })
+  }
 
   search.focus() // the autofocus attribute doesn't work in a cross-origin iframe
   search.setSelectionRange(search.value.length, search.value.length) // focus at end of field
