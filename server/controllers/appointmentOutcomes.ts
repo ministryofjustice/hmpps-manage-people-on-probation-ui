@@ -36,15 +36,20 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     return async function postOutcome(req, res) {
       const { crn, contactId, isValidParams, baseOutcomeUrl, appointmentSession } = res.locals.appointmentOutcome
       const { change } = req.query
+      const changeQuery = change ? `?change=${encodeURIComponent(String(change))}` : ''
+
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
       const outcomeType = appointmentSession?.outcome?.outcomeType
+      if (!outcomeType) {
+        return res.redirect(`${baseOutcomeUrl}${changeQuery}`)
+      }
       const map: OutcomeRedirectMap = {
         ...outcomeRedirectMap(baseOutcomeUrl),
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
-      const redirect = `${map[outcomeType]}${change ? `?change=${change}` : ''}`
+      const redirect = `${map[outcomeType]}${changeQuery}`
       return res.redirect(redirect)
     }
   },
