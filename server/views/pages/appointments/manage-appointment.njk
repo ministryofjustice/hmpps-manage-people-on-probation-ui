@@ -35,7 +35,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% set nextAppointmentHint = (nextAppointment.appointment.displayName or nextAppointment.appointment.type) | toSentenceCase + " arranged with " + nextAppointment.personManager.name.forename | convertToTitleCase + ((" at " + nextAppointmentLocation)if nextAppointmentLocation else
     "") + " on " + (
     nextAppointment.appointment.startDateTime | dateWithDayAndWithYear) + " at " + (
-    nextAppointment.appointment.startDateTime | shortTime) + "."
+    nextAppointment.appointment.startDateTime | govukTime) + "."
  %}
 {% endif %}
 {% if not nextAppointment.appointment and not nextAppointment.usernameIsCom %}
