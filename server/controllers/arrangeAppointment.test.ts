@@ -263,7 +263,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, mockRes)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
-    it('should redirect to the appointments page if POP only has one sentence', async () => {
+    it('should redirect to the type-and-attendance page if POP only has one sentence', async () => {
       const mockRequest = createMockRequest()
       const mockResponse = createMockResponse({ sentenceList: [sentence] })
       const spy = jest.spyOn(mockResponse, 'redirect')
