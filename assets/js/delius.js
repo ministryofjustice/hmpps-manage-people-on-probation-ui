@@ -92,7 +92,7 @@ function setupSearch() {
   if (!form || !search) return
 
   // Load filters from local storage
-  saveFilters(JSON.parse(localStorage.getItem('providers')))
+  // saveFilters(JSON.parse(localStorage.getItem('providers')))
 
   const applyFilters = document.getElementById('apply-filters')
   if (applyFilters) {
@@ -100,6 +100,11 @@ function setupSearch() {
       saveFilters().then(resetPageNumber)
     })
   }
+  // document.getElementById('search-results-container').addEventListener('click', e => {
+  //   if (e.target.name === 'apply-filters') {
+  //     saveFilters().then(resetPageNumber)
+  //   }
+  // })
 
   search.focus() // the autofocus attribute doesn't work in a cross-origin iframe
   search.setSelectionRange(search.value.length, search.value.length) // focus at end of field
