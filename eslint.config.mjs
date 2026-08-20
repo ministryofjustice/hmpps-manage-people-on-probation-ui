@@ -34,4 +34,12 @@ export default [
       'import/prefer-default-export': 0,
     },
   },
+  {
+    name: 'javascript-defaults',
+    files: ['**/*.js', '**/*.jsx'],
+    languageOptions: {
+      ecmaVersion: 'latest', // This enables modern syntax like '?'
+      sourceType: 'module',
+    },
+  },
 ]

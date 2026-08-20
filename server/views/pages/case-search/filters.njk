@@ -1,0 +1,46 @@
+{%- from "moj/components/filter/macro.njk" import mojFilter -%}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{%- set filterOptionsHtml %}
+{{ govukRadios({
+    name: 'matchAllTerms',
+    fieldset: {
+       attributes: {
+        'data-qa': 'matchAllTerms'
+      },
+      legend: {
+        text: "Match all terms?",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    classes: "govuk-radios--small govuk-radios--inline",
+    items: [
+        {
+            value: true,
+            text: "Yes",
+            checked: params.results.response.matchAllTerms if params.results.response.matchAllTerms !== undefined else true
+        },
+        {
+            value: false,
+            text: "No",
+            checked: not params.results.response.matchAllTerms if params.results.response.matchAllTerms !== undefined else false
+        }
+    ]
+  }) }}
+{% endset %}
+
+{{ mojFilter({
+  heading: {
+    html: 'Filter results',
+    classes: 'govuk-heading-s'
+  },
+  submit: {
+    value: "Apply filters",
+    attributes: {
+        "data-qa": "submit-button",
+        "id": "apply-filters"
+    }
+  },
+  optionsHtml: filterOptionsHtml
+}) }}
