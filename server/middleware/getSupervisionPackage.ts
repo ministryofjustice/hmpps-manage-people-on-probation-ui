@@ -50,24 +50,10 @@ export const getSupervisionPackage = (
     if (!res.locals.flags?.enableSupervisionPackage) return next()
 
     const { crn } = req.params as Record<string, string>
-    let supervisionPackageResponse: SupervisionPackageResponse | undefined
 
-    req.session.data.personalDetails ??= {}
-    req.session.data.personalDetails[crn] ??= {} as any
-    if (process.env.NODE_ENV === 'development') {
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
-      const { supervisionPackageData, supervisionPackageDataIsLoading } = await fetchSupervisionPackage(crn, token)
-      supervisionPackageResponse = !supervisionPackageDataIsLoading ? supervisionPackageData : undefined
-      req.session.data.personalDetails[crn].supervisionPackageResponse = supervisionPackageResponse
-    } else {
-      ;({ supervisionPackageResponse } = req.session.data.personalDetails[crn])
-      if (!supervisionPackageResponse) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
-        const { supervisionPackageData, supervisionPackageDataIsLoading } = await fetchSupervisionPackage(crn, token)
-        supervisionPackageResponse = !supervisionPackageDataIsLoading ? supervisionPackageData : undefined
-        req.session.data.personalDetails[crn].supervisionPackageResponse = supervisionPackageResponse
-      }
-    }
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
+    const { supervisionPackageData, supervisionPackageDataIsLoading } = await fetchSupervisionPackage(crn, token)
+    const supervisionPackageResponse = !supervisionPackageDataIsLoading ? supervisionPackageData : undefined
 
     if (supervisionPackageResponse) {
       res.locals.supervisionPackageDetails = supervisionPackageResponse

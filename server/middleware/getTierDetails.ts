@@ -48,24 +48,9 @@ export const getTierDetails = (
 
     const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
     const { crn } = req.params as Record<string, string>
-    let tierDetails: LatestTierResponse | undefined
 
-    req.session.data.personalDetails ??= {}
-    req.session.data.personalDetails[crn] ??= {} as any
-    if (process.env.NODE_ENV === 'development') {
-      const { tierData, tierDataIsLoading } = await fetchTierDetails(crn, token)
-
-      tierDetails = !tierDataIsLoading ? tierData : undefined
-      req.session.data.personalDetails[crn].tierDetails = tierDetails
-    } else {
-      ;({ tierDetails } = req.session.data.personalDetails[crn])
-      if (!tierDetails) {
-        const { tierData, tierDataIsLoading } = await fetchTierDetails(crn, token)
-
-        tierDetails = !tierDataIsLoading ? tierData : undefined
-        req.session.data.personalDetails[crn].tierDetails = tierDetails
-      }
-    }
+    const { tierData, tierDataIsLoading } = await fetchTierDetails(crn, token)
+    const tierDetails = !tierDataIsLoading ? tierData : undefined
 
     res.locals.tierUrlV3 = tierUrlV3(crn)
     res.locals.tierDetails = tierDetails
