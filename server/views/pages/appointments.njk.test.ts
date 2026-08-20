@@ -13,6 +13,7 @@ type TestModel = {
   offenderCheckinsByCRNResponse: any
   headerPersonName: any
   hasDeceased: boolean
+  showSupaSummary: boolean
   canAccessCheckins: boolean
   riskToStaff: Partial<RiskFlag>
   riskToProbationStaff: Partial<RiskFlag>
@@ -26,6 +27,7 @@ const baseModel: TestModel = {
     forename: 'James',
   },
   hasDeceased: false,
+  showSupaSummary: true,
   canAccessCheckins: false,
   riskToStaff: null,
   riskToProbationStaff: null,
@@ -205,24 +207,8 @@ describe('Appointments', () => {
     expect($('[data-qa=pastAppointmentNotes1]').length).toBe(1)
     expect($('[data-qa=pastAppointmentTags1]').length).toBe(1)
   })
-  it('should render the page with no supervision package summary', () => {
-    const $ = render({ supervisionPackageDetails: null })
-    expect($('aside').length).toBe(0)
-    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
-    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
-    expect($('.supervision-package-summary').length).toBe(0)
-  })
-  it('should render the page with no supervision package summary if deceased', () => {
-    const $ = render({ hasDeceased: true })
-    expect($('aside').length).toBe(0)
-    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
-    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
-    expect($('.supervision-package-summary').length).toBe(0)
-  })
-  it('should render the page with supervision packages disabled', () => {
-    const $ = render({ flags: { enableSupervisionPackage: false } })
-    expect($('[data-qa=pastAppointmentNotes1]').length).toBe(0)
-    expect($('[data-qa=pastAppointmentTags1]').length).toBe(0)
+  it('should render the page with no supervision package summary if supa feature flag disable or not supa crn or sentence has been terminated', () => {
+    const $ = render({ showSupaSummary: false })
     expect($('aside').length).toBe(0)
     expect($('.govuk-grid-column-three-quarters').length).toBe(0)
     expect($('.govuk-grid-column-one-quarter').length).toBe(0)
