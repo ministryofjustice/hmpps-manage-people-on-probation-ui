@@ -39,8 +39,11 @@ function resetPageNumber() {
 
 function saveFilters(selectedProviders) {
   const matchAllTerms = document.querySelector('input[name="matchAllTerms"]:checked')
-  const providers =
-    selectedProviders ?? [...document.querySelectorAll('input[name="providers-filter"]:checked')].map(el => el.value)
+  const provider = document.querySelector('select[name="providers-filter"]')
+  let providers = selectedProviders
+  if (provider && provider.value !== 'choose') {
+    providers = [provider].map(el => el.value)
+  }
   localStorage.setItem('providers', JSON.stringify(providers))
   return fetch(`${window.location.pathname}/filters`, {
     method: 'POST',
@@ -74,6 +77,10 @@ function doSearch() {
           doc.getElementById('search-results-container').classList
         document.getElementById('search-suggestions').innerHTML = doc.getElementById('search-suggestions').innerHTML
         document.getElementsByName('_csrf')[0].value = doc.getElementsByName('_csrf')[0].value
+        document.getElementById('apply-filters').addEventListener('click', e => {
+          saveFilters().then(resetPageNumber)
+          e.preventDefault()
+        })
       } else {
         handleError(new Error(`Search request failed with status ${response.status}`))
       }
@@ -86,6 +93,9 @@ function setupSearch() {
   const search = document.getElementById('search')
   const form = document.getElementById('search-form')
   if (!form || !search) return
+
+  // Load filters from local storage
+  saveFilters(JSON.parse(localStorage.getItem('providers')))
 
   document.getElementById('apply-filters').addEventListener('click', e => {
     saveFilters().then(resetPageNumber)

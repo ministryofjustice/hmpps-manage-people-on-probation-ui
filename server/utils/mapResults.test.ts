@@ -15,8 +15,8 @@ describe('mapResults()', () => {
     } as unknown as ProbationSearchRequest
     const results = mapResults(response, request)
     const expectedProviders = [
-      { checked: true, text: 'Provider 1 (2)', value: 'PA1-Provider 1' },
-      { checked: false, text: 'Provider 2 (5)', value: 'PA2-Provider 2' },
+      { selected: true, text: 'Provider 1 (2)', value: 'PA1-Provider 1' },
+      { selected: false, text: 'Provider 2 (5)', value: 'PA2-Provider 2' },
     ]
     expect(results.providers).toEqual(expectedProviders)
   })
