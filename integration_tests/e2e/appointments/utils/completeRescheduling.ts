@@ -35,6 +35,7 @@ export const completeRescheduling = ({ id = '', inPast = false, enableNonComplia
       completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
     }
     addNotePage = new AddNotePage()
+    cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
     cy.get(`#appointments-${urlCrn}-${id}-sensitivity-2`).click()
     addNotePage.getSubmitBtn().click()
   }
