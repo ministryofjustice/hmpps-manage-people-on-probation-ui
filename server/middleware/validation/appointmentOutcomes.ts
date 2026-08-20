@@ -207,6 +207,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
+    const fileRequired = !!contactId
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
@@ -216,7 +217,8 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/add-note`,
           notes: note,
-          fileOrNote: req.body.fileOrNote,
+          fileOrNote: !fileRequired || req.body.fileOrNote,
+          fileRequired,
           maxCharCount: maxCharCount as number,
           sensitivityLocked: appointmentSession?.sensitivityLocked || null,
         }),

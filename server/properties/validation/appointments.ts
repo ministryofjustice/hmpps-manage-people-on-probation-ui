@@ -21,6 +21,7 @@ export interface AppointmentsValidationArgs {
   maxCharCount?: number
   previousStart?: string
   fileOrNote?: string
+  fileRequired?: boolean
   isSensitive?: boolean
   sensitivityLocked?: boolean
 }

@@ -100,7 +100,7 @@ const checkValidation = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): vo
     addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
     addNotePage.getSubmitBtn().click()
     addNotePage.checkErrorSummaryBox(['Add a note or upload a file to continue'])
-    addNotePage.getElement(`#file-error`).should('contain.text', 'Add a note or upload a file to continue')
+    addNotePage.getElement(`#fileNote-error`).should('contain.text', 'Add a note or upload a file to continue')
   })
 }
 
@@ -144,6 +144,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
     it('redirects to check your answers page', () => {
       loadPage({ journey })
+      cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
       addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
       addNotePage.getSubmitBtn().click()
       const cyaPage = new AppointmentCheckYourAnswersPage()
@@ -198,7 +199,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   }
   it('submits successfully with a note or upload and sensitivity selected', () => {
     loadPage({ journey })
-    addNotePage.getFileUploadInput().attachFile(createFakeFile(3, 'pdf'))
+    cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
     addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
     addNotePage.getSubmitBtn().click()
     nextAppointmentPage = new NextAppointmentPage()

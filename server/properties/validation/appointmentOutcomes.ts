@@ -21,6 +21,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     log,
     sendBreachOrRecallLetter,
     notes,
+    fileRequired,
     maxCharCount,
     sensitivityLocked,
     showLetterTypeOptions,
@@ -149,7 +150,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       checks: [
         {
           validator: isNotEmpty,
-          msg: `Add a note or upload a file to continue`,
+          msg: fileRequired ? `Add a note or upload a file to continue` : `Add a note to continue`,
           log: `No content included for appointment patch`,
         },
       ],
