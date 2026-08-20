@@ -162,7 +162,8 @@ const alertsController: Controller<typeof routes, void> = {
         error: false,
         message: `You've cleared ${alertCount} ${alertCount > 1 ? 'alerts' : 'alert'}.`,
       }
-
+      delete req.query.page
+      req.url = '/alerts'
       return next()
     }
   },
