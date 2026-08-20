@@ -21,7 +21,8 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
 
   const { maxCharCount } = config
   const id = uuid || contactId
-  req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
+  const note = unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? ''
+  req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : note.trim()
   let localParams: LocalParams = { crn, id, outcomeJourney: true }
   if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
     localParams = { ...localParams, maxCharCount: maxCharCount as number }
@@ -206,6 +207,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
+    const fileRequired = !!contactId
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
@@ -214,7 +216,9 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           crn,
           id,
           page: `outcome/add-note`,
-          notes: unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? '',
+          notes: note,
+          fileOrNote: !fileRequired || req.body.fileOrNote,
+          fileRequired,
           maxCharCount: maxCharCount as number,
           sensitivityLocked: appointmentSession?.sensitivityLocked || null,
         }),

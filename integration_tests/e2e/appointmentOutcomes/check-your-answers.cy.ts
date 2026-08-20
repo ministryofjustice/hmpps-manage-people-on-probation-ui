@@ -175,16 +175,20 @@ const checkPage = () => {
     })
   })
 
-  describe('Outcome is unacceptable absence and action is initiate breach/recall and send a letter and no notes', () => {
+  describe('Outcome is unacceptable absence and action is initiate breach/recall and send a letter and a note', () => {
     it('should render the page', () => {
       cy.task('stubAppointment', { documents: true, isFuture: false })
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER', notes: '' })
+      loadPage({
+        outcome: 'UNACCEPTABLE_ABSENCE',
+        action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+        notes: 'Some notes',
+      })
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkSummary({
         outcomeText: 'Unacceptable absence',
         actionText: ['I will initiate the breach', 'I will send a different enforcement letter'],
         documents: true,
-        notes: false,
+        notes: true,
       })
     })
   })
