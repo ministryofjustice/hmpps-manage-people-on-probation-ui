@@ -22,7 +22,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const { maxCharCount } = config
   const id = uuid || contactId
   const note = unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? ''
-  req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : note
+  req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : note.trim()
   let localParams: LocalParams = { crn, id, outcomeJourney: true }
   if (reqUrl.includes(`${baseOutcomeUrl}/add-note`)) {
     localParams = { ...localParams, maxCharCount: maxCharCount as number }
