@@ -14,12 +14,13 @@ import {
   getOfficeLocationsByTeamAndProvider,
   getAppointment,
   checkAnswers,
+  getSupervisionPackage,
 } from '../middleware'
 import { getCurrentOutcome, getCurrentEnforcementAction, getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
 
-export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Services) {
+export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
@@ -27,6 +28,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     '/case/:crn/appointments',
     getPersonRiskFlags(hmppsAuthClient),
     getSentences(hmppsAuthClient),
+    getSupervisionPackage(hmppsAuthClient, mpopComponents),
     controllers.appointments.getAppointments(hmppsAuthClient),
   )
 

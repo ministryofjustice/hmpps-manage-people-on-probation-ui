@@ -333,13 +333,20 @@ describe('alertsController', () => {
     const nextSpy = jest.fn()
 
     it('should call clearAlerts with a single selected alert and return success', async () => {
-      const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: '123' }, url: '/alerts/clear' })
+      const req = httpMocks.createRequest({
+        method: 'POST',
+        body: { selectedAlerts: '123' },
+        url: '/alerts/clear',
+        query: { page: '1' },
+      })
       res.locals.user = defaultUser
       res.locals.flags = {}
       clearAlertsSpy.mockResolvedValueOnce({ success: true, clearedCount: 1 })
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, nextSpy)
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 1 alert.` })
+      expect(req.query.page).toBeUndefined()
+      expect(req.url).toBe('/alerts')
       expect(nextSpy).toHaveBeenCalled()
       checkSendAuditMessage(res, 'EDIT_MAS_CLEAR_ALERT', res.locals.user.username, SubjectType.USER)
     })
@@ -348,7 +355,8 @@ describe('alertsController', () => {
       const req = httpMocks.createRequest({
         method: 'POST',
         body: { selectedAlerts: ['456', '789'] },
-        url: '/alerts',
+        url: '/alerts/clear',
+        query: { page: '2' },
       })
       res.locals.user = defaultUser
       res.locals.flags = {}
@@ -356,6 +364,8 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, nextSpy)
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 2 alerts.` })
+      expect(req.query.page).toBeUndefined()
+      expect(req.url).toBe('/alerts')
       expect(nextSpy).toHaveBeenCalled()
     })
 

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
