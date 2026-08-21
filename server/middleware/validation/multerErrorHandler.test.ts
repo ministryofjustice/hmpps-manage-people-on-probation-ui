@@ -108,4 +108,19 @@ describe('multerErrorHandler', () => {
 
     expect(res.locals.renderPath).toBeTruthy()
   })
+
+  it('handles INVALID_FILE_NAME', async () => {
+    const err = new Error('INVALID_FILE_NAME')
+    const req = httpMocks.createRequest({ ...baseReq, multerError: err } as any)
+
+    await new Promise<void>(resolve => {
+      handler(req, res, () => {
+        resolve()
+      })
+    })
+
+    expect(res.locals.errorMessages).toEqual({
+      [field]: 'Filename: The Filename must not include any of the following characters ! | $ % & # ^ / \\ " < > : ? *',
+    })
+  })
 })
