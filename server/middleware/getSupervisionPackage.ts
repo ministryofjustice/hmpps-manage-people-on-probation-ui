@@ -52,13 +52,12 @@ export const getSupervisionPackage = (
     const { crn } = req.params as Record<string, string>
 
     const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
-    const { supervisionPackageData, supervisionPackageDataIsLoading } = await fetchSupervisionPackage(crn, token)
-    const supervisionPackageResponse = !supervisionPackageDataIsLoading ? supervisionPackageData : undefined
+    const { supervisionPackageData } = await fetchSupervisionPackage(crn, token)
 
-    if (supervisionPackageResponse) {
-      res.locals.supervisionPackageDetails = supervisionPackageResponse
-      if (supervisionPackageResponse.context?.finalThirdEligibility) {
-        const finalThirdEligibility = supervisionPackageResponse.context?.finalThirdEligibility
+    if (supervisionPackageData) {
+      res.locals.supervisionPackageDetails = supervisionPackageData
+      if (supervisionPackageData.context?.finalThirdEligibility) {
+        const finalThirdEligibility = supervisionPackageData.context?.finalThirdEligibility
         if (
           finalThirdEligibility?.since &&
           isFinalThirdEligibilityInWindow(finalThirdEligibility.since, DateTime.now())

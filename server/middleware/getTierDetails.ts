@@ -49,11 +49,10 @@ export const getTierDetails = (
     const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
     const { crn } = req.params as Record<string, string>
 
-    const { tierData, tierDataIsLoading } = await fetchTierDetails(crn, token)
-    const tierDetails = !tierDataIsLoading ? tierData : undefined
+    const { tierData } = await fetchTierDetails(crn, token)
 
     res.locals.tierUrlV3 = tierUrlV3(crn)
-    res.locals.tierDetails = tierDetails
+    res.locals.tierDetails = tierData
     return next()
   }
 }
