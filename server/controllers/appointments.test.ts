@@ -6,7 +6,7 @@ import { ParsedQs } from 'qs'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment, isMatchingAddress } from '../utils'
+import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
 import { mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
 import { cloneAppointmentAndRedirect, renderError, overrideDeliusManagedFlag } from '../middleware'
@@ -76,7 +76,6 @@ const mockScheduleWithFlag = {
     appointments: [
       {
         ...mockPersonSchedule.personSchedule.appointments[0],
-        deliusManaged: true,
       },
     ],
   },
@@ -217,16 +216,26 @@ describe('controllers/appointments', () => {
       statusCode: 200,
     })
   })
+
   describe('get appointments', () => {
     it('should request previous and upcoming appointments from the api', async () => {
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
+      const mockRes = mockAppResponse({
+        flags: { enablePreSentence: true, enableSupervisionPackage: true },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
 
     it('should render the appointments page', async () => {
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
+      const mockRes = mockAppResponse({
+        flags: { enablePreSentence: true, enableSupervisionPackage: true },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
+      expect(spy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
@@ -237,8 +246,12 @@ describe('controllers/appointments', () => {
         url: '',
       })
     })
+
     it('should override deliusManaged flag when enablePreSentence flag is false', async () => {
-      const mockRes = mockAppResponse({ flags: { enablePreSentence: false } })
+      const mockRes = mockAppResponse({
+        flags: { enablePreSentence: false, enableSupervisionPackage: true },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(mockOverrideDeliusManagedFlag).toHaveBeenCalledTimes(2)
@@ -254,14 +267,17 @@ describe('controllers/appointments', () => {
       })
     })
   })
-  describe('get appointments - no practitioner', () => {
-    beforeEach(async () => {
-      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
-    })
 
-    it('should render the appointments page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
+  describe('get appointments - no practitioner', () => {
+    it('should render the appointments page', async () => {
+      const mockRes = mockAppResponse({
+        flags: { enablePreSentence: true, enableSupervisionPackage: true },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
+      expect(spy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
@@ -272,17 +288,16 @@ describe('controllers/appointments', () => {
       })
     })
   })
-  describe('get appointments - checkins flag enabled and practitioner allocated', () => {
-    beforeEach(async () => {
-      res.locals.flags = { enableESupervisionCheckins: true }
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
-    })
-    afterEach(() => {
-      res.locals.flags = undefined
-    })
 
-    it('should render the appointments page with canAccessCheckins true', () => {
-      expect(renderSpy).toHaveBeenCalledWith(
+  describe('get appointments - checkins flag enabled and practitioner allocated', () => {
+    it('should render the appointments page with canAccessCheckins true', async () => {
+      const mockRes = mockAppResponse({
+        flags: { enableESupervisionCheckins: true, enableSupervisionPackage: true },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
+      expect(spy).toHaveBeenCalledWith(
         'pages/appointments',
         expect.objectContaining({
           hasPractitioner: true,
@@ -291,6 +306,7 @@ describe('controllers/appointments', () => {
       )
     })
   })
+
   describe('get upcoming appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient)(req, res)

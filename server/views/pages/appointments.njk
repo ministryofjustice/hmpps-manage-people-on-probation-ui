@@ -24,6 +24,8 @@
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check?back=appointments' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 
+{% set showSupaSummary = flags.enableSupervisionPackage and supervisionPackageDetails and not supervisionPackageDetails.context.sentences | hasTerminatedSentence %}
+
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
   {% set checkinLink = checkinLink %}
   {% set checkinButtonText = 'Set up online check ins' %}
@@ -236,7 +238,7 @@
       </div>
 {% endif %}
 
-{% if flags.enableSupervisionPackage and supervisionPackageDetails and not hasDeceased %}
+{% if showSupaSummary %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-three-quarters">
     {% endif %}
@@ -321,7 +323,7 @@
           <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the contacts page</a>.</p>
       </section>
     </div>
-    {% if flags.enableSupervisionPackage and supervisionPackageDetails and not hasDeceased %}
+    {% if showSupaSummary %}
     <aside class="govuk-grid-column-one-quarter">
 {{ supervisionPackageSummary(supervisionPackageDetails) }}
     </aside>
