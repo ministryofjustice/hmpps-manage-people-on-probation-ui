@@ -1158,7 +1158,7 @@ describe('controllers/arrangeAppointment', () => {
       }
       const mockReq = createMockRequest({
         query: { backPage: 'cya' },
-       appointmentSession,
+        appointmentSession,
       })
       const mockRes = createMockResponse({
         appointment: { ...appointmentSession, isReschedule: false },
