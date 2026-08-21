@@ -1,7 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
-import { hasTerminatedSentence } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
@@ -87,11 +86,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
-      const terminatedSentence = hasTerminatedSentence(res.locals?.supervisionPackageDetails?.context?.sentences)
-      const showSupaSummary =
-        res.locals?.flags?.enableSupervisionPackage === true &&
-        ![undefined, null].includes(res?.locals?.supervisionPackageDetails) &&
-        !terminatedSentence
 
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/appointments', {
@@ -102,7 +96,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         hasDeceased,
         hasPractitioner,
         canAccessCheckins,
-        showSupaSummary,
       })
     }
   },

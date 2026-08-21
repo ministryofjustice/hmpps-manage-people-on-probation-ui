@@ -24,6 +24,8 @@
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check?back=appointments' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 
+{% set showSupaSummary = flags.enableSupervisionPackage and supervisionPackageDetails and not supervisionPackageDetails.context.sentences | hasTerminatedSentence %}
+
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
   {% set checkinLink = checkinLink %}
   {% set checkinButtonText = 'Set up online check ins' %}
