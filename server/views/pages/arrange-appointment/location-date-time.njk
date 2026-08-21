@@ -2,7 +2,18 @@
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type-attendance?back=location-date-time' %}
+{% if change %}
+    {% if 'backPage=' in change %}
+        {% set backLink = change %}
+        {% elif '?' in change %}
+        {% set backLink = change + '&backPage=cya' %}
+    {% else %}
+        {% set backLink = change + '?backPage=cya' %}
+    {% endif %}
+{% else %}
+    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/type-attendance?back=location-date-time' %}
+{% endif %}
+
 {% set title = "Appointment date, time and location" %}
 {% set pageTitle = makePageTitle({
   pageHeading: [title, "Arrange appointment"]

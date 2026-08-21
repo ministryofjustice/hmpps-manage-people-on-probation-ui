@@ -319,6 +319,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const isReschedule = isRescheduleAppointment(req)
       if (change) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
+        const startTime = getDataValue(data, ['appointments', crn, id, 'start'])
+        const endTime = getDataValue(data, ['appointments', crn, id, 'end'])
+        setDataValue(data, ['appointments', crn, id, 'temp', 'startTimeFromCya'], startTime)
+        setDataValue(data, ['appointments', crn, id, 'temp', 'endTimeFromCya'], endTime)
+        setDataValue(data, ['appointments', crn, id, 'temp', 'dateFromCya'], date)
         const glDtContext = {
           uuid: id,
           username: res.locals.user?.username,
@@ -551,8 +556,9 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   getCheckYourAnswers: () => {
     return async function getCheckYourAnswers(req, res) {
-      const url = encodeURIComponent(req.url)
+      const url = encodeURIComponent(req.path)
       const { crn, id: uuid } = req.params as Record<string, string>
+      const { backPage } = req.query as Record<string, string>
       let { contactId } = req.params as Record<string, string>
       const id = uuid ?? contactId
       const { data } = req.session
@@ -575,7 +581,20 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         date,
         user: { locationCode: selectedLocation },
       } = getDataValue(data, ['appointments', crn, id])
-      const { isInPast } = dateIsInPast(date, start)
+      let { isInPast } = dateIsInPast(date, start)
+      if (backPage === 'cya') {
+        const dateFromCya = getDataValue(data, ['appointments', crn, id, 'temp', 'dateFromCya'])
+        const startTime = getDataValue(data, ['appointments', crn, id, 'temp', 'startTimeFromCya'])
+        const endTime = getDataValue(data, ['appointments', crn, id, 'temp', 'endTimeFromCya'])
+        ;({ isInPast } = dateIsInPast(dateFromCya, start))
+        setDataValue(data, ['appointments', crn, id, 'start'], startTime)
+        setDataValue(data, ['appointments', crn, id, 'end'], endTime)
+        setDataValue(data, ['appointments', crn, id, 'date'], dateFromCya)
+        res.locals.appointment.date = dateFromCya
+        res.locals.appointment.start = startTime
+        res.locals.appointment.end = endTime
+      }
+
       if (![`LOCATION_NOT_IN_LIST`, 'NO_LOCATION_REQUIRED'].includes(selectedLocation)) {
         location = res.locals.userLocations.find((loc: any) => loc.description === selectedLocation)
       }
