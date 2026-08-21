@@ -1,5 +1,4 @@
 import httpMocks from 'node-mocks-http'
-import { hasTerminatedSentence } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { v4 as uuidv4 } from 'uuid'
 import { Request } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
@@ -45,13 +44,7 @@ jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
-jest.mock('@ministryofjustice/hmpps-mpop-frontend-components-lib', () => {
-  const actualLib = jest.requireActual('@ministryofjustice/hmpps-mpop-frontend-components-lib')
-  return {
-    ...actualLib,
-    hasTerminatedSentence: jest.fn(),
-  }
-})
+
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -112,7 +105,6 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
 >
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
-const mockHasTerminatedSentence = hasTerminatedSentence as jest.MockedFunction<typeof hasTerminatedSentence>
 
 const reqObject = {
   params: {
@@ -231,7 +223,6 @@ describe('controllers/appointments', () => {
         flags: { enablePreSentence: true, enableSupervisionPackage: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
@@ -243,7 +234,6 @@ describe('controllers/appointments', () => {
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
@@ -254,7 +244,6 @@ describe('controllers/appointments', () => {
         hasPractitioner: true,
         canAccessCheckins: false,
         url: '',
-        showSupaSummary: true,
       })
     })
 
@@ -263,7 +252,6 @@ describe('controllers/appointments', () => {
         flags: { enablePreSentence: false, enableSupervisionPackage: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(mockOverrideDeliusManagedFlag).toHaveBeenCalledTimes(2)
@@ -275,70 +263,6 @@ describe('controllers/appointments', () => {
         hasDeceased: false,
         hasPractitioner: true,
         canAccessCheckins: false,
-        showSupaSummary: true,
-        url: '',
-      })
-    })
-
-    it('should set showSupaSummary local var as false if no supa details', async () => {
-      const mockRes = mockAppResponse({
-        flags: { enablePreSentence: true, enableSupervisionPackage: true },
-        supervisionPackageDetails: null,
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(spy).toHaveBeenCalledWith('pages/appointments', {
-        upcomingAppointments: mockScheduleWithFlag,
-        pastAppointments: mockScheduleWithFlag,
-        crn,
-        personRisks: undefined,
-        hasDeceased: false,
-        hasPractitioner: true,
-        canAccessCheckins: false,
-        showSupaSummary: false,
-        url: '',
-      })
-    })
-
-    it('should set showSupaSummary local var as false if supa feature flag is disabled', async () => {
-      const mockRes = mockAppResponse({
-        flags: { enablePreSentence: false, enableSupervisionPackage: false },
-        supervisionPackageDetails: { context: { sentences: [] } },
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(spy).toHaveBeenCalledWith('pages/appointments', {
-        upcomingAppointments: mockScheduleWithFlag,
-        pastAppointments: mockScheduleWithFlag,
-        crn,
-        personRisks: undefined,
-        hasDeceased: false,
-        hasPractitioner: true,
-        canAccessCheckins: false,
-        showSupaSummary: false,
-        url: '',
-      })
-    })
-
-    it('should set showSupaSummary local var as false if has terminated sentence', async () => {
-      const mockRes = mockAppResponse({
-        flags: { enablePreSentence: true, enableSupervisionPackage: true },
-        supervisionPackageDetails: { context: { sentences: [] } },
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      mockHasTerminatedSentence.mockImplementationOnce(() => true)
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(spy).toHaveBeenCalledWith('pages/appointments', {
-        upcomingAppointments: mockScheduleWithFlag,
-        pastAppointments: mockScheduleWithFlag,
-        crn,
-        personRisks: undefined,
-        hasDeceased: false,
-        hasPractitioner: true,
-        canAccessCheckins: false,
-        showSupaSummary: false,
         url: '',
       })
     })
@@ -351,7 +275,6 @@ describe('controllers/appointments', () => {
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
@@ -361,7 +284,6 @@ describe('controllers/appointments', () => {
         hasDeceased: false,
         hasPractitioner: false,
         canAccessCheckins: false,
-        showSupaSummary: true,
         url: '',
       })
     })
@@ -374,7 +296,6 @@ describe('controllers/appointments', () => {
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
-      mockHasTerminatedSentence.mockImplementationOnce(() => false)
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith(
         'pages/appointments',

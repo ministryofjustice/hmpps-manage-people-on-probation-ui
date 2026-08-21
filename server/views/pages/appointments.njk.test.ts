@@ -207,8 +207,26 @@ describe('Appointments', () => {
     expect($('[data-qa=pastAppointmentNotes1]').length).toBe(1)
     expect($('[data-qa=pastAppointmentTags1]').length).toBe(1)
   })
-  it('should render the page with no supervision package summary if supa feature flag disable or not supa crn or sentence has been terminated', () => {
-    const $ = render({ showSupaSummary: false })
+  it('should render the page with no supervision package summary if supa feature flag is disabled', () => {
+    const $ = render({ flags: { enableSupervisionPackage: false } })
+    expect($('aside').length).toBe(0)
+    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
+    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
+    expect($('.supervision-package-summary').length).toBe(0)
+  })
+  it('should render the page with no supervision package summary if no supervision package for crn', () => {
+    const $ = render({ supervisionPackageDetails: null })
+    expect($('aside').length).toBe(0)
+    expect($('.govuk-grid-column-three-quarters').length).toBe(0)
+    expect($('.govuk-grid-column-one-quarter').length).toBe(0)
+    expect($('.supervision-package-summary').length).toBe(0)
+  })
+  it('should render the page with no supervision package summary if primary sentence has been terminated', () => {
+    const $ = render({
+      supervisionPackageDetails: {
+        context: { sentences: [{ supervisionPackage: { code: 'SPA' }, custody: { status: { code: 'T' } } }] },
+      },
+    })
     expect($('aside').length).toBe(0)
     expect($('.govuk-grid-column-three-quarters').length).toBe(0)
     expect($('.govuk-grid-column-one-quarter').length).toBe(0)
