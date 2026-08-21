@@ -91,43 +91,7 @@ describe('getTierDetails middleware', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should use cached tierDetails when already present in session', async () => {
-    const cached = makeTierResponse()
-    const req = buildReq({ [CRN]: makeSessionEntry(cached) })
-    const res = buildRes(true)
-
-    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
-      req,
-      res,
-      nextSpy,
-    )
-
-    expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
-    expect(res.locals.tierDetails).toEqual(cached)
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
-  it('should fetch and store tierDetails in session when not cached', async () => {
-    const tierResponse = makeTierResponse()
-    mpopComponents.getTierDetails.mockResolvedValue(tierResponse)
-    const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
-
-    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
-      req,
-      res,
-      nextSpy,
-    )
-
-    expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
-    expect(mpopComponents.getTierDetails).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
-    expect(req.session.data.personalDetails[CRN].tierDetails).toEqual(tierResponse)
-    expect(res.locals.tierDetails).toEqual(tierResponse)
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
-  it('should re-fetch tierDetails in development mode even when cached', async () => {
-    process.env.NODE_ENV = 'development'
+  it('should always fetch tierDetails even when present in session', async () => {
     const cached = makeTierResponse()
     const fresh = makeTierResponse({
       calculation: { ...cached.calculation, tierScore: 'A1' } as LatestTierV3,
@@ -144,6 +108,24 @@ describe('getTierDetails middleware', () => {
 
     expect(mpopComponents.getTierDetails).toHaveBeenCalledTimes(1)
     expect(res.locals.tierDetails).toEqual(fresh)
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should fetch tierDetails and expose it on res.locals', async () => {
+    const tierResponse = makeTierResponse()
+    mpopComponents.getTierDetails.mockResolvedValue(tierResponse)
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
+      req,
+      res,
+      nextSpy,
+    )
+
+    expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+    expect(mpopComponents.getTierDetails).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
+    expect(res.locals.tierDetails).toEqual(tierResponse)
     expect(nextSpy).toHaveBeenCalled()
   })
 
