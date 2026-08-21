@@ -134,7 +134,7 @@
     "@ministryofjustice/hmpps-arns-frontend-components-lib": "2.1.0",
     "@ministryofjustice/hmpps-audit-client": "^1.1.3",
     "@ministryofjustice/hmpps-azure-telemetry": "^1.0.2",
-    "@ministryofjustice/hmpps-mpop-frontend-components-lib": "0.0.13",
+    "@ministryofjustice/hmpps-mpop-frontend-components-lib": "0.0.14",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "1.260.0",
