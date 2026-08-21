@@ -586,7 +586,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         const dateFromCya = getDataValue(data, ['appointments', crn, id, 'temp', 'dateFromCya'])
         const startTime = getDataValue(data, ['appointments', crn, id, 'temp', 'startTimeFromCya'])
         const endTime = getDataValue(data, ['appointments', crn, id, 'temp', 'endTimeFromCya'])
-        ;({ isInPast } = dateIsInPast(dateFromCya, start))
+        ;({ isInPast } = dateIsInPast(dateFromCya, startTime))
         setDataValue(data, ['appointments', crn, id, 'start'], startTime)
         setDataValue(data, ['appointments', crn, id, 'end'], endTime)
         setDataValue(data, ['appointments', crn, id, 'date'], dateFromCya)
