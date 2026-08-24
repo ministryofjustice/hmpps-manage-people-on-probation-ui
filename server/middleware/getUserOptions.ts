@@ -55,12 +55,8 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       team => team.description.toLowerCase() === defaultUserDetails?.team?.toLowerCase(),
     )?.code
 
-    let selectedTeam: string
-    if (res.locals.flags.enableMAN3255) {
-      selectedTeam = teamCodeQuery
-    } else {
-      selectedTeam = teamCodeQuery ?? teamCodeQuery
-    }
+    let selectedTeam = teamCodeQuery
+
     if (selectedTeam === probationPractitioner.team.code) {
       if (res.locals.flags.enableMAN3255) {
         selectedTeam = teams[0].code
