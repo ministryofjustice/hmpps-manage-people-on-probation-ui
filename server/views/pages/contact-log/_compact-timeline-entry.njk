@@ -1,7 +1,9 @@
+{% import './_ndelius-deep-link.njk' as ndeliusDeepLink %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = not entry.isUpdatableContact and entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set isMpopManageableAppointment = entry.isAppointment and not entry.deliusManaged %}
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
-{% if entry.isAppointment and not entry.deliusManaged %}
+{% if isMpopManageableAppointment %}
   {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
 {% elif entry.esupervisionId %}
   {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
@@ -16,6 +18,23 @@
     </li>
   {% elif shouldPromptToRecordAnOutcome %}
     {% include './_log-outcome-link.njk' %}
+  {% elif flags.enableUserEditableActions %}
+    {% set isMpopManageableType = entry.isUpdatableContact or isMpopManageableAppointment %}
+    {% set showManageOnDelius = entry.editable and not isMpopManageableType %}
+    <li>
+      <a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">
+        {{ 'Manage' if (entry.editable and isMpopManageableType) else 'View' }}<span class="govuk-visually-hidden">
+            {{ entry.displayName or entry.type }}</span>
+      </a>
+    </li>
+    {% if showManageOnDelius %}
+      <li>
+        <a href="{{ ndeliusDeepLink.manageOnDeliusUrl(entry, crn) }}" target="_blank" rel="external noopener noreferrer" class="contact-activity__manage-link" data-qa="manage-on-delius-link">
+            Manage on NDelius<span class="govuk-visually-hidden">
+            {{ entry.displayName or entry.type }} (opens in new tab)</span>
+        </a>
+      </li>
+    {% endif %}
   {% else %}
     {% if flags.enableEnforcementContacts and entry.type in enforcementContactTypes %}
       <li>

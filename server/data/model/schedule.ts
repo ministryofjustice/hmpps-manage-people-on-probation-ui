@@ -160,6 +160,7 @@ export interface Activity {
   externalReference?: string
   isUpdatableContact?: boolean
   isPreSentence?: boolean
+  editable?: boolean
 }
 
 export interface PersonAppointmentEnforcementAction {
