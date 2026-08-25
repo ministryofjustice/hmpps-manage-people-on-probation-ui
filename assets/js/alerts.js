@@ -26,6 +26,10 @@ const setupAlertsPage = () => {
       alertCheckboxes.forEach(checkbox => {
         // eslint-disable-next-line no-param-reassign
         checkbox.checked = !areAllSelected
+
+        selectAllButton.textContent = areAllSelected
+          ? 'Select all alerts on this page'
+          : 'Deselect all alerts on this page'
       })
     })
     setInterval(() => {
