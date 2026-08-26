@@ -79,27 +79,12 @@ context('Appointment', () => {
     page.pastAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
     page.pastAppointmentType(2).should('contain.text', 'Phone call')
     page.pastAppointmentType(4).should('contain.text', 'Planned video contact (NS)')
-    page.pastAppointmentType(4).should('contain.text', '⛭')
-    page.pastAppointmentType(4).should('contain.text', '?')
-    page.pastAppointmentType(4).should('contain.text', '!')
-    page
-      .pastAppointmentType(4)
-      .get('span.app-compliance-tag--compact')
-      .eq(1)
-      .invoke('attr', 'title')
-      .should('eq', 'Sensitive')
-    page
-      .pastAppointmentType(4)
-      .get('span.app-compliance-tag--compact')
-      .eq(2)
-      .invoke('attr', 'title')
-      .should('eq', 'Waiting for evidence')
-    page
-      .pastAppointmentType(4)
-      .get('span.app-compliance-tag--compact')
-      .eq(3)
-      .invoke('attr', 'title')
-      .should('eq', 'System generated')
+    page.pastAppointmentType(4).should('contain.text', 'Waiting for evidence')
+    page.pastAppointmentType(4).should('contain.text', 'System generated')
+    page.pastAppointmentType(4).should('contain.text', 'Sensitive')
+    page.pastAppointmentType(4).get('strong.app-compliance-tag').eq(1).should('contain.text', 'Waiting for evidence')
+    page.pastAppointmentType(4).get('strong.app-compliance-tag').eq(2).should('contain.text', 'System generated')
+    page.pastAppointmentType(4).get('strong.app-compliance-tag').eq(3).should('contain.text', 'Sensitive')
 
     page.assertAnchorElementAtIndexWithin(
       '[class="govuk-table__row"]',
