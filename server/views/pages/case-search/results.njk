@@ -35,7 +35,7 @@
             {{ govukPagination({ previous: { href: params.results.pagination.prev }, next: { href: params.results.pagination.next }, items: params.results.pagination.items }) }}
         {% endif %}
         {% elif params.results.query != null and params.results.errorMessage == null %}
-        <p>There are no results for your search. Try refining your query above.</p>``
+        <p>There are no results for your search. Try refining your query above.</p>
     {% endif %}
 </div>
 
