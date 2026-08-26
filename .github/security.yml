@@ -1,0 +1,145 @@
+name: Security
+
+on:
+  schedule:
+    - cron: "30 8 * * MON-FRI" # Every weekday at 08:30 UTC
+  workflow_dispatch:
+
+jobs:
+  trivy:
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@v2 # WORKFLOW_VERSION
+    with:
+      channel_id: manage-people-on-probation-alerts-security
+    secrets:
+      HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+
+  zap:
+    runs-on: [ self-hosted, hmpps-github-actions-runner ]
+    env:
+      CONFIG_FILE: ${{ github.workspace }}/.zap/autorun.yml
+      REPORT_DIR: ${{ github.workspace }}/.zap/zap-report
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Setup ZAP
+        uses: ./.github/actions/setup-zap
+
+      - name: Setup Firefox
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1
+        with:
+          firefox-version: latest-esr
+
+      - name: Replace variables in config file
+        run: envsubst < "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE" && cat "$CONFIG_FILE"
+        env:
+          ZAP_USERNAME: ${{ secrets.ZAP_USERNAME }}
+          ZAP_PASSWORD: ${{ secrets.ZAP_PASSWORD }}
+        shell: bash
+
+      - name: Run scan
+        run: owasp-zap -cmd -autorun "$CONFIG_FILE" -config selenium.firefoxBinary="$FIREFOX_BINARY"
+        env:
+          FIREFOX_BINARY: ${{ steps.firefox.outputs.firefox-path }}
+        shell: bash
+
+      - name: Upload report
+        uses: actions/upload-artifact@v7
+        with:
+          name: zap-report
+          path: ${{ env.REPORT_DIR }}
+
+      - name: Parse JSON report
+        id: json
+        run: |
+          risk_counts=$(jq -r '[.site[].alerts[]] | group_by(.riskcode) | map({ (.[0].riskcode): length }) | add' "$JSON_FILE")
+          echo "info=$(echo "$risk_counts" | jq '."0" // 0')" | tee -a "$GITHUB_OUTPUT"
+          echo "low=$(echo "$risk_counts" | jq '."1" // 0')" | tee -a "$GITHUB_OUTPUT"
+          echo "medium=$(echo "$risk_counts" | jq '."2" // 0')" | tee -a "$GITHUB_OUTPUT"
+          echo "high=$(echo "$risk_counts" | jq '."3" // 0')" | tee -a "$GITHUB_OUTPUT"
+        env:
+          JSON_FILE: ${{ env.REPORT_DIR }}/report.json
+        shell: bash
+
+      - name: Send message to Slack
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
+        if: steps.json.outputs.high != '0' || steps.json.outputs.medium != '0'
+        with:
+          method: chat.postMessage
+          payload: |
+            {
+              "channel": "manage-people-on-probation-alerts-security",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🛡️ *Manage people on probation probation* ZAP report"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": ">${{ steps.json.outputs.high }} high risk, ${{ steps.json.outputs.medium }} medium risk, and ${{ steps.json.outputs.low }} low risk issues were found."
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📈 Report"
+                      },
+                      "url": "https://ministryofjustice.github.io/hmpps-manage-people-on-probation-ui/zap-report"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📝 Logs"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Send failure message to Slack
+        uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4.0.0
+        if: failure()
+        with:
+          method: chat.postMessage
+          payload: |
+            {
+              "channel": "manage-people-on-probation-alerts-security",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ Failed to generate *Manage people on probation* ZAP report"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📝 Logs"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
