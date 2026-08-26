@@ -5,10 +5,6 @@
      class="probation-search__results-container{{ ' probation-search__has-results' if params.results.results else '' }}">
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
-            {%- include "./filters.njk" -%}
-        </div>
-
         <div class="govuk-grid-column-three-quarters">
             {% if params.results.response.totalElements > 0 %}
                 <p>Showing {{ params.results.pagination.from }} to {{ params.results.pagination.to }}
