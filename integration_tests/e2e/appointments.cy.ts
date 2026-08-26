@@ -82,9 +82,11 @@ context('Appointment', () => {
     page.pastAppointmentType(4).should('contain.text', 'Waiting for evidence')
     page.pastAppointmentType(4).should('contain.text', 'System generated')
     page.pastAppointmentType(4).should('contain.text', 'Sensitive')
-    page.pastAppointmentType(4).get('strong.app-compliance-tag').eq(1).should('contain.text', 'Waiting for evidence')
-    page.pastAppointmentType(4).get('strong.app-compliance-tag').eq(2).should('contain.text', 'System generated')
-    page.pastAppointmentType(4).get('strong.app-compliance-tag').eq(3).should('contain.text', 'Sensitive')
+    page.pastAppointmentType(4).within(() => {
+      cy.get('strong.app-compliance-tag').eq(0).should('contain.text', 'Waiting for evidence')
+      cy.get('strong.app-compliance-tag').eq(1).should('contain.text', 'System generated')
+      cy.get('strong.app-compliance-tag').eq(2).should('contain.text', 'Sensitive')
+    })
 
     page.assertAnchorElementAtIndexWithin(
       '[class="govuk-table__row"]',
