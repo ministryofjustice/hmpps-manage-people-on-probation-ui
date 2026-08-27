@@ -30,10 +30,8 @@
 {% endblock %}
 
 {% block content %}
-  {% if not checkinPhotoPage %}
     {% include "../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
-  {% endif %}
   {% if notStandardForm %}
     {% block primary %}{% endblock %}
   {% else %}
