@@ -52,17 +52,19 @@
 {% endif %}
 {% endset %}
 
-{{ mojFilter({
-  heading: {
-    html: 'Filter results',
-    classes: 'govuk-heading-s'
-  },
-  submit: {
-    value: "Apply filters",
-    attributes: {
-        "data-qa": "submit-button",
-        "id": "apply-filters"
-    }
-  },
-  optionsHtml: filterOptionsHtml
-}) }}
+<div id="{{ params.id }}-filters-container">
+    {{ mojFilter({
+      heading: {
+        html: 'Filter results',
+        classes: 'govuk-heading-s'
+      },
+      submit: {
+        value: "Apply filters",
+        attributes: {
+            "data-qa": "submit-button",
+            "id": "apply-filters"
+        }
+      },
+      optionsHtml: filterOptionsHtml
+    }) }}
+</div>
