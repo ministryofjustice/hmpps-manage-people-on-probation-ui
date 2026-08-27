@@ -191,6 +191,9 @@ export interface AppointmentSession {
     username?: string
     isInPast?: boolean
     date?: string
+    dateFromCya?: string
+    startTimeFromCya?: string
+    endTimeFromCya?: string
   }
   outcome?: AppointmentSessionOutcome
   sensitivityLocked?: boolean

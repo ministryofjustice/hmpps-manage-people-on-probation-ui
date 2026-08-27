@@ -4,6 +4,9 @@
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
+{% from "mpop/components/supervision-package-summary/macro.njk" import supervisionPackageSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "_components/note/macro.njk" import appNote %}
 {% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
 {% set currentNavSection = 'appointments' %}
 {% set personForename = headerPersonName.forename %}
@@ -20,6 +23,8 @@
 {% set nextCheckin = offenderCheckinsByCRNResponse %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check?back=appointments' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
+
+{% set showSupaSummary = flags.enableSupervisionPackage and supervisionPackageDetails and not supervisionPackageDetails.context.sentences | hasTerminatedSentence %}
 
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
   {% set checkinLink = checkinLink %}
@@ -38,38 +43,68 @@
     {% set appointmentDetails %}
     <a class='govuk-link' href={{ manageUrl }}>
       {{ appointmentDescription | toSentenceCase }}
-      {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      {% if not flags.enableSupervisionPackage %}
+       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+       {% endif %}
     </a>
+    {% if flags.enableSupervisionPackage %}
+    <div class="tags" data-qa="upcomingAppointmentTags{{ loop.index }}">
+      {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-top-2 govuk-!-margin-right-1', compact: false }) }}
+    </div>
+    {% endif %}
     {% endset %}
     {% set actionsButton %}
     {{ manageAppointmentLink(appointment, crn, manageUrl) }}
     {% endset %}
-
-    {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
-      {
+    {% set notes = '' %}
+    {% set hasNotes = flags.enableSupervisionPackage and appointment.appointmentNotes.length > 0 %}
+    {% if hasNotes %}
+{% for appointmentNote in appointment.appointmentNotes %}
+    {% if appointmentNote.note %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+  {% set columns = [
+    {
         html: appointmentDetails,
         attributes: { "data-qa":"upcomingAppointmentType"+loop.index },
-        classes: "govuk-!-width-one-third"
+        classes: "govuk-!-width-one-third" + (" app-!-no-border" if  hasNotes)
       },
       {
         text: appointment.startDateTime | dateWithYear,
         format: "numeric",
         attributes: { "data-qa":"upcomingAppointmentDate"+loop.index },
-        classes: "govuk-!-width-one-third-plus-three"
+        classes: "govuk-!-width-one-third-plus-three" + (" app-!-no-border" if  hasNotes)
       },
       {
         text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
         format: "numeric",
         attributes: { "data-qa":"upcomingAppointmentTime"+loop.index },
-        classes: "govuk-!-width-one-third-plus-three"
+        classes: "govuk-!-width-one-third-plus-three" + (" app-!-no-border" if  hasNotes)
       },
       {
         html: actionsButton,
         format: "numeric",
         attributes: {"data-qa": "upcomingAppointmentAction" + loop.index },
-        classes: "govuk-!-width-one-third-plus-three"
+        classes: "govuk-!-width-one-third-plus-three" + (" app-!-no-border" if  hasNotes)
       }
-    ]), upcomingAppointmentRows) %}
+    ]
+    %}
+    {% if hasNotes %}
+     {% set columns = (columns.push({
+        html:  govukDetails({
+                        summaryText: "Notes",
+                        classes: "govuk-!-margin-bottom-0",
+                        html: notes
+                    }),
+        classes: "notes",
+        attributes: { "data-qa":"upcomingAppointmentNotes" + loop.index }
+      }), columns)
+      %}
+      {% endif %}
+
+   {% set upcomingAppointmentRows = (upcomingAppointmentRows.push(columns), upcomingAppointmentRows) %}
   {% endfor %}
 {% endif %}
 
@@ -79,7 +114,15 @@
     {% set appointmentDescription = appointment.description + ' - ' + displayName if appointment.description else displayName %}
     {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
     {% set appointmentDetails %}
-     <div class="contact-log-compact__contact-wrapper">
+    {% if flags.enableSupervisionPackage %}
+          <a class='govuk-link' href={{ manageUrl }}>
+            {{ appointmentDescription | toSentenceCase }}
+          </a>
+          <div class="tags" data-qa="pastAppointmentTags{{ loop.index }}">
+            {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-top-2 govuk-!-margin-right-1', compact: false }) }}
+          </div>
+    {% else %}
+<div class="contact-log-compact__contact-wrapper">
         <div class="table-cell-link-content">
           <a class='govuk-link' href={{ manageUrl }}>
             {{ appointmentDescription | toSentenceCase }}
@@ -89,36 +132,60 @@
          {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
        </div>
      </div>
+    {% endif %}
     {% endset %}
 
     {% set actionsButton %}
     {{ manageAppointmentLink(appointment, crn, manageUrl) }}
     {% endset %}
 
-    {% set pastAppointmentRows = (pastAppointmentRows.push([
-      {
+      {% set notes = '' %}
+    {% set hasNotes = flags.enableSupervisionPackage and appointment.appointmentNotes.length > 0 %}
+    {% if hasNotes %}
+{% for appointmentNote in appointment.appointmentNotes %}
+    {% if appointmentNote.note %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+
+  {% set columns = [
+    {
         html: appointmentDetails,
         attributes: { "data-qa":"pastAppointmentType"+loop.index },
-        classes: "govuk-!-width-one-third"
+        classes: "govuk-!-width-one-third" + (" app-!-no-border" if  hasNotes)
       },
       {
         text: appointment.startDateTime | dateWithYear,
         format: "numeric",
         attributes: { "data-qa":"pastAppointmentDate"+loop.index },
-        classes: "govuk-!-width-one-third-plus-three"
+        classes: "govuk-!-width-one-third-plus-three" + (" app-!-no-border" if  hasNotes)
       },
       {
         text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
         format: "numeric",
         attributes: { "data-qa":"pastAppointmentTime"+loop.index },
-        classes: "govuk-!-width-one-third-plus-three"
+        classes: "govuk-!-width-one-third-plus-three" + (" app-!-no-border" if  hasNotes)
       },
       {
         html: actionsButton,
         format: "numeric",
-        classes: "govuk-!-width-one-third-plus-three"
+        classes: "govuk-!-width-one-third-plus-three" + (" app-!-no-border" if  hasNotes)
       }
-    ]), pastAppointmentRows) %}
+    ] %}
+{% if hasNotes %}
+     {% set columns = (columns.push({
+        html:  govukDetails({
+                        summaryText: "Notes",
+                        classes: "govuk-!-margin-bottom-0",
+                        html: notes
+                    }),
+        classes: "notes",
+        attributes: { "data-qa":"pastAppointmentNotes" + loop.index }
+      }), columns)
+      %}
+      {% endif %}
+       {% set pastAppointmentRows = (pastAppointmentRows.push(columns), pastAppointmentRows) %}
   {% endfor %}
 {% endif %}
 
@@ -145,8 +212,10 @@
   {% include "../partials/_risk-to-staff-alert.njk" %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-
-      <h2 class="govuk-heading-l" data-qa="appointments-header-label">Appointments</h2>
+      {% if flags.enableSupervisionPackage %}
+      <div class="flex flex--space-between">
+        {% endif %}
+<h2 class="govuk-heading-l" data-qa="appointments-header-label">Appointments</h2>
       {% include "../partials/_date-of-death-warning.njk" %}
       {% if not hasDeceased %}
         <div class="moj-button-group moj-button-group--inline govuk-!-margin-bottom-3">
@@ -165,15 +234,24 @@
           {% endif %}
         </div>
       {% endif %}
+     {% if flags.enableSupervisionPackage %}
+      </div>
+{% endif %}
 
-      <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointmentsSection">
+{% if showSupaSummary %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-three-quarters">
+    {% endif %}
+
+            <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointmentsSection">
         <h3 class="govuk-heading-m" id="section1" data-qa="upcomingAppointments">Upcoming appointments</h3>
         {% if upcomingAppointments.length == 0 %}
           <p>There are no upcoming appointments.</p>
         {% else %}
-          {{ govukTable({
+     {{ govukTable({
               firstCellIsHeader: false,
               captionClasses: 'govuk-visually-hidden',
+              classes: 'appointments' if flags.enableSupervisionPackage else '',
               head: [
                 {
                   text: "Appointment type",
@@ -210,9 +288,10 @@
         {% if pastAppointments.length == 0 %}
           <p>There are no past appointments.</p>
         {% else %}
-          {{ govukTable({
+               {{ govukTable({
               firstCellIsHeader: false,
               captionClasses: 'govuk-visually-hidden',
+              classes: 'appointments' if flags.enableSupervisionPackage else '',
               head: [
                 {
                   text: "Appointment type",
@@ -244,6 +323,11 @@
           <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the contacts page</a>.</p>
       </section>
     </div>
-  </div>
+    {% if showSupaSummary %}
+    <aside class="govuk-grid-column-one-quarter">
+{{ supervisionPackageSummary(supervisionPackageDetails) }}
+    </aside>
+    {% endif %}
+    </div>
 
 {% endblock %}

@@ -4,8 +4,12 @@ import { checkPopHeader, checkRiskToStaffAlert } from './appointments/imports'
 
 context('Overview', () => {
   const disableEMDI = () => cy.task('stubDisableEMDIOverviewShowGPSData')
-  const stubSupervisionPackage = (enabled: boolean) =>
+  const stubSupervisionPackage = (enabled: boolean) => {
     cy.task('stubFeatureFlag', { key: 'enableSupervisionPackage', enabled })
+    if (enabled) {
+      cy.task('stubSupervisionPackageFrontendContext', { crn: 'X000001' })
+    }
+  }
   const expectNoEMDILinks = (page: OverviewPage) => {
     page.getElementData('licencesEMDILink').should('not.exist')
     page.getElementData('requirementsEMDILink').should('not.exist')

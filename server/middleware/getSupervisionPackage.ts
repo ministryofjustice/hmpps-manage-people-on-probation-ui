@@ -1,8 +1,10 @@
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { DateTime } from 'luxon'
 import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { SupervisionPackageResponse } from '../models/SupervisionPackage'
+import { isFinalThirdEligibilityInWindow } from '../utils/finalThird'
 
 export const getSupervisionPackage = (
   hmppsAuthClient: HmppsAuthClient,
@@ -48,27 +50,21 @@ export const getSupervisionPackage = (
     if (!res.locals.flags?.enableSupervisionPackage) return next()
 
     const { crn } = req.params as Record<string, string>
-    let supervisionPackageResponse: SupervisionPackageResponse | undefined
 
-    req.session.data.personalDetails ??= {}
-    req.session.data.personalDetails[crn] ??= {} as any
-    if (process.env.NODE_ENV === 'development') {
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
-      const { supervisionPackageData, supervisionPackageDataIsLoading } = await fetchSupervisionPackage(crn, token)
-      supervisionPackageResponse = !supervisionPackageDataIsLoading ? supervisionPackageData : undefined
-      req.session.data.personalDetails[crn].supervisionPackageResponse = supervisionPackageResponse
-    } else {
-      ;({ supervisionPackageResponse } = req.session.data.personalDetails[crn])
-      if (!supervisionPackageResponse) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
-        const { supervisionPackageData, supervisionPackageDataIsLoading } = await fetchSupervisionPackage(crn, token)
-        supervisionPackageResponse = !supervisionPackageDataIsLoading ? supervisionPackageData : undefined
-        req.session.data.personalDetails[crn].supervisionPackageResponse = supervisionPackageResponse
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
+    const { supervisionPackageData } = await fetchSupervisionPackage(crn, token)
+
+    if (supervisionPackageData) {
+      res.locals.supervisionPackageDetails = supervisionPackageData
+      if (supervisionPackageData.context?.finalThirdEligibility) {
+        const finalThirdEligibility = supervisionPackageData.context?.finalThirdEligibility
+        if (
+          finalThirdEligibility?.since &&
+          isFinalThirdEligibilityInWindow(finalThirdEligibility.since, DateTime.now())
+        ) {
+          res.locals.finalThirdPrompt = { eligible: finalThirdEligibility.eligible }
+        }
       }
-    }
-
-    if (supervisionPackageResponse) {
-      res.locals.supervisionPackageDetails = supervisionPackageResponse
     }
 
     return next()

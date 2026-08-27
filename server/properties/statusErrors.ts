@@ -18,7 +18,7 @@ export const statusErrors: StatusErrorsType = {
   500: {
     title: 'Sorry, there is a problem with the service',
     message:
-      '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p>',
+      '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p><p><strong>There is an ongoing issue with search on this service. This affects searching for a case and the contact list. Use the NDelius search and contact list for now.</strong></p>',
   },
   409: {
     title: 'You’ve already arranged this appointment',

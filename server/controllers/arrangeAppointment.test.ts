@@ -21,6 +21,7 @@ import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
+import { Sentence } from '../data/model/sentenceDetails'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
@@ -245,6 +246,7 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
   describe('getSentence', () => {
+    const sentence: Partial<Sentence> = { id: 1, order: { description: 'Mock sentence', startDate: '', endDate: '' } }
     const mockReq = createMockRequest({
       dataSession: {
         errors: {
@@ -255,41 +257,26 @@ describe('controllers/arrangeAppointment', () => {
         },
       },
     })
+    const mockRes = createMockResponse({ sentenceList: [sentence] })
 
     it('should delete the session errors', async () => {
-      await controllers.arrangeAppointments.getSentence()(mockReq, res)
+      await controllers.arrangeAppointments.getSentence()(mockReq, mockRes)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
-    it('should redirect to the appointments page if POP has one sentence', async () => {
-      const mockRequest = {
-        ...req,
-        query: {},
-        session: {
-          data: {
-            sentences: {
-              X000001: ['sentence'],
-            },
-          },
-        },
-      } as httpMocks.MockRequest<any>
-      await controllers.arrangeAppointments.getSentence()(mockRequest, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`)
+    it('should redirect to the type-and-attendance page if POP only has one sentence', async () => {
+      const mockRequest = createMockRequest()
+      const mockResponse = createMockResponse({ sentenceList: [sentence] })
+      const spy = jest.spyOn(mockResponse, 'redirect')
+      await controllers.arrangeAppointments.getSentence()(mockRequest, mockResponse)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`)
     })
     it('should render the sentence page if POP has more than one sentence', async () => {
-      const mockRequest = {
-        ...req,
-        query: {},
-        session: {
-          data: {
-            sentences: {
-              X000001: ['sentence1', 'sentence2'],
-            },
-          },
-        },
-      } as httpMocks.MockRequest<any>
-      await controllers.arrangeAppointments.getSentence()(mockRequest, res)
+      const mockRequest = createMockRequest()
+      const mockResponse = createMockResponse({ sentenceList: [sentence, sentence] })
+      const spy = jest.spyOn(mockResponse, 'render')
+      await controllers.arrangeAppointments.getSentence()(mockRequest, mockResponse)
       checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
-      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
+      expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,
         change: undefined,
@@ -671,6 +658,43 @@ describe('controllers/arrangeAppointment', () => {
         personRisks: undefined,
         _maxDate: '31/12/2199',
       })
+    })
+
+    it('should set temp values in session when change query parameter is present', async () => {
+      const appointmentSession = {
+        date: '2025-07-20',
+        start: '10:00',
+        end: '11:00',
+      }
+      const mockReq = createMockRequest({
+        query: { change: 'true' },
+        appointmentSession,
+      })
+      const mockRes = createMockResponse({
+        appointment: { ...appointmentSession, type: { isLocationRequired: false } },
+      })
+      await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
+
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'temp', 'date'],
+        '2025-07-20',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'temp', 'startTimeFromCya'],
+        '10:00',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'temp', 'endTimeFromCya'],
+        '11:00',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'temp', 'dateFromCya'],
+        '2025-07-20',
+      )
     })
   })
 
@@ -1087,6 +1111,75 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
+    })
+  })
+  describe('getCheckYourAnswers', () => {
+    it('should render the check your answers page', async () => {
+      const appointmentSession = {
+        user: {
+          username: 'user-1',
+          locationCode: 'LOC1',
+        },
+        date: '2025-07-07',
+        start: '10:00',
+        end: '11:00',
+      }
+      const mockReq = createMockRequest({ appointmentSession })
+      const mockRes = createMockResponse({
+        appointment: { ...appointmentSession, isReschedule: false },
+        userLocations: [{ description: 'LOC1', code: 'LOC1' }],
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getCheckYourAnswers()(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `pages/arrange-appointment/check-your-answers`,
+        expect.objectContaining({
+          crn,
+          id: uuid,
+          location: { description: 'LOC1', code: 'LOC1' },
+        }),
+      )
+    })
+
+    it('should update session and locals from temp values when backPage is cya', async () => {
+      const appointmentSession = {
+        user: {
+          username: 'user-1',
+          locationCode: 'LOC1',
+        },
+        date: '2025-07-07',
+        start: '10:00',
+        end: '11:00',
+        temp: {
+          dateFromCya: '2025-08-08',
+          startTimeFromCya: '14:00',
+          endTimeFromCya: '15:00',
+        },
+      }
+      const mockReq = createMockRequest({
+        query: { backPage: 'cya' },
+        appointmentSession,
+      })
+      const mockRes = createMockResponse({
+        appointment: { ...appointmentSession, isReschedule: false },
+        userLocations: [{ description: 'LOC1', code: 'LOC1' }],
+      })
+      await controllers.arrangeAppointments.getCheckYourAnswers()(mockReq, mockRes)
+
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'start'],
+        '14:00',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'end'], '15:00')
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'date'],
+        '2025-08-08',
+      )
+      expect(mockRes.locals.appointment.date).toBe('2025-08-08')
+      expect(mockRes.locals.appointment.start).toBe('14:00')
+      expect(mockRes.locals.appointment.end).toBe('15:00')
     })
   })
   describe('getConfirmation', () => {

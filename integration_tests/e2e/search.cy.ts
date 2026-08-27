@@ -15,4 +15,20 @@ context('Search', () => {
     page.getNavigationLink(4).get('.moj-notification-badge').should('contain.text', 12)
     page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
   })
+  it('Search tooltip exists', () => {
+    cy.visit('/search')
+    cy.get("[data-qa='searchTips']").should('contain.text', 'Tips for searching')
+    cy.get('summary').click()
+    cy.get("[data-qa='searchTips']").should('have.attr', 'open')
+    cy.get("[data-qa='searchTips']").should(
+      'contain.text',
+      `You can search for first names, middle names, alias names, surnames and recorded gender.`,
+    )
+  })
+  it('Typing gives results', () => {
+    cy.visit('/search')
+    cy.get('input[name="probation-search-input"]').type('a')
+    cy.get("[data-qa='searchTips']").should('contain.text', 'Tips for searching')
+    cy.get("[class='probation-search__results-container']").should('contain.text', 'Showing 1 to 2')
+  })
 })

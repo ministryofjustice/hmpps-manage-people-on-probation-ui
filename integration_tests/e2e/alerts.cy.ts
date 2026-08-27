@@ -170,4 +170,13 @@ context('Alerts Dashboard', () => {
     cy.get('[data-qa="clearSelectedAlerts"]').click()
     cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear 2 alerts.')
   })
+
+  it('Button text, when all check boxes are selected and deselected', () => {
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').should('contain.text', 'Deselect all alerts on this page')
+    cy.get('button[id="select-all-alerts"]').click()
+    cy.get('button[id="select-all-alerts"]').should('contain.text', 'Select all alerts on this page')
+  })
 })

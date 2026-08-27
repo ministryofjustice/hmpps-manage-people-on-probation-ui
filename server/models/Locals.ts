@@ -24,6 +24,7 @@ import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
 import { TierChangePrompt } from '../utils/tierChange'
+import { FinalThirdPrompt } from '../utils/finalThird'
 import { SupervisionPackage } from './SupervisionPackage'
 import { ErrorSummary } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
@@ -39,6 +40,7 @@ import {
   OffenderCheckinsByCRNResponse,
 } from '../data/model/esupervision'
 import { PersonExistsResponse } from '../data/emdiClient'
+import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
 
 export interface AppointmentLocals {
   meta: {
@@ -114,6 +116,7 @@ interface Locals {
   tierCalculation?: TierCalculation | ErrorSummary
   tierDetails?: LatestTierResponse
   tierChangePrompt?: TierChangePrompt
+  finalThirdPrompt?: FinalThirdPrompt
   supervisionPackageDetails?: SupervisionPackage | null
   predictorScores?: TimelineItem
   riskData?: RiskData
@@ -174,6 +177,9 @@ interface Locals {
   personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
   nextAppointmentDetails: Activity | null
+  searchResponse?: ProbationSearchResponse
+  searchRequest?: ProbationSearchRequest
+  searchResults?: ProbationSearchResults
 }
 
 export interface AppointmentOutcomeSentence {

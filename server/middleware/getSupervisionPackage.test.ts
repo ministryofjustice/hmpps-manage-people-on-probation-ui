@@ -1,5 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { DateTime } from 'luxon'
 import { getSupervisionPackage } from './getSupervisionPackage'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import { AppResponse } from '../models/Locals'
@@ -87,41 +88,7 @@ describe('getSupervisionPackage middleware', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should use cached supervisionPackage when already present in session', async () => {
-    const cached = makeSupervisionPackageResponse()
-    const req = buildReq({ [CRN]: makeSessionEntry(cached) })
-    const res = buildRes(true)
-
-    await getSupervisionPackage(
-      hmppsAuthClient as unknown as HmppsAuthClient,
-      mpopComponents as unknown as MPoPComponents,
-    )(req, res, nextSpy)
-
-    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
-    expect(res.locals.supervisionPackageDetails).toEqual(cached)
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
-  it('should fetch and store supervisionPackage in session when not cached', async () => {
-    const packageResponse = makeSupervisionPackageResponse()
-    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
-    const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
-
-    await getSupervisionPackage(
-      hmppsAuthClient as unknown as HmppsAuthClient,
-      mpopComponents as unknown as MPoPComponents,
-    )(req, res, nextSpy)
-
-    expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
-    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
-    expect(req.session.data.personalDetails[CRN].supervisionPackageResponse).toEqual(packageResponse)
-    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
-  it('should re-fetch supervisionPackage in development mode even when cached', async () => {
-    process.env.NODE_ENV = 'development'
+  it('should always fetch supervisionPackage even when present in session', async () => {
     const cached = makeSupervisionPackageResponse()
     const fresh = makeSupervisionPackageResponse({ createdAt: '2024-02-01' })
     mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(fresh)
@@ -135,6 +102,23 @@ describe('getSupervisionPackage middleware', () => {
 
     expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledTimes(1)
     expect(res.locals.supervisionPackageDetails).toEqual(fresh)
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should fetch supervisionPackage and expose it on res.locals', async () => {
+    const packageResponse = makeSupervisionPackageResponse()
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
+    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -190,7 +174,7 @@ describe('getSupervisionPackage middleware', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should initialise session personal details for CRN if not already present', async () => {
+  it('should fetch supervisionPackage when session personal details are empty', async () => {
     const packageResponse = makeSupervisionPackageResponse()
     mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
     const req = buildReq({})
@@ -201,8 +185,134 @@ describe('getSupervisionPackage middleware', () => {
       mpopComponents as unknown as MPoPComponents,
     )(req, res, nextSpy)
 
-    expect(req.session.data.personalDetails[CRN]).toBeDefined()
-    expect(req.session.data.personalDetails[CRN].supervisionPackageResponse).toEqual(packageResponse)
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
+    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('sets finalThirdPrompt when eligibility became effective within the last 7 days (eligible)', async () => {
+    const packageResponse = makeSupervisionPackageResponse({
+      context: {
+        finalThirdEligibility: {
+          eligible: true,
+          since: DateTime.now().toISO(),
+        },
+      },
+    } as any)
+
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(res.locals.finalThirdPrompt).toEqual({ eligible: true })
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('sets finalThirdPrompt when eligibility became effective within the last 7 days (not eligible)', async () => {
+    const packageResponse = makeSupervisionPackageResponse({
+      context: {
+        finalThirdEligibility: {
+          eligible: false,
+          since: DateTime.now().toISO(),
+        },
+      },
+    } as any)
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(res.locals.finalThirdPrompt).toEqual({ eligible: false })
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('does not set a prompt when the eligibility change is outside the 7-day window', async () => {
+    const packageResponse = makeSupervisionPackageResponse({
+      context: {
+        finalThirdEligibility: {
+          eligible: true,
+          since: DateTime.now().minus({ days: 10 }).toISO(),
+        },
+      },
+    } as any)
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(res.locals.finalThirdPrompt).toBeUndefined()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('does not set a prompt when finalThirdEligibility is absent', async () => {
+    const packageResponse = makeSupervisionPackageResponse({
+      context: {},
+    } as any)
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(res.locals.finalThirdPrompt).toBeUndefined()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('does not set a prompt when since is absent', async () => {
+    const packageResponse = makeSupervisionPackageResponse({
+      context: {
+        finalThirdEligibility: {
+          eligible: true,
+        },
+      },
+    } as any)
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(res.locals.finalThirdPrompt).toBeUndefined()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('does not set a prompt and calls next() when the supervision package API call fails', async () => {
+    mpopComponents.getSupervisionPackageFrontendContext.mockRejectedValue(new Error('boom'))
+
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(logger.error).toHaveBeenCalled()
+    expect(res.locals.finalThirdPrompt).toBeUndefined()
     expect(nextSpy).toHaveBeenCalled()
   })
 })

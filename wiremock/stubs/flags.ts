@@ -384,6 +384,45 @@ const stubFeatureFlag = ({ key, enabled }: { key: string; enabled: boolean }): S
     },
   })
 
+// Sets multiple flags in a single flags-snapshot response. Needed when a test enables more
+// than one custom flag: stubFeatureFlag rebuilds the whole flags list from the static base
+// fixture on every call, so calling it twice for two different keys in the same test causes
+// the second call to silently drop the first key (it's absent from the base fixture).
+const stubFeatureFlags = (overrides: Array<{ key: string; enabled: boolean }>): SuperAgentRequest => {
+  const keys = overrides.map(({ key }) => key)
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          ...flags.mappings[0].response.jsonBody.flags.filter(f => !keys.includes(f.key)),
+          ...overrides.map(({ key, enabled }) => ({
+            key,
+            name: key,
+            description: '',
+            enabled,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-04-10T12:00:00.000000Z',
+            updatedAt: '2026-04-10T12:00:00.000000Z',
+            rules: [] as unknown[],
+            rollouts: [] as unknown[],
+          })),
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+}
+
 export default {
   stubEnableESuperVision,
   stubDisableSmsReminders,
@@ -395,4 +434,5 @@ export default {
   stubDisableEMDIOverviewShowGPSData,
   stubDisableEnforcementContacts,
   stubFeatureFlag,
+  stubFeatureFlags,
 }

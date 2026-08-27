@@ -132,7 +132,7 @@ describe('/controllers/activityLogController', () => {
         baseUrl: '',
         crn,
         query: req.query,
-        queryParams: [],
+        queryParams: ['view=default'],
         page: req.query.page,
         view: req.query.view,
         tierCalculation: mockTierCalculation,

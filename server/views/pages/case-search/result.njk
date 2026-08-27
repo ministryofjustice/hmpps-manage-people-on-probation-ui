@@ -1,0 +1,96 @@
+<tr class="govuk-table__row">
+    <td class="govuk-table__cell app-avatar-column">
+        <img nonce="{{ cspNonce }}" alt="Prisoner image for {{ result.surname }}, {{ result.firstName }}" class="app-avatar-img"
+            src="{{ result.imageUrl }}">
+    </td>
+    <th scope="row" class="govuk-table__header">
+        <a class="govuk-link"
+           href="{% if params.resultPath %}{{ params.resultPath | replace(':crn', result.otherIds.crn) }}{% else %}{{ fn.resultPath(result.otherIds.crn) }}{% endif %}"
+           title="Select case record for {{ result.surname }}, {{ result.firstName }}">
+            {{ fn.highlight(result.surname, 'surname' in result.highlight) | safe }},
+            {{ fn.highlight(result.firstName, 'firstName' in result.highlight) | safe }}
+            {{ fn.highlight(result.middleNames | default([]) | join(' '), 'middleNames' in result.highlight) | safe }}
+        </a>
+
+        {% if 'gender' in result.highlight %}
+            <p class="govuk-!-margin-1">Gender: {{ fn.highlight(result.gender) | safe }}</p>
+        {% endif %}
+
+        {% if 'otherIds.pncNumberLongYear' in result.highlight or 'otherIds.pncNumberShortYear' in result.highlight %}
+            <p class="govuk-!-margin-1">
+                <abbr title="Police National Computer Identifier">PNC</abbr>:
+                <span class="govuk-tag--yellow">{{ result.otherIds.pncNumber }}</span>
+            </p>
+        {% endif %}
+
+        {% if 'otherIds.nomsNumber' in result.highlight %}
+            <p class="govuk-!-margin-1">
+                <abbr title="Prisoner ID">NOMS</abbr>:
+                <span class="govuk-tag--yellow">{{ result.otherIds.nomsNumber }}</span>
+            </p>
+        {% endif %}
+
+        {% if 'otherIds.niNumber' in result.highlight %}
+            <p class="govuk-!-margin-1">
+                <abbr title="Prisoner ID">National Insurance Number</abbr>:
+                <span class="govuk-tag--yellow">{{ result.otherIds.niNumber }}</span>
+            </p>
+        {% endif %}
+
+        {% if 'otherIds.croNumber' in result.highlight %}
+            <p class="govuk-!-margin-1">
+                <abbr title="Criminal Records Office Number">CRO</abbr>:
+                <span class="govuk-tag--yellow">{{ result.otherIds.croNumber }}</span>
+            </p>
+        {% endif %}
+
+        {% if 'offenderAliases.firstName' in result.highlight or 'offenderAliases.surname' in result.highlight %}
+            {% for alias in result.offenderAliases %}
+                <p class="govuk-!-margin-1">
+                    Alias:
+                    {{ fn.highlight(alias.surname, 'offenderAliases.surname' in result.highlight) | safe }},
+                    {{ fn.highlight(alias.firstName, 'offenderAliases.firstName' in result.highlight) | safe }}
+                </p>
+            {% endfor %}
+        {% endif %}
+
+        {% if 'previousSurname' in result.highlight %}
+            <p class="govuk-!-margin-1">Previous surname: {{ fn.highlight(result.previousSurname, 'previousSurname' in result.highlight) | safe }}</p>
+        {% endif %}
+
+        {% if 'contactDetails.addresses.buildingName' in result.highlight
+            or 'contactDetails.addresses.streetName' in result.highlight
+            or 'contactDetails.addresses.town' in result.highlight
+            or 'contactDetails.addresses.county' in result.highlight
+            or 'contactDetails.addresses.postcode' in result.highlight %}
+            {% for address in result.contactDetails.addresses %}
+                <p class="govuk-!-margin-1">
+                    Address:
+                    {{ [
+                        fn.highlight(address.buildingName, 'contactDetails.addresses.buildingName' in result.highlight),
+                        fn.highlight([address.addressNumber, address.streetName] | reject('undefined') | join(' '), 'contactDetails.addresses.streetName' in result.highlight),
+                        fn.highlight(address.town, 'contactDetails.addresses.town' in result.highlight),
+                        fn.highlight(address.county, 'contactDetails.addresses.county' in result.highlight),
+                        fn.highlight(address.postcode, 'contactDetails.addresses.postcode' in result.highlight)
+                    ] | reject('undefined') | join(', ') | safe }}
+                </p>
+            {% endfor %}
+        {% endif %}
+    </td>
+    <td class="govuk-table__cell">
+        {{ fn.highlight(result.otherIds.crn, 'otherIds.crn' in result.highlight) | safe }}
+    </td>
+    <td class="govuk-table__cell">
+        <span class="{{ 'govuk-tag--yellow' if 'dateOfBirth' in result.highlight else '' }}">{{ fn.formatDate(result.dateOfBirth) }}</span>
+    </td>
+    {% for column in params.results.extraColumns %}
+        {% set columnValue = column.value(result) %}
+
+        <td class="govuk-table__cell">
+            {% if columnValue is string %}{{ columnValue }}
+            {% elif columnValue.text %}{{ columnValue.text }}
+            {% elif columnValue.html %}{{ columnValue.html | safe }}
+            {% endif %}
+        </td>
+    {% endfor %}
+</tr>

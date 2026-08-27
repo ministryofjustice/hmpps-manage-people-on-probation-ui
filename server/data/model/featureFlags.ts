@@ -10,6 +10,7 @@ export class FeatureFlags {
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
   enableTierChangePrompt?: boolean = undefined
+  enableFinalThirdPrompt?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
@@ -24,6 +25,9 @@ export class FeatureFlags {
   enableSparksFilter?: boolean = undefined
   enableSupervisionPackageFilter?: boolean = undefined
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
+  enableCRISSV2?: boolean = undefined
   enableSemanticSearch?: boolean = undefined
   enablePreSentence?: boolean = undefined
+  enableSearchV2?: boolean = undefined
+  enableMAN3255?: boolean = undefined
 }

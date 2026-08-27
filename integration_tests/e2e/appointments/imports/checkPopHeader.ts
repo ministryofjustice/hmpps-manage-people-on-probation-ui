@@ -12,7 +12,7 @@ export const checkPopHeader = ({
     cy.get('h1').should('contain.text', name)
     cy.get('[data-qa="crn"]').should('contain.text', headerCrn)
     cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')
-    cy.get('[data-qa="headerDateOfBirthAge"]').should('contain.text', '46')
+    cy.get('[data-qa="headerDateOfBirthAge"]').should('contain.text', '47')
     if (tierLinkEnabled) {
       cy.get('[data-qa="tierLink"]')
         .should('contain.text', appointments ? 'A3' : 'B2')

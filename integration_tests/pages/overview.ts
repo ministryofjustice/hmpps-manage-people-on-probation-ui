@@ -21,4 +21,6 @@ export default class OverviewPage extends Page {
   tierChangePromptLink = () => cy.get('[data-qa="tierChangePromptLink"]')
 
   outcomesPromptItem = () => cy.get('[data-qa="outcomesPromptItem"]')
+
+  finalThirdPromptItem = () => cy.get('[data-qa="finalThirdPromptItem"]')
 }

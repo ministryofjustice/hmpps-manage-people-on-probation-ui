@@ -19,7 +19,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     delete req.session.errorMessages
   }
   const { clearFilterKey, clearFilterValue } = req.query
-  const view = req?.query?.view ?? req?.body?.view
+  const view = req?.query?.view
   const { crn } = req.params as Record<string, string>
   const { keywords, dateFrom, dateTo, compliance, category, sparks, supervisionPackage, hideContact } = setSession()
   const errorMessages = req?.session?.errorMessages
@@ -28,21 +28,26 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     if (crn !== req.session.activityLogFilters?.crn) {
       delete req.session.activityLogFilters
     }
-    if (req.body?.submit && !req?.query?.error) {
-      const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
-      const categoryFilters: Array<string> = req.body.category ? [req.body.category].flat() : []
-      const sparksFilters: Array<string> = req.body.sparks ? [req.body.sparks].flat() : []
-      const supervisionPackageFilters: Array<string> = req.body.supervisionPackage
-        ? [req.body.supervisionPackage].flat()
+    if (req.query?.submit && !req?.query?.error) {
+      const complianceFilters: string[] = req.query.compliance ? ([req.query.compliance].flat() as string[]) : []
+      const categoryFilters: string[] = req.query.category ? ([req.query.category].flat() as string[]) : []
+      const sparksFilters: string[] = req.query.sparks ? ([req.query.sparks].flat() as string[]) : []
+      const supervisionPackageFilters: string[] = req.query.supervisionPackage
+        ? ([req.query.supervisionPackage].flat() as string[])
         : []
-      const hideContactFilters: Array<string> = req.body.hideContact ? [req.body.hideContact].flat() : []
-      req.session.activityLogFilters = req.body as ActivityLogFilters
-      req.session.activityLogFilters.compliance = complianceFilters
-      req.session.activityLogFilters.category = categoryFilters
-      req.session.activityLogFilters.sparks = sparksFilters
-      req.session.activityLogFilters.supervisionPackage = supervisionPackageFilters
-      req.session.activityLogFilters.hideContact = hideContactFilters
-      req.session.activityLogFilters.crn = crn
+      const hideContactFilters: string[] = req.query.hideContact ? ([req.query.hideContact].flat() as string[]) : []
+
+      req.session.activityLogFilters = {
+        keywords: (req.query.keywords as string) ?? '',
+        dateFrom: (req.query.dateFrom as string) ?? '',
+        dateTo: (req.query.dateTo as string) ?? '',
+        compliance: complianceFilters,
+        category: categoryFilters,
+        sparks: sparksFilters,
+        supervisionPackage: supervisionPackageFilters,
+        hideContact: hideContactFilters,
+        crn,
+      }
     }
     if (req.session.activityLogFilters) {
       checkClearFilterKeys()

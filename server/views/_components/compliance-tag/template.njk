@@ -3,26 +3,16 @@
 {% set entry = params.entry %}
 
 {% set tags = [] %}
-{% if entry.isSensitive === true %}
-  {% set text = 'Sensitive' %}
-  {% set shorthand = '!' %}
-  {% set iconClass = 'waiting' %}
-  {% set colour = 'yellow' %}
-  {% set tags = (tags.push({ 
-    'text': text, 
-    'shorthand': shorthand, 
-    'iconClass': iconClass, 
-    'colour': colour }), tags) %}
-{% endif %}
+
 {% if entry.rescheduled %}
   {% set text = 'Rescheduled' %}
   {% set shorthand = '⟳' %}
   {% set iconClass = 'rescheduled' %}
   {% set colour = 'blue' %}
-  {% set tags = (tags.push({ 
-    'text': text, 
-    'shorthand': shorthand, 
-    'iconClass': iconClass, 
+  {% set tags = (tags.push({
+    'text': text,
+    'shorthand': shorthand,
+    'iconClass': iconClass,
     'colour': colour }), tags) %}
 {% endif %}
 {% if entry.didTheyComply === true and (entry.wasAbsent === false or entry.acceptableAbsence === false) %}
@@ -30,10 +20,10 @@
   {% set shorthand = '✓' %}
   {% set iconClass = 'tick' %}
   {% set colour = 'green' %}
-  {% set tags = (tags.push({ 
-    'text': text, 
-    'shorthand': shorthand, 
-    'iconClass': iconClass, 
+  {% set tags = (tags.push({
+    'text': text,
+    'shorthand': shorthand,
+    'iconClass': iconClass,
     'colour': colour }), tags) %}
 {% endif %}
 {% if entry.wasAbsent === true %}
@@ -42,30 +32,30 @@
     {% set shorthand = '✓' %}
     {% set iconClass = 'tick' %}
     {% set colour = 'green' %}
-    {% set tags = (tags.push({ 
-      'text': text, 
-      'shorthand': shorthand, 
-      'iconClass': iconClass, 
+    {% set tags = (tags.push({
+      'text': text,
+      'shorthand': shorthand,
+      'iconClass': iconClass,
       'colour': colour }), tags) %}
   {% elif entry.absentWaitingEvidence === true %}
     {% set text = 'Waiting for evidence' %}
     {% set shorthand = '?' %}
     {% set colour = 'yellow' %}
     {% set iconClass = 'waiting' %}
-    {% set tags = (tags.push({ 
-      'text': text, 
-      'shorthand': shorthand, 
-      'iconClass': iconClass, 
+    {% set tags = (tags.push({
+      'text': text,
+      'shorthand': shorthand,
+      'iconClass': iconClass,
       'colour': colour }), tags) %}
   {% elif not entry.acceptableAbsence and entry.isAppointment %}
     {% set text = 'Unacceptable absence' %}
     {% set shorthand = '✘' %}
     {% set iconClass = 'strike' %}
     {% set colour = 'red' %}
-    {% set tags = (tags.push({ 
-      'text': text, 
-      'shorthand': shorthand, 
-      'iconClass': iconClass, 
+    {% set tags = (tags.push({
+      'text': text,
+      'shorthand': shorthand,
+      'iconClass': iconClass,
       'colour': colour }), tags) %}
   {% endif %}
 {% endif %}
@@ -74,10 +64,10 @@
   {% set shorthand = '✘' %}
   {% set iconClass = 'strike' %}
   {% set colour = 'red' %}
-  {% set tags = (tags.push({ 
-    'text': text, 
-    'shorthand': shorthand, 
-    'iconClass': iconClass, 
+  {% set tags = (tags.push({
+    'text': text,
+    'shorthand': shorthand,
+    'iconClass': iconClass,
     'colour': colour }), tags) %}
 {% endif %}
 {% if entry.complied === true %}
@@ -85,10 +75,10 @@
   {% set shorthand = '✘' %}
   {% set iconClass = 'strike' %}
   {% set colour = 'grey' %}
-  {% set tags = (tags.push({ 
-    'text': text, 
-    'shorthand': shorthand, 
-    'iconClass': iconClass, 
+  {% set tags = (tags.push({
+    'text': text,
+    'shorthand': shorthand,
+    'iconClass': iconClass,
     'colour': colour }), tags) %}
 {% endif %}
 
@@ -103,7 +93,17 @@
     'iconClass': iconClass,
     'colour': colour }), tags) %}
 {% endif %}
-
+{% if entry.isSensitive === true %}
+  {% set text = 'Sensitive' %}
+  {% set shorthand = '!' %}
+  {% set iconClass = 'waiting' %}
+  {% set colour = 'yellow' %}
+  {% set tags = (tags.push({
+    'text': text,
+    'shorthand': shorthand,
+    'iconClass': iconClass,
+    'colour': colour }), tags) %}
+{% endif %}
 {% for tag in tags %}
   {% set tagClasses = 'app-compliance-tag govuk-tag--' + tag.colour + ' ' + params.classes + (' app-compliance-tag--compact' if isCompact) %}
   {% if tag.text %}

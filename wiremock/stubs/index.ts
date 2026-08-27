@@ -27,6 +27,7 @@ import compliance from './compliance'
 import contactOutcomes from './contactOutcomes'
 import emdi from './emdi'
 import tier from './tier'
+import supervisionPackage from './supervisionPackage'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -58,6 +59,7 @@ export default {
   ...contactOutcomes,
   ...emdi,
   ...tier,
+  ...supervisionPackage,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({
       request: {

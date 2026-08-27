@@ -34,7 +34,7 @@ describe('utils/validOutcomeOptions', () => {
       value: 'ATTENDED_FAILED_TO_COMPLY',
       text: 'Attended - failed to comply',
       hint: {
-        text: 'For example, their behaviour was disruptive or they did not follow instructions.',
+        text: 'For example, they did not follow instructions.',
       },
     },
     {

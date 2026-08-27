@@ -13,6 +13,17 @@
           },
           "flags": [
             {
+              "key": "enableCRISSV2",
+              "name": "enableCRISSV2",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2025-11-17T15:28:37.920581Z",
+              "updatedAt": "2025-11-17T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
               "key": "enableCaseloadV2",
               "name": "enableCaseloadV2",
               "description": "",
@@ -204,6 +215,39 @@
               "name": "enablePreSentence",
               "description": "",
               "enabled": false,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableSearchV2",
+              "name": "enableSearchV2",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableSupervisionPackage",
+              "name": "enableSupervisionPackage",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableMAN3255",
+              "name": "enableMAN3255",
+              "description": "",
+              "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-07-08T12:00:00.000000Z",
               "updatedAt": "2026-07-08T12:00:00.000000Z",

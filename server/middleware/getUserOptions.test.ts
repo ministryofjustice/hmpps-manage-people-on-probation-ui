@@ -470,6 +470,7 @@ describe('/middleware/getUserOptions()', () => {
           username: 'DeborahFern',
           nameAndRole: 'Deborah Fern (PS - Other)',
           staffCode: 'N07B795',
+          selected: 'selected',
           email: 'deborah.fern@testemail.com',
           name: {
             forename: 'Deborah',
@@ -490,7 +491,6 @@ describe('/middleware/getUserOptions()', () => {
           username: 'peter-parker',
           nameAndRole: 'Peter Parker (PS - Other)',
           staffCode: 'N07B722',
-          selected: 'selected',
           email: 'peter.parker@testemail.com',
           name: {
             forename: 'Peter',
