@@ -1,6 +1,6 @@
 {% import './_ndelius-deep-link.njk' as ndeliusDeepLink %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
-{% set shouldPromptToRecordAnOutcome = not entry.isUpdatableContact and entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set shouldPromptToRecordAnOutcome = not entry.isUpdatableContact and entry.hasOutcome === false and hasAppointmentStartTimePassed and (not flags.enableUserEditableActions or entry.editable) %}
 {% set isMpopManageableAppointment = entry.isAppointment and not entry.deliusManaged %}
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if isMpopManageableAppointment %}
