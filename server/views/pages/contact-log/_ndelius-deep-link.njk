@@ -1,0 +1,7 @@
+{% macro manageOnDeliusUrl(entry, crn) %}
+  {%- if entry.type in deepLinkContactTypes and entry.eventNumber -%}
+    {{- deliusDeepLinkUrl('UPWWorksheet' if entry.type === 'CP/UPW - Appointment/Attendance (NS)' else 'DrugHistory', crn, entry.eventNumber) -}}
+  {%- else -%}
+    {{- deliusDeepLinkUrl('UpdateContact', crn, entry.id) -}}
+  {%- endif -%}
+{% endmacro %}
