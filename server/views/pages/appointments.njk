@@ -24,7 +24,7 @@
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check?back=appointments' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 
-{% set showSupaSummary = flags.enableSupervisionPackage and supervisionPackageDetails and not supervisionPackageDetails.context.sentences | hasTerminatedSentence %}
+{% set showSupaSummary = flags.enableSupervisionPackageAppointments and supervisionPackageDetails and not supervisionPackageDetails.context.sentences | hasTerminatedSentence %}
 
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
   {% set checkinLink = checkinLink %}
@@ -43,11 +43,11 @@
     {% set appointmentDetails %}
     <a class='govuk-link' href={{ manageUrl }}>
       {{ appointmentDescription | toSentenceCase }}
-      {% if not flags.enableSupervisionPackage %}
+      {% if not flags.enableSupervisionPackageAppointments %}
        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
        {% endif %}
     </a>
-    {% if flags.enableSupervisionPackage %}
+    {% if flags.enableSupervisionPackageAppointments %}
     <div class="tags" data-qa="upcomingAppointmentTags{{ loop.index }}">
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-top-2 govuk-!-margin-right-1', compact: false }) }}
     </div>
@@ -57,7 +57,7 @@
     {{ manageAppointmentLink(appointment, crn, manageUrl) }}
     {% endset %}
     {% set notes = '' %}
-    {% set hasNotes = flags.enableSupervisionPackage and appointment.appointmentNotes.length > 0 %}
+    {% set hasNotes = flags.enableSupervisionPackageAppointments and appointment.appointmentNotes.length > 0 %}
     {% if hasNotes %}
 {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
@@ -114,7 +114,7 @@
     {% set appointmentDescription = appointment.description + ' - ' + displayName if appointment.description else displayName %}
     {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
     {% set appointmentDetails %}
-    {% if flags.enableSupervisionPackage %}
+    {% if flags.enableSupervisionPackageAppointments %}
           <a class='govuk-link' href={{ manageUrl }}>
             {{ appointmentDescription | toSentenceCase }}
           </a>
@@ -140,7 +140,7 @@
     {% endset %}
 
       {% set notes = '' %}
-    {% set hasNotes = flags.enableSupervisionPackage and appointment.appointmentNotes.length > 0 %}
+    {% set hasNotes = flags.enableSupervisionPackageAppointments and appointment.appointmentNotes.length > 0 %}
     {% if hasNotes %}
 {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
@@ -212,7 +212,7 @@
   {% include "../partials/_risk-to-staff-alert.njk" %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {% if flags.enableSupervisionPackage %}
+      {% if flags.enableSupervisionPackageAppointments %}
       <div class="flex flex--space-between">
         {% endif %}
 <h2 class="govuk-heading-l" data-qa="appointments-header-label">Appointments</h2>
@@ -234,7 +234,7 @@
           {% endif %}
         </div>
       {% endif %}
-     {% if flags.enableSupervisionPackage %}
+     {% if flags.enableSupervisionPackageAppointments %}
       </div>
 {% endif %}
 
@@ -251,7 +251,7 @@
      {{ govukTable({
               firstCellIsHeader: false,
               captionClasses: 'govuk-visually-hidden',
-              classes: 'appointments' if flags.enableSupervisionPackage else '',
+              classes: 'appointments' if flags.enableSupervisionPackageAppointments else '',
               head: [
                 {
                   text: "Appointment type",
@@ -291,7 +291,7 @@
                {{ govukTable({
               firstCellIsHeader: false,
               captionClasses: 'govuk-visually-hidden',
-              classes: 'appointments' if flags.enableSupervisionPackage else '',
+              classes: 'appointments' if flags.enableSupervisionPackageAppointments else '',
               head: [
                 {
                   text: "Appointment type",

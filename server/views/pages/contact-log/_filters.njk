@@ -1,5 +1,8 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "govuk/components/input/macro.njk" import govukInput -%}
 
 {% set queryString = '?' + queryParams.join('&') if queryParams.length > 0 else
   '' %}
@@ -128,6 +131,26 @@
   }) }}
   {% endif %}
 
+  {% if filters.supervisionPackageAppointmentsOptions.length %}
+  {{ govukCheckboxes({
+    idPrefix: 'supervisionPackageAppointments',
+    name: 'supervisionPackageAppointments',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: 'Supervision package appointments filter',
+        classes: 'govuk-fieldset__legend--s'
+      }
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'supervisionPackageAppointments'
+      }
+    },
+    items: filters.supervisionPackageAppointmentsOptions
+  }) }}
+  {% endif %}
+
   {{ govukCheckboxes({
     idPrefix: 'category',
     name: 'category',
@@ -210,6 +233,15 @@
     }), filterCategories) %}
 {% endif %}
 
+{% if filters.selectedFilterItems.supervisionPackageAppointments.length %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Supervision package appointments filter'
+    },
+    items: filters.selectedFilterItems.supervisionPackageAppointments
+  }), filterCategories) %}
+{% endif %}
+
 
 <div class="govuk-grid-column-one-third contact-activity__filter govuk-!-padding-bottom-4">
     <form role="region" aria-label="Filters" method="get" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
@@ -263,7 +295,7 @@
       href: '/case/' + crn + '/activity-log' + clearLink
     },
     categories: filterCategories
-  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length or filters.selectedFilterItems.sparks.length or filters.selectedFilterItems.supervisionPackage.length,
+  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length or filters.selectedFilterItems.sparks.length or filters.selectedFilterItems.supervisionPackage.length or filters.selectedFilterItems.supervisionPackageAppointments.length,
   optionsHtml: filterOptionsHtml
 }) }}
 

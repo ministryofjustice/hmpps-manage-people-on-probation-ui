@@ -57,6 +57,25 @@ const getRequest = httpMocks.createRequest({
   },
 })
 
+const reqSupervisionPackageAppointments = httpMocks.createRequest({
+  method: 'POST',
+  params: {
+    crn,
+  },
+  query: {
+    page: '',
+    submit: true,
+    dateTo: '01/12/2024',
+    dateFrom: '',
+    view: 'compact',
+    supervisionPackageAppointments: ['appointments'],
+  },
+  session: {
+    activityLogFilters: { page: '' },
+    errorMessages: [{ dateTo: 'error' }],
+  },
+})
+
 const reqValid = httpMocks.createRequest({
   method: 'POST',
   params: {
@@ -93,6 +112,13 @@ describe('/controllers/activityLogController', () => {
     it('POST with no view with no date should clear session and create new error - continues to redirect', async () => {
       validation.activityLog(reqNoView, res)
       expect(res.redirect).toHaveBeenCalledWith('?error=true')
+    })
+    it('POST with invalid date and supervisionPackageAppointments selected preserves the filter in session', async () => {
+      validation.activityLog(reqSupervisionPackageAppointments, res)
+      expect(res.redirect).toHaveBeenCalledWith('?error=true&view=compact')
+      expect(reqSupervisionPackageAppointments.session.activityLogFilters.supervisionPackageAppointments).toEqual([
+        'appointments',
+      ])
     })
     it('POST with no view with valid dates should clear session and create no errors - continues to next', async () => {
       let next = false
