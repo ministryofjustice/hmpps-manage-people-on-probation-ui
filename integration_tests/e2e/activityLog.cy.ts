@@ -188,7 +188,7 @@ context('Contacts', () => {
     page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
-  it('should no longer show additionalvalidation if the date from is in the future', () => {
+  it('should no longer show additional validation if the date from is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateFromInput().type(`${day}/${month}/${year + 1}`)
