@@ -3,11 +3,11 @@ import { configureAllowedScripts } from '@ministryofjustice/hmpps-npm-script-all
 export default configureAllowedScripts({
   allowlist: {
     // Needed by esbuild for watching files during development
-    'node_modules/@parcel/watcher@2.5.6': 'ALLOW',
+    'node_modules/@parcel/watcher@2.6.0': 'ALLOW',
     // Needed to interface with Sentry for app monitoring
-    'node_modules/@sentry/cli@3.6.2': 'ALLOW',
+    'node_modules/@sentry/cli@3.7.0': 'ALLOW',
     // Provides capabilities for integration testing
-    'node_modules/cypress@15.20.1': 'ALLOW',
+    'node_modules/cypress@15.21.1': 'ALLOW',
     // Provides native integration, supporting ability to write dtrace probes for bunyan
     'node_modules/dtrace-provider@0.8.8': 'ALLOW',
     // ESBuild is written in GoLang - this is needed to download prebuilt binaries for the specific platform
@@ -17,6 +17,6 @@ export default configureAllowedScripts({
     // Need by playwright for detecting file system changes during test runs
     'node_modules/playwright/node_modules/fsevents@2.3.2': 'ALLOW',
     // Native solution to quickly resolve module paths, used by jest and eslint
-    'node_modules/unrs-resolver@1.11.1': 'ALLOW',
+    'node_modules/unrs-resolver@1.12.2': 'ALLOW',
   },
 })
