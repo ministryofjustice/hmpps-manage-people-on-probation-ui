@@ -13,10 +13,6 @@ export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = tr
         validator: isValidDate,
         msg: 'Enter a date in the correct format, for example 17/5/2024',
       },
-      {
-        validator: isNotLaterThanToday,
-        msg: 'The date from must be today or in the past',
-      },
     ],
   },
   dateTo: {
@@ -29,10 +25,6 @@ export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = tr
       {
         validator: isValidDate,
         msg: 'Enter a date in the correct format, for example 17/5/2024',
-      },
-      {
-        validator: isNotLaterThanToday,
-        msg: 'The date to must be today or in the past',
       },
       {
         validator: isNotLaterThan,
