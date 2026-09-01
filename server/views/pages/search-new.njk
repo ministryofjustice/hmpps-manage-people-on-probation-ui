@@ -7,8 +7,9 @@
 
 {% block content %}
     {{ caseSearch({
-        id: "search" + ("-notype" if not flags.enableAsYouTypeSearch),
+        id: "search",
         results: results,
+        enableAsYouTypeSearch: flags.enableAsYouTypeSearch,
         label: {
             html: '<h1 class="govuk-label-wrapper" data-qa="pageHeading"><label class="govuk-label moj-search__label govuk-label--l" for="search">Find a person on probation</label></h1>'
         }
