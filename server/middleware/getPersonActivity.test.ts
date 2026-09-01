@@ -159,7 +159,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -208,7 +207,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -242,7 +240,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -276,7 +273,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -309,7 +305,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -343,7 +338,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -381,7 +375,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -415,7 +408,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 
@@ -450,7 +442,6 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      maxDate: '21/1/2025',
       crn,
     }
 

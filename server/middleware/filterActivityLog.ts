@@ -210,7 +210,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   }))
 
   const today = new Date()
-  const maxDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
 
   res.locals.filters = {
     selectedFilterItems,
@@ -228,7 +227,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     hideContact: filters.hideContact,
-    maxDate,
     crn,
   }
   return next()
