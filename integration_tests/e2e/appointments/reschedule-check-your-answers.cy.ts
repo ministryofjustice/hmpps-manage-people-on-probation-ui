@@ -179,10 +179,7 @@ describe('Change appointment details and reschedule', () => {
           .should('contain.text', 'Attended and complied')
         checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
         checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Notes')
-        checkYourAnswerPage
-          .getSummaryListRow(7)
-          .find('.govuk-summary-list__value')
-          .should('contain.text', 'Not entered')
+        checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Test note')
         checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
         checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
         cy.get('[data-qa="calendarInviteInset"]').should('not.exist')

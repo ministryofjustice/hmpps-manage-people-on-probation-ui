@@ -21,6 +21,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     log,
     sendBreachOrRecallLetter,
     notes,
+    fileRequired,
     maxCharCount,
     sensitivityLocked,
     showLetterTypeOptions,
@@ -141,6 +142,16 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
           validator: isValidCharCount,
           msg: `Note must be ${maxCharCount} characters or less`,
           log: `Note exceeds maximum character length`,
+        },
+      ],
+    },
+    fileOrNote: {
+      optional: page !== `outcome/add-note`,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: fileRequired ? `Add a note or upload a file to continue` : `Add a note to continue`,
+          log: `No content included for appointment patch`,
         },
       ],
     },
