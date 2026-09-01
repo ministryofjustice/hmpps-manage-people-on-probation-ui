@@ -8,6 +8,7 @@ import config from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const hasAllDigits = (string: string) => /^\d+$/.test(string)
+export const isValidFileName = (string: string) => !/[!|$%&<>:?*#"/\\^]/.test(string)
 
 export const isNotEmpty = (args: any[]) => {
   return !!args[0] && args[0] !== undefined
