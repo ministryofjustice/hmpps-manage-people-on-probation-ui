@@ -1,4 +1,4 @@
-import { isNotEmpty, isNotLaterThan, isNotLaterThanToday, isValidDate } from '../../utils/validationUtils'
+import { isNotEmpty, isNotLaterThan, isValidDate } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
 export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = true): ValidationSpec => ({

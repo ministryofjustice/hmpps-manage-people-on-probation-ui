@@ -209,8 +209,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     checked: filters.hideContact.includes(value),
   }))
 
-  const today = new Date()
-
   res.locals.filters = {
     selectedFilterItems,
     complianceOptions,

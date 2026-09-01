@@ -188,6 +188,26 @@ context('Contacts', () => {
     page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
+  it('should no longer show additionalvalidation if the date from is in the future', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getDateFromInput().type(`${day}/${month}/${year + 1}`)
+    page.getApplyFiltersButton().click()
+    page.getErrorSummaryBox().should('be.visible')
+    page.getAllErrorSummaryLinks().should('have.length', 1)
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date to')
+  })
+
+  it('should no longer show additional validation if the date to is in the future', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getDateToInput().type(`${day}/${month}/${year + 1}`)
+    page.getApplyFiltersButton().click()
+    page.getErrorSummaryBox().should('be.visible')
+    page.getAllErrorSummaryLinks().should('have.length', 1)
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+  })
+
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {
     cy.visit('/case/X000001/activity-log')
     const value = 'Phone call'
