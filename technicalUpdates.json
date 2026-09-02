@@ -1,5 +1,31 @@
 [
   {
+    "heading": "My cases page improvements",
+    "summary": "2 September 2026",
+    "whatsNew": [
+      "My cases page improvements",
+      [
+        "To help you see important information more quickly, we’ve made some updates to the My cases page.\n\nYou can now: \nview your cases in alphabetical order by default \nsee a ‘New case’ badge for any cases assigned to you within the last 21 days \n easily see if a person on probation has more than one active sentence \n \n\n Following your feedback, we've also made some headers and filters clearer and more descriptive by changing:\n‘Sentence’ filter to ‘Sentence type’\n‘Sentence’ column to ‘Main sentence’\n‘Next contact’ filter to ‘Next appointment’\n‘Next contact’ header to ‘Next appointment’\n‘Last contact’ header to ‘Last appointment’\n"
+      ],
+      "See future dated contacts",
+      [
+      "You can now see future-dated contacts, including appointments, on the Contacts page. This gives you a more complete view of case activity."
+      ],
+      "More consistent alerts names",
+      [
+        "We’ve updated the names of contacts in the Alerts section to match the names used on the Contacts page. This makes it easier for you to identify what you’re looking for."
+      ],
+      "Bug fixes",
+      [
+        "\nCalendar events now go to the probation practitioner attending the appointment, instead of the allocated practitioner.\n We've made it clearer that you need to save when arranging another appointment while logging an appointment outcome. This is a temporary change while we work on a better solution.\n"
+      ],
+      "Give us feedback",
+      [
+        "Use the updated ‘beta’ banner at the top of every page to share your experiences of using Manage people on probation. \n\n Your opinions will help us to make improvements."
+      ]
+    ]
+  },
+  {
     "heading": "Log non-compliant outcomes",
     "summary": "10 August 2026",
     "whatsNew": [
