@@ -9,7 +9,6 @@ const render = () => {
     href: '/case/X000001/activity-log?clearFilterKey=supervisionPackageAppointments',
   }
   const filters: Partial<ActivityLogFiltersResponse> = {
-    maxDate: '02/09/2026',
     complianceOptions: [],
     categoryOptions: [],
     sparksOptions: [],
