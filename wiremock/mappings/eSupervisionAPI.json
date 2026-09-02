@@ -358,6 +358,40 @@
           "Content-Type": "application/json;charset=UTF-8"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offenders/.+?/eligibility",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "transformers": ["response-template"],
+        "jsonBody": {
+          "outcome": "ELIGIBLE",
+          "message": "This person is eligible for online check ins"
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offenders/X000001/eligibility",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "transformers": ["response-template"],
+        "jsonBody": {
+          "outcome": "INELIGIBLE",
+          "message": "Caroline is not eligible for online check ins because they are in a provisional tier."
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
     }
   ]
 }

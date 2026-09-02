@@ -11,6 +11,8 @@ import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
 import { PersonExistsResponse } from '../data/emdiClient'
 import logger from '../../logger'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { OffenderEligibility } from '../data/model/esupervision'
 
 const routes = ['getCase'] as const
 
@@ -22,6 +24,7 @@ const caseController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
+      const esupClient = new ESupervisionClient(token)
       // Preloads semantic search data into OpenSearch for this CRN; fire-and-forget, non-blocking.
       if (res.locals.flags.enableSemanticSearch) {
         masClient.preloadActivitySearch(crn).catch(err => {
@@ -52,6 +55,12 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
+
+      let checkinEligibility: OffenderEligibility | undefined
+      if (res.locals.flags.enableEsupEligibilityCheck) {
+        checkinEligibility = await esupClient.getOffenderEligibility(crn)
+      }
+
       let outcomes = contactResponse?.content
       if (res.locals.flags.enableOutcomesV1) {
         outcomes = filterContacts(outcomes)
@@ -84,6 +93,7 @@ const caseController: Controller<typeof routes, void> = {
         hasPractitioner,
         canAccessCheckins,
         locationMonitoringUri: personExistsResponse?.uri,
+        checkinEligibility,
       })
     }
   },

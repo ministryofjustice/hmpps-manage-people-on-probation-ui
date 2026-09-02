@@ -37,4 +37,5 @@ export class FeatureFlags {
   enablePreSentence?: boolean = undefined
   enableSearchV2?: boolean = undefined
   enableMAN3255?: boolean = undefined
+  enableEsupEligibilityCheck?: boolean = undefined
 }
