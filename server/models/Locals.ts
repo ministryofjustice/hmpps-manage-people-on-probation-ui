@@ -118,6 +118,7 @@ interface Locals {
   tierChangePrompt?: TierChangePrompt
   finalThirdPrompt?: FinalThirdPrompt
   supervisionPackageDetails?: SupervisionPackage | null
+  supervisionPackageAttempted?: boolean
   predictorScores?: TimelineItem
   riskData?: RiskData
   risks?: RiskSummary

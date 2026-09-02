@@ -568,6 +568,11 @@ export const supervisionPackageCategoryFilterOption = {
   value: 'appointments in supervision package',
 }
 
+export const supervisionPackageAppointmentsCategoryFilterOption = {
+  text: 'Show supervision package appointments',
+  value: 'supervision package appointments',
+}
+
 export const categoryFilterOptions = [
   { text: 'Appointments', value: 'appointments', codes: APPOINTMENTS_CODES },
   { text: 'Approved Premises', value: 'Approved Premises', codes: APPROVED_PREMISES_CODES },

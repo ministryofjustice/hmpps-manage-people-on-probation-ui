@@ -9,6 +9,7 @@ import { isFinalThirdEligibilityInWindow } from '../utils/finalThird'
 export const getSupervisionPackage = (
   hmppsAuthClient: HmppsAuthClient,
   mpopComponents: MPoPComponents,
+  { includeAppointmentsFlag = false }: { includeAppointmentsFlag?: boolean } = {},
 ): Route<Promise<void>> => {
   const fetchSupervisionPackage = async (
     crn: string,
@@ -46,8 +47,15 @@ export const getSupervisionPackage = (
   }
 
   return async function getSupervisionPackageInner(req, res, next) {
-    // If the feature flag is not enabled, skip fetching supervision package and proceed to the next middleware
-    if (!res.locals.flags?.enableSupervisionPackage) return next()
+    // Skip if an earlier mount of this middleware on the same request (e.g. case.ts's catch-all) already fetched it
+    if (res.locals.supervisionPackageAttempted || res.locals.supervisionPackageDetails) return next()
+
+    // enableSupervisionPackageAppointments only applies to routes mounted with includeAppointmentsFlag,
+    // so it doesn't trigger a fetch on every case page when only the appointments rollout flag is on
+    const appointmentsFlagActive = includeAppointmentsFlag && res.locals.flags?.enableSupervisionPackageAppointments
+    if (!res.locals.flags?.enableSupervisionPackage && !appointmentsFlagActive) return next()
+
+    res.locals.supervisionPackageAttempted = true
 
     const { crn } = req.params as Record<string, string>
 

@@ -155,6 +155,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -179,6 +180,7 @@ describe('/middleware/getPersonActivity', () => {
       filters: ['complied', 'notComplied'],
       filterBySparksContacts: false,
       filterBySupervisionPackageContacts: false,
+      filterBySupervisionPackageAppointmentsContacts: false,
       includeSystemGenerated: false,
       typeCodes: APPOINTMENTS_CODES,
     }
@@ -203,6 +205,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -236,6 +239,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -269,6 +273,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -301,6 +306,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -334,6 +340,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -371,6 +378,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -404,6 +412,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
@@ -428,6 +437,83 @@ describe('/middleware/getPersonActivity', () => {
     )
   })
 
+  it('should set filterBySupervisionPackageAppointmentsContacts to true (not typeCodes or filters) when enableSupervisionPackageAppointments is enabled', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = { enableSupervisionPackageAppointments: true }
+    res.locals.filters = {
+      ...filterVals,
+      compliance: [],
+      category: [],
+      supervisionPackageAppointments: ['supervision package appointments'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({
+        filters: [],
+        filterBySupervisionPackageAppointmentsContacts: true,
+        typeCodes: [],
+      }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
+    )
+    res.locals.flags = {}
+  })
+
+  it('should not apply the supervision package appointments filter when enableSupervisionPackageAppointments is disabled, even if the session holds a value', async () => {
+    req.params = { crn }
+    req.query = { page: '0' }
+    res.locals.flags = {}
+    res.locals.filters = {
+      ...filterVals,
+      compliance: ['complied'],
+      category: [],
+      supervisionPackageAppointments: ['supervision package appointments'],
+      complianceOptions: [],
+      categoryOptions: [],
+      sparksOptions: [],
+      supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
+      hideContactOptions: [],
+      selectedFilterItems: {},
+      baseUrl: '',
+      query: { ...filterVals },
+      maxDate: '21/1/2025',
+      crn,
+    }
+
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({
+        filters: ['complied'],
+        filterBySupervisionPackageAppointmentsContacts: false,
+        typeCodes: [],
+      }),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+      false,
+    )
+  })
+
   it('should pass useSemanticSearch as true to postPersonActivityLog when enableSemanticSearch is enabled', async () => {
     req.params = { crn }
     req.query = { page: '0' }
@@ -438,6 +524,7 @@ describe('/middleware/getPersonActivity', () => {
       categoryOptions: [],
       sparksOptions: [],
       supervisionPackageOptions: [],
+      supervisionPackageAppointmentsOptions: [],
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
