@@ -36,5 +36,6 @@ export class FeatureFlags {
   enableSemanticSearch?: boolean = undefined
   enablePreSentence?: boolean = undefined
   enableSearchV2?: boolean = undefined
+  enableAsYouTypeSearch?: boolean = undefined
   enableMAN3255?: boolean = undefined
 }
