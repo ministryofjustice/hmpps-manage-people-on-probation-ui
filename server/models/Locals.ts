@@ -228,8 +228,13 @@ export interface OutcomeSummary {
   notes: string
   sensitivity: string
   documents?: string[]
-  nextAppointment?: string
+  nextAppointment?: OutcomeNextAppointment | string
   enforcementActionChangeLink?: string
+}
+
+export interface OutcomeNextAppointment {
+  id?: string
+  label: string
 }
 
 export interface OutcomeConfirmationAction {
@@ -309,6 +314,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   responseContactId?: string
   linkedContactId?: string
   redirectFromUpdate?: boolean
+  nextAppointment?: OutcomeNextAppointment
 }
 
 export interface AppResponse extends Response {

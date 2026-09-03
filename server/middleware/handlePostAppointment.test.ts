@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { handlePostAppointment } from './handlePostAppointment'
 import { mockAppResponse } from '../controllers/mocks'
-import { isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from './renderError'
 import { HmppsAuthClient } from '../data'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
@@ -36,6 +36,7 @@ jest.mock('../utils', () => {
     ...actualUtils,
     isValidCrn: jest.fn(),
     isValidUUID: jest.fn(),
+    isNumericString: jest.fn(),
     setDataValue: jest.fn(),
   }
 })
@@ -58,6 +59,7 @@ jest.mock('./postRescheduleAppointments', () => ({
 
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
+const mockedIsNumericString = isNumericString as jest.MockedFunction<typeof isNumericString>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
@@ -88,12 +90,24 @@ const mockAppointment = (appointment: Partial<AppointmentSession> = {}): Appoint
 
 const buildRequest = ({
   appointment,
-}: { appointment?: Partial<AppointmentSession> } = {}): httpMocks.MockRequest<any> => {
+  url,
+  linkedContactId = null,
+  nextAppointmentId = '5678',
+  _id = id,
+  _contactId = null,
+}: {
+  appointment?: Partial<AppointmentSession>
+  url?: string
+  nextAppointmentId?: string
+  linkedContactId?: string
+  _id?: string
+  _contactId?: string
+} = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
       crn,
-      id,
-      contactId,
+      id: _id,
+      contactId: _contactId,
     },
     session: {
       data: {
@@ -102,8 +116,15 @@ const buildRequest = ({
             [id]: mockAppointment(appointment),
           },
         },
+        temp: {
+          [crn]: {
+            nextAppointmentId,
+            linkedContactId,
+          },
+        },
       },
     },
+    url,
   }
   return httpMocks.createRequest(req)
 }
@@ -112,6 +133,7 @@ const buildResponse = () => {
   const locals = {
     flags: {
       enableSensitivityRemoved: true,
+      enableCombinedCYAPage: true,
     },
     appointmentOutcome: {},
   }
@@ -127,6 +149,7 @@ describe('middleware/handlePostAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
   it('should return a 400 error if invalid crn', async () => {
     const req = buildRequest()
     mockedIsValidCrn.mockReturnValue(false)
@@ -135,6 +158,7 @@ describe('middleware/handlePostAppointment', () => {
     expect(mockRenderError).toHaveBeenCalledWith(404)
     expect(nextSpy).not.toHaveBeenCalledTimes(1)
   })
+
   it('should return a 400 error if invalid UUID', async () => {
     const req = buildRequest()
     mockedIsValidCrn.mockReturnValue(true)
@@ -143,10 +167,53 @@ describe('middleware/handlePostAppointment', () => {
     expect(mockRenderError).toHaveBeenCalledWith(404)
     expect(nextSpy).not.toHaveBeenCalledTimes(1)
   })
+
+  it('should validate contactId if enableCombinedCYAPage flag is true', async () => {
+    const req = buildRequest({ _id: null, _contactId: contactId })
+    mockedIsValidCrn.mockReturnValue(true)
+    mockedIsValidUUID.mockReturnValue(false)
+    mockedIsNumericString.mockReturnValue(true)
+    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(mockedIsNumericString).toHaveBeenCalledWith(contactId)
+    expect(mockedIsValidUUID).not.toHaveBeenCalled()
+  })
+
+  it('should call next() if enableCombinedCYAPage flag is true and the url includes /outcome/check-your-answers and there is no nextAppointmentId', async () => {
+    const req = buildRequest({
+      url: `/case/${crn}/appointments/appointment/${id}/outcome/check-your-answers`,
+      nextAppointmentId: null,
+    })
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
+    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+    expect(postAppointmentsSpy).not.toHaveBeenCalled()
+    expect(postRescheduleAppointmentsSpy).not.toHaveBeenCalled()
+  })
+
+  it('should redirect to the outcome check your answers page if enableCombinedCYAPage flag is true and the url includes /arrange-another-appointment and nextAppointmentId and linkedContactId exist', async () => {
+    const linkedContactId = '5678'
+    const req = buildRequest({
+      url: `/case/${crn}/arrange-appointment/${id}/arrange-another-appointment`,
+      linkedContactId,
+    })
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
+    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(redirectSpy).toHaveBeenCalledWith(
+      `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`,
+    )
+    expect(postAppointmentsSpy).not.toHaveBeenCalled()
+    expect(postRescheduleAppointmentsSpy).not.toHaveBeenCalled()
+  })
+
   it(`should set sensitivity as 'Yes' if sensitivityLocked = true and enableSensitivityRemoved flag = true`, async () => {
     const req = buildRequest()
-    mockedIsValidCrn.mockReturnValue(true)
-    mockedIsValidUUID.mockReturnValue(true)
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
     findUncompletedSpy.mockReturnValueOnce(() => '/req/url')
     await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
@@ -156,19 +223,23 @@ describe('middleware/handlePostAppointment', () => {
       'Yes',
     )
   })
+
   it('should redirect to uncompleted page if there are uncompleted sections', async () => {
     const uncompletedUrl = `/case/${crn}/uncompleted-page?change=/path/to/change`
     const req = buildRequest()
-    mockedIsValidCrn.mockReturnValue(true)
-    mockedIsValidUUID.mockReturnValue(true)
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
     findUncompletedSpy.mockReturnValueOnce(() => uncompletedUrl)
     await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(redirectSpy).toHaveBeenCalledWith(uncompletedUrl)
   })
+
   it('should post an appointment if there are no uncompleted sections and rescheduleAppointment.contactId does not exist', async () => {
     const req = buildRequest()
-    mockedIsValidCrn.mockReturnValue(true)
-    mockedIsValidUUID.mockReturnValue(true)
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
     await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(postAppointmentsSpy).toHaveBeenCalled()
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
@@ -185,11 +256,13 @@ describe('middleware/handlePostAppointment', () => {
     )
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
+
   it('should post a reschedule appointment if rescheduleAppointment.contactId exists', async () => {
     const appointment: Partial<AppointmentSession> = { rescheduleAppointment: { contactId } }
     const req = buildRequest({ appointment })
-    mockedIsValidCrn.mockReturnValue(true)
-    mockedIsValidUUID.mockReturnValue(true)
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
     await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(postRescheduleAppointmentsSpy).toHaveBeenCalledWith(hmppsAuthClient)
     expect(setDataValueSpy).toHaveBeenNthCalledWith(

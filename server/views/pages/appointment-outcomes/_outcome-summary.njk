@@ -1,12 +1,12 @@
 {% set changePath = appointmentOutcome.baseOutcomeUrl %}
 {% set showAction = true %}
-{% set buttonText = 'Confirm appointment outcome' %}
+{% set buttonText = 'Confirm this appointment' if flags.enableCombinedCYAPage else 'Confirm appointment outcome' %}
 
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',
         rows: [
-            { 
+            {
                 key: { text: "Appointment details" },
                 value: { text: appointmentOutcome.summary.appointmentDetails }
             },
@@ -27,13 +27,13 @@
                 key: { text: "Enforcement action"},
                 value: { html: appointmentOutcome.summary.enforcementAction  | replace('\n', '<br>') | safe  },
                 actions: {
-                    items: [ 
+                    items: [
                         {
                             href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "enforcement action"
-                        } 
-                    ] 
+                        }
+                    ]
                 } if showAction
             } if appointmentOutcome.summary.enforcementAction,
             {
@@ -44,55 +44,67 @@
                 key: { text: "Notes"},
                 value: { text: appointmentOutcome.summary.notes },
                 actions: {
-                    items: [ 
+                    items: [
                         {
                             href: changePath + "/add-note?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "notes"
-                        } 
-                    ] 
+                        }
+                    ]
                 } if showAction
             } if appointmentOutcome.summary.notes,
             {
                 key: { text: "Sensitivity"},
                 value: { text: appointmentOutcome.summary.sensitivity },
                 actions: {
-                    items: [ 
+                    items: [
                         {
                             href: changePath + "/add-note?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "sensitivity"
-                        } 
-                    ] 
+                        }
+                    ]
                 } if showAction and not appointmentOutcome.appointmentSession.sensitivityLocked
             } if appointmentOutcome.summary.sensitivity,
             {
                 key: { text: "Documents"},
                 value: { html: appointmentOutcome.summary.documents | join('<br>') | safe },
                 actions: {
-                    items: [ 
+                    items: [
                         {
                             href: changePath + "/add-note?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "documents"
-                        } 
-                    ] 
+                        }
+                    ]
                 } if showAction
             } if appointmentOutcome.summary.documents,
             {
                 key: { text: "Next appointment"},
-                value: { text: appointmentOutcome.summary.nextAppointment },
+                value: { text: appointmentOutcome.nextAppointment.label if appointmentOutcome.nextAppointment else 'No next appointment' },
                 actions: {
-                    items: [ 
+                    items: [
+                        {
+                            href: '/case/' + appointmentOutcome.crn + '/arrange-appointment/' + appointmentOutcome.nextAppointment.id + '/arrange-another-appointment' if appointmentOutcome.nextAppointment.id else changePath + "/next-appointment?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "next appointment"
+                        }
+                    ]
+                } if showAction
+            } if appointmentOutcome.nextAppointment and nextAppointmentId,
+              {
+                key: { text: "Next appointment"},
+                value: { text: appointmentOutcome.nextAppointment.label },
+                actions: {
+                    items: [
                         {
                             href: changePath + "/next-appointment?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "next appointment"
-                        } 
-                    ] 
+                        }
+                    ]
                 } if showAction
-            } if appointmentOutcome.summary.nextAppointment
-  
+            } if appointmentOutcome.nextAppointment and not nextAppointmentId
 ] }) }}
     <div class="govuk-button-group">
         {{ govukButton({

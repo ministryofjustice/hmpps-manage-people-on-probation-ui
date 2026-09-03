@@ -26,7 +26,12 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
-    const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    let id = uuid
+    if (res?.locals?.flags?.enableCombinedCYAPage) {
+      const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
+      id = nextAppointmentId || id
+    }
+    const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     logFieldPresence(
       'postAppointments',
       {
@@ -42,7 +47,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         userName: appointmentSession?.user?.name,
         userEmail: appointmentSession?.user?.email,
       },
-      { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
+      { uuid: id, enabled: res.locals.flags.enableSessionCacheLogging },
     )
     const {
       user: { username, locationCode, teamCode },
@@ -71,7 +76,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       type,
       start: dateTime(date, start),
       end: dateTime(date, end),
-      uuid,
+      uuid: id,
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',

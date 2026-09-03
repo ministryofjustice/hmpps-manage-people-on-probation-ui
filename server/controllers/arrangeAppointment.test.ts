@@ -185,7 +185,11 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         description: 'Planned Office Meeting',
       },
     ],
-    flags: { enableSensitivityRemoved: true, enableNonCompliance: true },
+    flags: {
+      enableSensitivityRemoved: true,
+      enableNonCompliance: true,
+      enableCombinedCYAPage: true,
+    },
     ...(localsResponse || {}),
   })
 
@@ -1088,6 +1092,21 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
+    it('should redirect to the outcome check your answers page if linkedContactId is present in the session', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        dataSession: {
+          temp: {
+            [crn]: {
+              linkedContactId: '1234',
+            },
+          },
+        },
+      })
+      await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/1234/outcome/check-your-answers`)
+    })
   })
   describe('postCheckYourAnswers', () => {
     it('should redirect to the confirmation page if all data provided', async () => {
@@ -1374,7 +1393,7 @@ describe('controllers/arrangeAppointment', () => {
   })
   describe('getArrangeAnotherAppointment', () => {
     it('should render the page', async () => {
-      const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment}`
+      const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
       const mockReq = createMockRequest({
         request: { url },
       })
@@ -1384,6 +1403,24 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         isInPast: null,
+        nextAppointmentId: null,
+      })
+    })
+    it('should render the page with isInPast and nextAppointmentId if present in session', async () => {
+      const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
+      const mockReq = createMockRequest({
+        request: { url },
+        dataSession: {
+          temp: { [crn]: { nextAppointmentId: '1234' } },
+        },
+      })
+      await controllers.arrangeAppointments.getArrangeAnotherAppointment()(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/arrange-another-appointment`, {
+        url: encodeURIComponent(url),
+        crn,
+        id: uuid,
+        isInPast: null,
+        nextAppointmentId: '1234',
       })
     })
   })

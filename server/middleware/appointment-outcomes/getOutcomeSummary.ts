@@ -1,8 +1,7 @@
 import { DateTime } from 'luxon'
-import { Route } from '../../@types'
+import type { Route } from '../../@types'
 import {
   dateWithDayAndWithYear,
-  dateWithYear,
   getContactEnforcementActions,
   getMappedActions,
   getMappedOutcome,
@@ -10,8 +9,8 @@ import {
   toSentenceCase,
 } from '../../utils'
 import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
-import { Activity } from '../../data/model/schedule'
-import { AppointmentOutcomeProps, OutcomeSummary } from '../../models/Locals'
+import type { Activity } from '../../data/model/schedule'
+import type { AppointmentOutcomeProps, OutcomeSummary, OutcomeNextAppointment } from '../../models/Locals'
 
 export const getOutcomeSummary: Route<void> = (_req, res, next) => {
   let summary: OutcomeSummary
@@ -40,15 +39,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       },
       appointment,
     } = res.locals.appointmentOutcome as AppointmentOutcomeProps<Activity>
-    const nextAppt = res?.locals?.nextAppointment?.appointment
-    let nextAppointment: string = 'No next appointment'
-    let type: string
-    let startDateTime: string
-    let endDateTime: string
-    if (nextAppt) {
-      ;({ type, startDateTime, endDateTime } = nextAppt)
-      nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
-    }
 
     const noOutcome = 'No outcome'
     const noAction = 'No enforcement action'
@@ -92,8 +82,21 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       outcome,
       notes: notes || 'No notes',
       sensitivity,
-      nextAppointment,
       documents,
+    }
+
+    if (!res?.locals?.flags?.enableCombinedCYAPage) {
+      const nextAppt = res?.locals?.nextAppointment?.appointment
+      let nextAppointment = 'No next appointment'
+      let type: string
+      let startDateTime: string
+      let endDateTime: string
+      let id: string
+      if (nextAppt) {
+        ;({ id, type, startDateTime, endDateTime } = nextAppt)
+        nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
+      }
+      summary.nextAppointment = nextAppointment
     }
 
     if (
@@ -108,9 +111,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       const enforcementAction = getSelectedEnforcementActions()
       summary.enforcementAction = breachNSICreatedBy || letterSentBy ? notePrepend : enforcementAction
       summary.enforcementActionChangeLink = outcomeType ? outcomeRedirectMap(baseOutcomeUrl)[outcomeType] : null
-      // if (otherEnforcementAction) {
-      //   summary.enforcementActionChangeLink = `${baseOutcomeUrl}/enforcement-action`
-      // }
       if (updateEnforcementAction) {
         summary.enforcementActionChangeLink = `${baseOutcomeUrl}/update-enforcement-action`
       }

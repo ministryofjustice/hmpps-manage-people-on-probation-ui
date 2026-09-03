@@ -4,9 +4,13 @@ import { dateIsInPast } from '../utils/dateIsInPast'
 import { getDataValue } from '../utils/getDataValue'
 import '../@types/express/index.d'
 
-export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean => {
+export const appointmentDateIsInPast = (req: Request, res: Response): boolean => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
-  const id = uuid || contactId
+  let id = uuid || contactId
+  if (res?.locals?.flags?.enableCombinedCYAPage) {
+    const nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId']) || null
+    id = nextAppointmentId || id
+  }
   let date: string
   let start: string
   let isInPast = false
