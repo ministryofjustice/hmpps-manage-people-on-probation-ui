@@ -12,9 +12,11 @@ import {
   completeOutcome,
 } from '../appointments/utils'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
+import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 
 let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
+let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
 
 const crn = 'X000001'
 
@@ -249,7 +251,10 @@ const checkPage = () => {
     it('should render the page with updated next appointment and persist original appointment', () => {
       loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+      cy.pause()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      // arrangeAnotherAppointmentPage.getSummaryListRow(1).find('.govuk-summary-list__actions').find('a').click()
       completeNextAppointmentPage({ value: 'KEEP_TYPE' })
       const appointmentType = `Planned office visit (NS)`
       checkYourAnswersOutcomePage

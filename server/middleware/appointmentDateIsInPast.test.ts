@@ -2,10 +2,10 @@ import { DateTime } from 'luxon'
 import httpMocks, { RequestMethod } from 'node-mocks-http'
 import { AppointmentSession } from '../models/Appointments'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { getDataValue } from '../utils'
 
 const crn = 'X000001'
 const id = 'b5719245-0f0a-4bbc-bbef-2d6a095e39f7'
+const nextAppointmentId = 'b5719245-0f0a-4bbc-bbef-2d6a095e39f8'
 
 const mockAppointment: AppointmentSession = {
   user: {
@@ -27,17 +27,21 @@ const buildRequest = ({
   appointment,
   method,
   body,
+  appointmentId = id,
+  _nextAppointmentId = null,
 }: {
   method?: RequestMethod
   request?: Record<string, string>
   appointment?: Record<string, string>
   body?: Record<string, any>
+  appointmentId?: string
+  _nextAppointmentId?: string
 }): httpMocks.MockRequest<any> => {
   const req = {
     method: method ?? 'POST',
     params: {
       crn,
-      id,
+      id: appointmentId,
     },
     body: {
       ...body,
@@ -46,10 +50,15 @@ const buildRequest = ({
       data: {
         appointments: {
           [crn]: {
-            [id]: {
+            [appointmentId]: {
               ...mockAppointment,
               ...(appointment ?? {}),
             },
+          },
+        },
+        temp: {
+          [crn]: {
+            nextAppointmentId: _nextAppointmentId,
           },
         },
       },
@@ -59,7 +68,13 @@ const buildRequest = ({
   return httpMocks.createRequest(req)
 }
 
-const res = httpMocks.createResponse()
+const res = httpMocks.createResponse({
+  locals: {
+    flags: {
+      enableCombinedCYAPage: true,
+    },
+  },
+})
 
 const now = DateTime.now()
 const date = now.plus({ days: 1 }).toFormat('d/M/yyyy')
@@ -111,6 +126,14 @@ describe('/middleware/appointmentDateIsInPast()', () => {
   })
   it('should return false if not post request and no date set in appointment session', () => {
     const req = buildRequest({ method: 'GET', appointment: { date: '', start: '', end: '' } })
+    expect(appointmentDateIsInPast(req, res)).toEqual(false)
+  })
+  it('should return false if next appointment ID is in session and date is in future', () => {
+    const req = buildRequest({
+      method: 'GET',
+      appointmentId: nextAppointmentId,
+      appointment: { date, start: '10:00', end: '10:30' },
+    })
     expect(appointmentDateIsInPast(req, res)).toEqual(false)
   })
 })

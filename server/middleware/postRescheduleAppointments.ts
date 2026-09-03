@@ -44,7 +44,7 @@ export const postRescheduleAppointments = (
       user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
-    const isInPast = appointmentDateIsInPast(req)
+    const isInPast = appointmentDateIsInPast(req, res)
     const { contactId } = rescheduleAppointment
     const body: RescheduleAppointmentRequestBody = {
       date,

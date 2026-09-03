@@ -6,6 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
 import { checkAppointments } from './checkAppointments'
 import { AppointmentChecks } from '../models/Appointments'
+import { mockAppResponse } from '../controllers/mocks'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -16,16 +17,29 @@ jest.mock('../data/tokenStore/redisTokenStore')
 const crn = 'X000001'
 const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
 const username = 'user-1'
-const res = {
-  locals: {
-    user: {
-      username,
-    },
-    case: { name: { forename: 'Test', surname: 'User' } },
+
+const res = mockAppResponse({
+  user: {
+    username,
   },
-  render: jest.fn().mockReturnThis(),
-  redirect: jest.fn().mockReturnThis(),
-} as unknown as AppResponse
+  flags: {
+    enableCombinedCYAPage: true,
+  },
+  case: { name: { forename: 'Test', surname: 'User' } },
+})
+// const res = {
+//   locals: {
+//     user: {
+//       username,
+//     },
+//     flags: {
+//       enableCombinedCYAPage: true,
+//     },
+//     case: { name: { forename: 'Test', surname: 'User' } },
+//   },
+//   render: jest.fn().mockReturnThis(),
+//   redirect: jest.fn().mockReturnThis(),
+// } as unknown as AppResponse
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
@@ -185,6 +199,9 @@ describe('past appointments feature flag is disabled', () => {
     locals: {
       user: {
         username,
+      },
+      flags: {
+        enableCombinedCYAPage: true,
       },
       case: { name: { forename: 'Test', surname: 'User' } },
     },

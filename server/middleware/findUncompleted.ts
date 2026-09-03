@@ -6,12 +6,16 @@ import { Route } from '../@types'
 export const findUncompleted = ({ forceValidation = false } = {}): Route<string | null> => {
   return function findUncompletedInner(req, res) {
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
-    const id = uuid || contactId
+    let id = uuid || contactId
     const { change } = req.query as Record<string, string>
     const changeUrl = change ? encodeURIComponent(change) : encodeURIComponent(req.url)
     const data = req?.session?.data ?? {}
+    if (res?.locals?.flags?.enableCombinedCYAPage) {
+      const nextAppointmentId = getDataValue<string>(data, ['temp', crn, 'nextAppointmentId']) || null
+      id = nextAppointmentId || id
+    }
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-    const dateInPast = appointmentDateIsInPast(req)
+    const dateInPast = appointmentDateIsInPast(req, res)
     const mapping: [string | undefined, string][] = [
       [appointment?.eventId, 'sentence'],
       [appointment?.type, 'type-attendance'],

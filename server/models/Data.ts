@@ -33,6 +33,7 @@ export interface Data {
   temp?: {
     [crn: string]: {
       linkedContactId?: string
+      nextAppointmentId?: string
       responseContactId?: string
     }
   }

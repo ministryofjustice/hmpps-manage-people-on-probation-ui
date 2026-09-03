@@ -9,27 +9,21 @@ import {
   completeOutcome,
   completeRescheduleAppointmentPage,
   completeSentencePage,
-  completeSupportingInformationPage,
-  completeTextMessageConfirmationPage,
+  completeNextAppointmentJourney,
   completeTypePage,
   getUuid,
 } from '../appointments/utils'
 import { Journey } from './imports'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
-import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
-import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
-import { AppointmentSessionSelection } from '../../../server/models/Appointments'
 
 const crn = 'X000001'
 let manageAppointmentPage: ManageAppointmentPage
 let rescheduleCheckYourAnswerPage: RescheduleCheckYourAnswerPage
 let addNotePage: AddNotePage
 let nextAppointmentPage: NextAppointmentPage
-let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
 let checkYourAnswersPage: AppointmentCheckYourAnswersPage
-let confirmationPage: AppointmentConfirmationPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
 
 const loadNextAppointmentPage = (): void => {
@@ -66,37 +60,6 @@ const completeRescheduleJourney = () => {
   })
 }
 
-const completeNextAppointment = ({
-  type = 'KEEP_TYPE',
-  dateInPast = false,
-}: {
-  type?: AppointmentSessionSelection
-  dateInPast?: boolean
-} = {}): void => {
-  if (type === 'KEEP_TYPE') {
-    arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    arrangeAnotherAppointmentPage.getSubmitBtn().click()
-  }
-  getUuid(2).then(uuid => {
-    if (type === 'CHANGE_TYPE') {
-      completeSentencePage({ loadPage: false, crnOverride: crn, uuidOverride: uuid })
-      completeTypePage()
-    }
-    if (['KEEP_TYPE', 'CHANGE_TYPE'].includes(type)) {
-      completeLocationDateTimePage({ dateInPast, crnOverride: crn, uuidOveride: uuid })
-    }
-    if (!dateInPast) {
-      completeTextMessageConfirmationPage({ _crn: crn, _uuid: uuid, index: 1 })
-      completeSupportingInformationPage({ crnOverride: crn, uuidOveride: uuid, sensitivityIsLocked: false })
-    } else {
-      completeOutcome()
-      completeAddNotePage({ crnOverride: crn, idOverride: uuid, sensitivityIsLocked: false })
-    }
-    checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
-    checkYourAnswersPage.getSubmitBtn().click()
-  })
-}
-
 const past = DateTime.now().minus({ days: 1 })
 const future = DateTime.now().plus({ days: 2 })
 const expectedPastDate = `${past.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
@@ -108,7 +71,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
       beforeEach(() => {
         loadNextAppointmentPage()
       })
-      it('should complete next appointment journey and link back to outcome check your answers page', () => {
+      it('should complete next appointment journey and link to the outcome check your answers page', () => {
         nextAppointmentPage = new NextAppointmentPage()
         nextAppointmentPage.checkPageTitle('Eula’s next supervision appointment')
         cy.get('.govuk-inset-text').should(
@@ -120,22 +83,21 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .should('contain.text', 'Do you want to arrange another appointment with Eula?')
         cy.get(`.govuk-radios__input[value=KEEP_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
-        completeNextAppointment({ dateInPast: true })
-        confirmationPage = new AppointmentConfirmationPage()
-        confirmationPage.checkPageTitle('Past appointment arranged')
-        cy.get('.govuk-panel').should('not.exist')
-        cy.get('[data-qa="appointment-type"]').should('contain.text', '3 way meeting (NS)')
-        cy.get('[data-qa="appointment-date"]')
-          .invoke('text')
-          .then(text => {
-            const formatted = text.replace(/\s+/g, ' ').trim()
-            expect(formatted).to.equal(expectedPastDate)
-          })
-        cy.get('[data-qa=logAppointmentOutcome]')
-          .find('p')
-          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on 21 February 2024.`)
-        cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
+        completeNextAppointmentJourney({ dateInPast: true, isOutcomeJourney: true })
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+        checkYourAnswersOutcomePage.checkPageTitle(
+          'Check your answers then confirm the appointment outcome and next appointment',
+        )
+        cy.get('.govuk-summary-list')
+          .find('.govuk-summary-list__row')
+          .eq(0)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', '3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am')
+        cy.get('.govuk-summary-list')
+          .find('.govuk-summary-list__row')
+          .eq(4)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', '3 way meeting (NS) on Wednesday 2 September 2026 at 9am to 10am')
       })
     })
 
@@ -143,25 +105,26 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
       beforeEach(() => {
         loadNextAppointmentPage()
       })
-      it('should complete next appointment journey and link back to outcome check your answers page', () => {
+      it('should complete next appointment journey and link to the outcome check your answers page', () => {
         nextAppointmentPage = new NextAppointmentPage()
         cy.get(`.govuk-radios__input[value=CHANGE_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
-        completeNextAppointment({ type: 'CHANGE_TYPE', dateInPast: false })
-        confirmationPage = new AppointmentConfirmationPage()
-        confirmationPage.checkPageTitle('Appointment arranged')
-        cy.get('[data-qa="appointment-type"]').should('contain.text', 'Planned office visit (NS)')
-        cy.get('[data-qa="appointment-date"]')
-          .invoke('text')
-          .then(text => {
-            const formatted = text.replace(/\s+/g, ' ').trim()
-            expect(formatted).to.equal(expectedFutureDate)
-          })
-        cy.get('[data-qa=logAppointmentOutcome]')
-          .find('p')
-          .should('contain.text', `You can now finish logging the outcome for 3 Way Meeting (NS) on 21 February 2024.`)
-        cy.get('[data-qa="submit-btn"]').should('contain.text', 'Return to log appointment outcome').click()
+        completeNextAppointmentJourney({ type: 'CHANGE_TYPE', dateInPast: false, isOutcomeJourney: true })
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+        checkYourAnswersOutcomePage.checkPageTitle(
+          'Check your answers then confirm the appointment outcome and next appointment',
+        )
+        cy.get('.govuk-summary-list')
+          .find('.govuk-summary-list__row')
+          .eq(0)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', '3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am')
+
+        cy.get('.govuk-summary-list')
+          .find('.govuk-summary-list__row')
+          .eq(4)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'Planned office visit (NS) on Saturday 5 September 2026 at 9am to 10am')
       })
     })
     describe('No next appointment arranged', () => {
@@ -178,14 +141,14 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
   if (journey === 'RESCHEDULE') {
     it('should not display the next appointment page and redirect to the reschedule cya page', () => {
       completeRescheduleJourney()
-      checkYourAnswersOutcomePage = new AppointmentCheckYourAnswersPage()
+      checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
       checkYourAnswersPage.checkPageTitle('Change appointment details and reschedule')
     })
   }
   if (journey === 'ARRANGE') {
     it('should not display the next appointment page and redirect to the cya page', () => {
       completeArrangeAppointmentJourney()
-      checkYourAnswersOutcomePage = new AppointmentCheckYourAnswersPage()
+      checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
       checkYourAnswersPage.checkPageTitle('Check your answers then confirm the appointment')
     })
   }

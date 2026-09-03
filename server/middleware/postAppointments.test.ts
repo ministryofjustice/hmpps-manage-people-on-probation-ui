@@ -144,11 +144,15 @@ const appointmentTypes: AppointmentType[] = [
     isLocationRequired: true,
   },
 ]
-const createMockReq = (appointment: AppointmentSession) => {
+const createMockReq = ({
+  appointment,
+  nextAppointmentId = null,
+  _id = id,
+}: { appointment?: AppointmentSession; _id?: string; nextAppointmentId?: string } = {}) => {
   return httpMocks.createRequest({
     params: {
       crn,
-      id,
+      id: _id,
     },
     session: {
       data: {
@@ -160,13 +164,18 @@ const createMockReq = (appointment: AppointmentSession) => {
         },
         appointments: {
           [crn]: {
-            [id]: appointment,
+            [_id]: appointment,
           },
         },
         appointmentTypes,
         personalDetails: {
           [crn]: {
             overview: mockPersonalDetails,
+          },
+        },
+        temp: {
+          [crn]: {
+            nextAppointmentId,
           },
         },
       },
@@ -291,7 +300,13 @@ const buildResponse = ({
   const localsRes = {
     case: mockCase,
     user: mockUser,
-    flags: { enableMAN2344: true, enableSmsReminders: true, enableNonCompliance: false, ...flags },
+    flags: {
+      enableMAN2344: true,
+      enableSmsReminders: true,
+      enableNonCompliance: false,
+      enableCombinedCYAPage: true,
+      ...flags,
+    },
     ...locals,
   }
   return mockAppResponse(localsRes)
@@ -313,10 +328,19 @@ describe('/middleware/postAppointments', () => {
         .mockResolvedValue(mockOutlookEventResponse)
     })
     it('should add eventId to the request body if value in appointment session is not PERSON_LEVEL_CONTACT', async () => {
-      const mockReq = createMockReq(mockAppointment)
+      const mockReq = createMockReq({ appointment: mockAppointment })
       const res = buildResponse()
       const response = await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody()
+      expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
+      expect(response).toEqual(mockAppointmentsPostResponse)
+    })
+    it('should use nextAppointmentId from session if enableCombinedCYAPage flag is true', async () => {
+      const nextAppointmentId = '1234'
+      const mockReq = createMockReq({ appointment: mockAppointment, _id: nextAppointmentId, nextAppointmentId })
+      const res = buildResponse()
+      const response = await postAppointments(hmppsAuthClient)(mockReq, res)
+      const expectedRequestBody = getExpectedRequestBody({ uuid: nextAppointmentId })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
       expect(response).toEqual(mockAppointmentsPostResponse)
     })
@@ -325,7 +349,7 @@ describe('/middleware/postAppointments', () => {
         ...mockAppointment,
         eventId: 'PERSON_LEVEL_CONTACT',
       }
-      const mockReq = createMockReq(appointment)
+      const mockReq = createMockReq({ appointment })
       const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ eventId: undefined })
@@ -336,7 +360,7 @@ describe('/middleware/postAppointments', () => {
         ...mockAppointment,
         requirementId: undefined,
       }
-      const mockReq = createMockReq(appointment)
+      const mockReq = createMockReq({ appointment })
       const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ requirementId: undefined })
@@ -348,7 +372,7 @@ describe('/middleware/postAppointments', () => {
         ...mockAppointment,
         licenceConditionId: undefined,
       }
-      const mockReq = createMockReq(appointment)
+      const mockReq = createMockReq({ appointment })
       const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ licenceConditionId: undefined })
@@ -362,7 +386,7 @@ describe('/middleware/postAppointments', () => {
           outcomeCode: 'ATTC',
         },
       }
-      const mockReq = createMockReq(appointment)
+      const mockReq = createMockReq({ appointment })
       const res = buildResponse({ flags: { enableNonCompliance: true } })
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: true })
@@ -374,7 +398,7 @@ describe('/middleware/postAppointments', () => {
         ...mockAppointment,
         outcomeRecorded: undefined,
       }
-      const mockReq = createMockReq(appointment)
+      const mockReq = createMockReq({ appointment })
       const res = buildResponse({ flags: { enableNonCompliance: true } })
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: false })
@@ -386,7 +410,7 @@ describe('/middleware/postAppointments', () => {
         ...mockAppointment,
         nsiId: undefined,
       }
-      const mockReq = createMockReq(appointment)
+      const mockReq = createMockReq({ appointment })
       const res = buildResponse()
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ nsiId: undefined })
@@ -400,7 +424,7 @@ describe('/middleware/postAppointments', () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)
-        const mockReq = createMockReq(mockAppointment)
+        const mockReq = createMockReq({ appointment: mockAppointment })
         const res = buildResponse()
         await postAppointments(hmppsAuthClient)(mockReq, res)
         checkOutlookEventRequest()
@@ -411,17 +435,19 @@ describe('/middleware/postAppointments', () => {
           .mockResolvedValueOnce(mockOutlookEventResponse)
         const popFirstName = 'James'
         const mockReq = createMockReq({
-          ...mockAppointment,
-          smsOptIn: 'YES',
-          smsPreview: {
-            request: {
-              firstName: popFirstName,
-              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
-              includeWelshPreview: false,
-              appointmentLocation: 'Mock Location',
-              appointmentTypeCode: 'COAP',
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: {
+              request: {
+                firstName: popFirstName,
+                dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+                includeWelshPreview: false,
+                appointmentLocation: 'Mock Location',
+                appointmentTypeCode: 'COAP',
+              },
+              preview: { englishSmsPreview: '', welshSmsPreview: '' },
             },
-            preview: { englishSmsPreview: '', welshSmsPreview: '' },
           },
         })
         const res = buildResponse()
@@ -434,19 +460,21 @@ describe('/middleware/postAppointments', () => {
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce({ ...mockOutlookEventResponse, id: undefined })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          smsOptIn: 'YES',
-          smsPreview: {
-            request: {
-              firstName: 'James',
-              includeWelshPreview: false,
-              appointmentLocation: 'Mock Location',
-              appointmentTypeCode: 'COAP',
-              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
-            },
-            preview: {
-              englishSmsPreview: '',
-              welshSmsPreview: '',
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: {
+              request: {
+                firstName: 'James',
+                includeWelshPreview: false,
+                appointmentLocation: 'Mock Location',
+                appointmentTypeCode: 'COAP',
+                dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+              },
+              preview: {
+                englishSmsPreview: '',
+                welshSmsPreview: '',
+              },
             },
           },
         })
@@ -468,8 +496,10 @@ describe('/middleware/postAppointments', () => {
           roles: [],
         })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          user: { ...mockAppointment.user, email: '' },
+          appointment: {
+            ...mockAppointment,
+            user: { ...mockAppointment.user, email: '' },
+          },
         })
         const res = buildResponse()
 
@@ -487,7 +517,7 @@ describe('/middleware/postAppointments', () => {
             errors: [{ text: errorMessage }],
           } as any)
 
-        const mockReq = createMockReq(mockAppointment)
+        const mockReq = createMockReq({ appointment: mockAppointment })
         const res = buildResponse()
 
         await postAppointments(hmppsAuthClient)(mockReq, res)
@@ -514,7 +544,7 @@ describe('/middleware/postAppointments', () => {
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockRejectedValueOnce(timeoutError)
 
-        const mockReq = createMockReq(mockAppointment)
+        const mockReq = createMockReq({ appointment: mockAppointment })
         const res = buildResponse()
 
         const response = await postAppointments(hmppsAuthClient)(mockReq, res)
@@ -533,7 +563,7 @@ describe('/middleware/postAppointments', () => {
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockRejectedValueOnce(otherError)
 
-        const mockReq = createMockReq(mockAppointment)
+        const mockReq = createMockReq({ appointment: mockAppointment })
         const res = buildResponse()
 
         await expect(postAppointments(hmppsAuthClient)(mockReq, res)).rejects.toThrow(otherError)
@@ -542,9 +572,11 @@ describe('/middleware/postAppointments', () => {
     })
     describe('Attending user does not have email', () => {
       const mockReq = createMockReq({
-        ...mockAppointment,
-        user: { ...mockAppointment.user, email: null },
-        smsOptIn: 'YES',
+        appointment: {
+          ...mockAppointment,
+          user: { ...mockAppointment.user, email: null },
+          smsOptIn: 'YES',
+        },
       })
       const locals = { user: { ...mockUser, email: null as string } }
       const res = buildResponse({ locals })
@@ -586,9 +618,11 @@ describe('/middleware/postAppointments', () => {
           roles: [],
         })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          user: { ...mockAppointment.user, email: null },
-          smsOptIn: 'YES',
+          appointment: {
+            ...mockAppointment,
+            user: { ...mockAppointment.user, email: null },
+            smsOptIn: 'YES',
+          },
         })
         const locals = { user: { ...mockUser, email: null as string } }
         const res = buildResponse({ locals })
@@ -611,8 +645,10 @@ describe('/middleware/postAppointments', () => {
     describe('Attending user name is missing from the appointment session (stale staff cache lookup)', () => {
       const buildMockReq = () =>
         createMockReq({
-          ...mockAppointment,
-          user: { ...mockAppointment.user, name: null },
+          appointment: {
+            ...mockAppointment,
+            user: { ...mockAppointment.user, name: null },
+          },
         })
 
       it('should resolve and return the created appointment instead of throwing, when a fresh user lookup also has no name', async () => {
@@ -647,8 +683,10 @@ describe('/middleware/postAppointments', () => {
       it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null) and email is already present', async () => {
         const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = createMockReq({
-          ...mockAppointment,
-          user: { ...mockAppointment.user, name: { forename: '', surname: '' } },
+          appointment: {
+            ...mockAppointment,
+            user: { ...mockAppointment.user, name: { forename: '', surname: '' } },
+          },
         })
         const res = buildResponse()
 
@@ -672,8 +710,10 @@ describe('/middleware/postAppointments', () => {
       it('should capture a single combined Sentry exception when both name and email are still missing after fallback', async () => {
         jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = createMockReq({
-          ...mockAppointment,
-          user: { ...mockAppointment.user, name: null, email: null },
+          appointment: {
+            ...mockAppointment,
+            user: { ...mockAppointment.user, name: null, email: null },
+          },
         })
         const res = buildResponse()
 
@@ -773,19 +813,21 @@ describe('/middleware/postAppointments', () => {
             },
           })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          smsOptIn: 'YES',
-          smsPreview: {
-            request: {
-              firstName: 'James',
-              includeWelshPreview: false,
-              appointmentLocation: 'Mock Location',
-              appointmentTypeCode: 'COAP',
-              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
-            },
-            preview: {
-              englishSmsPreview: '',
-              welshSmsPreview: '',
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: {
+              request: {
+                firstName: 'James',
+                includeWelshPreview: false,
+                appointmentLocation: 'Mock Location',
+                appointmentTypeCode: 'COAP',
+                dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+              },
+              preview: {
+                englishSmsPreview: '',
+                welshSmsPreview: '',
+              },
             },
           },
         })
@@ -805,19 +847,21 @@ describe('/middleware/postAppointments', () => {
             },
           })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          smsOptIn: 'YES',
-          smsPreview: {
-            request: {
-              firstName: 'James',
-              includeWelshPreview: true,
-              appointmentLocation: 'Mock Location',
-              appointmentTypeCode: 'COAP',
-              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
-            },
-            preview: {
-              englishSmsPreview: '',
-              welshSmsPreview: '',
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: {
+              request: {
+                firstName: 'James',
+                includeWelshPreview: true,
+                appointmentLocation: 'Mock Location',
+                appointmentTypeCode: 'COAP',
+                dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+              },
+              preview: {
+                englishSmsPreview: '',
+                welshSmsPreview: '',
+              },
             },
           },
         })
@@ -837,19 +881,21 @@ describe('/middleware/postAppointments', () => {
             },
           })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          smsOptIn: 'YES',
-          smsPreview: {
-            request: {
-              firstName: 'James',
-              includeWelshPreview: false,
-              appointmentLocation: 'Mock Location',
-              appointmentTypeCode: 'COAP',
-              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
-            },
-            preview: {
-              englishSmsPreview: '',
-              welshSmsPreview: '',
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: {
+              request: {
+                firstName: 'James',
+                includeWelshPreview: false,
+                appointmentLocation: 'Mock Location',
+                appointmentTypeCode: 'COAP',
+                dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+              },
+              preview: {
+                englishSmsPreview: '',
+                welshSmsPreview: '',
+              },
             },
           },
         })
@@ -869,19 +915,21 @@ describe('/middleware/postAppointments', () => {
             },
           })
         const mockReq = createMockReq({
-          ...mockAppointment,
-          smsOptIn: 'YES',
-          smsPreview: {
-            request: {
-              firstName: 'James',
-              includeWelshPreview: false,
-              appointmentLocation: 'Mock Location',
-              appointmentTypeCode: 'COAP',
-              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
-            },
-            preview: {
-              englishSmsPreview: '',
-              welshSmsPreview: '',
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: {
+              request: {
+                firstName: 'James',
+                includeWelshPreview: false,
+                appointmentLocation: 'Mock Location',
+                appointmentTypeCode: 'COAP',
+                dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+              },
+              preview: {
+                englishSmsPreview: '',
+                welshSmsPreview: '',
+              },
             },
           },
         })

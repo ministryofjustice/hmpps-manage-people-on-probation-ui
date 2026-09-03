@@ -9,7 +9,7 @@ import { Compliance } from '../../data/model/overview'
 const crn = 'X000001'
 const contactId = '12345'
 
-const req = httpMocks.createRequest()
+const req = httpMocks.createRequest({ session: { data: {} } })
 
 const mockAppointment = ({ appointment = {} } = {}): Activity => ({
   id: '123',
@@ -117,13 +117,16 @@ const buildResponse = ({
   nextAppointment = null as any,
   outcome = {},
   notes = 'Some notes',
+  enableCombinedCYAPage = true,
 }: {
   appointment?: Activity
   nextAppointment?: Activity
   outcome?: Partial<AppointmentSessionOutcome>
   notes?: string
+  enableCombinedCYAPage?: boolean
 } = {}): AppResponse => {
   const locals = {
+    flags: { enableCombinedCYAPage },
     appointmentOutcome: mockAppointmentOutcome({ outcome, notes, appointment }),
     nextAppointment: {
       appointment: nextAppointment,
@@ -143,7 +146,6 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       outcome: 'Attended - complied',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'No next appointment',
       documents: null,
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
@@ -165,8 +167,29 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'No next appointment',
       documents: null,
+    }
+    expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
+  })
+
+  it('should create the correct summary with next appointment when enableCombinedCYAPage is false', () => {
+    const outcome: AppointmentSessionOutcome = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'NO_FURTHER_ACTION',
+      enforcementActionCode: ['NFA'],
+    }
+    const res = buildResponse({ outcome, enableCombinedCYAPage: false, nextAppointment: mockAppointment() })
+    getOutcomeSummary(req, res, nextSpy)
+    const expectedSummary: OutcomeSummary = {
+      appointmentDetails: expectedAppointmentDetails,
+      outcome: 'Attended - failed to comply',
+      enforcementAction: 'No further action',
+      enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
+      notes: 'Some notes',
+      sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
+      documents: null,
+      nextAppointment: 'Planned office visit (NS) on Friday 15 May 2026 at 12pm to 1:30pm',
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
   })
@@ -188,7 +211,6 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'No next appointment',
       documents: null,
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
@@ -224,7 +246,6 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       evidenceDueDate: '29 May 2026',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'No next appointment',
       documents: null,
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
@@ -255,7 +276,6 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       enforcementActionChangeLink: '/base/outcome/url/failed-to-attend',
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: 'No next appointment',
       evidenceDueDate: '22 May 2026',
       documents: ['FILE1', 'FILE2'],
     }
@@ -275,7 +295,6 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       outcome: 'Acceptable absence - holiday',
       notes: 'No notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      nextAppointment: expectedAppointmentDetails,
       documents: null,
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)

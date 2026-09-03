@@ -173,6 +173,14 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         back = getDataValue(data, ['backLink', 'manage'])
       }
+      const nextAppointmentId = getDataValue<string>(data, ['temp', crn, 'nextAppointmentId'])
+      const linkedContactId = getDataValue<string>(data, ['temp', crn, 'linkedContactId'])
+      if (nextAppointmentId) {
+        delete req.session.data.temp[crn].nextAppointmentId
+      }
+      if (linkedContactId) {
+        delete req.session.data.temp[crn].linkedContactId
+      }
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -408,6 +416,14 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId'])
+      const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId'])
+      if (nextAppointmentId) {
+        delete req.session.data.temp[crn].nextAppointmentId
+      }
+      if (linkedContactId) {
+        delete req.session.data.temp[crn].linkedContactId
+      }
       const outcomeJourney = req.url.includes('outcome/next-appointment')
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
       return res.render('pages/appointments/next-appointment', {
