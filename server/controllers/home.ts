@@ -17,8 +17,8 @@ const homeController: Controller<typeof routes, void> = {
       let appointmentsRequiringOutcome
       let appointmentsRequiringOutcomeCount
       const homePage: Homepage = await deliusClient.getHomepage(res.locals.user.username)
-      appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome
-      appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount
+      appointmentsRequiringOutcome = homePage.appointmentsRequiringOutcome ?? []
+      appointmentsRequiringOutcomeCount = homePage.appointmentsRequiringOutcomeCount ?? 0
 
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 

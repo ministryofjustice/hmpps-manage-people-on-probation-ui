@@ -12,7 +12,6 @@ export default class ProbationFrontendComponentsApiClient {
       path: '/api/components',
       query: `component=${components.join('&component=')}`,
       headers: { 'x-user-token': userToken },
-      handleTimeout: true,
     })
   }
 }

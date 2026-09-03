@@ -294,7 +294,9 @@ export default class MasApiClient extends RestClient {
       handle404: false,
       handleTimeout: true,
     })) as EnforcementContactsResponse
-
+    if ('errors' in enforcementContacts) {
+      return enforcementContacts
+    }
     return mapEnforcementContactsWithApprovedContactDisplayNames(enforcementContacts)
   }
 

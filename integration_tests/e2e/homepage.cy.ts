@@ -96,6 +96,7 @@ context('Sign In', () => {
   it('Handle API timeout in home page ', () => {
     cy.task('stubAlertsTimeout')
     cy.task('stubEnforcementsTimeout')
+    cy.task('stubFooterTimeout')
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
 
@@ -106,5 +107,11 @@ context('Sign In', () => {
     page.getOutcomesToLog().should('exist')
     page.getOutcomesToLog().should('contain.text', 'Outcomes to log (')
     page.getOutcomesToLogRows().should('have.length', 5)
+    cy.get('[data-qa="privacyPolicyLink"]')
+      .should('have.attr', 'href', '/privacy-policy')
+      .and('contain.text', 'Privacy policy')
+    cy.get('[data-qa="cookiesPolicyLink"]')
+      .should('have.attr', 'href', '/cookies-policy')
+      .and('contain.text', 'Cookies policy')
   })
 })
