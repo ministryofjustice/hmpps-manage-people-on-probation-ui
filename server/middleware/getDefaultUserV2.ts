@@ -32,12 +32,12 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         const isAvailableOption = usersMaybe.users.map(user => user.staffCode).includes(probationPractitioner.code)
         if (isAvailableOption) {
           attendingUsername = probationPractitioner.username
+          providerCode = probationPractitioner.provider.code
+          teamCode = probationPractitioner.team.code
           if (res.locals.flags.enableMAN2344) {
             attendingEmail = probationPractitioner.email
             attendingName = probationPractitioner.name
           }
-          providerCode = probationPractitioner.provider.code
-          teamCode = probationPractitioner.team.code
         } else {
           useProbationPractitioner = false
         }
@@ -50,6 +50,10 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         attendingUsername = defaultUserDetails?.username
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
+        if (res.locals.flags.enableMAN2344) {
+          attendingEmail = defaultUserDetails?.email
+          attendingName = defaultUserDetails?.name
+        }
       }
 
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)

@@ -2,10 +2,16 @@ import httpMocks, { RequestMethod } from 'node-mocks-http'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import { mockAppResponse, probationPractitioner, userProviders } from '../controllers/mocks'
+import {
+  mockAppResponse,
+  probationPractitioner,
+  probationPractitionerNoMatch,
+  userProviders,
+} from '../controllers/mocks'
 import { setDataValue } from '../utils'
 import { Provider, Team, User } from '../data/model/caseload'
 import { getDefaultUserV2 } from './getDefaultUserV2'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -31,6 +37,8 @@ const name = { forename: 'Terry', surname: 'Jones' }
 const email = 'terry.jones@testemail.com'
 const providerCode = 'N50'
 const teamCode = 'N07IVH'
+const defaultUserProviderCode = 'N54'
+const defaultUserTeamCode = 'N07CHT'
 
 const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} } = {}): httpMocks.MockRequest<any> => {
   const request = {
@@ -121,6 +129,231 @@ describe('/middleware/getDefaultUserV2()', () => {
           req.session.data,
           ['appointments', crn, uuid, 'user', 'name'],
           userProviders.defaultUserDetails?.name,
+        )
+        expect(nextSpy).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('Attending user has not been set in session', () => {
+    describe('MAN2334 feature flag is disabled / email is not required', () => {
+      const req = buildRequest({ user: {} })
+      const resNoFlag = mockAppResponse({ user: { username }, flags: { enableMAN2344: false } })
+
+      it('Probation practitioner exists and is available option', async () => {
+        await getDefaultUserV2(hmppsAuthClient)(req, resNoFlag, nextSpy)
+        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+        expect(getUserProvidersSpy).toHaveBeenCalledWith(
+          username,
+          probationPractitioner.provider.code,
+          probationPractitioner.team.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'providerCode'],
+          probationPractitioner.provider.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          probationPractitioner.team.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'username'],
+          probationPractitioner.username,
+        )
+        expect(nextSpy).toHaveBeenCalled()
+      })
+
+      it('Probation practitioner exists but is not available option', async () => {
+        getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(probationPractitionerNoMatch))
+        await getDefaultUserV2(hmppsAuthClient)(req, resNoFlag, nextSpy)
+        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(
+          1,
+          username,
+          probationPractitionerNoMatch.provider.code,
+          probationPractitionerNoMatch.team.code,
+        )
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'providerCode'],
+          defaultUserProviderCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          defaultUserTeamCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'username'],
+          userProviders.defaultUserDetails.username,
+        )
+        expect(nextSpy).toHaveBeenCalled()
+      })
+
+      it('Probation practitioner is unallocated', async () => {
+        getProbationPractitionerSpy.mockImplementationOnce(() =>
+          Promise.resolve({ unallocated: true } as ProbationPractitioner),
+        )
+        await getDefaultUserV2(hmppsAuthClient)(req, resNoFlag, nextSpy)
+        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+        expect(getUserProvidersSpy).toHaveBeenCalledWith(username)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'providerCode'],
+          defaultUserProviderCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          defaultUserTeamCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'username'],
+          userProviders.defaultUserDetails.username,
+        )
+        expect(nextSpy).toHaveBeenCalled()
+      })
+    })
+
+    describe('MAN2334 feature flag is enabled / email is required', () => {
+      const req = buildRequest({ user: {} })
+
+      it('Probation practitioner exists and is available option', async () => {
+        await getDefaultUserV2(hmppsAuthClient)(req, res, nextSpy)
+        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+        expect(getUserProvidersSpy).toHaveBeenCalledWith(
+          username,
+          probationPractitioner.provider.code,
+          probationPractitioner.team.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'providerCode'],
+          probationPractitioner.provider.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          probationPractitioner.team.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'username'],
+          probationPractitioner.username,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'email'],
+          probationPractitioner.email,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'name'],
+          probationPractitioner.name,
+        )
+        expect(nextSpy).toHaveBeenCalled()
+      })
+
+      it('Probation practitioner exists but is not available option', async () => {
+        getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(probationPractitionerNoMatch))
+        await getDefaultUserV2(hmppsAuthClient)(req, res, nextSpy)
+        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(
+          1,
+          username,
+          probationPractitionerNoMatch.provider.code,
+          probationPractitionerNoMatch.team.code,
+        )
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'providerCode'],
+          defaultUserProviderCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          defaultUserTeamCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'username'],
+          userProviders.defaultUserDetails.username,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'email'],
+          userProviders.defaultUserDetails.email,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'name'],
+          userProviders.defaultUserDetails.name,
+        )
+        expect(nextSpy).toHaveBeenCalled()
+      })
+
+      it('Probation practitioner is unallocated', async () => {
+        getProbationPractitionerSpy.mockImplementationOnce(() =>
+          Promise.resolve({ unallocated: true } as ProbationPractitioner),
+        )
+        await getDefaultUserV2(hmppsAuthClient)(req, res, nextSpy)
+        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+        expect(getUserProvidersSpy).toHaveBeenCalledWith(username)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          1,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'providerCode'],
+          defaultUserProviderCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          2,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          defaultUserTeamCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'username'],
+          userProviders.defaultUserDetails.username,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'email'],
+          userProviders.defaultUserDetails.email,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'name'],
+          userProviders.defaultUserDetails.name,
         )
         expect(nextSpy).toHaveBeenCalled()
       })
