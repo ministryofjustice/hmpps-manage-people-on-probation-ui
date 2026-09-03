@@ -1,5 +1,6 @@
 import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
+import * as Sentry from '@sentry/node'
 import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
 import { isValidHost, isValidPath } from '../utils'
@@ -17,8 +18,15 @@ jest.mock('../utils/isValidPath', () => {
   }
 })
 
+jest.mock('@sentry/node', () => ({
+  getClient: jest.fn(),
+  captureException: jest.fn(),
+}))
+
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
+const mockedSentryGetClient = Sentry.getClient as jest.Mock
+const mockedSentryCaptureException = Sentry.captureException as jest.Mock
 let restClient: RestClient
 
 beforeEach(() => {
@@ -384,6 +392,189 @@ describe('RestClient requestWithBody - 400 handling', () => {
         data: requestData,
       }),
     ).rejects.toThrow('http 400: Bad request from API')
+
+    expect(nock.isDone()).toBe(true)
+  })
+})
+
+describe('RestClient.get timeout handling', () => {
+  const timeoutMessage =
+    'We are having trouble loading some information right now. You can continue using the service or try again later.'
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedIsValidHost.mockReturnValue(true)
+    mockedIsValidPath.mockReturnValue(true)
+    mockedSentryGetClient.mockReturnValue({})
+    nock.cleanAll()
+  })
+
+  afterEach(() => {
+    nock.cleanAll()
+  })
+
+  it('should return a friendly error when timeout is handled', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    const response = await restClient.get<ErrorSummary>({
+      path: '/test',
+      handleTimeout: true,
+      errorMessage: timeoutMessage,
+    })
+
+    expect(response).toEqual({
+      errors: [
+        {
+          text: timeoutMessage,
+        },
+      ],
+    })
+
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('should throw timeout error when handleTimeout is false', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    await expect(
+      restClient.get({
+        path: '/test',
+        handleTimeout: false,
+      }),
+    ).rejects.toThrow('Timeout of 1000ms exceeded')
+
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('should capture timeout exception in Sentry', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    await restClient.get<ErrorSummary>({
+      path: '/test',
+      handleTimeout: true,
+      errorMessage: timeoutMessage,
+    })
+
+    expect(mockedSentryCaptureException).toHaveBeenCalledTimes(1)
+
+    expect(mockedSentryCaptureException).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Timeout of 1000ms exceeded',
+      }),
+      {
+        tags: {
+          'error.kind': 'timeout',
+          'request.path': '/test',
+          'api.name': 'api-name',
+        },
+      },
+    )
+  })
+
+  it('should not capture timeout in Sentry when Sentry client is unavailable', async () => {
+    mockedSentryGetClient.mockReturnValue(undefined)
+
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    const response = await restClient.get<ErrorSummary>({
+      path: '/test',
+      handleTimeout: true,
+      errorMessage: timeoutMessage,
+    })
+
+    expect(response).toEqual({
+      errors: [
+        {
+          text: timeoutMessage,
+        },
+      ],
+    })
+
+    expect(mockedSentryCaptureException).not.toHaveBeenCalled()
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('should use the supplied errorMessage for a handled timeout', async () => {
+    const customMessage =
+      'We are having trouble loading some information right now. You can continue using the service or try again later.'
+
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    const response = await restClient.get<ErrorSummary>({
+      path: '/test',
+      handleTimeout: true,
+      errorMessage: customMessage,
+    })
+
+    expect(response?.errors[0].text).toBe(customMessage)
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('should not retry timeout even when handleTimeout is true', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    const response = await restClient.get<ErrorSummary>({
+      path: '/test',
+      handleTimeout: true,
+      retry: true,
+      errorMessage: timeoutMessage,
+    })
+
+    expect(response?.errors[0].text).toBe(timeoutMessage)
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('should handle timeout when there is no HTTP response', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/test')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    const response = await restClient.get<ErrorSummary>({
+      path: '/test',
+      handleTimeout: true,
+      errorMessage: timeoutMessage,
+    })
+
+    expect(response).toEqual({
+      errors: [
+        {
+          text: timeoutMessage,
+        },
+      ],
+    })
 
     expect(nock.isDone()).toBe(true)
   })

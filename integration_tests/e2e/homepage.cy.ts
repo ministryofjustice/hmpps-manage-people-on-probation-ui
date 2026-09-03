@@ -92,4 +92,19 @@ context('Sign In', () => {
 
     Page.verifyOnPage(SearchPage)
   })
+
+  it('Handle API timeout in home page ', () => {
+    cy.task('stubAlertsTimeout')
+    cy.task('stubEnforcementsTimeout')
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+
+    cy.get('[class="moj-alert__content"]').should(
+      'contain.text',
+      'We are having trouble loading some information right now. You can continue using the service or try again later.',
+    )
+    page.getOutcomesToLog().should('exist')
+    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (')
+    page.getOutcomesToLogRows().should('have.length', 5)
+  })
 })

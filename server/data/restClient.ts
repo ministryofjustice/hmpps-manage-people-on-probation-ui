@@ -1,5 +1,6 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
+import * as Sentry from '@sentry/node'
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
@@ -21,6 +22,7 @@ interface Request {
   handle415?: boolean
   handle500?: boolean
   handle401?: boolean
+  handleTimeout?: boolean
   errorMessage?: string
   file?: Express.Multer.File
   isMultipart?: boolean
@@ -60,6 +62,7 @@ export default class RestClient {
     handle404 = false,
     handle500 = false,
     handle401 = false,
+    handleTimeout = false,
     errorMessage = '',
     retry = true,
   }: Request): Promise<TResponse | null> {
@@ -90,9 +93,28 @@ export default class RestClient {
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
-
       return raw ? (result as TResponse) : result.body
     } catch (error: any) {
+      if (handleTimeout && isTimeoutError(error)) {
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({
+          text: 'We are having trouble loading some information right now. You can continue using the service or try again later.',
+        })
+        if (Sentry.getClient()) {
+          const eventId = Sentry.captureException(error, {
+            tags: {
+              'error.kind': 'timeout',
+              'request.path': path,
+              'api.name': this.name,
+            },
+          })
+          logger.info(`Sentry timeout eventId: ${eventId}`)
+        }
+        return {
+          ...(error.response ?? {}),
+          errors: warnings,
+        } as TResponse
+      }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })
