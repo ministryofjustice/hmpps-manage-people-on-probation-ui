@@ -449,19 +449,19 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockedGetUserOptions).toHaveBeenCalled()
       expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        1,
+        4,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'providerCode'],
         providerCode,
       )
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        2,
+        5,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'teamCode'],
         teamCode,
       )
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        3,
+        6,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'username'],
         username,

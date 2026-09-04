@@ -240,10 +240,18 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { body, query, session } = req
       const { change } = query as Record<string, string>
       const { data } = session
+      const loggedInUsername = res.locals.user.username
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
-      const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
+
+      const providers = getDataValue(data, ['providers', 'temp', loggedInUsername])
+      const teams = getDataValue(data, ['teams', 'temp', loggedInUsername])
+      const staff = getDataValue<User[]>(data, ['staff', 'temp', loggedInUsername])
+      setDataValue(data, ['providers', loggedInUsername], providers)
+      setDataValue(data, ['teams', loggedInUsername], teams)
+      setDataValue(data, ['staff', loggedInUsername], staff)
+
       const staffMember = staff?.find(person => person.username === username)
       logger.info(
         `[postWhoWillAttend] uuid='${id}' loggedInUser='${res.locals.user.username}' selectedUsername='${username}' staffMemberFound=${Boolean(staffMember)}`,

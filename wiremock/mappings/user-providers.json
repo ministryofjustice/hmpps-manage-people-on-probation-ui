@@ -1,96 +1,7 @@
 {
   "mappings": [
     {
-      "request": {
-        "urlPattern": "/mas/user/USER1/providers",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "jsonBody": {
-          "defaultUserDetails": {
-            "username": "PETER-PARKER",
-            "name": {
-              "forename": "Peter",
-              "surname": "Parker"
-            },
-            "homeArea": "London",
-            "team": "Automated Allocation Team",
-            "email": "peter.parker@testemail.com"
-          },
-          "providers": [
-            {
-              "code": "N50",
-              "name": "Greater Manchester"
-            },
-            {
-              "code": "N07",
-              "name": "London"
-            },
-            {
-              "code": "N54",
-              "name": "North East Region"
-            }
-          ],
-          "teams": [
-            {
-              "description": "Automated Allocation Team",
-              "code": "N07AAT"
-            },
-            {
-              "description": "Automation SPG",
-              "code": "N07CHT"
-            },
-            {
-              "description": "Homelessness Prevention Team,",
-              "code": "N07HPT"
-            }
-          ],
-          "users": [
-            {
-              "username": "andy-best",
-              "nameAndRole": "andy best (PS-PSO)",
-              "name": {
-                "forename": "Andy",
-                "surname": "Best"
-              },
-              "email": "andy.best@testemail.com"
-            },
-            {
-              "username": "peter-parker",
-              "nameAndRole": "peter parker (PS-PSO)",
-              "name": {
-                "forename": "Peter",
-                "surname": "Parker"
-              },
-              "email": "peter.parker@testemail.com"
-            },
-            {
-              "username": "tony-pan",
-              "nameAndRole": "tony pan (PS-PSO)",
-              "name": {
-                "forename": "Tony",
-                "surname": "Pan"
-              },
-              "email": "tony.pan@testemail.com"
-            },
-            {
-              "username": "terry-jones",
-              "name": {
-                "forename": "Terry",
-                "surname": "Jones"
-              },
-              "nameAndRole": "terry jones (PS-PSO)",
-              "email": "terry.jones@testemail.com"
-            }
-          ]
-        },
-        "headers": {
-          "Content-Type": "application/json"
-        }
-      }
-    },
-    {
+      "priority": 1,
       "request": {
         "urlPattern": "/mas/user/tony-pan/providers",
         "method": "GET"
@@ -98,6 +9,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
+          "id": "tony-pan",
           "defaultUserDetails": {
             "username": "PETER-PARKER",
             "name": {
@@ -190,6 +102,7 @@
       }
     },
     {
+      "priority": 3,
       "request": {
         "urlPathPattern": "/mas/user/USER1/providers",
         "queryParameters": {
@@ -202,6 +115,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
+          "id": "N50",
           "defaultUserDetails": {
             "username": "peter-parker",
             "name": {
@@ -285,6 +199,7 @@
       }
     },
     {
+      "priority": 2,
       "request": {
         "urlPathPattern": "/mas/user/USER1/providers",
         "queryParameters": {
@@ -300,6 +215,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
+          "id": "N50AHA",
           "defaultUserDetails": {
             "username": "PETER-PARKER",
             "name": {
@@ -383,6 +299,7 @@
       }
     },
     {
+      "priority": 3,
       "request": {
         "urlPathPattern": "/mas/user/USER1/providers",
         "queryParameters": {
@@ -395,6 +312,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
+          "id": "N07",
           "defaultUserDetails": {
             "username": "PETER-PARKER",
             "name": {
@@ -487,6 +405,7 @@
       }
     },
     {
+      "priority": 3,
       "request": {
         "urlPathPattern": "/mas/user/USER1/providers",
         "queryParameters": {
@@ -499,6 +418,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
+          "id": "N54",
           "defaultUserDetails": {
             "username": "PETER-PARKER",
             "name": {
@@ -573,6 +493,15 @@
               },
               "nameAndRole": "deborah fern (PS - Other)",
               "email": "deborah.fern@testemail.com"
+            },
+            {
+              "username": "IainChambers",
+              "name": {
+                "forename": "Iain",
+                "surname": "Chamber"
+              },
+              "email": "iain.chambersr@testemail.com",
+              "nameAndRole": "Iain Chambers (PS - Other)"
             }
           ]
         },
@@ -582,6 +511,108 @@
       }
     },
     {
+      "priority": 4,
+      "request": {
+        "urlPattern": "/mas/user/USER1/providers",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": "USER1",
+          "defaultUserDetails": {
+            "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
+            "homeArea": "London",
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "Automated Allocation Team",
+              "code": "N07AAT"
+            },
+            {
+              "description": "Automation SPG",
+              "code": "N07CHT"
+            },
+            {
+              "description": "Homelessness Prevention Team,",
+              "code": "N07HPT"
+            }
+          ],
+          "users": [
+            {
+              "username": "andy-best",
+              "nameAndRole": "andy best (PS-PSO)",
+              "name": {
+                "forename": "Andy",
+                "surname": "Best"
+              },
+              "email": "andy.best@testemail.com"
+            },
+            {
+              "username": "peter-parker",
+              "nameAndRole": "peter parker (PS-PSO)",
+              "name": {
+                "forename": "Peter",
+                "surname": "Parker"
+              },
+              "email": "peter.parker@testemail.com"
+            },
+            {
+              "username": "tony-pan",
+              "nameAndRole": "tony pan (PS-PSO)",
+              "name": {
+                "forename": "Tony",
+                "surname": "Pan"
+              },
+              "email": "tony.pan@testemail.com"
+            },
+            {
+              "username": "terry-jones",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
+            },
+            {
+              "username": "DeborahFern",
+              "name": {
+                "forename": "Deborah",
+                "surname": "Fern"
+              },
+              "nameAndRole": "deborah fern (PS - Other)",
+              "email": "deborah.fern@testemail.com"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "priority": 5,
       "request": {
         "urlPathPattern": "/mas/user/.*/providers",
         "method": "GET"
@@ -589,6 +620,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
+          "id": "any",
           "defaultUserDetails": {
             "username": "PETER-PARKER",
             "name": {
