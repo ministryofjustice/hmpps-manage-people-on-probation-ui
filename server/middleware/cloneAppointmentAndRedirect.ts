@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { AppointmentSession, AppointmentSessionSelection } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { getDataValue, setDataValue } from '../utils'
+import { deleteOutcomeVars } from './appointment-outcomes'
 
 export const cloneAppointmentAndRedirect = (
   appointmentToClone: AppointmentSession = {},
@@ -14,14 +15,7 @@ export const cloneAppointmentAndRedirect = (
     const uuid = apptType === 'RESCHEDULE' ? id : uuidv4()
     const { url } = req
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
-    const nextAppointmentId = req?.session?.data?.temp?.[crn]?.nextAppointmentId
-    const linkedContactId = req?.session?.data?.temp?.[crn]?.linkedContactId
-    if (nextAppointmentId) {
-      delete req.session.data.temp[crn].nextAppointmentId
-    }
-    if (linkedContactId) {
-      delete req.session.data.temp[crn].linkedContactId
-    }
+    deleteOutcomeVars(crn)(req, res)
     if (req.url.includes('/outcome/next-appointment')) {
       setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
       if (['KEEP_TYPE', 'CHANGE_TYPE'].includes(apptType) && uuid && res?.locals?.flags?.enableCombinedCYAPage) {
