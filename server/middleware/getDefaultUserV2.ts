@@ -1,7 +1,7 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { getDataValue, setDataValue } from '../utils'
+import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import { Name } from '../data/model/personalDetails'
 
 export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
@@ -10,14 +10,18 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const { username } = res.locals.user
     const { data } = req.session
 
+    // eslint-disable-next-line no-useless-escape
+    const regexIgnoreValuesInParentheses = /[\(\)]/
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
 
     let attendingUsername = getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) ?? null
+    let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
+    let provider = getDataValue(data, ['appointments', crn, id, 'user', 'provider']) ?? null
+    let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
+    let team = getDataValue(data, ['appointments', crn, id, 'user', 'team']) ?? null
     let attendingEmail: string
     let attendingName: Name
-    let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
-    let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
 
     if (!attendingUsername || !providerCode || !teamCode) {
       const probationPractitioner = await masClient.getProbationPractitioner(crn)
@@ -29,11 +33,12 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           probationPractitioner?.provider?.code,
           probationPractitioner?.team?.code,
         )
-        const isAvailableOption = usersMaybe.users.map(user => user.staffCode).includes(probationPractitioner.code)
-        if (isAvailableOption) {
-          attendingUsername = probationPractitioner.username
+        attendingUsername = usersMaybe.users.find(user => user.username === probationPractitioner.username)?.nameAndRole
+        if (attendingUsername !== undefined) {
           providerCode = probationPractitioner.provider.code
+          provider = probationPractitioner.provider.name
           teamCode = probationPractitioner.team.code
+          team = probationPractitioner.team.description
           if (res.locals.flags.enableMAN2344) {
             attendingEmail = probationPractitioner.email
             attendingName = probationPractitioner.name
@@ -46,10 +51,14 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       }
 
       if (!useProbationPractitioner) {
-        const { defaultUserDetails, providers, teams } = await masClient.getUserProviders(username)
-        attendingUsername = defaultUserDetails?.username
-        providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
-        teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
+        const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(username)
+        attendingUsername = users.find(
+          user => user.username === defaultUserDetails?.username?.toLowerCase(),
+        )?.nameAndRole
+        providerCode = providers.find(p => p.name === defaultUserDetails.homeArea)?.code
+        provider = defaultUserDetails?.homeArea
+        teamCode = teams.find(t => t.description === defaultUserDetails.team)?.code
+        team = defaultUserDetails?.team
         if (res.locals.flags.enableMAN2344) {
           attendingEmail = defaultUserDetails?.email
           attendingName = defaultUserDetails?.name
@@ -57,8 +66,11 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       }
 
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
+      setDataValue(data, ['appointments', crn, id, 'user', 'provider'], provider)
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
-      setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
+      setDataValue(data, ['appointments', crn, id, 'user', 'team'], team)
+      const nameAndRole = convertToTitleCase(attendingUsername, [], regexIgnoreValuesInParentheses)
+      setDataValue(data, ['appointments', crn, id, 'user', 'username'], nameAndRole)
       if (res.locals.flags.enableMAN2344) {
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
@@ -79,3 +91,4 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 }
 
 // NEED TO MAINTAIN CACHING
+// WHY IS STORING PROVIDERS, TEAMS, USERS NEEDED

@@ -36,9 +36,15 @@ const username = 'user-1'
 const name = { forename: 'Terry', surname: 'Jones' }
 const email = 'terry.jones@testemail.com'
 const providerCode = 'N50'
+const provider = 'London'
 const teamCode = 'N07IVH'
+const team = 'Automated Allocation Team'
+const nameAndRole = 'Deborah Fern (PS - Other)'
 const defaultUserProviderCode = 'N54'
+const defaultUserProvider = 'North East Region'
 const defaultUserTeamCode = 'N07CHT'
+const defaultUserTeam = 'Automation SPG'
+const defaultUserNameAndRole = 'Peter Parker (PS - Other)'
 
 const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} } = {}): httpMocks.MockRequest<any> => {
   const request = {
@@ -157,14 +163,26 @@ describe('/middleware/getDefaultUserV2()', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           2,
           req.session.data,
-          ['appointments', crn, uuid, 'user', 'teamCode'],
-          probationPractitioner.team.code,
+          ['appointments', crn, uuid, 'user', 'provider'],
+          provider,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           3,
           req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          probationPractitioner.team.code,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'team'],
+          team,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          req.session.data,
           ['appointments', crn, uuid, 'user', 'username'],
-          probationPractitioner.username,
+          nameAndRole,
         )
         expect(nextSpy).toHaveBeenCalled()
       })
@@ -189,14 +207,26 @@ describe('/middleware/getDefaultUserV2()', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           2,
           req.session.data,
-          ['appointments', crn, uuid, 'user', 'teamCode'],
-          defaultUserTeamCode,
+          ['appointments', crn, uuid, 'user', 'provider'],
+          defaultUserProvider,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           3,
           req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          defaultUserTeamCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'team'],
+          defaultUserTeam,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          req.session.data,
           ['appointments', crn, uuid, 'user', 'username'],
-          userProviders.defaultUserDetails.username,
+          defaultUserNameAndRole,
         )
         expect(nextSpy).toHaveBeenCalled()
       })
@@ -217,14 +247,26 @@ describe('/middleware/getDefaultUserV2()', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           2,
           req.session.data,
-          ['appointments', crn, uuid, 'user', 'teamCode'],
-          defaultUserTeamCode,
+          ['appointments', crn, uuid, 'user', 'provider'],
+          defaultUserProvider,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           3,
           req.session.data,
+          ['appointments', crn, uuid, 'user', 'teamCode'],
+          defaultUserTeamCode,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          4,
+          req.session.data,
+          ['appointments', crn, uuid, 'user', 'team'],
+          defaultUserTeam,
+        )
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          5,
+          req.session.data,
           ['appointments', crn, uuid, 'user', 'username'],
-          userProviders.defaultUserDetails.username,
+          defaultUserNameAndRole,
         )
         expect(nextSpy).toHaveBeenCalled()
       })
@@ -235,38 +277,14 @@ describe('/middleware/getDefaultUserV2()', () => {
 
       it('Probation practitioner exists and is available option', async () => {
         await getDefaultUserV2(hmppsAuthClient)(req, res, nextSpy)
-        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-        expect(getUserProvidersSpy).toHaveBeenCalledWith(
-          username,
-          probationPractitioner.provider.code,
-          probationPractitioner.team.code,
-        )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          1,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'providerCode'],
-          probationPractitioner.provider.code,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          2,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'teamCode'],
-          probationPractitioner.team.code,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          3,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'username'],
-          probationPractitioner.username,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          4,
+          6,
           req.session.data,
           ['appointments', crn, uuid, 'user', 'email'],
           probationPractitioner.email,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          5,
+          7,
           req.session.data,
           ['appointments', crn, uuid, 'user', 'name'],
           probationPractitioner.name,
@@ -277,40 +295,14 @@ describe('/middleware/getDefaultUserV2()', () => {
       it('Probation practitioner exists but is not available option', async () => {
         getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(probationPractitionerNoMatch))
         await getDefaultUserV2(hmppsAuthClient)(req, res, nextSpy)
-        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(
-          1,
-          username,
-          probationPractitionerNoMatch.provider.code,
-          probationPractitionerNoMatch.team.code,
-        )
-        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username)
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          1,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'providerCode'],
-          defaultUserProviderCode,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          2,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'teamCode'],
-          defaultUserTeamCode,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          3,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'username'],
-          userProviders.defaultUserDetails.username,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          4,
+          6,
           req.session.data,
           ['appointments', crn, uuid, 'user', 'email'],
           userProviders.defaultUserDetails.email,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          5,
+          7,
           req.session.data,
           ['appointments', crn, uuid, 'user', 'name'],
           userProviders.defaultUserDetails.name,
@@ -323,34 +315,14 @@ describe('/middleware/getDefaultUserV2()', () => {
           Promise.resolve({ unallocated: true } as ProbationPractitioner),
         )
         await getDefaultUserV2(hmppsAuthClient)(req, res, nextSpy)
-        expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-        expect(getUserProvidersSpy).toHaveBeenCalledWith(username)
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          1,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'providerCode'],
-          defaultUserProviderCode,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          2,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'teamCode'],
-          defaultUserTeamCode,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          3,
-          req.session.data,
-          ['appointments', crn, uuid, 'user', 'username'],
-          userProviders.defaultUserDetails.username,
-        )
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          4,
+          6,
           req.session.data,
           ['appointments', crn, uuid, 'user', 'email'],
           userProviders.defaultUserDetails.email,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
-          5,
+          7,
           req.session.data,
           ['appointments', crn, uuid, 'user', 'name'],
           userProviders.defaultUserDetails.name,
