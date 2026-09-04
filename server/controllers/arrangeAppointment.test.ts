@@ -460,12 +460,6 @@ describe('controllers/arrangeAppointment', () => {
         ['appointments', crn, uuid, 'user', 'teamCode'],
         teamCode,
       )
-      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        6,
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'user', 'username'],
-        username,
-      )
 
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
     })

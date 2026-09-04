@@ -50,7 +50,7 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           probationPractitioner?.provider?.code,
           probationPractitioner?.team?.code,
         )
-        attendingUsername = PPusers.find(user => user.username === probationPractitioner.username)?.nameAndRole
+        attendingUsername = PPusers.find(user => user?.username === probationPractitioner?.username)?.nameAndRole
         if (attendingUsername !== undefined) {
           providerCode = probationPractitioner.provider.code
           teamCode = probationPractitioner.team.code
@@ -74,7 +74,7 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           providers: defaultProviders,
           teams: defaultTeams,
           users: defaultUsers,
-        } = await masClient.getUserProviders(username)
+        } = await masClient.getUserProviders(username, providerCode, teamCode)
         attendingUsername = defaultUsers.find(
           user => user.username === defaultUserDetails?.username?.toLowerCase(),
         )?.nameAndRole

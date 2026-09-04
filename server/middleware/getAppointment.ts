@@ -4,9 +4,9 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType, YesNo } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
-import { convertToTitleCase, getDataValue } from '../utils'
+import { getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
-import { Location, Provider, Team, User } from '../data/model/caseload'
+import { Location, Provider, Team } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getAppointmentInner(req, res, next) {
@@ -19,8 +19,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const { forename } = currentCase.personalDetails.name
     const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
     const { data } = req.session
-    // eslint-disable-next-line no-useless-escape
-    const regexIgnoreValuesInParentheses = /[\(\)]/
 
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
@@ -92,21 +90,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
 
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
-      const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
       const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
       const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
-      let selectedUser = convertToTitleCase(
-        staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
-        [],
-        regexIgnoreValuesInParentheses,
-      )
-      if (!selectedUser) {
-        const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
-        if (name) {
-          const { forename: first, surname: last } = name
-          selectedUser = `${first} ${last}`
-        }
-      }
+      const selectedUser = staffId
 
       let attendingHtml = selectedUser
       let teamRegionHtml = ''

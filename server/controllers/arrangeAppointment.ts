@@ -95,6 +95,9 @@ const resetSessionValues = (req: Request, res: Response) => {
   }
 }
 
+// eslint-disable-next-line no-useless-escape
+const regexIgnoreValuesInParentheses = /[\(\)]/
+
 const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
   redirectToSentence: () => {
     return async function redirectToSentence(req, res) {
@@ -244,7 +247,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
-
       const providers = getDataValue(data, ['providers', 'temp', loggedInUsername])
       const teams = getDataValue(data, ['teams', 'temp', loggedInUsername])
       const staff = getDataValue<User[]>(data, ['staff', 'temp', loggedInUsername])
@@ -281,7 +283,12 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         )
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
-        setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
+        const user = convertToTitleCase(
+          staff?.find(u => u?.username === username)?.nameAndRole,
+          [],
+          regexIgnoreValuesInParentheses,
+        )
+        setDataValue(data, ['appointments', crn, id, 'user', 'username'], user)
         if (res.locals.flags.enableMAN2344) {
           const email = staffMember?.email ?? null
           const name = staffMember?.name ?? null
@@ -641,7 +648,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+      if (attending?.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
         if (attending?.name?.forename) {
           const formattedName =
             attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()

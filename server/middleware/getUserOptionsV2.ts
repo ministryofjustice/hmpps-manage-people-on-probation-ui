@@ -19,7 +19,8 @@ export const getUserOptionsV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const providerCode =
       providerCodeQuery || getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) || ''
     const teamCode =
-      teamCodeQuery || !providerCodeQuery ? getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) || '' : ''
+      teamCodeQuery ||
+      (!providerCodeQuery ? getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) || '' : '')
     const usernameSession =
       !providerCodeQuery && !teamCodeQuery
         ? getDataValue(data, ['appointments', crn, id, 'user', 'username']) || ''
@@ -99,9 +100,9 @@ export const getUserOptionsV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     res.locals.userStaff = userOptions
     res.locals.providerCode = providerCode
     res.locals.teamCode = teamCode
-    setDataValue(data, ['providers', 'temp', username], providers)
-    setDataValue(data, ['teams', 'temp', username], teams)
-    setDataValue(data, ['staff', 'temp', username], users)
+    setDataValue(data, ['providers', 'temp', username], providerOptions)
+    setDataValue(data, ['teams', 'temp', username], teamOptions)
+    setDataValue(data, ['staff', 'temp', username], userOptions)
 
     if (!next) {
       return null

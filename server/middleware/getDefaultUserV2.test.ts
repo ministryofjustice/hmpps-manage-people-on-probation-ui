@@ -153,7 +153,7 @@ describe('/middleware/getDefaultUserV2()', () => {
           probationPractitionerNoMatch.provider.code,
           probationPractitionerNoMatch.team.code,
         )
-        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username)
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username, null, null)
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           1,
           req.session.data,
@@ -181,7 +181,7 @@ describe('/middleware/getDefaultUserV2()', () => {
         )
         await getDefaultUserV2(hmppsAuthClient)(req, resNoFlag, nextSpy)
         expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-        expect(getUserProvidersSpy).toHaveBeenCalledWith(username)
+        expect(getUserProvidersSpy).toHaveBeenCalledWith(username, null, null)
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           1,
           req.session.data,
