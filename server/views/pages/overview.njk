@@ -243,60 +243,80 @@
     }) }}
 
   {% set checkin %}
-  {% set nextCheckin = offenderCheckinsByCRNResponse %}
-  {% set nextCheckinText %}
-  {% if nextCheckin.status === 'VERIFIED' %}
-    {% set checkinLinkText = 'View all online check in details' %}
-    {% set checkinHrefLink = manageCheckinLink %}
-    {% set checkinLabel = 'Next check in due' %}
-    {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
-        {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
-    {% else %}
-        {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
-    {% endif %}
-    {{ govukSummaryList({
-                rows: [
-                    {
-                        key: { html: '<span data-qa="nextCheckinDueLabel">' + checkinLabel + '</span>'},
-                        value: { html: '<span data-qa="nextCheckInValue">' + checkinText + '</span>'}
-                    },
-                    {
-                        key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
-                        value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span>'}
-                    },
-                    {
-                        key: { html: '<span data-qa="contactPrefLabel">Contact preferences</span>'},
-                        value: { html: '<span data-qa="contactPrefValue">' + nextCheckin.contactPreference | userFriendlyString + '</span>'}
-                    }
-                   ]
-            }) }}
-  {% endif %}
-  {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
-    {% set checkinLinkText = 'Set up online check ins'%}
-    {% set checkinHrefLink = checkinLink %}
-    {{ govukSummaryList({
-                rows: [
-                    {
-                        key: { html: '<span data-qa="checkinDueLabel">First check in due</span>'},
-                        value: { html: '<span data-qa="checkinDueValue">Online check ins not set up</span>'}
-                    }
-                ]
-            }) }}
-  {% endif %}
-  {% if nextCheckin.status === 'INACTIVE' %}
-    {% set checkinLinkText = 'View all online check in details' %}
-    {% set checkinHrefLink = manageCheckinLink %}
-    {{ govukSummaryList({
-          rows: [
-              {
-                  key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
-                  value: { html: '<span data-qa="checkinDueValue">Check ins stopped</span>'}
-              }
-          ]
-      }) }}
-  {% endif %}
+    {% set nextCheckin = offenderCheckinsByCRNResponse %}
+    {% set nextCheckinText %}
+      {% if nextCheckin.status === 'VERIFIED' %}
+        {% set checkinLinkText = 'Manage online check ins' %}
+        {% set checkinHrefLink = manageCheckinLink %}
+        {% set checkinLabel = 'Next online check in' %}
+        {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
+            {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
+        {% else %}
+            {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+        {% endif %}
+        {{ govukSummaryList({
+                    rows: [
+                        {
+                            key: { html: '<span data-qa="nextCheckinDueLabel">' + checkinLabel + '</span>'},
+                            value: { html: '<span data-qa="nextCheckInValue">' + checkinText + '</span>'}
+                        }
+                      ]
+                }) }}
+      {% endif %}
+      {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
+        {% set checkinLinkText = 'Set up online check ins'%}
+        {% set checkinHrefLink = checkinLink %}
+        {% if flags.enableEsupEligibilityCheck === true %}
+          {{ govukSummaryList({
+                      rows: [
+                          {
+                              key: { html: '<span data-qa="checkinDueLabel">Status</span>'},
+                              value: { html: '<span data-qa="checkinDueValue">' + checkinEligibility.message + '</span>'}
+                          }
+                      ]
+                  }) }}
+        {% else %}
+          {{ govukSummaryList({
+                      rows: [
+                          {
+                              key: { html: '<span data-qa="checkinDueLabel">Status</span>'},
+                              value: { html: '<span data-qa="checkinDueValue">Online check ins not set up</span>'}
+                          }
+                      ]
+                  }) }}
+        {% endif %}
+      {% endif %}
+      {% if nextCheckin.status === 'INACTIVE' %}
+        {% set checkinLinkText = 'View all online check in details' %}
+        {% set checkinHrefLink = manageCheckinLink %}
+        {{ govukSummaryList({
+              rows: [
+                  {
+                      key: { html: '<span data-qa="checkinDueLabel">Status</span>'},
+                      value: { html: '<span data-qa="checkinDueValue">Check ins stopped</span>'}
+                  }
+              ]
+          }) }}
+      {% endif %}
+    {% endset %}
   {% endset %}
-  {% endset %}
+  {% if flags.enableEsupEligibilityCheck === true %}
+    {{ appSummaryCard({
+        titleText: 'Online check ins',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinCard'},
+        html: nextCheckinText,
+        actions: {
+            items: [
+                {
+                    text: checkinLinkText,
+                    href: checkinHrefLink
+                }
+            ]
+        } if canAccessCheckins and checkinEligibility.outcome === 'ELIGIBLE'
+    }) }}
+  {% else %}
     {{ appSummaryCard({
         titleText: 'Online check ins',
         headingLevel: 3,
@@ -312,6 +332,7 @@
             ]
         } if canAccessCheckins
     }) }}
+  {% endif %}
 
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}
