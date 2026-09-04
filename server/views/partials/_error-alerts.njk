@@ -20,19 +20,19 @@
     {% set errors = errors.concat(personExistsResponse.errors) %}
 {% endif %}
 {% if enforcementContactResponse and enforcementContactResponse.timeoutError %}
-    {% set errors = errors.concat(enforcementContactResponse.timeoutError) %}
+    {% set errors = enforcementContactResponse.timeoutError %}
 {% endif %}
 {% if appointmentsTimeoutError %}
-    {% set errors = errors.concat(appointmentsTimeoutError) %}
+    {% set errors = appointmentsTimeoutError %}
 {% endif %}
 {% if alertsCount and alertsCount.timeoutError %}
-    {% set errors = errors.concat(alertsCount.timeoutError) %}
+    {% set errors = alertsCount.timeoutError %}
 {% endif %}
 {% if homePageTimeOutError and homePageTimeOutError %}
-    {% set errors = errors.concat(homePageTimeOutError) %}
+    {% set errors = homePageTimeOutError %}
 {% endif %}
 {% if user and user.timeoutError %}
-    {% set errors = errors.concat(user.timeoutError) %}
+    {% set errors = user.timeoutError %}
 {% endif %}
 
 
