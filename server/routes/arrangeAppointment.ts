@@ -7,7 +7,7 @@ import {
   getSentences,
   getAppointmentTypes,
   getAppointment,
-  getDefaultUser,
+  getDefaultUserV2,
   getUserOptions,
   routeChangeAttendee,
   getSmsPreview,
@@ -36,6 +36,7 @@ import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
 import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
+import { getUserOptionsV2 } from '../middleware/getUserOptionsV2'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -75,7 +76,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     restrictPageAccess({ requiredValues: ['eventId'] }),
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getDefaultUser(hmppsAuthClient),
+    getDefaultUserV2(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     forceValidation,
     controllers.arrangeAppointments.getTypeAttendance(),
@@ -92,7 +93,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
     restrictPageAccess({ requiredValues: ['eventId'] }),
-    getUserOptions(hmppsAuthClient),
+    getUserOptionsV2(hmppsAuthClient),
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
   router.post(

@@ -89,23 +89,28 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
-      const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
-      const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
-      const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
-      const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
-      const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
-      let selectedUser = convertToTitleCase(
-        staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
-        [],
-        regexIgnoreValuesInParentheses,
-      )
-      if (!selectedUser) {
-        const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
-        if (name) {
-          const { forename: first, surname: last } = name
-          selectedUser = `${first} ${last}`
-        }
-      }
+
+      // const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
+      // const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
+      // const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
+      // const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
+      // const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
+      // let selectedUser = convertToTitleCase(
+      //   staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
+      //   [],
+      //   regexIgnoreValuesInParentheses,
+      // )
+      // if (!selectedUser) {
+      //   const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
+      //   if (name) {
+      //     const { forename: first, surname: last } = name
+      //     selectedUser = `${first} ${last}`
+      //   }
+      // }
+
+      const selectedUser = getDataValue(data, ['appointments', crn, id, 'user', 'username']) ?? ''
+      const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'team']) ?? ''
+      const selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'provider']) ?? ''
 
       let attendingHtml = selectedUser
       let teamRegionHtml = ''
