@@ -96,7 +96,6 @@ context('Sign In', () => {
   it('Handle API timeout in home page ', () => {
     cy.task('stubAlertsTimeout')
     cy.task('stubEnforcementsTimeout')
-    cy.task('stubFooterTimeout')
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
 

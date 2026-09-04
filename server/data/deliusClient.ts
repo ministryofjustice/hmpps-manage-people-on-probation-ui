@@ -8,7 +8,7 @@ export default class DeliusClient extends RestClient {
   }
 
   async getHomepage(username: string): Promise<Homepage> {
-    return this.get({ path: `/user/${username}/homepage`, handleTimeout: true })
+    return this.get({ path: `/user/${username}/homepage` })
   }
 }
 
@@ -23,6 +23,7 @@ export interface Homepage {
   appointmentsRequiringOutcome: AppointmentSummary[]
   appointmentsRequiringOutcomeCount: number
   enforcementContacts?: EnforcementContact[]
+  timeoutError?: any
 }
 
 export interface AppointmentSummary {

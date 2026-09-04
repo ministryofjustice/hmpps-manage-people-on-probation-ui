@@ -11,6 +11,7 @@ import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
 import 'multer'
 import isTimeoutError from '../utils/isTimeoutError'
+import { matchesTimeoutPath, timeoutUrlPaths } from '../middleware/checkTimeoutURL'
 
 interface Request {
   path: string
@@ -22,7 +23,6 @@ interface Request {
   handle415?: boolean
   handle500?: boolean
   handle401?: boolean
-  handleTimeout?: boolean
   errorMessage?: string
   file?: Express.Multer.File
   isMultipart?: boolean
@@ -62,7 +62,6 @@ export default class RestClient {
     handle404 = false,
     handle500 = false,
     handle401 = false,
-    handleTimeout = false,
     errorMessage = '',
     retry = true,
   }: Request): Promise<TResponse | null> {
@@ -95,7 +94,7 @@ export default class RestClient {
         .timeout(this.timeoutConfig())
       return raw ? (result as TResponse) : result.body
     } catch (error: any) {
-      if (handleTimeout && isTimeoutError(error)) {
+      if (matchesTimeoutPath(path, timeoutUrlPaths) && isTimeoutError(error)) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({
           text: 'We are having trouble loading some information right now. You can continue using the service or try again later.',
@@ -112,8 +111,8 @@ export default class RestClient {
         }
         return {
           ...(error.response ?? {}),
-          errors: warnings,
-        } as TResponse
+          timeoutError: warnings,
+        }
       }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []

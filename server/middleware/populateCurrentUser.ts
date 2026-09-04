@@ -25,7 +25,12 @@ export default function populateCurrentUser(
         }
         if (userDetails) {
           const { staff, ...userDetailsRest } = userDetails
-          localsUser = { ...userDetailsRest, ...localsUser, userId: userDetails.userId?.toString() }
+          localsUser = {
+            ...userDetailsRest,
+            ...localsUser,
+            userId: userDetails.userId?.toString(),
+            timeoutError: userDetails?.timeoutError,
+          }
           if (staff?.probationDeliveryUnits) {
             localsUser.probationDeliveryUnits = staff.probationDeliveryUnits
           }

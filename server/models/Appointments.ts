@@ -386,6 +386,7 @@ export interface MasUserDetails {
   staff?: {
     probationDeliveryUnits?: ProbationDeliveryUnit[]
   }
+  timeoutError?: any
 }
 
 export interface AttendedCompliedAppointment {

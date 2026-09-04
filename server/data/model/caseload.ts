@@ -89,6 +89,7 @@ export interface UserAppontment {
     description: string
     date: string
   }[]
+  timeoutError?: any
 }
 
 export interface UserLocation {

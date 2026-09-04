@@ -292,7 +292,6 @@ export default class MasApiClient extends RestClient {
     const enforcementContacts = (await this.get({
       path: `/contact/${username}/enforcements?${queryParameters.toString()}`,
       handle404: false,
-      handleTimeout: true,
     })) as EnforcementContactsResponse
     if ('errors' in enforcementContacts) {
       return enforcementContacts
@@ -574,7 +573,6 @@ export default class MasApiClient extends RestClient {
       handle404: true,
       handle500: true,
       errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
-      handleTimeout: true,
     })
   }
 
