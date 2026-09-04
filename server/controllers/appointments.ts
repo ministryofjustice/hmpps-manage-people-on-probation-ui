@@ -24,6 +24,7 @@ import {
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
+import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 
 const routes = [
   'getAppointments',
@@ -173,14 +174,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         back = getDataValue(data, ['backLink', 'manage'])
       }
-      const nextAppointmentId = getDataValue<string>(data, ['temp', crn, 'nextAppointmentId'])
-      const linkedContactId = getDataValue<string>(data, ['temp', crn, 'linkedContactId'])
-      if (nextAppointmentId) {
-        delete req.session.data.temp[crn].nextAppointmentId
-      }
-      if (linkedContactId) {
-        delete req.session.data.temp[crn].linkedContactId
-      }
+      deleteOutcomeVars(crn)(req, res)
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -416,14 +410,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId'])
-      const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId'])
-      if (nextAppointmentId) {
-        delete req.session.data.temp[crn].nextAppointmentId
-      }
-      if (linkedContactId) {
-        delete req.session.data.temp[crn].linkedContactId
-      }
+      deleteOutcomeVars(crn)(req, res)
       const outcomeJourney = req.url.includes('outcome/next-appointment')
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
       return res.render('pages/appointments/next-appointment', {

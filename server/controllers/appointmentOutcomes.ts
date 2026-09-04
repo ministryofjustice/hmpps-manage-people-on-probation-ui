@@ -7,6 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
 import { getDataValue, setDataValue } from '../utils'
+import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -148,18 +149,12 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       let nextAppointmentId: string = null
       if (res.locals.flags.enableCombinedCYAPage) {
         const { crn } = res.locals.appointmentOutcome
-        const responseContactId = getDataValue<string>(req.session.data, ['temp', crn, 'responseContactId'])
-        const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId'])
-        nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
+        const responseContactId = req?.session?.data?.temp?.[crn]?.responseContactId
         if (responseContactId) {
           delete req.session.data.temp[crn].responseContactId
         }
-        if (linkedContactId) {
-          delete req.session.data.temp[crn].linkedContactId
-        }
-        if (nextAppointmentId) {
-          delete req.session.data.temp[crn].nextAppointmentId
-        }
+        deleteOutcomeVars(crn)(req, res)
+        nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
       }
       return res.render('pages/appointment-outcomes/confirmation', { nextAppointmentId })
     }
