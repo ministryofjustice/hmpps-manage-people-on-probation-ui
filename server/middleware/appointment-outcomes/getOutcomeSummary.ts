@@ -73,8 +73,11 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     const outcome = getSelectedOutcome()
 
     let appointmentDetails = null
-    if (appointment?.type && appointment?.startDateTime && appointment?.endDateTime) {
-      appointmentDetails = `${toSentenceCase(appointment.type)} on ${dateWithDayAndWithYear(appointment.startDateTime)} at ${govukTime(appointment.startDateTime)} to ${govukTime(appointment.endDateTime)}`
+    if (appointment?.type && appointment?.startDateTime) {
+      appointmentDetails = `${toSentenceCase(appointment.type)} on ${dateWithDayAndWithYear(appointment.startDateTime)} at ${govukTime(appointment.startDateTime)}`
+      if (appointment?.endDateTime) {
+        appointmentDetails = `${appointmentDetails} to ${govukTime(appointment.endDateTime)}`
+      }
     }
 
     summary = {
