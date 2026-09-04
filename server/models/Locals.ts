@@ -117,6 +117,7 @@ interface Locals {
   tierDetails?: LatestTierResponse
   tierChangePrompt?: TierChangePrompt
   finalThirdPrompt?: FinalThirdPrompt
+  oasysLink?: string
   supervisionPackageDetails?: SupervisionPackage | null
   supervisionPackageAttempted?: boolean
   predictorScores?: TimelineItem
