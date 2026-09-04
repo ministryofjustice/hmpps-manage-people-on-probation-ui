@@ -153,8 +153,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         if (responseContactId) {
           delete req.session.data.temp[crn].responseContactId
         }
-        deleteOutcomeVars(crn)(req, res)
         nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
+        deleteOutcomeVars(crn)(req, res)
       }
       return res.render('pages/appointment-outcomes/confirmation', { nextAppointmentId })
     }
