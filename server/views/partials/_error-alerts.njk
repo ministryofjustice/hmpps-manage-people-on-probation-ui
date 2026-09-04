@@ -19,6 +19,23 @@
 {% if personExistsResponse and personExistsResponse.errors | length %}
     {% set errors = errors.concat(personExistsResponse.errors) %}
 {% endif %}
+{% if enforcementContactResponse and enforcementContactResponse.timeoutError %}
+    {% set errors = enforcementContactResponse.timeoutError %}
+{% endif %}
+{% if appointmentsTimeoutError %}
+    {% set errors = appointmentsTimeoutError %}
+{% endif %}
+{% if alertsCount and alertsCount.timeoutError %}
+    {% set errors = alertsCount.timeoutError %}
+{% endif %}
+{% if homePageTimeOutError and homePageTimeOutError %}
+    {% set errors = homePageTimeOutError %}
+{% endif %}
+{% if user and user.timeoutError %}
+    {% set errors = user.timeoutError %}
+{% endif %}
+
+
 {% if errors.length > 0 %}
   {% set errorsHtml %}
     {% if errors.length > 1 %}

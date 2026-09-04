@@ -26,6 +26,7 @@ export interface UserAlerts {
   totalPages: number
   page: number
   size: number
+  timeoutError?: any
 }
 
 export interface ClearAlertsRequest {

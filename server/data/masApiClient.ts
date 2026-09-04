@@ -293,7 +293,9 @@ export default class MasApiClient extends RestClient {
       path: `/contact/${username}/enforcements?${queryParameters.toString()}`,
       handle404: false,
     })) as EnforcementContactsResponse
-
+    if ('errors' in enforcementContacts) {
+      return enforcementContacts
+    }
     return mapEnforcementContactsWithApprovedContactDisplayNames(enforcementContacts)
   }
 

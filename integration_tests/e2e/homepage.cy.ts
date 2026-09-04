@@ -92,4 +92,25 @@ context('Sign In', () => {
 
     Page.verifyOnPage(SearchPage)
   })
+
+  it('Handle API timeout in home page ', () => {
+    cy.task('stubAlertsTimeout')
+    cy.task('stubEnforcementsTimeout')
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+
+    cy.get('[class="moj-alert__content"]').should(
+      'contain.text',
+      'We are having trouble loading some information right now. You can continue using the service or try again later.',
+    )
+    page.getOutcomesToLog().should('exist')
+    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (')
+    page.getOutcomesToLogRows().should('have.length', 5)
+    cy.get('[data-qa="privacyPolicyLink"]')
+      .should('have.attr', 'href', '/privacy-policy')
+      .and('contain.text', 'Privacy policy')
+    cy.get('[data-qa="cookiesPolicyLink"]')
+      .should('have.attr', 'href', '/cookies-policy')
+      .and('contain.text', 'Cookies policy')
+  })
 })

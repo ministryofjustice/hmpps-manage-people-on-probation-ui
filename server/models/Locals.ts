@@ -94,6 +94,7 @@ export interface LocalsUser {
   displayName?: string
   token: string
   probationDeliveryUnits?: ProbationDeliveryUnit[]
+  timeoutError?: any
 }
 
 interface Locals {
