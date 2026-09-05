@@ -70,7 +70,7 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
       startDateTime,
     }
   }
-  const isInPast = appointmentDateIsInPast(req)
+  const isInPast = appointmentDateIsInPast(req, res)
   const attendedFailedToComply = appointmentSession?.outcome?.attendedFailedToComply
   const unacceptableAbsence = appointmentSession?.outcome?.unacceptableAbsence
   const updateEnforcementAction = appointmentSession?.outcome?.updateEnforcementAction

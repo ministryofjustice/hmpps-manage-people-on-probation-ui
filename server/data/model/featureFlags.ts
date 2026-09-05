@@ -39,4 +39,5 @@ export class FeatureFlags {
   enableSearchV2?: boolean = undefined
   enableAsYouTypeSearch?: boolean = undefined
   enableMAN3255?: boolean = undefined
+  enableCombinedCYAPage?: boolean = undefined
 }

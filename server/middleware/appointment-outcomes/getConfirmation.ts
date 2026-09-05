@@ -1,9 +1,9 @@
-import { Route } from '../../@types'
-import { Activity } from '../../data/model/schedule'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
-import { dateWithYear, dayOfWeek, govukTime } from '../../utils'
-import { enforcementActionMap } from '../../properties/appointment-outcomes'
+import type { Route } from '../../@types'
+import type { Activity } from '../../data/model/schedule'
+import type { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../models/Appointments'
 import type { OutcomeConfirmationAction, OutcomeConfirmation, AppointmentOutcomeProps } from '../../models/Locals'
+import { dateWithYear, dayOfWeek, getDataValue, govukTime } from '../../utils'
+import { enforcementActionMap } from '../../properties/appointment-outcomes'
 import config from '../../config'
 
 export const getConfirmation: Route<void> = (req, res, next): void => {
@@ -12,17 +12,32 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   const {
     crn,
     id,
+    forename,
     appointmentSession,
     appointment,
+    nextAppointment,
     sentence: { type: sentenceType },
   } = appointmentOutcome
-
+  const nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
+  const confirmNextAppointment = nextAppointmentId && res.locals.flags.enableCombinedCYAPage
   let title = 'Enforcement outcome added'
+  if (confirmNextAppointment) {
+    title = 'Enforcement outcome updated and next appointment arranged'
+  }
   const actions: OutcomeConfirmationAction[] = []
   let hasActions = true
   const noDiaryActionText = 'This outcome has been saved against the appointment on NDelius.'
   const diaryActionText = 'This enforcement outcome has been added to the NDelius Enforcement Diary.'
-  let text = [diaryActionText]
+  const nextAppointmentText = [
+    `You’ve arranged a ${nextAppointment?.label}.`,
+    `${forename} will receive a confirmation text message with the new appointment details.`,
+  ]
+  const recallAction: OutcomeConfirmationAction = {
+    text: 'use the Consider a recall service',
+    href: config.recall.link,
+    external: true,
+  }
+  let text = confirmNextAppointment ? [diaryActionText, ...nextAppointmentText] : [diaryActionText]
   const { date, start, end } = appointmentSession
   const type = appointment?.type || null
   const appointmentDate = `${dayOfWeek(date)} ${dateWithYear(date)} from ${govukTime(start)} to ${govukTime(end)}`
@@ -51,8 +66,13 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     'ACCEPTABLE_ABSENCE',
   ]
   if (outcomes.includes(appointmentSession.outcome.outcomeType)) {
-    title = 'Appointment outcome updated'
-    text = [noDiaryActionText]
+    if (confirmNextAppointment) {
+      title = nextAppointmentId ? 'Outcome updated and next appointment arranged' : 'Appointment outcome updated'
+      text = [noDiaryActionText, ...nextAppointmentText]
+    } else {
+      title = 'Appointment outcome updated'
+      text = [noDiaryActionText]
+    }
   }
 
   if (appointmentSession?.outcome?.letterType && appointmentSession?.outcome?.letterSentBy) {
@@ -62,18 +82,21 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     // Enforcement letter sent by case admin 👇
     if (appointmentSession?.outcome?.letterSentBy === 'CASE_ADMIN') {
       if (sentenceType === 'CUSTODY') {
-        actions.push({
-          text: 'use the Consider a recall service',
-          href: config.recall.link,
-          external: true,
-        })
+        actions.push(recallAction)
       }
       text = [diaryActionText, `Follow your local process to request a ${letterType}.`]
+      if (confirmNextAppointment) {
+        text = [...text, ...nextAppointmentText]
+      }
     }
     // Enforcement letter sent by PP 👇
     if (appointmentSession?.outcome?.letterSentBy === 'USER') {
       hasActions = false
       text = [diaryActionText, `Your case administrator or you will create and send a ${letterType}.`]
+      if (confirmNextAppointment) {
+        hasActions = true
+        text = [...text, ...nextAppointmentText]
+      }
     }
   }
 
@@ -106,9 +129,18 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     !appointmentSession.outcome.letterSentBy &&
     noDiaryActions.some(action => allSelectedActions.includes(action))
   ) {
-    text = [noDiaryActionText]
+    const breachRecallText = 'Liaise with your case administrator to create a breach/recall NSI on NDelius.'
+    text = confirmNextAppointment
+      ? [
+          noDiaryActionText,
+          ...(appointmentSession?.outcome?.breachNSICreatedBy ? [breachRecallText] : []),
+          ...nextAppointmentText,
+        ]
+      : [noDiaryActionText]
     if (appointmentSession?.outcome?.breachNSICreatedBy) {
-      text.push('Liaise with your case administrator to create a breach/recall NSI on NDelius.')
+      if (!confirmNextAppointment) {
+        text.push(breachRecallText)
+      }
     }
   }
 
@@ -120,14 +152,28 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     !allSelectedActions.includes('NO_FURTHER_ACTION')
   ) {
     title = 'Unacceptable absence outcome added'
-    text = noDiaryActions.some(action => allSelectedActions.includes(action)) ? [noDiaryActionText] : [diaryActionText]
+    if (confirmNextAppointment) {
+      title = 'Enforcement outcome updated and next appointment arranged'
+      text = noDiaryActions.some(action => allSelectedActions.includes(action))
+        ? [noDiaryActionText, ...nextAppointmentText]
+        : [diaryActionText, ...nextAppointmentText]
+    } else {
+      text = noDiaryActions.some(action => allSelectedActions.includes(action))
+        ? [noDiaryActionText]
+        : [diaryActionText]
+    }
   }
 
   // No further action 👇
 
   if (allSelectedActions.includes('NO_FURTHER_ACTION')) {
     title = 'No further action outcome added'
-    text = [noDiaryActionText]
+    if (confirmNextAppointment) {
+      title = 'Outcome updated and next appointment arranged'
+      text = [noDiaryActionText, ...nextAppointmentText]
+    } else {
+      text = [noDiaryActionText]
+    }
   }
 
   // Further actions 👇

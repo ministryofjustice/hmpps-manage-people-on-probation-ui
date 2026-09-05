@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { appointmentId } from '../appointments/imports/common'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import {
@@ -17,6 +18,8 @@ let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
 
 const crn = 'X000001'
+
+const yesterday = DateTime.now().minus({ days: 1 }).toFormat('cccc d LLLL yyyy')
 
 interface Props {
   outcome?: AppointmentOutcomeType | AcceptableAbsenceOutcomeType
@@ -250,17 +253,20 @@ const checkPage = () => {
       loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
       checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
-      completeNextAppointmentPage({ value: 'KEEP_TYPE' })
+      completeNextAppointmentPage({ value: 'KEEP_TYPE', isOutcome: true })
       const appointmentType = `Planned office visit (NS)`
+
+      checkYourAnswersOutcomePage.checkPageTitle(
+        'Check your answers then confirm the appointment outcome and next appointment',
+      )
       checkYourAnswersOutcomePage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
-
         .should('contain.text', `${appointmentType} on Wednesday 21 February 2024 at 10:15am to 10:30am`)
       checkYourAnswersOutcomePage
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'Other call on Wednesday 21 February 2024 at 10:15am to 10:30am')
+        .should('contain.text', `${appointmentType} on ${yesterday} at 9am to 10am`)
     })
   })
 }

@@ -5,7 +5,7 @@
 }) %}
 {% set notStandardForm = true %}
 {% set anotherAppointment = true %}
-{% set buttonText = "Arrange appointment" %}
+{% set buttonText = "Continue" if nextAppointmentId and flags.enableCombinedCYAPage else "Arrange appointment"  %}
 {% if isInPast != true and isInPast != null %}
     {% set showCalendarInsetText = true %}
 {% endif %}

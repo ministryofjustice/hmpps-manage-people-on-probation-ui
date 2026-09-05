@@ -24,6 +24,7 @@ import {
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
+import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 
 const routes = [
   'getAppointments',
@@ -173,6 +174,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         back = getDataValue(data, ['backLink', 'manage'])
       }
+      deleteOutcomeVars(crn)(req, res)
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -408,6 +410,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      deleteOutcomeVars(crn)(req, res)
       const outcomeJourney = req.url.includes('outcome/next-appointment')
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
       return res.render('pages/appointments/next-appointment', {
