@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import {
   AcceptableAbsenceOutcomeType,
   AppointmentEnforcementAction,
@@ -19,6 +20,8 @@ let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
 let confirmationPage: ConfirmationOutcomePage
 let nextAppointmentPage: NextAppointmentPage
 let overviewPage: OverviewPage
+
+const yesterday = DateTime.now().minus({ days: 1 }).toFormat('cccc d LLLL yyyy')
 
 interface Props {
   outcome?: AppointmentOutcomeType
@@ -49,7 +52,7 @@ const loadPage = (
 const checkNextAppointmentText = () => {
   confirmationPage
     .getWhatHappensNextText()
-    .should('contain.text', 'You’ve arranged a 3 way meeting (NS) on Wednesday 2 September 2026 at 9am to 10am.')
+    .should('contain.text', `You’ve arranged a 3 way meeting (NS) on ${yesterday} at 9am to 10am.`)
     .should('contain.text', 'Alton will receive a confirmation text message with the new appointment details.')
     .should('contain.text', 'The new appointment has been added to:')
     .should('contain.text', 'your calendar')
@@ -228,7 +231,7 @@ const checkPage = () => {
         .getWhatHappensNextText()
         .should('contain.text', 'Your case administrator or you will create and send a other enforcement letter.')
       checkNextAppointmentText()
-      checkFurtherActions()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
 

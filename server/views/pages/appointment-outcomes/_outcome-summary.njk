@@ -81,7 +81,7 @@
             } if appointmentOutcome.summary.documents,
             {
                 key: { text: "Next appointment"},
-                value: { text: appointmentOutcome.nextAppointment.label if appointmentOutcome.nextAppointment else 'No next appointment' },
+                value: { text: appointmentOutcome.nextAppointment.label if appointmentOutcome.nextAppointment.label else 'No next appointment' },
                 actions: {
                     items: [
                         {
@@ -91,10 +91,10 @@
                         }
                     ]
                 } if showAction
-            } if appointmentOutcome.nextAppointment and nextAppointmentId,
-              {
+            } if appointmentOutcome.nextAppointment and flags.enableCombinedCYAPage,
+             {
                 key: { text: "Next appointment"},
-                value: { text: appointmentOutcome.nextAppointment.label },
+                value: { text: appointmentOutcome.summary.nextAppointment },
                 actions: {
                     items: [
                         {
@@ -104,7 +104,7 @@
                         }
                     ]
                 } if showAction
-            } if appointmentOutcome.nextAppointment and not nextAppointmentId
+            } if appointmentOutcome.summary.nextAppointment and not flags.enableCombinedCYAPage
 ] }) }}
     <div class="govuk-button-group">
         {{ govukButton({

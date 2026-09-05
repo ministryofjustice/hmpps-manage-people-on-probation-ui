@@ -41,9 +41,8 @@ const nextAppointment: OutcomeNextAppointment = {
 }
 
 const expectedNextAppointmentText = [
-  '<p class="govuk-body">You’ve arranged a Planned telephone contact (NS) on Friday 21 August 2026 at 9am to 10am.</p>',
-  '<p class="govuk-body">John will receive a confirmation text message with the new appointment details.</p>',
-  '<p class="govuk-body govuk-!-margin-bottom-0">The new appointment has been added to:</p><ul class="govuk-list govuk-list--bullet"><li>your calendar</li><li>the NDelius contact log and officer diary, along with any supporting information</ul>',
+  'You’ve arranged a Planned telephone contact (NS) on Friday 21 August 2026 at 9am to 10am.',
+  'John will receive a confirmation text message with the new appointment details.',
 ]
 
 const buildResponse = ({
@@ -88,7 +87,6 @@ const req = httpMocks.createRequest({ url, session: { data: {} } })
 const nextSpy = jest.fn()
 
 describe('/middleware/appointment-outcomes/getConfirmation', () => {
-  /*
   describe('Outcome is attended and complied, attended but sent home due to Probation Service issues or acceptable absence', () => {
     const outcomes: AppointmentOutcomeType[] = [
       'ATTENDED_COMPLIED',
@@ -130,10 +128,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
         getConfirmation(mockReq, res, nextSpy)
         expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
           title: 'Outcome updated and next appointment arranged',
-          text: [
-            '<p class="govuk-body">This outcome has been saved against the appointment on NDelius.</p>',
-            ...expectedNextAppointmentText,
-          ],
+          text: ['This outcome has been saved against the appointment on NDelius.', ...expectedNextAppointmentText],
           type,
           date: 'Monday 22 December 2025 from 9:15am to 9:30am',
           actions: [
@@ -194,8 +189,8 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Enforcement outcome updated and next appointment arranged',
         text: [
-          '<p class="govuk-body">This enforcement outcome has been added to the NDelius Enforcement Diary.</p>',
-          '<p class="govuk-body">Follow your local process to request a second warning letter.</p>',
+          'This enforcement outcome has been added to the NDelius Enforcement Diary.',
+          'Follow your local process to request a second warning letter.',
           ...expectedNextAppointmentText,
         ],
         type,
@@ -247,18 +242,13 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Enforcement outcome updated and next appointment arranged',
         text: [
-          '<p class="govuk-body">This enforcement outcome has been added to the NDelius Enforcement Diary.</p>',
-          '<p class="govuk-body">Your case administrator or you will create and send a second warning letter.</p>',
+          'This enforcement outcome has been added to the NDelius Enforcement Diary.',
+          'Your case administrator or you will create and send a second warning letter.',
           ...expectedNextAppointmentText,
         ],
         type,
         date: 'Monday 22 December 2025 from 9:15am to 9:30am',
         actions: [
-          {
-            external: true,
-            href: 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/',
-            text: 'use the Consider a recall service',
-          },
           {
             text: 'arrange another appointment',
             href: `/case/${crn}/appointments/appointment/${id}/next-appointment?back=${encodeURIComponent(url)}`,
@@ -319,8 +309,8 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Enforcement outcome updated and next appointment arranged',
         text: [
-          '<p class="govuk-body">This outcome has been saved against the appointment on NDelius.</p>',
-          '<p class="govuk-body">Liaise with your case administrator to create a breach/recall NSI on NDelius.</p>',
+          'This outcome has been saved against the appointment on NDelius.',
+          'Liaise with your case administrator to create a breach/recall NSI on NDelius.',
           ...expectedNextAppointmentText,
         ],
         type,
@@ -338,7 +328,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       })
     })
   })
-*/
+
   describe('Action is not a letter and does get added to the NDelius enforcement diary', () => {
     const outcome: AppointmentSessionOutcome = {
       outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
@@ -376,7 +366,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Enforcement outcome updated and next appointment arranged',
         text: [
-          '<p class="govuk-body">This enforcement outcome has been added to the NDelius Enforcement Diary.</p>',
+          'This enforcement outcome has been added to the NDelius Enforcement Diary.',
           ...expectedNextAppointmentText,
         ],
         type,
@@ -438,10 +428,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       getConfirmation(mockReq, res, nextSpy)
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Enforcement outcome updated and next appointment arranged',
-        text: [
-          '<p class="govuk-body">This outcome has been saved against the appointment on NDelius.</p>',
-          ...expectedNextAppointmentText,
-        ],
+        text: ['This outcome has been saved against the appointment on NDelius.', ...expectedNextAppointmentText],
         type,
         date: 'Monday 22 December 2025 from 9:15am to 9:30am',
         actions: [
@@ -514,8 +501,8 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Enforcement outcome updated and next appointment arranged',
         text: [
-          '<p class="govuk-body">This enforcement outcome has been added to the NDelius Enforcement Diary.</p>',
-          '<p class="govuk-body">Follow your local process to request a first warning letter.</p>',
+          'This enforcement outcome has been added to the NDelius Enforcement Diary.',
+          'Follow your local process to request a first warning letter.',
           ...expectedNextAppointmentText,
         ],
         type,
@@ -579,10 +566,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
       getConfirmation(mockReq, res, nextSpy)
       expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
         title: 'Outcome updated and next appointment arranged',
-        text: [
-          '<p class="govuk-body">This outcome has been saved against the appointment on NDelius.</p>',
-          ...expectedNextAppointmentText,
-        ],
+        text: ['This outcome has been saved against the appointment on NDelius.', ...expectedNextAppointmentText],
         type,
         date: 'Monday 22 December 2025 from 9:15am to 9:30am',
         actions: [

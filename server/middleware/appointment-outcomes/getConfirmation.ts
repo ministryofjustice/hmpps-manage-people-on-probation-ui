@@ -29,18 +29,15 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   const noDiaryActionText = 'This outcome has been saved against the appointment on NDelius.'
   const diaryActionText = 'This enforcement outcome has been added to the NDelius Enforcement Diary.'
   const nextAppointmentText = [
-    `<p class="govuk-body">You’ve arranged a ${nextAppointment?.label}.</p>`,
-    `<p class="govuk-body">${forename} will receive a confirmation text message with the new appointment details.</p>`,
-    '<p class="govuk-body govuk-!-margin-bottom-0">The new appointment has been added to:</p><ul class="govuk-list govuk-list--bullet"><li>your calendar</li><li>the NDelius contact log and officer diary, along with any supporting information</ul>',
+    `You’ve arranged a ${nextAppointment?.label}.`,
+    `${forename} will receive a confirmation text message with the new appointment details.`,
   ]
   const recallAction: OutcomeConfirmationAction = {
     text: 'use the Consider a recall service',
     href: config.recall.link,
     external: true,
   }
-  let text = confirmNextAppointment
-    ? [`<p class="govuk-body">${diaryActionText}</p>`, ...nextAppointmentText]
-    : [diaryActionText]
+  let text = confirmNextAppointment ? [diaryActionText, ...nextAppointmentText] : [diaryActionText]
   const { date, start, end } = appointmentSession
   const type = appointment?.type || null
   const appointmentDate = `${dayOfWeek(date)} ${dateWithYear(date)} from ${govukTime(start)} to ${govukTime(end)}`
@@ -71,7 +68,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   if (outcomes.includes(appointmentSession.outcome.outcomeType)) {
     if (confirmNextAppointment) {
       title = nextAppointmentId ? 'Outcome updated and next appointment arranged' : 'Appointment outcome updated'
-      text = [`<p class="govuk-body">${noDiaryActionText}</p>`, ...nextAppointmentText]
+      text = [noDiaryActionText, ...nextAppointmentText]
     } else {
       title = 'Appointment outcome updated'
       text = [noDiaryActionText]
@@ -87,29 +84,18 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
       if (sentenceType === 'CUSTODY') {
         actions.push(recallAction)
       }
+      text = [diaryActionText, `Follow your local process to request a ${letterType}.`]
       if (confirmNextAppointment) {
-        text = [
-          `<p class="govuk-body">${diaryActionText}</p>`,
-          `<p class="govuk-body">Follow your local process to request a ${letterType}.</p>`,
-          ...nextAppointmentText,
-        ]
-      } else {
-        text = [diaryActionText, `Follow your local process to request a ${letterType}.`]
+        text = [...text, ...nextAppointmentText]
       }
     }
     // Enforcement letter sent by PP 👇
     if (appointmentSession?.outcome?.letterSentBy === 'USER') {
       hasActions = false
+      text = [diaryActionText, `Your case administrator or you will create and send a ${letterType}.`]
       if (confirmNextAppointment) {
-        text = [
-          `<p class="govuk-body">${diaryActionText}</p>`,
-          `<p class="govuk-body">Your case administrator or you will create and send a ${letterType}.</p>`,
-          ...nextAppointmentText,
-        ]
-        actions.push(recallAction)
         hasActions = true
-      } else {
-        text = [diaryActionText, `Your case administrator or you will create and send a ${letterType}.`]
+        text = [...text, ...nextAppointmentText]
       }
     }
   }
@@ -146,8 +132,8 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     const breachRecallText = 'Liaise with your case administrator to create a breach/recall NSI on NDelius.'
     text = confirmNextAppointment
       ? [
-          `<p class="govuk-body">${noDiaryActionText}</p>`,
-          `<p class="govuk-body">${breachRecallText}</p>`,
+          noDiaryActionText,
+          ...(appointmentSession?.outcome?.breachNSICreatedBy ? [breachRecallText] : []),
           ...nextAppointmentText,
         ]
       : [noDiaryActionText]
@@ -169,8 +155,8 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     if (confirmNextAppointment) {
       title = 'Enforcement outcome updated and next appointment arranged'
       text = noDiaryActions.some(action => allSelectedActions.includes(action))
-        ? [`<p class="govuk-body">${noDiaryActionText}</p>`, ...nextAppointmentText]
-        : [`<p class="govuk-body">${diaryActionText}</p>`, ...nextAppointmentText]
+        ? [noDiaryActionText, ...nextAppointmentText]
+        : [diaryActionText, ...nextAppointmentText]
     } else {
       text = noDiaryActions.some(action => allSelectedActions.includes(action))
         ? [noDiaryActionText]
@@ -184,7 +170,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     title = 'No further action outcome added'
     if (confirmNextAppointment) {
       title = 'Outcome updated and next appointment arranged'
-      text = [`<p class="govuk-body">${noDiaryActionText}</p>`, ...nextAppointmentText]
+      text = [noDiaryActionText, ...nextAppointmentText]
     } else {
       text = [noDiaryActionText]
     }

@@ -62,8 +62,8 @@ const completeRescheduleJourney = () => {
 
 const past = DateTime.now().minus({ days: 1 })
 const future = DateTime.now().plus({ days: 2 })
-const expectedPastDate = `${past.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
-const expectedFutureDate = `${future.toFormat('cccc d LLLL yyyy')} from 9am to 10am`
+const expectedPastDate = `${past.toFormat('cccc d LLLL yyyy')} at 9am to 10am`
+const expectedFutureDate = `${future.toFormat('cccc d LLLL yyyy')} at 9am to 10am`
 
 const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   if (journey === 'MANAGE') {
@@ -97,7 +97,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .find('.govuk-summary-list__row')
           .eq(4)
           .find('.govuk-summary-list__value')
-          .should('contain.text', '3 way meeting (NS) on Wednesday 2 September 2026 at 9am to 10am')
+          .should('contain.text', `3 way meeting (NS) on ${expectedPastDate}`)
       })
     })
 
@@ -124,7 +124,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .find('.govuk-summary-list__row')
           .eq(4)
           .find('.govuk-summary-list__value')
-          .should('contain.text', 'Planned office visit (NS) on Saturday 5 September 2026 at 9am to 10am')
+          .should('contain.text', `Planned office visit (NS) on ${expectedFutureDate}`)
       })
     })
     describe('No next appointment arranged', () => {
