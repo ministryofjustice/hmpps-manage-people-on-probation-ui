@@ -133,6 +133,7 @@ describe('/middleware/appointmentDateIsInPast()', () => {
       method: 'GET',
       appointmentId: nextAppointmentId,
       appointment: { date, start: '10:00', end: '10:30' },
+      _nextAppointmentId: nextAppointmentId,
     })
     expect(appointmentDateIsInPast(req, res)).toEqual(false)
   })

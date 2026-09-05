@@ -27,12 +27,15 @@
         <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
             <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
             {% for text in appointmentOutcome.confirmation.text %}
-            {% if nextAppointmentId %}
-                {{ text | safe }}
-                {% else %}
  <p class="govuk-body">{{ text }}</p>
-                {% endif %}
             {% endfor %}
+            {% if nextAppointmentId %}
+<p class="govuk-body govuk-!-margin-bottom-0">The new appointment has been added to:</p>
+<ul class="govuk-list govuk-list--bullet">
+    <li>your calendar</li>
+    <li>the NDelius contact log and officer diary, along with any supporting information</li>
+</ul>
+            {% endif %}
         </div>
         {% if appointmentOutcome.confirmation.actions.length %}
             <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
