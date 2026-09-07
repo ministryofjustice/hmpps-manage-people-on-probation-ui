@@ -9,6 +9,7 @@ export class FeatureFlags {
   enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
+  enablePersonHeader?: boolean = undefined
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
