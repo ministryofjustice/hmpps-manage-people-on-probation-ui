@@ -86,7 +86,7 @@ export const getUserOptionsV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     userOptions = userOptions.map(({ nameAndRole, username: staffUsername, ...restUserProps }) => {
       const option: User = { nameAndRole, username: staffUsername, ...restUserProps }
       if (usernameSession !== '') {
-        if (nameAndRole === usernameSession) {
+        if (staffUsername === usernameSession) {
           option.selected = 'selected'
         }
       } else if (staffUsername.toLowerCase() === defaultUserDetails?.username.toLowerCase()) {

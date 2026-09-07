@@ -288,7 +288,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           [],
           regexIgnoreValuesInParentheses,
         )
-        setDataValue(data, ['appointments', crn, id, 'user', 'username'], user)
+        setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
+        setDataValue(data, ['appointments', crn, id, 'user', 'displayname'], user)
         if (res.locals.flags.enableMAN2344) {
           const email = staffMember?.email ?? null
           const name = staffMember?.name ?? null

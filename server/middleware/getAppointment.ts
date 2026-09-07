@@ -39,7 +39,13 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
 
     if (appointmentSession) {
       const {
-        user: { username: staffId = null, locationCode = null, providerCode = null, teamCode = null } = {},
+        user: {
+          username: staffId = null,
+          displayName = null,
+          locationCode = null,
+          providerCode = null,
+          teamCode = null,
+        } = {},
         type: typeId,
         visorReport,
         eventId,
@@ -92,7 +98,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
       const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
       const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
-      const selectedUser = staffId
+      const selectedUser = displayName ?? ''
 
       let attendingHtml = selectedUser
       let teamRegionHtml = ''
@@ -129,7 +135,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           mobileNumber,
         },
         attending: {
-          name: selectedUser,
+          name: staffId,
           team: selectedTeam,
           region: selectedRegion,
           html: attendingHtml,

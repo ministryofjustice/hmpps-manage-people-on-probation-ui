@@ -17,6 +17,7 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
 
     let attendingUsername = getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) ?? null
+    let attendingDisplayName = getDataValue<string>(data, ['appointments', crn, id, 'user', 'displayName']) ?? null
     let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
     let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
     let attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
@@ -27,6 +28,7 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
     if (
       !attendingUsername ||
+      !attendingDisplayName ||
       !providerCode ||
       !teamCode ||
       ((!attendingEmail || !attendingName) && res.locals.flags.enableMAN2344) ||
@@ -50,8 +52,9 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           probationPractitioner?.provider?.code,
           probationPractitioner?.team?.code,
         )
-        attendingUsername = PPusers.find(user => user?.username === probationPractitioner?.username)?.nameAndRole
-        if (attendingUsername !== undefined) {
+        attendingDisplayName = PPusers.find(user => user?.username === probationPractitioner?.username)?.nameAndRole
+        if (attendingDisplayName !== undefined) {
+          attendingUsername = probationPractitioner?.username
           providerCode = probationPractitioner.provider.code
           teamCode = probationPractitioner.team.code
           if (res.locals.flags.enableMAN2344) {
@@ -75,7 +78,8 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           teams: defaultTeams,
           users: defaultUsers,
         } = await masClient.getUserProviders(username, providerCode, teamCode)
-        attendingUsername = defaultUsers.find(
+        attendingUsername = defaultUserDetails?.username
+        attendingDisplayName = defaultUsers.find(
           user => user.username === defaultUserDetails?.username?.toLowerCase(),
         )?.nameAndRole
         providerCode = defaultProviders.find(p => p.name === defaultUserDetails.homeArea)?.code
@@ -91,8 +95,9 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
-      const nameAndRole = convertToTitleCase(attendingUsername, [], regexIgnoreValuesInParentheses)
-      setDataValue(data, ['appointments', crn, id, 'user', 'username'], nameAndRole)
+      const nameAndRole = convertToTitleCase(attendingDisplayName, [], regexIgnoreValuesInParentheses)
+      setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
+      setDataValue(data, ['appointments', crn, id, 'user', 'displayName'], nameAndRole)
       if (res.locals.flags.enableMAN2344) {
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
