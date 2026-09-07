@@ -1,6 +1,7 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
 import { Document, PersonalDetails } from '../data/model/personalDetails'
+import { ProbationPractitioner } from './CaseDetail'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
@@ -110,6 +111,7 @@ interface Locals {
   headerCRN?: string
   headerDob?: string
   headerTierLink?: string
+  probationPractitioner?: ProbationPractitioner
   tierUrlV3?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
