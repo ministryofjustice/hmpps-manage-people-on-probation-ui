@@ -19,7 +19,7 @@ export const getOutcomeNextAppointment: Route<void> = (req, res, next) => {
       ;({ id, type, startDateTime, endDateTime } = nextAppt)
       nextAppointment = {
         id,
-        label: `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`,
+        label: `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)}${endDateTime ? ` to ${govukTime(endDateTime)}` : ''}`,
       }
     }
     if (nextAppointmentId) {
@@ -32,7 +32,7 @@ export const getOutcomeNextAppointment: Route<void> = (req, res, next) => {
       const nextAppointmentType = res.locals.appointmentTypes.find((t: any) => t.code === typeCode)?.description || null
       nextAppointment = {
         id: nextAppointmentId,
-        label: `${toSentenceCase(nextAppointmentType)} on ${dateWithDayAndWithYear(nextAppointmentDate)} at ${govukTime(start)} to ${govukTime(end)}`,
+        label: `${toSentenceCase(nextAppointmentType)} on ${dateWithDayAndWithYear(nextAppointmentDate)} at ${govukTime(start)}${end ? ` to ${govukTime(end)}` : ''}`,
       }
     }
 

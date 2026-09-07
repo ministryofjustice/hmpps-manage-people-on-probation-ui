@@ -32,10 +32,11 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
     }
 
     let responseContactId: number
-
-    const uncompleted = findUncompleted({ forceValidation: true })(req, res)
-    if (uncompleted?.includes('?change')) {
-      return res.redirect(uncompleted)
+    if (!url.includes('/outcome/check-your-answers')) {
+      const uncompleted = findUncompleted({ forceValidation: true })(req, res)
+      if (uncompleted?.includes('?change')) {
+        return res.redirect(uncompleted)
+      }
     }
 
     if (res?.locals?.flags?.enableCombinedCYAPage) {

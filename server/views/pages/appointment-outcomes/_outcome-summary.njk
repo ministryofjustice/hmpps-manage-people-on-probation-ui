@@ -80,12 +80,12 @@
                 } if showAction
             } if appointmentOutcome.summary.documents,
             {
-                key: { text: "Next appointment"},
+                key: { text: "Next appointment" + appointmentOutcome.nextAppointment.id},
                 value: { text: appointmentOutcome.nextAppointment.label if appointmentOutcome.nextAppointment.label else 'No next appointment' },
                 actions: {
                     items: [
                         {
-                            href: '/case/' + appointmentOutcome.crn + '/arrange-appointment/' + appointmentOutcome.nextAppointment.id + '/arrange-another-appointment' if appointmentOutcome.nextAppointment.id else changePath + "/next-appointment?change=" + url,
+                            href: '/case/' + appointmentOutcome.crn + '/arrange-appointment/' + appointmentOutcome.nextAppointment.id + '/arrange-another-appointment' if nextAppointmentId else changePath + "/next-appointment?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "next appointment"
                         }

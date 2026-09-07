@@ -224,6 +224,15 @@ describe('middleware/handlePostAppointment', () => {
     )
   })
 
+  it('should not find uncompleted pages if on outcome check your answers page', async () => {
+    const req = buildRequest({ url: '/outcome/check-your-answers' })
+    mockedIsValidCrn.mockReturnValueOnce(true)
+    mockedIsValidUUID.mockReturnValueOnce(true)
+    mockedIsNumericString.mockReturnValueOnce(true)
+    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(findUncompletedSpy).not.toHaveBeenCalled()
+  })
+
   it('should redirect to uncompleted page if there are uncompleted sections', async () => {
     const uncompletedUrl = `/case/${crn}/uncompleted-page?change=/path/to/change`
     const req = buildRequest()
