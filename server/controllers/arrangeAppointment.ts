@@ -274,26 +274,24 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
-        if (res.locals.flags.enableMAN2344) {
-          const email = staffMember?.email ?? null
-          const name = staffMember?.name ?? null
-          logSessionCacheChange(
-            'postWhoWillAttend',
-            data,
-            ['appointments', crn, id, 'user', 'email'],
-            email,
-            postWhoWillAttendContext,
-          )
-          logSessionCacheChange(
-            'postWhoWillAttend',
-            data,
-            ['appointments', crn, id, 'user', 'name'],
-            name,
-            postWhoWillAttendContext,
-          )
-          setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
-          setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
-        }
+        const email = staffMember?.email ?? null
+        const name = staffMember?.name ?? null
+        logSessionCacheChange(
+          'postWhoWillAttend',
+          data,
+          ['appointments', crn, id, 'user', 'email'],
+          email,
+          postWhoWillAttendContext,
+        )
+        logSessionCacheChange(
+          'postWhoWillAttend',
+          data,
+          ['appointments', crn, id, 'user', 'name'],
+          name,
+          postWhoWillAttendContext,
+        )
+        setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
+        setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
         await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)

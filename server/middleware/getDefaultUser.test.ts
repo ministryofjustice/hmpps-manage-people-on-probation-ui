@@ -85,7 +85,7 @@ const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} 
   return httpMocks.createRequest(request)
 }
 
-const res = mockAppResponse({ user: { username }, flags: { enableMAN2344: true } })
+const res = mockAppResponse({ user: { username }, flags: {} })
 
 const getUserProvidersSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserProviders')
@@ -190,67 +190,6 @@ describe('/middleware/getDefaultUser()', () => {
         })
         it('should save the user staff to session', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(8, data, ['staff', username], userProviders.users)
-        })
-      })
-
-      describe('enable MAN2344 feature flag is disabled - should not save email and name to session', () => {
-        const resWithoutFlag = mockAppResponse({ user: { username }, flags: { enableMAN2344: false } })
-        const mock = {
-          ...userProviders,
-          providers: [...userProviders.providers.slice(0, 1), ...userProviders.providers.slice(2)],
-          teams: [...userProviders.teams.slice(1)],
-          users: [...userProviders.users.slice(0, 2)],
-        }
-        beforeEach(async () => {
-          jest.spyOn(MasApiClient.prototype, 'getUserProviders').mockImplementationOnce(() => Promise.resolve(mock))
-          await getDefaultUser(hmppsAuthClient)(req, resWithoutFlag, nextSpy)
-        })
-        it('should save the correct session values', () => {
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            1,
-            data,
-            ['appointments', crn, uuid, 'user', 'providerCode'],
-            probationPractitioner.provider.code,
-          )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            2,
-            data,
-            ['appointments', crn, uuid, 'user', 'teamCode'],
-            probationPractitioner.team.code,
-          )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            3,
-            data,
-            ['appointments', crn, uuid, 'user', 'username'],
-            probationPractitioner.username,
-          )
-          expect(mockSetDataValue).not.toHaveBeenNthCalledWith(
-            4,
-            data,
-            ['appointments', crn, uuid, 'user', 'email'],
-            probationPractitioner.email,
-          )
-          expect(mockSetDataValue).not.toHaveBeenNthCalledWith(
-            5,
-            data,
-            ['appointments', crn, uuid, 'user', 'name'],
-            probationPractitioner.name,
-          )
-
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            4,
-            data,
-            ['providers', username],
-            [...mock.providers, probationPractitioner.provider],
-          )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            5,
-            data,
-            ['teams', username],
-            [...mock.teams, probationPractitioner.team],
-          )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, req.session.data, ['staff', username], [...mock.users])
-          expect(nextSpy).toHaveBeenCalledTimes(1)
         })
       })
     })
