@@ -135,7 +135,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           mobileNumber,
         },
         attending: {
-          name: staffId,
+          name: selectedUser,
           team: selectedTeam,
           region: selectedRegion,
           html: attendingHtml,

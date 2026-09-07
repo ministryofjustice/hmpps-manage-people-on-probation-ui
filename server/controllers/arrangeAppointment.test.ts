@@ -446,7 +446,6 @@ describe('controllers/arrangeAppointment', () => {
       })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(mockGetOfficeLocationsByTeamAndProvider).toHaveBeenCalled()
-      expect(mockedGetUserOptions).toHaveBeenCalled()
       expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
         4,

@@ -222,7 +222,7 @@ describe('Arrange an appointment', () => {
   })
 
   describe('Visiting the attending page', () => {
-    const expectedUser = 'DeborahFern (Automated Allocation Team, London)'
+    const expectedUser = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
@@ -266,7 +266,7 @@ describe('Arrange an appointment', () => {
       )
     })
     it('should update the default user', () => {
-      const changedUser = 'Iain Chambers (PS - Other) (Homelessness Prevention Team,, North East Region)'
+      const changedUser = 'Iain Chambers (PS - Other) (Breach Team (Durham and Cleveland), North East Region)'
       cy.get('[data-qa="attendee"] a').click()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
       cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')

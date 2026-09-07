@@ -33,6 +33,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
 import { filterContacts } from '../middleware/filterContacts'
 import logger from '../../logger'
+import { getUserOptionsV2 } from '../middleware/getUserOptionsV2'
 
 const routes = [
   'redirectToSentence',
@@ -289,7 +290,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           regexIgnoreValuesInParentheses,
         )
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
-        setDataValue(data, ['appointments', crn, id, 'user', 'displayname'], user)
+        setDataValue(data, ['appointments', crn, id, 'user', 'displayName'], user)
         if (res.locals.flags.enableMAN2344) {
           const email = staffMember?.email ?? null
           const name = staffMember?.name ?? null
@@ -311,7 +312,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         }
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
-        await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)
       }
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
