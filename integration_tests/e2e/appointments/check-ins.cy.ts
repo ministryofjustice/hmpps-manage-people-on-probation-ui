@@ -885,7 +885,7 @@ context('check-ins error scenario ', () => {
     checkYourAnswersPage.getErrorText().should('contain.text', 'An error occurred during registration')
   })
 
-  it.only('should be able to show error page, when checkin registration fails', () => {
+  it('should be able to show error page, when checkin registration fails', () => {
     loadPage()
 
     cy.task('stubOffenderSetupComplete500Response')
