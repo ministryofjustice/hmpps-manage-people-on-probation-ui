@@ -219,6 +219,7 @@
       arrangeAppointmentHref: '/case/' + crn + '/arrange-appointment/sentence?back=' + url,
       updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn),
       crn: crn,
+      oasysReviewHref: oasysLink,
       deliusBaseURL: deliusHomepageUrl(),
       nextAppointmentHref: ('/case/' + crn + '/appointments/appointment/' + supervisionPackageDetails.nextAppointment.id + '/manage?back=' + url) if supervisionPackageDetails.nextAppointment.id else '',
       allAppointmentsHref: '/case/' + crn + '/appointments'
