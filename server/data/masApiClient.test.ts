@@ -390,4 +390,36 @@ describe('masApiClient', () => {
       }
     })
   })
+  describe('patchDocuments', () => {
+    beforeEach(() => {
+      mockedIsValidHost.mockReturnValue(true)
+      mockedIsValidPath.mockReturnValue(true)
+    })
+
+    it('should sanitise the original filename before uploading', async () => {
+      const file = {
+        fieldname: 'file',
+        originalname: 'my/test$file?.pdf',
+        encoding: '7bit',
+        mimetype: 'application/pdf',
+        destination: '',
+        filename: 'my-test-file.pdf',
+        path: '/tmp/my-test-file.pdf',
+        size: 123,
+        buffer: Buffer.from('test file'),
+        stream: undefined,
+      } as Express.Multer.File
+
+      const response = { data: 'data' }
+
+      fakeMasApiClient
+        .patch('/documents/X000001/update/contact/1')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await masApiClient.patchDocuments('X000001', '1', file)
+
+      expect(output).toEqual(response)
+    })
+  })
 })
