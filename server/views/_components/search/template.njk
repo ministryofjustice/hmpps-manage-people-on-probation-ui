@@ -1,5 +1,5 @@
-<div class="moj-search">
-    <form role="search" id="homepage-search-form" class="probation-search__form" method="POST" action="{{action}}">
+<search class="moj-search">
+    <form id="homepage-search-form" class="probation-search__form" method="POST" action="{{action}}">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="probation-search__input-container">
             <div class="govuk-form-group">
@@ -9,17 +9,19 @@
                     </h2>
                 </label>
                 <div id="search-hint" class="govuk-hint moj-search__hint">
-            You can search by name, date of birth or any other identifier (for example CRN <span class="govuk-visually-hidden">(Case Reference Number) </span>or PNC <span class="govuk-visually-hidden">(Police National Computer Identifier) </span>number ).
+                You can search by name, date of birth or any other identifier (for example CRN <span class="govuk-visually-hidden">(Case Reference Number) </span>or PNC <span class="govuk-visually-hidden">(Police National Computer Identifier) </span>number ).
+                </div>
+                <div class="govuk-input__wrapper moj-search__input-wrapper">
+                    <input class="govuk-input" id="search" name="probation-search-input" type="search" aria-describedby="search-hint">
+                    <button type="submit" class="govuk-button moj-search__button" data-module="govuk-button" data-qa="search-submit">
+                        Search
+                    </button>
+                    <p id="homepage-search-suggestions" class="probation-search__suggestions govuk-!-margin-top-1"></p>
+                </div>
             </div>
-                <input class="govuk-input" id="search" name="probation-search-input" type="search" aria-describedby="search-hint">
-            </div>
-            <button type="submit" class="govuk-button moj-search__button" data-module="govuk-button" data-qa="search-submit">
-            Search
-        </button>
-            <p id="homepage-search-suggestions" class="probation-search__suggestions govuk-!-margin-top-1"></p>
         </div>
     </form>
-</div>
+</search>
 <p>
     <a class="govuk-link govuk-link--no-visited-state" href="/case">View your cases</a>
 </p>
