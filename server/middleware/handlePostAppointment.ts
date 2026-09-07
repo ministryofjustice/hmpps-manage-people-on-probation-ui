@@ -2,25 +2,15 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { AppointmentSession, RescheduleAppointmentResponse, AppointmentsPostResponse } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { isValidCrn, isValidUUID, getDataValue, setDataValue, isNumericString } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 import { findUncompleted } from './findUncompleted'
 import { postAppointments } from './postAppointments'
 import { postRescheduleAppointments } from './postRescheduleAppointments'
-import { renderError } from './renderError'
 
 export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function handlePostAppointmentInner(req, res, next) {
     const { data } = req.session
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
-    let isValidId = false
-    if (uuid) {
-      isValidId = isValidUUID(uuid)
-    } else if (contactId) {
-      isValidId = isNumericString(contactId)
-    }
-    if (!isValidCrn(crn) || !isValidId) {
-      return renderError(404)(req, res)
-    }
     const id = uuid || contactId
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     const sensitivityLocked = appointment?.sensitivityLocked

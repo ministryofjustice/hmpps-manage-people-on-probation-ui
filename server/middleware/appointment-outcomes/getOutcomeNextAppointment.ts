@@ -17,9 +17,10 @@ export const getOutcomeNextAppointment: Route<void> = (req, res, next) => {
     let id: string
     if (nextAppt) {
       ;({ id, type, startDateTime, endDateTime } = nextAppt)
+      const endStr = endDateTime ? ` to ${govukTime(endDateTime)}` : ''
       nextAppointment = {
         id,
-        label: `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)}${endDateTime ? ` to ${govukTime(endDateTime)}` : ''}`,
+        label: `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)}${endStr}`,
       }
     }
     if (nextAppointmentId) {
@@ -30,9 +31,10 @@ export const getOutcomeNextAppointment: Route<void> = (req, res, next) => {
         type: typeCode,
       } = getDataValue<AppointmentSession>(data, ['appointments', crn, nextAppointmentId])
       const nextAppointmentType = res.locals.appointmentTypes.find((t: any) => t.code === typeCode)?.description || null
+      const endStr = end ? ` to ${govukTime(end)}` : ''
       nextAppointment = {
         id: nextAppointmentId,
-        label: `${toSentenceCase(nextAppointmentType)} on ${dateWithDayAndWithYear(nextAppointmentDate)} at ${govukTime(start)}${end ? ` to ${govukTime(end)}` : ''}`,
+        label: `${toSentenceCase(nextAppointmentType)} on ${dateWithDayAndWithYear(nextAppointmentDate)} at ${govukTime(start)}${endStr}`,
       }
     }
 

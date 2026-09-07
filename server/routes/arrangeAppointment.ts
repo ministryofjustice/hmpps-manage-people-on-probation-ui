@@ -18,6 +18,7 @@ import {
   forceValidation,
   restrictPageAccess,
   getSentenceList,
+  checkIsValidUrl,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -191,6 +192,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
       '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     ],
     getPersonAppointment(hmppsAuthClient),
+    checkIsValidUrl,
     handlePostAppointment(hmppsAuthClient),
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),

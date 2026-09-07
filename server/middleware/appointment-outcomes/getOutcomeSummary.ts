@@ -91,12 +91,8 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
     if (!res?.locals?.flags?.enableCombinedCYAPage) {
       const nextAppt = res?.locals?.nextAppointment?.appointment
       let nextAppointment = 'No next appointment'
-      let type: string
-      let startDateTime: string
-      let endDateTime: string
-      let id: string
       if (nextAppt) {
-        ;({ id, type, startDateTime, endDateTime } = nextAppt)
+        const { type, startDateTime, endDateTime } = nextAppt
         nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
       }
       summary.nextAppointment = nextAppointment

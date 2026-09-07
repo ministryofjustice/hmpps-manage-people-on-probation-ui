@@ -15,6 +15,7 @@ import {
   forceValidation,
   getOverdueOutcomes,
   handlePostAppointment,
+  checkIsValidUrl,
 } from '../middleware'
 
 import {
@@ -303,6 +304,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     `${manageBasePath}/check-your-answers`,
+    checkIsValidUrl,
     handlePostAppointment(hmppsAuthClient),
     handlePutOutcome(hmppsAuthClient),
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),

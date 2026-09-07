@@ -150,34 +150,6 @@ describe('middleware/handlePostAppointment', () => {
     jest.clearAllMocks()
   })
 
-  it('should return a 400 error if invalid crn', async () => {
-    const req = buildRequest()
-    mockedIsValidCrn.mockReturnValue(false)
-    mockedIsValidUUID.mockReturnValue(true)
-    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
-    expect(mockRenderError).toHaveBeenCalledWith(404)
-    expect(nextSpy).not.toHaveBeenCalledTimes(1)
-  })
-
-  it('should return a 400 error if invalid UUID', async () => {
-    const req = buildRequest()
-    mockedIsValidCrn.mockReturnValue(true)
-    mockedIsValidUUID.mockReturnValue(false)
-    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
-    expect(mockRenderError).toHaveBeenCalledWith(404)
-    expect(nextSpy).not.toHaveBeenCalledTimes(1)
-  })
-
-  it('should validate contactId if enableCombinedCYAPage flag is true', async () => {
-    const req = buildRequest({ _id: null, _contactId: contactId })
-    mockedIsValidCrn.mockReturnValue(true)
-    mockedIsValidUUID.mockReturnValue(false)
-    mockedIsNumericString.mockReturnValue(true)
-    await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
-    expect(mockedIsNumericString).toHaveBeenCalledWith(contactId)
-    expect(mockedIsValidUUID).not.toHaveBeenCalled()
-  })
-
   it('should call next() if enableCombinedCYAPage flag is true and the url includes /outcome/check-your-answers and there is no nextAppointmentId', async () => {
     const req = buildRequest({
       url: `/case/${crn}/appointments/appointment/${id}/outcome/check-your-answers`,
