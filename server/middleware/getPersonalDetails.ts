@@ -78,7 +78,8 @@ export const getPersonalDetails = (
         },
       }
     } else {
-      ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
+      ;({ overview, sentencePlan, risks, tierCalculation, riskData, probationPractitioner } =
+        req.session.data.personalDetails[crn])
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
@@ -86,6 +87,7 @@ export const getPersonalDetails = (
     res.locals.risksWidget = toRoshWidget(risks)
     res.locals.risks = risks
     res.locals.riskData = riskData
+    res.locals.probationPractitioner = probationPractitioner
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth
