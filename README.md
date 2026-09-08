@@ -192,6 +192,23 @@ az login
 
 ### Set application ID, get value from Application Insights
 
+Find the App ID for the relevant Application Insights resource either via the Azure Portal (resource **Overview** page, or **Configure → API Access**) or the Azure CLI:
+
+```bash
+# lists all Application Insights resources you have access to, with their App IDs
+az monitor app-insights component show \
+  --query "[].{name:name, resourceGroup:resourceGroup, appId:appId}" \
+  -o table
+```
+
+If prompted to install the `application-insights` CLI extension, accept (`Y`), or avoid the prompt in future with:
+
+```bash
+az config set extension.use_dynamic_install=yes_without_prompt
+```
+
+Then export the App ID:
+
 ```bash
 export APP_ID="<application-insights-app-id>"
 ```
@@ -211,6 +228,15 @@ cd azure-queries
 ./run-query.sh service-unavailable-page-views.kql
 ```
 
+Both this query and the investigation query below take an optional lookback-days arg selecting a
+single, complete local day, N days back from today: `0d` = today, `1d` = yesterday (the default
+used by the scheduled report), `7d` = the single day exactly a week ago (not a rolling 7-day
+window). Defaults to `0d` when run manually via `run-query.sh` without this arg:
+
+```bash
+./run-query.sh service-unavailable-page-views.kql 7d
+```
+
 For investigating individual occurrences (timestamp, user ID, operation ID and page path), run the investigation query instead:
 
 ```bash
@@ -220,10 +246,54 @@ cd azure-queries
 
 ### Export results as CSV
 
-`run-query.sh` writes the raw Application Insights response to `azure-queries/result.json`. To export the results as CSV, run the query first and then pipe `result.json` through `jq`:
+`run-query.sh` writes the raw Application Insights response to `azure-queries/result.json`. Pass
+`--csv=<path>` (in any position, alongside the other args) to have it also write a CSV (with a
+header row) in one go — no separate `jq` step needed:
+
+```bash
+cd azure-queries
+./run-query.sh service-unavailable-page-views-investigation.kql --csv=results.csv
+```
+
+Or, if you'd rather do it manually / need a different shape, run the query first and then pipe
+`result.json` through `jq` yourself:
 
 ```bash
 cd azure-queries
 ./run-query.sh service-unavailable-page-views-investigation.kql
 jq -r '.tables[0].rows[] | @csv' result.json > results.csv
 ```
+
+### Investigating exceptions and cross-service tracing
+
+All services share a single Application Insights instance, differentiated only by
+`cloud_RoleName` — so a single `APP_ID` and a single query already returns telemetry for every
+service sharing an `operation_Id`, no need to switch resources.
+
+`ui-exceptions-trace.kql` finds exceptions raised by the UI and lists the affected `operation_Id`
+(trace id) values, and `cross-service-operation-trace.kql` shows a clean, chronologically-ordered
+timeline for those trace ids using `union` across item types (like a one-off Application Insights
+GUI query) rather than joining tables — joining fans out into many duplicate-looking rows, because
+a single trace can contain dozens of spans (this app uses OpenTelemetry auto-instrumentation,
+which records every internal middleware/function call as well as real outbound HTTP calls). Both
+support optional positional args passed to `run-query.sh`: a lookback window (defaults to `0d`,
+i.e. today only) and, for the trace query, a comma-separated list of `operation_Id` values. Add
+`--csv=<path>` to export the results as CSV at the same time.
+
+1. Run the finder query and note the `operation_Id` values in the results:
+
+   ```bash
+   cd azure-queries
+   ./run-query.sh ui-exceptions-trace.kql --csv=results.csv
+   ```
+
+2. Run the trace query, passing those `operation_Id` values, to see the full cross-service
+   timeline in one go:
+
+   ```bash
+   ./run-query.sh cross-service-operation-trace.kql 0d <op-id-1>,<op-id-2>,<op-id-3> --csv=trace.csv
+   ```
+
+   Filter/group the CSV by `cloud_RoleName` to see each service's side of the trace, so you can
+   tell whether a downstream service completed the request successfully (issue is on the network
+   path between services), never received it, or failed itself.

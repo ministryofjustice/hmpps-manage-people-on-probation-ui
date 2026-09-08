@@ -441,6 +441,38 @@ describe('middleware/postRescheduleAppointments', () => {
         'Failed to create rescheduling calendar event',
       )
     })
+    it('should set req.session.data.isOutlookEventPending to true and return the reschedule response if postRescheduleAppointmentEvent times out', async () => {
+      const timeoutError: any = new Error('Timeout of 5000ms exceeded')
+      timeoutError.code = 'ECONNABORTED'
+      jest
+        .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')
+        .mockRejectedValueOnce(timeoutError)
+
+      const [req] = buildRequest()
+      const res = buildResponse()
+
+      const response = await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(response).toEqual(mockRescheduleResponse)
+      expect(req.session.data.isOutlookEventPending).toEqual(true)
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ err: timeoutError }),
+        expect.stringContaining('Outlook calendar event reschedule timed out'),
+      )
+      expect(req.session.data.isOutLookEventFailed).toBeFalsy()
+    })
+    it('should rethrow the error if postRescheduleAppointmentEvent rejects with a non-timeout error', async () => {
+      const otherError = new Error('Some other failure')
+      jest
+        .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')
+        .mockRejectedValueOnce(otherError)
+
+      const [req] = buildRequest()
+      const res = buildResponse()
+
+      await expect(postRescheduleAppointments(hmppsAuthClient)(req, res)).rejects.toThrow(otherError)
+      expect(req.session.data.isOutlookEventPending).toBeFalsy()
+    })
   })
 
   describe('SMS reminders', () => {

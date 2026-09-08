@@ -30,12 +30,23 @@ RESULT_FILE="$SCRIPT_DIR/result.json"
 QUERY=$(sed "s/__LOOKBACK_DAYS__/${LOOKBACK_DAYS}/g" "$QUERY_FILE")
 
 # Substitute __OPERATION_IDS__ placeholder (if present) with a quoted,
-# comma-separated list built from the third arg, e.g. "id1,id2" becomes
-# "id1","id2" for use inside a KQL dynamic([...]) array. Files without the
-# placeholder, or invocations without a third arg, are unaffected.
+# comma-separated list built from the third arg, e.g. "id1, id2" becomes
+# "id1","id2" for use inside a KQL dynamic([...]) array (whitespace around
+# each id is trimmed so "id1, id2" and "id1,id2" behave the same). Files
+# without the placeholder, or invocations without a third arg, are
+# unaffected.
 if [[ -n "$OPERATION_IDS" ]]; then
-  QUOTED_OPERATION_IDS=$(echo "$OPERATION_IDS" | sed -E 's/([^,]+)/"\1"/g')
+  QUOTED_OPERATION_IDS=$(echo "$OPERATION_IDS" | tr ',' '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^\(.*\)$/"\1"/' | paste -sd, -)
   QUERY=$(echo "$QUERY" | sed "s/__OPERATION_IDS__/${QUOTED_OPERATION_IDS}/g")
+fi
+
+# Fail fast with a clear error if the query still requires operation-ids
+# (i.e. the placeholder is present) but none were supplied, rather than
+# sending invalid KQL (with a literal "__OPERATION_IDS__" token) to
+# Application Insights.
+if [[ "$QUERY" == *"__OPERATION_IDS__"* ]]; then
+  echo "Error: $QUERY_FILE requires a comma-separated operation-ids arg (third positional arg), but none was provided." >&2
+  exit 1
 fi
 
 token=$(az account get-access-token \
