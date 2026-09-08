@@ -25,13 +25,11 @@ const homeController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
 
       let enforcementActions: EnforcementContact[] = []
-      if (res.locals.flags?.enableMyEnforcementActionsOverview) {
-        const enforcementContactResponse = await masClient.getEnforcementContacts(
-          res.locals.user.username,
-          (pageNum - 1).toString(),
-        )
-        enforcementActions = enforcementContactResponse.enforcementContacts
-      }
+      const enforcementContactResponse = await masClient.getEnforcementContacts(
+        res.locals.user.username,
+        (pageNum - 1).toString(),
+      )
+      enforcementActions = enforcementContactResponse.enforcementContacts
 
       const { upcomingAppointments } = homePage
       let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
@@ -71,19 +69,15 @@ const homeController: Controller<typeof routes, void> = {
       const { appointments, outcomes, totalAppointments, totalOutcomes } = await masClient.getUserAppointments(
         res.locals.user.username,
       )
-      const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
-        req.host.includes(host),
-      )
+
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
       let enforcementActions: EnforcementContact[] = []
-      if (res.locals.flags?.enableMyEnforcementActionsOverview) {
-        const enforcementContactResponse = await masClient.getEnforcementContacts(
-          res.locals.user.username,
-          (pageNum - 1).toString(),
-        )
-        enforcementActions = enforcementContactResponse.enforcementContacts
-      }
+      const enforcementContactResponse = await masClient.getEnforcementContacts(
+        res.locals.user.username,
+        (pageNum - 1).toString(),
+      )
+      enforcementActions = enforcementContactResponse.enforcementContacts
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,

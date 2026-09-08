@@ -36,6 +36,23 @@ const res = mockAppResponse({ flags: { enableDeliusClient: true } })
 const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
+const mockEnforcementContacts = [{ id: '3', appointmentType: 'Enforcement' }]
+const mockEnforcementAction = {
+  appointmentDate: '2026-05-01',
+  appointmentOutcome: 'Unacceptable Absence',
+  appointmentType: 'Office Appointment',
+  caseName: {
+    forename: 'John',
+    middleName: 'Michael',
+    surname: 'Smith',
+  },
+  crn: 'X123456',
+  deliusManaged: true,
+  dob: '1988-04-12',
+  enforcementAction: 'Breach Initiated',
+  evidenceDueDate: '2026-05-08',
+  id: 12345,
+}
 
 describe('homeController', () => {
   describe('getHome', () => {
@@ -86,7 +103,7 @@ describe('homeController', () => {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
-          enforcementActions: [],
+          enforcementActions: [mockEnforcementAction],
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -100,7 +117,7 @@ describe('homeController', () => {
       })
       it('should request the homepage data from the api', () => {
         expect(spy).toHaveBeenCalledWith(res.locals.user.username)
-        expect(masSpy).not.toHaveBeenCalled()
+        expect(masSpy).toHaveBeenCalled()
       })
     })
     describe('production', () => {
@@ -131,7 +148,7 @@ describe('homeController', () => {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
-          enforcementActions: [],
+          enforcementActions: [mockEnforcementAction],
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -201,7 +218,7 @@ describe('homeController', () => {
           upcomingAppointments: mockHomepage.upcomingAppointments,
           appointmentsRequiringOutcome: [recentAppointment, boundaryAppointment],
           appointmentsRequiringOutcomeCount: 2,
-          enforcementActions: [],
+          enforcementActions: [mockEnforcementAction],
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -215,10 +232,10 @@ describe('homeController', () => {
       })
     })
 
-    describe('enforcement actions overview feature flag', () => {
-      it('should pass enforcement actions when enableMyEnforcementActionsOverview is true', async () => {
+    describe('enforcement actions overview', () => {
+      it('should pass enforcement actions', async () => {
         const resWithEnforcementFlag = mockAppResponse({
-          flags: { enableDeliusClient: true, enableMyEnforcementActionsOverview: true },
+          flags: { enableDeliusClient: true },
         })
         const renderSpyWithEnforcement = jest.spyOn(resWithEnforcementFlag, 'render')
         jest.spyOn(DeliusClient.prototype, 'getHomepage').mockResolvedValue(mockHomepage)
@@ -231,14 +248,14 @@ describe('homeController', () => {
         expect(renderSpyWithEnforcement).toHaveBeenCalledWith(
           'pages/homepage/homepage',
           expect.objectContaining({
-            enforcementActions: mockHomepage.enforcementContacts,
+            enforcementActions: [mockEnforcementAction],
           }),
         )
       })
 
       it('should handle pagination for enforcement actions', async () => {
         const resWithEnforcementFlag = mockAppResponse({
-          flags: { enableDeliusClient: true, enableMyEnforcementActionsOverview: true },
+          flags: { enableDeliusClient: true },
         })
         const reqWithPage = httpMocks.createRequest({
           params: { crn },
@@ -258,7 +275,7 @@ describe('homeController', () => {
         expect(renderSpyWithEnforcement).toHaveBeenCalledWith(
           'pages/homepage/homepage',
           expect.objectContaining({
-            enforcementActions: mockHomepage.enforcementContacts,
+            enforcementActions: [mockEnforcementAction],
           }),
         )
       })
@@ -267,7 +284,6 @@ describe('homeController', () => {
     describe('getHomeOld', () => {
       const mockAppointments = [{ id: '1', type: 'Appointment' }]
       const mockOutcomes = [{ id: '2', type: 'Outcome' }]
-      const mockEnforcementContacts = [{ id: '3', appointmentType: 'Enforcement' }]
 
       beforeEach(() => {
         jest.spyOn(MasApiClient.prototype, 'getUserAppointments').mockResolvedValue({
@@ -294,14 +310,14 @@ describe('homeController', () => {
             outcomes: mockOutcomes,
             totalAppointments: 1,
             totalOutcomes: 1,
-            enforcementActions: [],
+            enforcementActions: mockEnforcementContacts,
           }),
         )
       })
 
-      it('should render legacy home page with enforcement actions when flag is enabled', async () => {
+      it('should render legacy home page with enforcement actions', async () => {
         const resOld = mockAppResponse({
-          flags: { enableDeliusClient: false, enableMyEnforcementActionsOverview: true },
+          flags: { enableDeliusClient: false },
         })
         const renderSpyOld = jest.spyOn(resOld, 'render')
 
@@ -317,7 +333,7 @@ describe('homeController', () => {
 
       it('should handle pagination in getHomeOld', async () => {
         const resOld = mockAppResponse({
-          flags: { enableDeliusClient: false, enableMyEnforcementActionsOverview: true },
+          flags: { enableDeliusClient: false },
         })
         const reqWithPage = httpMocks.createRequest({
           query: { page: '3' },
