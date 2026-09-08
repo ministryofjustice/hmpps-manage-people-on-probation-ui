@@ -115,7 +115,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       try {
         fallbackUserDetails = await masClient.getUserDetails(username)
       } catch (error) {
-        logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
+        logger.warn(error, `Appointment ${id}: failed to retrieve user details for ${username}`)
       }
 
       if (isNameIncomplete(name)) {
@@ -130,7 +130,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
       const stillMissing = [isNameIncomplete(name) && 'name', !email && 'email'].filter(Boolean)
       if (stillMissing.length) {
-        const message = `Appointment ${uuid}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
+        const message = `Appointment ${id}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
         logger.warn(message)
         Sentry.captureException(new Error(message), {
           tags: {
@@ -178,7 +178,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           includeWelshPreview,
           appointmentLocation = null,
           appointmentTypeCode = null,
-        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
+        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, id, 'smsPreview', 'request'])
         isWelshTranslation = includeWelshPreview
         outlookEventRequestBody.smsEventRequest = {
           firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,

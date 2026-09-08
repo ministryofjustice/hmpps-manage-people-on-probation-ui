@@ -16,25 +16,30 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
     const sensitivityLocked = appointment?.sensitivityLocked
     const url = req.url.split('?')[0]
     const rescheduleAppointment = appointment?.rescheduleAppointment
+    const isOutcomeCYAPage = url.includes('/outcome/check-your-answers')
 
     if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
       setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
     }
 
     let responseContactId: number
-    if (!url.includes('/outcome/check-your-answers')) {
+    if (!isOutcomeCYAPage) {
       const uncompleted = findUncompleted({ forceValidation: true })(req, res)
       if (uncompleted?.includes('?change')) {
         return res.redirect(uncompleted)
       }
     }
 
-    if (res?.locals?.flags?.enableCombinedCYAPage) {
-      const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
-      const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+    const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
 
-      // if on outcome check your answers page and there is no nextAppointmentId, call next() 👇
-      if (url.includes('/outcome/check-your-answers') && !nextAppointmentId) {
+    // if on outcome check your answers page and there is no nextAppointmentId, call next() 👇
+    if (!res?.locals?.flags?.enableCombinedCYAPage && isOutcomeCYAPage && !nextAppointmentId) {
+      return next()
+    }
+
+    if (res?.locals?.flags?.enableCombinedCYAPage) {
+      const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+      if (isOutcomeCYAPage && !nextAppointmentId) {
         return next()
       }
       // if on arrange another appointment page and nextAppointmentId and linkedContactId exist, redirect to outcome check your answers page 👇

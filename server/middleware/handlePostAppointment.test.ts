@@ -182,7 +182,7 @@ describe('middleware/handlePostAppointment', () => {
   })
 
   it(`should set sensitivity as 'Yes' if sensitivityLocked = true and enableSensitivityRemoved flag = true`, async () => {
-    const req = buildRequest()
+    const req = buildRequest({ url: '/arrange-appointment/check-your-answers', nextAppointmentId: null })
     mockedIsValidCrn.mockReturnValueOnce(true)
     mockedIsValidUUID.mockReturnValueOnce(true)
     mockedIsNumericString.mockReturnValueOnce(true)
@@ -217,7 +217,7 @@ describe('middleware/handlePostAppointment', () => {
   })
 
   it('should post an appointment if there are no uncompleted sections and rescheduleAppointment.contactId does not exist', async () => {
-    const req = buildRequest()
+    const req = buildRequest({ url: '/arrange-appointment/check-your-answers', nextAppointmentId: null })
     mockedIsValidCrn.mockReturnValueOnce(true)
     mockedIsValidUUID.mockReturnValueOnce(true)
     mockedIsNumericString.mockReturnValueOnce(true)
@@ -240,7 +240,7 @@ describe('middleware/handlePostAppointment', () => {
 
   it('should post a reschedule appointment if rescheduleAppointment.contactId exists', async () => {
     const appointment: Partial<AppointmentSession> = { rescheduleAppointment: { contactId } }
-    const req = buildRequest({ appointment })
+    const req = buildRequest({ appointment, url: '/arrange-appointment/check-your-answers', nextAppointmentId: null })
     mockedIsValidCrn.mockReturnValueOnce(true)
     mockedIsValidUUID.mockReturnValueOnce(true)
     mockedIsNumericString.mockReturnValueOnce(true)
