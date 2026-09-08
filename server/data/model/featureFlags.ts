@@ -16,7 +16,6 @@ export class FeatureFlags {
   enableHomePageOutcomesWithFilter?: boolean = undefined
   enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
-  enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
   enableCaseloadV2?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
