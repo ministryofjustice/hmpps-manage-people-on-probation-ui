@@ -1,7 +1,7 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { Provider, Team, User } from '../data/model/caseload'
+import { DefaultUserDetails, Provider, Team, User } from '../data/model/caseload'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 import logger from '../../logger'
@@ -30,10 +30,40 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const teamCodeSession = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) || ''
     const usernameSession = getDataValue(data, ['appointments', crn, id, 'user', 'username']) || ''
 
-    const [{ defaultUserDetails, providers, teams: defaultTeams }, probationPractitioner] = await Promise.all([
-      masClient.getUserProviders(username),
-      masClient.getProbationPractitioner(crn),
-    ])
+    let defaultUserDetails: DefaultUserDetails
+    let providers: Provider[]
+    let defaultTeams: Team[]
+
+    const probationPractitioner = await masClient.getProbationPractitioner(crn)
+    let useProbationPractitioner = true
+    if (probationPractitioner.unallocated === false) {
+      const userProvidersForPPTeam = await masClient.getUserProviders(
+        username,
+        probationPractitioner.provider.code,
+        probationPractitioner.team.code,
+      )
+      const isAccessible = userProvidersForPPTeam.users.find(user => user?.username === probationPractitioner?.username)
+      if (isAccessible) {
+        defaultUserDetails = {
+          ...isAccessible,
+          homeArea: probationPractitioner.provider.name,
+          team: probationPractitioner.team.description,
+        } as DefaultUserDetails
+        providers = userProvidersForPPTeam.providers
+        defaultTeams = userProvidersForPPTeam.teams
+      } else {
+        useProbationPractitioner = false
+      }
+    } else {
+      useProbationPractitioner = false
+    }
+
+    if (!useProbationPractitioner) {
+      const userProviders = await masClient.getUserProviders(username)
+      defaultUserDetails = userProviders.defaultUserDetails
+      providers = userProviders.providers
+      defaultTeams = userProviders.teams
+    }
 
     let providerOptions = providers.map(provider => {
       const { code, name } = provider

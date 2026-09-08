@@ -47,13 +47,27 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       sessionTeams = teams
       sessionStaff = users
       logger.info(`[getDefaultUser] uuid='${id}' username='${username}' resolving default attending user`)
+      let useProbationPractitioner = true
       if (probationPractitioner.unallocated === false) {
-        attendingUsername = probationPractitioner.username
-        attendingEmail = probationPractitioner.email
-        attendingName = probationPractitioner.name
-        providerCode = probationPractitioner.provider.code
-        teamCode = probationPractitioner.team.code
+        const { users: accessibleUsersInPPteam } = await masClient.getUserProviders(
+          username,
+          probationPractitioner.provider.code,
+          probationPractitioner.team.code,
+        )
+        const isAccessible = accessibleUsersInPPteam.find(user => user?.username === probationPractitioner?.username)
+        if (isAccessible) {
+          attendingUsername = probationPractitioner.username
+          attendingEmail = probationPractitioner.email
+          attendingName = probationPractitioner.name
+          providerCode = probationPractitioner.provider.code
+          teamCode = probationPractitioner.team.code
+        } else {
+          useProbationPractitioner = false
+        }
       } else {
+        useProbationPractitioner = false
+      }
+      if (!useProbationPractitioner) {
         attendingUsername = defaultUserDetails?.username
         attendingEmail = defaultUserDetails?.email
         attendingName = defaultUserDetails.name
