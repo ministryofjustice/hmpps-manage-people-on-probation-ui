@@ -6,6 +6,6 @@ customEvents
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
 | where timestamp > startofday(ago(6d))
 | extend content = tostring(customDimensions.content)
-| where content has "View the sentence plan (opens in new tab)"
+| where content contains_cs "View the sentence plan (opens in new tab)"
 | summarize ["Clicks"] = count() by ["Date"] = format_datetime(bin(timestamp, 1d), "yyyy-MM-dd")
 | order by Date desc

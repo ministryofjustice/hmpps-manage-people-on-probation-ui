@@ -7,5 +7,5 @@ customEvents
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
 | where timestamp > startofday(ago(0d))
 | extend content = tostring(customDimensions.content)
-| where content has "View the sentence plan (opens in new tab)"
+| where content contains_cs "View the sentence plan (opens in new tab)"
 | summarize ["Clicks"] = count()

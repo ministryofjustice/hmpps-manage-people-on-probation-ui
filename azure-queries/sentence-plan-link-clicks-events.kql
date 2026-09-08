@@ -6,7 +6,7 @@ customEvents
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
 | where timestamp > startofday(ago(6d))
 | extend content = tostring(customDimensions.content)
-| where content has "View the sentence plan (opens in new tab)"
+| where content contains_cs "View the sentence plan (opens in new tab)"
 | extend NormalisedPage = replace_regex(operation_Name, @"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", "{id}")
 | extend NormalisedPage = replace_regex(NormalisedPage, @"/[A-Za-z][0-9]{6}(/|$)", @"/{crn}\1")
 | extend Crn = extract(@"/([A-Za-z][0-9]{6})(/|$)", 1, operation_Name)
