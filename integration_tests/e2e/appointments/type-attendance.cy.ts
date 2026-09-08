@@ -266,13 +266,13 @@ describe('Arrange an appointment', () => {
       )
     })
     it('should update the default user', () => {
-      const changedUser = 'Iain Chambers (PS - Other) (Breach Team (Durham and Cleveland), North East Region)'
+      const changedUser = 'Iain Chambers (PS - Other) (Automation SPG, North East Region)'
       cy.get('[data-qa="attendee"] a').click()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
       cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
       cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
       cy.get('[data-qa="providerCode"]').select('N54')
-      cy.get('[data-qa="teamCode"]').select('N54N03')
+      cy.get('[data-qa="teamCode"]').select('N07CHT')
       cy.get('[data-qa="username"]').select('IainChambers')
       attendancePage.getSubmitBtn().click()
       cy.get('[data-qa="attendeeDetails"]').should('contain.text', changedUser)
@@ -284,7 +284,7 @@ describe('Arrange an appointment', () => {
       cyaPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', changedUser)
       cyaPage.getSummaryListRow(3).find('.govuk-link').click()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N54')
-      cy.get('[data-qa="teamCode"]').should('have.value', 'N54N03')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07CHT')
       cy.get('[data-qa="username"]').should('have.value', 'IainChambers')
       cy.get('[data-qa="providerCode"]').select('N07')
       cy.get('[data-qa="teamCode"]').select('N07AAT')
