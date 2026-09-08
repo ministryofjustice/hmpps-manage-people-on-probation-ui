@@ -294,6 +294,9 @@ export default {
     pdf: 'application/pdf',
     doc: 'application/msword',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    jpeg: 'image/jpeg',
+  },
+  validFileExtensions: {
     jpeg: '.jpeg',
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
