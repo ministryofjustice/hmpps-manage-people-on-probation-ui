@@ -84,10 +84,11 @@ tokenStore.getToken.mockResolvedValue(token.access_token)
 const nextSpy = jest.fn()
 const showCaseloadSpy = jest.spyOn(caseloadController, 'showCaseload')
 const res = mockAppResponse()
-const resFlag = mockAppResponse({ flags: { enableCaseloadV2: true } })
+const resFlag = mockAppResponse({ flags: {} })
 const renderSpy = jest.spyOn(res, 'render')
 const flagRenderSpy = jest.spyOn(resFlag, 'render')
-const mockCaseload = {} as UserCaseload
+const mockCaseload = { caseload: undefined, sortedBy: undefined } as UserCaseload
+const tiers = { X801756: { tierScore: 'A0' }, X801758: { tierScore: 'D2' } }
 const mockFilters = {} as CaseSearchFilter
 
 describe('caseloadController', () => {
@@ -154,6 +155,7 @@ describe('caseloadController', () => {
         currentNavSection: 'yourCases',
         filter: mockFilters,
         url: req.url,
+        tiers,
       })
     })
   })
@@ -184,7 +186,7 @@ describe('caseloadController', () => {
       expect(searchUserCaseloadSpy).toHaveBeenCalledWith(
         res.locals.user.username,
         '0',
-        'nextContact.asc',
+        'nameOrCrn.asc',
         expectedCaseFilter,
       )
     })
@@ -192,10 +194,7 @@ describe('caseloadController', () => {
       await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
       expect(tiersSpy).toHaveBeenCalled()
     })
-    it('should not request the tiers from the api when flag not set', async () => {
-      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
-      expect(tiersSpy).not.toHaveBeenCalled()
-    })
+
     it('should link tiers with cases when flag set', async () => {
       searchUserCaseloadSpy.mockImplementationOnce(() => Promise.resolve(mockUserCaseload))
       const mockNewCaseload = {

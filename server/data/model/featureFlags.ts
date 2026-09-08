@@ -18,7 +18,6 @@ export class FeatureFlags {
   enableMyEnforcementActionsOverview?: boolean = undefined
   enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
-  enableCaseloadV2?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
