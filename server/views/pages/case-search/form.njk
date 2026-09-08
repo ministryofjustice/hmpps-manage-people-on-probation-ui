@@ -72,7 +72,7 @@
                 attributes: params.attributes,
                 autocomplete: params.autocomplete,
                 classes: params.classes,
-                errorMessage: { text: "Enter a search term" } if params.results.errorMessage,
+                errorMessage: { text: "Enter a search term" } if params.results.errorMessage.text === "Please enter a search term" else params.results.errorMessage,
                 hint: params.hint if params.hint else {
                     classes: 'moj-search__hint',
                     html: labelHtml

@@ -79,7 +79,7 @@ describe('Search Routes', () => {
       expect(searchService.get).toHaveBeenCalledWith(req, res, next)
     })
 
-    it('Should use typedSearchService.post when flag applied', () => {
+    it('Should use typedSearchService.get when flag applied', () => {
       const req = httpMocks.createRequest({ method: 'GET', url: '/search' })
       const res = httpMocks.createResponse({
         locals: {
