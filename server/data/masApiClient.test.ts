@@ -413,7 +413,11 @@ describe('masApiClient', () => {
       const response = { data: 'data' }
 
       fakeMasApiClient
-        .patch('/documents/X000001/update/contact/1')
+        .patch('/documents/X000001/update/contact/1', body => {
+          const bodyString = body.toString()
+
+          return bodyString.includes('Content-Disposition: form-data; name="file"; filename="my-test-file-.pdf"')
+        })
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
