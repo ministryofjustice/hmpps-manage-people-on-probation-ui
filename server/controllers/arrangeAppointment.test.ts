@@ -186,7 +186,6 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
       },
     ],
     flags: {
-      enableSensitivityRemoved: true,
       enableNonCompliance: true,
       enableCombinedCYAPage: true,
     },
@@ -830,7 +829,7 @@ describe('controllers/arrangeAppointment', () => {
         },
       })
       const mockRes = createMockResponse({
-        flags: { enableSensitivityRemoved: true, enableNonCompliance: false },
+        flags: { enableNonCompliance: false },
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
@@ -873,7 +872,7 @@ describe('controllers/arrangeAppointment', () => {
         },
       })
       const mockRes = createMockResponse({
-        flags: { enableSensitivityRemoved: true, enableNonCompliance: false },
+        flags: { enableNonCompliance: false },
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)

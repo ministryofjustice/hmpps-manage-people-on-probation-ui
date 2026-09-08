@@ -17,8 +17,7 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
     const url = req.url.split('?')[0]
     const rescheduleAppointment = appointment?.rescheduleAppointment
     const isOutcomeCYAPage = url.includes('/outcome/check-your-answers')
-
-    if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
+    if (sensitivityLocked) {
       setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
     }
 

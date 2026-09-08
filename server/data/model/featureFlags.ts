@@ -14,7 +14,6 @@ export class FeatureFlags {
   enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
-  enableSensitivityRemoved?: boolean = undefined
   enableMyEnforcementActionsOverview?: boolean = undefined
   enableEMDISentencesShowGPSData?: boolean = undefined
   enableEMDIOverviewShowGPSData?: boolean = undefined
