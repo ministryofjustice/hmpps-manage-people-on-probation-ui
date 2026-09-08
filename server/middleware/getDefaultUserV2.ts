@@ -31,7 +31,8 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       !attendingDisplayName ||
       !providerCode ||
       !teamCode ||
-      ((!attendingEmail || !attendingName) && res.locals.flags.enableMAN2344) ||
+      !attendingEmail ||
+      !attendingName ||
       !providers ||
       !teams ||
       !users
@@ -57,10 +58,8 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           attendingUsername = probationPractitioner?.username
           providerCode = probationPractitioner.provider.code
           teamCode = probationPractitioner.team.code
-          if (res.locals.flags.enableMAN2344) {
-            attendingEmail = probationPractitioner.email
-            attendingName = probationPractitioner.name
-          }
+          attendingEmail = probationPractitioner.email
+          attendingName = probationPractitioner.name
           providers = PPproviders
           teams = PPteams
           users = PPusers
@@ -84,10 +83,8 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         )?.nameAndRole
         providerCode = defaultProviders.find(p => p.name === defaultUserDetails.homeArea)?.code
         teamCode = defaultTeams.find(t => t.description === defaultUserDetails.team)?.code
-        if (res.locals.flags.enableMAN2344) {
-          attendingEmail = defaultUserDetails?.email
-          attendingName = defaultUserDetails?.name
-        }
+        attendingEmail = defaultUserDetails?.email
+        attendingName = defaultUserDetails?.name
         providers = defaultProviders
         teams = defaultTeams
         users = defaultUsers
@@ -98,10 +95,8 @@ export const getDefaultUserV2 = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const nameAndRole = convertToTitleCase(attendingDisplayName, [], regexIgnoreValuesInParentheses)
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
       setDataValue(data, ['appointments', crn, id, 'user', 'displayName'], nameAndRole)
-      if (res.locals.flags.enableMAN2344) {
-        setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
-        setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
-      }
+      setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
+      setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       setDataValue(data, ['providers', username], providers)
       setDataValue(data, ['teams', username], teams)
       setDataValue(data, ['staff', username], users)
