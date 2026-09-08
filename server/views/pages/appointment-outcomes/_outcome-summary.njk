@@ -80,7 +80,7 @@
                 } if showAction
             } if appointmentOutcome.summary.documents,
             {
-                key: { text: "Next appointment" + appointmentOutcome.nextAppointment.id},
+                key: { text: "Next appointment" },
                 value: { text: appointmentOutcome.nextAppointment.label if appointmentOutcome.nextAppointment.label else 'No next appointment' },
                 actions: {
                     items: [

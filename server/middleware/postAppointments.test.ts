@@ -337,6 +337,7 @@ describe('/middleware/postAppointments', () => {
     it('should use nextAppointmentId from session if enableCombinedCYAPage flag is true', async () => {
       const nextAppointmentId = '1234'
       const mockReq = createMockReq({ appointment: mockAppointment, _id: nextAppointmentId, nextAppointmentId })
+      mockReq.params.id = id
       const res = buildResponse()
       const response = await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ uuid: nextAppointmentId })

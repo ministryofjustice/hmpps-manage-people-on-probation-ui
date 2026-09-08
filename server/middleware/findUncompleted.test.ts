@@ -84,7 +84,9 @@ describe('middleware/findUncompleted', () => {
     expect(findUncompleted()(req, res)).toBe(change)
   })
   it('should return change url if nextAppointmentId is available and all required appointment data provided', () => {
-    const req = buildRequest({}, id)
+    const nextAppointmentId = '2'
+    const req = buildRequest({ eventId: null }, nextAppointmentId)
+    req.session.data.appointments[crn][nextAppointmentId] = mockAppointmentSession
     expect(findUncompleted()(req, res)).toBe(change)
   })
   it('should return sentence url if no eventId', () => {
