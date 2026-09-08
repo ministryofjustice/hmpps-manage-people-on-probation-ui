@@ -291,7 +291,7 @@ const buildResponse = ({
   const localsRes = {
     case: mockCase,
     user: mockUser,
-    flags: { enableMAN2344: true, enableSmsReminders: true, enableNonCompliance: false, ...flags },
+    flags: { enableSmsReminders: true, enableNonCompliance: false, ...flags },
     ...locals,
   }
   return mockAppResponse(localsRes)
