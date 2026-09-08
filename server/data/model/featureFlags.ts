@@ -5,7 +5,6 @@ export class FeatureFlags {
   enableCompliancePage?: boolean = undefined
   enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined

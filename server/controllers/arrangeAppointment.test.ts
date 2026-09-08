@@ -185,7 +185,7 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         description: 'Planned Office Meeting',
       },
     ],
-    flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: true },
+    flags: { enableSensitivityRemoved: true, enableNonCompliance: true },
     ...(localsResponse || {}),
   })
 
@@ -819,7 +819,7 @@ describe('controllers/arrangeAppointment', () => {
         },
       })
       const mockRes = createMockResponse({
-        flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: false },
+        flags: { enableSensitivityRemoved: true, enableNonCompliance: false },
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
@@ -862,7 +862,7 @@ describe('controllers/arrangeAppointment', () => {
         },
       })
       const mockRes = createMockResponse({
-        flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: false },
+        flags: { enableSensitivityRemoved: true, enableNonCompliance: false },
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)

@@ -164,7 +164,7 @@ const checkDefaultUserSelection = (req: httpMocks.MockRequest<any>) => {
   })
 }
 
-const res = mockAppResponse({ user: { username: loggedInUsername }, flags: { enableMAN2344: true } })
+const res = mockAppResponse({ user: { username: loggedInUsername }, flags: {} })
 
 const getUserProvidersSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserProviders')
