@@ -67,11 +67,12 @@
         <input type="hidden" name="_csrf" value="{{ params.results.csrfToken }}">
 
         <div class="probation-search__input-container">
+            <div class="govuk-input__wrapper_mpop moj-search__input-wrapper">
             {{ govukInput({
                 attributes: params.attributes,
                 autocomplete: params.autocomplete,
                 classes: params.classes,
-                errorMessage: params.results.errorMessage,
+                errorMessage: { text: "Enter a search term" } if params.results.errorMessage.text === "Please enter a search term" else params.results.errorMessage,
                 hint: params.hint if params.hint else {
                     classes: 'moj-search__hint',
                     html: labelHtml
@@ -88,8 +89,9 @@
             }) }}
 
             {% if not params.enableAsYouTypeSearch %}
-                {{ govukButton({ id: "search-button", text: "Search", classes: "moj-search__button" }) }}
+                {{ govukButton({ id: "search-button", text: "Search", classes: "govuk-button moj-search__button_mpop" }) }}
             {% endif %}
+            </div>
 
             <p id="{{ params.id }}-suggestions" class="probation-search__suggestions govuk-!-margin-top-1">
                 {% if params.results.suggestions | length %}

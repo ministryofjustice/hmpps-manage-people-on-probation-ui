@@ -43,6 +43,22 @@ export const services = () => {
 
   const userService = new UserService(manageUsersApiClient)
 
+  const typedSearchService = new CaseSearchService({
+    hmppsAuthClient: authClientSearch,
+    environment: config.env,
+    extraColumns: [
+      {
+        header: 'Managed by',
+        value: result => getManagedBy(result),
+      },
+      {
+        header: 'PDU',
+        value: result => getPdu(result),
+      },
+    ],
+    allowEmptyQuery: true,
+  })
+
   const searchService = new CaseSearchService({
     hmppsAuthClient: authClientSearch,
     environment: config.env,
@@ -74,6 +90,7 @@ export const services = () => {
     hmppsAuthClient,
     userService,
     searchService,
+    typedSearchService,
     searchServiceWithoutExtraColumns,
     flagService,
     probationComponentsApiService,
