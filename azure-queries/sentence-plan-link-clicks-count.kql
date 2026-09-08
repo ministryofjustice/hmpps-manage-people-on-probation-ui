@@ -1,30 +1,11 @@
 // Count of clicks (not page views) on the "View the sentence plan (opens in new tab)" link,
 // which only appears on the Risk page for people who have both risk and plan data
 // (sentencePlan.showLink).
+//
+//   ./run-query.sh sentence-plan-link-clicks-count.kql
 customEvents
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
 | where timestamp > startofday(ago(0d))
 | extend content = tostring(customDimensions.content)
 | where content has "View the sentence plan (opens in new tab)"
 | summarize ["Clicks"] = count()
-
-// Daily pattern over the last 7 days
-customEvents
-| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
-| where timestamp > startofday(ago(7d))
-| extend content = tostring(customDimensions.content)
-| where content has "View the sentence plan (opens in new tab)"
-| summarize ["Clicks"] = count() by ["Date"] = format_datetime(bin(timestamp, 1d), "yyyy-MM-dd")
-| order by Date desc
-
-// Individual click events over the last 7 days, with user and case (CRN)
-customEvents
-| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
-| where timestamp > startofday(ago(7d))
-| extend content = tostring(customDimensions.content)
-| where content has "View the sentence plan (opens in new tab)"
-| extend NormalisedPage = replace_regex(operation_Name, @"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", "{id}")
-| extend NormalisedPage = replace_regex(NormalisedPage, @"/[A-Za-z][0-9]{6}(/|$)", @"/{crn}\1")
-| extend Crn = extract(@"/([A-Za-z][0-9]{6})(/|$)", 1, operation_Name)
-| project timestamp, ["User"] = user_Id, Crn, ["Page"] = NormalisedPage, operation_Id
-| order by timestamp desc
