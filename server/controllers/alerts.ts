@@ -93,7 +93,7 @@ const alertsController: Controller<typeof routes, void> = {
       )
 
       const arnsClient = new ArnsApiClient(token)
-      const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData?.content ?? [], arnsClient, res)
+      const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData.content, arnsClient, res)
       res.render('pages/alerts', {
         note: false,
         queryString,

@@ -62,54 +62,19 @@ const stubEnforcementsTimeout = (): SuperAgentRequest =>
     },
   })
 
-const stubAlertsTimeout = (): SuperAgentRequest =>
+const stubAppointmentTimeout = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: '/mas/alerts(\\?.*)?',
+      urlPathPattern: '/delius/user/USER1/homepage',
       method: 'GET',
     },
     response: {
       status: 200,
       jsonBody: {
-        content: [
-          {
-            id: 1,
-            type: {
-              description: 'Email/Text from offender',
-              editable: true,
-            },
-            crn: 'X000001',
-            date: '2025-07-10',
-            description: 'Email from offending community team',
-            alertNotes: [
-              {
-                id: 0,
-                createdBy: 'Custody Status Service',
-                createdByDate: '2024-07-19',
-                note: 'Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.',
-                hasNoteBeenTruncated: false,
-              },
-            ],
-            name: {
-              forename: 'Caroline',
-              middleName: '',
-              surname: 'Wolff',
-            },
-            officer: {
-              name: {
-                forename: 'Officer',
-                middleName: '',
-                surname: 'Test',
-              },
-              code: 'STMOR01',
-            },
-            riskLevel: 'MEDIUM',
-          },
-        ],
-        totalResults: 1,
-        totalPages: 1,
-        page: 0,
-        size: 1,
+        outcomes: [],
+        appointments: [],
+        totalAppointments: 0,
+        totalOutcomes: 0,
       },
       headers: {
         'Content-Type': 'application/json',
@@ -122,5 +87,5 @@ export default {
   stubEmptyHomepage,
   stubEmptyEnforcementContacts,
   stubEnforcementsTimeout,
-  stubAlertsTimeout,
+  stubAppointmentTimeout,
 }

@@ -53,7 +53,7 @@ const homeController: Controller<typeof routes, void> = {
         appointmentsRequiringOutcomeCount,
         enforcementActions,
         url,
-        homePageTimeOutError: homePage.timeoutError,
+        appointmentsTimeoutError: homePage.timeoutError,
         enforcementContactResponse,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,

@@ -1,19 +1,4 @@
 {% set errors = [] %}
-{% if enforcementContactResponse and enforcementContactResponse.timeoutError %}
-    {% set errors = enforcementContactResponse.timeoutError %}
-{% endif %}
-{% if appointmentsTimeoutError %}
-    {% set errors = appointmentsTimeoutError %}
-{% endif %}
-{% if alertsCount and alertsCount.timeoutError %}
-    {% set errors = alertsCount.timeoutError %}
-{% endif %}
-{% if homePageTimeOutError and homePageTimeOutError %}
-    {% set errors = homePageTimeOutError %}
-{% endif %}
-{% if user and user.timeoutError %}
-    {% set errors = user.timeoutError %}
-{% endif %}
 {% if alertsCount.errors.length > 0 %}
     {% set errors = errors.concat(alertsCount.errors) %}
 {% endif %}
@@ -57,3 +42,53 @@
     html: errorsHtml
   }) }}
 {% endif %}
+
+{% set timeoutErrors = [] %}
+{% if appointmentsTimeoutError %}
+    {% set timeoutErrors = timeoutErrors.concat([
+        {
+            text: 'Upcoming appointments are currently unavailable.'
+        },
+        {
+            text: 'Outcomes to log are currently unavailable.'
+        }
+    ]) %}
+{% endif %}
+
+{% if enforcementContactResponse and enforcementContactResponse.timeoutError %}
+    {% set timeoutErrors = timeoutErrors.concat([
+        {
+            text: 'Enforcement actions are currently unavailable.'
+        }
+    ]) %}
+{% endif %}
+
+{% if timeoutErrors.length > 0 %}
+
+    {% set errorListHtml %}
+        {% if timeoutErrors.length > 1 %}
+            <ul>
+                {% for error in timeoutErrors %}
+                    <li>{{error.text}}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <span>{{timeoutErrors[0].text}}</span>
+        {% endif %}
+    {% endset %}
+
+    {{ mojAlert({
+        variant: "error",
+        title: "There is a problem",
+        showTitleAsHeading: true,
+        dismissible: false,
+        html: errorListHtml,
+        attributes: {
+            "data-qa": "timeOutError"
+        }
+    }) }}
+
+{% endif %}
+
+
+

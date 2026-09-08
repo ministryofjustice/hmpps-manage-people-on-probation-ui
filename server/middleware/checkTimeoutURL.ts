@@ -5,13 +5,7 @@ interface TimeoutUrlPaths {
 }
 
 export const timeoutUrlPaths: TimeoutUrlPaths = {
-  urls: [
-    '^/contact/[^/]+/enforcements$',
-    '^/user/[^/]+/appointments$',
-    '^/user/[^/]+$',
-    '^/alerts$',
-    '^/user/[^/]+/homepage$',
-  ],
+  urls: ['^/contact/[^/]+/enforcements$', '^/user/[^/]+/appointments$', '^/user/[^/]+/homepage$'],
 }
 
 export function matchesTimeoutPath(requestPath: string, config: TimeoutUrlPaths): boolean {

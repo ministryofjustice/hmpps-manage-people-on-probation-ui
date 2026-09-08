@@ -97,7 +97,7 @@ export default class RestClient {
       if (matchesTimeoutPath(path, timeoutUrlPaths) && isTimeoutError(error)) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({
-          text: 'We are having trouble loading some information right now. You can continue using the service or try again later.',
+          text: 'Some information on this page is currently unavailable.',
         })
         if (Sentry.getClient()) {
           const eventId = Sentry.captureException(error, {

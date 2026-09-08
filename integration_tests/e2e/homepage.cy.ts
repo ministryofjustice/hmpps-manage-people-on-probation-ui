@@ -94,18 +94,28 @@ context('Sign In', () => {
   })
 
   it('Handle API timeout in home page ', () => {
-    cy.task('stubAlertsTimeout')
+    cy.task('stubAppointmentTimeout')
     cy.task('stubEnforcementsTimeout')
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
 
-    cy.get('[class="moj-alert__content"]').should(
-      'contain.text',
-      'We are having trouble loading some information right now. You can continue using the service or try again later.',
-    )
+    cy.get('[class="moj-alert__content"]').should('contain.text', 'Upcoming appointments are currently unavailable')
+    cy.get('.moj-alert__content li')
+      .should('have.length', 3)
+      .and('contain.text', 'Upcoming appointments are currently unavailable.')
+      .and('contain.text', 'Outcomes to log are currently unavailable.')
+      .and('contain.text', 'Enforcement actions are currently unavailable.')
+
     page.getOutcomesToLog().should('exist')
-    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (')
-    page.getOutcomesToLogRows().should('have.length', 5)
+    cy.get('[data-qa="outcomesTimeoutError"]').should('contain.text', 'Outcomes to log are currently unavailable.')
+    cy.get('[data-qa="appointmentsTimeoutError"]').should(
+      'contain.text',
+      'Upcoming appointments are currently unavailable.',
+    )
+    cy.get('[data-qa="enforcementTimeoutError"]').should(
+      'contain.text',
+      'Enforcement actions are currently unavailable.',
+    )
     cy.get('[data-qa="privacyPolicyLink"]')
       .should('have.attr', 'href', '/privacy-policy')
       .and('contain.text', 'Privacy policy')
