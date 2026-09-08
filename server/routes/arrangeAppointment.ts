@@ -8,7 +8,6 @@ import {
   getAppointmentTypes,
   getAppointment,
   getDefaultUserV2,
-  getUserOptions,
   routeChangeAttendee,
   getSmsPreview,
   getPersonRiskFlags,

@@ -17,7 +17,6 @@ import {
   renderError,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
-  getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
   isRescheduleAppointment,
@@ -33,7 +32,6 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
 import { filterContacts } from '../middleware/filterContacts'
 import logger from '../../logger'
-import { getUserOptionsV2 } from '../middleware/getUserOptionsV2'
 
 const routes = [
   'redirectToSentence',
