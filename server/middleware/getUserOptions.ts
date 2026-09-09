@@ -3,8 +3,8 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
-import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 import logger from '../../logger'
+import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getUserOptionsInner(req, res, next?) {
@@ -15,111 +15,59 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const masClient = new MasApiClient(token)
     const { data } = req.session
 
+    // eslint-disable-next-line no-useless-escape
+    const regexIgnoreValuesInParentheses = /[\(\)]/
+
     const sessionCacheContext = {
       uuid: id,
       username,
       crn,
-      enabled: res.locals.flags.enableSessionCacheLogging,
-    }
-    // eslint-disable-next-line no-useless-escape
-    const regexIgnoreValuesInParentheses = /[\(\)]/
-
-    let selectedTeam = ''
-    let selectedUser = ''
-    const providerCodeSession = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) || ''
-    const teamCodeSession = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) || ''
-    const usernameSession = getDataValue(data, ['appointments', crn, id, 'user', 'username']) || ''
-
-    const [{ defaultUserDetails, providers, teams: defaultTeams }, probationPractitioner] = await Promise.all([
-      masClient.getUserProviders(username),
-      masClient.getProbationPractitioner(crn),
-    ])
-
-    let providerOptions = providers.map(provider => {
-      const { code, name } = provider
-      const option: Provider = { code, name }
-      return option
-    })
-
-    providerOptions = providerOptions.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
-
-    const defaultProvider =
-      providers.find(provider => provider.name.toLowerCase() === defaultUserDetails.homeArea.toLowerCase())?.code || ''
-
-    let selectedProvider = providerCodeQuery || providerCodeSession || defaultProvider || providerOptions?.[0]?.code
-
-    if (!providerCodeQuery && providerCodeSession && providerCodeSession === probationPractitioner.provider.code) {
-      selectedProvider = defaultProvider
+      enabled: res.locals.flags?.enableSessionCacheLogging,
     }
 
-    providerOptions = providerOptions.map(({ code, name }) => {
+    const providerCode =
+      providerCodeQuery || getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) || ''
+    const teamCode =
+      teamCodeQuery ||
+      (!providerCodeQuery ? getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) || '' : '')
+    const usernameSession =
+      !providerCodeQuery && !teamCodeQuery
+        ? getDataValue(data, ['appointments', crn, id, 'user', 'username']) || ''
+        : ''
+
+    const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(
+      username,
+      providerCode,
+      teamCode,
+    )
+
+    let providerOptions = providers.map(({ code, name }) => {
       const option: Provider = { code, name }
-      if (code === selectedProvider) {
+      if (providerCode !== '') {
+        if (code === providerCode) {
+          option.selected = 'selected'
+        }
+      } else if (name === defaultUserDetails?.homeArea) {
         option.selected = 'selected'
       }
       return option
     })
+    providerOptions = providerOptions.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
 
-    logSessionCacheChange(
-      'getUserOptions.selectedProvider',
-      data,
-      ['appointments', crn, id, 'user', 'providerCode'],
-      selectedProvider,
-      sessionCacheContext,
-    )
-
-    const { teams } = await masClient.getTeamsByProvider(selectedProvider)
-
-    let teamOptions = teams.map(team => {
-      const { code, description } = team
+    let teamOptions = teams.map(({ code, description }) => {
       const option: Team = { code, description }
+      if (teamCode !== '') {
+        if (code === teamCode) {
+          option.selected = 'selected'
+        }
+      } else if (description === defaultUserDetails?.team) {
+        option.selected = 'selected'
+      }
       return option
     })
-
     teamOptions = teamOptions.sort((a, b) =>
       a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
     )
-
-    const defaultTeam =
-      defaultTeams.find(team => team.description.toLowerCase() === defaultUserDetails?.team?.toLowerCase())?.code || ''
-
-    if (teamCodeQuery) {
-      selectedTeam = teamCodeQuery
-    } else if (!providerCodeQuery) {
-      selectedTeam = teamCodeSession || defaultTeam
-    }
-
-    if (
-      !providerCodeQuery &&
-      !teamCodeQuery &&
-      teamCodeSession &&
-      teamCodeSession === probationPractitioner.team.code
-    ) {
-      selectedTeam = defaultTeam
-    }
-    if (!selectedTeam) {
-      selectedTeam = teamOptions?.[0]?.code
-    }
-
-    teamOptions = teamOptions.map(({ code, description }) => {
-      const option: Team = { code, description }
-      if (code === selectedTeam) {
-        option.selected = 'selected'
-      }
-      return option
-    })
-
-    logSessionCacheChange(
-      'getUserOptions.selectedTeam',
-      data,
-      ['appointments', crn, id, 'user', 'teamCode'],
-      selectedTeam,
-      sessionCacheContext,
-    )
-
-    const { users } = await masClient.getStaffByTeam(selectedTeam)
-
-    const defaultUser = defaultUserDetails?.username || ''
 
     let userOptions = users.map(user => {
       const { username: staffUsername, nameAndRole, staffCode, email, name } = user
@@ -132,55 +80,33 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       return option
     })
-
     userOptions = userOptions.sort((a, b) =>
       a.nameAndRole.localeCompare(b.nameAndRole, undefined, { sensitivity: 'base' }),
     )
-
-    if (!teamCodeQuery) {
-      selectedUser = usernameSession || defaultUser
-    }
-    if (!selectedUser) {
-      selectedUser = userOptions?.[0]?.username || ''
-    }
-
-    if (
-      !providerCodeQuery &&
-      !teamCodeQuery &&
-      usernameSession &&
-      usernameSession.toLowerCase() === probationPractitioner?.username?.toLowerCase()
-    ) {
-      selectedUser = defaultUser
-    }
-
-    userOptions = userOptions.map(({ username: staffUsername, ...restUserProps }) => {
-      const option: User = { username: staffUsername, ...restUserProps }
-      if (staffUsername.toLowerCase() === selectedUser.toLowerCase()) {
+    userOptions = userOptions.map(({ nameAndRole, username: staffUsername, ...restUserProps }) => {
+      const option: User = { nameAndRole, username: staffUsername, ...restUserProps }
+      if (usernameSession !== '') {
+        if (staffUsername.toLowerCase() === usernameSession.toLowerCase()) {
+          option.selected = 'selected'
+        }
+      } else if (staffUsername.toLowerCase() === defaultUserDetails?.username.toLowerCase()) {
         option.selected = 'selected'
       }
       return option
     })
 
-    logSessionCacheChange(
-      'getUserOptions.selectedUser',
-      data,
-      ['appointments', crn, id, 'user', 'username'],
-      selectedUser,
-      sessionCacheContext,
-    )
-
     res.locals.userProviders = providerOptions
     res.locals.userTeams = teamOptions
     res.locals.userStaff = userOptions
-    res.locals.providerCode = selectedProvider
-    res.locals.teamCode = selectedTeam
+    res.locals.providerCode = providerCode
+    res.locals.teamCode = teamCode
     logger.info(`[getUserOptions] uuid='${id}' username='${username}' calledWithNext=${Boolean(next)}`)
-    logSessionCacheChange('getUserOptions', data, ['providers', username], providerOptions, sessionCacheContext)
-    logSessionCacheChange('getUserOptions', data, ['teams', username], teamOptions, sessionCacheContext)
-    logSessionCacheChange('getUserOptions', data, ['staff', username], userOptions, sessionCacheContext)
-    setDataValue(data, ['providers', username], providerOptions)
-    setDataValue(data, ['teams', username], teamOptions)
-    setDataValue(data, ['staff', username], userOptions)
+    logSessionCacheChange('getUserOptions', data, ['providers', 'temp', username], providerOptions, sessionCacheContext)
+    logSessionCacheChange('getUserOptions', data, ['teams', 'temp', username], teamOptions, sessionCacheContext)
+    logSessionCacheChange('getUserOptions', data, ['staff', 'temp', username], userOptions, sessionCacheContext)
+    setDataValue(data, ['providers', 'temp', username], providerOptions)
+    setDataValue(data, ['teams', 'temp', username], teamOptions)
+    setDataValue(data, ['staff', 'temp', username], userOptions)
 
     if (!next) {
       return null

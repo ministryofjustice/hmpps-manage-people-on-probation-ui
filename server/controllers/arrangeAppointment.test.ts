@@ -12,7 +12,6 @@ import {
   cloneAppointmentAndRedirect,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
-  getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
 } from '../middleware'
@@ -22,6 +21,7 @@ import { AppResponse } from '../models/Locals'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
+import { getUserOptions } from '../middleware/getUserOptions'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
@@ -449,25 +449,18 @@ describe('controllers/arrangeAppointment', () => {
       })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(mockGetOfficeLocationsByTeamAndProvider).toHaveBeenCalled()
-      expect(mockedGetUserOptions).toHaveBeenCalled()
       expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        1,
+        4,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'providerCode'],
         providerCode,
       )
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        2,
+        5,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'teamCode'],
         teamCode,
-      )
-      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        3,
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'user', 'username'],
-        username,
       )
 
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()

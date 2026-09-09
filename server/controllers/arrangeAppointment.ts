@@ -17,7 +17,6 @@ import {
   renderError,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
-  getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
   isRescheduleAppointment,
@@ -94,6 +93,9 @@ const resetSessionValues = (req: Request, res: Response) => {
     setDataValue(data, [...path, 'sensitivity'], null)
   }
 }
+
+// eslint-disable-next-line no-useless-escape
+const regexIgnoreValuesInParentheses = /[\(\)]/
 
 const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
   redirectToSentence: () => {
@@ -240,10 +242,17 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { body, query, session } = req
       const { change } = query as Record<string, string>
       const { data } = session
+      const loggedInUsername = res.locals.user.username
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
-      const staff = getDataValue<User[]>(data, ['staff', res.locals.user.username])
+      const providers = getDataValue(data, ['providers', 'temp', loggedInUsername])
+      const teams = getDataValue(data, ['teams', 'temp', loggedInUsername])
+      const staff = getDataValue<User[]>(data, ['staff', 'temp', loggedInUsername])
+      setDataValue(data, ['providers', loggedInUsername], providers)
+      setDataValue(data, ['teams', loggedInUsername], teams)
+      setDataValue(data, ['staff', loggedInUsername], staff)
+
       const staffMember = staff?.find(person => person.username === username)
       logger.info(
         `[postWhoWillAttend] uuid='${id}' loggedInUser='${res.locals.user.username}' selectedUsername='${username}' staffMemberFound=${Boolean(staffMember)}`,
@@ -293,7 +302,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
         setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
-        await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)
       }
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
@@ -648,7 +656,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+      if (attending?.username?.toUpperCase() !== res.locals.user.username.toUpperCase()) {
         if (attending?.name?.forename) {
           const formattedName =
             attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()
