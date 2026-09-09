@@ -148,12 +148,14 @@ const createMockReq = ({
   appointment,
   nextAppointmentId = null,
   _id = id,
-}: { appointment?: AppointmentSession; _id?: string; nextAppointmentId?: string } = {}) => {
+  url = '/arrange-appointment/check-your-answers',
+}: { appointment?: AppointmentSession; _id?: string; nextAppointmentId?: string; url?: string } = {}) => {
   return httpMocks.createRequest({
     params: {
       crn,
       id: _id,
     },
+    url,
     session: {
       data: {
         locations: {
@@ -334,9 +336,14 @@ describe('/middleware/postAppointments', () => {
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
       expect(response).toEqual(mockAppointmentsPostResponse)
     })
-    it('should use nextAppointmentId from session if enableCombinedCYAPage flag is true', async () => {
+    it('should use nextAppointmentId from session if enableCombinedCYAPage flag is true and on outcome cya page', async () => {
       const nextAppointmentId = '1234'
-      const mockReq = createMockReq({ appointment: mockAppointment, _id: nextAppointmentId, nextAppointmentId })
+      const mockReq = createMockReq({
+        appointment: mockAppointment,
+        _id: nextAppointmentId,
+        nextAppointmentId,
+        url: '/outcome/check-your-answers',
+      })
       mockReq.params.id = id
       const res = buildResponse()
       const response = await postAppointments(hmppsAuthClient)(mockReq, res)

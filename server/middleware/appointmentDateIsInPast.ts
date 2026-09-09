@@ -6,11 +6,7 @@ import '../@types/express/index.d'
 
 export const appointmentDateIsInPast = (req: Request, res: Response): boolean => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
-  let id = uuid || contactId
-  if (res?.locals?.flags?.enableCombinedCYAPage) {
-    const nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId']) || null
-    id = nextAppointmentId || id
-  }
+  const id = uuid || contactId
   let date: string
   let start: string
   let isInPast = false
