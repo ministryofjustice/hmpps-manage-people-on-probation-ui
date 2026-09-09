@@ -8,7 +8,6 @@ import {
   getAppointmentTypes,
   getAppointment,
   getDefaultUser,
-  getUserOptions,
   routeChangeAttendee,
   getSmsPreview,
   getPersonRiskFlags,
@@ -38,6 +37,7 @@ import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
 import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
+import { getUserOptions } from '../middleware/getUserOptions'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))

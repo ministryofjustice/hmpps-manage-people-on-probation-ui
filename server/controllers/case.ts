@@ -60,26 +60,21 @@ const caseController: Controller<typeof routes, void> = {
       if (res.locals.flags.enableEsupEligibilityCheck) {
         checkinEligibility = await esupClient.getOffenderEligibility(crn)
       }
-
-      let outcomes = contactResponse?.content
-      if (res.locals.flags.enableOutcomesV1) {
-        outcomes = filterContacts(outcomes)
-      }
+      
+      const outcomes = filterContacts(contactResponse?.content)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
       let personExistsResponse: PersonExistsResponse | undefined
-      if (res.locals.flags.enableEMDIOverviewShowGPSData) {
-        await getSentences(hmppsAuthClient)(req, res, () => {})
-        const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
-          hasLocationMonitoring(item?.licenceConditions, item?.requirements),
-        )
-        if (hasLocationMonitoringData) {
-          personExistsResponse = await existsInEMDI(crn, token)
-          res.locals.personExistsResponse = personExistsResponse
-        }
+      await getSentences(hmppsAuthClient)(req, res, () => {})
+      const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
+        hasLocationMonitoring(item?.licenceConditions, item?.requirements),
+      )
+      if (hasLocationMonitoringData) {
+        personExistsResponse = await existsInEMDI(crn, token)
+        res.locals.personExistsResponse = personExistsResponse
       }
       return res.render('pages/overview', {
         overview,

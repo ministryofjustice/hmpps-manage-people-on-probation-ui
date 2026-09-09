@@ -24,17 +24,6 @@
               "rollouts": []
             },
             {
-              "key": "enableCaseloadV2",
-              "name": "enableCaseloadV2",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-11-17T15:28:37.920581Z",
-              "updatedAt": "2025-11-17T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableSmsReminders",
               "name": "enableSmsReminders",
               "description": "",
@@ -57,41 +46,17 @@
               "rollouts": []
             },
             {
-              "key": "enableManageContacts",
-              "name": "enableManageContacts",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-04-23T12:00:00.000000Z",
-              "updatedAt": "2026-04-23T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableDeliusClient",
               "name": "enableDeliusClient",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
+              "updatedAt": "2026-02-26T12:00:00.000000Z"
             },
             {
               "key": "enableNonCompliance",
               "name": "enableNonCompliance",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableOutcomesV1",
-              "name": "enableOutcomesV1",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
@@ -134,17 +99,6 @@
               "rollouts": []
             },
             {
-              "key": "enableSensitivityRemoved",
-              "name": "enableSensitivityRemoved",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-04-23T12:00:00.000000Z",
-              "updatedAt": "2026-04-23T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableMyEnforcementActionsOverview",
               "name": "enableMyEnforcementActionsOverview",
               "description": "",
@@ -152,28 +106,6 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-02-26T12:00:00.000000Z",
               "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableEMDISentencesShowGPSData",
-              "name": "enableEMDISentencesShowGPSData",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-05-18T12:00:00.000000Z",
-              "updatedAt": "2026-05-18T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableEMDIOverviewShowGPSData",
-              "name": "enableEMDIOverviewShowGPSData",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-05-18T12:00:00.000000Z",
-              "updatedAt": "2026-05-18T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             },

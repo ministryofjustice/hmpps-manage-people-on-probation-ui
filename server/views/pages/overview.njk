@@ -587,7 +587,7 @@
           {% if loop.first %}
             <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
           {% endif %}
-          {% if flags.enableEMDIOverviewShowGPSData and locationMonitoringUri %}
+          {% if locationMonitoringUri %}
                 {% set hasLocationMonitoring = sentence.eventNumber | checkLocationMonitoringByEventNumber(sentences) %}
           {% endif %}
           {{ sentence.order.description }} <br/>
@@ -646,7 +646,7 @@
               {
                 key: { html: '<span data-qa="licenceConditionsLabel">Licence conditions</span>' },
                  value: { html: '<span data-qa="licenceConditionsValue">' + licences + '</span>' }
-              } if flags.enableEMDIOverviewShowGPSData and showLicenceRow
+              } if showLicenceRow
             ]
           }) }}
           {% endset %}

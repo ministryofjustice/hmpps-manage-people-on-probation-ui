@@ -161,6 +161,7 @@ export interface AppointmentSessionUser {
   staffCode?: string
   name?: Name
   email?: string
+  displayName?: string
 }
 
 export interface AppointmentSession {

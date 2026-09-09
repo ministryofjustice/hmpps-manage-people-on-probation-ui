@@ -524,9 +524,7 @@ describe('/middleware/createAppointmentSession', () => {
     const res = mockAppResponse({
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
-      flags: {
-        enableSensitivityRemoved: true,
-      },
+      flags: {},
     })
     createAppointmentSession(req, res, nextSpy)
     expect(res.locals.appointmentSession).toBeDefined()

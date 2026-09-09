@@ -132,7 +132,6 @@ const buildRequest = ({
 const buildResponse = () => {
   const locals = {
     flags: {
-      enableSensitivityRemoved: true,
       enableCombinedCYAPage: true,
     },
     appointmentOutcome: {},
@@ -180,12 +179,10 @@ describe('middleware/handlePostAppointment', () => {
     expect(postAppointmentsSpy).not.toHaveBeenCalled()
     expect(postRescheduleAppointmentsSpy).not.toHaveBeenCalled()
   })
-
-  it(`should set sensitivity as 'Yes' if sensitivityLocked = true and enableSensitivityRemoved flag = true`, async () => {
-    const req = buildRequest({ url: '/arrange-appointment/check-your-answers', nextAppointmentId: null })
-    mockedIsValidCrn.mockReturnValueOnce(true)
-    mockedIsValidUUID.mockReturnValueOnce(true)
-    mockedIsNumericString.mockReturnValueOnce(true)
+  it(`should set sensitivity as 'Yes' if sensitivityLocked = true`, async () => {
+    const req = buildRequest()
+    mockedIsValidCrn.mockReturnValue(true)
+    mockedIsValidUUID.mockReturnValue(true)
     findUncompletedSpy.mockReturnValueOnce(() => '/req/url')
     await handlePostAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
