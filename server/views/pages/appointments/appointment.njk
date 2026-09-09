@@ -11,8 +11,7 @@
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% set shouldShowManageButton =
-  flags.enableManageContacts
-  and (appointment.displayName or appointment.isUpdatableContact)
+(appointment.displayName or appointment.isUpdatableContact)
   and appointment.type not in enforcementContactTypes
 %}
 {% block beforeContent %}
@@ -47,7 +46,7 @@
 
 {% block content %}
 
-{% if showSuccessBanner and flags.enableManageContacts == true %}
+{% if showSuccessBanner %}
   {% if uploadFailed %}
     {{ mojBanner({
         type: 'warning',

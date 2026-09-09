@@ -3,7 +3,6 @@ export class FeatureFlags {
   [index: string]: boolean
   enableSmsReminders?: boolean = undefined
   enableCompliancePage?: boolean = undefined
-  enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
