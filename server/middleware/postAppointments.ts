@@ -26,7 +26,12 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
-    const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    let id = uuid
+    if (res?.locals?.flags?.enableCombinedCYAPage && req.url.includes('/outcome/check-your-answers')) {
+      const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
+      id = nextAppointmentId || id
+    }
+    const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     logFieldPresence(
       'postAppointments',
       {
@@ -42,7 +47,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         userName: appointmentSession?.user?.name,
         userEmail: appointmentSession?.user?.email,
       },
-      { uuid, enabled: res.locals.flags.enableSessionCacheLogging },
+      { uuid: id, enabled: res.locals.flags.enableSessionCacheLogging },
     )
     const {
       user: { username, locationCode, teamCode },
@@ -71,7 +76,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       type,
       start: dateTime(date, start),
       end: dateTime(date, end),
-      uuid,
+      uuid: id,
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
@@ -110,7 +115,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       try {
         fallbackUserDetails = await masClient.getUserDetails(username)
       } catch (error) {
-        logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${username}`)
+        logger.warn(error, `Appointment ${id}: failed to retrieve user details for ${username}`)
       }
 
       if (isNameIncomplete(name)) {
@@ -125,7 +130,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
       const stillMissing = [isNameIncomplete(name) && 'name', !email && 'email'].filter(Boolean)
       if (stillMissing.length) {
-        const message = `Appointment ${uuid}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
+        const message = `Appointment ${id}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
         logger.warn(message)
         Sentry.captureException(new Error(message), {
           tags: {
@@ -173,7 +178,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           includeWelshPreview,
           appointmentLocation = null,
           appointmentTypeCode = null,
-        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
+        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, id, 'smsPreview', 'request'])
         isWelshTranslation = includeWelshPreview
         outlookEventRequestBody.smsEventRequest = {
           firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,

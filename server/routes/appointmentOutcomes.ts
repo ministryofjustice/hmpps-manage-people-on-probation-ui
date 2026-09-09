@@ -6,7 +6,6 @@ import { Services } from '../services'
 import {
   autoStoreSessionData,
   getPersonAppointment,
-  createAppointmentSession,
   getAppointmentTypes,
   getSentences,
   getPersonalDetails,
@@ -15,6 +14,8 @@ import {
   getUserProviders,
   forceValidation,
   getOverdueOutcomes,
+  handlePostAppointment,
+  checkIsValidUrl,
 } from '../middleware'
 
 import {
@@ -41,6 +42,7 @@ import {
   getFailedToAttendTicket,
   getTicket,
   resetEnforcementActionSelection,
+  getOutcomeNextAppointment,
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
@@ -296,11 +298,14 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get(
     `${manageBasePath}/check-your-answers`,
     getNextComAppointment(hmppsAuthClient),
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.appointmentOutcomes.getCheckYourAnswers(hmppsAuthClient),
   )
   router.post(
     `${manageBasePath}/check-your-answers`,
+    checkIsValidUrl,
+    handlePostAppointment(hmppsAuthClient),
     handlePutOutcome(hmppsAuthClient),
     controllers.appointmentOutcomes.postCheckYourAnswers(hmppsAuthClient),
   )
@@ -320,6 +325,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get(
     `${manageBasePath}/confirmation`,
     getOverdueOutcomes(hmppsAuthClient),
+    getOutcomeNextAppointment,
     getConfirmation,
     controllers.appointmentOutcomes.getConfirmation(hmppsAuthClient),
   )

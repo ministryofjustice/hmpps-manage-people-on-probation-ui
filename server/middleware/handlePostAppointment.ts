@@ -2,32 +2,50 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { AppointmentSession, RescheduleAppointmentResponse, AppointmentsPostResponse } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { isValidCrn, isValidUUID, getDataValue, setDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 import { findUncompleted } from './findUncompleted'
 import { postAppointments } from './postAppointments'
 import { postRescheduleAppointments } from './postRescheduleAppointments'
-import { renderError } from './renderError'
 
 export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function handlePostAppointmentInner(req, res, next) {
     const { data } = req.session
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
-    if (!isValidCrn(crn) || !isValidUUID(uuid)) {
-      return renderError(404)(req, res)
-    }
     const id = uuid || contactId
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
     const sensitivityLocked = appointment?.sensitivityLocked
+    const url = req.url.split('?')[0]
     const rescheduleAppointment = appointment?.rescheduleAppointment
+    const isOutcomeCYAPage = url.includes('/outcome/check-your-answers')
+
     if (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) {
       setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'Yes')
     }
 
     let responseContactId: number
+    if (!isOutcomeCYAPage) {
+      const uncompleted = findUncompleted({ forceValidation: true })(req, res)
+      if (uncompleted?.includes('?change')) {
+        return res.redirect(uncompleted)
+      }
+    }
 
-    const uncompleted = findUncompleted({ forceValidation: true })(req, res)
-    if (uncompleted?.includes('?change')) {
-      return res.redirect(uncompleted)
+    const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
+
+    // if on outcome check your answers page and there is no nextAppointmentId, call next() 👇
+    if (!res?.locals?.flags?.enableCombinedCYAPage && isOutcomeCYAPage && !nextAppointmentId) {
+      return next()
+    }
+
+    if (res?.locals?.flags?.enableCombinedCYAPage) {
+      const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+      if (isOutcomeCYAPage && !nextAppointmentId) {
+        return next()
+      }
+      // if on arrange another appointment page and nextAppointmentId and linkedContactId exist, redirect to outcome check your answers page 👇
+      if (linkedContactId && nextAppointmentId && url.includes('/arrange-another-appointment')) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`)
+      }
     }
 
     if (rescheduleAppointment?.contactId) {
