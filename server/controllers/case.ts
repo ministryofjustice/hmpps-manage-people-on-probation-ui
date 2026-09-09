@@ -60,7 +60,7 @@ const caseController: Controller<typeof routes, void> = {
       if (res.locals.flags.enableEsupEligibilityCheck) {
         checkinEligibility = await esupClient.getOffenderEligibility(crn)
       }
-      
+
       const outcomes = filterContacts(contactResponse?.content)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
