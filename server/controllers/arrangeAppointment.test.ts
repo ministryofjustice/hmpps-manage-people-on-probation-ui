@@ -21,7 +21,7 @@ import { AppResponse } from '../models/Locals'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
-import { getUserOptionsV2 } from '../middleware/getUserOptionsV2'
+import { getUserOptions } from '../middleware/getUserOptions'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
@@ -57,9 +57,9 @@ jest.mock('../middleware', () => ({
   appointmentDateIsInPast: jest.fn(),
   isRescheduleAppointment: jest.fn().mockImplementation(() => true),
   getOfficeLocationsByTeamAndProvider: jest.fn(() => mockMiddlewareFn),
-  getDefaultUserV2: jest.fn(() => mockMiddlewareFn),
+  getDefaultUser: jest.fn(() => mockMiddlewareFn),
   checkAnswers: jest.fn(() => mockMiddlewareFn),
-  getUserOptionsV2: jest.fn(() => mockMiddlewareFn),
+  getUserOptions: jest.fn(() => mockMiddlewareFn),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -91,7 +91,7 @@ const mockedCheckAnswers = checkAnswers as jest.MockedFunction<typeof checkAnswe
 const mockGetOfficeLocationsByTeamAndProvider = getOfficeLocationsByTeamAndProvider as jest.MockedFunction<
   typeof getOfficeLocationsByTeamAndProvider
 >
-const mockedGetUserOptions = getUserOptionsV2 as jest.MockedFunction<typeof getUserOptionsV2>
+const mockedGetUserOptions = getUserOptions as jest.MockedFunction<typeof getUserOptions>
 const mockedFindUncompleted = findUncompleted as jest.MockedFunction<typeof findUncompleted>
 const mockedAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
