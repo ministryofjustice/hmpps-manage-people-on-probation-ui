@@ -433,7 +433,7 @@ describe('ESupervisionClient', () => {
       }
 
       fakeESupervisionApi
-        .delete(`/v2/offenders/${crn}/eligibility`)
+        .get(`/v2/offenders/${crn}/eligibility`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
