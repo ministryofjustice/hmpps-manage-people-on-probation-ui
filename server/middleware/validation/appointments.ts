@@ -58,7 +58,7 @@ const appointments: Route<void> = (req, res, next) => {
     localParams = {
       ...localParams,
       isReschedule: isRescheduleAppointment(req),
-      isInPast: appointmentDateIsInPast(req),
+      isInPast: appointmentDateIsInPast(req, res),
       _maxDate,
     }
   }

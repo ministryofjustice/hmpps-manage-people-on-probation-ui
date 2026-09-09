@@ -1,7 +1,9 @@
+import { DateTime } from 'luxon'
 import {
   AcceptableAbsenceOutcomeType,
   AppointmentEnforcementAction,
   AppointmentOutcomeType,
+  AppointmentSessionSelection,
   EnforcementActionCreatedBy,
 } from '../../../server/models/Appointments'
 import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-your-answers.page'
@@ -11,7 +13,7 @@ import ManageAppointmentPage from '../../pages/appointments/manage-appointment.p
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import OverviewPage from '../../pages/overview'
 import { appointmentId, crn } from '../appointments/imports/common'
-import { completeOutcome, completeAddNotePage } from '../appointments/utils'
+import { completeOutcome, completeAddNotePage, completeNextAppointmentJourney } from '../appointments/utils'
 
 let manageAppointmentPage: ManageAppointmentPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
@@ -19,13 +21,18 @@ let confirmationPage: ConfirmationOutcomePage
 let nextAppointmentPage: NextAppointmentPage
 let overviewPage: OverviewPage
 
+const yesterday = DateTime.now().minus({ days: 1 }).toFormat('cccc d LLLL yyyy')
+
 interface Props {
   outcome?: AppointmentOutcomeType
   action?: AppointmentEnforcementAction | AcceptableAbsenceOutcomeType
   letterSentBy?: EnforcementActionCreatedBy
 }
 
-const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null, letterSentBy = null }: Props = {}): void => {
+const loadPage = (
+  { outcome = 'ATTENDED_COMPLIED', action = null, letterSentBy = null }: Props = {},
+  nextAppointment: AppointmentSessionSelection = 'NO',
+): void => {
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
   manageAppointmentPage = new ManageAppointmentPage()
@@ -33,10 +40,38 @@ const loadPage = ({ outcome = 'ATTENDED_COMPLIED', action = null, letterSentBy =
   completeOutcome({ outcome, action, letterSentBy })
   completeAddNotePage({ journey: 'MANAGE', crnOverride: crn })
   nextAppointmentPage = new NextAppointmentPage()
-  cy.get(`.govuk-radios__input[value=NO]`).click()
+  cy.get(`.govuk-radios__input[value=${nextAppointment}]`).click()
   nextAppointmentPage.getSubmitBtn().click()
+  if (['KEEP_TYPE', 'CHANGE_TYPE'].includes(nextAppointment)) {
+    completeNextAppointmentJourney({ type: nextAppointment, dateInPast: true, isOutcomeJourney: true, crn })
+  }
   checkYourAnswersOutcomePage = new AppointmentCheckYourAnswersPage()
   checkYourAnswersOutcomePage.getSubmitBtn().click()
+}
+
+const checkNextAppointmentText = () => {
+  confirmationPage
+    .getWhatHappensNextText()
+    .should('contain.text', `You’ve arranged a 3 way meeting (NS) on ${yesterday} at 9am to 10am.`)
+    .should('contain.text', 'Alton will receive a confirmation text message with the new appointment details.')
+    .should('contain.text', 'The new appointment has been added to:')
+    .should('contain.text', 'your calendar')
+    .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
+}
+
+const checkFurtherActions = ({ hasRecallService = true } = {}) => {
+  if (hasRecallService) {
+    confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'use the Consider a recall service')
+  }
+  confirmationPage
+    .getFurtherActionLinks()
+    .eq(hasRecallService ? 1 : 0)
+    .should('contain.text', 'arrange another appointment')
+  confirmationPage
+    .getFurtherActionLinks()
+    .eq(hasRecallService ? 2 : 1)
+    .should('contain.text', 'log outcomes for 3 appointments')
+  confirmationPage.getFurtherActionLinks().should('have.length', hasRecallService ? 3 : 2)
 }
 
 const checkPage = () => {
@@ -50,7 +85,7 @@ const checkPage = () => {
       { outcomeType: 'ACCEPTABLE_ABSENCE', action: 'ACCEPTABLE_ABSENCE_HOLIDAY' },
     ]
     outcomes.forEach(outcome => {
-      it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation if outcome is ${outcome.outcomeType}`, () => {
+      it(`should display the correct confirmation if outcome is ${outcome.outcomeType}`, () => {
         loadPage(outcome)
         confirmationPage = new ConfirmationOutcomePage()
         confirmationPage.checkPageTitle('Appointment outcome updated')
@@ -60,15 +95,28 @@ const checkPage = () => {
           .getWhatHappensNextText()
           .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
         confirmationPage.getWhatHappensNextText().should('have.length', 1)
-        confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
-        confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
-        confirmationPage.getFurtherActionLinks().should('have.length', 2)
+        checkFurtherActions({ hasRecallService: false })
+      })
+    })
+
+    outcomes.forEach(outcome => {
+      it(`should display the correct confirmation if outcome is ${outcome.outcomeType} and next appointment is arranged`, () => {
+        loadPage(outcome, 'KEEP_TYPE')
+        confirmationPage = new ConfirmationOutcomePage()
+        confirmationPage.checkPageTitle('Outcome updated and next appointment arranged')
+        confirmationPage.getType().should('not.exist')
+        confirmationPage.getDate().should('not.exist')
+        confirmationPage
+          .getWhatHappensNextText()
+          .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
+        checkNextAppointmentText()
+        checkFurtherActions({ hasRecallService: false })
       })
     })
   })
 
   describe('Appointment type is COMMUNITY and enforcement letter is sent by case admin', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       loadPage({
         outcome: 'ATTENDED_FAILED_TO_COMPLY',
         action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
@@ -78,23 +126,36 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('Enforcement outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(1)
         .should('contain.text', 'Follow your local process to request a other enforcement letter.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 2)
-      confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
-      confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
-      confirmationPage.getFurtherActionLinks().should('have.length', 2)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 2)
+      checkFurtherActions({ hasRecallService: false })
+    })
+    it(`should display the correct confirmation if next appointment is arranged`, () => {
+      loadPage(
+        {
+          outcome: 'ATTENDED_FAILED_TO_COMPLY',
+          action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+          letterSentBy: 'CASE_ADMIN',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Enforcement outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
+        .should('contain.text', 'Follow your local process to request a other enforcement letter.')
+      checkNextAppointmentText()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
 
   describe('Appointment type is CUSTODY and enforcement letter is sent by case admin', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       cy.task('stubSentences', { sentenceType: 'CUSTODY' })
-
       loadPage({
         outcome: 'ATTENDED_FAILED_TO_COMPLY',
         action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
@@ -104,22 +165,38 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('Enforcement outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(1)
         .should('contain.text', 'Follow your local process to request a other enforcement letter.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 2)
-      confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'use the Consider a recall service')
-      confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'arrange another appointment')
-      confirmationPage.getFurtherActionLinks().eq(2).should('contain.text', 'log outcomes for 3 appointments')
-      confirmationPage.getFurtherActionLinks().should('have.length', 3)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 2)
+      checkFurtherActions()
+    })
+    it(`should display the correct confirmation if next appointment is arranged`, () => {
+      cy.task('stubSentences', { sentenceType: 'CUSTODY' })
+      loadPage(
+        {
+          outcome: 'ATTENDED_FAILED_TO_COMPLY',
+          action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+          letterSentBy: 'CASE_ADMIN',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Enforcement outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'Follow your local process to request a other enforcement letter.')
+      checkNextAppointmentText()
+      checkFurtherActions()
     })
   })
 
   describe('Appointment type is COMMUNITY and enforcement letter is sent by PP', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       loadPage({
         outcome: 'ATTENDED_FAILED_TO_COMPLY',
         action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
@@ -129,19 +206,37 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('Enforcement outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(1)
         .should('contain.text', 'Your case administrator or you will create and send a other enforcement letter.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 2)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 2)
       confirmationPage.getFurtherAction().should('not.exist')
+    })
+    it(`should display the correct confirmation if next appointment is arranged`, () => {
+      loadPage(
+        {
+          outcome: 'ATTENDED_FAILED_TO_COMPLY',
+          action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+          letterSentBy: 'USER',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Enforcement outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'Your case administrator or you will create and send a other enforcement letter.')
+      checkNextAppointmentText()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
 
   describe('Enforcement action is breach/recall initiated and is not added to NDelius diary', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       loadPage({
         outcome: 'ATTENDED_FAILED_TO_COMPLY',
         action: 'BREACH_RECALL_INITIATED',
@@ -151,21 +246,36 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('Enforcement outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(1)
         .should('contain.text', 'Liaise with your case administrator to create a breach/recall NSI on NDelius.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 2)
-      confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
-      confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
-      confirmationPage.getFurtherActionLinks().should('have.length', 2)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 2)
+      checkFurtherActions({ hasRecallService: false })
+    })
+    it(`should display the correct confirmation if next appointment is arranged`, () => {
+      loadPage(
+        {
+          outcome: 'ATTENDED_FAILED_TO_COMPLY',
+          action: 'BREACH_RECALL_INITIATED',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Enforcement outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'Liaise with your case administrator to create a breach/recall NSI on NDelius.')
+      checkNextAppointmentText()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
 
   describe('Enforcement action is not letter and is added to NDelius diary', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       loadPage({
         outcome: 'FAILED_TO_ATTEND',
         action: 'REFER_TO_OFFENDER_MANAGER',
@@ -174,17 +284,30 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('Enforcement outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 1)
-      confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
-      confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
-      confirmationPage.getFurtherActionLinks().should('have.length', 2)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 1)
+      checkFurtherActions({ hasRecallService: false })
+    })
+    it(`should display the correct confirmation if next appointment is arranged`, () => {
+      loadPage(
+        {
+          outcome: 'FAILED_TO_ATTEND',
+          action: 'REFER_TO_OFFENDER_MANAGER',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Enforcement outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This enforcement outcome has been added to the NDelius Enforcement Diary.')
+      checkNextAppointmentText()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
 
   describe('Outcome is UNACCEPTABLE_ABSENCE', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       loadPage({
         outcome: 'UNACCEPTABLE_ABSENCE',
         action: 'BREACH_RECALL_INITIATED',
@@ -193,17 +316,30 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('Unacceptable absence outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 1)
-      confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
-      confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
-      confirmationPage.getFurtherActionLinks().should('have.length', 2)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 1)
+      checkFurtherActions({ hasRecallService: false })
+    })
+    it(`should display the correct confirmation if next appointment arranged`, () => {
+      loadPage(
+        {
+          outcome: 'UNACCEPTABLE_ABSENCE',
+          action: 'BREACH_RECALL_INITIATED',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Enforcement outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
+      checkNextAppointmentText()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
 
   describe('Enforcement action is NO_FURTHER_ACTION', () => {
-    it(`should add the correct confirmation to res.locals.appointmentOutcome.confirmation`, () => {
+    it(`should display the correct confirmation`, () => {
       loadPage({
         outcome: 'UNACCEPTABLE_ABSENCE',
         action: 'NO_FURTHER_ACTION',
@@ -212,12 +348,25 @@ const checkPage = () => {
       confirmationPage.checkPageTitle('No further action outcome added')
       confirmationPage
         .getWhatHappensNextText()
-        .eq(0)
         .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
-      confirmationPage.getWhatHappensNextText().should('have.length', 1)
-      confirmationPage.getFurtherActionLinks().eq(0).should('contain.text', 'arrange another appointment')
-      confirmationPage.getFurtherActionLinks().eq(1).should('contain.text', 'log outcomes for 3 appointments')
-      confirmationPage.getFurtherActionLinks().should('have.length', 2)
+      confirmationPage.getWhatHappensNextText().find('p').should('have.length', 1)
+      checkFurtherActions({ hasRecallService: false })
+    })
+    it(`should display the correct confirmation if next appointment is arranged`, () => {
+      loadPage(
+        {
+          outcome: 'UNACCEPTABLE_ABSENCE',
+          action: 'NO_FURTHER_ACTION',
+        },
+        'KEEP_TYPE',
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage.checkPageTitle('Outcome updated and next appointment arranged')
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
+      checkNextAppointmentText()
+      checkFurtherActions({ hasRecallService: false })
     })
   })
   describe('User click the return to overview button', () => {

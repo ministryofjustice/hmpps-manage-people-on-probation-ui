@@ -512,7 +512,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"No results\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": [] }"
+            "equalToJson": "{\"keywords\": \"No results\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": [] }"
           }
         ]
       },
@@ -544,7 +544,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": []}"
+            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": []}"
           }
         ]
       },
@@ -608,7 +608,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"filters\": [\"noOutcome\", \"complied\", \"notComplied\"], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": []}"
+            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"filters\": [\"noOutcome\", \"complied\", \"notComplied\"], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": []}"
           }
         ]
       },
@@ -672,7 +672,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"filters\": [], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": []}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"filters\": [], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": []}"
           }
         ]
       },
@@ -736,7 +736,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\", \"complied\", \"notComplied\"], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": []}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\", \"complied\", \"notComplied\"], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": []}"
           }
         ]
       },
@@ -868,7 +868,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\", \"complied\"], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": []}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\", \"complied\"], \"includeSystemGenerated\": true, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": []}"
           }
         ]
       },
@@ -1798,7 +1798,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [], \"includeSystemGenerated\": false, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"typeCodes\": []}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [], \"includeSystemGenerated\": false, \"filterBySparksContacts\": false, \"filterBySupervisionPackageContacts\": false, \"filterBySupervisionPackageAppointmentsContacts\": false, \"typeCodes\": []}"
           }
         ]
       },

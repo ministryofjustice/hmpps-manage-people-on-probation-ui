@@ -17,6 +17,7 @@ import { buildCaseLink } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
+import isTimeoutError from '../utils/isTimeoutError'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
@@ -44,7 +45,7 @@ export const postRescheduleAppointments = (
       user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
-    const isInPast = appointmentDateIsInPast(req)
+    const isInPast = appointmentDateIsInPast(req, res)
     const { contactId } = rescheduleAppointment
     const body: RescheduleAppointmentRequestBody = {
       date,
@@ -121,25 +122,40 @@ export const postRescheduleAppointments = (
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
 
-      eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
-      const outlookEventResponse: any = eventResponse
-      if (outlookEventResponse?.status === 500) {
-        const sentryError =
-          outlookEventResponse?.error ??
-          new Error(outlookEventResponse?.errors?.[0]?.text ?? 'Rescheduling appointment event not successful.')
-        const sentryEventId = Sentry.captureException(sentryError, {
-          tags: {
-            'http.status': '500',
-            'error.type': 'internal_server_error',
-            service: 'Probation Supervision Appointments Api',
-            operation: 'postRescheduleAppointmentEvent',
-          },
-        })
-        logger.info(`Sentry eventId: ${sentryEventId}`)
-        logger.warn(
-          { sentryEventId, apiError: outlookEventResponse?.error, apiErrors: outlookEventResponse?.errors },
-          'Failed to create rescheduling calendar event',
-        )
+      try {
+        eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
+        const outlookEventResponse: any = eventResponse
+        if (outlookEventResponse?.status === 500) {
+          const sentryError =
+            outlookEventResponse?.error ??
+            new Error(outlookEventResponse?.errors?.[0]?.text ?? 'Rescheduling appointment event not successful.')
+          const sentryEventId = Sentry.captureException(sentryError, {
+            tags: {
+              'http.status': '500',
+              'error.type': 'internal_server_error',
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postRescheduleAppointmentEvent',
+            },
+          })
+          logger.info(`Sentry eventId: ${sentryEventId}`)
+          logger.warn(
+            { sentryEventId, apiError: outlookEventResponse?.error, apiErrors: outlookEventResponse?.errors },
+            'Failed to create rescheduling calendar event',
+          )
+        }
+      } catch (error) {
+        if (isTimeoutError(error)) {
+          logger.warn(
+            { err: error },
+            `Outlook calendar event reschedule timed out for ${rescheduleEventRequest.rescheduledEventRequest.supervisionAppointmentUrn}`,
+          )
+
+          data.isOutlookEventPending = true
+
+          return response
+        }
+
+        throw error
       }
     }
 

@@ -63,6 +63,7 @@ import {
   mapPersonAppointmentWithApprovedContactDisplayNames,
   mapScheduleWithApprovedContactDisplayNames,
 } from '../utils/contactDisplayNames'
+import { sanitizeFilename } from '../utils/sanitizeFilename'
 
 interface GetUserScheduleProps {
   username: string
@@ -362,13 +363,17 @@ export default class MasApiClient extends RestClient {
     id: string,
     file: Express.Multer.File,
   ): Promise<{ statusCode: number } | ErrorSummary | null> {
+    const sanitizedFile: Express.Multer.File = {
+      ...file,
+      originalname: sanitizeFilename(file.originalname),
+    }
     return this.patch({
       path: `/documents/${crn}/update/contact/${id}`,
       handle404: true,
       handle415: true,
       handle500: true,
       isMultipart: true,
-      file,
+      file: sanitizedFile,
       errorMessage: 'Upload failed. Please try again later',
     })
   }

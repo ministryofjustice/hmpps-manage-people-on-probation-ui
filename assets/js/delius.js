@@ -67,8 +67,7 @@ function setupFilterButton() {
   if (!button) {
     return
   }
-  button.onclick = event => {
-    event.preventDefault()
+  button.onclick = () => {
     saveFilters()
       .then(resetPageNumber)
       .catch(error => handleError(error))
@@ -137,25 +136,18 @@ function doSearch() {
 }
 
 function setupSearch() {
-  // Focus on input
   const search = document.getElementById('search')
   const form = document.getElementById('search-form')
-  if (!form || !search) return
-
-  let storedProviders = []
-  try {
-    storedProviders = JSON.parse(localStorage.getItem('providers')) || []
-  } catch {
-    storedProviders = []
-  }
-
-  // Load filters from local storage
-  saveFilters(storedProviders).catch(error => handleError(error))
+  if (!search || !form) return
 
   setupFilterButton()
 
   search.focus() // the autofocus attribute doesn't work in a cross-origin iframe
   search.setSelectionRange(search.value.length, search.value.length) // focus at end of field
+
+  // Prevent search on typing if search button exists
+  const searchButton = document.getElementById('search-button')
+  if (searchButton) return
 
   // Enable search on typing
   search.addEventListener('input', debounce(doSearch, 250))

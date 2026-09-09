@@ -31,10 +31,8 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     let attendingUsername = getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) ?? null
     let attendingEmail: string
     let attendingName: Name
-    if (res.locals.flags.enableMAN2344) {
-      attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
-      attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
-    }
+    attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
+    attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
     let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
     let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
     const [{ defaultUserDetails, providers, teams, users }, probationPractitioner] = await Promise.all([
@@ -51,18 +49,14 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       logger.info(`[getDefaultUser] uuid='${id}' username='${username}' resolving default attending user`)
       if (probationPractitioner.unallocated === false) {
         attendingUsername = probationPractitioner.username
-        if (res.locals.flags.enableMAN2344) {
-          attendingEmail = probationPractitioner.email
-          attendingName = probationPractitioner.name
-        }
+        attendingEmail = probationPractitioner.email
+        attendingName = probationPractitioner.name
         providerCode = probationPractitioner.provider.code
         teamCode = probationPractitioner.team.code
       } else {
         attendingUsername = defaultUserDetails?.username
-        if (res.locals.flags.enableMAN2344) {
-          attendingEmail = defaultUserDetails?.email
-          attendingName = defaultUserDetails.name
-        }
+        attendingEmail = defaultUserDetails?.email
+        attendingName = defaultUserDetails.name
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
       }
@@ -96,24 +90,22 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
       logger.info(`[getDefaultUser] uuid='${id}' attendingUsername='${attendingUsername}'`)
-      if (res.locals.flags.enableMAN2344) {
-        logSessionCacheChange(
-          'getDefaultUser',
-          data,
-          ['appointments', crn, id, 'user', 'email'],
-          attendingEmail,
-          defaultUserContext,
-        )
-        logSessionCacheChange(
-          'getDefaultUser',
-          data,
-          ['appointments', crn, id, 'user', 'name'],
-          attendingName,
-          defaultUserContext,
-        )
-        setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
-        setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
-      }
+      logSessionCacheChange(
+        'getDefaultUser',
+        data,
+        ['appointments', crn, id, 'user', 'email'],
+        attendingEmail,
+        defaultUserContext,
+      )
+      logSessionCacheChange(
+        'getDefaultUser',
+        data,
+        ['appointments', crn, id, 'user', 'name'],
+        attendingName,
+        defaultUserContext,
+      )
+      setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
+      setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       const appointmentStaff = await masClient.getStaffByTeam(teamCode)
       const ppStaff = probationPractitioner?.username
         ? appointmentStaff.users.find(
@@ -150,12 +142,10 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           username: probationPractitioner.username,
           nameAndRole,
         }
-        if (res.locals.flags.enableMAN2344) {
-          sessionStaffItem = {
-            ...sessionStaffItem,
-            name: probationPractitioner.name,
-            email: probationPractitioner.email,
-          }
+        sessionStaffItem = {
+          ...sessionStaffItem,
+          name: probationPractitioner.name,
+          email: probationPractitioner.email,
         }
         sessionStaff = [...sessionStaff, sessionStaffItem]
       }

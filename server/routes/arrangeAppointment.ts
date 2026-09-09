@@ -18,6 +18,7 @@ import {
   forceValidation,
   restrictPageAccess,
   getSentenceList,
+  checkIsValidUrl,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -26,6 +27,7 @@ import {
   getContactOutcomes,
   handlePutOutcome,
   getOutcomeSentence,
+  getOutcomeNextAppointment,
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -179,6 +181,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
@@ -189,11 +192,13 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
       '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     ],
     getPersonAppointment(hmppsAuthClient),
+    checkIsValidUrl,
     handlePostAppointment(hmppsAuthClient),
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
     getContactOutcomes(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     handlePutOutcome(hmppsAuthClient),
   )
@@ -214,6 +219,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getContactOutcomes(hmppsAuthClient),
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )

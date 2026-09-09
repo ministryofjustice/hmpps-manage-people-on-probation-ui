@@ -220,7 +220,7 @@ describe('controllers/appointments', () => {
   describe('get appointments', () => {
     it('should request previous and upcoming appointments from the api', async () => {
       const mockRes = mockAppResponse({
-        flags: { enablePreSentence: true, enableSupervisionPackage: true },
+        flags: { enablePreSentence: true, enableSupervisionPackageAppointments: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
@@ -230,7 +230,7 @@ describe('controllers/appointments', () => {
 
     it('should render the appointments page', async () => {
       const mockRes = mockAppResponse({
-        flags: { enablePreSentence: true, enableSupervisionPackage: true },
+        flags: { enablePreSentence: true, enableSupervisionPackageAppointments: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
@@ -249,7 +249,7 @@ describe('controllers/appointments', () => {
 
     it('should override deliusManaged flag when enablePreSentence flag is false', async () => {
       const mockRes = mockAppResponse({
-        flags: { enablePreSentence: false, enableSupervisionPackage: true },
+        flags: { enablePreSentence: false, enableSupervisionPackageAppointments: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
@@ -271,7 +271,7 @@ describe('controllers/appointments', () => {
   describe('get appointments - no practitioner', () => {
     it('should render the appointments page', async () => {
       const mockRes = mockAppResponse({
-        flags: { enablePreSentence: true, enableSupervisionPackage: true },
+        flags: { enablePreSentence: true, enableSupervisionPackageAppointments: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
@@ -292,7 +292,7 @@ describe('controllers/appointments', () => {
   describe('get appointments - checkins flag enabled and practitioner allocated', () => {
     it('should render the appointments page with canAccessCheckins true', async () => {
       const mockRes = mockAppResponse({
-        flags: { enableESupervisionCheckins: true, enableSupervisionPackage: true },
+        flags: { enableESupervisionCheckins: true, enableSupervisionPackageAppointments: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')

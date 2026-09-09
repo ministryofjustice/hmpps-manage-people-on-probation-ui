@@ -1,6 +1,4 @@
 /* eslint-disable no-param-reassign */
-
-import { DateTime } from 'luxon'
 import { Route } from '../@types'
 
 import {
@@ -9,6 +7,7 @@ import {
   supervisionPackageCategoryFilterOption,
   filterOptions as complianceFilterOptions,
   hideContactsFilterOptions,
+  supervisionPackageAppointmentsCategoryFilterOption,
 } from '../properties'
 import { ActivityLogFilters, SelectedFilterItem } from '../models/ActivityLog'
 import { Option } from '../models/Option'
@@ -21,7 +20,17 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const { clearFilterKey, clearFilterValue } = req.query
   const view = req?.query?.view
   const { crn } = req.params as Record<string, string>
-  const { keywords, dateFrom, dateTo, compliance, category, sparks, supervisionPackage, hideContact } = setSession()
+  const {
+    keywords,
+    dateFrom,
+    dateTo,
+    compliance,
+    category,
+    sparks,
+    supervisionPackage,
+    supervisionPackageAppointments,
+    hideContact,
+  } = setSession()
   const errorMessages = req?.session?.errorMessages
 
   function setSession() {
@@ -35,6 +44,9 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       const supervisionPackageFilters: string[] = req.query.supervisionPackage
         ? ([req.query.supervisionPackage].flat() as string[])
         : []
+      const supervisionPackageAppointmentsFilters: string[] = req.query.supervisionPackageAppointments
+        ? ([req.query.supervisionPackageAppointments].flat() as string[])
+        : []
       const hideContactFilters: string[] = req.query.hideContact ? ([req.query.hideContact].flat() as string[]) : []
 
       req.session.activityLogFilters = {
@@ -45,6 +57,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
         category: categoryFilters,
         sparks: sparksFilters,
         supervisionPackage: supervisionPackageFilters,
+        supervisionPackageAppointments: supervisionPackageAppointmentsFilters,
         hideContact: hideContactFilters,
         crn,
       }
@@ -60,6 +73,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       category: req.session?.activityLogFilters?.category ?? [],
       sparks: req.session?.activityLogFilters?.sparks ?? [],
       supervisionPackage: req.session?.activityLogFilters?.supervisionPackage ?? [],
+      supervisionPackageAppointments: req.session?.activityLogFilters?.supervisionPackageAppointments ?? [],
       hideContact: req.session?.activityLogFilters?.hideContact ?? [],
     }
   }
@@ -85,6 +99,11 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters.supervisionPackage = req.session.activityLogFilters.supervisionPackage.filter(
         (value: string) => value !== clearFilterValue,
       )
+    } else if (clearFilterKey === 'supervisionPackageAppointments') {
+      req.session.activityLogFilters.supervisionPackageAppointments =
+        req.session.activityLogFilters.supervisionPackageAppointments.filter(
+          (value: string) => value !== clearFilterValue,
+        )
     } else if (clearFilterKey === 'hideContact') {
       req.session.activityLogFilters.hideContact = req.session.activityLogFilters.hideContact.filter(
         (value: string) => value !== clearFilterValue,
@@ -101,7 +120,11 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const sparksOptionsSource = sparksEnabled ? [sparksCategoryFilterOption] : []
 
   const supervisionPackageEnabled = res.locals.flags?.enableSupervisionPackageFilter === true
+  const supervisionPackageAppointmentsEnabled = res.locals.flags?.enableSupervisionPackageAppointments === true
   const supervisionPackageOptionsSource = supervisionPackageEnabled ? [supervisionPackageCategoryFilterOption] : []
+  const supervisionPackageAppointmentsOptionsSource = supervisionPackageAppointmentsEnabled
+    ? [supervisionPackageAppointmentsCategoryFilterOption]
+    : []
 
   const baseUrl = `/case/${crn}/activity-log`
   const filters: ActivityLogFilters = {
@@ -112,10 +135,18 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     category,
     sparks,
     supervisionPackage,
+    supervisionPackageAppointments,
     hideContact,
   }
 
-  const keysWithClearValue = ['compliance', 'category', 'sparks', 'supervisionPackage', 'hideContact']
+  const keysWithClearValue = [
+    'compliance',
+    'category',
+    'sparks',
+    'supervisionPackage',
+    'supervisionPackageAppointments',
+    'hideContact',
+  ]
   const filterHref = (key: string, value: string): string => {
     const base = keysWithClearValue.includes(key)
       ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
@@ -156,6 +187,16 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
             if (supervisionPackageOption) {
               value.push({
                 text: supervisionPackageOption.text,
+                href: filterHref(filterKey, text),
+              })
+            }
+          } else if (filterKey === 'supervisionPackageAppointments') {
+            const supervisionPackageAppointmentsOption = supervisionPackageAppointmentsOptionsSource.find(
+              option => option.value === text,
+            )
+            if (supervisionPackageAppointmentsOption) {
+              value.push({
+                text: supervisionPackageAppointmentsOption.text,
                 href: filterHref(filterKey, text),
               })
             }
@@ -203,14 +244,19 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     checked: filters.supervisionPackage.includes(value),
   }))
 
+  const supervisionPackageAppointmentsOptions: Option[] = supervisionPackageAppointmentsOptionsSource.map(
+    ({ text, value }) => ({
+      text,
+      value,
+      checked: filters.supervisionPackageAppointments.includes(value),
+    }),
+  )
+
   const hideContactOptions: Option[] = hideContactsFilterOptions.map(({ text, value }) => ({
     text,
     value,
     checked: filters.hideContact.includes(value),
   }))
-
-  const today = new Date()
-  const maxDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
 
   res.locals.filters = {
     selectedFilterItems,
@@ -218,6 +264,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     categoryOptions,
     sparksOptions,
     supervisionPackageOptions,
+    supervisionPackageAppointmentsOptions,
     hideContactOptions,
     baseUrl,
     keywords: filters.keywords,
@@ -225,10 +272,10 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     category: filters.category,
     sparks: filters.sparks,
     supervisionPackage: filters.supervisionPackage,
+    supervisionPackageAppointments: filters.supervisionPackageAppointments,
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     hideContact: filters.hideContact,
-    maxDate,
     crn,
   }
   return next()

@@ -9,11 +9,13 @@ import {
   getTierChangePrompt,
   getSupervisionPackage,
   getNextAppointment,
+  getOasysLink,
 } from '../middleware'
 
 export default function caseRoutes(router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) {
   router.all(
     ['/case/:crn', '/case/:crn/*path'],
+    getOasysLink(),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getPersonRiskFlags(hmppsAuthClient),
     getTierDetails(hmppsAuthClient, mpopComponents),

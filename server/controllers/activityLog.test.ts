@@ -119,6 +119,7 @@ describe('/controllers/activityLogController', () => {
         filters: [] as string[],
         filterBySparksContacts: false,
         filterBySupervisionPackageContacts: false,
+        filterBySupervisionPackageAppointmentsContacts: false,
         includeSystemGenerated: false,
         typeCodes: [] as string[],
       }

@@ -79,17 +79,6 @@
               "rollouts": []
             },
             {
-              "key": "enableMAN2344",
-              "name": "enableMAN2344",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableNonCompliance",
               "name": "enableNonCompliance",
               "description": "",
@@ -277,6 +266,17 @@
               "rollouts": []
             },
             {
+              "key": "enableAsYouTypeSearch",
+              "name": "enableAsYouTypeSearch",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
               "key": "enableSupervisionPackage",
               "name": "enableSupervisionPackage",
               "description": "",
@@ -290,6 +290,17 @@
             {
               "key": "enableMAN3255",
               "name": "enableMAN3255",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableCombinedCYAPage",
+              "name": "enableCombinedCYAPage",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",

@@ -5,10 +5,10 @@ export class FeatureFlags {
   enableCompliancePage?: boolean = undefined
   enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
+  enablePersonHeader?: boolean = undefined
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
@@ -31,11 +31,14 @@ export class FeatureFlags {
   enableESUPCheckinNewQuestions?: boolean = undefined
   enableSparksFilter?: boolean = undefined
   enableSupervisionPackageFilter?: boolean = undefined
+  enableSupervisionPackageAppointments?: boolean = undefined
   enableRescheduleFutureAppointmentWithOutcome?: boolean = undefined
   enableCRISSV2?: boolean = undefined
   enableSemanticSearch?: boolean = undefined
   enablePreSentence?: boolean = undefined
   enableSearchV2?: boolean = undefined
+  enableAsYouTypeSearch?: boolean = undefined
   enableMAN3255?: boolean = undefined
+  enableCombinedCYAPage?: boolean = undefined
   enableEsupEligibilityCheck?: boolean = undefined
 }

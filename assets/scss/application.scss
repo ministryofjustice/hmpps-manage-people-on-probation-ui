@@ -880,3 +880,18 @@ table.appointments tr > .notes {
     border-left: 4px solid #b1b4b6;
     background: #f3f2f1;
 }
+
+.moj-search__button_mpop {
+    display: flex;
+    position: relative;
+    width: auto;
+    height: 2.5rem;
+    margin-bottom: 0;
+    margin-left: 10px;
+    vertical-align: bottom;
+}
+
+.govuk-input__wrapper_mpop {
+  display: flex;
+  align-items: flex-end;
+}

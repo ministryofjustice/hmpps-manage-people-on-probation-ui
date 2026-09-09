@@ -10,11 +10,11 @@ export default class ConfirmationOutcomePage extends Page {
   }
 
   getDate = () => {
-    return cy.get('.govuk-panel').find('span')
+    return cy.get('.govuk-panel').find('[data-qa="appointmentDate"]')
   }
 
   getWhatHappensNextText = () => {
-    return cy.get('[data-qa="what-happens-next"]').find('p')
+    return cy.get('[data-qa="what-happens-next"]')
   }
 
   getFurtherAction = () => {

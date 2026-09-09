@@ -188,26 +188,24 @@ context('Contacts', () => {
     page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
-  it('should show the correct validation if date from is in the future', () => {
+  it('should no longer show additional validation if the date from is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateFromInput().type(`${day}/${month}/${year + 1}`)
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 2)
-    page.getErrorSummaryLink(0).should('contain.text', 'The date from must be today or in the past')
-    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
+    page.getAllErrorSummaryLinks().should('have.length', 1)
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date to')
   })
 
-  it('should show the correct validation if date to is in the future', () => {
+  it('should no longer show additional validation if the date to is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateToInput().type(`${day}/${month}/${year + 1}`)
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page.getAllErrorSummaryLinks().should('have.length', 1)
     page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
-    page.getErrorSummaryLink(1).should('contain.text', 'The date to must be today or in the past')
   })
 
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {

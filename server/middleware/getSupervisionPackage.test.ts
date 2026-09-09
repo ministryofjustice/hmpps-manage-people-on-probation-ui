@@ -47,11 +47,11 @@ const buildReq = (sessionPersonalDetails: Record<string, any> = {}) =>
     },
   })
 
-const buildRes = (enableSupervisionPackage: boolean): AppResponse =>
+const buildRes = (enableSupervisionPackage: boolean, enableSupervisionPackageAppointments?: boolean): AppResponse =>
   ({
     locals: {
       user: { username: 'user-1' },
-      flags: { enableSupervisionPackage },
+      flags: { enableSupervisionPackage, enableSupervisionPackageAppointments },
     },
   }) as unknown as AppResponse
 
@@ -85,6 +85,101 @@ describe('getSupervisionPackage middleware', () => {
 
     expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
     expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should call next() without fetching when both enableSupervisionPackage and enableSupervisionPackageAppointments flags are false', async () => {
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(false, false)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
+    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should not fetch supervisionPackage when enableSupervisionPackageAppointments is true but includeAppointmentsFlag is not set', async () => {
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(false, true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
+    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should fetch supervisionPackage when enableSupervisionPackage is false but enableSupervisionPackageAppointments is true and includeAppointmentsFlag is set', async () => {
+    const packageResponse = makeSupervisionPackageResponse()
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(false, true)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+      { includeAppointmentsFlag: true },
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
+    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should not fetch supervisionPackage when it was already set on res.locals by an earlier middleware', async () => {
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true, true)
+    res.locals.supervisionPackageDetails = makeSupervisionPackageResponse()
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+      { includeAppointmentsFlag: true },
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
+    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should not fetch supervisionPackage when a fetch was already attempted by an earlier mount, even if outcome was null or error', async () => {
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true, true)
+    res.locals.supervisionPackageAttempted = true
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+      { includeAppointmentsFlag: true },
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
+    expect(mpopComponents.getSupervisionPackageFrontendContext).not.toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should fetch supervisionPackage when enableSupervisionPackage is true but enableSupervisionPackageAppointments is false', async () => {
+    const packageResponse = makeSupervisionPackageResponse()
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(packageResponse)
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true, false)
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(req, res, nextSpy)
+
+    expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
+    expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -139,7 +234,31 @@ describe('getSupervisionPackage middleware', () => {
       'Failed to fetch supervision package from MPoP Components API.',
     )
     expect(res.locals.supervisionPackageDetails).toBeUndefined()
+    expect(res.locals.supervisionPackageAttempted).toBe(true)
     expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should not attempt a second fetch on subsequent middleware mount when the first fetch returns null', async () => {
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(null)
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true, true)
+
+    const middleware1 = getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )
+    const middleware2 = getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+      { includeAppointmentsFlag: true },
+    )
+
+    await middleware1(req, res, nextSpy)
+    await middleware2(req, res, nextSpy)
+
+    expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledTimes(1)
+    expect(res.locals.supervisionPackageDetails).toBeUndefined()
+    expect(res.locals.supervisionPackageAttempted).toBe(true)
   })
 
   it('should send error to the logger when the API call throws an error', async () => {

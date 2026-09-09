@@ -122,22 +122,13 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const defaultUser = defaultUserDetails?.username || ''
 
     let userOptions = users.map(user => {
-      if (res.locals.flags.enableMAN2344) {
-        const { username: staffUsername, nameAndRole, staffCode, email, name } = user
-        const option: User = {
-          username: staffUsername,
-          nameAndRole: convertToTitleCase(nameAndRole, [], regexIgnoreValuesInParentheses),
-          staffCode,
-          email,
-          name,
-        }
-        return option
-      }
-      const { username: staffUsername, nameAndRole, staffCode } = user
+      const { username: staffUsername, nameAndRole, staffCode, email, name } = user
       const option: User = {
         username: staffUsername,
         nameAndRole: convertToTitleCase(nameAndRole, [], regexIgnoreValuesInParentheses),
         staffCode,
+        email,
+        name,
       }
       return option
     })

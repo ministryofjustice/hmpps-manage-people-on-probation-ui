@@ -5,7 +5,7 @@ import { RiskFlag } from '../../data/model/risk'
 
 type TestModel = {
   flags: {
-    enableSupervisionPackage?: boolean
+    enableSupervisionPackageAppointments?: boolean
   }
   upcomingAppointments: Schedule
   pastAppointments: Schedule
@@ -21,7 +21,7 @@ type TestModel = {
 
 const baseModel: TestModel = {
   flags: {
-    enableSupervisionPackage: true,
+    enableSupervisionPackageAppointments: true,
   },
   headerPersonName: {
     forename: 'James',
@@ -208,7 +208,7 @@ describe('Appointments', () => {
     expect($('[data-qa=pastAppointmentTags1]').length).toBe(1)
   })
   it('should render the page with no supervision package summary if supa feature flag is disabled', () => {
-    const $ = render({ flags: { enableSupervisionPackage: false } })
+    const $ = render({ flags: { enableSupervisionPackageAppointments: false } })
     expect($('aside').length).toBe(0)
     expect($('.govuk-grid-column-three-quarters').length).toBe(0)
     expect($('.govuk-grid-column-one-quarter').length).toBe(0)
