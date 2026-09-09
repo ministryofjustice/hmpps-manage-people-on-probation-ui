@@ -37,22 +37,6 @@ const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 const mockEnforcementContacts = [{ id: '3', appointmentType: 'Enforcement' }]
-const mockEnforcementAction = {
-  appointmentDate: '2026-05-01',
-  appointmentOutcome: 'Unacceptable Absence',
-  appointmentType: 'Office Appointment',
-  caseName: {
-    forename: 'John',
-    middleName: 'Michael',
-    surname: 'Smith',
-  },
-  crn: 'X123456',
-  deliusManaged: true,
-  dob: '1988-04-12',
-  enforcementAction: 'Breach Initiated',
-  evidenceDueDate: '2026-05-08',
-  id: 12345,
-}
 
 describe('homeController', () => {
   describe('getHome', () => {
@@ -64,12 +48,7 @@ describe('homeController', () => {
       host: 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
     })
     const originalEnv = process.env.NODE_ENV
-    const {
-      upcomingAppointments,
-      appointmentsRequiringOutcome,
-      appointmentsRequiringOutcomeCount,
-      enforcementContacts,
-    } = mockHomepage
+    const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } = mockHomepage
     let spy: jest.SpyInstance
     let masSpy: jest.SpyInstance
     beforeEach(async () => {
@@ -103,7 +82,7 @@ describe('homeController', () => {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
-          enforcementActions: [mockEnforcementAction],
+          enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -148,7 +127,7 @@ describe('homeController', () => {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
-          enforcementActions: [mockEnforcementAction],
+          enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -218,7 +197,7 @@ describe('homeController', () => {
           upcomingAppointments: mockHomepage.upcomingAppointments,
           appointmentsRequiringOutcome: [recentAppointment, boundaryAppointment],
           appointmentsRequiringOutcomeCount: 2,
-          enforcementActions: [mockEnforcementAction],
+          enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
@@ -248,7 +227,7 @@ describe('homeController', () => {
         expect(renderSpyWithEnforcement).toHaveBeenCalledWith(
           'pages/homepage/homepage',
           expect.objectContaining({
-            enforcementActions: [mockEnforcementAction],
+            enforcementActions: [mockHomepage.enforcementContacts[0]],
           }),
         )
       })
@@ -275,7 +254,7 @@ describe('homeController', () => {
         expect(renderSpyWithEnforcement).toHaveBeenCalledWith(
           'pages/homepage/homepage',
           expect.objectContaining({
-            enforcementActions: [mockEnforcementAction],
+            enforcementActions: [mockHomepage.enforcementContacts[0]],
           }),
         )
       })
