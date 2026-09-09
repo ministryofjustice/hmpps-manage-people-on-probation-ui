@@ -52,7 +52,6 @@ const buildResponse = ({
   outcome?: AppointmentSessionOutcome
   locals?: Record<string, any>
   _nextAppointment?: OutcomeNextAppointment
-  isInPast?: boolean
 } = {}): AppResponse => {
   const response = {
     flags: { enableCombinedCYAPage: true },
