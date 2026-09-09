@@ -429,7 +429,7 @@ describe('ESupervisionClient', () => {
 
       const response = {
         outcome: 'ELIGIBLE',
-        message: 'This person is eligible for online check ins'
+        message: 'This person is eligible for online check ins',
       }
 
       fakeESupervisionApi
