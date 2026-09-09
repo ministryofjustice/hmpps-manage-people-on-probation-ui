@@ -54,7 +54,6 @@ const checkNextAppointmentText = () => {
   confirmationPage
     .getWhatHappensNextText()
     .should('contain.text', `You’ve arranged a 3 way meeting (NS) on ${yesterday} at 9am to 10am.`)
-    // .should('contain.text', 'Alton will receive a confirmation text message with the new appointment details.')
     .should('contain.text', 'The new appointment has been added to:')
     .should('contain.text', 'your calendar')
     .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
