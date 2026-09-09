@@ -9,7 +9,7 @@ const { link } = config.eSupervisionManageCheckins
 const crn = 'X000001'
 const id = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 
-const appWith = (flags: Partial<FeatureFlags>): Express => {
+const appWith = (flags: Partial<FeatureFlags> = {}): Express => {
   const app = express()
   app.use((_req, res, next) => {
     res.locals.flags = { enableESupervisionCheckins: true, ...flags } as FeatureFlags
@@ -87,24 +87,18 @@ describe('eSupervisionCheckInsRoutes', () => {
   })
 
   describe.each([
-    ['enableESUPCheckinNewSetup', setupPaths],
-    ['enableESUPCheckinNewSettings', settingsPaths],
-    ['enableESUPCheckinNewStop', stopPaths],
-    ['enableESUPCheckinNewRestart', restartPaths],
-    ['enableESUPCheckinNewReview', reviewPaths],
-    ['enableESUPCheckinNewQuestions', questionsPaths],
-  ])('%s', (flag, paths) => {
-    it.each(paths)('redirects %s to the manage check-ins service when the flag is on', async path => {
-      const res = await request(appWith({ [flag]: true })).get(path)
+    ['setup', setupPaths],
+    ['settings', settingsPaths],
+    ['stop', stopPaths],
+    ['restart', restartPaths],
+    ['review', reviewPaths],
+    ['questions', questionsPaths],
+  ])('%s paths', (_, paths) => {
+    it.each(paths)('redirects %s to the manage check-ins service', async path => {
+      const res = await request(appWith()).get(path)
 
       expect(res.status).toBe(302)
       expect(res.headers.location).toBe(`${link}${path}`)
-    })
-
-    it.each(paths)('does not redirect %s when the flag is off', async path => {
-      const res = await request(appWith({ [flag]: false })).get(path)
-
-      expect(res.status).not.toBe(302)
     })
   })
 })
