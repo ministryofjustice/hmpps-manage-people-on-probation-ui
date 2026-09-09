@@ -679,10 +679,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         appointmentType = 'RESCHEDULE'
       }
       if (res.locals.contactResponse) {
-        let outcomes = res.locals.contactResponse.content
-        if (res.locals.flags?.enableOutcomesV1) {
-          outcomes = filterContacts(outcomes)
-        }
+        const outcomes = filterContacts(res.locals.contactResponse.content)
         res.locals.contactResponse.content = outcomes
       }
       let linkedAppointment = null

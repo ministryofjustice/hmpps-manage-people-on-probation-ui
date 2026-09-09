@@ -127,9 +127,7 @@ const preloadActivitySearchSpy = jest
   .mockImplementation(() => Promise.resolve(undefined))
 
 const res = mockAppResponse({
-  flags: {
-    enableOutcomesV1: true,
-  },
+  flags: {},
 })
 const renderSpy = jest.spyOn(res, 'render')
 
@@ -236,11 +234,8 @@ describe('caseController', () => {
     })
     beforeEach(async () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
-      res.locals.flags = { enableESupervisionCheckins: true, enableOutcomesV1: true }
+      res.locals.flags = { enableESupervisionCheckins: true }
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-    })
-    afterEach(() => {
-      res.locals.flags = { enableOutcomesV1: true }
     })
 
     it('should render the overview page with canAccessCheckins true', () => {
@@ -356,7 +351,7 @@ describe('caseController', () => {
     })
 
     beforeEach(() => {
-      res.locals.flags = { enableEMDIOverviewShowGPSData: true, enableOutcomesV1: true }
+      res.locals.flags = { enableEMDIOverviewShowGPSData: true }
       res.locals.user = { username: 'test-user', authSource: 'nomis', token: 'token-1' }
       getSentencesSpy.mockImplementation(() => (r: any, s: any, next: any) => {
         const { locals } = s
@@ -367,16 +362,13 @@ describe('caseController', () => {
 
     afterEach(() => {
       jest.clearAllMocks()
-      res.locals.flags = { enableOutcomesV1: true }
       delete res.locals.sentences
     })
 
     it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(true)
       existsInEMDISpy.mockResolvedValue({ uri: 'https://emdi-uri' })
-
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-
       expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
@@ -384,9 +376,7 @@ describe('caseController', () => {
 
     it('should call getSentences but NOT existsInEMDI when flag is enabled but NO location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(false)
-
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-
       expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
@@ -394,9 +384,7 @@ describe('caseController', () => {
 
     it('should NOT call getSentences when flag is disabled', async () => {
       res.locals.flags.enableEMDIOverviewShowGPSData = false
-
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-
       expect(getSentencesSpy).not.toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
     })
@@ -414,24 +402,17 @@ describe('caseController', () => {
         },
       },
     })
-
     afterEach(() => {
-      res.locals.flags = { enableOutcomesV1: true }
+      res.locals.flags = {}
     })
-
     it('should call preloadActivitySearch when enableSemanticSearch is enabled', async () => {
-      res.locals.flags = { enableSemanticSearch: true, enableOutcomesV1: true }
-
+      res.locals.flags = { enableSemanticSearch: true }
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-
       expect(preloadActivitySearchSpy).toHaveBeenCalledWith(crn)
     })
 
     it('should NOT call preloadActivitySearch when enableSemanticSearch is disabled', async () => {
-      res.locals.flags = { enableOutcomesV1: true }
-
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-
       expect(preloadActivitySearchSpy).not.toHaveBeenCalled()
     })
   })

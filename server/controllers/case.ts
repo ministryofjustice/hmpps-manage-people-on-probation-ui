@@ -52,10 +52,7 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
-      let outcomes = contactResponse?.content
-      if (res.locals.flags.enableOutcomesV1) {
-        outcomes = filterContacts(outcomes)
-      }
+      const outcomes = filterContacts(contactResponse?.content)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
