@@ -1,6 +1,6 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Location, Provider, Team, User } from '../data/model/caseload'
-import { PersonalDetails } from '../data/model/personalDetails'
+import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
 import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
 import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
@@ -20,6 +20,7 @@ export interface PersonalDetailsSession {
   riskData?: RiskData
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
+  professionalContact?: ProfessionalContact | null
   tierDetails?: LatestTierResponse
   supervisionPackageResponse?: SupervisionPackageResponse
   nextAppointmentResponse?: NextAppointmentResponse

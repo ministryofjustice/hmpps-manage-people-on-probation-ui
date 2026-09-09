@@ -10,6 +10,7 @@ export class FeatureFlags {
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
   enablePersonHeader?: boolean = undefined
+  enablePersonHeaderTierV3?: boolean = undefined
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
