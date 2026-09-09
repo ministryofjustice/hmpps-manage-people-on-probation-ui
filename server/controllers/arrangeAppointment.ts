@@ -639,7 +639,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES') || null
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
       let attendingName = 'your'
-      if (attending?.username.toUpperCase() !== res.locals.user.username.toUpperCase()) {
+      if (attending?.username?.toUpperCase() !== res.locals.user.username.toUpperCase()) {
         if (attending?.name?.forename) {
           const formattedName =
             attending.name.forename.charAt(0).toUpperCase() + attending.name.forename.slice(1).toLowerCase()

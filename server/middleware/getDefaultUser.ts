@@ -50,7 +50,9 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           probationPractitioner?.provider?.code,
           probationPractitioner?.team?.code,
         )
-        attendingUsername = PPusers.find(user => user?.username === probationPractitioner?.username)?.username
+        attendingUsername = PPusers.find(
+          user => user?.username?.toLowerCase() === probationPractitioner?.username?.toLowerCase(),
+        )?.username
         if (attendingUsername !== undefined) {
           providerCode = probationPractitioner.provider.code
           teamCode = probationPractitioner.team.code
