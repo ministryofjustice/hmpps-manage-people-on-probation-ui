@@ -59,15 +59,13 @@ const caseController: Controller<typeof routes, void> = {
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
       let personExistsResponse: PersonExistsResponse | undefined
-      if (res.locals.flags.enableEMDIOverviewShowGPSData) {
-        await getSentences(hmppsAuthClient)(req, res, () => {})
-        const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
-          hasLocationMonitoring(item?.licenceConditions, item?.requirements),
-        )
-        if (hasLocationMonitoringData) {
-          personExistsResponse = await existsInEMDI(crn, token)
-          res.locals.personExistsResponse = personExistsResponse
-        }
+      await getSentences(hmppsAuthClient)(req, res, () => {})
+      const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
+        hasLocationMonitoring(item?.licenceConditions, item?.requirements),
+      )
+      if (hasLocationMonitoringData) {
+        personExistsResponse = await existsInEMDI(crn, token)
+        res.locals.personExistsResponse = personExistsResponse
       }
       return res.render('pages/overview', {
         overview,
