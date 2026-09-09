@@ -83,7 +83,7 @@
                 checked: body.sensitivity == 'No'
             }
         ]
-    } if not isSensitive or not flags.enableSensitivityRemoved %}
+    } if not isSensitive %}
     {% if errorMessages.sensitivity %}
         {% set errorMsgSensitivity = {
             text: errorMessages.sensitivity
@@ -113,7 +113,7 @@
             }) }}
         </section>
     {% endif %}
-    {% if isSensitive and flags.enableSensitivityRemoved %}
+    {% if isSensitive %}
         <p>You already told us that this contact includes sensitive information.</p>
     {% endif %}
 
