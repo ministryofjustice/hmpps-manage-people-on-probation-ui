@@ -4,13 +4,11 @@ import { AppointmentOutcomeType, AppointmentSessionOutcome } from '../../models/
 import { AppResponse, OutcomeNextAppointment } from '../../models/Locals'
 import { getConfirmation } from './getConfirmation'
 import { ContactResponse } from '../../data/model/overdueOutcomes'
-import { SmsOptInOptions } from '../../data/model/OutlookEvent'
 
 const crn = 'X000001'
 const id = '12345'
 const type = 'Planned Office Visit (NS)'
 const url = `/case/${crn}/appointments/appointment/${id}/outcome/confirmation`
-const smsText = 'John will receive a confirmation text message with the new appointment details.'
 
 const contactResponse: ContactResponse = {
   content: [
@@ -167,7 +165,7 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
         text: [
           'This outcome has been saved against the appointment on NDelius.',
           ...expectedNextAppointmentText,
-          smsText,
+          'John will receive a confirmation text message with the new appointment details.',
         ],
         type,
         date: 'Monday 22 December 2025 from 9:15am to 9:30am',
