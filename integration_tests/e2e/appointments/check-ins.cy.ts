@@ -963,10 +963,7 @@ context('check-ins overview and manage pages', () => {
     const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
     overviewPage.getElementData('nextCheckInValue').should('contain.text', expectedDate)
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
-    overviewPage
-      .getElementData('checkinCard')
-      .find('.govuk-link')
-      .should('contain.text', 'Manage online check ins')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Manage online check ins')
   })
 
   it('should show online check ins due section ', () => {
@@ -978,7 +975,9 @@ context('check-ins overview and manage pages', () => {
     overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage.getElementData('checkinDueLabel').should('contain.text', 'Status')
-    overviewPage.getElementData('checkinDueValue').should('contain.text', 'This person is eligible for online check ins')
+    overviewPage
+      .getElementData('checkinDueValue')
+      .should('contain.text', 'This person is eligible for online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Set up online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
@@ -1005,10 +1004,7 @@ context('check-ins overview and manage pages', () => {
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
-    overviewPage
-      .getElementData('checkinCard')
-      .find('.govuk-link')
-      .should('contain.text', 'Manage online check ins')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Manage online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
 
     manageCheckins.checkOnPage()
@@ -1036,10 +1032,7 @@ context('check-ins overview and manage pages', () => {
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
-    overviewPage
-      .getElementData('checkinCard')
-      .find('.govuk-link')
-      .should('contain.text', 'Manage online check ins')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Manage online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
 
     const manageCheckins = new ManageCheckins()
