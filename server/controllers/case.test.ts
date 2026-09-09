@@ -32,6 +32,8 @@ import {
 } from '../data/model/personalDetails'
 import { PersonalDetailsSession } from '../models/Data'
 import { ProbationPractitioner } from '../models/CaseDetail'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { OffenderEligibility } from '../data/model/esupervision'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -103,6 +105,12 @@ const mockPersonalDetails: PersonalDetailsSession = {
 const mockOverdueOutcomesResponse = {
   content: [{ date: '2021-01-01' }, { date: '2025-01-02' }, { date: '2025-01-03' }],
 }
+
+const mockOffenderEligibilityResponse: OffenderEligibility = {
+  outcome: 'ELIGIBLE',
+  message: 'This person is eligible for online check ins',
+}
+
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
   .mockImplementation(() => Promise.resolve(mockOverview))
@@ -118,6 +126,10 @@ jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
+
+const getOffenderEligibilitySpy = jest
+  .spyOn(ESupervisionClient.prototype, 'getOffenderEligibility')
+  .mockImplementation(() => Promise.resolve(mockOffenderEligibilityResponse))
 
 const getSentencesSpy = getSentences as jest.Mock
 const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
@@ -236,7 +248,7 @@ describe('caseController', () => {
     })
     beforeEach(async () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
-      res.locals.flags = { enableESupervisionCheckins: true, enableOutcomesV1: true }
+      res.locals.flags = { enableESupervisionCheckins: true}
       await controllers.case.getCase(hmppsAuthClient)(req, res)
     })
     afterEach(() => {
@@ -249,6 +261,37 @@ describe('caseController', () => {
         expect.objectContaining({
           hasPractitioner: true,
           canAccessCheckins: true,
+        }),
+      )
+    })
+  })
+  describe('getCase - checkin eligibility returned', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
+      res.locals.flags = { enableEsupEligibilityCheck: true, enableOutcomesV1: true }
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = { enableOutcomesV1: true }
+    })
+
+    it('should render the overview page with canAccessCheckins true', () => {
+      expect(getOffenderEligibilitySpy).toHaveBeenCalledWith(crn)
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          checkinEligibility: {"message": "This person is eligible for online check ins", "outcome": "ELIGIBLE"},
         }),
       )
     })
