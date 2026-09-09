@@ -959,18 +959,14 @@ context('check-ins overview and manage pages', () => {
     overviewPage.checkOnPage()
     overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
-    overviewPage.getElementData('nextCheckinDueLabel').should('contain.text', 'Next check in due')
+    overviewPage.getElementData('nextCheckinDueLabel').should('contain.text', 'Next online check in')
     const expectedDate = DateTime.now().plus({ days: 5 }).toFormat('d MMMM yyyy')
     overviewPage.getElementData('nextCheckInValue').should('contain.text', expectedDate)
-    overviewPage.getElementData('frequencyLabel').should('contain.text', 'Frequency')
-    overviewPage.getElementData('frequencyValue').should('contain.text', 'Every week')
-    overviewPage.getElementData('contactPrefLabel').should('contain.text', 'Contact preferences')
-    overviewPage.getElementData('contactPrefValue').should('contain.text', 'Text message')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage
       .getElementData('checkinCard')
       .find('.govuk-link')
-      .should('contain.text', 'View all online check in details')
+      .should('contain.text', 'Manage online check ins')
   })
 
   it('should show online check ins due section ', () => {
@@ -981,8 +977,8 @@ context('check-ins overview and manage pages', () => {
     overviewPage.checkOnPage()
     overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
-    overviewPage.getElementData('checkinDueLabel').should('contain.text', 'First check in due')
-    overviewPage.getElementData('checkinDueValue').should('contain.text', 'Online check ins not set up')
+    overviewPage.getElementData('checkinDueLabel').should('contain.text', 'Status')
+    overviewPage.getElementData('checkinDueValue').should('contain.text', 'This person is eligible for online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Set up online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
@@ -1012,7 +1008,7 @@ context('check-ins overview and manage pages', () => {
     overviewPage
       .getElementData('checkinCard')
       .find('.govuk-link')
-      .should('contain.text', 'View all online check in details')
+      .should('contain.text', 'Manage online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
 
     manageCheckins.checkOnPage()
@@ -1043,7 +1039,7 @@ context('check-ins overview and manage pages', () => {
     overviewPage
       .getElementData('checkinCard')
       .find('.govuk-link')
-      .should('contain.text', 'View all online check in details')
+      .should('contain.text', 'Manage online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
 
     const manageCheckins = new ManageCheckins()

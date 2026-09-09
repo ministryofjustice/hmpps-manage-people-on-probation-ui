@@ -385,8 +385,8 @@
         "status": 200,
         "transformers": ["response-template"],
         "jsonBody": {
-          "outcome": "INELIGIBLE",
-          "message": "Caroline is not eligible for online check ins because they are in a provisional tier."
+          "outcome": "ELIGIBLE",
+          "message": "This person is eligible for online check ins"
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
