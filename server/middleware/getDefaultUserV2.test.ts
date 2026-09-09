@@ -139,17 +139,11 @@ describe('/middleware/getDefaultUserV2()', () => {
       expect(mockSetDataValue).toHaveBeenNthCalledWith(
         4,
         req.session.data,
-        ['appointments', crn, uuid, 'user', 'displayName'],
-        nameAndRole,
-      )
-      expect(mockSetDataValue).toHaveBeenNthCalledWith(
-        5,
-        req.session.data,
         ['appointments', crn, uuid, 'user', 'email'],
         probationPractitioner.email,
       )
       expect(mockSetDataValue).toHaveBeenNthCalledWith(
-        6,
+        5,
         req.session.data,
         ['appointments', crn, uuid, 'user', 'name'],
         probationPractitioner.name,
@@ -189,17 +183,11 @@ describe('/middleware/getDefaultUserV2()', () => {
       expect(mockSetDataValue).toHaveBeenNthCalledWith(
         4,
         req.session.data,
-        ['appointments', crn, uuid, 'user', 'displayName'],
-        defaultUserNameAndRole,
-      )
-      expect(mockSetDataValue).toHaveBeenNthCalledWith(
-        5,
-        req.session.data,
         ['appointments', crn, uuid, 'user', 'email'],
         userProviders.defaultUserDetails.email,
       )
       expect(mockSetDataValue).toHaveBeenNthCalledWith(
-        6,
+        5,
         req.session.data,
         ['appointments', crn, uuid, 'user', 'name'],
         userProviders.defaultUserDetails.name,
@@ -235,17 +223,11 @@ describe('/middleware/getDefaultUserV2()', () => {
       expect(mockSetDataValue).toHaveBeenNthCalledWith(
         4,
         req.session.data,
-        ['appointments', crn, uuid, 'user', 'displayName'],
-        defaultUserNameAndRole,
-      )
-      expect(mockSetDataValue).toHaveBeenNthCalledWith(
-        5,
-        req.session.data,
         ['appointments', crn, uuid, 'user', 'email'],
         userProviders.defaultUserDetails.email,
       )
       expect(mockSetDataValue).toHaveBeenNthCalledWith(
-        6,
+        5,
         req.session.data,
         ['appointments', crn, uuid, 'user', 'name'],
         userProviders.defaultUserDetails.name,

@@ -282,13 +282,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         )
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
-        const user = convertToTitleCase(
-          staff?.find(u => u?.username === username)?.nameAndRole,
-          [],
-          regexIgnoreValuesInParentheses,
-        )
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
-        setDataValue(data, ['appointments', crn, id, 'user', 'displayName'], user)
         const email = staffMember?.email ?? null
         const name = staffMember?.name ?? null
         logSessionCacheChange(
