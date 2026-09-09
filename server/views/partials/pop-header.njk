@@ -60,13 +60,25 @@
         managedBy: probationPractitioner.name.forename + ' ' + probationPractitioner.name.surname + ' (' + probationPractitioner.team.description + ')' if probationPractitioner and not probationPractitioner.unallocated else 'Unallocated',
         riskBadges: riskBadges
     }) }}
+
+    // Turn this flag on for 26 September or whenever go live date is 
+{% elseif flags.enablePersonHeaderExampleV3 %}
+    {{ personHeader({
+        name: headerPersonName.forename + ' ' + headerPersonName.surname,
+        crn: headerCRN,
+        dob: headerDob | dateWithYear,
+        tier: tierDetails.calculation.tierScore | convertToTitleCase,
+        historyHref: tierUrlV3,
+        managedBy: probationPractitioner.name.forename + ' ' + probationPractitioner.name.surname + ' (' + probationPractitioner.team.description + ')' if probationPractitioner and not probationPractitioner.unallocated else 'Unallocated',
+        riskBadges: riskBadges
+    }) }}
 {% else %}
     <div class="govuk-flex">
         <div>
             {% if flags.enableSupervisionPackagePoPHeader %}
                 <div data-qa="new-pop-header">
                 {{ popHeader({
-                crn:headerCRN,
+                crn: headerCRN,
                 dob: headerDob | dateWithYear,
                 age: headerDob | yearsSince,
                 tierScore: tierDetails.calculation.tierScore | convertToTitleCase,
