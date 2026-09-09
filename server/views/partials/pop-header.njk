@@ -50,13 +50,28 @@
     {% endif %}
 {% endset %}
 
+// example 1
+
 {% if flags.enablePersonHeader %}
     {{ personHeader({
         name: headerPersonName.forename + ' ' + headerPersonName.surname,
         crn: headerCRN,
         dob: headerDob | dateWithYear,
-        tier: tierCalculation.tierScore | convertToTitleCase,
-        historyHref: headerTierLink,
+        tier: flags.enablePersonHeaderExampleV3 ? tierDetails.calculation.tierScore | convertToTitleCase : tierCalculation.tierScore | convertToTitleCase,
+        historyHref: flags.enablePersonHeaderExampleV3 ? tierUrlV3 : headerTierLink,
+        managedBy: probationPractitioner.name.forename + ' ' + probationPractitioner.name.surname + ' (' + probationPractitioner.team.description + ')' if probationPractitioner and not probationPractitioner.unallocated else 'Unallocated',
+        riskBadges: riskBadges
+    }) }}
+
+    // example 2
+    // Turn this flag on for 26 September or whenever go live date is 
+{% elseif flags.enablePersonHeaderExampleV3 %}
+    {{ personHeader({
+        name: headerPersonName.forename + ' ' + headerPersonName.surname,
+        crn: headerCRN,
+        dob: headerDob | dateWithYear,
+        tier: tierDetails.calculation.tierScore | convertToTitleCase,
+        historyHref: tierUrlV3,
         managedBy: probationPractitioner.name.forename + ' ' + probationPractitioner.name.surname + ' (' + probationPractitioner.team.description + ')' if probationPractitioner and not probationPractitioner.unallocated else 'Unallocated',
         riskBadges: riskBadges
     }) }}
@@ -66,7 +81,7 @@
             {% if flags.enableSupervisionPackagePoPHeader %}
                 <div data-qa="new-pop-header">
                 {{ popHeader({
-                crn:headerCRN,
+                crn: headerCRN,
                 dob: headerDob | dateWithYear,
                 age: headerDob | yearsSince,
                 tierScore: tierDetails.calculation.tierScore | convertToTitleCase,
