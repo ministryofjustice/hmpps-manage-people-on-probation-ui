@@ -248,7 +248,7 @@ describe('caseController', () => {
     })
     beforeEach(async () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
-      res.locals.flags = { enableESupervisionCheckins: true}
+      res.locals.flags = { enableESupervisionCheckins: true }
       await controllers.case.getCase(hmppsAuthClient)(req, res)
     })
     afterEach(() => {
@@ -291,7 +291,7 @@ describe('caseController', () => {
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/overview',
         expect.objectContaining({
-          checkinEligibility: {"message": "This person is eligible for online check ins", "outcome": "ELIGIBLE"},
+          checkinEligibility: { message: 'This person is eligible for online check ins', outcome: 'ELIGIBLE' },
         }),
       )
     })
