@@ -35,10 +35,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       !users
     ) {
       let useProbationPractitioner = true
-      let probationPractitioner: ProbationPractitioner
-      if (!providerCode && !teamCode && !attendingUsername) {
-        probationPractitioner = await masClient.getProbationPractitioner(crn)
-      }
+      const probationPractitioner = await masClient.getProbationPractitioner(crn)
 
       if (!probationPractitioner?.unallocated) {
         const {
