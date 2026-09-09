@@ -34,7 +34,7 @@ import { BreachOrRecall, SentenceCompliance } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import { SmsPreviewResponse } from '../data/model/OutlookEvent'
+import { SmsOptInOptions, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import {
   ESupervisionCheckIn,
   EsupervisionUpcomingQuestionsResponse,
@@ -235,6 +235,7 @@ export interface OutcomeSummary {
 export interface OutcomeNextAppointment {
   id?: string
   label: string
+  smsOptIn?: SmsOptInOptions
 }
 
 export interface OutcomeConfirmationAction {

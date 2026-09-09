@@ -32,6 +32,7 @@ interface Props {
 const loadPage = (
   { outcome = 'ATTENDED_COMPLIED', action = null, letterSentBy = null }: Props = {},
   nextAppointment: AppointmentSessionSelection = 'NO',
+  dateInPast = true,
 ): void => {
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
@@ -43,7 +44,7 @@ const loadPage = (
   cy.get(`.govuk-radios__input[value=${nextAppointment}]`).click()
   nextAppointmentPage.getSubmitBtn().click()
   if (['KEEP_TYPE', 'CHANGE_TYPE'].includes(nextAppointment)) {
-    completeNextAppointmentJourney({ type: nextAppointment, dateInPast: true, isOutcomeJourney: true, crn })
+    completeNextAppointmentJourney({ type: nextAppointment, dateInPast, isOutcomeJourney: true, crn })
   }
   checkYourAnswersOutcomePage = new AppointmentCheckYourAnswersPage()
   checkYourAnswersOutcomePage.getSubmitBtn().click()
@@ -53,7 +54,7 @@ const checkNextAppointmentText = () => {
   confirmationPage
     .getWhatHappensNextText()
     .should('contain.text', `You’ve arranged a 3 way meeting (NS) on ${yesterday} at 9am to 10am.`)
-    .should('contain.text', 'Alton will receive a confirmation text message with the new appointment details.')
+    // .should('contain.text', 'Alton will receive a confirmation text message with the new appointment details.')
     .should('contain.text', 'The new appointment has been added to:')
     .should('contain.text', 'your calendar')
     .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
@@ -94,6 +95,12 @@ const checkPage = () => {
         confirmationPage
           .getWhatHappensNextText()
           .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
+        confirmationPage
+          .getWhatHappensNextText()
+          .should(
+            'not.contain.text',
+            'Alton will receive a confirmation text message with the new appointment details.',
+          )
         confirmationPage.getWhatHappensNextText().should('have.length', 1)
         checkFurtherActions({ hasRecallService: false })
       })
@@ -335,6 +342,23 @@ const checkPage = () => {
         .should('contain.text', 'This outcome has been saved against the appointment on NDelius.')
       checkNextAppointmentText()
       checkFurtherActions({ hasRecallService: false })
+    })
+  })
+
+  describe('Future next appointment with text message, outcome is ACCEPTABLE_ABSENCE', () => {
+    it('should display the correct confirmation', () => {
+      loadPage(
+        {
+          outcome: 'ACCEPTABLE_ABSENCE',
+          action: 'ACCEPTABLE_ABSENCE_EMPLOYMENT',
+        },
+        'KEEP_TYPE',
+        false,
+      )
+      confirmationPage = new ConfirmationOutcomePage()
+      confirmationPage
+        .getWhatHappensNextText()
+        .should('contain.text', 'Alton will receive a confirmation text message with the new appointment details.')
     })
   })
 
