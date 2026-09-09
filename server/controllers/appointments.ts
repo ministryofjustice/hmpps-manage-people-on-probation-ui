@@ -261,7 +261,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         contactId,
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
-        outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
+        outcomes,
         outcomesFilter: req.session.outcomesFilter[crn] ?? 'PAST_TWO_YEARS',
       })
     }
