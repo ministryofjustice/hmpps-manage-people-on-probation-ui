@@ -93,7 +93,8 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       let nextAppointment = 'No next appointment'
       if (nextAppt) {
         const { type, startDateTime, endDateTime } = nextAppt
-        nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)} to ${govukTime(endDateTime)}`
+        const endStr = endDateTime ? ` to ${govukTime(endDateTime)}` : ''
+        nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)}${endStr}`
       }
       summary.nextAppointment = nextAppointment
     }
