@@ -21,6 +21,7 @@ import {
   mockRiskData,
   probationPractitioner,
   mockPredictorScores,
+  mockContacts,
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
@@ -88,6 +89,9 @@ const searchUserCaseloadSpy = jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(probationPractitioner))
+const getContactsSpy = jest
+  .spyOn(MasApiClient.prototype, 'getContacts')
+  .mockImplementation(() => Promise.resolve(mockContacts))
 let getPersonalDetailsSpy: jest.SpyInstance
 let getSentencePlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
@@ -152,6 +156,7 @@ const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {
     risks: mockRisks,
     tierCalculation: mockTierCalculation,
     probationPractitioner,
+    professionalContact: mockContacts,
   }
   if (ogrs4Enabled) {
     mockPersonalDetails.riskData = mockRiskData
@@ -209,6 +214,7 @@ describe('/middleware/getPersonalDetails', () => {
         nameOrCrn: req.params.crn,
       })
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(getContactsSpy).toHaveBeenCalledWith(req.params.crn)
       expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
       expect(predictorsSpy).not.toHaveBeenCalled()
       expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
@@ -222,6 +228,10 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.headerCRN).toEqual(req.params.crn)
       expect(res.locals.headerDob).toEqual('1979-08-18')
       expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
+      expect(res.locals.managedBy).toEqual({
+        text: 'Arhsimna Xolfo (All London)',
+        href: '/case/X000002/personal-details/staff-contacts',
+      })
       expect(nextSpy).toHaveBeenCalled()
     })
 

@@ -55,9 +55,10 @@
         name: headerPersonName.forename + ' ' + headerPersonName.surname,
         crn: headerCRN,
         dob: headerDob | dateWithYear,
-        tier: tierCalculation.tierScore | convertToTitleCase,
-        historyHref: headerTierLink,
-        managedBy: probationPractitioner.name.forename + ' ' + probationPractitioner.name.surname + ' (' + probationPractitioner.team.description + ')' if probationPractitioner and not probationPractitioner.unallocated else 'Unallocated',
+        tier: (tierDetails.calculation.tierScore if flags.enablePersonHeaderTierV3 else tierCalculation.tierScore) | convertToTitleCase,
+        historyHref: tierUrlV3 if flags.enablePersonHeaderTierV3 else headerTierLink,
+        managedBy: managedBy.text,
+        managedByHref: managedBy.href,
         riskBadges: riskBadges
     }) }}
 {% else %}

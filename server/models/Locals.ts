@@ -3,6 +3,7 @@ import { Response } from 'express'
 import { Document, PersonalDetails } from '../data/model/personalDetails'
 import { ProbationPractitioner } from './CaseDetail'
 import { FeatureFlags } from '../data/model/featureFlags'
+import { ManagedByDetails } from '../utils/getManagedByDetails'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
@@ -112,6 +113,7 @@ interface Locals {
   headerDob?: string
   headerTierLink?: string
   probationPractitioner?: ProbationPractitioner
+  managedBy?: ManagedByDetails
   tierUrlV3?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto

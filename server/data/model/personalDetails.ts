@@ -235,6 +235,8 @@ export interface Contact {
   allocatedUntil?: string
   responsibleOfficer: boolean
   prisonOffenderManager: boolean
+  isUnallocated?: boolean
+  lastUpdated?: string
 }
 
 export type Origin = 'appointments' | undefined
