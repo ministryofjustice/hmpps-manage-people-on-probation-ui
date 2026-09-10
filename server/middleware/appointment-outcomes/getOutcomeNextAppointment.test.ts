@@ -41,6 +41,7 @@ const buildRequest = ({ id = null }: { id?: string | null } = {}): httpMocks.Moc
               start: '11:00',
               end: '11:30',
               type: 'COAP',
+              smsOptIn: 'YES',
             },
           },
         },
@@ -92,6 +93,7 @@ describe('middleware/appointment-outcomes/getOutcomeNextAppointment', () => {
     expect(res.locals.appointmentOutcome.nextAppointment).toStrictEqual({
       id: nextAppointmentId,
       label: 'Planned office visit (NS) on Saturday 1 August 2026 at 11am to 11:30am',
+      smsOptIn: 'YES',
     })
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })

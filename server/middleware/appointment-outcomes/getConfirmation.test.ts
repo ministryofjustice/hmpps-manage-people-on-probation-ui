@@ -42,7 +42,6 @@ const nextAppointment: OutcomeNextAppointment = {
 
 const expectedNextAppointmentText = [
   'You’ve arranged a Planned telephone contact (NS) on Friday 21 August 2026 at 9am to 10am.',
-  'John will receive a confirmation text message with the new appointment details.',
 ]
 
 const buildResponse = ({
@@ -142,6 +141,43 @@ describe('/middleware/appointment-outcomes/getConfirmation', () => {
             },
           ],
         })
+      })
+    })
+  })
+  describe('Future next appointment with text message', () => {
+    const outcome: AppointmentSessionOutcome = {
+      outcomeType: 'ACCEPTABLE_ABSENCE',
+      acceptableAbsence: 'ACCEPTABLE_ABSENCE_EMPLOYMENT',
+    }
+    it('should set the correct confirmation values', () => {
+      const mockReq = httpMocks.createRequest({
+        url,
+        session: { data: { temp: { [crn]: { nextAppointmentId: '123' } } } },
+      })
+      const res = buildResponse({
+        outcome,
+        _nextAppointment: { ...nextAppointment, smsOptIn: 'YES' },
+      })
+      getConfirmation(mockReq, res, nextSpy)
+      expect(res.locals.appointmentOutcome.confirmation).toStrictEqual({
+        title: 'Outcome updated and next appointment arranged',
+        text: [
+          'This outcome has been saved against the appointment on NDelius.',
+          ...expectedNextAppointmentText,
+          'John will receive a confirmation text message with the new appointment details.',
+        ],
+        type,
+        date: 'Monday 22 December 2025 from 9:15am to 9:30am',
+        actions: [
+          {
+            text: 'arrange another appointment',
+            href: `/case/${crn}/appointments/appointment/${id}/next-appointment?back=${encodeURIComponent(url)}`,
+          },
+          {
+            text: `log outcomes for ${contactResponse.content.length} appointments`,
+            href: `/case/${crn}/record-an-outcome/outcome`,
+          },
+        ],
       })
     })
   })
