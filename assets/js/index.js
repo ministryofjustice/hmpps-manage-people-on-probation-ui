@@ -73,11 +73,18 @@ const setNoFixedAddressConditional = () => {
   }
 }
 
+function removeOptions(selectElement) {
+  let i
+  const L = selectElement.options.length - 1
+  for (i = L; i >= 0; i -= 1) {
+    selectElement.remove(i)
+  }
+}
+
 const attendanceSelectors = () => {
   const providerSelect = document.querySelector('[data-qa="providerCode"]')
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
-  const params = new URL(window.location.toString()).searchParams
-  const change = params.get('change')
+  const userSelect = document.querySelector('[data-qa="username"]')
   let providerCode = ''
   if (providerSelect) {
     providerCode = providerSelect.value
@@ -86,8 +93,29 @@ const attendanceSelectors = () => {
       const urlParts = location.href.split('?')[0].split('/')
       const crn = urlParts[4]
       const uuid = urlParts[6]
-      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
-      location.href = `${baseUrl}?providerCode=${value}${change ? `&change=${change}` : ''}`
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
+      fetch(`${baseUrl}?providerCode=${value}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then(async response => {
+        if (!response.ok) {
+          throw new Error(`Saving filters failed with status ${response.status}`)
+        }
+        const json = await response.json()
+        removeOptions(teamSelect)
+        const { teams } = json
+        teams.forEach(team =>
+          teamSelect.add(new Option(team.description, team.code, undefined, team.selected === 'selected')),
+        )
+        removeOptions(userSelect)
+        const { users } = json
+        users.forEach(user =>
+          userSelect.add(new Option(user.nameAndRole, user.staffCode, undefined, user.selected === 'selected')),
+        )
+        return response
+      })
     })
   }
   if (teamSelect) {
@@ -96,8 +124,24 @@ const attendanceSelectors = () => {
       const urlParts = location.href.split('?')[0].split('/')
       const crn = urlParts[4]
       const uuid = urlParts[6]
-      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
-      location.href = `${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
+      fetch(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then(async response => {
+        if (!response.ok) {
+          throw new Error(`Saving filters failed with status ${response.status}`)
+        }
+        const json = await response.json()
+        removeOptions(userSelect)
+        const { users } = json
+        users.forEach(user =>
+          userSelect.add(new Option(user.nameAndRole, user.staffCode, undefined, user.selected === 'selected')),
+        )
+        return response
+      })
     })
   }
 }
