@@ -28,10 +28,10 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
   let hasActions = true
   const noDiaryActionText = 'This outcome has been saved against the appointment on NDelius.'
   const diaryActionText = 'This enforcement outcome has been added to the NDelius Enforcement Diary.'
-  const nextAppointmentText = [
-    `You’ve arranged a ${nextAppointment?.label}.`,
-    `${forename} will receive a confirmation text message with the new appointment details.`,
-  ]
+  const nextAppointmentText = [`You’ve arranged a ${nextAppointment?.label}.`]
+  if (nextAppointment?.smsOptIn?.includes('YES')) {
+    nextAppointmentText.push(`${forename} will receive a confirmation text message with the new appointment details.`)
+  }
   const recallAction: OutcomeConfirmationAction = {
     text: 'use the Consider a recall service',
     href: config.recall.link,

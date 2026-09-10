@@ -29,12 +29,14 @@ export const getOutcomeNextAppointment: Route<void> = (req, res, next) => {
         start,
         end,
         type: typeCode,
+        smsOptIn,
       } = getDataValue<AppointmentSession>(data, ['appointments', crn, nextAppointmentId])
       const nextAppointmentType = res.locals.appointmentTypes.find((t: any) => t.code === typeCode)?.description || null
       const endStr = end ? ` to ${govukTime(end)}` : ''
       nextAppointment = {
         id: nextAppointmentId,
         label: `${toSentenceCase(nextAppointmentType)} on ${dateWithDayAndWithYear(nextAppointmentDate)} at ${govukTime(start)}${endStr}`,
+        smsOptIn,
       }
     }
 
