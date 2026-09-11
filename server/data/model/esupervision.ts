@@ -263,5 +263,10 @@ export interface EsupervisionUpcomingQuestionsResponse {
   }[]
 }
 
+export interface OffenderEligibility {
+  outcome: 'ELIGIBLE' | 'INELIGIBLE'
+  message: string
+}
+
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
 export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'
