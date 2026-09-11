@@ -8,14 +8,12 @@ import { getUuid, completeLocationDateTimePage, completeTextMessageConfirmationP
 export const checkUpdateSensitivity = ({
   page,
   dateInPast = false,
-  enableNonCompliance = true,
 }: {
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
   dateInPast?: boolean
-  enableNonCompliance?: boolean
 }) => {
   getUuid().then(pageUuid => {
-    const index = enableNonCompliance && dateInPast ? 10 : 8
+    const index = dateInPast ? 10 : 8
     page.getSummaryListRow(index).find('.govuk-link').click()
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()

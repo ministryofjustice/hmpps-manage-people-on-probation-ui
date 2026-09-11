@@ -164,15 +164,5 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
         },
       ],
     },
-    [`[appointments][${crn}][${id}][outcome][complied]`]: {
-      optional: page !== `outcome/attended-complied`,
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: `Select if they attended and complied`,
-          log: 'Attended and complied not selected',
-        },
-      ],
-    },
   }
 }

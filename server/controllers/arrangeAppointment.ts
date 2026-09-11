@@ -43,8 +43,6 @@ const routes = [
   'postWhoWillAttend',
   'getLocationDateTime',
   'postLocationDateTime',
-  'getAttendedComplied',
-  'postAttendedComplied',
   'getLocationNotInList',
   'getSupportingInformation',
   'postSupportingInformation',
@@ -72,13 +70,8 @@ const resetSessionValues = (req: Request, res: Response) => {
   const updatedDateIsInPast = appointmentDateIsInPast(req, res)
   const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
   if (!retainOutcomeRecorded) {
-    if (res.locals.flags.enableNonCompliance) {
-      logSessionCacheChange('resetSessionValues', data, [...path, 'outcome', 'outcomeType'], null, context)
-      setDataValue(data, [...path, 'outcome', 'outcomeType'], null)
-    } else {
-      logSessionCacheChange('resetSessionValues', data, [...path, 'outcomeRecorded'], null, context)
-      setDataValue(data, [...path, 'outcomeRecorded'], null)
-    }
+    logSessionCacheChange('resetSessionValues', data, [...path, 'outcome', 'outcomeType'], null, context)
+    setDataValue(data, [...path, 'outcome', 'outcomeType'], null)
   }
   if (updatedDateIsInPast && smsOptIn?.includes('YES')) {
     logSessionCacheChange('resetSessionValues', data, [...path, 'smsOptIn'], 'NO', context)
@@ -385,12 +378,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const selectedLocation = getDataValue(data, [...path, 'user', 'locationCode'])
       let nextPage = res.locals?.flags?.enableSmsReminders ? `text-message-confirmation` : `supporting-information`
 
-      if (res.locals.flags.enableNonCompliance && appointmentDateIsInPast(req, res)) {
+      if (appointmentDateIsInPast(req, res)) {
         nextPage = 'outcome'
       }
-      if (!res.locals.flags.enableNonCompliance && appointmentDateIsInPast(req, res)) {
-        nextPage = `attended-complied`
-      }
+
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
       }
@@ -402,34 +393,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         redirect = `${redirect}?change=${change}`
       }
       return res.redirect(redirect)
-    }
-  },
-  getAttendedComplied: _hmppsAuthClient => {
-    return async function getAttendedComplied(req, res) {
-      const { crn, id } = req.params as Record<string, string>
-      const { alertDismissed = false } = req.session
-      const { forename, surname, appointment } = res.locals.appointmentOutcome
-      const isReschedule = isRescheduleAppointment(req)
-      await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_ATTENDED_AND_COMPLIED', crn, SubjectType.CRN)
-      res.render('pages/appointments/attended-complied', {
-        crn,
-        id,
-        alertDismissed,
-        isInPast: true,
-        appointment,
-        cancelLink: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
-        forename: convertToTitleCase(forename),
-        surname: convertToTitleCase(surname),
-        useDecorator: true,
-        isReschedule,
-      })
-    }
-  },
-  postAttendedComplied: () => {
-    return async function postAttendedComplied(req, res) {
-      const { crn, id } = req.params as Record<string, string>
-      const { change } = req.query as Record<string, string>
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/add-note${change ? `?change=${change}` : ''}`)
     }
   },
   getLocationNotInList: () => {
@@ -712,7 +675,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         res.locals.contactResponse.content = outcomes
       }
       let linkedAppointment = null
-      if (res?.locals?.flags?.enableNonCompliance && linkedContactId) {
+      if (linkedContactId) {
         const { date, type: typeCode } = getDataValue<AppointmentSession>(data, ['appointments', crn, linkedContactId])
         linkedAppointment = {
           contactId: linkedContactId,
@@ -750,7 +713,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      if (res?.locals?.flags?.enableNonCompliance && _linkedContactId) {
+      if (_linkedContactId) {
         return res.redirect(
           `/case/${crn}/appointments/appointment/${_linkedContactId}/outcome/check-your-answers?back=${url}`,
         )

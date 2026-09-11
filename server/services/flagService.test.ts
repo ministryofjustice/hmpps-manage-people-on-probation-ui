@@ -33,7 +33,7 @@ jest.mock('../config', () => {
 jest.mock('../data/model/featureFlags', () => ({
   FeatureFlags: jest.fn().mockImplementation(() => ({
     enableDeliusClient: undefined,
-    enableNonCompliance: undefined,
+    enableBreachOrRecallAndSendLetterAction: undefined,
     enableESupervisionCheckins: undefined,
   })),
 }))
@@ -52,7 +52,7 @@ describe('FlagService', () => {
       responses: [
         {
           booleanEvaluationResponse: {
-            flagKey: 'enableNonCompliance',
+            flagKey: 'enableBreachOrRecallAndSendLetterAction',
             enabled: true,
           },
         },
@@ -98,7 +98,7 @@ describe('FlagService', () => {
     expect(requests).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          flagKey: 'enableNonCompliance',
+          flagKey: 'enableBreachOrRecallAndSendLetterAction',
           entityId: email,
           context: { email },
         }),
@@ -120,7 +120,9 @@ describe('FlagService', () => {
       ]),
     )
     expect(requests).toHaveLength(4)
-    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableNonCompliance')).toHaveLength(1)
+    expect(
+      requests.filter((r: { flagKey: string }) => r.flagKey === 'enableBreachOrRecallAndSendLetterAction'),
+    ).toHaveLength(1)
     expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(2)
   })
   it('adds a username request for username-gated flags', async () => {
@@ -152,14 +154,14 @@ describe('FlagService', () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
     expect(await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })).toStrictEqual({
       enableDeliusClient: false,
-      enableNonCompliance: false,
+      enableBreachOrRecallAndSendLetterAction: false,
       enableESupervisionCheckins: true,
     })
   })
@@ -167,14 +169,14 @@ describe('FlagService', () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
 
     expect(await service.getFlags({ email, username, pduCodes: [] })).toStrictEqual({
       enableDeliusClient: false,
-      enableNonCompliance: false,
+      enableBreachOrRecallAndSendLetterAction: false,
       enableESupervisionCheckins: true,
     })
   })
@@ -193,21 +195,21 @@ describe('FlagService', () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: true } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
     expect(result.enableDeliusClient).toBe(true)
-    expect(result.enableNonCompliance).toBe(false)
+    expect(result.enableBreachOrRecallAndSendLetterAction).toBe(false)
   })
   it('fails closed for check-ins flag when pduCodes is empty and username is not available', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: true } },
       ],
     })
 
@@ -221,7 +223,7 @@ describe('FlagService', () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: false } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: true } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
       ],
@@ -239,7 +241,7 @@ describe('FlagService', () => {
     expect(mockEvaluateBatch).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({
-          entityId: 'enableNonCompliance',
+          entityId: 'enableBreachOrRecallAndSendLetterAction',
           context: {},
         }),
       ]),
@@ -248,7 +250,7 @@ describe('FlagService', () => {
   it('returns feature flags based on evaluation results', async () => {
     expect(await service.getFlags({ email: undefined })).toStrictEqual({
       enableDeliusClient: false,
-      enableNonCompliance: true,
+      enableBreachOrRecallAndSendLetterAction: true,
       enableESupervisionCheckins: false,
     })
   })
@@ -284,12 +286,12 @@ describe('FlagService', () => {
     )
   })
 
-  it('captures message in Sentry when enableNonCompliance flag has unexpected response count', async () => {
+  it('captures message in Sentry when enableBreachOrRecallAndSendLetterAction flag has unexpected response count', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: false } },
         { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
       ],
     })
@@ -297,16 +299,18 @@ describe('FlagService', () => {
     const result = await service.getFlags({ email })
 
     expect(result.enableDeliusClient).toBe(true)
-    expect(result.enableNonCompliance).toBe(false)
+    expect(result.enableBreachOrRecallAndSendLetterAction).toBe(false)
     expect(result.enableESupervisionCheckins).toBe(true)
 
     expect(Sentry.captureException).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining('Expected exactly 1 response for flag enableNonCompliance, got 2'),
+        message: expect.stringContaining(
+          'Expected exactly 1 response for flag enableBreachOrRecallAndSendLetterAction, got 2',
+        ),
       }),
       expect.objectContaining({
         tags: {
-          flag: 'enableNonCompliance',
+          flag: 'enableBreachOrRecallAndSendLetterAction',
           service: 'FlagService',
         },
         extra: {
@@ -322,14 +326,14 @@ describe('FlagService', () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
         { booleanEvaluationResponse: { flagKey: 'enableDeliusClient', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: true } },
-        { booleanEvaluationResponse: { flagKey: 'enableNonCompliance', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableBreachOrRecallAndSendLetterAction', enabled: false } },
       ],
     })
 
     const result = await service.getFlags({ email })
 
-    expect(result.enableNonCompliance).toBe(false)
+    expect(result.enableBreachOrRecallAndSendLetterAction).toBe(false)
 
     expect(Sentry.getClient).toHaveBeenCalled()
 

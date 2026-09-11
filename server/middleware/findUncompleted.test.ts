@@ -70,7 +70,6 @@ const buildResponse = (locals: Record<string, any>) => mockAppResponse(locals)
 
 const res = buildResponse({
   flags: {
-    enableNonCompliance: true,
     enableCombinedCYAPage: true,
   },
 })
@@ -152,32 +151,8 @@ describe('middleware/findUncompleted', () => {
     })
     expect(findUncompleted()(req, mockRes)).toBe(change)
   })
-  it('should return attended-complied if enableNonCompliance feature flag is disabled, no outcomeRecorded value in appointment session and appointment date is in past', () => {
-    mockAppointmentDateIsInPast.mockImplementationOnce(() => true)
-    const req = buildRequest({
-      outcomeRecorded: null,
-    })
-    const mockRes = buildResponse({
-      flags: {
-        enableNonCompliance: false,
-      },
-    })
-    expect(findUncompleted()(req, mockRes)).toBe(
-      `/case/${crn}/arrange-appointment/${id}/attended-complied?change=${change}`,
-    )
-  })
-  it('should return change url if  enableNonCompliance feature flag is disabled,  no outcomeRecorded value in appointment session and appointment date is in future', () => {
-    const req = buildRequest({
-      outcomeRecorded: null,
-    })
-    const mockRes = buildResponse({
-      flags: {
-        enableNonCompliance: false,
-      },
-    })
-    expect(findUncompleted()(req, mockRes)).toBe(change)
-  })
-  it('should return outcome if enableNonCompliance feature flag is enabled, no outcome type value in appointment session and appointment date is in past', () => {
+
+  it('should return outcome if no outcome type value in appointment session and appointment date is in past', () => {
     mockAppointmentDateIsInPast.mockImplementationOnce(() => true)
     const req = buildRequest({
       outcome: {
@@ -187,7 +162,7 @@ describe('middleware/findUncompleted', () => {
 
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/outcome?change=${change}`)
   })
-  it('should return change url if  enableNonCompliance feature flag is enabled,  no outcome type value in appointment session and appointment date is in future', () => {
+  it('should return change url if  no outcome type value in appointment session and appointment date is in future', () => {
     const req = buildRequest({
       outcome: {
         type: null,

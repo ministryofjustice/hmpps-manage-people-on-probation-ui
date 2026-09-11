@@ -31,8 +31,6 @@ const routes = [
   'getAllUpcomingAppointments',
   'postAppointments',
   'getRecordAnOutcome',
-  'getAttendedComplied',
-  'postAttendedComplied',
   'getAddNote',
   'postAddNote',
   'getManageAppointment',
@@ -266,44 +264,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-  /* Delete these controllers after enableNonCompliance feature flag is removed 👇 */
-  getAttendedComplied: _hmppsAuthClient => {
-    return async function getAttendedComplied(req, res) {
-      const { crn } = req.params as Record<string, string>
-      const { alertDismissed = false } = req.session
-      await auditService.sendAuditMessage({
-        action: 'VIEW_RECORD_AN_OUTCOME',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const { forename, surname, appointment } = res.locals.appointmentOutcome
-      const headerPersonName = { forename, surname }
-      res.render('pages/appointments/attended-complied', {
-        crn,
-        alertDismissed,
-        isInPast: true,
-        headerPersonName,
-        forename,
-        surname,
-        appointment,
-      })
-    }
-  },
-  postAttendedComplied: _hmppsAuthClient => {
-    return async function postAttendedComplied(req, res) {
-      const { crn, contactId: id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isNumericString(id)) {
-        return renderError(404)(req, res)
-      }
-      const { data } = req.session
-      setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true)
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
-    }
-  },
-  /* ----------------- 👆 -----------------  */
   getAddNote: _hmppsAuthClient => {
     return async function getAddNote(req, res) {
       const { crn } = req.params as Record<string, string>
@@ -438,7 +398,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (nextAppointment !== 'NO') {
         return cloneAppointmentAndRedirect(currentAppointment, nextAppointment)(req, res)
       }
-      if (res.locals.flags?.enableNonCompliance && req.url.includes('/outcome/next-appointment')) {
+      if (req.url.includes('/outcome/next-appointment')) {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
