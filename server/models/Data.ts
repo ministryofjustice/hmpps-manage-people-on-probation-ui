@@ -11,6 +11,7 @@ import { SentencePlan } from './Risk'
 import { ErrorSummary } from '../data/model/common'
 import { ProbationPractitioner } from './CaseDetail'
 import { NextAppointmentResponse, SupervisionPackageResponse } from './SupervisionPackage'
+import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -18,6 +19,7 @@ export interface PersonalDetailsSession {
   risks: RiskSummary
   tierCalculation: TierCalculation
   riskData?: RiskData
+  riskBadgeData?: RiskBadgeData
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
   professionalContact?: ProfessionalContact | null

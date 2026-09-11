@@ -11,10 +11,11 @@ import { tierLink, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
-import { RiskSummary } from '../data/model/risk'
+import { PersonRiskFlags, RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { getManagedByDetails } from '../utils/getManagedByDetails'
+import { getRiskBadgeGroups, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -30,6 +31,8 @@ export const getPersonalDetails = (
     let riskData: RiskData
     let probationPractitioner: ProbationPractitioner
     let professionalContact: ProfessionalContact | null
+    let personRiskFlags: PersonRiskFlags
+    let riskBadgeData: RiskBadgeData
     let token: string | undefined
     if (!req?.session?.data?.personalDetails?.[crn]) {
       const { username } = res.locals.user
@@ -39,16 +42,41 @@ export const getPersonalDetails = (
       const tierClient = new TierApiClient(token)
       const arnsAssessmentPlatformClient = new ArnsAssessmentPlatformApiClient(token)
       const authOptions = asUser(res.locals.user.token)
-      ;[overview, risks, tierCalculation, userCaseload, riskData, probationPractitioner, professionalContact] =
-        await Promise.all([
-          masClient.getPersonalDetails(crn),
-          arnsClient.getRisks(crn),
-          tierClient.getCalculationDetails(crn),
-          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-          arnsComponents.getRiskData(authOptions, 'crn', crn),
-          masClient.getProbationPractitioner(crn),
-          masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
-        ])
+      ;;;[
+        overview,
+        risks,
+        tierCalculation,
+        userCaseload,
+        riskData,
+        probationPractitioner,
+        professionalContact,
+        personRiskFlags,
+      ] = await Promise.all([
+        masClient.getPersonalDetails(crn),
+        arnsClient.getRisks(crn),
+        tierClient.getCalculationDetails(crn),
+        masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
+        arnsComponents.getRiskData(authOptions, 'crn', crn),
+        masClient.getProbationPractitioner(crn),
+        masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
+        masClient.getPersonRiskFlags(crn),
+      ])
+
+
+      console.log('*************** riskData ***********************')
+
+      console.dir(riskData, { depth: null })
+      console.log('*************** personRiskFlags ***********************')
+
+      console.dir(personRiskFlags, { depth: null })
+
+      riskBadgeData = getRiskBadgeGroups(personRiskFlags.riskFlags)
+
+      console.log('*************** riskBadgeData ***********************')
+      console.dir(riskBadgeData, { depth: null })
+
+      console.log('**************************************')
+
       const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
       sentencePlan = { showLink: false, showText: false, lastUpdatedDate: '' }
       if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {
@@ -101,6 +129,8 @@ export const getPersonalDetails = (
     if (overview?.dateOfDeath) {
       res.locals.dateOfDeath = overview.dateOfDeath
     }
+    res.locals.personRiskFlags = personRiskFlags
+    res.locals.riskBadgeData = riskBadgeData
     return next()
   }
 }
