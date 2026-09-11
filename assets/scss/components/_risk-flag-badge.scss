@@ -1,0 +1,50 @@
+.risk-badge-link {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+
+.moj-badge.risk-badge--very-high {
+  background-color: #ffffff;
+  color: #0b0c0c;
+  border: 2px solid #711a0d;
+}
+
+.moj-badge.risk-badge--high {
+  background-color: #ffffff;
+  color: #0b0c0c;
+  border: 2px solid #d4351c;
+}
+
+.moj-badge.risk-badge--medium {
+  background-color: #ffffff;
+  color: #0b0c0c;
+  border: 2px solid #f2590d;
+}
+
+.moj-badge.risk-badge--low {
+  background-color: #ffffff;
+  color: #0b0c0c;
+  border: 2px solid #85994b;
+}
+
+.pop-header-risk-badges {
+  &:not(:empty) {
+    margin-bottom: govuk-spacing(2);
+  }
+}
+
+.person-header__risk-tags {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.pop-header-risk-badges .moj-badge,
+.pop-header-risk-flags .moj-badge {
+  /* Ensure badges in the header preserve original casing - override moj-frontend defaults */
+  text-transform: none !important;
+  font-weight: 400;
+}

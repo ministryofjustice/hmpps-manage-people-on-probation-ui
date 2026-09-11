@@ -12,10 +12,11 @@ import { tierLink, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
-import { RiskSummary } from '../data/model/risk'
+import { PersonRiskFlags, RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { getManagedByDetails } from '../utils/getManagedByDetails'
+import { getRiskBadgeGroups, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -55,6 +56,7 @@ export const getPersonalDetails = (
         const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => null)
         personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : undefined
       }
+
       const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
       sentencePlan = { showLink: false, showText: false, lastUpdatedDate: '' }
       if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {

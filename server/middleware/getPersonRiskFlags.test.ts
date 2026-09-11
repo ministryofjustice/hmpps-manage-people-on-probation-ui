@@ -108,6 +108,10 @@ describe('middleware/getPersonRiskFlags', () => {
     })
   })
   describe('risks session exists for current crn', () => {
+    const mockRiskBadgeData = {
+      remainingCount: 0,
+    }
+
     const req = httpMocks.createRequest({
       params: {
         crn,
@@ -117,24 +121,38 @@ describe('middleware/getPersonRiskFlags', () => {
           risks: {
             [crn]: mockSessionRisks,
           },
+          riskBadgeData: {
+            [crn]: mockRiskBadgeData,
+          },
         },
       },
     })
+
     beforeEach(async () => {
+      jest.clearAllMocks()
+
       await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
     })
+
     it('should not request the risk flags from the api', () => {
       expect(getPersonRiskFlagsSpy).not.toHaveBeenCalled()
     })
+
     it('should not set the risks session', () => {
       expect(mockSetDataValue).not.toHaveBeenCalled()
     })
+
     it('should set res.locals.personRisks to the session value', () => {
       expect(res.locals.personRisks).toEqual(mockSessionRisks)
     })
+
     it('should set res.locals.riskToStaff to the expected value', () => {
-      expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'MEDIUM' })
+      expect(res.locals.riskToStaff).toStrictEqual({
+        id: 1,
+        level: 'MEDIUM',
+      })
     })
+
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
@@ -157,5 +175,27 @@ describe('middleware/getPersonRiskFlags', () => {
     it('should set res.locals.riskToStaff level to VERY_HIGH', () => {
       expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'VERY_HIGH' })
     })
+  })
+
+  it('should not generate risk badge data when risk flags are not present', async () => {
+    getPersonRiskFlagsSpy.mockResolvedValueOnce({
+      ...mockRisks,
+      riskFlags: undefined,
+    } as PersonRiskFlags)
+
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+
+    await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
+
+    expect(res.locals.riskBadgeData).toBeUndefined()
+
+    expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['riskBadgeData', crn], undefined)
   })
 })
