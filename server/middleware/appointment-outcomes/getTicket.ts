@@ -28,8 +28,16 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
       type === 'COMMUNITY' ? 'priorBreachesOnCurrentOrderCount' : 'priorRecallsOnCurrentOrderCount'
 
     const breachOrRecall = type === 'COMMUNITY' ? 'breach' : 'recall'
-    // attended failed to comply page, unacceptable absence page 👈
+    const today = new Date()
+    const oneYearAgo = new Date(today)
+    oneYearAgo.setFullYear(today.getFullYear() - 1)
 
+    const formatDate = (date: Date) => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+
+    const dateFrom= formatDate(oneYearAgo)
+    const dateTo= formatDate(today)
+
+    // attended failed to comply page, unacceptable absence page 👈
     if (['attended-failed-to-comply', 'unacceptable-absence'].some(url => reqUrl.endsWith(url))) {
       const failureToComplyContacts = [...unacceptableAbsence, ...attendedButDidNotComply]
 
@@ -89,7 +97,7 @@ export const getTicket = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>
     if (reqUrl.endsWith('outcome/acceptable-absence') && acceptableAbsence?.length > 1) {
       ticket = {
         title: `${forename} has had multiple acceptable absences in the past 12 months`,
-        html: `<p class="govuk-body">You can view a <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=acceptable+absence&compliance=complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">list of ${forename}’s acceptable absences (opens in new tab)</a>.`,
+        html: `<p class="govuk-body">You can view a <a class="govuk-link" href="/case/${crn}/activitylog/redirect?keywords=&dateFrom=${encodeURIComponent(dateFrom)}&dateTo=${encodeURIComponent(dateTo)}&compliance=complied&submit=true&view=&page=0" target="_blank" rel="noopener noreferrer">list of ${forename}’s acceptable absences (opens in new tab)</a>.`,
         type: 'BLUE',
       }
     }
