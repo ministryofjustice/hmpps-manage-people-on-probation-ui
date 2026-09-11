@@ -23,6 +23,7 @@ export interface Homepage {
   appointmentsRequiringOutcome: AppointmentSummary[]
   appointmentsRequiringOutcomeCount: number
   enforcementContacts?: EnforcementContact[]
+  timeoutError?: any
 }
 
 export interface AppointmentSummary {

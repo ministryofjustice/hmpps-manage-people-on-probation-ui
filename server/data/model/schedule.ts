@@ -27,6 +27,7 @@ export interface EnforcementContactsResponse {
   totalResults: number
   totalPages: number
   enforcementContacts: EnforcementContact[]
+  timeoutError?: any
 }
 
 export interface EnforcementContact {

@@ -94,4 +94,35 @@ context('Sign In', () => {
 
     Page.verifyOnPage(SearchPage)
   })
+
+  it('Handle API timeout in home page ', () => {
+    cy.task('stubAppointmentTimeout')
+    cy.task('stubEnforcementsTimeout')
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+
+    cy.get('[class="moj-alert__content"]').should('contain.text', 'Upcoming appointments are currently unavailable')
+    cy.get('.moj-alert__content li')
+      .should('have.length', 3)
+      .and('contain.text', 'Upcoming appointments are currently unavailable.')
+      .and('contain.text', 'Outcomes to log are currently unavailable.')
+      .and('contain.text', 'Enforcement actions are currently unavailable.')
+
+    page.getOutcomesToLog().should('exist')
+    cy.get('[data-qa="outcomesTimeoutError"]').should('contain.text', 'Outcomes to log are currently unavailable.')
+    cy.get('[data-qa="appointmentsTimeoutError"]').should(
+      'contain.text',
+      'Upcoming appointments are currently unavailable.',
+    )
+    cy.get('[data-qa="enforcementTimeoutError"]').should(
+      'contain.text',
+      'Enforcement actions are currently unavailable.',
+    )
+    cy.get('[data-qa="privacyPolicyLink"]')
+      .should('have.attr', 'href', '/privacy-policy')
+      .and('contain.text', 'Privacy policy')
+    cy.get('[data-qa="cookiesPolicyLink"]')
+      .should('have.attr', 'href', '/cookies-policy')
+      .and('contain.text', 'Cookies policy')
+  })
 })

@@ -20,4 +20,8 @@ describe('isTimeoutError', () => {
   it('returns false for undefined error', () => {
     expect(isTimeoutError(undefined)).toBe(false)
   })
+
+  it('returns true for ERR_SOCKET_TIMEOUT', () => {
+    expect(isTimeoutError({ code: 'ERR_SOCKET_TIMEOUT' })).toBe(true)
+  })
 })
