@@ -123,7 +123,6 @@ const mockAppointment: AppointmentSession = {
 
 const mockFlags = (flags?: Record<string, boolean>) => ({
   enableSmsReminders: true,
-  enableNonCompliance: false,
   ...(flags ?? {}),
 })
 
@@ -204,47 +203,7 @@ describe('middleware/postRescheduleAppointments', () => {
     jest.clearAllMocks()
   })
 
-  describe('reschedule an appointment in the future - Non compliance disabled', () => {
-    const [req, mockAppointmentSession] = buildRequest({ outcomeRecorded: 'No' })
-    const {
-      date,
-      start: startTime,
-      end: endTime,
-      user: { staffCode, teamCode, locationCode },
-      notes,
-      rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
-    } = mockAppointmentSession
-    const expectedBody = {
-      date,
-      startTime,
-      endTime,
-      uuid,
-      staffCode,
-      teamCode,
-      locationCode,
-      requestedBy,
-      notes,
-      sensitive: true,
-      isInFuture: true,
-      sendToVisor: false,
-      outcomeRecorded: false,
-      reasonForRecreate: 'Reschedule reason',
-      reasonIsSensitive: false,
-    }
-    let returnedResponse: RescheduleAppointmentResponse
-    const res = buildResponse()
-    beforeEach(async () => {
-      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
-    })
-    it('should send a reschedule appointment request to the api', () => {
-      expect(putRescheduleAppointmentSpy).toHaveBeenCalledWith(contactId, expectedBody)
-    })
-    it('should return the response', () => {
-      expect(returnedResponse).toEqual(mockRescheduleResponse)
-    })
-  })
-
-  describe('reschedule an appointment in the future - Non compliance enabled', () => {
+  describe('reschedule an appointment in the future', () => {
     const [req, mockAppointmentSession] = buildRequest({ outcomeRecorded: undefined })
     const {
       date,
@@ -272,7 +231,7 @@ describe('middleware/postRescheduleAppointments', () => {
       reasonIsSensitive: false,
     }
     let returnedResponse: RescheduleAppointmentResponse
-    const flags = { enableNonCompliance: true }
+    const flags = {}
     const res = buildResponse({ flags })
     beforeEach(async () => {
       returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
@@ -285,47 +244,7 @@ describe('middleware/postRescheduleAppointments', () => {
     })
   })
 
-  describe('reschedule an appointment in the past - Non compliance disabled', () => {
-    const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10' })
-    const {
-      date,
-      start: startTime,
-      end: endTime,
-      user: { staffCode, teamCode, locationCode },
-      notes,
-      rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
-    } = mockAppointmentSession
-    let returnedResponse: RescheduleAppointmentResponse
-    const res = buildResponse()
-    beforeEach(async () => {
-      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
-    })
-    it('should send a reschedule appointment request to the api', () => {
-      const expectedBody = {
-        date,
-        startTime,
-        endTime,
-        uuid,
-        staffCode,
-        teamCode,
-        locationCode,
-        requestedBy,
-        notes,
-        sensitive: true,
-        isInFuture: false,
-        sendToVisor: false,
-        outcomeRecorded: true,
-        reasonForRecreate: 'Reschedule reason',
-        reasonIsSensitive: false,
-      }
-      expect(putRescheduleAppointmentSpy).toHaveBeenCalledWith(contactId, expectedBody)
-    })
-    it('should return the response', () => {
-      expect(returnedResponse).toEqual(mockRescheduleResponse)
-    })
-  })
-
-  describe('reschedule an appointment in the past - Non compliance enabled', () => {
+  describe('reschedule an appointment in the past', () => {
     const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10', outcome: { outcomeCode: 'ATTC' } })
     const {
       date,
@@ -336,7 +255,7 @@ describe('middleware/postRescheduleAppointments', () => {
       rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
     } = mockAppointmentSession
     let returnedResponse: RescheduleAppointmentResponse
-    const flags = { enableNonCompliance: true }
+    const flags = {}
     const res = buildResponse({ flags })
     beforeEach(async () => {
       returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse

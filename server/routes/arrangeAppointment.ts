@@ -129,22 +129,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
-  router.all(['/case/:crn/arrange-appointment/:id/attended-complied'], getOutcomeProps)
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/attended-complied',
-    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date'] }),
-    controllers.arrangeAppointments.getAttendedComplied(),
-  )
-
-  router.post(
-    '/case/:crn/arrange-appointment/:id/attended-complied',
-    validate.appointments,
-    autoStoreSessionData(hmppsAuthClient),
-    checkAnswers,
-    controllers.arrangeAppointments.postAttendedComplied(),
-  )
-
   router.get(
     '/case/:crn/arrange-appointment/:id/supporting-information',
     restrictPageAccess({ requiredValues: ['eventId', 'type', ['user', 'locationCode']] }),
@@ -255,30 +239,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     const { isInPast, isToday } = dateIsInPast(date, time)
     return res.json({ isInPast, isToday, alertDismissed })
   })
-
-  /* Delete these routes after enableNonCompliance feature flag is removed 👇 */
-
-  router.all(
-    '/case/:crn/arrange-appointment/:id/add-note',
-    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'outcomeRecorded'] }),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getAppointment(hmppsAuthClient),
-    getOutcomeProps,
-  )
-  router.get(
-    '/case/:crn/arrange-appointment/:id/add-note',
-    forceValidation,
-    controllers.arrangeAppointments.getAddNote(),
-  )
-
-  router.post(
-    '/case/:crn/arrange-appointment/:id/add-note',
-    validate.appointments,
-    autoStoreSessionData(hmppsAuthClient),
-    controllers.arrangeAppointments.postAddNote(),
-  )
-
-  /* ----------------- 👆 -----------------  */
 }
 
 export default arrangeAppointmentRoutes
