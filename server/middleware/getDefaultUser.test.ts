@@ -99,7 +99,7 @@ describe('/middleware/getDefaultUser()', () => {
   })
 
   describe('Attending user has been set in session', () => {
-    const req = buildRequest({ user: { providerCode, teamCode, username, email, name, displayName } })
+    const req = buildRequest({ user: { providerCode, teamCode, username, name } })
     it('Should not update the session values and call next', async () => {
       await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
       expect(mockSetDataValue).not.toHaveBeenCalled()

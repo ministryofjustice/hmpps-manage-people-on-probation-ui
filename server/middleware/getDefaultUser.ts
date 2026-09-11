@@ -24,16 +24,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     let teams = getDataValue(data, ['teams', username]) ?? null
     let users = getDataValue(data, ['staff', username]) ?? null
 
-    if (
-      !attendingUsername ||
-      !providerCode ||
-      !teamCode ||
-      !attendingEmail ||
-      !attendingName ||
-      !providers ||
-      !teams ||
-      !users
-    ) {
+    if (!attendingUsername || !providerCode || !teamCode || !providers || !teams || !users) {
       let useProbationPractitioner = true
       const probationPractitioner = await masClient.getProbationPractitioner(crn)
 
