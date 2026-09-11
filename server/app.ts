@@ -43,7 +43,7 @@ export default function createApp(services: Services): express.Application {
       // requestLogger() below - so every registered handler (this one
       // included) is captured in the trace, not just ones registered after it.
       instrumentRouter()
-      app.use(requestLogger())
+      // app.use(requestLogger())
     }
   }
 

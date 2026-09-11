@@ -522,7 +522,9 @@ context('Risk', () => {
     checkPopHeader()
   })
   it('Risk flag information and tier is not provided due to 500 from ARNS, TIER, RiskFlag endpoint', () => {
-    cy.visit('/case/X000002/risk')
+    cy.visit('/case/X000002/risk', {
+      failOnStatusCode: false,
+    })
     const page = new RiskDetailPage()
 
     cy.get(`[data-qa=errors]`).should(
@@ -535,5 +537,10 @@ context('Risk', () => {
       'contain.text',
       'Risk flag information is currently unavailable. Try again later or use NDelius.',
     )
+
+    cy.get('[data-qa="errors"]')
+      .should('contain.text', 'Risk information from the Assess and plan service is currently unavailable.')
+      .and('contain.text', 'Tier information is currently unavailable.')
+      .and('contain.text', 'Risk flag information is currently unavailable. Try again later or use NDelius.')
   })
 })
