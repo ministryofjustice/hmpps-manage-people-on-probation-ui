@@ -6,24 +6,21 @@ import AppointmentLocationNotInListPage from '../../pages/appointments/location-
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
-import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import { crn, uuid } from './imports/common'
 import {
   completeSentencePage,
   completeTypePage,
-  completeAttendedCompliedPage,
   completeAddNotePage,
   completeSupportingInformationPage,
   completeRescheduleAppointmentPage,
   getUuid,
+  completeOutcome,
 } from './utils'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 
-const loadPage = ({ urlCRN = crn, typeOptionIndex = 1, enableNonCompliance = true } = {}) => {
-  if (!enableNonCompliance) {
-    cy.task('stubDisableNonCompliance')
-  }
+const loadPage = ({ urlCRN = crn, typeOptionIndex = 1 } = {}) => {
   completeSentencePage({ eventIndex: 1, crnOverride: urlCRN })
   completeTypePage(typeOptionIndex)
 }
@@ -369,21 +366,6 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
     })
   })
-  describe('Date is selected from the picker which is in the past - non compliance disabled', () => {
-    beforeEach(() => {
-      loadPage({ enableNonCompliance: false })
-      locationDateTimePage = new AppointmentLocationDateTimePage()
-      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
-    })
-    it('should display the log an outcome alert banner', () => {
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-    it('should hide the alert banner if date is selected from the picker in the future', () => {
-      const future = now.plus({ days: 2 })
-      locationDateTimePage.getDatePickerInput().clear().type(future.toFormat('d/M/yyyy'))
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
-    })
-  })
 
   describe('Date is entered which is in the past', () => {
     beforeEach(() => {
@@ -398,21 +380,6 @@ describe('Pick a date, location and time for this appointment', () => {
       const future = now.plus({ days: 2 }).toFormat('d/M/yyyy')
       locationDateTimePage.getDatePickerInput().clear().type(future)
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
-    })
-  })
-  describe('Date is entered which is in the past - non compliance disabled', () => {
-    beforeEach(() => {
-      loadPage({ enableNonCompliance: false })
-      locationDateTimePage = new AppointmentLocationDateTimePage()
-      locationDateTimePage.getDatePickerInput().type(`${yesterday.toFormat('d/M/yyyy')}`)
-    })
-    it('should display the log an outcome alert banner', () => {
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-    it('should hide the alert banner if a date is entered in the future', () => {
-      const future = now.plus({ days: 2 }).toFormat('d/M/yyyy')
-      locationDateTimePage.getDatePickerInput().clear().type(future)
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
 
@@ -438,29 +405,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
     })
   })
-  describe('Todays date is selected from the picker, and a start time in the past is entered - non compliance disabled', () => {
-    const mockedTime = DateTime.local().set({
-      hour: 9,
-      minute: 1,
-      second: 0,
-      millisecond: 0,
-    })
-    beforeEach(() => {
-      cy.clock(mockedTime.toMillis())
-      cy.intercept('POST', '/appointment/is-in-past', {
-        statusCode: 200,
-        body: { isInPast: true },
-      }).as('isInPast')
-      loadPage({ enableNonCompliance: false })
-      locationDateTimePage.getDatePickerToggle().click()
-      locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).clear().type('08:00')
-    })
-    it('should display the log an outcome alert banner', () => {
-      cy.wait('@isInPast')
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-  })
+
   describe('Todays date is selected from the picker, and a start time in the future is entered', () => {
     const mockedTime = DateTime.local().set({
       hour: 9,
@@ -504,82 +449,6 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       selectPastDate()
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
-    })
-
-    it('should display the warning message if enableNonCompliance flag is disabled', () => {
-      cy.task('stubDisableNonCompliance')
-      loadPage({ enableNonCompliance: false })
-      selectPastDate()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-
-    it('should persist the log an outcome alert banner when form is submitted with validation errors', () => {
-      cy.task('stubDisableNonCompliance')
-      loadPage()
-      selectPastDate()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-      locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-
-    it('should persist the log an outcome alert banner when past date is submitted and cancel and go back link is clicked from log an outcome page - non compliance disabled', () => {
-      loadPage({ enableNonCompliance: false })
-      selectPastDate()
-      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.getSubmitBtn().click()
-      logOutcomePage = new AttendedCompliedPage()
-      logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
-      logOutcomePage.getCancelGoBackLink().click()
-      locationDateTimePage.checkOnPage()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-    it('should persist the log an outcome banner when change link is clicked on check your answers page - non compliance disabled', () => {
-      loadPage({ enableNonCompliance: false })
-      selectPastDate()
-      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.getSubmitBtn().click()
-      completeAttendedCompliedPage()
-      completeAddNotePage()
-      cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-  })
-
-  describe('Date in the past is selected, the the alert banner is dismissed', () => {
-    beforeEach(() => {
-      cy.task('stubDisableNonCompliance')
-      loadPage()
-      selectPastDate()
-    })
-    it('should display the log an outcome alert banner', () => {
-      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
-    })
-    it('should hide the banner if dismiss link is clicked', () => {
-      locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
-    })
-    it('should not re-show the alert banner when invalid form is submitted and validation errors are shown', () => {
-      locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
-      locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
-    })
-    it('should not re-show the alert banner when the form is submitted, then the back link is clicked on the next page', () => {
-      locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
-      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('09:30')
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      locationDateTimePage.getSubmitBtn().click()
-      locationDateTimePage.getSubmitBtn().click()
-      logOutcomePage = new AttendedCompliedPage()
-      logOutcomePage.getCancelGoBackLink().click()
-      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
 
@@ -629,7 +498,7 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   const completeInvalidRescheduleDateTime = () => {
-    completeRescheduleAppointmentPage({ enableNonCompliance: false })
+    completeRescheduleAppointmentPage()
     const rescheduleCyaPage = new RescheduleCheckYourAnswerPage()
     rescheduleCyaPage.getSubmitBtn().click()
     locationDateTimePage = new AppointmentLocationDateTimePage()
@@ -669,25 +538,25 @@ describe('Pick a date, location and time for this appointment', () => {
       })
     })
     it('should submit the page if date is changed', () => {
-      locationDateTimePage.getDatePickerInput().clear().type('22/2/2024')
+      locationDateTimePage.getDatePickerInput().clear().type('22/1/2024')
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
-      const attendedCompliedPage = new AttendedCompliedPage()
-      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
+      const outcomePage = new OutcomePage()
+      outcomePage.checkPageTitle('What was the outcome of this appointment?')
     })
     it('should submit the page if start time is changed', () => {
       locationDateTimePage.getElementInput(`startTime`).clear().type('10:20')
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
-      const attendedCompliedPage = new AttendedCompliedPage()
-      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
+      const outcomePage = new OutcomePage()
+      outcomePage.checkPageTitle('What was the outcome of this appointment?')
     })
     it('should submit the page if end time is changed', () => {
       locationDateTimePage.getElementInput(`endTime`).clear().type('10:40')
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
-      const attendedCompliedPage = new AttendedCompliedPage()
-      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
+      const outcomePage = new OutcomePage()
+      outcomePage.checkPageTitle('What was the outcome of this appointment?')
     })
   })
 })

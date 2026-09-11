@@ -2,8 +2,6 @@ import { DateTime } from 'luxon'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import { statusErrors } from '../../../server/properties/statusErrors'
-import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
-import AddNotePage from '../../pages/appointments/add-note.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
@@ -27,7 +25,6 @@ import {
   completeLocationDateTimePage,
   completeTextMessageConfirmationPage,
   completeSupportingInformationPage,
-  completeAttendedCompliedPage,
   completeAddNotePage,
   completeOutcome,
 } from './utils'
@@ -42,7 +39,6 @@ interface LoadPageArgs {
   dateInPast?: boolean
   textMessageOptionIndex?: number
   textMessageFeatureFlag?: boolean
-  enableNonCompliance?: boolean
   outcome?: AppointmentOutcomeType
   action?: AppointmentEnforcementAction
 }
@@ -54,13 +50,9 @@ const loadPage = ({
   dateInPast = false,
   textMessageOptionIndex = 1,
   textMessageFeatureFlag = true,
-  enableNonCompliance = true,
   outcome = 'ATTENDED_FAILED_TO_COMPLY',
   action = 'NO_FURTHER_ACTION',
 }: LoadPageArgs = {}) => {
-  if (!enableNonCompliance) {
-    cy.task('stubDisableNonCompliance')
-  }
   completeSentencePage({ eventIndex: sentenceOptionIndex })
   completeTypePage(typeOptionIndex, hasVisor)
   completeLocationDateTimePage({ dateInPast })
@@ -76,12 +68,7 @@ const loadPage = ({
     completeSupportingInformationPage({ notes })
   }
   if (dateInPast) {
-    if (!enableNonCompliance) {
-      completeAttendedCompliedPage()
-    }
-    if (enableNonCompliance) {
-      completeOutcome({ outcome, action })
-    }
+    completeOutcome({ outcome, action })
     completeAddNotePage()
   }
   if (!dateInPast && !textMessageFeatureFlag) {
@@ -202,28 +189,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
   })
 
-  describe('Appointment date is in the past - non compliance disabled', () => {
-    const cyaPage = new AppointmentCheckYourAnswersPage()
-    beforeEach(() => {
-      loadPage({ dateInPast: true, enableNonCompliance: false })
-    })
-    it('should display the attended and complied row', () => {
-      checkAppointmentSummary({
-        page: cyaPage,
-        probationPractitioner: false,
-        dateInPast: true,
-        enableNonCompliance: false,
-      })
-    })
-    it('should update the notes when value is changed', () => {
-      checkUpdateNotes({ page: cyaPage, dateInPast: true, enableNonCompliance: false })
-    })
-    it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity({ page: cyaPage, dateInPast: true, enableNonCompliance: false })
-    })
-  })
-
-  describe('Appointment date is in the past, outcome is ATTENDED_FAILED_TO_COMPLY, action is NO_FURTHER_ACTION - non compliance enabled', () => {
+  describe('Appointment date is in the past, outcome is ATTENDED_FAILED_TO_COMPLY, action is NO_FURTHER_ACTION', () => {
     const cyaPage = new AppointmentCheckYourAnswersPage()
     beforeEach(() => {
       loadPage({ dateInPast: true })
@@ -239,7 +205,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
   })
 
-  describe('Appointment date is in the past, outcome is ATTENDED_FAILED_TO_COMPLY, action is BREACH_RECALL_INITIATED_AND_SEND_LETTER - non compliance enabled', () => {
+  describe('Appointment date is in the past, outcome is ATTENDED_FAILED_TO_COMPLY, action is BREACH_RECALL_INITIATED_AND_SEND_LETTER', () => {
     const cyaPage = new AppointmentCheckYourAnswersPage()
     beforeEach(() => {
       loadPage({ dateInPast: true, action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
@@ -262,37 +228,18 @@ describe('Check your answers then confirm the appointment', () => {
 
   describe('User updates the appointment date', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
-    let logOutcomePage: AttendedCompliedPage
     let supportingInfoPage: AppointmentNotePage
-    let addNotePage: AddNotePage
     let textMessageConfirmPage: TextMessageConfirmationPage
 
     const recordOutcome = `appointments-${crn}-${uuid}-outcomeRecorded`
 
-    const changeDate = ({ dateInPast = false, enableNonCompliance = true } = {}) => {
-      loadPage({ dateInPast, enableNonCompliance })
+    const changeDate = ({ dateInPast = false } = {}) => {
+      loadPage({ dateInPast })
       cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(5).find('.govuk-link').click()
     }
 
-    describe('changes future appointment to past appointment - non compliance disabled', () => {
-      beforeEach(() => {
-        cy.task('stubDisableNonCompliance')
-        changeDate({ enableNonCompliance: false })
-        completeLocationDateTimePage({ dateInPast: true })
-      })
-      it('should redirect to the log an outcome page, then add notes', () => {
-        logOutcomePage = new AttendedCompliedPage()
-        logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
-        cy.get(`#${recordOutcome}`).should('not.be.checked')
-        cy.get(`#${recordOutcome}`).click()
-        logOutcomePage.getSubmitBtn().click()
-        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
-        cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkPageTitle('Check your answers')
-      })
-    })
-    describe('changes future appointment to past appointment - non compliance enabled', () => {
+    describe('changes future appointment to past appointment', () => {
       beforeEach(() => {
         changeDate()
         completeLocationDateTimePage({ dateInPast: true })
@@ -337,27 +284,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
     })
 
-    describe('changes past appointment date to another date in the past - non compliance disabled', () => {
-      const dateInPast = true
-      beforeEach(() => {
-        changeDate({ dateInPast, enableNonCompliance: false })
-        const now = DateTime.now()
-        const dateOverride = now.minus({ days: 2 })
-        completeLocationDateTimePage({ dateOverride })
-      })
-      it('should redirect to the log an outcome page, then add notes', () => {
-        logOutcomePage = new AttendedCompliedPage()
-        logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
-        cy.get(`#${recordOutcome}`).should('not.be.checked')
-        cy.get(`#${recordOutcome}`).click()
-        logOutcomePage.getSubmitBtn().click()
-        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
-        cyaPage = new AppointmentCheckYourAnswersPage()
-        cyaPage.checkPageTitle('Check your answers')
-      })
-    })
-
-    describe('changes past appointment date to another date in the past - non compliance enabled', () => {
+    describe('changes past appointment date to another date in the past', () => {
       beforeEach(() => {
         changeDate({ dateInPast: true })
         const now = DateTime.now()

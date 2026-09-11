@@ -62,7 +62,6 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       notes,
       sensitivity,
       visorReport,
-      outcomeRecorded,
       smsOptIn,
       outcome,
     } = appointmentSession
@@ -91,11 +90,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       body.licenceConditionId = parseInt(licenceConditionId as string, 10)
     }
 
-    if (res.locals.flags?.enableNonCompliance) {
-      body.outcomeRecorded = !!outcome?.outcomeCode
-    } else {
-      body.outcomeRecorded = outcomeRecorded === 'Yes'
-    }
+    body.outcomeRecorded = !!outcome?.outcomeCode
 
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)

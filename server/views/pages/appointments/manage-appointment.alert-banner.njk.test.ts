@@ -15,9 +15,7 @@ type TestModel = {
   title: string
   pageTitle: string
   url: string
-  flags: {
-    enableNonCompliance: boolean
-  }
+  flags: object
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
   sentences: Array<{ order: { description: string } }>
@@ -32,9 +30,7 @@ const baseModel: TestModel = {
   title: 'Manage planned office visit (NS) with Terry Jones',
   pageTitle: 'Manage planned office visit (NS) with Terry Jones',
   url: `/case/${crn}/appointments/appointment/${appointmentId}/manage`,
-  flags: {
-    enableNonCompliance: false,
-  },
+  flags: {},
   deepLinkContactTypes: ['Drug Test Appointment (NS)', 'CP/UPW - Appointment/Attendance (NS)'],
   personAppointment: {
     personSummary: {
