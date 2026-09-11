@@ -13,7 +13,6 @@ export class FeatureFlags {
   enableFinalThirdPrompt?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
-  enableMyEnforcementActionsOverview?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
