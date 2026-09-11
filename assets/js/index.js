@@ -85,10 +85,16 @@ const attendanceSelectors = () => {
   const providerSelect = document.querySelector('[data-qa="providerCode"]')
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
   const userSelect = document.querySelector('[data-qa="username"]')
+  const submitButton = document.getElementById('submit-btn')
   let providerCode = ''
   if (providerSelect) {
     providerCode = providerSelect.value
     providerSelect.addEventListener('change', event => {
+      submitButton.disabled = true
+      providerSelect.disabled = true
+      teamSelect.disabled = true
+      userSelect.disabled = true
+      providerCode = providerSelect.value
       const { value } = event.target
       const urlParts = location.href.split('?')[0].split('/')
       const crn = urlParts[4]
@@ -112,19 +118,28 @@ const attendanceSelectors = () => {
         removeOptions(userSelect)
         const { users } = json
         users.forEach(user =>
-          userSelect.add(new Option(user.nameAndRole, user.staffCode, undefined, user.selected === 'selected')),
+          userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
         )
+        submitButton.disabled = false
+        providerSelect.disabled = false
+        teamSelect.disabled = false
+        userSelect.disabled = false
         return response
       })
     })
   }
   if (teamSelect) {
     teamSelect.addEventListener('change', event => {
+      submitButton.disabled = true
+      providerSelect.disabled = true
+      teamSelect.disabled = true
+      userSelect.disabled = true
       const { value } = event.target
       const urlParts = location.href.split('?')[0].split('/')
       const crn = urlParts[4]
       const uuid = urlParts[6]
       const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
+      console.log(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`)
       fetch(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`, {
         method: 'POST',
         headers: {
@@ -138,8 +153,12 @@ const attendanceSelectors = () => {
         removeOptions(userSelect)
         const { users } = json
         users.forEach(user =>
-          userSelect.add(new Option(user.nameAndRole, user.staffCode, undefined, user.selected === 'selected')),
+          userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
         )
+        submitButton.disabled = false
+        providerSelect.disabled = false
+        teamSelect.disabled = false
+        userSelect.disabled = false
         return response
       })
     })
