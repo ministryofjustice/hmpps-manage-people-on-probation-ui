@@ -139,7 +139,6 @@ const attendanceSelectors = () => {
       const crn = urlParts[4]
       const uuid = urlParts[6]
       const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
-      console.log(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`)
       fetch(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`, {
         method: 'POST',
         headers: {
