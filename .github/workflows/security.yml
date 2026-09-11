@@ -6,11 +6,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  trivy:
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@v2 # WORKFLOW_VERSION
+  security-snyk-check:
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    name: Project security Snyk dependency check
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_snyk_scan.yml@v2
     with:
-      channel_id: manage-people-on-probation-alerts-security
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
+      subproject: ''
+      severity: 'HIGH,CRITICAL'
+      scan_type: 'image' # or 'fs'
+      location: '.'
+      slack_include_summary: true
+      snyk_policy_path: '' # Optional path to a custom Snyk policy file
     secrets:
+      HMPPS_SNYK_CLIENT_SECRET: ${{ secrets.HMPPS_SNYK_CLIENT_SECRET }}
+      HMPPS_SNYK_CLIENT_ID: ${{ secrets.HMPPS_SNYK_CLIENT_ID }}
       HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
 
   zap:
