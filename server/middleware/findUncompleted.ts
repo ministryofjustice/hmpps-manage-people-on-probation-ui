@@ -22,13 +22,8 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
       [appointment?.smsOptIn, 'text-message-confirmation'],
     ]
     if (dateInPast) {
-      if (res.locals.flags.enableNonCompliance) {
-        mapping.push([appointment?.outcome?.outcomeType, 'outcome'])
-        mapping.push([appointment?.sensitivity, 'outcome/add-note'])
-      } else {
-        mapping.push([appointment?.outcomeRecorded, 'attended-complied'])
-        mapping.push([appointment?.sensitivity, 'add-note'])
-      }
+      mapping.push([appointment?.outcome?.outcomeType, 'outcome'])
+      mapping.push([appointment?.sensitivity, 'outcome/add-note'])
     } else {
       mapping.push([appointment?.sensitivity, 'supporting-information'])
     }
@@ -36,7 +31,7 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     let appointmentIsIncomplete = false
     for (const [value, redirect] of mapping) {
       appointmentIsIncomplete = !value
-      if (['attended-complied', 'outcome'].includes(redirect)) {
+      if (redirect === 'outcome') {
         appointmentIsIncomplete = !value && dateInPast
       }
       if (redirect === 'text-message-confirmation') {

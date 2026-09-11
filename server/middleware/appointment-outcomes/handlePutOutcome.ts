@@ -24,7 +24,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
       (contactId && responseContactId && isInPast && !addNotes) ||
       (contactId && !responseContactId && !addNotes) ||
       (contactId && addNotes && put)
-    if (res.locals.flags.enableNonCompliance && validRequest) {
+    if (validRequest) {
       if (!isValidParams) {
         return renderError(404)(req, res)
       }

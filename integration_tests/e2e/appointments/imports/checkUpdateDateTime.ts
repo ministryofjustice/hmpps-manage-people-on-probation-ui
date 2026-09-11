@@ -5,7 +5,6 @@ import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-y
 import AppointmentLocationDateTimePage from '../../../pages/appointments/location-date-time.page'
 import {
   completeAddNotePage,
-  completeAttendedCompliedPage,
   completeOutcome,
   completeSupportingInformationPage,
   completeTextMessageConfirmationPage,
@@ -18,11 +17,9 @@ import { crn } from './common'
 export const checkUpdateDateTime = ({
   page,
   inPast = false,
-  enableNonCompliance = true,
 }: {
   page?: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
   inPast?: boolean
-  enableNonCompliance?: boolean
 } = {}) => {
   getCrn().then(pageCrn => {
     getUuid().then(pageUuid => {
@@ -61,11 +58,7 @@ export const checkUpdateDateTime = ({
         completeSupportingInformationPage({ notes: true, uuidOveride: pageUuid })
       }
       if (inPast) {
-        if (enableNonCompliance) {
-          completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
-        } else {
-          completeAttendedCompliedPage({ _crn: pageCrn, _uuid: pageUuid })
-        }
+        completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
         completeAddNotePage({ idOverride: pageUuid, crnOverride: crn })
       }
       if (page instanceof AppointmentCheckYourAnswersPage) {
@@ -86,24 +79,18 @@ export const checkUpdateDateTime = ({
           }
         })
       if (inPast) {
-        if (!enableNonCompliance) {
-          page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
-          page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-        }
-        if (enableNonCompliance) {
-          page
-            .getSummaryListRow(6)
-            .find('.govuk-summary-list__key')
-            .should('contain.text', 'What was the outcome of this appointment?')
-          page
-            .getSummaryListRow(6)
-            .find('.govuk-summary-list__value')
-            .should('contain.text', 'Attended - failed to comply')
-          page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Enforcement action')
-          page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No further action')
-          page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
-          page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
-        }
+        page
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__key')
+          .should('contain.text', 'What was the outcome of this appointment?')
+        page
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'Attended - failed to comply')
+        page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Enforcement action')
+        page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No further action')
+        page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
+        page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
       }
     })
   })

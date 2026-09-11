@@ -45,27 +45,6 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopCo
     controllers.appointments.getRecordAnOutcome(hmppsAuthClient),
   )
 
-  /* Delete these routes after enableNonCompliance feature flag is removed 👇 */
-
-  router.all(
-    '/case/:crn/appointments/appointment/:contactId/attended-complied',
-    getPersonAppointment(hmppsAuthClient),
-    getOutcomeProps,
-  )
-
-  get(
-    '/case/:crn/appointments/appointment/:contactId/attended-complied',
-    controllers.appointments.getAttendedComplied(hmppsAuthClient),
-  )
-
-  router.post(
-    '/case/:crn/appointments/appointment/:contactId/attended-complied',
-    validate.appointments,
-    controllers.appointments.postAttendedComplied(hmppsAuthClient),
-  )
-
-  /* ----------------- 👆 -----------------  */
-
   router.all(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
     getPersonAppointment(hmppsAuthClient),
