@@ -119,4 +119,40 @@ describe('/middleware/getUserOptions()', () => {
       expect(getUserProvidersSpy).toHaveBeenCalledWith(username, providerCodeQuery, teamCodeQuery)
     })
   })
+
+  describe('no-js path is used', () => {
+    describe('noconflicting parameters are given', () => {
+      const providerCodeQuery = 'PC'
+      const req = buildRequest({
+        query: {
+          '[appointments][X000001][a4615940-2808-4ab5-a8e0-feddecb8ae1a][temp][providerCode]': providerCodeQuery,
+          'update-btn': '',
+        },
+      })
+      beforeEach(async () => {
+        await getUserOptions(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should get providers for correct parameters', () => {
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username, providerCodeQuery, '')
+      })
+    })
+
+    describe('conflicting parameters are given', () => {
+      const providerCodeQuery = 'PC'
+      const teamCodeQuery = 'NO'
+      const req = buildRequest({
+        query: {
+          '[appointments][X000001][a4615940-2808-4ab5-a8e0-feddecb8ae1a][temp][providerCode]': providerCodeQuery,
+          '[appointments][X000001][a4615940-2808-4ab5-a8e0-feddecb8ae1a][temp][teamCode]': teamCodeQuery,
+          'update-btn': '',
+        },
+      })
+      beforeEach(async () => {
+        await getUserOptions(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should get providers for correct parameters', () => {
+        expect(getUserProvidersSpy).toHaveBeenNthCalledWith(2, username, providerCodeQuery, '')
+      })
+    })
+  })
 })

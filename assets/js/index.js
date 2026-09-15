@@ -112,6 +112,10 @@ const attendanceSelectors = () => {
         },
       }).then(async response => {
         if (!response.ok) {
+          submitButton.disabled = false
+          providerSelect.disabled = false
+          teamSelect.disabled = false
+          userSelect.disabled = false
           throw new Error(`Saving filters failed with status ${response.status}`)
         }
         const json = await response.json()
@@ -152,6 +156,10 @@ const attendanceSelectors = () => {
         },
       }).then(async response => {
         if (!response.ok) {
+          submitButton.disabled = false
+          providerSelect.disabled = false
+          teamSelect.disabled = false
+          userSelect.disabled = false
           throw new Error(`Saving filters failed with status ${response.status}`)
         }
         const json = await response.json()

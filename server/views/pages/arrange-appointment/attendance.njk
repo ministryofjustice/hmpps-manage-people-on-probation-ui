@@ -13,7 +13,7 @@
 {% block primary %}
     <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %} {% if formId %} id="{{ formIdName }}"{% endif %}>
         <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {% if change %}<input type="hidden" name="change" value="{{ change }}">{% endif %}
         {% set providerItems = [] %}
         {% for provider in userProviders %}
             {% set providerItems = (providerItems.push({value: provider.code, text: provider.name, selected: provider.selected}), providerItems) %}
