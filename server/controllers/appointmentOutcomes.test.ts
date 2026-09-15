@@ -104,12 +104,14 @@ const mockReq = ({
   enforcementAction = {},
   linkedContactId = null,
   responseContactId = null,
+  nextAppointmentId = null,
 }: {
   request?: Record<string, any>
   type?: AppointmentOutcomeType
   enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
   linkedContactId?: string
   responseContactId?: string
+  nextAppointmentId?: string
 } = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: { crn: 'R000101' },
@@ -129,6 +131,7 @@ const mockReq = ({
           [crn]: {
             linkedContactId,
             responseContactId,
+            nextAppointmentId,
           },
         },
       },
@@ -256,6 +259,7 @@ describe('controllers/appointmentOutcomes', () => {
 
     it('should render the check your answers page when getCheckYourAnswers is called', async () => {
       const req = mockReq({
+        nextAppointmentId: '123',
         request: {
           url: `/case/${crn}/appointments/appointment/${contactId}/outcome/check-your-answers`,
         },
@@ -265,6 +269,7 @@ describe('controllers/appointmentOutcomes', () => {
       await controllers.appointmentOutcomes.getCheckYourAnswers()(req, res)
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/check-your-answers', {
         url: encodeURIComponent(req.url),
+        nextAppointmentId: '123',
       })
     })
 
@@ -400,6 +405,16 @@ describe('controllers/appointmentOutcomes', () => {
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(
         `/case/${crn}/appointments/appointment/${contactId}/outcome/next-appointment?back=/case/X000001/appointments/appointment/1234/outcome/add-note`,
+      )
+    })
+    it('should set the next appointment if nextAppointmentId exists', async () => {
+      const req = mockReq({ nextAppointmentId: '1234' })
+      const res = mockRes()
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(setDataValueSpy).toHaveBeenCalledWith(
+        req.session.data,
+        ['temp', crn, 'nextAppointment'],
+        res.locals.appointmentOutcome,
       )
     })
     it('should redirect to the confirmation page when postCheckYourAnswers is called', async () => {

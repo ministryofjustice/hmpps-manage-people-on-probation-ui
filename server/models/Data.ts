@@ -11,6 +11,8 @@ import { SentencePlan } from './Risk'
 import { ErrorSummary } from '../data/model/common'
 import { ProbationPractitioner } from './CaseDetail'
 import { NextAppointmentResponse, SupervisionPackageResponse } from './SupervisionPackage'
+import { AppointmentOutcomeProps } from './Locals'
+import { Activity } from '../data/model/schedule'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -35,6 +37,7 @@ export interface Data {
     [crn: string]: {
       linkedContactId?: string
       nextAppointmentId?: string
+      nextAppointment?: AppointmentOutcomeProps<Activity>
       responseContactId?: string
     }
   }
