@@ -85,6 +85,7 @@ const attendanceSelectors = () => {
   const providerSelect = document.querySelector('[data-qa="providerCode"]')
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
   const userSelect = document.querySelector('[data-qa="username"]')
+  document.getElementById('update-btn').classList.add('no-js')
   const submitButton = document.getElementById('submit-btn')
   const announcer = document.getElementById('update-announcer')
   let providerCode = ''

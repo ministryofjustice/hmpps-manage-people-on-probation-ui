@@ -1,4 +1,4 @@
-{% extends "../_form.njk" %}
+{% extends "../_content.njk" %}
 
 {% set title = 'Who will attend the appointment?' %}
 {% set pageTitle = makePageTitle({
@@ -10,48 +10,74 @@
     {% set decoratorTarget = 'user' %}
 {% endif %}
 
-{% block form %}
-    <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
-    {% set providerItems = [] %}
-    {% for provider in userProviders %}
-        {% set providerItems = (providerItems.push({value: provider.code, text: provider.name, selected: provider.selected}), providerItems) %}
-    {% endfor %}
+{% block primary %}
+    <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %} {% if formId %} id="{{ formIdName }}"{% endif %}>
+        <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {% set providerItems = [] %}
+        {% for provider in userProviders %}
+            {% set providerItems = (providerItems.push({value: provider.code, text: provider.name, selected: provider.selected}), providerItems) %}
+        {% endfor %}
 
-    {% set teamItems = [] %}
-    {% for team in userTeams %}
-        {% set teamItems = (teamItems.push({value: team.code, text: team.description, selected: team.selected}), teamItems) %}
-    {% endfor %}
+        {% set teamItems = [] %}
+        {% for team in userTeams %}
+            {% set teamItems = (teamItems.push({value: team.code, text: team.description, selected: team.selected}), teamItems) %}
+        {% endfor %}
 
-    {% set userItems = [] %}
-    {% for user in userStaff %}
-        {% set userItems = (userItems.push({value: user.username, text: user.nameAndRole, selected: user.selected}), userItems) %}
-    {% endfor %}
-    <div id="update-announcer" aria-live="polite" class="govuk-visually-hidden"></div>
+        {% set userItems = [] %}
+        {% for user in userStaff %}
+            {% set userItems = (userItems.push({value: user.username, text: user.nameAndRole, selected: user.selected}), userItems) %}
+        {% endfor %}
+        <div id="update-announcer" aria-live="polite" class="govuk-visually-hidden"></div>
 
-    <p>You can attend or book for someone else.</p>
+        <p>You can attend or book for someone else.</p>
 
-    {{ govukSelect({
-        label: { text: "Select region" },
-        items: providerItems,
-        attributes: {
-            'data-qa': 'providerCode'
-        }
-    } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'providerCode'])) }}
+        {{ govukSelect({
+            label: { text: "Select region" },
+            items: providerItems,
+            attributes: {
+                'data-qa': 'providerCode'
+            }
+        } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'providerCode'])) }}
 
-    {{ govukSelect({
-        label: { text: "Select team" },
-        items: teamItems,
-         attributes: {
-            'data-qa': 'teamCode'
-        }
-    } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'teamCode'])) }}
+        {{ govukSelect({
+            label: { text: "Select team" },
+            items: teamItems,
+            attributes: {
+                'data-qa': 'teamCode'
+            }
+        } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'teamCode'])) }}
 
-    {{ govukSelect({
-        label: { text: "Select name" },
-        items: userItems,
-         attributes: {
-            'data-qa': 'username'
-        }
-    } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'username'])) }}
+        {{ govukSelect({
+            label: { text: "Select name" },
+            items: userItems,
+            attributes: {
+                'data-qa': 'username'
+            }
+        } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'username'])) }}
+
+        <div class="govuk-button-group">
+            {{ govukButton({
+                html: 'Update options',
+                id: 'update-btn',
+                name: 'update-btn',
+                classes: "govuk-button--secondary",
+                attributes: {
+                    'data-qa': 'update-btn',
+                    'formmethod': 'get',
+                    'formAction': 'attendance'
+                }
+            }) }}
+            {{ govukButton({
+                html: buttonText if buttonText else 'Continue',
+                isStartButton: buttonText === 'Start now',
+                id: submitButtonId if submitButtonId else 'submit-btn',
+                name: 'submit-btn',
+                attributes: {
+                  'data-qa': 'submit-btn'
+                }
+            }) }}
+        </div>
+    </form>
 
 {% endblock %}
