@@ -35,7 +35,7 @@ import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
-import { dateIsInPast } from '../utils'
+import { dateIsInPast, getDataValue } from '../utils'
 import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
 import { getUserOptions } from '../middleware/getUserOptions'
 
@@ -103,6 +103,20 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     autoStoreSessionData(hmppsAuthClient),
     checkAnswers,
     controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient),
+  )
+  router.post(
+    '/case/:crn/arrange-appointment/:id/attendance/filter',
+    getUserOptions(hmppsAuthClient),
+    (req, res, _next) => {
+      const { username } = res.locals.user
+      const { data } = req.session
+      const response = {
+        providers: getDataValue(data, ['providers', 'temp', username]),
+        teams: getDataValue(data, ['teams', 'temp', username]),
+        users: getDataValue(data, ['staff', 'temp', username]),
+      }
+      return res.json(response)
+    },
   )
 
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
