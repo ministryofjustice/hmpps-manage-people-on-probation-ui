@@ -115,6 +115,12 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         : `${baseOutcomeUrl}/next-appointment`
       if (change) redirect = change
       if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+      const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
+      if (nextAppointmentId) {
+        const nextAppointmentOutcome = res.locals.appointmentOutcome
+        setDataValue(req.session.data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
+      }
+
       if (linkedContactId && res.locals.flags.enableCombinedCYAPage) {
         redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
       }
