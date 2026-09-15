@@ -12,16 +12,13 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 
-{% set outcomeLabel = 'Log appointment outcome' if flags.enableNonCompliance else
-  'Log attended and complied appointment' %}
+{% set outcomeLabel = 'Log appointment outcome'  %}
 {% set outcomeLink = null %}
-{% if not flags.enableNonCompliance and not appointment.hasOutcome and appointment.isInPast %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/attended-complied' %}
-{% endif %}
-{% if flags.enableNonCompliance and not appointment.hasOutcome %}
+
+{% if not appointment.hasOutcome %}
   {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
-{% if flags.enableNonCompliance and appointment.hasOutcome %}
+{% if appointment.hasOutcome %}
   {% set outcomeLabel = 'Change appointment outcome' %}
   {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
@@ -72,7 +69,6 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% endif %}
 
 {% set notesStatus = 'Not started' %}
-{% set outcomeStatus = '' %}
 {% set compliedStatus = 'Not started' %}
 {% set compliedTagColor = 'blue' %}
 {% set outcomeTagColour = 'blue' %}
@@ -83,32 +79,27 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% set compliedTagColor = 'blue' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.didTheyComply == true %}
-  {% set outcomeStatus = 'Complied' %}
   {% set compliedStatus = 'Complied' %}
   {% set outcomeTagColour = 'green' %}
   {% set compliedTagColor = 'green' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == false %}
-  {% set outcomeStatus = 'Unacceptable absence' %}
   {% set outcomeTagColour = 'red' %}
   {% set compliedTagColor = 'red' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == true %}
-  {% set outcomeStatus = 'Acceptable absence' %}
   {% set outcomeTagColour = 'green' %}
   {% set compliedTagColor = 'blue' %}
 {% endif %}
 
 {% set outcomeHint = null %}
-{% if not flags.enableNonCompliance and not appointment.isInPast %}
-  {% set outcomeHint = "You cannot log an attended and complied outcome until the appointment has happened." %}
-{% endif %}
-{% if flags.enableNonCompliance and appointmentOutcome.currentOutcome.reason %}
+
+{% if appointmentOutcome.currentOutcome.reason %}
   {% set outcomeHint = appointmentOutcome.currentOutcome.reason %}
 {% endif %}
-{% if flags.enableNonCompliance and appointment.hasOutcome and not appointment.isInPast and not flags.enableRescheduleFutureAppointmentWithOutcome %}
+{% if appointment.hasOutcome and not appointment.isInPast and not flags.enableRescheduleFutureAppointmentWithOutcome %}
   {% set outcomeLink = '' %}
-  {% set outcomeHint = outcomeHint + '<br>You cannot change this outcome until the appointment has passed.' %}
+  {% set outcomeHint = (outcomeHint + '<br>' if outcomeHint else '') + 'You cannot change this outcome until the appointment has passed.' %}
 {% endif %}
 
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
@@ -203,8 +194,8 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       classes: 'govuk-link--no-underline',
       status: {
         tag: {
-          text: compliedStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
-          classes: "govuk-tag--auto-width govuk-tag--" + (compliedTagColor if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
+          text: appointmentOutcome.currentOutcome.status,
+          classes: "govuk-tag--auto-width govuk-tag--" + appointmentOutcome.currentOutcome.tagColour | lower
         }
       }
     },
@@ -222,13 +213,13 @@ appointment.officer.name | fullName | convertToTitleCase) %}
           classes: "govuk-tag--auto-width govuk-tag--" + appointmentOutcome.currentEnforcementAction.tagColour | lower
         }
       }
-    } if flags.enableNonCompliance and appointment.hasOutcome and appointment.action and not appointment.didTheyComply,
+    } if appointment.hasOutcome and appointment.action and not appointment.didTheyComply,
     {
       title: {
         text: "Add appointment notes"
       },
 
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage' if flags.enableNonCompliance),
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
       status: {
         tag: {
           text: notesStatus,
@@ -241,7 +232,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Upload documents"
       },
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + ('/outcome' if flags.enableNonCompliance) + '/add-note' + ('?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage' if flags.enableNonCompliance),
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
       status: {
         tag: {
           text: 'No documents',
@@ -249,7 +240,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         } if appointment.documents.length == 0,
         text: 'Uploaded' if appointment.documents.length > 0
       }
-    } if flags.enableNonCompliance,
+    },
     {
       title: {
         text: "Arrange next appointment"
@@ -296,11 +287,11 @@ appointment.officer.name | fullName | convertToTitleCase) %}
     },
     value: {
       html: govukTag({
-          text: outcomeStatus if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.status,
-          classes: "govuk-tag--" + (outcomeTagColour if not flags.enableNonCompliance else appointmentOutcome.currentOutcome.tagColour | lower)
+          text: appointmentOutcome.currentOutcome.status,
+          classes: "govuk-tag--" + appointmentOutcome.currentOutcome.tagColour | lower
         })
       }
-    } if (outcomeStatus and appointment.deliusManaged),
+    } if (appointment.hasOutcome and appointment.deliusManaged),
     {
       key: {
         text: "Sentence"
@@ -320,7 +311,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
           }
         ]
       } if sentence.eventNumber
-    } if flags.enableNonCompliance and not appointment.deliusManaged,
+    } if not appointment.deliusManaged,
     {
       key: {
         text: "Date and time"

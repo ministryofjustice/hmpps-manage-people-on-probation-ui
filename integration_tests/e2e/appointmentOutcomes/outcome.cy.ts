@@ -14,7 +14,6 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-absence.page'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
 import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
-import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import { ExpectedOption, Journey, checkOptionRedirects } from './imports'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -25,12 +24,7 @@ let outcomePage: OutcomePage
 let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 
 type RedirectPages =
-  | AttendedCompliedPage
-  | AttendedFailedToComplyPage
-  | AcceptableAbsencePage
-  | UnacceptableAbsencePage
-  | FailedToAttendPage
-  | AddNotePage
+  AttendedFailedToComplyPage | AcceptableAbsencePage | UnacceptableAbsencePage | FailedToAttendPage | AddNotePage
 
 interface Args {
   journey?: Journey

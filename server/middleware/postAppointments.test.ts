@@ -187,7 +187,7 @@ const createMockReq = ({
 
 const getExpectedRequestBody = (request?: Partial<AppointmentRequestBody>): AppointmentRequestBody => {
   const {
-    user: { locationCode, username: _username, teamCode, name, email },
+    user: { locationCode, username: _username, teamCode },
     date,
     start,
     end,
@@ -304,7 +304,6 @@ const buildResponse = ({
     user: mockUser,
     flags: {
       enableSmsReminders: true,
-      enableNonCompliance: false,
       enableCombinedCYAPage: true,
       ...flags,
     },
@@ -329,7 +328,14 @@ describe('/middleware/postAppointments', () => {
         .mockResolvedValue(mockOutlookEventResponse)
     })
     it('should add eventId to the request body if value in appointment session is not PERSON_LEVEL_CONTACT', async () => {
-      const mockReq = createMockReq({ appointment: mockAppointment })
+      const mockReq = createMockReq({
+        appointment: {
+          ...mockAppointment,
+          outcome: {
+            outcomeCode: 'ATTC',
+          },
+        },
+      })
       const res = buildResponse()
       const response = await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody()
@@ -338,8 +344,14 @@ describe('/middleware/postAppointments', () => {
     })
     it('should use nextAppointmentId from session if enableCombinedCYAPage flag is true and on outcome cya page', async () => {
       const nextAppointmentId = '1234'
+      const appointment: AppointmentSession = {
+        ...mockAppointment,
+        outcome: {
+          outcomeCode: 'ATTC',
+        },
+      }
       const mockReq = createMockReq({
-        appointment: mockAppointment,
+        appointment,
         _id: nextAppointmentId,
         nextAppointmentId,
         url: '/outcome/check-your-answers',
@@ -355,6 +367,9 @@ describe('/middleware/postAppointments', () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         eventId: 'PERSON_LEVEL_CONTACT',
+        outcome: {
+          outcomeCode: 'ATTC',
+        },
       }
       const mockReq = createMockReq({ appointment })
       const res = buildResponse()
@@ -366,6 +381,9 @@ describe('/middleware/postAppointments', () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         requirementId: undefined,
+        outcome: {
+          outcomeCode: 'ATTC',
+        },
       }
       const mockReq = createMockReq({ appointment })
       const res = buildResponse()
@@ -378,6 +396,9 @@ describe('/middleware/postAppointments', () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         licenceConditionId: undefined,
+        outcome: {
+          outcomeCode: 'ATTC',
+        },
       }
       const mockReq = createMockReq({ appointment })
       const res = buildResponse()
@@ -386,7 +407,7 @@ describe('/middleware/postAppointments', () => {
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
 
-    it(`should add outcomeRecorded = true to the request body if outcome recorded - Non Compliance enabled`, async () => {
+    it(`should add outcomeRecorded = true to the request body if outcome recorded`, async () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         outcome: {
@@ -394,19 +415,19 @@ describe('/middleware/postAppointments', () => {
         },
       }
       const mockReq = createMockReq({ appointment })
-      const res = buildResponse({ flags: { enableNonCompliance: true } })
+      const res = buildResponse({ flags: {} })
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: true })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
 
-    it(`should add outcomeRecorded = false to the request body if future appointment and no outcome recorded - Non Compliance enabled`, async () => {
+    it(`should add outcomeRecorded = false to the request body if future appointment and no outcome recorded`, async () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         outcomeRecorded: undefined,
       }
       const mockReq = createMockReq({ appointment })
-      const res = buildResponse({ flags: { enableNonCompliance: true } })
+      const res = buildResponse({ flags: {} })
       await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody({ outcomeRecorded: false })
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
@@ -416,6 +437,9 @@ describe('/middleware/postAppointments', () => {
       const appointment: AppointmentSession = {
         ...mockAppointment,
         nsiId: undefined,
+        outcome: {
+          outcomeCode: 'ATTC',
+        },
       }
       const mockReq = createMockReq({ appointment })
       const res = buildResponse()
