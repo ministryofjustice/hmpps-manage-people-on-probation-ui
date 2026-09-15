@@ -43,6 +43,7 @@ import {
 } from '../data/model/esupervision'
 import { PersonExistsResponse } from '../data/emdiClient'
 import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
+import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export interface AppointmentLocals {
   meta: {
@@ -116,6 +117,8 @@ interface Locals {
   managedBy?: ManagedByDetails
   tierUrlV3?: string
   dateOfDeath?: string
+  personRiskFlags?: PersonRiskFlags
+  riskBadgeData?: RiskBadgeData
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   tierDetails?: LatestTierResponse
