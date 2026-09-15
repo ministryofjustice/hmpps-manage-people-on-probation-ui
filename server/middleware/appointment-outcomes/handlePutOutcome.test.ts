@@ -5,17 +5,19 @@ import { AppointmentSession, AppointmentSessionOutcome } from '../../models/Appo
 import { renderError } from '../renderError'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
-import { EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
+import { Activity, EnforcementActionsRequest, PutContactRequest } from '../../data/model/schedule'
 import TokenStore from '../../data/tokenStore/redisTokenStore'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 import { EnforcementActionCode } from '../../properties/appointment-outcomes'
 
 const id = '304bddc2-cfa5-4a33-92e2-ee31fc93d627'
 const contactId = '1234'
+const uuid = 'c71da63b-b38d-4ffb-927a-2ec3298da03e'
 const crn = 'X000001'
 const baseOutcomeUrl = '/base-outcome-url'
 const notePrepend = 'Prepend text'
 const notes = 'Some notes'
+const responseContactId = '5678'
 
 const mockMiddlewareFn = jest.fn()
 jest.mock('../renderError', () => ({
@@ -85,10 +87,35 @@ const mockAppointment = ({
   ...appointment,
 })
 
-const buildRequest = ({ put = undefined }: { put?: string } = {}): httpMocks.MockRequest<any> => {
+const tempNextAppt = ({ isInPast = true, appointment = {} } = {}): Partial<AppointmentOutcomeProps<Activity>> => ({
+  isInPast,
+  notePrepend,
+  appointmentSession: mockAppointment({ appointment }),
+})
+
+const buildRequest = ({
+  put = undefined,
+  nextAppointmentId = null,
+  nextAppointment = null,
+}: {
+  put?: string
+  nextAppointmentId?: string
+  nextAppointment?: Partial<AppointmentOutcomeProps<Activity>>
+} = {}): httpMocks.MockRequest<any> => {
   const req = {
     query: { put },
     params: { id, contactId, crn },
+    session: {
+      data: {
+        temp: {
+          [crn]: {
+            nextAppointmentId,
+            nextAppointment,
+            responseContactId,
+          },
+        },
+      },
+    },
   }
   return httpMocks.createRequest(req)
 }
@@ -129,16 +156,14 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
   it('should only call next() if arranged appointment is in the future', async () => {
-    const appointmentOutcome: Partial<AppointmentOutcomeProps<any>> = { responseContactId: '1234', isInPast: false }
-    const req = buildRequest()
-    const res = buildResponse({ appointmentOutcome })
-    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
-    expect(putContactSpy).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-  it('should only call next() if manage appointment but contactId is undefined', async () => {
-    const appointmentOutcome: Partial<AppointmentOutcomeProps<any>> = { contactId: undefined }
+    const appointmentOutcome: Partial<AppointmentOutcomeProps<any>> = {
+      responseContactId: '1234',
+      isInPast: false,
+      uuid,
+      contactId: undefined,
+    }
     const req = buildRequest()
     const res = buildResponse({ appointmentOutcome })
     await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
@@ -308,7 +333,7 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
       date,
       time: start,
       outcomeCode: outcome.outcomeCode,
-      notes: notePrepend,
+      notes: `${notePrepend}\n${notes}`,
       sensitive: true,
       alert: false,
     }
@@ -370,6 +395,103 @@ describe('middleware/appointment-outcomes/handlePutOutcome', () => {
     expect(putContactSpy).toHaveBeenCalledWith(contactId, expectedRequest)
     expect(postEnforcementActionsSpy).toHaveBeenCalledWith(contactId, expectedEnforcementActionRequest)
     expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should send the correct requests to the API if posting next appointment in the past and logging outcome in the past', async () => {
+    const nextAppointment: Partial<AppointmentSession> = { date: '2026-05-10', notes: '' }
+    const appointment: Partial<AppointmentSession> = { notes: '' }
+    const req = buildRequest({
+      nextAppointmentId: '1234',
+      nextAppointment: tempNextAppt({ appointment: nextAppointment }),
+    })
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED',
+      enforcementActionCode: ['IBR'],
+    }
+    const { date, start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: notePrepend,
+      sensitive: true,
+      alert: false,
+    }
+    const expectedNextAppointmentRequest: PutContactRequest = {
+      date: '2026-05-10',
+      time: start,
+      outcomeCode: 'ATTC',
+      notes: notePrepend,
+      sensitive: true,
+      alert: false,
+    }
+    const res = buildResponse({ appointment, outcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    expect(putContactSpy).toHaveBeenCalledTimes(2)
+    expect(putContactSpy).toHaveBeenNthCalledWith(1, contactId, expectedRequest)
+    expect(putContactSpy).toHaveBeenNthCalledWith(2, responseContactId, expectedNextAppointmentRequest)
+  })
+
+  it('should send the correct requests to the API if posting next appointment in the future and logging outcome in the past', async () => {
+    const nextAppointment: Partial<AppointmentSession> = { date: '2044-05-10', notes: '' }
+    const date = '2025-05-10'
+    const appointment: Partial<AppointmentSession> = { notes: '', date }
+    const req = buildRequest({
+      nextAppointmentId: '1234',
+      nextAppointment: tempNextAppt({ appointment: nextAppointment, isInPast: false }),
+    })
+
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED',
+      enforcementActionCode: ['IBR'],
+    }
+    const { start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: notePrepend,
+      sensitive: true,
+      alert: false,
+    }
+    const res = buildResponse({ appointment, outcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    expect(putContactSpy).toHaveBeenCalledTimes(1)
+    expect(putContactSpy).toHaveBeenNthCalledWith(1, contactId, expectedRequest)
+  })
+
+  it('should send the correct requests to the API if posting next appointment in the future and logging outcome in the future', async () => {
+    const date = '2044-05-10'
+    const nextAppointment: Partial<AppointmentSession> = { date, notes: '' }
+    const appointment: Partial<AppointmentSession> = { notes: '', date }
+    const req = buildRequest({
+      nextAppointmentId: '1234',
+      nextAppointment: tempNextAppt({ appointment: nextAppointment, isInPast: false }),
+    })
+
+    const outcome: Partial<AppointmentSessionOutcome> = {
+      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
+      outcomeCode: 'AFTC',
+      attendedFailedToComply: 'BREACH_RECALL_INITIATED',
+      enforcementActionCode: ['IBR'],
+    }
+    const { start } = mockAppointment()
+    const expectedRequest: PutContactRequest = {
+      date,
+      time: start,
+      outcomeCode: outcome.outcomeCode,
+      notes: notePrepend,
+      sensitive: true,
+      alert: false,
+    }
+    const res = buildResponse({ appointment, outcome })
+    await handlePutOutcome(hmppsAuthClient)(req, res, nextSpy)
+    expect(putContactSpy).toHaveBeenCalledTimes(1)
+    expect(putContactSpy).toHaveBeenNthCalledWith(1, contactId, expectedRequest)
   })
 
   it('should not post the enforcement actions if adding appointment notes', async () => {
