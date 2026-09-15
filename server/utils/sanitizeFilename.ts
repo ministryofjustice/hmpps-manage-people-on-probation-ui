@@ -1,3 +1,3 @@
 export const sanitizeFilename = (filename: string): string => {
-  return filename.replace(/[!$%&#^/\\"<>;?*]/g, '-')
+  return filename.replace(/[!$%&#^/\\"<>;?*|]/g, '-')
 }
