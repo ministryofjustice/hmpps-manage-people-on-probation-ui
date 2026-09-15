@@ -86,6 +86,7 @@ const attendanceSelectors = () => {
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
   const userSelect = document.querySelector('[data-qa="username"]')
   const submitButton = document.getElementById('submit-btn')
+  const announcer = document.getElementById('update-announcer')
   let providerCode = ''
   if (providerSelect) {
     providerCode = providerSelect.value
@@ -120,6 +121,7 @@ const attendanceSelectors = () => {
         users.forEach(user =>
           userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
         )
+        announcer.textContent = 'Updated team and username options'
         submitButton.disabled = false
         providerSelect.disabled = false
         teamSelect.disabled = false
@@ -154,6 +156,7 @@ const attendanceSelectors = () => {
         users.forEach(user =>
           userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
         )
+        announcer.textContent = 'Updated username options'
         submitButton.disabled = false
         providerSelect.disabled = false
         teamSelect.disabled = false

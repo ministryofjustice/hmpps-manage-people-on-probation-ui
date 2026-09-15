@@ -26,6 +26,7 @@
     {% for user in userStaff %}
         {% set userItems = (userItems.push({value: user.username, text: user.nameAndRole, selected: user.selected}), userItems) %}
     {% endfor %}
+    <div id="update-announcer" aria-live="polite" class="govuk-visually-hidden"></div>
 
     <p>You can attend or book for someone else.</p>
 
