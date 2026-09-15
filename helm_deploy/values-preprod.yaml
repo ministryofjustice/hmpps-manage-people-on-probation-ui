@@ -27,7 +27,8 @@ generic-service:
         ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
         ctl:ruleRemoveTargetByTag=attack-lfi;ARGS:notes,\
         ctl:ruleRemoveTargetByTag=attack-xss;ARGS:notes,\
-        ctl:ruleRemoveTargetByTag=attack-sqli;ARGS:notes"
+        ctl:ruleRemoveTargetByTag=attack-sqli;ARGS:notes,\
+        ctl:ruleRemoveTargetById=920120;FILES:fileUpload"
 
       SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/(?:arrange-appointment/[^/]+/(?:add-note|supporting-information|outcome/add-note)|appointments/[^/]+/check-in/(?:review/(?:expired|identity|notes)|view|view-expired))$" \
         "id:100102,phase:1,pass,nolog,\
