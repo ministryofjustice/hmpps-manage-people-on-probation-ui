@@ -78,12 +78,21 @@ const homeController: Controller<typeof routes, void> = {
         (pageNum - 1).toString(),
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
+      let appointmentsRequiringOutcome = outcomes
+      if (res.locals.flags.enableHomePageOutcomesWithFilter) {
+        const lastThreeMonthsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.startDateTime)
+          const threeMonthsAgo = DateTime.now().minus({ months: 3 })
+          return contactDate >= threeMonthsAgo
+        })
+        appointmentsRequiringOutcome = lastThreeMonthsAppointmentsRequiringOutcome
+      }
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
-        totalOutcomes,
+        totalOutcomes: appointmentsRequiringOutcome.length,
         appointments,
-        outcomes,
+        outcomes: appointmentsRequiringOutcome,
         enforcementActions,
         url,
         delius_link: config.delius.link,
