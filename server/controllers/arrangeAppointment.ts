@@ -70,8 +70,8 @@ const resetSessionValues = (req: Request, res: Response) => {
   const updatedDateIsInPast = appointmentDateIsInPast(req, res)
   const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
   if (!retainOutcomeRecorded) {
-    logSessionCacheChange('resetSessionValues', data, [...path, 'outcome', 'outcomeType'], null, context)
-    setDataValue(data, [...path, 'outcome', 'outcomeType'], null)
+    logSessionCacheChange('resetSessionValues', data, [...path, 'outcome'], null, context)
+    setDataValue(data, [...path, 'outcome'], null)
   }
   if (updatedDateIsInPast && smsOptIn?.includes('YES')) {
     logSessionCacheChange('resetSessionValues', data, [...path, 'smsOptIn'], 'NO', context)

@@ -805,7 +805,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
+        ['appointments', crn, uuid, 'outcome'],
         null,
       )
     })
@@ -826,7 +826,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
+        ['appointments', crn, uuid, 'outcome'],
         null,
       )
     })
