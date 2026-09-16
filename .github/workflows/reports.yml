@@ -26,7 +26,7 @@ jobs:
         run: |
           {
             echo 'query<<EOF'
-            cat azure-queries/service-unavailable-page-views.kql
+            sed 's/__LOOKBACK_DAYS__/1d/g' azure-queries/service-unavailable-page-views.kql
             echo EOF
           } >> "$GITHUB_OUTPUT"
 

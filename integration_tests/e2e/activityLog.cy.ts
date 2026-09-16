@@ -61,7 +61,6 @@ context('Contacts', () => {
 
   it('should render the update contact button when contact is updatable', () => {
     cy.visit('/case/X000001/activity/322')
-
     cy.get('[data-qa="manage-link"]')
       .should('exist')
       .and('contain.text', 'Update contact')

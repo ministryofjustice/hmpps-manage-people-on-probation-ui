@@ -1,7 +1,12 @@
 let startOfTodayLocal = startofday(datetime_utc_to_local(now(), "Europe/London"));
-let startOfYesterdayLocal = startOfTodayLocal - 1d;
+// Lookback window: selects a single, complete local day, N days back from today.
+// e.g. 0d = all of today, 1d = all of yesterday, 7d = the single day exactly a week
+// ago (not a rolling 7-day window). Defaults to 0d (today only) when run via run-query.sh.
+//   ./run-query.sh service-unavailable-page-views-investigation.kql 7d
+let startOfYesterdayLocal = startOfTodayLocal - __LOOKBACK_DAYS__;
+let endOfYesterdayLocal = startOfYesterdayLocal + 1d;
 let startOfYesterdayUtc = datetime_local_to_utc(startOfYesterdayLocal, "Europe/London");
-let startOfTodayUtc = datetime_local_to_utc(startOfTodayLocal, "Europe/London");
+let startOfTodayUtc = datetime_local_to_utc(endOfYesterdayLocal, "Europe/London");
 pageViews
 | where timestamp >= startOfYesterdayUtc and timestamp < startOfTodayUtc
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"

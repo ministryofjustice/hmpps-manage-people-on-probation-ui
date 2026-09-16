@@ -93,7 +93,7 @@ describe('sentenceController', () => {
     })
     describe('getSentence', () => {
       beforeEach(async () => {
-        res.locals.flags = { enableEMDISentencesShowGPSData: true }
+        res.locals.flags = {}
         checkLocationMonitoringSpy.mockReturnValue({
           hasLicenceConditionsLMData: false,
           hasRequirementsLMData: false,
@@ -112,7 +112,7 @@ describe('sentenceController', () => {
       })
 
       it('should call existsInEMDI if location monitoring data is present in licence conditions', async () => {
-        res.locals.flags = { enableEMDISentencesShowGPSData: true }
+        res.locals.flags = {}
         checkLocationMonitoringSpy.mockReturnValue({
           hasLicenceConditionsLMData: true,
           hasRequirementsLMData: false,
@@ -124,7 +124,7 @@ describe('sentenceController', () => {
       })
 
       it('should call existsInEMDI if location monitoring data is present in requirements', async () => {
-        res.locals.flags = { enableEMDISentencesShowGPSData: true }
+        res.locals.flags = {}
         checkLocationMonitoringSpy.mockReturnValue({
           hasLicenceConditionsLMData: false,
           hasRequirementsLMData: true,
@@ -136,7 +136,7 @@ describe('sentenceController', () => {
       })
 
       it('should NOT call existsInEMDI if location monitoring data is NOT present', async () => {
-        res.locals.flags = { enableEMDISentencesShowGPSData: true }
+        res.locals.flags = {}
         checkLocationMonitoringSpy.mockReturnValue({
           hasLicenceConditionsLMData: false,
           hasRequirementsLMData: false,
@@ -147,20 +147,6 @@ describe('sentenceController', () => {
       })
     })
 
-    describe('getSentence when enableEMDISentencesShowGPSData flag is disabled', () => {
-      beforeEach(async () => {
-        res.locals.flags = { enableEMDISentencesShowGPSData: false }
-      })
-      it('should NOT call existsInEMDI if flag is disabled even if location monitoring data is present', async () => {
-        checkLocationMonitoringSpy.mockReturnValue({
-          hasLicenceConditionsLMData: true,
-          hasRequirementsLMData: true,
-        })
-        await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
-
-        expect(existsInEMDISpy).not.toHaveBeenCalled()
-      })
-    })
     describe('getProbationHistory', () => {
       beforeEach(async () => {
         await controllers.sentence.getProbationHistory(hmppsAuthClient)(req, res)

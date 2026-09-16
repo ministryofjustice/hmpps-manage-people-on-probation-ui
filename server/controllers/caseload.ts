@@ -48,8 +48,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
-      const { sortBy: sortByQuery = res.locals?.flags?.enableCaseloadV2 ? 'nameOrCrn.asc' : 'nextContact.asc' } =
-        req.query as Record<string, string>
+      const { sortBy: sortByQuery = 'nameOrCrn.asc' } = req.query as Record<string, string>
       const pageNum: number = req.query.page
         ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize)
         : 1
@@ -60,12 +59,9 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sortByQuery,
         req.session.caseFilter,
       )
-      let tiers: TierCalculations
-      if (res.locals?.flags?.enableCaseloadV2) {
-        const uniqueCrns = [...new Set(caseload?.caseload?.map(item => item.crn))].filter(Boolean)
-        const tierClient = new TierApiClient(token)
-        tiers = await tierClient.getTiers(uniqueCrns)
-      }
+      const uniqueCrns = [...new Set(caseload?.caseload?.map(item => item.crn))].filter(Boolean)
+      const tierClient = new TierApiClient(token)
+      const tiers = await tierClient.getTiers(uniqueCrns)
       const { filter } = args
 
       const url = encodeURIComponent(req.url)

@@ -28,7 +28,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
       back,
       change,
       _maxDate,
-      isInPast: appointmentDateIsInPast(req),
+      isInPast: appointmentDateIsInPast(req, res),
     }
     const render = `pages/arrange-appointment/location-date-time`
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

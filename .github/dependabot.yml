@@ -7,6 +7,9 @@ updates:
       time: "21:00"
       timezone: "Europe/London"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "@opentelemetry/api"
+        versions: ["1.9.1"]
     groups:
       minor:
         update-types:

@@ -1,5 +1,5 @@
 {% set changePath = "/case/" + crn + "/arrange-appointment/"  + id %}
-{% set changeOutcomePath = (changePath + "/outcome")if flags.enableNonCompliance else 
+{% set changeOutcomePath = (changePath + "/outcome")if flags.enableNonCompliance else
     changePath %}
 {% set insertText = "You'll receive a calendar invite for the appointment." %}
 {% set sentenceHtml %}
@@ -33,9 +33,9 @@
     {% set locationHtml = 'Not required' %}
 {% endif %}
 
-{% set typeValue = 'Not entered' if not appointment.type else 
+{% set typeValue = 'Not entered' if not appointment.type else
     appointment.type.description | toSentenceCase(['(NS)']) %}
-{% set locationValue = 'Not entered' if not locationHtml else 
+{% set locationValue = 'Not entered' if not locationHtml else
     locationHtml | safe %}
 {% set typeHint = '' %}
 {% set locationHint = '' %}
@@ -46,11 +46,11 @@
     {% set typeHint = noForHint %}
     {% set locationHint = noForHint %}
 {% endif %}
-{% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) 
+{% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename)
     and not appointment.type %}
     {% set locationHint = noTypeHint %}
 {% endif %}
-{% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) 
+{% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename)
     and appointment.type and(not appointment.attending.name) %}
     {% set locationHint = noAttendingHint %}
 {% endif %}
@@ -62,7 +62,7 @@
 {% set noDateHint = 'Select the appointment date first.' %}
 {% set textMessageConfirmationHtml = 'Not entered' %}
 {% if appointment.textMessageConfirmation != null %}
-    {% set textMessageConfirmationHtml = appointment.textMessageConfirmation + ('<br>' + appointment.appointmentFor.mobileNumber if appointment.textMessageConfirmation == 'Yes' else 
+    {% set textMessageConfirmationHtml = appointment.textMessageConfirmation + ('<br>' + appointment.appointmentFor.mobileNumber if appointment.textMessageConfirmation == 'Yes' else
         ''
     ) %}
 {% endif %}
@@ -89,13 +89,13 @@
             { key: { text: "Appointment for" },
             value: { html: 'Not entered' if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else sentenceHtml | safe  },
             actions: {
-            items: [ { 
-            href: changePath + "/sentence?change=" + url, 
-            text: "Choose for" if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else "Change", 
+            items: [ {
+            href: changePath + "/sentence?change=" + url,
+            text: "Choose for" if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else "Change",
             visuallyHiddenText: "sentence"
-            } 
-            ] 
-            } if showAction }, 
+            }
+            ]
+            } if showAction },
             {
             key: { text: "Appointment type" },
             value: { html: typeValue + ('<span class="govuk-summary-list__hint">' + typeHint + '</span>' if typeHint )  },
@@ -113,35 +113,35 @@
                 key: { text: "VISOR report"},
                 value: { text: appointment.visorReport },
                 actions: {
-                    items: [ 
+                    items: [
                         {
                             href: changePath + "/type-attendance?change=" + url,
                             text: "Change",
                             visuallyHiddenText: "type of appointment"
-                        } 
-                    ] 
+                        }
+                    ]
                 } if showAction
             } if appointment.meta.isVisor,
     { key: { text: "Attending" },
     value: { html: 'Not entered' if not appointment.attending.name else appointment.attending.html },
     actions: {
-    items: [ { 
-    href: changePath + "/attendance?change=" + url, 
-    text: "Choose attending" if not appointment.attending.name else "Change", 
+    items: [ {
+    href: changePath + "/attendance?change=" + url,
+    text: "Choose attending" if not appointment.attending.name else "Change",
     visuallyHiddenText: "attendance"
-     } 
-     ] 
+     }
+     ]
      } if showAction },
-     { key: { text: "Location" }, 
+     { key: { text: "Location" },
      value: { html: locationValue + ('<span class="govuk-summary-list__hint">' + locationHint + '</span>' if locationHint )  },
-     actions: { items: [ { href: changePath + "/location-date-time?change=" + url, 
+     actions: { items: [ { href: changePath + "/location-date-time?change=" + url,
      text: "Choose location" if not locationHtml else  "Change",
       visuallyHiddenText: "location"
       }
       ]
       } if showAction  and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) and appointment.type and appointment.attending.name },
       { key: { html: dateAndTimeLabelHtml },
-      value: { html: 'Not entered' if appointmentDates.length == 0 else appointmentDatesHtml }, 
+      value: { html: 'Not entered' if appointmentDates.length == 0 else appointmentDatesHtml },
       actions: { items: [ { href: changePath + "/location-date-time?change=" + url,
       text: "Choose date and time" if appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
@@ -156,7 +156,7 @@
         }
     } if appointmentOutcome.summary.outcome and flags.enableNonCompliance and isInPast,
     {
-        key: { text: 'Enforcement action' }, 
+        key: { text: 'Enforcement action' },
         value: { html: appointmentOutcome.summary.enforcementAction  | replace('\n', '<br>') | safe },
         actions: {
             items: [
@@ -177,43 +177,43 @@
            { key: { text: "Text message confirmation" },
     value: { html: textMessageConfirmationHtml + ('<span class="govuk-summary-list__hint">' + noDateHint + '</span>' if not appointment.date )  },
     actions: {
-    items: [ { 
-    href: changePath + "/text-message-confirmation?change=" + url, 
-    text: "Change", 
+    items: [ {
+    href: changePath + "/text-message-confirmation?change=" + url,
+    text: "Change",
     visuallyHiddenText: "text message confirmation"
-     } 
-     ] 
-     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast, 
+     }
+     ]
+     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast,
        { key: { text: "Attended and complied" },
     value: { html: appointment.outcomeRecorded },
     actions: {
-    items: [ { 
-    href: changePath + "/attended-complied?change=" + url, 
-    text: "Change", 
+    items: [ {
+    href: changePath + "/attended-complied?change=" + url,
+    text: "Change",
     visuallyHiddenText: "outcome recorded"
-     } 
-     ] 
-     } if showAction } if appointment.outcomeRecorded and not flags.enableNonCompliance,  
+     }
+     ]
+     } if showAction } if appointment.outcomeRecorded and not flags.enableNonCompliance,
        { key: { text: "Notes" if isInPast else "Supporting information" },
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
-    items: [ { 
-    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
-    text: "Change", 
+    items: [ {
+    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url,
+    text: "Change",
     visuallyHiddenText: "notes"
-     } 
-     ] 
-     } if showAction }, 
+     }
+     ]
+     } if showAction },
       { key: { text: "Sensitivity" },
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
-    items: [ { 
-    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url, 
-    text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
+    items: [ {
+    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url,
+    text: "Choose sensitivity" if not appointment.sensitivity else "Change",
     visuallyHiddenText: "sensitivity"
-     } 
-     ] 
-     } if showAction and (not flags.enableSensitivityRemoved or not sensitivityLocked) }
+     }
+     ]
+     } if showAction and not sensitivityLocked }
 ] }) }}
     {% if showCalendarInsetText %}
         {{ govukInsetText({

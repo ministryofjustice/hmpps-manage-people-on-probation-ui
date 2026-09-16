@@ -19,6 +19,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const { forename } = currentCase.personalDetails.name
     const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
     const { data } = req.session
+
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
 
@@ -41,7 +42,13 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
 
     if (appointmentSession) {
       const {
-        user: { username: staffId = null, locationCode = null, providerCode = null, teamCode = null } = {},
+        user: {
+          username: staffId = null,
+          displayName = null,
+          locationCode = null,
+          providerCode = null,
+          teamCode = null,
+        } = {},
         type: typeId,
         visorReport,
         eventId,
@@ -89,16 +96,20 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
+
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
       const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
       const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
       const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
-      let selectedUser = convertToTitleCase(
-        staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
-        [],
-        regexIgnoreValuesInParentheses,
-      )
+      let selectedUser =
+        displayName ??
+        convertToTitleCase(
+          staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
+          [],
+          regexIgnoreValuesInParentheses,
+        )
+
       if (!selectedUser) {
         const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
         if (name) {

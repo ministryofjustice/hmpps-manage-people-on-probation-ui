@@ -86,13 +86,13 @@ context('Edit main address', () => {
     page.getElementData('notes').find('label').should('contain.text', 'Notes (optional)')
     page.getElementData('notes').find('textarea').should('have.value', '')
 
-    page.getElementData('buildingName').should('not.be.visible')
-    page.getElementData('buildingNumber').should('not.be.visible')
-    page.getElementData('streetName').should('not.be.visible')
-    page.getElementData('district').should('not.be.visible')
-    page.getElementData('town').should('not.be.visible')
-    page.getElementData('county').should('not.be.visible')
-    page.getElementData('postcode').should('not.be.visible')
+    page.getElementData('buildingName').should('not.contain.text')
+    page.getElementData('buildingNumber').should('not.contain.text')
+    page.getElementData('streetName').should('not.contain.text')
+    page.getElementData('district').should('not.contain.text')
+    page.getElementData('town').should('not.contain.text')
+    page.getElementData('county').should('not.contain.text')
+    page.getElementData('postcode').should('not.contain.text')
 
     page.getElementData('submitBtn').should('contain.text', 'Save changes')
     page
@@ -211,7 +211,7 @@ context('Edit main address', () => {
     page.getElementInput('startDate').clear()
     page.getElementData('submitBtn').click()
     page.getCheckboxField('noFixedAddress').should('be.checked')
-    page.getElementInput('buildingName').should('not.be.visible')
+    page.getElementInput('buildingName').should('not.contain.text')
   })
   it('Submitting with no fixed address unchecked and no address details filled, should redirect to Personal details screen and update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')

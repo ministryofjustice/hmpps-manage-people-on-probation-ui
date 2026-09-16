@@ -9,7 +9,7 @@
                     </h2>
                 </label>
                 <div id="search-hint" class="govuk-hint moj-search__hint">
-                You can search by name, date of birth or any other identifier (for example CRN <span class="govuk-visually-hidden">(Case Reference Number) </span>or PNC <span class="govuk-visually-hidden">(Police National Computer Identifier) </span>number ).
+                    {%- include "../../pages/case-search/search-tooltip.njk" -%}
                 </div>
                 <div class="govuk-input__wrapper moj-search__input-wrapper">
                     <input class="govuk-input" id="search" name="probation-search-input" type="search" aria-describedby="search-hint">

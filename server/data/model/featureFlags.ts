@@ -3,23 +3,16 @@ export class FeatureFlags {
   [index: string]: boolean
   enableSmsReminders?: boolean = undefined
   enableCompliancePage?: boolean = undefined
-  enableManageContacts?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableMAN2344?: boolean = undefined
   enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
   enablePersonHeader?: boolean = undefined
+  enablePersonHeaderTierV3?: boolean = undefined
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
-  enableOutcomesV1?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
   enableHomePageOutcomesWithFilter?: boolean = undefined
-  enableSensitivityRemoved?: boolean = undefined
-  enableMyEnforcementActionsOverview?: boolean = undefined
-  enableEMDISentencesShowGPSData?: boolean = undefined
-  enableEMDIOverviewShowGPSData?: boolean = undefined
-  enableCaseloadV2?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
@@ -40,4 +33,5 @@ export class FeatureFlags {
   enableSearchV2?: boolean = undefined
   enableAsYouTypeSearch?: boolean = undefined
   enableMAN3255?: boolean = undefined
+  enableCombinedCYAPage?: boolean = undefined
 }

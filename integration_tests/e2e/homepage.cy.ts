@@ -87,6 +87,8 @@ context('Sign In', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
 
+    cy.get('[data-qa="searchTips"]').should('contain.text', 'Tips for searching')
+
     page.getSearchSubmit().should('exist')
     page.getSearchSubmit().click()
 

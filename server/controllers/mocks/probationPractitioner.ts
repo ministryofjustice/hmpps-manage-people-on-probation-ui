@@ -18,3 +18,22 @@ export const probationPractitioner: ProbationPractitioner = {
   username: 'DeborahFern',
   email: 'deborah.fern@testemail.com',
 }
+
+export const probationPractitionerNoMatch: ProbationPractitioner = {
+  code: 'N08B88',
+  name: {
+    forename: 'Bog',
+    surname: 'Trog',
+  },
+  provider: {
+    code: 'N08',
+    name: 'Other',
+  },
+  team: {
+    code: 'N08B',
+    description: 'Non Match Team',
+  },
+  unallocated: false,
+  username: 'BogTrog',
+  email: 'bog.trog@testemail.com',
+}

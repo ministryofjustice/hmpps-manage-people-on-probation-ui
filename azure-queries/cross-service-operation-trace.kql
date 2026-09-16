@@ -1,0 +1,47 @@
+// Companion to ui-exceptions-trace.kql — since all services share
+// a single Application Insights instance (differentiated by cloud_RoleName,
+// not by separate APP_IDs), this single query, run once, already returns
+// every telemetry item — UI and any downstream API(s) — for a given
+// operation_Id (W3C trace id). No need to switch APP_ID or re-run per
+// service.
+//
+// Uses `union` across item types (like the one-off LSM query below) rather
+// than joining tables together — each telemetry item becomes its own row,
+// tagged with itemType, so nothing fans out or duplicates. This also works
+// well pasted directly into the Application Insights / Log Analytics query
+// GUI with operation_Id hardcoded, e.g.:
+//
+//   union pageViews, dependencies, requests, browserTimings, exceptions
+//   | where timestamp > startofday(ago(0d))
+//   | where operation_Id == "{operation_Id}"
+//   | order by timestamp asc
+//   | project timestamp, cloud_RoleName, itemType, name, target, type, operation_Name, duration, id, operation_Id, operation_ParentId, success, resultCode, customDimensions, outerMessage, details
+//
+// Usage via run-query.sh:
+//   1. Run ui-exceptions-trace.kql to find affected operation_Id
+//      values.
+//   2. Run this query, passing the lookback window and a comma-separated
+//      list of those operation_Id values:
+//
+//        ./run-query.sh cross-service-operation-trace.kql 0d <op-id-1>,<op-id-2>,<op-id-3>
+//
+// How to interpret the results (filter/group the output by cloud_RoleName to
+// see each service's side of the trace):
+//   - A `requests` row for another service completed successfully (e.g. 200)
+//     -> that service did its job; if the UI still saw ECONNRESET, the reset
+//     happened on the network path between services (proxy/load balancer/
+//     keep-alive idle timeout), not a bug in that service.
+//   - No rows at all for another service's cloud_RoleName -> the request
+//     never reached that service (network/firewall/DNS issue, or the reset
+//     happened before it was received).
+//   - An `exceptions` row, or a failed `requests`/`dependencies` row, for
+//     that service -> that service itself failed; that's the root cause.
+let opIds = dynamic([__OPERATION_IDS__]);
+let startOfTodayLocal = startofday(datetime_utc_to_local(now(), "Europe/London"));
+let lookback = startOfTodayLocal - __LOOKBACK_DAYS__;
+let lookbackUtc = datetime_local_to_utc(lookback, "Europe/London");
+union pageViews, dependencies, requests, browserTimings, exceptions
+| where timestamp >= lookbackUtc
+| where operation_Id in (opIds)
+| order by operation_Id asc, timestamp asc
+| project timestamp, cloud_RoleName, itemType, name, target, type, operation_Name, duration, id, operation_Id, operation_ParentId, success, resultCode, customDimensions, outerMessage, innermostMessage, details

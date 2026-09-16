@@ -413,9 +413,6 @@ describe('controllers/appointments', () => {
   })
 
   describe('get record an outcome', () => {
-    beforeEach(() => {
-      res.locals.flags = { enableOutcomesV1: true }
-    })
     it('should render the record an outcome page', async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
       checkSendAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', crn, 'CRN' as SubjectType)

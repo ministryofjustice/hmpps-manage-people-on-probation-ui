@@ -10,8 +10,9 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     const { change } = req.query as Record<string, string>
     const changeUrl = change ? encodeURIComponent(change) : encodeURIComponent(req.url)
     const data = req?.session?.data ?? {}
+
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-    const dateInPast = appointmentDateIsInPast(req)
+    const dateInPast = appointmentDateIsInPast(req, res)
     const mapping: [string | undefined, string][] = [
       [appointment?.eventId, 'sentence'],
       [appointment?.type, 'type-attendance'],

@@ -1,0 +1,34 @@
+// Find exceptions raised by the UI, and list the affected operation_Id (trace
+// id) values. This deliberately does NOT join to requests/dependencies here —
+// a single trace can contain dozens of spans (the UI is instrumented with
+// OpenTelemetry, which auto-records every internal middleware/function call
+// as well as real outbound HTTP calls), so joining tables together fans out
+// into many duplicate-looking rows.
+//
+// Once you have the operation_Id(s) you're interested in from this query,
+// feed them into cross-service-operation-trace.kql, which uses `union` (like
+// the LSM one-off query below) to give a single, readable, chronologically-
+// ordered timeline per trace instead of a cross-joined table.
+//
+//   ./run-query.sh ui-exceptions-trace.kql
+//
+// operation_Id is the W3C trace id. Because the UI is instrumented with
+// OpenTelemetry (server/utils/azureAppInsights.ts) via auto HTTP
+// instrumentation, this trace id is propagated on outbound calls to the
+// downstream API automatically (no extra code needed) — so the same
+// operation_Id can be looked up in the same Application Insights instance
+// for any other service too (see cross-service-operation-trace.kql).
+//
+// Toggle the time window: 0d = just today, 1d = since yesterday, 7d = last
+// week, etc. Override without editing this file by passing a second arg to
+// run-query.sh, e.g.:
+//   ./run-query.sh ui-exceptions-trace.kql 2d
+let lookbackDays = __LOOKBACK_DAYS__;
+let startOfTodayLocal = startofday(datetime_utc_to_local(now(), "Europe/London"));
+let lookback = startOfTodayLocal - lookbackDays;
+let lookbackUtc = datetime_local_to_utc(lookback, "Europe/London");
+exceptions
+| where timestamp >= lookbackUtc
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| project timestamp, operation_Id, type, innermostMessage, client_IP
+| order by timestamp asc

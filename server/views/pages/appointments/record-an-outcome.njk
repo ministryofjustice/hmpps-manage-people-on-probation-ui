@@ -28,16 +28,10 @@
 
 {% block pageContent %}
   <div class="govuk-grid-row govuk-!-margin-top-4">
-
-    {% if flags.enableOutcomesV1 %}
     <div class="govuk-grid-column-one-quarter govuk-!-margin-left-0">
       {% include "../../partials/_outcome-filters.njk" %}
     </div>
     <div class="govuk-grid-column-three-quarters">
-    {% else %}
-    <div>
-    {% endif %}
-
         {% if outcomes.length > 0 %}
             {% set appointmentRadioItems = [] %}
             {% for appointment in outcomes %}
@@ -83,5 +77,6 @@
                 <strong>0 results found</strong>
             </p>
         {% endif %}
+    </div>
     </div>
 {% endblock %}

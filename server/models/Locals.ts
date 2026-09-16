@@ -3,6 +3,7 @@ import { Response } from 'express'
 import { Document, PersonalDetails } from '../data/model/personalDetails'
 import { ProbationPractitioner } from './CaseDetail'
 import { FeatureFlags } from '../data/model/featureFlags'
+import { ManagedByDetails } from '../utils/getManagedByDetails'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
@@ -34,7 +35,7 @@ import { BreachOrRecall, SentenceCompliance } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import { SmsPreviewResponse } from '../data/model/OutlookEvent'
+import { SmsOptInOptions, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import {
   ESupervisionCheckIn,
   EsupervisionUpcomingQuestionsResponse,
@@ -112,6 +113,7 @@ interface Locals {
   headerDob?: string
   headerTierLink?: string
   probationPractitioner?: ProbationPractitioner
+  managedBy?: ManagedByDetails
   tierUrlV3?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
@@ -228,8 +230,14 @@ export interface OutcomeSummary {
   notes: string
   sensitivity: string
   documents?: string[]
-  nextAppointment?: string
+  nextAppointment?: OutcomeNextAppointment | string
   enforcementActionChangeLink?: string
+}
+
+export interface OutcomeNextAppointment {
+  id?: string
+  label: string
+  smsOptIn?: SmsOptInOptions
 }
 
 export interface OutcomeConfirmationAction {
@@ -309,6 +317,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   responseContactId?: string
   linkedContactId?: string
   redirectFromUpdate?: boolean
+  nextAppointment?: OutcomeNextAppointment
 }
 
 export interface AppResponse extends Response {

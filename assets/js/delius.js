@@ -67,8 +67,7 @@ function setupFilterButton() {
   if (!button) {
     return
   }
-  button.onclick = event => {
-    event.preventDefault()
+  button.onclick = () => {
     saveFilters()
       .then(resetPageNumber)
       .catch(error => handleError(error))
@@ -141,13 +140,6 @@ function setupSearch() {
   const form = document.getElementById('search-form')
   if (!search || !form) return
 
-  let storedProviders = []
-  try {
-    storedProviders = JSON.parse(localStorage.getItem('providers')) || []
-  } catch {
-    storedProviders = []
-  }
-  saveFilters(storedProviders).catch(error => handleError(error))
   setupFilterButton()
 
   search.focus() // the autofocus attribute doesn't work in a cross-origin iframe

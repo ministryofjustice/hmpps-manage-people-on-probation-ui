@@ -23,7 +23,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
   let sensitivity: YesNo | undefined = null
   let sensitivityLocked: boolean | undefined = null
   if (selection === 'RESCHEDULE' || contactId) {
-    sensitivity = res.locals.flags?.enableSensitivityRemoved && appointment.isSensitive ? 'Yes' : undefined
+    sensitivity = appointment.isSensitive ? 'Yes' : undefined
     if (sensitivity === 'Yes') {
       sensitivityLocked = true
     }

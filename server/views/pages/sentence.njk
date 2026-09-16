@@ -167,7 +167,7 @@
                                   {
                                       key: { text: 'GPS Data' },
                                       value: { html: licencesEMDILink | safe }
-                                  } if flags.enableEMDISentencesShowGPSData and locationMonitoringUri and hasLicenceLM
+                                  } if locationMonitoringUri and hasLicenceLM
                               ]
                           }) }}
                     {% endset %}
@@ -231,7 +231,7 @@
                                   {
                                       key: { text: 'GPS Data' },
                                       value: { html: requirementsEMDILink | safe }
-                                  } if flags.enableEMDISentencesShowGPSData and locationMonitoringUri and hasRequirementLM
+                                  } if locationMonitoringUri and hasRequirementLM
                               ]
                           }) }}
                     {% endset %}

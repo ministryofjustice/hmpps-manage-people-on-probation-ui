@@ -8,7 +8,6 @@ import {
   getAppointmentTypes,
   getAppointment,
   getDefaultUser,
-  getUserOptions,
   routeChangeAttendee,
   getSmsPreview,
   getPersonRiskFlags,
@@ -18,6 +17,7 @@ import {
   forceValidation,
   restrictPageAccess,
   getSentenceList,
+  checkIsValidUrl,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -26,6 +26,7 @@ import {
   getContactOutcomes,
   handlePutOutcome,
   getOutcomeSentence,
+  getOutcomeNextAppointment,
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -36,6 +37,7 @@ import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
 import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
+import { getUserOptions } from '../middleware/getUserOptions'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -179,6 +181,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
@@ -189,11 +192,13 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
       '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     ],
     getPersonAppointment(hmppsAuthClient),
+    checkIsValidUrl,
     handlePostAppointment(hmppsAuthClient),
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
     getContactOutcomes(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     handlePutOutcome(hmppsAuthClient),
   )
@@ -214,6 +219,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getContactOutcomes(hmppsAuthClient),
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
