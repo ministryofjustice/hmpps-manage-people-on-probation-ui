@@ -33,7 +33,7 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
 
     const { put } = req.query
 
-    if (res.locals.flags.enableNonCompliance && !isInvalidRequest) {
+    if (res.locals.flags.enableNonCompliance && !isInvalidRequest && (!addNotes || Boolean(contactId && put))) {
       if (!isValidParams) {
         return renderError(404)(req, res)
       }

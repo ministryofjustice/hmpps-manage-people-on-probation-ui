@@ -409,7 +409,7 @@ describe('controllers/appointmentOutcomes', () => {
     })
     it('should set the next appointment if nextAppointmentId exists', async () => {
       const req = mockReq({ nextAppointmentId: '1234' })
-      const res = mockRes()
+      const res = mockRes({ appointmentOutcome: { uuid: '1234' } })
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(setDataValueSpy).toHaveBeenCalledWith(
         req.session.data,
