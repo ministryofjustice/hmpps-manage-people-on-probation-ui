@@ -574,6 +574,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
         }
       }
+      const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
+      if (nextAppointmentId) {
+        const nextAppointmentOutcome = res.locals.appointmentOutcome
+        setDataValue(req.session.data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
+      }
       return res.redirect(redirect)
     }
   },

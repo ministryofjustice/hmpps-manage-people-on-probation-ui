@@ -17,19 +17,11 @@ import { renderError } from '../renderError'
 import { type ProbationPractitioner } from '../../models/CaseDetail'
 
 export const getOutcomeProps: Route<void> = (req, res, next) => {
-  const { crn, id: uuid } = req.params as Record<string, string>
-  let { contactId } = req.params as Record<string, string>
-  let id = uuid || contactId
+  const { crn, id: uuid, contactId } = req.params as Record<string, string>
+  const id = uuid || contactId
   const data = req?.session?.data
   const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
   const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
-
-  // override contact id with response contact id if exists 👇
-
-  if (responseContactId) {
-    id = responseContactId
-    contactId = responseContactId
-  }
 
   const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
   const isValidParams = isValidCrn(crn) && isValidId
