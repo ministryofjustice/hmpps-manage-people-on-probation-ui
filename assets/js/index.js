@@ -91,6 +91,8 @@ const attendanceSelectors = () => {
   }
   const submitButton = document.getElementById('submit-btn')
   const announcer = document.getElementById('update-announcer')
+  const params = new URL(window.location.toString()).searchParams
+  const change = params.get('change')
   let providerCode = ''
   if (providerSelect) {
     providerCode = providerSelect.value
@@ -112,11 +114,7 @@ const attendanceSelectors = () => {
         },
       }).then(async response => {
         if (!response.ok) {
-          submitButton.disabled = false
-          providerSelect.disabled = false
-          teamSelect.disabled = false
-          userSelect.disabled = false
-          throw new Error(`Saving filters failed with status ${response.status}`)
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
         }
         const json = await response.json()
         removeOptions(teamSelect)
@@ -156,11 +154,7 @@ const attendanceSelectors = () => {
         },
       }).then(async response => {
         if (!response.ok) {
-          submitButton.disabled = false
-          providerSelect.disabled = false
-          teamSelect.disabled = false
-          userSelect.disabled = false
-          throw new Error(`Saving filters failed with status ${response.status}`)
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
         }
         const json = await response.json()
         removeOptions(userSelect)
