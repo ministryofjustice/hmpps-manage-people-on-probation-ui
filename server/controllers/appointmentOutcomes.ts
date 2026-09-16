@@ -116,7 +116,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (change) redirect = change
       if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
       const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
-      if (nextAppointmentId) {
+      if (nextAppointmentId === uuid) {
         const nextAppointmentOutcome = res.locals.appointmentOutcome
         setDataValue(req.session.data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
       }
