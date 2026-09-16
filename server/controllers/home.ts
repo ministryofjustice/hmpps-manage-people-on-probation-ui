@@ -32,15 +32,15 @@ const homeController: Controller<typeof routes, void> = {
       enforcementActions = enforcementContactResponse.enforcementContacts
 
       const { upcomingAppointments } = homePage
-      let lastTwoYearsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
+      let lastThreeMonthsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
       if (res.locals.flags.enableHomePageOutcomesWithFilter) {
-        lastTwoYearsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+        lastThreeMonthsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.startDateTime)
-          const twoYearsAgo = DateTime.now().minus({ years: 2 })
-          return contactDate >= twoYearsAgo
+          const threeMonthsAgo = DateTime.now().minus({ months: 3 })
+          return contactDate >= threeMonthsAgo
         })
-        appointmentsRequiringOutcome = lastTwoYearsAppointmentsRequiringOutcome
-        appointmentsRequiringOutcomeCount = lastTwoYearsAppointmentsRequiringOutcome.length
+        appointmentsRequiringOutcome = lastThreeMonthsAppointmentsRequiringOutcome
+        appointmentsRequiringOutcomeCount = lastThreeMonthsAppointmentsRequiringOutcome.length
       }
       const url = encodeURIComponent(req.url)
       await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)

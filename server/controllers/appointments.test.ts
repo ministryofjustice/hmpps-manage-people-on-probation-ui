@@ -422,14 +422,14 @@ describe('controllers/appointments', () => {
         actionType: outcomeActionType,
         contactId,
         baseUrl: '',
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
     it('should filter outcomes when filter is set', async () => {
       const reqWithFilter = httpMocks.createRequest({
         ...reqObject,
         query: { ...reqObject.query, filter: 'true' },
-        body: { outcomesFilter: 'OLDER_THAN_TWO_YEARS', 'appointment-id': id },
+        body: { outcomesFilter: 'OLDER_THAN_THREE_MONTHS', 'appointment-id': id },
       })
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(reqWithFilter, res)
       checkSendAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', crn, 'CRN' as SubjectType)
@@ -439,7 +439,7 @@ describe('controllers/appointments', () => {
         actionType: outcomeActionType,
         contactId,
         baseUrl: '',
-        outcomesFilter: 'OLDER_THAN_TWO_YEARS',
+        outcomesFilter: 'OLDER_THAN_THREE_MONTHS',
       })
     })
     it('should redirect when filter is not set', async () => {

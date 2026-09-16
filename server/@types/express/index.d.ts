@@ -30,7 +30,7 @@ declare module 'express-session' {
     documentFilters?: DocumentFilters
     documentLevels?: DocumentLevel[]
     outcomesFilter?: {
-      [crn: string]: 'PAST_TWO_YEARS' | 'OLDER_THAN_TWO_YEARS' | 'ALL'
+      [crn: string]: 'PAST_THREE_MONTHS' | 'OLDER_THAN_THREE_MONTHS' | 'ALL'
     }
     data?: Data
     errors?: Errors

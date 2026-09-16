@@ -51,21 +51,27 @@ context('Outcomes to log', () => {
     cy.visit('/caseload/appointments/no-outcome')
     const page = new UserAppointments()
     page.checkPageTitle('Outcomes to log')
-    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
-    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+    checkColumnHeading(
+      page,
+      0,
+      'Name / CRN',
+      'name',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
+    )
+    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS')
     checkColumnHeading(
       page,
       2,
       'Sentence',
       'sentence',
-      '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
     )
     checkColumnHeading(
       page,
       3,
       'Date and time',
       'date',
-      '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
       'ascending',
     )
     page.getTableColumnHeading(4).should('contain.text', 'Action')

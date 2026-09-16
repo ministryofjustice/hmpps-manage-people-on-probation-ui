@@ -156,27 +156,27 @@ describe('homeController', () => {
     })
 
     describe('outcomes filter with feature flag enabled', () => {
-      it('should filter appointments requiring outcomes to only include the last 2 years and update count', async () => {
+      it('should filter appointments requiring outcomes to only include the last 3 months and update count', async () => {
         const recentAppointment = {
           id: 1,
           name: { surname: 'Recent', forename: 'Person' },
           crn: 'X000002',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ years: 1 }).toISO() as string,
+          startDateTime: DateTime.now().minus({ months: 1 }).toISO() as string,
         }
         const boundaryAppointment = {
           id: 3,
           name: { surname: 'Boundary', forename: 'Person' },
           crn: 'X000004',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ years: 2 }).plus({ minutes: 1 }).toISO() as string,
+          startDateTime: DateTime.now().minus({ months: 3 }).plus({ minutes: 1 }).toISO() as string,
         }
         const oldAppointment = {
           id: 2,
           name: { surname: 'Old', forename: 'Person' },
           crn: 'X000003',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ years: 2, days: 1 }).toISO() as string,
+          startDateTime: DateTime.now().minus({ months: 3, days: 1 }).toISO() as string,
         }
         const homepageWithMixedOutcomeDates = {
           ...mockHomepage,
