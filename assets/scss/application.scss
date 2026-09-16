@@ -899,3 +899,26 @@ table.appointments tr > .notes {
 .no-js {
   display: none;
 }
+
+.govuk-grid-column-one-quarter-early-resize {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 15px;
+}
+@media (min-width: 72.0625em) {
+  .govuk-grid-column-one-quarter-early-resize {
+    width: 25%;
+    float: left;
+  }
+}
+.govuk-grid-column-three-quarters-early-resize {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 15px;
+}
+@media (min-width: 72.0625em) {
+  .govuk-grid-column-three-quarters-early-resize {
+    width: 75%;
+    float: left;
+  }
+}
