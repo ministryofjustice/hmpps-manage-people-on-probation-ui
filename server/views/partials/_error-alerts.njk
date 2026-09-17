@@ -1,4 +1,27 @@
+{% set timeoutErrors = [] %}
+{% if appointmentsTimeoutError %}
+    {% set timeoutErrors = timeoutErrors.concat([
+        {
+            text: 'Upcoming appointments are currently unavailable.'
+        },
+        {
+            text: 'Outcomes to log are currently unavailable.'
+        }
+    ]) %}
+{% endif %}
+
+{% if enforcementTimeoutError %}
+    {% set timeoutErrors = timeoutErrors.concat([
+        {
+            text: 'Enforcement actions are currently unavailable.'
+        }
+    ]) %}
+{% endif %}
+
 {% set errors = [] %}
+{% if timeoutErrors.length > 0 %}
+    {% set errors = errors.concat(timeoutErrors) %}
+{% endif %}
 {% if alertsCount.errors.length > 0 %}
     {% set errors = errors.concat(alertsCount.errors) %}
 {% endif %}
@@ -35,59 +58,12 @@
   {{ mojAlert({
     variant: "error",
     title: "There is a problem",
-    showTitleAsHeading: false,
-    dismissible: true,
+    showTitleAsHeading: true,
+    dismissible: false,
     classes: alertClasses,
     attributes: { "data-qa": "errors" },
     html: errorsHtml
   }) }}
-{% endif %}
-
-{% set timeoutErrors = [] %}
-{% if appointmentsTimeoutError %}
-    {% set timeoutErrors = timeoutErrors.concat([
-        {
-            text: 'Upcoming appointments are currently unavailable.'
-        },
-        {
-            text: 'Outcomes to log are currently unavailable.'
-        }
-    ]) %}
-{% endif %}
-
-{% if enforcementTimeoutError %}
-    {% set timeoutErrors = timeoutErrors.concat([
-        {
-            text: 'Enforcement actions are currently unavailable.'
-        }
-    ]) %}
-{% endif %}
-
-{% if timeoutErrors.length > 0 %}
-
-    {% set errorListHtml %}
-        {% if timeoutErrors.length > 1 %}
-            <ul>
-                {% for error in timeoutErrors %}
-                    <li>{{error.text}}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <span>{{timeoutErrors[0].text}}</span>
-        {% endif %}
-    {% endset %}
-
-    {{ mojAlert({
-        variant: "error",
-        title: "There is a problem",
-        showTitleAsHeading: true,
-        dismissible: false,
-        html: errorListHtml,
-        attributes: {
-            "data-qa": "timeOutError"
-        }
-    }) }}
-
 {% endif %}
 
 
