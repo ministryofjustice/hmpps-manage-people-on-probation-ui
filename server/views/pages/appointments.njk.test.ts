@@ -287,8 +287,7 @@ describe('Appointments', () => {
       canAccessCheckins: true,
       checkinEligibility: { outcome: 'INELIGIBLE', message: 'This person is eligible for online check ins' },
     })
-    expect($('[data-qa="online-manage-btn"]').length).toBe(1)
-    expect($('[data-qa="online-manage-btn"]').text()).toContain('Manage online check ins')
+    expect($('[data-qa="online-manage-btn"]').length).toBe(0)
   })
   it('should render the page without manage check-ins button when ineligible', () => {
     const $ = render({
@@ -296,8 +295,7 @@ describe('Appointments', () => {
       canAccessCheckins: true,
       checkinEligibility: { outcome: 'INELIGIBLE', message: 'This person is eligible for online check ins' },
     })
-    expect($('[data-qa="online-manage-btn"]').length).toBe(1)
-    expect($('[data-qa="online-manage-btn"]').text()).toContain('Manage online check ins')
+    expect($('[data-qa="online-checkin-btn"]').length).toBe(0)
   })
   it('should render the page with no buttons', () => {
     const $ = render({ hasDeceased: true })
