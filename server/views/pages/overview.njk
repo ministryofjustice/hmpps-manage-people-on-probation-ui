@@ -271,7 +271,7 @@
                       rows: [
                           {
                               key: { html: '<span data-qa="checkinDueLabel">Status</span>'},
-                              value: { html: '<span data-qa="checkinDueValue">' + checkinEligibility.message + '</span>'}
+                              value: { html: '<span data-qa="checkinDueValue">' + (checkinEligibility.message | escape) + '</span>'}
                           }
                       ]
                   }) }}
