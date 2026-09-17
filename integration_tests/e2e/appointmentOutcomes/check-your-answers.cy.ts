@@ -113,6 +113,7 @@ const checkSummary = ({
     .getSummaryListRow(index + 2)
     .find('.govuk-summary-list__value')
     .should('contain.text', 'Other call on Wednesday 21 February 2024 at 10:15am to 10:30am')
+  checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
 }
 
 const checkPage = () => {
@@ -207,6 +208,7 @@ const checkPage = () => {
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'No further action')
+      checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
     })
   })
 
@@ -225,6 +227,7 @@ const checkPage = () => {
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'I will send a first warning letter')
+      checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
     })
   })
 
@@ -267,6 +270,9 @@ const checkPage = () => {
         .getSummaryListRow(7)
         .find('.govuk-summary-list__value')
         .should('contain.text', `${appointmentType} on ${yesterday} at 9am to 10am`)
+      checkYourAnswersOutcomePage
+        .getSubmitBtn()
+        .should('contain.text', 'Confirm appointment outcome and arrange appointment')
     })
   })
 }
