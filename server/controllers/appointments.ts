@@ -25,6 +25,8 @@ import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appoint
 import config from '../config'
 import { filterContacts } from '../middleware/filterContacts'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { OffenderEligibility } from '../data/model/esupervision'
 
 const routes = [
   'getAppointments',
@@ -48,6 +50,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
+      const esupClient = new ESupervisionClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENTS',
         who: res.locals.user.username,
@@ -62,6 +65,11 @@ const appointmentsController: Controller<typeof routes, void> = {
         masClient.getPersonSchedule(crn, 'previous', '0'),
         masClient.getProbationPractitioner(crn),
       ])
+
+      let checkinEligibility: OffenderEligibility | undefined
+      if (res.locals.flags.enableEsupEligibilityCheck) {
+        checkinEligibility = await esupClient.getOffenderEligibility(crn)
+      }
 
       let pastAppointments = pastAppointmentsResponse
       let upcomingAppointments = upcomingAppointmentsResponse
@@ -97,6 +105,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         hasDeceased,
         hasPractitioner,
         canAccessCheckins,
+        checkinEligibility,
       })
     }
   },
