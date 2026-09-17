@@ -110,7 +110,7 @@ const mockPersonalDetails: PersonalDetailsSession = {
   riskData: mockRiskData,
 }
 const mockOverdueOutcomesResponse = {
-  content: [{ date: '2021-01-01' }, { date: '2025-01-02' }, { date: '2025-01-03' }],
+  content: [{ date: '2025-01-03' }, { date: '2026-08-10' }, { date: '2026-09-10' }],
 }
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')

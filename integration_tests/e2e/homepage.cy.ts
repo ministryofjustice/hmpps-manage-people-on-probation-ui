@@ -16,7 +16,7 @@ context('Sign In', () => {
     page.getAppointments().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
-  it('Renders the the outcomes to log with 2 years filter', () => {
+  it('Renders the the outcomes to log with 3 months filter', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
     page.getOutcomesToLog().should('exist')

@@ -246,11 +246,11 @@ const appointmentsController: Controller<typeof routes, void> = {
       req.session.outcomesFilter[crn] = req?.body?.outcomesFilter ?? req?.session?.outcomesFilter[crn]
       const content = res.locals.contactResponse?.content
       let outcomes = filterContacts(content)
-      if (req.session.outcomesFilter[crn] === 'OLDER_THAN_TWO_YEARS') {
+      if (req.session.outcomesFilter[crn] === 'OLDER_THAN_THREE_MONTHS') {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
-          const twoYearsAgo = DateTime.now().minus({ years: 2 })
-          return contactDate < twoYearsAgo
+          const threeMonthsAgo = DateTime.now().minus({ months: 3 })
+          return contactDate < threeMonthsAgo
         })
       } else if (req.session.outcomesFilter[crn] === 'ALL') {
         outcomes = content
@@ -262,7 +262,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
         outcomes,
-        outcomesFilter: req.session.outcomesFilter[crn] ?? 'PAST_TWO_YEARS',
+        outcomesFilter: req.session.outcomesFilter[crn] ?? 'PAST_THREE_MONTHS',
       })
     }
   },

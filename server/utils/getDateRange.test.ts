@@ -16,14 +16,14 @@ describe('getDateRange', () => {
     Settings.now = () => Date.now()
   })
 
-  describe('PAST_TWO_YEARS', () => {
+  describe('PAST_THREE_MONTHS', () => {
     it('returns correct range in UK timezone', () => {
       mockNow('2026-04-27T10:00:00Z')
 
-      const result = getDateRange('PAST_TWO_YEARS')
+      const result = getDateRange('PAST_THREE_MONTHS')
 
       expect(result).toEqual({
-        fromDate: '2024-04-27',
+        fromDate: '2026-01-27',
         toDate: '2026-04-27',
       })
     })
@@ -31,20 +31,20 @@ describe('getDateRange', () => {
     it('is inclusive of today', () => {
       mockNow('2026-01-01T00:00:00Z')
 
-      const result = getDateRange('PAST_TWO_YEARS')
+      const result = getDateRange('PAST_THREE_MONTHS')
 
       expect(result.toDate).toBe('2026-01-01')
     })
   })
 
-  describe('OLDER_THAN_TWO_YEARS', () => {
+  describe('OLDER_THAN_THREE_MONTHS', () => {
     it('returns correct upper bound (no overlap)', () => {
       mockNow('2026-04-27T10:00:00Z')
 
-      const result = getDateRange('OLDER_THAN_TWO_YEARS')
+      const result = getDateRange('OLDER_THAN_THREE_MONTHS')
 
       expect(result).toEqual({
-        toDate: '2024-04-26',
+        toDate: '2026-01-26',
       })
     })
   })

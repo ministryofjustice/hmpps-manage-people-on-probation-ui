@@ -311,7 +311,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -351,7 +351,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -391,7 +391,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -442,7 +442,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
     it('renders the outcomes to log page with the sortBy search param included in the url', async () => {
@@ -481,7 +481,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
 
@@ -489,9 +489,9 @@ describe('caseloadController', () => {
       const req = httpMocks.createRequest({
         query: {
           page: '1',
-          outcomeFilter: 'PAST_TWO_YEARS',
+          outcomeFilter: 'PAST_THREE_MONTHS',
         },
-        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
       })
       const getDateRangeSpy = jest
         .spyOn(dateRangeUtils, 'getDateRange')
@@ -500,7 +500,7 @@ describe('caseloadController', () => {
 
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
 
-      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_TWO_YEARS')
+      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_THREE_MONTHS')
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
         page: '0',
@@ -527,9 +527,9 @@ describe('caseloadController', () => {
           page => addParameters(req, { page: page.toString() }),
           mockResponse.size,
         ),
-        sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+        sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
   })
@@ -540,20 +540,20 @@ describe('caseloadController', () => {
     it('redirects to the same path with outcomeFilter query parameter', async () => {
       const req = httpMocks.createRequest({
         body: {
-          outcomesFilter: 'PAST_TWO_YEARS',
+          outcomesFilter: 'PAST_THREE_MONTHS',
         },
         url: '/caseload/appointments/no-outcome',
       })
 
       await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
 
-      expect(redirectSpy).toHaveBeenCalledWith('/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+      expect(redirectSpy).toHaveBeenCalledWith('/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS')
     })
 
     it('preserves existing query parameters when adding outcomeFilter', async () => {
       const req = httpMocks.createRequest({
         body: {
-          outcomesFilter: 'OLDER_THAN_TWO_YEARS',
+          outcomesFilter: 'OLDER_THAN_THREE_MONTHS',
         },
         url: '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc',
       })
@@ -561,7 +561,7 @@ describe('caseloadController', () => {
       await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(
-        '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc&outcomeFilter=OLDER_THAN_TWO_YEARS',
+        '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc&outcomeFilter=OLDER_THAN_THREE_MONTHS',
       )
     })
   })

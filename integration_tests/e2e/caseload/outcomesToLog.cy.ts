@@ -51,21 +51,27 @@ context('Outcomes to log', () => {
     cy.visit('/caseload/appointments/no-outcome')
     const page = new UserAppointments()
     page.checkPageTitle('Outcomes to log')
-    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
-    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+    checkColumnHeading(
+      page,
+      0,
+      'Name / CRN',
+      'name',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
+    )
+    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS')
     checkColumnHeading(
       page,
       2,
       'Sentence',
       'sentence',
-      '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
     )
     checkColumnHeading(
       page,
       3,
       'Date and time',
       'date',
-      '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
       'ascending',
     )
     page.getTableColumnHeading(4).should('contain.text', 'Action')
@@ -88,7 +94,7 @@ context('Outcomes to log', () => {
       .should('contain.text', '+ 3 more')
       .should('have.attr', 'href', '/case/X778160/sentence')
     page.getTableCell(2, 3).find('a').should('contain.text', '+ 1 more')
-    page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
+    page.getTableCell(1, 4).should('contain.text', '27 August 2026').should('contain.text', '9:30am')
     page
       .getTableCell(1, 5)
       .find('a')

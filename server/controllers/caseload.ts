@@ -139,7 +139,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
       const [name, dir] = sortByQuery.split('.') as [ColName, SortDir]
       let cols = colNames
-      const outcomeFilter = req.query?.outcomeFilter ?? 'PAST_TWO_YEARS'
+      const outcomeFilter = req.query?.outcomeFilter ?? 'PAST_THREE_MONTHS'
       let fromDate
       let toDate
       if (type === 'no-outcome') {
