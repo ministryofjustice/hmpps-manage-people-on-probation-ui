@@ -94,7 +94,7 @@ context('Outcomes to log', () => {
       .should('contain.text', '+ 3 more')
       .should('have.attr', 'href', '/case/X778160/sentence')
     page.getTableCell(2, 3).find('a').should('contain.text', '+ 1 more')
-    page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
+    page.getTableCell(1, 4).should('contain.text', '27 August 2026').should('contain.text', '9:30am')
     page
       .getTableCell(1, 5)
       .find('a')
