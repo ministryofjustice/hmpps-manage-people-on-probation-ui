@@ -16,6 +16,8 @@ import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { OffenderEligibility } from '../data/model/esupervision'
 
 const crn = 'X000001'
 const id = '1234'
@@ -155,6 +157,11 @@ const mockAppointment: AttendedCompliedAppointment | Activity = {
   startDateTime: '2025-11-20',
 }
 
+const mockOffenderEligibility: OffenderEligibility = {
+  outcome: 'ELIGIBLE',
+  message: 'This person is eligible for online check ins',
+}
+
 const res = mockAppResponse({
   user: {
     username: 'user-1',
@@ -208,6 +215,10 @@ const patchAppointmentSpy = jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(mockPractitioner))
+
+const getOffenderEligibilitySpy = jest
+  .spyOn(ESupervisionClient.prototype, 'getOffenderEligibility')
+  .mockImplementation(() => Promise.resolve(mockOffenderEligibility))
 
 describe('controllers/appointments', () => {
   beforeEach(() => {
@@ -302,6 +313,28 @@ describe('controllers/appointments', () => {
         expect.objectContaining({
           hasPractitioner: true,
           canAccessCheckins: true,
+        }),
+      )
+    })
+  })
+
+  describe('get appointments - checkins eligibility flag enabled', () => {
+    it('should render the appointments page with checkinEligibility details', async () => {
+      const mockRes = mockAppResponse({
+        flags: {
+          enableESupervisionCheckins: true,
+          enableSupervisionPackageAppointments: true,
+          enableEsupEligibilityCheck: true,
+        },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
+      expect(getOffenderEligibilitySpy).toHaveBeenCalledWith(crn)
+      expect(spy).toHaveBeenCalledWith(
+        'pages/appointments',
+        expect.objectContaining({
+          checkinEligibility: { message: 'This person is eligible for online check ins', outcome: 'ELIGIBLE' },
         }),
       )
     })
