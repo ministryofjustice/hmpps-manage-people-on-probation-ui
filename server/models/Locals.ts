@@ -114,6 +114,7 @@ interface Locals {
   headerTierLink?: string
   probationPractitioner?: ProbationPractitioner
   managedBy?: ManagedByDetails
+  personPhotoSrc?: string
   tierUrlV3?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto

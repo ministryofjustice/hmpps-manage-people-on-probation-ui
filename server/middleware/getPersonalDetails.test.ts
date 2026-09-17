@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { Readable } from 'stream'
 import httpMocks from 'node-mocks-http'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
@@ -7,6 +8,7 @@ import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
+import PrisonApiClient from '../data/prisonApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
@@ -50,6 +52,7 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
 jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
+jest.mock('../data/prisonApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -278,6 +281,52 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.riskData).toEqual(mockRiskData)
       expect(res.locals.predictorScores).toBeUndefined()
       expect(nextSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('photo', () => {
+    it('sets personPhotoSrc to the prisoner-image route when a photo exists', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
+    })
+
+    it('leaves personPhotoSrc undefined when there is no photo (404)', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValueOnce(null)
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+    })
+
+    it('leaves personPhotoSrc undefined, and still renders the header, when the Prisons API fails', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('does not request a photo when there is no NOMS number', async () => {
+      const getImageDataSpy = jest.spyOn(PrisonApiClient.prototype, 'getImageData')
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(res.locals.personPhotoSrc).toBeUndefined()
     })
   })
 
