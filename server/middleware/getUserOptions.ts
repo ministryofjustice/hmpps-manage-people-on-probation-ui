@@ -26,7 +26,7 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       enabled: res.locals.flags?.enableSessionCacheLogging,
     }
 
-    if (req.query['update-btn'] === '') {
+    if (req.query['update-btn'] === '' && res.locals.flags?.enableAttendeeUpdates) {
       const noJSProvider = req.query[`[appointments][${crn}][${id}][temp][providerCode]`] as string
       providerCodeQuery = noJSProvider
       const noJSTeam = req.query[`[appointments][${crn}][${id}][temp][teamCode]`] as string

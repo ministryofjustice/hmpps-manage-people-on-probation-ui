@@ -105,6 +105,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     checkAnswers,
     controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient),
   )
+
   router.post('/case/:crn/arrange-appointment/:id/attendance/filter', getUserOptions(hmppsAuthClient), returnOptions)
 
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)

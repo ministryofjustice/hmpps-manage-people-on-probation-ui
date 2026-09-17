@@ -11,6 +11,9 @@
 {% endif %}
 
 {% block primary %}
+    {% if flags.enableAttendeeUpdates %}
+        <div hidden id="enableAttendeeUpdates"></div>
+    {% endif %}
     <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %} {% if formId %} id="{{ formIdName }}"{% endif %}>
         <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
         {% if change %}<input type="hidden" name="change" value="{{ change }}">{% endif %}

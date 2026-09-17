@@ -81,7 +81,36 @@ function removeOptions(selectElement) {
   }
 }
 
-const attendanceSelectors = () => {
+const attendanceSelectorsOld = () => {
+  const providerSelect = document.querySelector('[data-qa="providerCode"]')
+  const teamSelect = document.querySelector('[data-qa="teamCode"]')
+  const params = new URL(window.location.toString()).searchParams
+  const change = params.get('change')
+  let providerCode = ''
+  if (providerSelect) {
+    providerCode = providerSelect.value
+    providerSelect.addEventListener('change', event => {
+      const { value } = event.target
+      const urlParts = location.href.split('?')[0].split('/')
+      const crn = urlParts[4]
+      const uuid = urlParts[6]
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
+      location.href = `${baseUrl}?providerCode=${value}${change ? `&change=${change}` : ''}`
+    })
+  }
+  if (teamSelect) {
+    teamSelect.addEventListener('change', event => {
+      const { value } = event.target
+      const urlParts = location.href.split('?')[0].split('/')
+      const crn = urlParts[4]
+      const uuid = urlParts[6]
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
+      location.href = `${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
+    })
+  }
+}
+
+const attendanceSelectorsNew = () => {
   const providerSelect = document.querySelector('[data-qa="providerCode"]')
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
   const userSelect = document.querySelector('[data-qa="username"]')
@@ -482,7 +511,13 @@ function standardiseTimeValue(timeValue) {
 
 setNoFixedAddressConditional()
 resetConditionals()
-attendanceSelectors()
+const doc = document.getElementById('enableAttendeeUpdates')
+if (doc) {
+  attendanceSelectorsNew()
+} else {
+  attendanceSelectorsOld()
+}
+
 homeSearch()
 crissHeaders() // REMOVE once enableCRISSV2 flag rolled out
 recentCaseDisplay()
