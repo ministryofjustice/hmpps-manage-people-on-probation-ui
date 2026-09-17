@@ -157,6 +157,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.post(
     '/case/:crn/arrange-appointment/:id/supporting-information',
     validate.appointments,
+    getOutcomeProps,
     autoStoreSessionData(hmppsAuthClient),
     checkAnswers,
     controllers.arrangeAppointments.postSupportingInformation(),
@@ -195,8 +196,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     ],
     getPersonAppointment(hmppsAuthClient),
     checkIsValidUrl,
-    handlePostAppointment(hmppsAuthClient),
     getOutcomeProps,
+    handlePostAppointment(hmppsAuthClient),
     getOutcomeSentence(hmppsAuthClient),
     getContactOutcomes(hmppsAuthClient),
     getNotePrepend,

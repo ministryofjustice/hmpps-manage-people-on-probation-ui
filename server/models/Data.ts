@@ -11,6 +11,8 @@ import { SentencePlan } from './Risk'
 import { ErrorSummary } from '../data/model/common'
 import { ProbationPractitioner } from './CaseDetail'
 import { NextAppointmentResponse, SupervisionPackageResponse } from './SupervisionPackage'
+import { AppointmentOutcomeProps } from './Locals'
+import { Activity } from '../data/model/schedule'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -21,6 +23,7 @@ export interface PersonalDetailsSession {
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
   professionalContact?: ProfessionalContact | null
+  personPhotoSrc?: string
   tierDetails?: LatestTierResponse
   supervisionPackageResponse?: SupervisionPackageResponse
   nextAppointmentResponse?: NextAppointmentResponse
@@ -35,6 +38,7 @@ export interface Data {
     [crn: string]: {
       linkedContactId?: string
       nextAppointmentId?: string
+      nextAppointment?: AppointmentOutcomeProps<Activity>
       responseContactId?: string
     }
   }
