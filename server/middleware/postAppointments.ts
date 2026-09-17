@@ -182,6 +182,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         isWelshTranslation = includeWelshPreview
         outlookEventRequestBody.smsEventRequest = {
           firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
+          practitionerFirstName: firstName,
           mobileNumber,
           crn,
           smsOptIn: true,

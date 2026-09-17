@@ -241,6 +241,7 @@ const checkOutlookEventRequest = (smsRequest = false, firstName = mockUser.first
   const res = buildResponse()
   const smsEventRequest: SmsEventRequest = {
     firstName,
+    practitionerFirstName: mockUser.firstName,
     mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
