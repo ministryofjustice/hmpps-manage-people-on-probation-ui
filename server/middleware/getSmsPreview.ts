@@ -50,7 +50,6 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
           locationMatch?.address?.officeName || locationMatch?.address?.buildingName || locationMatch.description || ''
       }
       if (appointmentLocation) body.appointmentLocation = appointmentLocation
-      
     }
 
     if (JSON.stringify(smsPreview?.request) === JSON.stringify(body) && smsPreview?.preview) {
