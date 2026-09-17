@@ -186,7 +186,6 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
       },
     ],
     flags: {
-      enableNonCompliance: true,
       enableCombinedCYAPage: true,
     },
     ...(localsResponse || {}),
@@ -776,7 +775,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).not.toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcomeRecorded'],
+        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
         null,
       )
       expect(mockedSetDataValue).not.toHaveBeenCalledWith(
@@ -790,7 +789,7 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the future - non compliance enabled', async () => {
+    it('should reset the outcome recorded session value if original date was in the future', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -806,34 +805,12 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
+        ['appointments', crn, uuid, 'outcome'],
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the future - non compliance disabled', async () => {
-      const mockReq = createMockRequest({
-        query: { change },
-        appointmentSession: {
-          date: '2029-07-07',
-          temp: {
-            date: tomorrow,
-            isInPast: false,
-          },
-        },
-      })
-      const mockRes = createMockResponse({
-        flags: { enableNonCompliance: false },
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'outcomeRecorded'],
-        null,
-      )
-    })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance enabled', async () => {
+
+    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -849,30 +826,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
-        null,
-      )
-    })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance disabled', async () => {
-      const mockReq = createMockRequest({
-        query: { change },
-        appointmentSession: {
-          date: '2025-07-08',
-          temp: {
-            date: '2025-07-07',
-            isInPast: true,
-          },
-        },
-      })
-      const mockRes = createMockResponse({
-        flags: { enableNonCompliance: false },
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'outcomeRecorded'],
+        ['appointments', crn, uuid, 'outcome'],
         null,
       )
     })

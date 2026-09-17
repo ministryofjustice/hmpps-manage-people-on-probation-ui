@@ -103,7 +103,7 @@ describe('Change appointment details and reschedule', () => {
     })
   })
 
-  describe('Reschedule appointment in the past - non compliance enabled', () => {
+  describe('Reschedule appointment in the past', () => {
     beforeEach(() => {
       completeRescheduleAppointmentPage()
       checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
@@ -159,33 +159,6 @@ describe('Change appointment details and reschedule', () => {
         checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__actions').find('a').click()
         attendedFailedToComplyPage = new AttendedFailedToComplyPage()
         cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
-      })
-    })
-  })
-
-  describe('Reschedule appointment in the past - non compliance disabled', () => {
-    beforeEach(() => {
-      completeRescheduleAppointmentPage({ enableNonCompliance: false })
-      checkYourAnswerPage = new AppointmentCheckYourAnswersPage()
-      checkYourAnswerPage.checkPageTitle('Change appointment details and reschedule')
-      checkYourAnswerPage.getSubmitBtn().click()
-    })
-    it('should display the log outcomes alert banner and not display outlook invite text', () => {
-      getUuid().then(uuid => {
-        completeRescheduling({ id: uuid, inPast: true, enableNonCompliance: false })
-        checkYourAnswerPage
-          .getSummaryListRow(6)
-          .find('.govuk-summary-list__key')
-          .should('contain.text', 'Attended and complied')
-        checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-        checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Notes')
-        checkYourAnswerPage
-          .getSummaryListRow(7)
-          .find('.govuk-summary-list__value')
-          .should('contain.text', 'Not entered')
-        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
-        checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
-        cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
       })
     })
   })
