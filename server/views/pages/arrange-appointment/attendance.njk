@@ -60,17 +60,19 @@
         } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'username'])) }}
 
         <div class="govuk-button-group">
-            {{ govukButton({
-                html: 'Update options',
-                id: 'update-btn',
-                name: 'update-btn',
-                classes: "govuk-button--secondary",
-                attributes: {
-                    'data-qa': 'update-btn',
-                    'formmethod': 'get',
-                    'formAction': 'attendance'
-                }
-            }) }}
+            {% if flags.enableAttendeeUpdates %}
+                {{ govukButton({
+                    html: 'Update options',
+                    id: 'update-btn',
+                    name: 'update-btn',
+                    classes: "govuk-button--secondary",
+                    attributes: {
+                        'data-qa': 'update-btn',
+                        'formmethod': 'get',
+                        'formAction': 'attendance'
+                    }
+                }) }}
+            {% endif %}
             {{ govukButton({
                 html: buttonText if buttonText else 'Continue',
                 isStartButton: buttonText === 'Start now',
