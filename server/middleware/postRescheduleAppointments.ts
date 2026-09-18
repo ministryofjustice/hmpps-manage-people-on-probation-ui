@@ -107,6 +107,7 @@ export const postRescheduleAppointments = (
           includeWelshPreview,
           appointmentLocation = null,
           appointmentTypeCode = null,
+          practitionerFirstName = null,
         } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
         isWelshTranslation = includeWelshPreview
         rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
@@ -116,6 +117,8 @@ export const postRescheduleAppointments = (
           smsOptIn: true,
           includeWelshTranslation: includeWelshPreview,
         }
+        if (practitionerFirstName)
+          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName = practitionerFirstName
         if (appointmentLocation)
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode)

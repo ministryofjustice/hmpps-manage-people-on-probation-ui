@@ -53,6 +53,7 @@ const mockPersonalDetails: Partial<PersonalDetails> = {
   name: { forename: 'James', surname: 'Morrison' },
   mobileNumber: '07700900000',
 }
+
 const putRescheduleAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'putRescheduleAppointment')
   .mockImplementation(() => Promise.resolve(mockRescheduleResponse))
@@ -109,6 +110,7 @@ const mockAppointment: AppointmentSession = {
   smsPreview: {
     request: {
       firstName: 'James',
+      practitionerFirstName: 'user',
       includeWelshPreview: false,
       appointmentLocation: 'Mock Location',
       appointmentTypeCode: 'COAP',
@@ -490,6 +492,7 @@ describe('middleware/postRescheduleAppointments', () => {
           rescheduledEventRequest: expect.objectContaining({
             smsEventRequest: expect.objectContaining({
               firstName: mockAppointment.smsPreview.request.firstName,
+              practitionerFirstName: mockAppointment.smsPreview.request.practitionerFirstName,
               mobileNumber: mockLocals().case.mobileNumber,
               crn,
               smsOptIn: true,
@@ -577,6 +580,7 @@ describe('middleware/postRescheduleAppointments', () => {
           rescheduledEventRequest: expect.objectContaining({
             smsEventRequest: expect.objectContaining({
               firstName: 'James',
+              practitionerFirstName: 'user',
               mobileNumber: '07822567890',
               crn,
               smsOptIn: true,
@@ -595,6 +599,7 @@ describe('middleware/postRescheduleAppointments', () => {
         smsPreview: {
           request: {
             includeWelshPreview: true,
+            practitionerFirstName: 'Practioner',
             appointmentLocation: 'Mock Location',
             appointmentTypeCode: 'COAP',
           },
