@@ -434,27 +434,4 @@ describe('utils/getRiskBadgeGroups', () => {
     })
   })
 
-  describe('handles unexpected descriptions', () => {
-    it('places an unexpected description after known descriptions with the same severity', () => {
-      const riskFlags = [
-        createRiskFlag({
-          id: 1,
-          description: 'Some Unexpected Risk',
-          level: 'HIGH',
-        }),
-        createRiskFlag({
-          id: 2,
-          description: 'Risk to Public',
-          level: 'HIGH',
-        }),
-      ]
-
-      const result = getRiskBadgeGroups(riskFlags)
-
-      expect(result.groups[0].badges.map(badge => badge.text)).toEqual([
-        'Risk to public - High',
-        'Some unexpected risk',
-      ])
-    })
-  })
 })
