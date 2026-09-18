@@ -26,14 +26,12 @@ export const handlePutOutcome = (hmppsAuthClient: HmppsAuthClient, addNotes = fa
     const { data } = req.session
     const nextAppointment = getDataValue<AppointmentOutcomeProps<Activity>>(data, ['temp', crn, 'nextAppointment'])
     const responseContactId = getDataValue<string>(data, ['temp', crn, 'responseContactId'])
-    const isInvalidRequest = uuid && !isInPast
+    const isInvalidRequest = Boolean(uuid && !isInPast)
     if (nextAppointment) {
       ;({ isInPast: nextAppointmentIsInPast } = nextAppointment)
     }
-
     const { put } = req.query
-
-    if (res.locals.flags.enableNonCompliance && !isInvalidRequest && (!addNotes || Boolean(contactId && put))) {
+    if (!isInvalidRequest && (!addNotes || Boolean(contactId && put))) {
       if (!isValidParams) {
         return renderError(404)(req, res)
       }

@@ -132,9 +132,6 @@ const buildResponse = ({
   isValidParams?: boolean
 } = {}): httpMocks.MockRequest<any> => {
   const locals = {
-    flags: {
-      enableNonCompliance: true,
-    },
     appointmentOutcome: {
       crn,
       id,
