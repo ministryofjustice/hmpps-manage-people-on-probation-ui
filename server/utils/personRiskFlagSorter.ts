@@ -46,7 +46,7 @@ export const registerTypes = {
     { code: 'MSP', description: 'Modern Slavery - Perpetrator' },
     { code: 'MSV', description: 'Modern Slavery - Victim' },
     { code: 'DASO', description: 'Domestic Abuse Safety Officer' },
-    { code: 'ADVP', description: 'Domestic Abuse' },
+    { code: 'ADVP', description: 'Domestic Abuse Perpetrator' },
     { code: 'COR', description: 'Corruptor' },
     { code: 'CYB1', description: 'Cyber - Enabled' },
     { code: 'CYB2', description: 'Cyber - Dependent' },
