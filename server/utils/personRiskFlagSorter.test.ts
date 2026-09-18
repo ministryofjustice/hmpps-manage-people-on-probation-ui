@@ -433,5 +433,4 @@ describe('utils/getRiskBadgeGroups', () => {
       })
     })
   })
-
 })

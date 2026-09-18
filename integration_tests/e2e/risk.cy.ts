@@ -537,6 +537,5 @@ context('Risk', () => {
       'contain.text',
       'Risk flag information is currently unavailable. Try again later or use NDelius.',
     )
-
   })
 })
