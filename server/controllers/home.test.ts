@@ -51,6 +51,38 @@ describe('homeController', () => {
     const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } = mockHomepage
     let spy: jest.SpyInstance
     let masSpy: jest.SpyInstance
+
+    const expectedHomePageLinks = {
+      delius_link: config.delius.link,
+      oasys_link: config.oaSys.link,
+      interventions_link: config.interventions.link,
+      recall_link: config.recall.link,
+      cas1_link: config.cas1.link,
+      cas3_link: config.cas3.link,
+      caval_link: config.caval.link,
+      epf2_link: config.epf2.link,
+    }
+
+    const expectHomePageToBeRendered = (
+      render: jest.SpyInstance,
+      values: {
+        upcomingAppointments: unknown
+        appointmentsRequiringOutcome: unknown
+        appointmentsRequiringOutcomeCount: unknown
+        enforcementActions: unknown
+        url: string
+        appointmentsTimeoutError?: unknown
+        enforcementTimeoutError?: unknown
+      },
+    ) => {
+      expect(render).toHaveBeenCalledWith('pages/homepage/homepage', {
+        ...values,
+        appointmentsTimeoutError: values.appointmentsTimeoutError,
+        enforcementTimeoutError: values.enforcementTimeoutError,
+        ...expectedHomePageLinks,
+      })
+    }
+
     beforeEach(async () => {
       jest.resetAllMocks()
       jest.resetModules()
@@ -78,20 +110,14 @@ describe('homeController', () => {
 
       it('should render the home page with the esupervision link', () => {
         checkSendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
-        expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
+        expectHomePageToBeRendered(renderSpy, {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
-          delius_link: config.delius.link,
-          oasys_link: config.oaSys.link,
-          interventions_link: config.interventions.link,
-          recall_link: config.recall.link,
-          cas1_link: config.cas1.link,
-          cas3_link: config.cas3.link,
-          caval_link: config.caval.link,
-          epf2_link: config.epf2.link,
+          appointmentsTimeoutError: mockHomepage.timeoutError,
+          enforcementTimeoutError: undefined,
         })
       })
       it('should request the homepage data from the api', () => {
@@ -122,21 +148,14 @@ describe('homeController', () => {
           }),
         )
         await controllers.home.getHome(hmppsAuthClient)(mockReq, res)
-
-        expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
+        expectHomePageToBeRendered(renderSpy, {
           upcomingAppointments,
           appointmentsRequiringOutcome,
           appointmentsRequiringOutcomeCount,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
-          delius_link: config.delius.link,
-          oasys_link: config.oaSys.link,
-          interventions_link: config.interventions.link,
-          recall_link: config.recall.link,
-          cas1_link: config.cas1.link,
-          cas3_link: config.cas3.link,
-          caval_link: config.caval.link,
-          epf2_link: config.epf2.link,
+          appointmentsTimeoutError: mockHomepage.timeoutError,
+          enforcementTimeoutError: undefined,
         })
       })
     })
@@ -193,20 +212,14 @@ describe('homeController', () => {
 
         await controllers.home.getHome(hmppsAuthClient)(req, resWithFilterFlag)
 
-        expect(renderSpyWithFilter).toHaveBeenCalledWith('pages/homepage/homepage', {
+        expectHomePageToBeRendered(renderSpyWithFilter, {
           upcomingAppointments: mockHomepage.upcomingAppointments,
           appointmentsRequiringOutcome: [recentAppointment, boundaryAppointment],
           appointmentsRequiringOutcomeCount: 2,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
-          delius_link: config.delius.link,
-          oasys_link: config.oaSys.link,
-          interventions_link: config.interventions.link,
-          recall_link: config.recall.link,
-          cas1_link: config.cas1.link,
-          cas3_link: config.cas3.link,
-          caval_link: config.caval.link,
-          epf2_link: config.epf2.link,
+          appointmentsTimeoutError: homepageWithMixedOutcomeDates.timeoutError,
+          enforcementTimeoutError: undefined,
         })
       })
     })
@@ -324,6 +337,42 @@ describe('homeController', () => {
         await controllers.home.getHomeOld(hmppsAuthClient)(reqWithPage, resOld)
 
         expect(masSpyOldPagination).toHaveBeenCalledWith(resOld.locals.user.username, '2')
+      })
+
+      it('should render empty collections and both timeout messages when legacy APIs time out', async () => {
+        const resOld = mockAppResponse({ flags: { enableDeliusClient: false } })
+        const renderSpyOld = jest.spyOn(resOld, 'render')
+
+        const appointmentsTimeoutError = 'Unable to retrieve appointments'
+        const enforcementTimeoutError = 'Unable to retrieve enforcement actions'
+
+        jest.spyOn(MasApiClient.prototype, 'getUserAppointments').mockResolvedValue({
+          appointments: undefined,
+          outcomes: undefined,
+          totalAppointments: 0,
+          totalOutcomes: 0,
+          timeoutError: appointmentsTimeoutError,
+        } as any)
+
+        jest.spyOn(MasApiClient.prototype, 'getEnforcementContacts').mockResolvedValue({
+          enforcementContacts: undefined,
+          timeoutError: enforcementTimeoutError,
+        } as any)
+
+        await controllers.home.getHomeOld(hmppsAuthClient)(req, resOld)
+
+        expect(renderSpyOld).toHaveBeenCalledWith(
+          'pages/homepage-old/homepage',
+          expect.objectContaining({
+            appointments: [],
+            outcomes: [],
+            enforcementActions: [],
+            totalAppointments: 0,
+            totalOutcomes: 0,
+            appointmentsTimeoutError,
+            enforcementTimeoutError,
+          }),
+        )
       })
     })
 

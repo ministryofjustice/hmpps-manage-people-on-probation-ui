@@ -47,7 +47,7 @@ const homeController: Controller<typeof routes, void> = {
       return res.render('pages/homepage/homepage', {
         upcomingAppointments: upcomingAppointments ?? [],
         appointmentsRequiringOutcome: appointmentsRequiringOutcome ?? [],
-        appointmentsRequiringOutcomeCount: appointmentsRequiringOutcomeCount ?? [],
+        appointmentsRequiringOutcomeCount,
         enforcementActions: enforcementActions ?? [],
         url,
         appointmentsTimeoutError: homePage.timeoutError,
