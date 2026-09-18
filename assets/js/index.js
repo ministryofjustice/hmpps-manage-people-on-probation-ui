@@ -208,7 +208,7 @@ const attendanceSelectorsNew = () => {
           return response
         })
         .catch(() => {
-          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}`
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
         })
     })
   }
