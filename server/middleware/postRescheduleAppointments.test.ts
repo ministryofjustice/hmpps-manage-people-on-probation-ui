@@ -599,7 +599,7 @@ describe('middleware/postRescheduleAppointments', () => {
         smsPreview: {
           request: {
             includeWelshPreview: true,
-            practitionerFirstName: 'Practioner',
+            practitionerFirstName: 'Practitioner',
             appointmentLocation: 'Mock Location',
             appointmentTypeCode: 'COAP',
           },
