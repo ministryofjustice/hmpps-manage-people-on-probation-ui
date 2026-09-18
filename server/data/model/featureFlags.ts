@@ -33,5 +33,6 @@ export class FeatureFlags {
   enableAsYouTypeSearch?: boolean = undefined
   enableMAN3255?: boolean = undefined
   enableCombinedCYAPage?: boolean = undefined
+  enableAttendeeUpdates?: boolean = undefined
   enableEsupEligibilityCheck?: boolean = undefined
 }

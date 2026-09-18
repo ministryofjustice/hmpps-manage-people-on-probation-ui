@@ -896,6 +896,10 @@ table.appointments tr > .notes {
   align-items: flex-end;
 }
 
+.no-js {
+  display: none;
+}
+
 .govuk-grid-column-early-resize {
   box-sizing: border-box;
   width: 100%;
