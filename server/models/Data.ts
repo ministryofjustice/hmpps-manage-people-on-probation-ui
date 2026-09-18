@@ -24,6 +24,8 @@ export interface PersonalDetailsSession {
   probationPractitioner?: ProbationPractitioner
   professionalContact?: ProfessionalContact | null
   personPhotoSrc?: string
+  arnsUnavailable?: boolean
+  prisonsUnavailable?: boolean
   tierDetails?: LatestTierResponse
   supervisionPackageResponse?: SupervisionPackageResponse
   nextAppointmentResponse?: NextAppointmentResponse
