@@ -50,5 +50,5 @@ const stubEMDIPeopleExists404Response = (crn: string = 'X000001'): SuperAgentReq
 export default {
   stubEMDIPeopleExists500Response,
   stubEMDIPeopleExists404Response,
-  stubEMDIPeopleExists505Response: stubEMDIPeopleExists503Response,
+  stubEMDIPeopleExists503Response,
 }
