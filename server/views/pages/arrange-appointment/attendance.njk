@@ -77,7 +77,8 @@
                 html: buttonText if buttonText else 'Continue',
                 isStartButton: buttonText === 'Start now',
                 id: submitButtonId if submitButtonId else 'submit-btn',
-                name: 'submit-btn',
+                name: '_csrf',
+                value: csrfToken,
                 attributes: {
                   'data-qa': 'submit-btn'
                 }

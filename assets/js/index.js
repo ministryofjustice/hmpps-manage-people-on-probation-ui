@@ -141,29 +141,34 @@ const attendanceSelectorsNew = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).then(async response => {
-        if (!response.ok) {
-          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
-        } else {
-          const json = await response.json()
-          removeOptions(teamSelect)
-          const { teams } = json
-          teams.forEach(team =>
-            teamSelect.add(new Option(team.description, team.code, undefined, team.selected === 'selected')),
-          )
-          removeOptions(userSelect)
-          const { users } = json
-          users.forEach(user =>
-            userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
-          )
-          announcer.textContent = 'Updated team and username options'
-        }
-        submitButton.disabled = false
-        providerSelect.disabled = false
-        teamSelect.disabled = false
-        userSelect.disabled = false
-        return response
+        body: JSON.stringify({ _csrf: window.csrfToken }),
       })
+        .then(async response => {
+          if (!response.ok) {
+            location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
+          } else {
+            const json = await response.json()
+            removeOptions(teamSelect)
+            const { teams } = json
+            teams.forEach(team =>
+              teamSelect.add(new Option(team.description, team.code, undefined, team.selected === 'selected')),
+            )
+            removeOptions(userSelect)
+            const { users } = json
+            users.forEach(user =>
+              userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
+            )
+            announcer.textContent = 'Updated team and username options'
+          }
+          submitButton.disabled = false
+          providerSelect.disabled = false
+          teamSelect.disabled = false
+          userSelect.disabled = false
+          return response
+        })
+        .catch(() => {
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}`
+        })
     })
   }
   if (teamSelect) {
@@ -182,24 +187,29 @@ const attendanceSelectorsNew = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }).then(async response => {
-        if (!response.ok) {
-          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
-        } else {
-          const json = await response.json()
-          removeOptions(userSelect)
-          const { users } = json
-          users.forEach(user =>
-            userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
-          )
-          announcer.textContent = 'Updated username options'
-        }
-        submitButton.disabled = false
-        providerSelect.disabled = false
-        teamSelect.disabled = false
-        userSelect.disabled = false
-        return response
+        body: JSON.stringify({ _csrf: window.csrfToken }),
       })
+        .then(async response => {
+          if (!response.ok) {
+            location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
+          } else {
+            const json = await response.json()
+            removeOptions(userSelect)
+            const { users } = json
+            users.forEach(user =>
+              userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
+            )
+            announcer.textContent = 'Updated username options'
+          }
+          submitButton.disabled = false
+          providerSelect.disabled = false
+          teamSelect.disabled = false
+          userSelect.disabled = false
+          return response
+        })
+        .catch(() => {
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}`
+        })
     })
   }
 }
