@@ -13,6 +13,7 @@ import { ProbationPractitioner } from './CaseDetail'
 import { NextAppointmentResponse, SupervisionPackageResponse } from './SupervisionPackage'
 import { AppointmentOutcomeProps } from './Locals'
 import { Activity } from '../data/model/schedule'
+import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -20,6 +21,7 @@ export interface PersonalDetailsSession {
   risks: RiskSummary
   tierCalculation: TierCalculation
   riskData?: RiskData
+  riskBadgeData?: RiskBadgeData
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
   professionalContact?: ProfessionalContact | null
@@ -76,5 +78,9 @@ export interface Data {
   }
   risks?: {
     [crn: string]: PersonRiskFlags
+  }
+
+  riskBadgeData?: {
+    [crn: string]: RiskBadgeData
   }
 }
