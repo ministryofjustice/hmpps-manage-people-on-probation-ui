@@ -181,6 +181,14 @@ context('Sentence', () => {
     cy.get(`[data-qa=errors]`).should('contain.text', 'Electronic monitoring data is currently unavailable.')
   })
 
+  it('Sentence page is rendered without location monitoring info when EMDI API returns http 503 error', () => {
+    cy.task('stubEMDIPeopleExists505Response')
+    cy.visit('/case/X000001/sentence?number=3')
+    const page = Page.verifyOnPage(SentencePage)
+    page.getElementData('licencesEMDILink').should('not.exist')
+    cy.get(`[data-qa=errors]`).should('contain.text', 'Electronic monitoring data is currently unavailable.')
+  })
+
   it('Sentence page is rendered with date of death recorded warning', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001/sentence')
