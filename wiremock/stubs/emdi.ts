@@ -16,6 +16,22 @@ const stubEMDIPeopleExists500Response = (crn: string = 'X000001'): SuperAgentReq
     },
   })
 
+const stubEMDIPeopleExists503Response = (crn: string = 'X000001'): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    priority: 1,
+    request: {
+      urlPathPattern: `/emdi/people/exists/${crn}`,
+      method: 'GET',
+    },
+    response: {
+      status: 503,
+      jsonBody: { message: '503 Error message' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 const stubEMDIPeopleExists404Response = (crn: string = 'X000001'): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     priority: 1,
@@ -34,4 +50,5 @@ const stubEMDIPeopleExists404Response = (crn: string = 'X000001'): SuperAgentReq
 export default {
   stubEMDIPeopleExists500Response,
   stubEMDIPeopleExists404Response,
+  stubEMDIPeopleExists503Response,
 }
