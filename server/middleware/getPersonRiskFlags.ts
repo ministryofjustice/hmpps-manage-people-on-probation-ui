@@ -34,7 +34,7 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       setDataValue(data, ['riskBadgeData', crn], riskBadgeData)
     } else {
       personRisks = req.session.data.risks[crn]
-      riskBadgeData = req.session.data.riskBadgeData[crn]
+      riskBadgeData = req.session.data.riskBadgeData?.[crn] ?? getRiskBadgeGroups(personRisks.riskFlags ?? [])
     }
     const riskToStaff = getStaffRisk(personRisks.riskFlags)
     const riskToProbationStaff = getProbationRisk(personRisks.riskFlags)
