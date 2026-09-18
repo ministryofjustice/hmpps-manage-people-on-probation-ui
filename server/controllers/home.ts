@@ -45,10 +45,10 @@ const homeController: Controller<typeof routes, void> = {
       const url = encodeURIComponent(req.url)
       await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
       return res.render('pages/homepage/homepage', {
-        upcomingAppointments,
-        appointmentsRequiringOutcome,
-        appointmentsRequiringOutcomeCount,
-        enforcementActions,
+        upcomingAppointments: upcomingAppointments ?? [],
+        appointmentsRequiringOutcome: appointmentsRequiringOutcome ?? [],
+        appointmentsRequiringOutcomeCount: appointmentsRequiringOutcomeCount ?? [],
+        enforcementActions: enforcementActions ?? [],
         url,
         appointmentsTimeoutError: homePage.timeoutError,
         enforcementTimeoutError: enforcementContactResponse.timeoutError,
@@ -87,9 +87,9 @@ const homeController: Controller<typeof routes, void> = {
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
         totalOutcomes,
-        appointments,
-        outcomes,
-        enforcementActions,
+        appointments: appointments ?? [],
+        outcomes: outcomes ?? [],
+        enforcementActions: enforcementActions ?? [],
         enforcementTimeoutError: enforcementContactResponse.timeoutError,
         appointmentsTimeoutError,
         url,
