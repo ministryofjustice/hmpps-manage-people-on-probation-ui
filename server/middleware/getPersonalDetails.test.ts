@@ -160,6 +160,8 @@ const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {
     tierCalculation: mockTierCalculation,
     probationPractitioner,
     professionalContact: mockContacts,
+    arnsUnavailable: false,
+    prisonsUnavailable: false,
   }
   if (ogrs4Enabled) {
     mockPersonalDetails.riskData = mockRiskData
@@ -296,7 +298,7 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
     })
 
-    it('leaves personPhotoSrc undefined when there is no photo (404)', async () => {
+    it('leaves personPhotoSrc undefined, and prisonsUnavailable false, when there is no photo (404)', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -305,9 +307,10 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(false)
     })
 
-    it('leaves personPhotoSrc undefined, and still renders the header, when the Prisons API fails', async () => {
+    it('leaves personPhotoSrc undefined, sets prisonsUnavailable, and still renders the header, when the Prisons API fails', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -316,6 +319,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
     })
 
@@ -327,6 +331,36 @@ describe('/middleware/getPersonalDetails', () => {
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
+    })
+  })
+
+  describe('arns', () => {
+    it('sets arnsUnavailable and still renders the header when getRisks fails', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable and still renders the header when getRiskData fails', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('leaves arnsUnavailable false when both ARNS calls succeed', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(false)
     })
   })
 
