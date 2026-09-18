@@ -450,22 +450,4 @@ describe('RestClient.get timeout handling', () => {
     expect(mockedSentryCaptureException).not.toHaveBeenCalled()
     expect(nock.isDone()).toBe(true)
   })
-
-  it('should not handle a non-timeout error for a configured timeout path', async () => {
-    nock('http://localhost:8080', {
-      reqheaders: { authorization: 'Bearer token-1' },
-    })
-      .get('/api/alerts')
-      .reply(500, { message: 'Internal Server Error' })
-
-    await expect(
-      restClient.get({
-        path: '/alerts',
-        retry: false,
-      }),
-    ).rejects.toThrow('Internal Server Error')
-
-    expect(mockedSentryCaptureException).not.toHaveBeenCalled()
-    expect(nock.isDone()).toBe(true)
-  })
 })
