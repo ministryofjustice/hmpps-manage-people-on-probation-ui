@@ -182,7 +182,7 @@ context('Sentence', () => {
   })
 
   it('Sentence page is rendered without location monitoring info when EMDI API returns http 503 error', () => {
-    cy.task('stubEMDIPeopleExists505Response')
+    cy.task('stubEMDIPeopleExists503Response')
     cy.visit('/case/X000001/sentence?number=3')
     const page = Page.verifyOnPage(SentencePage)
     page.getElementData('licencesEMDILink').should('not.exist')

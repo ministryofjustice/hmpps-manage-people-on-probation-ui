@@ -33,7 +33,7 @@ interface RequestWithBody extends Request {
   retry?: boolean
 }
 
-export const standard5xxCodes = new Set([500, 501, 502, 503, 504, 505, 506, 507, 508, 511])
+export const standard5xxCodes = new Set(Array.from({ length: 100 }, (_, offset) => 500 + offset))
 
 export default class RestClient {
   agent: Agent

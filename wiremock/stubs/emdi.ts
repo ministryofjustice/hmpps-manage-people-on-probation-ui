@@ -16,7 +16,7 @@ const stubEMDIPeopleExists500Response = (crn: string = 'X000001'): SuperAgentReq
     },
   })
 
-const stubEMDIPeopleExists505Response = (crn: string = 'X000001'): SuperAgentRequest =>
+const stubEMDIPeopleExists503Response = (crn: string = 'X000001'): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     priority: 1,
     request: {
@@ -50,5 +50,5 @@ const stubEMDIPeopleExists404Response = (crn: string = 'X000001'): SuperAgentReq
 export default {
   stubEMDIPeopleExists500Response,
   stubEMDIPeopleExists404Response,
-  stubEMDIPeopleExists505Response,
+  stubEMDIPeopleExists505Response: stubEMDIPeopleExists503Response,
 }
