@@ -1,10 +1,12 @@
 import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
+import * as Sentry from '@sentry/node'
 import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
 import { isValidHost, isValidPath } from '../utils'
 import logger from '../../logger'
 import { ErrorSummary } from './model/common'
+import isTimeoutError from '../utils/isTimeoutError'
 
 jest.mock('../utils/isValidHost', () => {
   return {
@@ -17,8 +19,15 @@ jest.mock('../utils/isValidPath', () => {
   }
 })
 
+jest.mock('@sentry/node', () => ({
+  getClient: jest.fn(),
+  captureException: jest.fn(),
+}))
+
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
+const mockedSentryGetClient = Sentry.getClient as jest.Mock
+const mockedSentryCaptureException = Sentry.captureException as jest.Mock
 let restClient: RestClient
 
 beforeEach(() => {
@@ -384,6 +393,105 @@ describe('RestClient requestWithBody - 400 handling', () => {
         data: requestData,
       }),
     ).rejects.toThrow('http 400: Bad request from API')
+
+    expect(nock.isDone()).toBe(true)
+  })
+})
+
+describe('RestClient.get timeout handling', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedIsValidHost.mockReturnValue(true)
+    mockedIsValidPath.mockReturnValue(true)
+    nock.cleanAll()
+  })
+  it('should return timeoutError when a configured path times out', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/user/123/appointments')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    mockedSentryGetClient.mockReturnValue(null)
+
+    const response = await restClient.get<{
+      timeoutError: ErrorSummary[]
+    }>({
+      path: '/user/123/appointments',
+    })
+
+    expect(response).toEqual({
+      timeoutError: [
+        {
+          text: 'Some information on this page is currently unavailable.',
+        },
+      ],
+    })
+
+    expect(mockedSentryCaptureException).not.toHaveBeenCalled()
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('should not handle timeout for a path that is not configured', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/not-configured')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    await expect(
+      restClient.get({
+        path: '/not-configured',
+        retry: false,
+      }),
+    ).rejects.toThrow('Timeout of 1000ms exceeded')
+
+    expect(mockedSentryCaptureException).not.toHaveBeenCalled()
+    expect(nock.isDone()).toBe(true)
+  })
+
+  it('captures configured path timeouts in Sentry', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/user/123/appointments')
+      .delayConnection(1500)
+      .reply(200, { success: true })
+
+    const sentryClient = {}
+    mockedSentryGetClient.mockReturnValue(sentryClient as any)
+    mockedSentryCaptureException.mockReturnValue('sentry-event-id')
+
+    const response = await restClient.get<{
+      timeoutError: ErrorSummary[]
+    }>({
+      path: '/user/123/appointments',
+    })
+
+    expect(response).toEqual({
+      timeoutError: [
+        {
+          text: 'Some information on this page is currently unavailable.',
+        },
+      ],
+    })
+
+    expect(mockedSentryCaptureException).toHaveBeenCalledTimes(1)
+
+    const [capturedError, captureContext] = mockedSentryCaptureException.mock.calls[0]
+
+    expect(capturedError).toBeDefined()
+    expect(isTimeoutError(capturedError)).toBe(true)
+
+    expect(captureContext).toEqual({
+      tags: {
+        'error.kind': 'timeout',
+        'request.path': '/user/123/appointments',
+        'api.name': 'api-name',
+      },
+    })
 
     expect(nock.isDone()).toBe(true)
   })
