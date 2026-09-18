@@ -33,6 +33,8 @@ export const getPersonalDetails = (
     let probationPractitioner: ProbationPractitioner
     let professionalContact: ProfessionalContact | null
     let personPhotoSrc: string | undefined
+    let arnsUnavailable = false
+    let prisonsUnavailable = false
     let token: string | undefined
     if (!req?.session?.data?.personalDetails?.[crn]) {
       const { username } = res.locals.user
@@ -45,15 +47,24 @@ export const getPersonalDetails = (
       ;[overview, risks, tierCalculation, userCaseload, riskData, probationPractitioner, professionalContact] =
         await Promise.all([
           masClient.getPersonalDetails(crn),
-          arnsClient.getRisks(crn),
+          arnsClient.getRisks(crn).catch((): null => {
+            arnsUnavailable = true
+            return null
+          }),
           tierClient.getCalculationDetails(crn),
           masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-          arnsComponents.getRiskData(authOptions, 'crn', crn),
+          arnsComponents.getRiskData(authOptions, 'crn', crn).catch((): null => {
+            arnsUnavailable = true
+            return null
+          }),
           masClient.getProbationPractitioner(crn),
           masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
         ])
       if (overview.noms) {
-        const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => null)
+        const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => {
+          prisonsUnavailable = true
+          return null
+        })
         personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : undefined
       }
 
@@ -88,6 +99,8 @@ export const getPersonalDetails = (
             probationPractitioner,
             professionalContact,
             personPhotoSrc,
+            arnsUnavailable,
+            prisonsUnavailable,
           },
         },
       }
@@ -101,6 +114,8 @@ export const getPersonalDetails = (
         probationPractitioner,
         professionalContact,
         personPhotoSrc,
+        arnsUnavailable,
+        prisonsUnavailable,
       } = req.session.data.personalDetails[crn])
     }
     res.locals.sentencePlan = sentencePlan
@@ -112,6 +127,8 @@ export const getPersonalDetails = (
     res.locals.probationPractitioner = probationPractitioner
     res.locals.managedBy = getManagedByDetails(crn, professionalContact)
     res.locals.personPhotoSrc = personPhotoSrc
+    res.locals.arnsUnavailable = arnsUnavailable
+    res.locals.prisonsUnavailable = prisonsUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth

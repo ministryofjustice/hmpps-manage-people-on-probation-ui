@@ -116,6 +116,8 @@ interface Locals {
   probationPractitioner?: ProbationPractitioner
   managedBy?: ManagedByDetails
   personPhotoSrc?: string
+  arnsUnavailable?: boolean
+  prisonsUnavailable?: boolean
   tierUrlV3?: string
   dateOfDeath?: string
   personRiskFlags?: PersonRiskFlags
