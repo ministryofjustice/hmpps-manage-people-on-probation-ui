@@ -14,6 +14,10 @@ export type LatestTierV3 = LatestTier & {
     text: 'Missing' | 'Provisional' | 'Unavailable' | null
     color: 'red' | 'orange' | 'grey' | null
   }
+  provisional: boolean
+  tierScore: string
+  calculationId: string
+  calculationDate: string
 }
 
 export interface LatestTierResponse {
