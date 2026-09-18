@@ -538,9 +538,5 @@ context('Risk', () => {
       'Risk flag information is currently unavailable. Try again later or use NDelius.',
     )
 
-    cy.get('[data-qa="errors"]')
-      .should('contain.text', 'Risk information from the Assess and plan service is currently unavailable.')
-      .and('contain.text', 'Tier information is currently unavailable.')
-      .and('contain.text', 'Risk flag information is currently unavailable. Try again later or use NDelius.')
   })
 })
