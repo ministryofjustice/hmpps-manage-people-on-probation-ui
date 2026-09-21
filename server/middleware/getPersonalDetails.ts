@@ -70,13 +70,12 @@ export const getPersonalDetails = (
           masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
         ])
       if (overview.noms) {
-        const photoPromise = new PrisonApiClient(token).getImageData(overview.noms)
-        const photoData = await (isolateApiFailures
-          ? photoPromise.catch((): null => {
-              prisonsUnavailable = true
-              return null
-            })
-          : photoPromise)
+        // The photo fetch has always been caught defensively, regardless of enablePersonHeader -
+        // only whether we report prisonsUnavailable (and show the mojAlert) is flag-gated.
+        const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => {
+          if (isolateApiFailures) prisonsUnavailable = true
+          return null
+        })
         personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : undefined
       }
 

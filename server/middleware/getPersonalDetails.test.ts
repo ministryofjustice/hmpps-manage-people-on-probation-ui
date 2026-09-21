@@ -324,17 +324,17 @@ describe('/middleware/getPersonalDetails', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
 
-    it('does not isolate a Prisons API failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+    it('still renders the header (no crash) but leaves prisonsUnavailable false when enablePersonHeader is off - the photo fetch has always been caught defensively, independent of this flag', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
       jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
-
-      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
-
-      expect(nextSpy).not.toHaveBeenCalled()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(false)
+      expect(nextSpy).toHaveBeenCalled()
     })
 
     it('does not request a photo when there is no NOMS number', async () => {
