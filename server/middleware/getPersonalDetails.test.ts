@@ -448,6 +448,18 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(req.session.data.personalDetails.X000002).toBeUndefined()
     })
+
+    it('still initialises req.session.data on a degraded result when it did not exist yet, so downstream middleware (e.g. getPersonRiskFlags) does not crash on a fresh session', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = httpMocks.createRequest({ params: { crn: 'X000002' }, session: {} })
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(req.session.data).toBeDefined()
+      expect(req.session.data.personalDetails?.X000002).toBeUndefined()
+    })
   })
 
   describe('ndelius', () => {

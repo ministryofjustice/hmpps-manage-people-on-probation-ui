@@ -112,26 +112,26 @@ export const getPersonalDetails = (
           logger.error(error, 'Failed to connect to Assessment Platform API.')
         }
       }
+      // Always initialise req.session.data - downstream middleware (e.g. getPersonRiskFlags)
+      // relies on it existing regardless of whether this request's result is degraded.
+      req.session.data = req?.session?.data ?? {}
       // Don't cache a degraded result - an ARNS/Prisons failure is transient, so the next
       // request for this CRN should retry rather than being stuck with the failure for the
       // rest of the session.
       if (!arnsUnavailable && !prisonsUnavailable) {
-        req.session.data = {
-          ...(req?.session?.data ?? {}),
-          personalDetails: {
-            ...(req?.session?.data?.personalDetails ?? {}),
-            [crn]: {
-              overview,
-              sentencePlan,
-              risks,
-              tierCalculation,
-              riskData,
-              probationPractitioner,
-              professionalContact,
-              personPhotoSrc,
-              arnsUnavailable,
-              prisonsUnavailable,
-            },
+        req.session.data.personalDetails = {
+          ...(req.session.data.personalDetails ?? {}),
+          [crn]: {
+            overview,
+            sentencePlan,
+            risks,
+            tierCalculation,
+            riskData,
+            probationPractitioner,
+            professionalContact,
+            personPhotoSrc,
+            arnsUnavailable,
+            prisonsUnavailable,
           },
         }
       }
