@@ -364,6 +364,19 @@ describe('/middleware/getPersonalDetails', () => {
     })
   })
 
+  describe('ndelius', () => {
+    it('AC1: does not isolate an NDelius (MAS personal details) failure, so it fails the whole page', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+      expect(res.locals.headerCRN).toBeUndefined()
+    })
+  })
+
   it('should set the local variable if date of death is recorded', async () => {
     req = getReq()
     res = getRes()

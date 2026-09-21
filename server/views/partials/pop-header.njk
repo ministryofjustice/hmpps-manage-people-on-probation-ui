@@ -12,10 +12,23 @@
     {% set headerErrors = (headerErrors.push({ text: "Risk information from the ARNS service is currently unavailable." }), headerErrors) %}
 {% endif %}
 {% if headerErrors.length %}
-    {{ govukErrorSummary({
-        titleText: "There is a problem",
-        errorList: headerErrors,
-        attributes: { "data-qa": "headerErrors" }
+    {% set headerErrorsHtml %}
+        {% if headerErrors.length > 1 %}
+            <ul class="govuk-!-margin-top-0">
+            {% for error in headerErrors %}
+                <li>{{ error.text }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <span>{{ headerErrors[0].text }}</span>
+        {% endif %}
+    {% endset %}
+    {{ mojAlert({
+        variant: "error",
+        title: "There is a problem",
+        showTitleAsHeading: true,
+        attributes: { "data-qa": "headerErrors" },
+        html: headerErrorsHtml
     }) }}
 {% endif %}
 
