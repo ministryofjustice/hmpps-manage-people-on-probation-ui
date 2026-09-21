@@ -16,6 +16,11 @@ $no-score-border-colour: #505a5f;
 $no-score-background-colour: #ffffff;
 $mappa-colour: #4c2c92;
 
+// MPoP project colour aliases for badges and consistent black
+$risk-badge-high: #d4351c;
+$badge-color: #0b0c0c;
+
+
 @import '../../node_modules/govuk-frontend/dist/govuk/index';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
 @import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/all';
@@ -616,7 +621,7 @@ body.feature-disabled {
 
 .feedback-prompt {
   background-color: #f3f2f1;
-  color: #0b0c0c;
+  color: $badge-color;
   border-top: 1px solid #b1b4b6;
   outline: 0;
   margin-top: 60px;
