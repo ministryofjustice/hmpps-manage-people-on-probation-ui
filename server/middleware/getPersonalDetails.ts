@@ -44,27 +44,39 @@ export const getPersonalDetails = (
       const tierClient = new TierApiClient(token)
       const arnsAssessmentPlatformClient = new ArnsAssessmentPlatformApiClient(token)
       const authOptions = asUser(res.locals.user.token)
+      // Failure isolation (MAN-2840) is only applied for the new person-header - the legacy
+      // header keeps its original behaviour, where an ARNS/Prisons failure fails the whole page.
+      const isolateApiFailures = res.locals.flags?.enablePersonHeader
+      const risksPromise = arnsClient.getRisks(crn)
+      const riskDataPromise = arnsComponents.getRiskData(authOptions, 'crn', crn)
       ;[overview, risks, tierCalculation, userCaseload, riskData, probationPractitioner, professionalContact] =
         await Promise.all([
           masClient.getPersonalDetails(crn),
-          arnsClient.getRisks(crn).catch((): null => {
-            arnsUnavailable = true
-            return null
-          }),
+          isolateApiFailures
+            ? risksPromise.catch((): null => {
+                arnsUnavailable = true
+                return null
+              })
+            : risksPromise,
           tierClient.getCalculationDetails(crn),
           masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-          arnsComponents.getRiskData(authOptions, 'crn', crn).catch((): null => {
-            arnsUnavailable = true
-            return null
-          }),
+          isolateApiFailures
+            ? riskDataPromise.catch((): null => {
+                arnsUnavailable = true
+                return null
+              })
+            : riskDataPromise,
           masClient.getProbationPractitioner(crn),
           masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
         ])
       if (overview.noms) {
-        const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => {
-          prisonsUnavailable = true
-          return null
-        })
+        const photoPromise = new PrisonApiClient(token).getImageData(overview.noms)
+        const photoData = await (isolateApiFailures
+          ? photoPromise.catch((): null => {
+              prisonsUnavailable = true
+              return null
+            })
+          : photoPromise)
         personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : undefined
       }
 

@@ -146,21 +146,7 @@ describe('pop-header.njk API failure handling', () => {
       expect(html).toContain('govuk-tag')
     })
 
-    it('AC2: ARNS failure hides the risk badges and shows the ARNS message', () => {
-      const html = render(
-        legacyContext({
-          arnsUnavailable: true,
-          riskData: null,
-          risksWidget: toRoshWidget(null),
-        }),
-      )
-
-      expect(html).toContain('data-qa="headerErrors"')
-      expect(html).toContain('Risk information from the ARNS service is currently unavailable.')
-      expect(html).not.toContain('govuk-tag')
-    })
-
-    it('AC4: both failures show a bulleted list with both messages, Photos first', () => {
+    it('never shows the error summary, even when arnsUnavailable/prisonsUnavailable are set, because this feature is gated behind enablePersonHeader', () => {
       const html = render(
         legacyContext({
           arnsUnavailable: true,
@@ -170,21 +156,9 @@ describe('pop-header.njk API failure handling', () => {
         }),
       )
 
-      expect(html).toContain('data-qa="headerErrors"')
-      expect(html).toContain('<ul')
-      expect(html.indexOf('Photos and throughcare')).toBeLessThan(html.indexOf('Risk information from the ARNS'))
-    })
-
-    it('AC5: the error summary appears above the header content', () => {
-      const html = render(
-        legacyContext({
-          arnsUnavailable: true,
-          riskData: null,
-          risksWidget: toRoshWidget(null),
-        }),
-      )
-
-      expect(html.indexOf('data-qa="headerErrors"')).toBeLessThan(html.indexOf('data-qa="legacy-pop-header"'))
+      expect(html).not.toContain('data-qa="headerErrors"')
+      expect(html).not.toContain('Risk information from the ARNS service is currently unavailable.')
+      expect(html).not.toContain('Photos and throughcare information are currently unavailable.')
     })
   })
 })

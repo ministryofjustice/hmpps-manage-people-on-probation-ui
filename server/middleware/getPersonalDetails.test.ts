@@ -310,17 +310,31 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.prisonsUnavailable).toBe(false)
     })
 
-    it('leaves personPhotoSrc undefined, sets prisonsUnavailable, and still renders the header, when the Prisons API fails', async () => {
+    it('leaves personPhotoSrc undefined, sets prisonsUnavailable, and still renders the header, when the Prisons API fails and enablePersonHeader is on', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
       jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('does not isolate a Prisons API failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
     })
 
     it('does not request a photo when there is no NOMS number', async () => {
@@ -335,21 +349,23 @@ describe('/middleware/getPersonalDetails', () => {
   })
 
   describe('arns', () => {
-    it('sets arnsUnavailable and still renders the header when getRisks fails', async () => {
+    it('sets arnsUnavailable and still renders the header when getRisks fails and enablePersonHeader is on', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
     })
 
-    it('sets arnsUnavailable and still renders the header when getRiskData fails', async () => {
+    it('sets arnsUnavailable and still renders the header when getRiskData fails and enablePersonHeader is on', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
@@ -361,6 +377,28 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.arnsUnavailable).toBe(false)
+    })
+
+    it('does not isolate an ARNS getRisks failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not isolate an ARNS getRiskData failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
     })
   })
 

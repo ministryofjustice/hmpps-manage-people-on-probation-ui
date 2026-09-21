@@ -11,7 +11,7 @@
 {% if arnsUnavailable %}
     {% set headerErrors = (headerErrors.push({ text: "Risk information from the ARNS service is currently unavailable." }), headerErrors) %}
 {% endif %}
-{% if headerErrors.length %}
+{% if flags.enablePersonHeader and headerErrors.length %}
     {% set headerErrorsHtml %}
         {% if headerErrors.length > 1 %}
             <ul class="govuk-!-margin-top-0">
