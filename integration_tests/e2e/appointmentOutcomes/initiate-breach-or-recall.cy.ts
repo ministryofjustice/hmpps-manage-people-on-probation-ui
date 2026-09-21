@@ -130,16 +130,50 @@ const getExpectedOptions = ({
 }
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
-  it('should render the page if sentence type is COMMUNITY', () => {
-    loadPage({ journey })
-    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
-    initiateBreachOrRecallPage.checkPageTitle('Initiate a breach')
-    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    cy.get('legend').should('contain.text', 'Who will create the breach NSI (non-statutory intervention)?')
-    const options = getExpectedOptions()
-    checkOptions(options)
-    cy.get('[data-module="govuk-radios"]').should('have.length', 1)
+  describe('sentence type is COMMUNITY', { testIsolation: false }, () => {
+    before(() => {
+      loadPage({ journey })
+    })
+    it('should render the page', () => {
+      initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+      initiateBreachOrRecallPage.checkPageTitle('Initiate a breach')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+      cy.get('legend').should('contain.text', 'Who will create the breach NSI (non-statutory intervention)?')
+      const options = getExpectedOptions()
+      checkOptions(options)
+      cy.get('[data-module="govuk-radios"]').should('have.length', 1)
+    })
+    it('should have the correct back link', () => {
+      let expectedLink: string
+      getUuid(3).then(uuid => {
+        if (journey === 'MANAGE') {
+          expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome/attended-failed-to-comply`
+        } else {
+          expectedLink = `/case/${crn}/arrange-appointment/${uuid}/outcome/attended-failed-to-comply`
+        }
+        attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
+      })
+    })
+    it('should show validation error when no option is selected for breach/recall enforcement action', () => {
+      const msg = 'Select who will create the breach NSI'
+      initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+      uncheckAllRadios()
+      initiateBreachOrRecallPage.getSubmitBtn().click()
+      initiateBreachOrRecallPage.checkErrorSummaryBox([msg])
+      getUuid(3).then(uuid => {
+        const id = journey === 'MANAGE' ? appointmentId : uuid
+        cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', msg)
+      })
+    })
+    it('should redirect to the correct page when an option is selected', () => {
+      cy.get('.govuk-radios__item').eq(0).find('input').click()
+      initiateBreachOrRecallPage.getSubmitBtn().click()
+      addNotePage = new AddNotePage()
+      addNotePage.checkOnPage()
+      addNotePage.getBackLink().click()
+    })
   })
+
   it('should render the page if sentence type is CUSTODY', () => {
     loadPage({ journey, sentenceType: 'CUSTODY' })
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
@@ -215,18 +249,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     cy.get('[data-module="govuk-radios"]').should('have.length', 3)
   })
 
-  it('should have the correct back link', () => {
-    loadPage({ journey })
-    let expectedLink: string
-    getUuid(3).then(uuid => {
-      if (journey === 'MANAGE') {
-        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome/attended-failed-to-comply`
-      } else {
-        expectedLink = `/case/${crn}/arrange-appointment/${uuid}/outcome/attended-failed-to-comply`
-      }
-      attendedFailedToComplyPage.getBackLink().should('have.attr', 'href', expectedLink)
-    })
-  })
   it('should show validation errors when no options are selected for send letter enforcement action for a custody sentence', () => {
     loadPage({ journey, sentenceType: 'CUSTODY', sendLetter: true })
     initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
@@ -250,59 +272,45 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     })
   })
 
-  it('should show validation error when no option is selected for breach/recall enforcement action', () => {
-    const msg = 'Select who will create the breach NSI'
-    loadPage({ journey })
-    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
-    uncheckAllRadios()
-    initiateBreachOrRecallPage.getSubmitBtn().click()
-    initiateBreachOrRecallPage.checkErrorSummaryBox([msg])
-    getUuid(3).then(uuid => {
-      const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', msg)
+  describe('sentence type is community and send letter is true', { testIsolation: false }, () => {
+    before(() => {
+      loadPage({ journey, sendLetter: true })
     })
-  })
-
-  it('should show validation errors when no options are selected for send letter enforcement action', () => {
-    loadPage({ journey, sendLetter: true })
-    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
-    initiateBreachOrRecallPage.getSubmitBtn().click()
-    initiateBreachOrRecallPage.checkErrorSummaryBox(msgs)
-    getUuid(3).then(uuid => {
-      const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', msgs[0])
-      cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
-      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
+    it('should show validation errors when no options are selected', () => {
+      loadPage({ journey, sendLetter: true })
+      initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+      initiateBreachOrRecallPage.getSubmitBtn().click()
+      initiateBreachOrRecallPage.checkErrorSummaryBox(msgs)
+      getUuid(3).then(uuid => {
+        const id = journey === 'MANAGE' ? appointmentId : uuid
+        cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('contain.text', msgs[0])
+        cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
+        cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
+      })
     })
-  })
-  it('should show validation errors when only the first option is selected for send letter enforcement action', () => {
-    loadPage({ journey, sendLetter: true })
-    initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
-    cy.get('[data-module="govuk-radios"]').eq(0).find('.govuk-radios__item').eq(0).find('input').click()
-    initiateBreachOrRecallPage.getSubmitBtn().click()
-    initiateBreachOrRecallPage.checkErrorSummaryBox([msgs[1], msgs[2]])
-    getUuid(3).then(uuid => {
-      const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('not.exist')
-      cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
-      cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
+    it('should show validation errors when only the first option is selected', () => {
+      loadPage({ journey, sendLetter: true })
+      initiateBreachOrRecallPage = new InitiateBreachOrRecallPage()
+      cy.get('[data-module="govuk-radios"]').eq(0).find('.govuk-radios__item').eq(0).find('input').click()
+      initiateBreachOrRecallPage.getSubmitBtn().click()
+      initiateBreachOrRecallPage.checkErrorSummaryBox([msgs[1], msgs[2]])
+      getUuid(3).then(uuid => {
+        const id = journey === 'MANAGE' ? appointmentId : uuid
+        cy.get(`#appointments-${crn}-${id}-outcome-breachNSICreatedBy-error`).should('not.exist')
+        cy.get(`#appointments-${crn}-${id}-outcome-letterSentBy-error`).should('contain.text', msgs[1])
+        cy.get(`#appointments-${crn}-${id}-outcome-letterType-error`).should('contain.text', msgs[2])
+      })
     })
-  })
-  it('should redirect to the correct page when an option is selected', () => {
-    loadPage({ journey })
-    cy.get('.govuk-radios__item').eq(0).find('input').click()
-    initiateBreachOrRecallPage.getSubmitBtn().click()
-    addNotePage = new AddNotePage()
-    addNotePage.checkOnPage()
-  })
-  it('should redirect to the correct page when all options are selected for send letter enforcement action', () => {
-    loadPage({ journey, sendLetter: true })
-    cy.get('[data-module="govuk-radios"]').eq(0).find('.govuk-radios__item').eq(0).find('input').click()
-    cy.get('[data-module="govuk-radios"]').eq(1).find('.govuk-radios__item').eq(0).find('input').click()
-    cy.get('[data-module="govuk-radios"]').eq(2).find('.govuk-radios__item').eq(0).find('input').click()
-    initiateBreachOrRecallPage.getSubmitBtn().click()
-    addNotePage = new AddNotePage()
-    addNotePage.checkOnPage()
+    it('should redirect to the correct page when all options are selected', () => {
+      loadPage({ journey, sendLetter: true })
+      cy.get('[data-module="govuk-radios"]').eq(0).find('.govuk-radios__item').eq(0).find('input').click()
+      cy.get('[data-module="govuk-radios"]').eq(1).find('.govuk-radios__item').eq(0).find('input').click()
+      cy.get('[data-module="govuk-radios"]').eq(2).find('.govuk-radios__item').eq(0).find('input').click()
+      initiateBreachOrRecallPage.getSubmitBtn().click()
+      addNotePage = new AddNotePage()
+      addNotePage.checkOnPage()
+      addNotePage.getBackLink().click()
+    })
   })
 
   checkBreachOrRecallWarningBanner(loadPage, InitiateBreachOrRecallPage)

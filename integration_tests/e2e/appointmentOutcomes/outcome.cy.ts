@@ -15,7 +15,7 @@ import AcceptableAbsencePage from '../../pages/appointmentOutcomes/acceptable-ab
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
 import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptable-absence.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
-import { ExpectedOption, Journey, checkOptionRedirects } from './imports'
+import { ExpectedOption, Journey, checkOptionRedirects, checkOptionRedirectsNoBacklink } from './imports'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
@@ -195,7 +195,7 @@ describe('Appointment outcome', () => {
       cy.go('back')
     })
     it('check untested redirect option for future appointment', () => {
-      checkOptionRedirects(options, OutcomePage)
+      checkOptionRedirectsNoBacklink(options, OutcomePage)
     })
     it('backLink goes to previous page', () => {
       outcomePage.getCancelGoBackLink().click()
