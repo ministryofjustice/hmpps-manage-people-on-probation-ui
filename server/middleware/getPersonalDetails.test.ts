@@ -12,6 +12,7 @@ import PrisonApiClient from '../data/prisonApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
+import { RiskSummary } from '../data/model/risk'
 import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
@@ -371,6 +372,42 @@ describe('/middleware/getPersonalDetails', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
 
+    it('sets arnsUnavailable when getRisks resolves an error-summary object (real 500/401 behaviour, not a rejection)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockResolvedValueOnce({
+        errors: [{ text: 'Risk information from the ARNS service is currently unavailable.' }],
+      } as unknown as RiskSummary)
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.risksWidget.overallRisk).toBe('NOT_FOUND')
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable when getRiskData resolves a non-200/404 httpStatus (real 500/401 behaviour, not a rejection)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 500 })
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.riskData).toBeNull()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('leaves arnsUnavailable false when getRiskData resolves httpStatus 404 (legitimately no data, not a failure)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 404 })
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(false)
+    })
+
     it('leaves arnsUnavailable false when both ARNS calls succeed', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       req = getReq()
@@ -399,6 +436,17 @@ describe('/middleware/getPersonalDetails', () => {
       await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
 
       expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not cache a degraded (arnsUnavailable) result, so the next request for this CRN retries', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(req.session.data.personalDetails.X000002).toBeUndefined()
     })
   })
 

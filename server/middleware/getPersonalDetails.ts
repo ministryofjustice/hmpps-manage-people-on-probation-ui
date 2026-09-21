@@ -12,6 +12,7 @@ import { tierLink, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
+import { ErrorSummary } from '../data/model/common'
 import { PersonRiskFlags, RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
@@ -69,6 +70,20 @@ export const getPersonalDetails = (
           masClient.getProbationPractitioner(crn),
           masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
         ])
+      if (isolateApiFailures) {
+        // ArnsApiClient.getRisks resolves an error-summary object (not a rejection) for
+        // 401/500 responses - detect that shape the same way server/controllers/alerts.ts does.
+        if (risks && (risks as unknown as ErrorSummary).errors !== undefined) {
+          arnsUnavailable = true
+          risks = null as unknown as RiskSummary
+        }
+        // ArnsComponents.getRiskData resolves { assessments: [], httpStatus } for any failure
+        // (including 401/500) instead of rejecting - httpStatus 404 is a legitimate "no data".
+        if (riskData && riskData.httpStatus !== 200 && riskData.httpStatus !== 404) {
+          arnsUnavailable = true
+          riskData = null as unknown as RiskData
+        }
+      }
       if (overview.noms) {
         // The photo fetch has always been caught defensively, regardless of enablePersonHeader -
         // only whether we report prisonsUnavailable (and show the mojAlert) is flag-gated.
@@ -97,23 +112,28 @@ export const getPersonalDetails = (
           logger.error(error, 'Failed to connect to Assessment Platform API.')
         }
       }
-      req.session.data = {
-        ...(req?.session?.data ?? {}),
-        personalDetails: {
-          ...(req?.session?.data?.personalDetails ?? {}),
-          [crn]: {
-            overview,
-            sentencePlan,
-            risks,
-            tierCalculation,
-            riskData,
-            probationPractitioner,
-            professionalContact,
-            personPhotoSrc,
-            arnsUnavailable,
-            prisonsUnavailable,
+      // Don't cache a degraded result - an ARNS/Prisons failure is transient, so the next
+      // request for this CRN should retry rather than being stuck with the failure for the
+      // rest of the session.
+      if (!arnsUnavailable && !prisonsUnavailable) {
+        req.session.data = {
+          ...(req?.session?.data ?? {}),
+          personalDetails: {
+            ...(req?.session?.data?.personalDetails ?? {}),
+            [crn]: {
+              overview,
+              sentencePlan,
+              risks,
+              tierCalculation,
+              riskData,
+              probationPractitioner,
+              professionalContact,
+              personPhotoSrc,
+              arnsUnavailable,
+              prisonsUnavailable,
+            },
           },
-        },
+        }
       }
     } else {
       ;({
