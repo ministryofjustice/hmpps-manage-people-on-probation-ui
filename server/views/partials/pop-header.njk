@@ -1,6 +1,8 @@
 {% from "mpop/components/pop-header/macro.njk" import popHeader %}
 {% from "mpop/components/person-header/macro.njk" import personHeader %}
 
+{% set calculation = tierDetails.calculation %}
+
 {% set overallRisk = risksWidget.overallRisk %}
 {% if overallRisk == 'VERY_HIGH' %}
     {% set overallRisk = 'VERY HIGH' %}
@@ -55,10 +57,11 @@
         name: headerPersonName.forename + ' ' + headerPersonName.surname,
         crn: headerCRN,
         dob: headerDob | dateWithYear,
-        tier: (tierDetails.calculation.tierScore if flags.enablePersonHeaderTierV3 else tierCalculation.tierScore) | convertToTitleCase,
+        tier: (calculation.tierScore if flags.enablePersonHeaderTierV3 else tierCalculation.tierScore) | convertToTitleCase,
         historyHref: tierUrlV3 if flags.enablePersonHeaderTierV3 else headerTierLink,
         managedBy: managedBy.text,
         managedByHref: managedBy.href,
+        photo: personPhotoSrc,
         riskBadges: riskBadges
     }) }}
 {% else %}
@@ -67,12 +70,11 @@
             {% if flags.enableSupervisionPackagePoPHeader %}
                 <div data-qa="new-pop-header">
                 {{ popHeader({
-                crn:headerCRN,
-                dob: headerDob | dateWithYear,
-                age: headerDob | yearsSince,
-                tierScore: tierDetails.calculation.tierScore | convertToTitleCase,
-                historyHref: tierUrlV3
-            }) }}
+                    crn: headerCRN,
+                    dob: headerDob | dateWithYear,
+                    age: headerDob | yearsSince,
+                    historyHref: tierUrlV3
+                } | merge(calculation or {}) | merge({ tierScore: (calculation.tierScore if calculation else '') | convertToTitleCase })) }}
                 </div>
             {% else %}
                 <ul data-qa="legacy-pop-header" class="govuk-list govuk-caption-m inline-list-from-tablet">

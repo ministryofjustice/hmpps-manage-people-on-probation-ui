@@ -5,12 +5,13 @@ import { Provider, Team, User } from '../data/model/caseload'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import logger from '../../logger'
 import { logSessionCacheChange } from '../utils/logSessionCacheChange'
+import { getUserProviders } from './getUserProviders'
 
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getUserOptionsInner(req, res, next?) {
     const { username } = res.locals.user
     const { crn, id } = req.params as Record<string, string>
-    const { providerCode: providerCodeQuery, teamCode: teamCodeQuery } = req.query as Record<string, string>
+    let { providerCode: providerCodeQuery, teamCode: teamCodeQuery } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
     const { data } = req.session
@@ -23,6 +24,14 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       username,
       crn,
       enabled: res.locals.flags?.enableSessionCacheLogging,
+    }
+
+    if (req.query['update-btn'] === '' && res.locals.flags?.enableAttendeeUpdates) {
+      const noJSProvider = req.query[`[appointments][${crn}][${id}][temp][providerCode]`] as string
+      providerCodeQuery = noJSProvider
+      const noJSTeam = req.query[`[appointments][${crn}][${id}][temp][teamCode]`] as string
+      const providerCheck = await masClient.getUserProviders(username, noJSProvider)
+      teamCodeQuery = providerCheck.teams.find(team => team.code === noJSTeam)?.code
     }
 
     const providerCode =

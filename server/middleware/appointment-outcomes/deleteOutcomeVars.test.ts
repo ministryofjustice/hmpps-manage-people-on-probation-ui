@@ -11,6 +11,7 @@ const req = httpMocks.createRequest({
         [crn]: {
           linkedContactId: '1234',
           nextAppointmentId: '5678',
+          nextAppointment: {},
         },
       },
     },
@@ -24,5 +25,6 @@ describe('/middleware/appointment-outcomes/deleteOutcomeVars', () => {
     deleteOutcomeVars(crn)(req, res)
     expect(req.session.data.temp[crn].linkedContactId).toBeUndefined()
     expect(req.session.data.temp[crn].nextAppointmentId).toBeUndefined()
+    expect(req.session.data.temp[crn].nextAppointment).toBeUndefined()
   })
 })

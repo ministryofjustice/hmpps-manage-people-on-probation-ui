@@ -22,6 +22,7 @@ interface Request {
   handle404?: boolean
   handle415?: boolean
   handle500?: boolean
+  handle5xxRange?: boolean
   handle401?: boolean
   errorMessage?: string
   file?: Express.Multer.File
@@ -33,6 +34,8 @@ interface RequestWithBody extends Request {
   data?: Record<string, any>
   retry?: boolean
 }
+
+export const standard5xxCodes = new Set(Array.from({ length: 100 }, (_, offset) => 500 + offset))
 
 export default class RestClient {
   agent: Agent
@@ -61,6 +64,7 @@ export default class RestClient {
     raw = false,
     handle404 = false,
     handle500 = false,
+    handle5xxRange = false,
     handle401 = false,
     errorMessage = '',
     retry = true,
@@ -92,6 +96,7 @@ export default class RestClient {
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
+
       return raw ? (result as TResponse) : result.body
     } catch (error: any) {
       if (matchesTimeoutPath(path, timeoutUrlPaths) && isTimeoutError(error)) {
@@ -113,6 +118,13 @@ export default class RestClient {
           ...(error.response ?? {}),
           timeoutError: warnings,
         }
+      }
+      if (handle5xxRange && standard5xxCodes.has(error?.response?.status)) {
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({ text: errorMessage })
+        error.response.errors = warnings
+        logger.info('Handling 5xx range; current code: ', error?.response?.status)
+        return error.response
       }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []

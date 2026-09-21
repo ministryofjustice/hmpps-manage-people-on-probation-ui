@@ -30,6 +30,8 @@ const username = 'user-1'
 const locationCode = '1234'
 const appointmentLocation = 'Leamington Probation Office'
 const buildingName = 'Building One'
+const practitionerEmail = 'test@test.com'
+const practitionerFirstName = 'Sam'
 
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const date = '2026-12-22'
@@ -46,6 +48,8 @@ const constructMockAppointmentSession = (smsPreviewRequest = {}): AppointmentSes
     username,
     teamCode: 'mock-team-code',
     locationCode,
+    email: practitionerEmail,
+    name: { forename: practitionerFirstName, surname: 'Practitioner' },
   },
   eventId: '1',
   type,
@@ -60,6 +64,8 @@ const constructMockAppointmentSession = (smsPreviewRequest = {}): AppointmentSes
       dateAndTimeOfAppointment: `${date}T${start}:00.000+00:00`,
       appointmentTypeCode: type,
       includeWelshPreview: false,
+      recipientEmail: practitionerEmail,
+      practitionerFirstName,
       appointmentLocation,
       ...(smsPreviewRequest ?? {}),
     },
@@ -139,6 +145,8 @@ describe('middleware/getSmsPreview', () => {
     const mockAppointmentSession = constructMockAppointmentSession()
     return {
       firstName: 'James',
+      recipientEmail: 'test@test.com',
+      practitionerFirstName: 'Sam',
       appointmentLocation,
       dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
       includeWelshPreview: false,
@@ -168,6 +176,8 @@ describe('middleware/getSmsPreview', () => {
     const expectedRequestBody: SmsPreviewRequest = {
       firstName: 'James',
       appointmentLocation,
+      recipientEmail: practitionerEmail,
+      practitionerFirstName,
       dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
       includeWelshPreview: false,
       appointmentTypeCode: mockAppointmentSession.type,
@@ -195,6 +205,46 @@ describe('middleware/getSmsPreview', () => {
     it('should return next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
+  })
+
+  describe('SMS preview session recipient email does not match request', () => {
+    const requestBody = getRequestBody()
+    const expectedSession = { request: requestBody, preview: mockSmsPreview }
+    const req = buildRequest({
+      appointment: {
+        ...constructMockAppointmentSession(),
+        smsPreview: {
+          request: { ...requestBody, recipientEmail: 'previous.practitioner@example.com' },
+          preview: mockSmsPreview,
+        },
+      },
+    })
+
+    beforeEach(async () => {
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    })
+
+    apiRequestChecks(req.session.data, requestBody, expectedSession)
+  })
+
+  describe('SMS preview session practitioner first name does not match request', () => {
+    const requestBody = getRequestBody()
+    const expectedSession = { request: requestBody, preview: mockSmsPreview }
+    const req = buildRequest({
+      appointment: {
+        ...constructMockAppointmentSession(),
+        smsPreview: {
+          request: { ...requestBody, practitionerFirstName: 'Previous' },
+          preview: mockSmsPreview,
+        },
+      },
+    })
+
+    beforeEach(async () => {
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    })
+
+    apiRequestChecks(req.session.data, requestBody, expectedSession)
   })
 
   describe('SMS preview session location does not match request', () => {
@@ -249,9 +299,13 @@ describe('middleware/getSmsPreview', () => {
   })
 
   describe('No location code in appointment session', () => {
+    const appointmentSession = constructMockAppointmentSession()
     const appointment: AppointmentSession = {
-      ...constructMockAppointmentSession(),
-      user: { locationCode: null },
+      ...appointmentSession,
+      user: {
+        ...appointmentSession.user,
+        locationCode: null,
+      },
     }
     const req = buildRequest({ appointment })
     beforeEach(async () => {
@@ -298,6 +352,8 @@ describe('middleware/getSmsPreview', () => {
       dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
       includeWelshPreview: true,
       appointmentTypeCode: mockAppointmentSession.type,
+      recipientEmail: practitionerEmail,
+      practitionerFirstName,
     }
     beforeEach(async () => {
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)

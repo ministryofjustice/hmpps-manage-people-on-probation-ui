@@ -17,6 +17,7 @@ import {
   completeTextMessageConfirmationPage,
   completeSupportingInformationPage,
 } from './utils'
+import ErrorPage from '../../pages/error'
 
 const mockData = mockResponse as Wiremock
 
@@ -86,20 +87,8 @@ describe('Arrange an appointment', () => {
         })
       })
 
-      describe('enableNonCompliance flag', () => {
-        it('should display the bullet point for non-compliance if enableNonCompliance is false', () => {
-          cy.task('stubDisableNonCompliance')
-          loadPage()
-          typePage = Page.verifyOnPage(AppointmentTypePage)
-          typePage
-            .getInsetText()
-            .find('ul')
-            .find('li')
-            .should('contain.text', 'appointments you know have non-attendance or non-compliance')
-          checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
-        })
-
-        it('should not display the bullet point for non-compliance if enableNonCompliance is true', () => {
+      describe('Non-compliance', () => {
+        it('should not display the bullet point for non-compliance', () => {
           loadPage()
           typePage = Page.verifyOnPage(AppointmentTypePage)
           typePage
@@ -294,6 +283,16 @@ describe('Arrange an appointment', () => {
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Peter Parker (PS-PSO) (Automated Allocation Team, London)')
+    })
+    it('should refresh to error page if API call fails', () => {
+      cy.get('[data-qa="attendee"] a').click()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
+      cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
+      cy.get('[data-qa="providerCode"]').select('N50')
+      cy.get('[data-qa="teamCode"]').select('N50AHA')
+      const page = new ErrorPage()
+      page.checkPageTitle('Sorry, there is a problem with the service')
     })
   })
 })

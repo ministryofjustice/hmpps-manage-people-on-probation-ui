@@ -1,6 +1,5 @@
 {% set changePath = "/case/" + crn + "/arrange-appointment/"  + id %}
-{% set changeOutcomePath = (changePath + "/outcome")if flags.enableNonCompliance else
-    changePath %}
+{% set changeOutcomePath = changePath + "/outcome" %}
 {% set insertText = "You'll receive a calendar invite for the appointment." %}
 {% set sentenceHtml %}
 {% if appointment.appointmentFor.sentence %}
@@ -154,7 +153,7 @@
                 { href: appointmentOutcome.baseOutcomeUrl + "?change=" + url, text: 'Change', visuallyHiddenText: 'outcome of this appointment' }
             ]
         }
-    } if appointmentOutcome.summary.outcome and flags.enableNonCompliance and isInPast,
+    } if appointmentOutcome.summary.outcome and isInPast,
     {
         key: { text: 'Enforcement action' },
         value: { html: appointmentOutcome.summary.enforcementAction  | replace('\n', '<br>') | safe },
@@ -163,7 +162,7 @@
                 { href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url, text: 'Change', visuallyHiddenText: 'enforcement action' }
             ]
         }
-    } if appointmentOutcome.summary.enforcementAction and flags.enableNonCompliance and isInPast,
+    } if appointmentOutcome.summary.enforcementAction and isInPast,
     {
         key: { text:'Evidence due date' },
         value: { text: appointmentOutcome.summary.evidenceDueDate },
@@ -172,7 +171,7 @@
                 { href: appointmentOutcome.summary.enforcementActionChangeLink + "?change=" + url, text: 'Change', visuallyHiddenText: 'evidence due date' }
             ]
         }
-    } if appointmentOutcome.summary.evidenceDueDate and flags.enableNonCompliance and isInPast,
+    } if appointmentOutcome.summary.evidenceDueDate and isInPast,
 
            { key: { text: "Text message confirmation" },
     value: { html: textMessageConfirmationHtml + ('<span class="govuk-summary-list__hint">' + noDateHint + '</span>' if not appointment.date )  },
@@ -184,21 +183,11 @@
      }
      ]
      } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast,
-       { key: { text: "Attended and complied" },
-    value: { html: appointment.outcomeRecorded },
-    actions: {
-    items: [ {
-    href: changePath + "/attended-complied?change=" + url,
-    text: "Change",
-    visuallyHiddenText: "outcome recorded"
-     }
-     ]
-     } if showAction } if appointment.outcomeRecorded and not flags.enableNonCompliance,
        { key: { text: "Notes" if isInPast else "Supporting information" },
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ {
-    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url,
+    href:   (appointmentOutcome.baseOutcomeUrl + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url,
     text: "Change",
     visuallyHiddenText: "notes"
      }
@@ -208,7 +197,7 @@
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ {
-    href:   ((appointmentOutcome.baseOutcomeUrl if flags.enableNonCompliance else changePath) + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url,
+    href:   (appointmentOutcome.baseOutcomeUrl + "/add-note" if isInPast else changePath + "/supporting-information") + "?change=" + url,
     text: "Choose sensitivity" if not appointment.sensitivity else "Change",
     visuallyHiddenText: "sensitivity"
      }

@@ -73,7 +73,15 @@ const setNoFixedAddressConditional = () => {
   }
 }
 
-const attendanceSelectors = () => {
+function removeOptions(selectElement) {
+  let i
+  const L = selectElement.options.length - 1
+  for (i = L; i >= 0; i -= 1) {
+    selectElement.remove(i)
+  }
+}
+
+const attendanceSelectorsOld = () => {
   const providerSelect = document.querySelector('[data-qa="providerCode"]')
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
   const params = new URL(window.location.toString()).searchParams
@@ -98,6 +106,110 @@ const attendanceSelectors = () => {
       const uuid = urlParts[6]
       const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
       location.href = `${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
+    })
+  }
+}
+
+const attendanceSelectorsNew = () => {
+  const providerSelect = document.querySelector('[data-qa="providerCode"]')
+  const teamSelect = document.querySelector('[data-qa="teamCode"]')
+  const userSelect = document.querySelector('[data-qa="username"]')
+  const updateButton = document.getElementById('update-btn')
+  if (updateButton) {
+    updateButton.classList.add('no-js')
+  }
+  const submitButton = document.getElementById('submit-btn')
+  const announcer = document.getElementById('update-announcer')
+  const params = new URL(window.location.toString()).searchParams
+  const change = params.get('change')
+  let providerCode = ''
+  if (providerSelect) {
+    providerCode = providerSelect.value
+    providerSelect.addEventListener('change', event => {
+      submitButton.disabled = true
+      providerSelect.disabled = true
+      teamSelect.disabled = true
+      userSelect.disabled = true
+      providerCode = providerSelect.value
+      const { value } = event.target
+      const urlParts = location.href.split('?')[0].split('/')
+      const crn = urlParts[4]
+      const uuid = urlParts[6]
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
+      fetch(`${baseUrl}?providerCode=${value}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _csrf: window.csrfToken }),
+      })
+        .then(async response => {
+          if (!response.ok) {
+            location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
+          } else {
+            const json = await response.json()
+            removeOptions(teamSelect)
+            const { teams } = json
+            teams.forEach(team =>
+              teamSelect.add(new Option(team.description, team.code, undefined, team.selected === 'selected')),
+            )
+            removeOptions(userSelect)
+            const { users } = json
+            users.forEach(user =>
+              userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
+            )
+            announcer.textContent = 'Updated team and username options'
+          }
+          submitButton.disabled = false
+          providerSelect.disabled = false
+          teamSelect.disabled = false
+          userSelect.disabled = false
+          return response
+        })
+        .catch(() => {
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}`
+        })
+    })
+  }
+  if (teamSelect) {
+    teamSelect.addEventListener('change', event => {
+      submitButton.disabled = true
+      providerSelect.disabled = true
+      teamSelect.disabled = true
+      userSelect.disabled = true
+      const { value } = event.target
+      const urlParts = location.href.split('?')[0].split('/')
+      const crn = urlParts[4]
+      const uuid = urlParts[6]
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
+      fetch(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _csrf: window.csrfToken }),
+      })
+        .then(async response => {
+          if (!response.ok) {
+            location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
+          } else {
+            const json = await response.json()
+            removeOptions(userSelect)
+            const { users } = json
+            users.forEach(user =>
+              userSelect.add(new Option(user.nameAndRole, user.username, undefined, user.selected === 'selected')),
+            )
+            announcer.textContent = 'Updated username options'
+          }
+          submitButton.disabled = false
+          providerSelect.disabled = false
+          teamSelect.disabled = false
+          userSelect.disabled = false
+          return response
+        })
+        .catch(() => {
+          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
+        })
     })
   }
 }
@@ -411,7 +523,13 @@ function standardiseTimeValue(timeValue) {
 
 setNoFixedAddressConditional()
 resetConditionals()
-attendanceSelectors()
+const doc = document.getElementById('enableAttendeeUpdates')
+if (doc) {
+  attendanceSelectorsNew()
+} else {
+  attendanceSelectorsOld()
+}
+
 homeSearch()
 crissHeaders() // REMOVE once enableCRISSV2 flag rolled out
 recentCaseDisplay()

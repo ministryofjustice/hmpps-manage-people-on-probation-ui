@@ -48,9 +48,7 @@ const appointments: Route<void> = (req, res, next) => {
     outcomeJourney,
   }
 
-  if (
-    [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
-  ) {
+  if (req.url.includes('/location-date-time')) {
     const { _maxDate } = getMinMaxDates()
 
     localParams = {
@@ -59,18 +57,6 @@ const appointments: Route<void> = (req, res, next) => {
       isInPast: appointmentDateIsInPast(req, res),
       _maxDate,
     }
-  }
-
-  if (req.url.includes('/attended-complied')) {
-    localParams = { ...localParams, ...res.locals.appointmentOutcome }
-  }
-
-  if (
-    [`/arrange-appointment/${id}/attended-complied`, `/arrange-appointment/${id}/add-note`].some(urlPart =>
-      req.url.includes(urlPart),
-    )
-  ) {
-    localParams = { ...localParams, useDecorator: true }
   }
 
   const baseUrl = req.url.split('?')[0]
@@ -151,40 +137,6 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           contactId,
           page: 'record-an-outcome',
-        }),
-      ),
-    }
-  }
-
-  const validateAttendedComplied = (): void => {
-    if (!req.url.includes(`/case/${crn}/arrange-appointment/${id}/attended-complied`)) return
-
-    render = 'pages/appointments/attended-complied'
-
-    errorMessages = validateWithSpec(
-      req,
-      appointmentsValidation({
-        crn,
-        id,
-        page: `arrange-appointment/${id}/attended-complied`,
-      }),
-    )
-  }
-
-  const validateManageAttendedComplied = (): void => {
-    if (!req.url.includes(`appointment/${contactId}/attended-complied`)) return
-
-    render = 'pages/appointments/attended-complied'
-
-    errorMessages = {
-      ...errorMessages,
-      ...validateWithSpec(
-        req,
-        appointmentsValidation({
-          crn,
-          id,
-          contactId,
-          page: `appointment/${contactId}/attended-complied`,
         }),
       ),
     }
@@ -312,8 +264,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
-  validateAttendedComplied()
-  validateManageAttendedComplied()
   validateAddNote()
   validateManageAddNote()
   validateReschedule()

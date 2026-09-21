@@ -15,6 +15,7 @@ import {
   EsupervisionUpcomingQuestionsResponse,
   UploadLocationResponse,
   OffenderCheckinsByCRNResponse,
+  OffenderEligibility,
   OffenderInfo,
   OffenderSetup,
   OffenderSetupCompleteResponse,
@@ -153,6 +154,12 @@ export default class ESupervisionClient extends RestClient {
   async deleteAssignedQuestionsFromCheckIn(crn: string): Promise<{ message: string }> {
     return this.delete({
       path: `/v2/questions/assignment?crn=${crn}`,
+    })
+  }
+
+  async getOffenderEligibility(crn: string): Promise<OffenderEligibility> {
+    return this.get({
+      path: `/v2/offenders/${crn}/eligibility`,
     })
   }
 }

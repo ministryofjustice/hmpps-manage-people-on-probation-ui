@@ -14,7 +14,7 @@ export default class EMDIClient extends RestClient {
     return this.get({
       path: `/people/exists/${crn}`,
       handle404: true,
-      handle500: true,
+      handle5xxRange: true,
       errorMessage: 'Electronic monitoring data is currently unavailable.',
     })
   }

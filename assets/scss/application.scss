@@ -896,25 +896,27 @@ table.appointments tr > .notes {
   align-items: flex-end;
 }
 
-.govuk-grid-column-one-quarter-early-resize {
+.no-js {
+  display: none;
+}
+
+.govuk-grid-column-early-resize {
   box-sizing: border-box;
   width: 100%;
   padding: 0 15px;
 }
 @media (min-width: 72.0625em) {
-  .govuk-grid-column-one-quarter-early-resize {
-    width: 25%;
+  .govuk-grid-column-early-resize {
     float: left;
   }
 }
-.govuk-grid-column-three-quarters-early-resize {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 0 15px;
+@media (min-width: 72.0625em) {
+  .govuk-grid-column-early-resize--one-quarter {
+    width: 25%;
+  }
 }
 @media (min-width: 72.0625em) {
-  .govuk-grid-column-three-quarters-early-resize {
+  .govuk-grid-column-early-resize--three-quarters {
     width: 75%;
-    float: left;
   }
 }
