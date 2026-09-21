@@ -88,8 +88,8 @@ export const checkOptionRedirects = <TPage extends Page>(
     outcomePage.getSubmitBtn().click()
     const page = new RedirectPage()
     page.checkPageTitle(redirectPageTitle)
-    page.getBackLink().click()
-    cy.get('[data-module="govuk-radios"]').should('exist')
+    cy.go('back')
+    outcomePage.checkOnPage()
   })
 }
 

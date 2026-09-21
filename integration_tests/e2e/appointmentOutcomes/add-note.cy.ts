@@ -99,30 +99,77 @@ const checkValidation = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): vo
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
-  it('renders the page', () => {
-    loadPage({ journey })
-    getUuid(3).then(uuid => {
-      cy.get('.govuk-back-link').should('exist')
-      cy.contains('Use paragraphs and formatting').should('be.visible')
-      cy.get('[data-qa="crissRadio"]').find('.govuk-radios__input').first().should('be.checked')
-      const id = journey === 'MANAGE' ? appointmentId : uuid
-      cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', '')
-      if (journey === 'MANAGE') {
-        cy.get('label[for="fileUpload"]').should('contain.text', 'Upload a file (optional)')
-        cy.get('.guidance-panel').should('not.exist')
-      }
-    })
-  })
-  if (journey === 'MANAGE') {
-    it('switch to criss headers format when option selected', () => {
+  describe('Default appointment settings', { testIsolation: false }, () => {
+    before(() => {
       loadPage({ journey })
+    })
+    // beforeEach(() => {
+
+    // })
+    it('renders the page', () => {
       getUuid(3).then(uuid => {
+        cy.get('.govuk-back-link').should('exist')
+        cy.contains('Use paragraphs and formatting').should('be.visible')
+        cy.get('[data-qa="crissRadio"]').find('.govuk-radios__input').first().should('be.checked')
         const id = journey === 'MANAGE' ? appointmentId : uuid
-        addNotePage.getCrissRadio().eq(1).check()
-        cy.get(`[id="freeform-container"]`).should('have.class', 'govuk-!-display-none')
-        cy.get(`[id="structured-container"]`).should('not.have.class', 'govuk-!-display-none')
+        cy.get(`textarea#appointments-${crn}-${id}-notes`).should('have.value', '')
+        if (journey === 'MANAGE') {
+          cy.get('label[for="fileUpload"]').should('contain.text', 'Upload a file (optional)')
+          cy.get('.guidance-panel').should('not.exist')
+        }
       })
     })
+    if (journey === 'MANAGE') {
+      it('switch to criss headers format when option selected', () => {
+        getUuid(3).then(uuid => {
+          const id = journey === 'MANAGE' ? appointmentId : uuid
+          addNotePage.getCrissRadio().eq(1).check()
+          cy.get(`[id="freeform-container"]`).should('have.class', 'govuk-!-display-none')
+          cy.get(`[id="structured-container"]`).should('not.have.class', 'govuk-!-display-none')
+        })
+      })
+      it('rejects files larger than 5mb', () => {
+        addNotePage.getFileUploadInput().attachFile(createFakeFile(6, 'pdf'))
+        addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+        addNotePage.getSubmitBtn().click()
+        addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
+      })
+      ;(['pdf', 'doc', 'docx'] as const).forEach(filetype => {
+        it(`uploads a valid ${filetype} file`, () => {
+          cy.task('stubPatchDocument200Response')
+          cy.intercept('POST', '/case/*/appointments/appointment/*/outcome/add-note').as('submit')
+          addNotePage.getFileUploadInput().attachFile(createFakeFile(1, filetype))
+          cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
+          addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+          addNotePage.getSubmitBtn().click()
+          cy.wait('@submit')
+          nextAppointmentPage = new NextAppointmentPage()
+          nextAppointmentPage.checkPageTitle(`Eula’s next supervision appointment`)
+          nextAppointmentPage.getBackLink().click()
+        })
+      })
+    }
+    if (journey === 'ARRANGE') {
+      it('does not show file upload', () => {
+        cy.get('[data-qa="fileUpload"]').should('not.exist')
+      })
+      it('redirects to check your answers page', () => {
+        addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+        addNotePage.getSubmitBtn().click()
+        const cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkPageTitle('Check your answers')
+        cy.go('back')
+        addNotePage.checkOnPage()
+      })
+    }
+    it('submits successfully with no notes or upload and sensitivity selected', () => {
+      addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+      addNotePage.getSubmitBtn().click()
+      nextAppointmentPage = new NextAppointmentPage()
+    })
+  })
+
+  if (journey === 'MANAGE') {
     it('should not display the sensitivity question if already set to true', () => {
       loadPage({ journey, isSensitive: true })
       addNotePage.getSensitiveInformation().should('not.exist')
@@ -130,41 +177,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
     checkValidation({ journey })
   }
 
-  if (journey === 'ARRANGE') {
-    it('does not show file upload', () => {
-      loadPage({ journey })
-      cy.get('[data-qa="fileUpload"]').should('not.exist')
-    })
-    it('redirects to check your answers page', () => {
-      loadPage({ journey })
-      addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
-      addNotePage.getSubmitBtn().click()
-      const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkPageTitle('Check your answers')
-    })
-  }
   if (journey === 'MANAGE') {
-    it('rejects files larger than 5mb', () => {
-      loadPage({ journey })
-      addNotePage.getFileUploadInput().attachFile(createFakeFile(6, 'pdf'))
-      addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
-      addNotePage.getSubmitBtn().click()
-      addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
-    })
-    ;(['pdf', 'doc', 'docx'] as const).forEach(filetype => {
-      it(`uploads a valid ${filetype} file`, () => {
-        cy.task('stubPatchDocument200Response')
-        cy.intercept('POST', '/case/*/appointments/appointment/*/outcome/add-note').as('submit')
-        loadPage({ journey })
-        addNotePage.getFileUploadInput().attachFile(createFakeFile(1, filetype))
-        cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
-        addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
-        addNotePage.getSubmitBtn().click()
-        cy.wait('@submit')
-        nextAppointmentPage = new NextAppointmentPage()
-        nextAppointmentPage.checkPageTitle(`Eula’s next supervision appointment`)
-      })
-    })
     it('should display the prepended note inset text if breach action', () => {
       loadPage({ journey, action: 'BREACH_RECALL_INITIATED' })
       cy.get('.guidance-panel')
@@ -189,12 +202,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
         .should('contain.text', 'I will send a different enforcement letter')
     })
   }
-  it('submits successfully with no notes or upload and sensitivity selected', () => {
-    loadPage({ journey })
-    addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
-    addNotePage.getSubmitBtn().click()
-    nextAppointmentPage = new NextAppointmentPage()
-  })
 }
 
 describe('Add a note', () => {
