@@ -35,4 +35,5 @@ export class FeatureFlags {
   enableCombinedCYAPage?: boolean = undefined
   enableAttendeeUpdates?: boolean = undefined
   enableEsupEligibilityCheck?: boolean = undefined
+  showContactInformationWarning?: boolean = undefined
 }
