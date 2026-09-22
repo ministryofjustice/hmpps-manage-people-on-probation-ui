@@ -4,6 +4,34 @@
 
 {% set calculation = tierDetails.calculation %}
 
+{% set headerErrors = [] %}
+{% if prisonsUnavailable %}
+    {% set headerErrors = (headerErrors.push({ text: "Photos and throughcare information are currently unavailable." }), headerErrors) %}
+{% endif %}
+{% if arnsUnavailable %}
+    {% set headerErrors = (headerErrors.push({ text: "Risk information from the ARNS service is currently unavailable." }), headerErrors) %}
+{% endif %}
+{% if flags.enablePersonHeader and headerErrors.length %}
+    {% set headerErrorsHtml %}
+        {% if headerErrors.length > 1 %}
+            <ul class="govuk-!-margin-top-0">
+            {% for error in headerErrors %}
+                <li>{{ error.text }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <span>{{ headerErrors[0].text }}</span>
+        {% endif %}
+    {% endset %}
+    {{ mojAlert({
+        variant: "error",
+        title: "There is a problem",
+        showTitleAsHeading: true,
+        attributes: { "data-qa": "headerErrors" },
+        html: headerErrorsHtml
+    }) }}
+{% endif %}
+
 {% set overallRisk = risksWidget.overallRisk %}
 {% if overallRisk == 'VERY_HIGH' %}
     {% set overallRisk = 'VERY HIGH' %}
