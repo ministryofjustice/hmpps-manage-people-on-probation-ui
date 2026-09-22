@@ -85,7 +85,7 @@ export default class MasApiClient extends RestClient {
    * @deprecated use DeliusClient.getHomepage
    */
   async getUserAppointments(username: string): Promise<UserAppontment> {
-    return this.get({ path: `/user/${username}/appointments` })
+    return this.get({ path: `/user/${username}/appointments`, handleTimeout: true })
   }
 
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
@@ -269,6 +269,7 @@ export default class MasApiClient extends RestClient {
   async getEnforcementContacts(
     username: string,
     page: string,
+    handleTimeout: boolean = false,
     size: string = '5',
     filterDueDate: string = 'false',
     months: string = '12',
@@ -293,6 +294,7 @@ export default class MasApiClient extends RestClient {
     const enforcementContacts = (await this.get({
       path: `/contact/${username}/enforcements?${queryParameters.toString()}`,
       handle404: false,
+      handleTimeout,
     })) as EnforcementContactsResponse
     if ('errors' in enforcementContacts) {
       return enforcementContacts

@@ -28,6 +28,7 @@ const homeController: Controller<typeof routes, void> = {
       const enforcementContactResponse: EnforcementContactsResponse = await masClient.getEnforcementContacts(
         res.locals.user.username,
         (pageNum - 1).toString(),
+        true,
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
 
@@ -81,6 +82,7 @@ const homeController: Controller<typeof routes, void> = {
       const enforcementContactResponse: EnforcementContactsResponse = await masClient.getEnforcementContacts(
         res.locals.user.username,
         (pageNum - 1).toString(),
+        true,
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
       const url = encodeURIComponent(req.url)

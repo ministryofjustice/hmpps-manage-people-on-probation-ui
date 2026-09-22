@@ -405,7 +405,8 @@ describe('RestClient.get timeout handling', () => {
     mockedIsValidPath.mockReturnValue(true)
     nock.cleanAll()
   })
-  it('should return timeoutError when a configured path times out', async () => {
+
+  it('should return timeoutError when handleTimeout is enabled and the request times out', async () => {
     nock('http://localhost:8080', {
       reqheaders: { authorization: 'Bearer token-1' },
     })
@@ -419,6 +420,7 @@ describe('RestClient.get timeout handling', () => {
       timeoutError: ErrorSummary[]
     }>({
       path: '/user/123/appointments',
+      handleTimeout: true,
     })
 
     expect(response).toEqual({
@@ -433,7 +435,7 @@ describe('RestClient.get timeout handling', () => {
     expect(nock.isDone()).toBe(true)
   })
 
-  it('should not handle timeout for a path that is not configured', async () => {
+  it('should throw when the request times out and handleTimeout is disabled', async () => {
     nock('http://localhost:8080', {
       reqheaders: { authorization: 'Bearer token-1' },
     })
@@ -452,7 +454,7 @@ describe('RestClient.get timeout handling', () => {
     expect(nock.isDone()).toBe(true)
   })
 
-  it('captures configured path timeouts in Sentry', async () => {
+  it('captures handled timeouts in Sentry', async () => {
     nock('http://localhost:8080', {
       reqheaders: { authorization: 'Bearer token-1' },
     })
@@ -468,6 +470,7 @@ describe('RestClient.get timeout handling', () => {
       timeoutError: ErrorSummary[]
     }>({
       path: '/user/123/appointments',
+      handleTimeout: true,
     })
 
     expect(response).toEqual({

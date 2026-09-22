@@ -93,7 +93,7 @@ describe('enforcementAction controller', () => {
 
       await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
 
-      expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', '25', '', '')
+      expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', false, '25', '', '')
       expect(renderSpy).toHaveBeenCalledWith('pages/my-enforcement-actions', {
         enforcementContacts: mockResponse,
         sortByOrder: expectedSortByOrder,
@@ -134,7 +134,14 @@ describe('enforcementAction controller', () => {
 
         await controllers.enforcementActions.getAllEnforcementContacts(hmppsAuthClient)(req, res)
 
-        expect(getEnforcementContactsSpy).toHaveBeenCalledWith('user-1', '0', '25', expectedSortBy, expectedAscending)
+        expect(getEnforcementContactsSpy).toHaveBeenCalledWith(
+          'user-1',
+          '0',
+          false,
+          '25',
+          expectedSortBy,
+          expectedAscending,
+        )
         expect(renderSpy).toHaveBeenCalledWith(
           'pages/my-enforcement-actions',
           expect.objectContaining({ sortByOrder: expectedSortByOrder }),
@@ -178,6 +185,7 @@ describe('enforcementAction controller', () => {
         expect(getEnforcementContactsSpy).toHaveBeenCalledWith(
           'user-1',
           expect.anything(),
+          false,
           '25',
           expect.anything(),
           expect.anything(),

@@ -8,7 +8,7 @@ export default class DeliusClient extends RestClient {
   }
 
   async getHomepage(username: string): Promise<Homepage> {
-    return this.get({ path: `/user/${username}/homepage` })
+    return this.get({ path: `/user/${username}/homepage`, handleTimeout: true })
   }
 }
 

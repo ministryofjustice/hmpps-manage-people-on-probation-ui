@@ -11,7 +11,6 @@ import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
 import 'multer'
 import isTimeoutError from '../utils/isTimeoutError'
-import { matchesTimeoutPath, timeoutUrlPaths } from '../middleware/checkTimeoutURL'
 
 interface Request {
   path: string
@@ -23,6 +22,7 @@ interface Request {
   handle415?: boolean
   handle500?: boolean
   handle5xxRange?: boolean
+  handleTimeout?: boolean
   handle401?: boolean
   errorMessage?: string
   file?: Express.Multer.File
@@ -66,6 +66,7 @@ export default class RestClient {
     handle500 = false,
     handle5xxRange = false,
     handle401 = false,
+    handleTimeout = false,
     errorMessage = '',
     retry = true,
   }: Request): Promise<TResponse | null> {
@@ -99,7 +100,7 @@ export default class RestClient {
 
       return raw ? (result as TResponse) : result.body
     } catch (error: any) {
-      if (matchesTimeoutPath(path, timeoutUrlPaths) && isTimeoutError(error)) {
+      if (handleTimeout && isTimeoutError(error)) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({
           text: 'Some information on this page is currently unavailable.',
