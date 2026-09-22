@@ -16,6 +16,11 @@ $no-score-border-colour: #505a5f;
 $no-score-background-colour: #ffffff;
 $mappa-colour: #4c2c92;
 
+// MPoP project colour aliases for badges and consistent black
+$risk-badge-high: #d4351c;
+$badge-color: #0b0c0c;
+
+
 @import '../../node_modules/govuk-frontend/dist/govuk/index';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
 @import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/all';
@@ -30,6 +35,7 @@ $mappa-colour: #4c2c92;
 @import '../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table';
 @import './components/predictor-scores';
 @import './components/risk-flag-widget';
+@import './components/risk-flag-badge';
 @import './components/timeline';
 @import './components/flex';
 @import './components/note';
@@ -615,7 +621,7 @@ body.feature-disabled {
 
 .feedback-prompt {
   background-color: #f3f2f1;
-  color: #0b0c0c;
+  color: $badge-color;
   border-top: 1px solid #b1b4b6;
   outline: 0;
   margin-top: 60px;
@@ -894,4 +900,29 @@ table.appointments tr > .notes {
 .govuk-input__wrapper_mpop {
   display: flex;
   align-items: flex-end;
+}
+
+.no-js {
+  display: none;
+}
+
+.govuk-grid-column-early-resize {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 15px;
+}
+@media (min-width: 72.0625em) {
+  .govuk-grid-column-early-resize {
+    float: left;
+  }
+}
+@media (min-width: 72.0625em) {
+  .govuk-grid-column-early-resize--one-quarter {
+    width: 25%;
+  }
+}
+@media (min-width: 72.0625em) {
+  .govuk-grid-column-early-resize--three-quarters {
+    width: 75%;
+  }
 }

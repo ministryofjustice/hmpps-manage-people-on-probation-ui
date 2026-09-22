@@ -27,7 +27,7 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       type: appointmentTypeCode,
       date,
       start,
-      user: { locationCode },
+      user: { locationCode, email: recipientEmail, name: practitionerName },
       smsPreview,
     } = appointment
     const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
@@ -39,6 +39,8 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       appointmentTypeCode,
       includeWelshPreview,
     }
+    if (recipientEmail) body.recipientEmail = recipientEmail
+    if (practitionerName?.forename) body.practitionerFirstName = practitionerName.forename
 
     // we should not be sending location when its telephone or video contact
     if (!appointmentTypesWithoutLocation.has(appointmentTypeCode)) {

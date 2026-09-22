@@ -422,4 +422,23 @@ describe('ESupervisionClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('getOffenderEligibility', () => {
+    it('should return offender check in eligibility', async () => {
+      const crn = 'X000001'
+
+      const response = {
+        outcome: 'ELIGIBLE',
+        message: 'This person is eligible for online check ins',
+      }
+
+      fakeESupervisionApi
+        .get(`/v2/offenders/${crn}/eligibility`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.getOffenderEligibility(crn)
+      expect(output).toEqual(response)
+    })
+  })
 })

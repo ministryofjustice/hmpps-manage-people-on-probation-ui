@@ -1,7 +1,17 @@
 context('PoP Header partial', () => {
+  const CRN = 'X000001'
+
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
+  const enablePopHeaderWithTier = (tier: { tierScore: string; provisional?: boolean }) => {
+    cy.task('stubFeatureFlags', [
+      { key: 'enableSupervisionPackagePoPHeader', enabled: true },
+      { key: 'enableSupervisionPackage', enabled: true },
+    ])
+    cy.task('stubTierDetails', { crn: CRN, ...tier })
+  }
 
   it('shows the new popHeader component when enableSupervisionPackagePoPHeader is true', () => {
     cy.task('stubFeatureFlag', { key: 'enableSupervisionPackagePoPHeader', enabled: true })
@@ -9,6 +19,46 @@ context('PoP Header partial', () => {
 
     cy.get('[data-qa="new-pop-header"]').should('exist').and('contain.text', 'X000001')
     cy.get('[data-qa="legacy-pop-header"]').should('not.exist')
+  })
+
+  it('renders the calculated tier score and no provisional tag when the tier is confirmed', () => {
+    enablePopHeaderWithTier({ tierScore: 'B2', provisional: false })
+    cy.visit('/case/X000001')
+
+    cy.get('[data-qa="new-pop-header"] [data-qa="tierLink"]').should('contain.text', 'Tier: B2')
+    cy.get('[data-qa="new-pop-header"] .govuk-tag').should('not.exist')
+  })
+
+  it('renders a provisional tag when the tier calculation is provisional', () => {
+    enablePopHeaderWithTier({ tierScore: 'B2', provisional: true })
+    cy.visit('/case/X000001')
+
+    cy.get('[data-qa="new-pop-header"] [data-qa="tierLink"]').should('contain.text', 'Tier: B2')
+    cy.get('[data-qa="new-pop-header"] .govuk-tag').should('exist').and('contain.text', 'Provisional')
+  })
+
+  // Known gap: pop-header.njk only shows a tag when provisional is true, but the API can
+  // return MISSING with provisional: false. Asserting the current behaviour here so a fix
+  // shows up as an intentional test change rather than an untracked regression.
+  it('shows the tier score but no tag for a MISSING tier score when provisional is false', () => {
+    enablePopHeaderWithTier({ tierScore: 'MISSING', provisional: false })
+    cy.visit('/case/X000001')
+
+    cy.get('[data-qa="new-pop-header"] [data-qa="tierLink"]').should('contain.text', 'Tier: Missing')
+    cy.get('[data-qa="new-pop-header"] .govuk-tag').should('not.exist')
+  })
+
+  // Known gap: same as above but for the Unavailable tag returned when the calculation can't
+  // be found (404) - the API/library always reports provisional: false in this case.
+  it('shows no tag when the tier calculation cannot be found', () => {
+    cy.task('stubFeatureFlags', [
+      { key: 'enableSupervisionPackagePoPHeader', enabled: true },
+      { key: 'enableSupervisionPackage', enabled: true },
+    ])
+    cy.task('stubTierDetails', { crn: CRN, tierScore: '', status: 404 })
+    cy.visit('/case/X000001')
+
+    cy.get('[data-qa="new-pop-header"] .govuk-tag').should('not.exist')
   })
 
   it('shows the legacy header when enableSupervisionPackagePoPHeader is false', () => {
@@ -36,5 +86,28 @@ context('PoP Header partial', () => {
     cy.get('[data-qa="legacy-pop-header"]').should('exist').and('contain.text', 'X000001')
     cy.get('.moj-page-header-actions').should('exist')
     cy.get('.person-header').should('not.exist')
+  })
+
+  it('person risk flags are displayed when enablePersonHeader is true', () => {
+    cy.task('stubFeatureFlag', { key: 'enablePersonHeader', enabled: true })
+    cy.visit('/case/X000001')
+
+    cy.get('.person-header [data-qa="crn"]').should('exist').and('contain.text', 'X000001')
+
+    cy.get('[data-qa="risk-badge-5"]').should('be.visible').and('contain.text', 'Risk to public - High')
+
+    cy.get('[data-qa="risk-badge-1"]').should('be.visible').and('contain.text', 'Risk to staff - High')
+
+    cy.get('[data-qa="risk-badge-2"]').should('be.visible').and('contain.text', 'Domestic abuse perpetrator')
+
+    cy.get('[data-qa="risk-badge-3"]').should('be.visible').and('contain.text', 'Risk to known adult - Low')
+
+    cy.get('[data-qa="risk-badge-8"]').should('be.visible').and('contain.text', 'Sexual conviction - Low')
+
+    cy.get('[data-qa="risk-badge-6"]').should('be.visible').and('contain.text', 'County lines - victim')
+
+    cy.get('[data-qa="risk-badge-7"]').should('be.visible').and('contain.text', 'Contact suspended')
+
+    cy.get('[data-qa="risk-badge-more"]').should('be.visible').and('contain.text', '+1 active risk flags')
   })
 })

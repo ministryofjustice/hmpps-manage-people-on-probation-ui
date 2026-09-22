@@ -11,7 +11,6 @@ import {
   completeSentencePage,
   completeTypePage,
   completeLocationDateTimePage,
-  completeAttendedCompliedPage,
   completeAddNotePage,
   completeTextMessageConfirmationPage,
   completeSupportingInformationPage,
@@ -26,23 +25,16 @@ const loadPage = ({
   crnOverride = '',
   dateInPast = false,
   completeTextMessageConfirmOptionIndex = 1,
-  enableNonCompliance = true,
 }: {
   crnOverride?: string
   dateInPast?: boolean
   completeTextMessageConfirmOptionIndex?: number
-  enableNonCompliance?: boolean
 } = {}) => {
   completeSentencePage({ eventIndex: 1, crnOverride })
   completeTypePage(1, false)
   completeLocationDateTimePage({ index: 1, crnOverride, dateInPast })
   if (dateInPast) {
-    if (enableNonCompliance) {
-      completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
-    }
-    if (!enableNonCompliance) {
-      completeAttendedCompliedPage()
-    }
+    completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
     completeAddNotePage()
   } else {
     completeTextMessageConfirmationPage({ index: completeTextMessageConfirmOptionIndex, _crn: crnOverride })
@@ -265,50 +257,7 @@ describe('Confirmation page', () => {
     })
   })
 
-  describe('Appointment changed to date in the past - non compliance disabled', () => {
-    const crn = 'X000001'
-    it('should update the cya page', () => {
-      cy.task('stubDisableNonCompliance')
-      completeSentencePage({ eventIndex: 1, crnOverride: crn })
-      completeTypePage(1, false)
-      completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
-      completeTextMessageConfirmationPage({ index: 1, _crn: crn })
-      completeSupportingInformationPage({ notes: true, crnOverride: crn })
-      const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
-      getUuid().then(uuid => {
-        completeLocationDateTimePage({
-          index: 1,
-          crnOverride: crn,
-          dateInPast: true,
-        })
-        completeAttendedCompliedPage({ manageJourney: false, _crn: crn, _uuid: uuid })
-        completeAddNotePage({ crnOverride: crn, idOverride: uuid })
-        completeCYAPage()
-        confirmPage = new AppointmentConfirmationPage()
-        confirmPage
-          .getWhatHappensNext()
-          .find('p:nth-of-type(1)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
-          })
-        confirmPage
-          .getWhatHappensNext()
-          .find('p:nth-of-type(2)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `The appointment has been added to the NDelius contact log and officer diary.`,
-            )
-          })
-      })
-    })
-  })
-
-  describe('Appointment changed to date in the past - non compliance enabled', () => {
+  describe('Appointment changed to date in the past', () => {
     const crn = 'X000001'
     it('should update the cya page', () => {
       completeSentencePage({ eventIndex: 1, crnOverride: crn })
@@ -350,10 +299,10 @@ describe('Confirmation page', () => {
     })
   })
 
-  describe('Appointment rescheduled to a date and time in the future - non compliance enabled', () => {
+  describe('Appointment rescheduled to a date and time in the future', () => {
     let checkYourAnswerPage: RescheduleCheckYourAnswerPage
     beforeEach(() => {
-      completeRescheduleAppointmentPage({ enableNonCompliance: true })
+      completeRescheduleAppointmentPage()
     })
     it('should render the confirmation page', () => {
       getUuid().then(uuid => {
@@ -389,10 +338,10 @@ describe('Confirmation page', () => {
       })
     })
   })
-  describe('Appointment rescheduled to a date and time in the past - non compliance enabled', () => {
+  describe('Appointment rescheduled to a date and time in the past', () => {
     let checkYourAnswerPage: RescheduleCheckYourAnswerPage
     beforeEach(() => {
-      completeRescheduleAppointmentPage({ enableNonCompliance: true })
+      completeRescheduleAppointmentPage()
     })
     it('should render the confirmation page', () => {
       const inPast = true
@@ -400,36 +349,6 @@ describe('Confirmation page', () => {
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
         completeRescheduling({ id: uuid, inPast })
-        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
-        checkYourAnswerPage.getSubmitBtn().click()
-        confirmPage = new AppointmentConfirmationPage()
-        cy.get('[data-qa="what-happens-next"]')
-          .find('p')
-          .eq(0)
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
-          })
-        cy.get('[data-qa="what-happens-next"]')
-          .find('p')
-          .eq(1)
-          .should('contain.text', 'The appointment has been updated on the NDelius contact log and officer diary.')
-      })
-    })
-  })
-
-  describe('Appointment rescheduled to a date and time in the past - non compliance disabled', () => {
-    let checkYourAnswerPage: RescheduleCheckYourAnswerPage
-    beforeEach(() => {
-      completeRescheduleAppointmentPage({ enableNonCompliance: false })
-    })
-    it('should render the confirmation page', () => {
-      const inPast = true
-      getUuid().then(uuid => {
-        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
-        checkYourAnswerPage.getSubmitBtn().click()
-        completeRescheduling({ id: uuid, inPast, enableNonCompliance: false })
         checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
         checkYourAnswerPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()

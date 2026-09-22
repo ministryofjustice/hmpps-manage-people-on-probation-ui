@@ -1,7 +1,6 @@
 {% set changePath = appointmentOutcome.baseOutcomeUrl %}
 {% set showAction = true %}
-{% set buttonText = 'Confirm this appointment' if flags.enableCombinedCYAPage else 'Confirm appointment outcome' %}
-
+{% set buttonText = 'Confirm appointment outcome and arrange appointment' if nextAppointment and nextAppointmentId and flags.enableCombinedCYAPage else ('Confirm this appointment' if flags.enableCombinedCYAPage else 'Confirm appointment outcome') %}
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',

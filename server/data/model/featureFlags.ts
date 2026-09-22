@@ -4,7 +4,6 @@ export class FeatureFlags {
   enableSmsReminders?: boolean = undefined
   enableCompliancePage?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableNonCompliance?: boolean = undefined
   enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
   enablePersonHeader?: boolean = undefined
@@ -35,4 +34,7 @@ export class FeatureFlags {
   enableMAN3255?: boolean = undefined
   enableCombinedCYAPage?: boolean = undefined
   enable3MonthsOutcomes?: boolean = undefined
+  enableAttendeeUpdates?: boolean = undefined
+  enableEsupEligibilityCheck?: boolean = undefined
+  showContactInformationWarning?: boolean = undefined
 }

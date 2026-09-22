@@ -62,11 +62,8 @@ export const postRescheduleAppointments = (
       uuid,
       isInFuture: isInPast === false,
     }
-    if (res.locals.flags?.enableNonCompliance) {
-      body.outcomeRecorded = !!outcome?.outcomeCode
-    } else {
-      body.outcomeRecorded = outcomeRecorded === 'Yes'
-    }
+    body.outcomeRecorded = !!outcome?.outcomeCode
+
     if (rescheduleAppointment?.reason) {
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
     }
@@ -107,6 +104,7 @@ export const postRescheduleAppointments = (
           includeWelshPreview,
           appointmentLocation = null,
           appointmentTypeCode = null,
+          practitionerFirstName = null,
         } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
         isWelshTranslation = includeWelshPreview
         rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
@@ -116,6 +114,8 @@ export const postRescheduleAppointments = (
           smsOptIn: true,
           includeWelshTranslation: includeWelshPreview,
         }
+        if (practitionerFirstName)
+          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName = practitionerFirstName
         if (appointmentLocation)
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode)

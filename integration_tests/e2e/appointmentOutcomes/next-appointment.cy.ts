@@ -125,6 +125,9 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .eq(4)
           .find('.govuk-summary-list__value')
           .should('contain.text', `Planned office visit (NS) on ${expectedFutureDate}`)
+        checkYourAnswersOutcomePage
+          .getSubmitBtn()
+          .should('contain.text', 'Confirm appointment outcome and arrange appointment')
       })
     })
     describe('No next appointment arranged', () => {
@@ -135,6 +138,7 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
         cy.get(`.govuk-radios__input[value=NO]`).click()
         nextAppointmentPage.getSubmitBtn().click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
+        checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
       })
     })
   }

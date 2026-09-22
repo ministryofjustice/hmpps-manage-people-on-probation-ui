@@ -5,7 +5,6 @@
 {% set pageTitle = makePageTitle({
   pageHeading: [title, "Record an outcome"]
 }) %}
-{% set buttonText = 'Confirm appointment outcome and arrange appointment' if nextAppointment and nextAppointmentId and flags.enableCombinedCYAPage else 'Confirm this appointment'  %}
 {% set showCalendarInsetText = not isInPast %}
 {% set outcome = true %}
 {% block beforeContent %}{% endblock %}

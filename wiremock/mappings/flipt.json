@@ -55,17 +55,6 @@
               "updatedAt": "2026-02-26T12:00:00.000000Z"
             },
             {
-              "key": "enableNonCompliance",
-              "name": "enableNonCompliance",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-02-26T12:00:00.000000Z",
-              "updatedAt": "2026-02-26T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableESupervisionCheckins",
               "name": "enableESupervisionCheckins",
               "description": "",
@@ -73,6 +62,17 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-04-16T12:00:00.000000Z",
               "updatedAt": "2026-04-16T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableEsupEligibilityCheck",
+              "name": "enableEsupEligibilityCheck",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-09-01T12:00:00.000000Z",
+              "updatedAt": "2026-09-01T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             },
@@ -227,6 +227,28 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-07-08T12:00:00.000000Z",
               "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableAttendeeUpdates",
+              "name": "enableAttendeeUpdates",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enablePersonHeader",
+              "name": "enablePersonHeader",
+              "description": "",
+              "enabled": false,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-04-16T12:00:00.000000Z",
+              "updatedAt": "2026-04-16T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             }

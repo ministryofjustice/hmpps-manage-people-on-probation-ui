@@ -16,6 +16,8 @@ import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { OffenderEligibility } from '../data/model/esupervision'
 
 const crn = 'X000001'
 const id = '1234'
@@ -155,6 +157,11 @@ const mockAppointment: AttendedCompliedAppointment | Activity = {
   startDateTime: '2025-11-20',
 }
 
+const mockOffenderEligibility: OffenderEligibility = {
+  outcome: 'ELIGIBLE',
+  message: 'This person is eligible for online check ins',
+}
+
 const res = mockAppResponse({
   user: {
     username: 'user-1',
@@ -211,6 +218,10 @@ const patchAppointmentSpy = jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(mockPractitioner))
+
+const getOffenderEligibilitySpy = jest
+  .spyOn(ESupervisionClient.prototype, 'getOffenderEligibility')
+  .mockImplementation(() => Promise.resolve(mockOffenderEligibility))
 
 describe('controllers/appointments', () => {
   beforeEach(() => {
@@ -305,6 +316,28 @@ describe('controllers/appointments', () => {
         expect.objectContaining({
           hasPractitioner: true,
           canAccessCheckins: true,
+        }),
+      )
+    })
+  })
+
+  describe('get appointments - checkins eligibility flag enabled', () => {
+    it('should render the appointments page with checkinEligibility details', async () => {
+      const mockRes = mockAppResponse({
+        flags: {
+          enableESupervisionCheckins: true,
+          enableSupervisionPackageAppointments: true,
+          enableEsupEligibilityCheck: true,
+        },
+        supervisionPackageDetails: { context: { sentences: [] } },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
+      expect(getOffenderEligibilitySpy).toHaveBeenCalledWith(crn)
+      expect(spy).toHaveBeenCalledWith(
+        'pages/appointments',
+        expect.objectContaining({
+          checkinEligibility: { message: 'This person is eligible for online check ins', outcome: 'ELIGIBLE' },
         }),
       )
     })
@@ -482,79 +515,6 @@ describe('controllers/appointments', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
   })
-
-  /* Delete these tests after enableNonCompliance feature flag is removed 👇 */
-
-  describe('get attended and complied', () => {
-    beforeEach(async () => {
-      await controllers.appointments.getAttendedComplied(hmppsAuthClient)(req, res)
-    })
-    checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
-    it('should render the record an outcome page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
-        crn,
-        alertDismissed: false,
-        isInPast: true,
-        headerPersonName: { forename: 'Forename', surname: 'Surname' },
-        forename: 'Forename',
-        surname: 'Surname',
-        appointment: mockAppointment,
-      })
-    })
-  })
-
-  describe('post attended and complied', () => {
-    const mockReq = httpMocks.createRequest({
-      params: {
-        crn,
-        id,
-        contactId,
-        actionType,
-      },
-      body: {
-        outcomeRecorded: 'yes',
-      },
-      session: {
-        data: {},
-      },
-    })
-    describe('If CRN request param is invalid', () => {
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(false)
-        mockIsNumericString.mockReturnValue(false)
-        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
-      })
-      it('should return a 404 status and render the error page', () => {
-        expect(mockRenderError).toHaveBeenCalledWith(404)
-        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
-      })
-      it('should not redirect', () => {
-        expect(redirectSpy).not.toHaveBeenCalled()
-      })
-      it('should NOT send the patch request to the api', () => {
-        expect(patchAppointmentSpy).not.toHaveBeenCalled()
-      })
-    })
-    describe('If CRN request param is valid', () => {
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
-      })
-      it('should set the outcome recorded session', () => {
-        expect(mockSetDataValue).toHaveBeenCalledWith(
-          req.session.data,
-          ['appointments', crn, contactId, 'outcomeRecorded'],
-          true,
-        )
-      })
-      it('should redirect to the add notes page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/add-note`)
-      })
-    })
-  })
-
-  /* ----------------- 👆 -----------------  */
 
   describe('get add note', () => {
     const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
