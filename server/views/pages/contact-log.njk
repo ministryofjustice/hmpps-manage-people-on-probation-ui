@@ -66,6 +66,14 @@
   <div class="govuk-grid-row govuk-!-margin-top-4">
     {% include "./contact-log/_filters.njk" %}
     <div class="govuk-grid-column-two-thirds">
+      {% if showContactInformationWarning %}
+          {{ mojAlert({
+                variant: "error",
+                dismissible: false,
+                title: "Contacts created since Friday 18 September 2026 are currently unavailable.",
+                text: "Contacts created since Friday 18 September 2026 are currently unavailable. You can view them on NDelius."
+          }) }}
+      {% endif %}
       {% if personActivity.activities.length %}
         {% if entries.length > 0 %}
           <div>
