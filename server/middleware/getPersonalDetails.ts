@@ -13,11 +13,10 @@ import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
 import { ErrorSummary } from '../data/model/common'
-import { PersonRiskFlags, RiskSummary } from '../data/model/risk'
+import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { getManagedByDetails } from '../utils/getManagedByDetails'
-import { getRiskBadgeGroups, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
