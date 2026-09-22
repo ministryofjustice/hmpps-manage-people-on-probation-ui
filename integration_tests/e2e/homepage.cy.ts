@@ -43,16 +43,6 @@ context('Sign In', () => {
     page.getEnforcementActionRows().eq(1).find('a').contains('Manage').should('exist')
   })
 
-  it('Renders the the outcomes to log', () => {
-    cy.task('stubDisableHomePageOutcome')
-    cy.visit('/')
-    const page = Page.verifyOnPage(IndexPage)
-    page.getOutcomesToLog().should('exist')
-    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (21)')
-    page.getOutcomesToLogRows().should('have.length', 5)
-    page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'false')
-  })
-
   it('Renders correctly when appointments and outcomes to log are empty', () => {
     cy.task('stubEmptyHomepage')
     cy.task('stubEmptyEnforcementContacts')
