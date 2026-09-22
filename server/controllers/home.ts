@@ -4,7 +4,7 @@ import config from '../config'
 import DeliusClient, { AppointmentSummary, Homepage } from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
-import { EnforcementContact } from '../data/model/schedule'
+import { EnforcementContact, EnforcementContactsResponse } from '../data/model/schedule'
 
 const routes = ['getHome', 'getHomeOld'] as const
 
@@ -25,9 +25,10 @@ const homeController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
 
       let enforcementActions: EnforcementContact[] = []
-      const enforcementContactResponse = await masClient.getEnforcementContacts(
+      const enforcementContactResponse: EnforcementContactsResponse = await masClient.getEnforcementContacts(
         res.locals.user.username,
         (pageNum - 1).toString(),
+        true,
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
 
@@ -40,16 +41,18 @@ const homeController: Controller<typeof routes, void> = {
           return contactDate >= twoYearsAgo
         })
         appointmentsRequiringOutcome = lastTwoYearsAppointmentsRequiringOutcome
-        appointmentsRequiringOutcomeCount = lastTwoYearsAppointmentsRequiringOutcome.length
+        appointmentsRequiringOutcomeCount = lastTwoYearsAppointmentsRequiringOutcome?.length
       }
       const url = encodeURIComponent(req.url)
       await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
       return res.render('pages/homepage/homepage', {
-        upcomingAppointments,
-        appointmentsRequiringOutcome,
+        upcomingAppointments: upcomingAppointments ?? [],
+        appointmentsRequiringOutcome: appointmentsRequiringOutcome ?? [],
         appointmentsRequiringOutcomeCount,
-        enforcementActions,
+        enforcementActions: enforcementActions ?? [],
         url,
+        appointmentsTimeoutError: homePage.timeoutError,
+        enforcementTimeoutError: enforcementContactResponse.timeoutError,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
         interventions_link: config.interventions.link,
@@ -66,25 +69,31 @@ const homeController: Controller<typeof routes, void> = {
     return async function getHomeOld(req, res) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { appointments, outcomes, totalAppointments, totalOutcomes } = await masClient.getUserAppointments(
-        res.locals.user.username,
-      )
-
+      const {
+        appointments,
+        outcomes,
+        totalAppointments,
+        totalOutcomes,
+        timeoutError: appointmentsTimeoutError,
+      } = await masClient.getUserAppointments(res.locals.user.username)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
       let enforcementActions: EnforcementContact[] = []
-      const enforcementContactResponse = await masClient.getEnforcementContacts(
+      const enforcementContactResponse: EnforcementContactsResponse = await masClient.getEnforcementContacts(
         res.locals.user.username,
         (pageNum - 1).toString(),
+        true,
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
         totalOutcomes,
-        appointments,
-        outcomes,
-        enforcementActions,
+        appointments: appointments ?? [],
+        outcomes: outcomes ?? [],
+        enforcementActions: enforcementActions ?? [],
+        enforcementTimeoutError: enforcementContactResponse.timeoutError,
+        appointmentsTimeoutError,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
