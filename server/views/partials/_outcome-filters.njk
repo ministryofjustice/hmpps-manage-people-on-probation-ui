@@ -1,6 +1,9 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
+{% set value = 'THREE_MONTHS' if flags.enable3MonthsOutcomes else 'TWO_YEARS' %}
+{% set text = '3 months' if flags.enable3MonthsOutcomes else '2 years' %}
+
 <form role="region" aria-label="Filters" method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}?filter=true">
 <div class="moj-filter" data-module="moj-filter">
   <div class="moj-filter__header">
@@ -18,13 +21,13 @@
             value: outcomesFilter,
             items: [
                 {
-                    value: 'PAST_THREE_MONTHS',
-                    text: "Past 3 months",
+                    value: 'PAST_' + value,
+                    text: "Past " + text,
                     checked: true
                 },
                 {
-                    value: 'OLDER_THAN_THREE_MONTHS',
-                    text: "Older than 3 months"
+                    value: 'OLDER_THAN_' + value',
+                    text: "Older than " + text
                 },
                 {
                     value: 'ALL',

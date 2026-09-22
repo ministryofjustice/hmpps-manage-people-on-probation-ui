@@ -48,7 +48,7 @@ describe('homeController', () => {
       host: 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
     })
     const originalEnv = process.env.NODE_ENV
-    const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } = mockHomepage
+    const { upcomingAppointments, appointmentsRequiringOutcome } = mockHomepage
     let spy: jest.SpyInstance
     let masSpy: jest.SpyInstance
     beforeEach(async () => {
@@ -81,7 +81,7 @@ describe('homeController', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           upcomingAppointments,
           appointmentsRequiringOutcome,
-          appointmentsRequiringOutcomeCount,
+          appointmentsRequiringOutcomeCount: 1,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           delius_link: config.delius.link,
@@ -126,7 +126,7 @@ describe('homeController', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           upcomingAppointments,
           appointmentsRequiringOutcome,
-          appointmentsRequiringOutcomeCount,
+          appointmentsRequiringOutcomeCount: 1,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           delius_link: config.delius.link,
@@ -155,7 +155,7 @@ describe('homeController', () => {
       })
     })
 
-    describe('outcomes filter with feature flag enabled', () => {
+    describe('outcomes filter with 3 month feature flag enabled', () => {
       it('should filter appointments requiring outcomes to only include the last 3 months and update count', async () => {
         const recentAppointment = {
           id: 1,
@@ -184,7 +184,7 @@ describe('homeController', () => {
           appointmentsRequiringOutcomeCount: 3,
         }
         const resWithFilterFlag = mockAppResponse({
-          flags: { enableDeliusClient: true, enableHomePageOutcomesWithFilter: true },
+          flags: { enableDeliusClient: true, enable3MonthsOutcomes: true },
         })
         const renderSpyWithFilter = jest.spyOn(resWithFilterFlag, 'render')
         jest
@@ -262,7 +262,7 @@ describe('homeController', () => {
 
     describe('getHomeOld', () => {
       const mockAppointments = [{ id: '1', type: 'Appointment' }]
-      const mockOutcomes = [{ id: '2', type: 'Outcome' }]
+      const mockOutcomes = [{ id: '2', type: 'Outcome', startDateTime: '2025-09-17T09:00:00Z' }]
 
       beforeEach(() => {
         jest.spyOn(MasApiClient.prototype, 'getUserAppointments').mockResolvedValue({

@@ -136,7 +136,7 @@ const preloadActivitySearchSpy = jest
   .mockImplementation(() => Promise.resolve(undefined))
 
 const res = mockAppResponse({
-  flags: {},
+  flags: { enable3MonthsOutcomes: true },
 })
 const renderSpy = jest.spyOn(res, 'render')
 

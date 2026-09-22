@@ -32,16 +32,18 @@ const homeController: Controller<typeof routes, void> = {
       enforcementActions = enforcementContactResponse.enforcementContacts
 
       const { upcomingAppointments } = homePage
-      let lastThreeMonthsAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
-      if (res.locals.flags.enableHomePageOutcomesWithFilter) {
-        lastThreeMonthsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
-          const contactDate = DateTime.fromISO(contact.startDateTime)
+      let recentAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
+      recentAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+        const contactDate = DateTime.fromISO(contact.startDateTime)
+        if (res.locals.flags.enable3MonthsOutcomes) {
           const threeMonthsAgo = DateTime.now().minus({ months: 3 })
           return contactDate >= threeMonthsAgo
-        })
-        appointmentsRequiringOutcome = lastThreeMonthsAppointmentsRequiringOutcome
-        appointmentsRequiringOutcomeCount = lastThreeMonthsAppointmentsRequiringOutcome.length
-      }
+        }
+        const twoYearsAgo = DateTime.now().minus({ years: 2 })
+        return contactDate >= twoYearsAgo
+      })
+      appointmentsRequiringOutcome = recentAppointmentsRequiringOutcome
+      appointmentsRequiringOutcomeCount = recentAppointmentsRequiringOutcome.length
       const url = encodeURIComponent(req.url)
       await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
       return res.render('pages/homepage/homepage', {
@@ -79,14 +81,16 @@ const homeController: Controller<typeof routes, void> = {
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
       let appointmentsRequiringOutcome = outcomes
-      if (res.locals.flags.enableHomePageOutcomesWithFilter) {
-        const lastThreeMonthsAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
-          const contactDate = DateTime.fromISO(contact.startDateTime)
+      const recentAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+        const contactDate = DateTime.fromISO(contact.startDateTime)
+        if (res.locals.flags.enable3MonthsOutcomes) {
           const threeMonthsAgo = DateTime.now().minus({ months: 3 })
           return contactDate >= threeMonthsAgo
-        })
-        appointmentsRequiringOutcome = lastThreeMonthsAppointmentsRequiringOutcome
-      }
+        }
+        const twoYearsAgo = DateTime.now().minus({ years: 2 })
+        return contactDate >= twoYearsAgo
+      })
+      appointmentsRequiringOutcome = recentAppointmentsRequiringOutcome
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,

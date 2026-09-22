@@ -30,7 +30,7 @@ import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
-import { filterContacts } from '../middleware/filterContacts'
+import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import logger from '../../logger'
 
 const routes = [
@@ -708,7 +708,9 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         appointmentType = 'RESCHEDULE'
       }
       if (res.locals.contactResponse) {
-        const outcomes = filterContacts(res.locals.contactResponse.content)
+        const outcomes = res.locals.flags.enable3MonthsOutcomes
+          ? filterContactsMonths(res.locals.contactResponse.content)
+          : filterContacts(res.locals.contactResponse.content)
         res.locals.contactResponse.content = outcomes
       }
       let linkedAppointment = null

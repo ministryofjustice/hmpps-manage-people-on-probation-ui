@@ -83,10 +83,8 @@ tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const nextSpy = jest.fn()
 const showCaseloadSpy = jest.spyOn(caseloadController, 'showCaseload')
-const res = mockAppResponse()
-const resFlag = mockAppResponse({ flags: {} })
+const res = mockAppResponse({ flags: { enable3MonthsOutcomes: true } })
 const renderSpy = jest.spyOn(res, 'render')
-const flagRenderSpy = jest.spyOn(resFlag, 'render')
 const mockCaseload = { caseload: undefined, sortedBy: undefined } as UserCaseload
 const tiers = { X801756: { tierScore: 'A0' }, X801758: { tierScore: 'D2' } }
 const mockFilters = {} as CaseSearchFilter
@@ -190,12 +188,12 @@ describe('caseloadController', () => {
         expectedCaseFilter,
       )
     })
-    it('should request the tiers from the api when flag set', async () => {
-      await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
+    it('should request the tiers from the api', async () => {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
       expect(tiersSpy).toHaveBeenCalled()
     })
 
-    it('should link tiers with cases when flag set', async () => {
+    it('should link tiers with cases', async () => {
       searchUserCaseloadSpy.mockImplementationOnce(() => Promise.resolve(mockUserCaseload))
       const mockNewCaseload = {
         caseload: [
@@ -211,8 +209,8 @@ describe('caseloadController', () => {
           },
         ],
       }
-      await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
-      expect(flagRenderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
         pagination: mockPagination,
         caseload: mockNewCaseload,
         currentNavSection: 'yourCases',
@@ -419,7 +417,7 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?page=1',
       })
-      res.locals.flags = { enableHomePageOutcomesWithFilter: false }
+      res.locals.flags = { enableHomePageOutcomesWithFilter: false, enable3MonthsOutcomes: true }
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
@@ -458,7 +456,7 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?sortBy=sentence.desc',
       })
-      res.locals.flags = { enableHomePageOutcomesWithFilter: false }
+      res.locals.flags = { enableHomePageOutcomesWithFilter: false, enable3MonthsOutcomes: true }
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,

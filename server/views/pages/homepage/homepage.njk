@@ -4,6 +4,8 @@
 {% set homepage = true %}
 {% set mainClasses = "app-container govuk-body" %}
 
+{% set filter = "PAST_THREE_MONTHS" if flags.enable3MonthsOutcomes else "PAST_TWO_YEARS" %}
+
 {% block header %}
   {% include "../../partials/prob_fe_header.njk" %}
   {% block banner %}{% endblock %}
@@ -73,7 +75,7 @@
             html: 'Outcomes to log' + (' (' + appointmentsRequiringOutcomeCount + ')' if appointmentsRequiringOutcome.length else '')
         },
         afterHeading: {
-          html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Outcomes to log' + (' (' + appointmentsRequiringOutcomeCount + ')' if appointmentsRequiringOutcome.length else '') + ' </span>' +  ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS">Log more outcomes</a>' if appointmentsRequiringOutcome.length else '')
+          html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Outcomes to log' + (' (' + appointmentsRequiringOutcomeCount + ')' if appointmentsRequiringOutcome.length else '') + ' </span>' +  ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/no-outcome?outcomeFilter=' + filter + '">Log more outcomes</a>' if appointmentsRequiringOutcome.length else '')
         },
         content: {
             html: outcomesTable
