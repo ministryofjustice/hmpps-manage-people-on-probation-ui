@@ -147,7 +147,32 @@ describe('/controllers/activityLogController', () => {
             activities: mockActivities.activities,
           },
         ],
+        showContactInformationWarning: false,
       })
+    })
+    it('should render the contact-log page with showContactInformationWarning false when the feature flag is not set', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/contact-log',
+        expect.objectContaining({
+          showContactInformationWarning: false,
+        }),
+      )
+    })
+    it('should render the contact-log page with showContactInformationWarning true when the feature flag is enabled', async () => {
+      const resWithFlag = mockAppResponse({
+        filters: { dateFrom: '', dateTo: '', keywords: '' },
+        flags: { showContactInformationWarning: true },
+      })
+      const renderSpyWithFlag = jest.spyOn(resWithFlag, 'render')
+
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, resWithFlag)
+
+      expect(renderSpyWithFlag).toHaveBeenCalledWith(
+        'pages/contact-log',
+        expect.objectContaining({
+          showContactInformationWarning: true,
+        }),
+      )
     })
     it('should redirect to clean URL and store flash when showSuccessBanner is in query', async () => {
       const reqWithBanner = httpMocks.createRequest({
