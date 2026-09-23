@@ -101,7 +101,7 @@ const homeController: Controller<typeof routes, void> = {
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
-        totalOutcomes: appointmentsRequiringOutcome.length,
+        totalOutcomes: appointmentsRequiringOutcome?.length ?? 0,
         appointments: appointments ?? [],
         outcomes: appointmentsRequiringOutcome ?? [],
         enforcementActions: enforcementActions ?? [],
