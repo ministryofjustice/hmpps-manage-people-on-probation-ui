@@ -549,7 +549,6 @@ describe('Pick a date, location and time for this appointment', () => {
           'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new start time.',
           'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new end time.',
         ])
-        cy.pause()
 
         locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-date-error`).should($error => {
           expect($error.text().trim()).to.include(
