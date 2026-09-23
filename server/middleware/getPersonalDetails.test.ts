@@ -12,6 +12,7 @@ import PrisonApiClient from '../data/prisonApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
+import { RiskSummary } from '../data/model/risk'
 import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
@@ -160,6 +161,8 @@ const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {
     tierCalculation: mockTierCalculation,
     probationPractitioner,
     professionalContact: mockContacts,
+    arnsUnavailable: false,
+    prisonsUnavailable: false,
   }
   if (ogrs4Enabled) {
     mockPersonalDetails.riskData = mockRiskData
@@ -296,7 +299,7 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
     })
 
-    it('leaves personPhotoSrc undefined when there is no photo (404)', async () => {
+    it('leaves personPhotoSrc undefined, and prisonsUnavailable false, when there is no photo (404)', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -305,9 +308,24 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(false)
     })
 
-    it('leaves personPhotoSrc undefined, and still renders the header, when the Prisons API fails', async () => {
+    it('leaves personPhotoSrc undefined, sets prisonsUnavailable, and still renders the header, when the Prisons API fails and enablePersonHeader is on', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('still renders the header (no crash) but leaves prisonsUnavailable false when enablePersonHeader is off - the photo fetch has always been caught defensively, independent of this flag', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -316,6 +334,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
     })
 
@@ -327,6 +346,132 @@ describe('/middleware/getPersonalDetails', () => {
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
+    })
+  })
+
+  describe('arns', () => {
+    it('sets arnsUnavailable and still renders the header when getRisks fails and enablePersonHeader is on', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable and still renders the header when getRiskData fails and enablePersonHeader is on', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable when getRisks resolves an error-summary object (real 500/401 behaviour, not a rejection)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockResolvedValueOnce({
+        errors: [{ text: 'Risk information from the ARNS service is currently unavailable.' }],
+      } as unknown as RiskSummary)
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.risksWidget.overallRisk).toBe('NOT_FOUND')
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable when getRiskData resolves a non-200/404 httpStatus (real 500/401 behaviour, not a rejection)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 500 })
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.riskData).toBeNull()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('leaves arnsUnavailable false when getRiskData resolves httpStatus 404 (legitimately no data, not a failure)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 404 })
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(false)
+    })
+
+    it('leaves arnsUnavailable false when both ARNS calls succeed', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(false)
+    })
+
+    it('does not isolate an ARNS getRisks failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not isolate an ARNS getRiskData failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not cache a degraded (arnsUnavailable) result, so the next request for this CRN retries', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(req.session.data.personalDetails.X000002).toBeUndefined()
+    })
+
+    it('still initialises req.session.data on a degraded result when it did not exist yet, so downstream middleware (e.g. getPersonRiskFlags) does not crash on a fresh session', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = httpMocks.createRequest({ params: { crn: 'X000002' }, session: {} })
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(req.session.data).toBeDefined()
+      expect(req.session.data.personalDetails?.X000002).toBeUndefined()
+    })
+  })
+
+  describe('ndelius', () => {
+    it('AC1: does not isolate an NDelius (MAS personal details) failure, so it fails the whole page', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+      expect(res.locals.headerCRN).toBeUndefined()
     })
   })
 

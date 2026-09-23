@@ -90,6 +90,7 @@ export interface UserAppontment {
     startDateTime: string
     endDateTime: string
   }[]
+  timeoutError?: any
 }
 
 export interface UserLocation {
