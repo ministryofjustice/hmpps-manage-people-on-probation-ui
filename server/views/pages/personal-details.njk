@@ -99,9 +99,9 @@
   {% set hasPreviousAddresses = previousAddressCount > 0 %}
 
   {% if hasOtherAddresses or hasPreviousAddresses %}
-    {% set otherAddressString = '1 other address' if otherAddressCount == 1 else 
+    {% set otherAddressString = '1 other address' if otherAddressCount == 1 else
       otherAddressCount + ' other addresses' %}
-    {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else 
+    {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else
       previousAddressCount + ' previous addresses' %}
 
     {% if hasOtherAddresses and hasPreviousAddresses %}
@@ -141,7 +141,7 @@
                     attributes: {
                       'data-qa': 'telephoneNumberAction'
                     }
-                  }] 
+                  }]
                 } if manageUsersAccess === true
               },
                 {
@@ -155,7 +155,7 @@
                     attributes: {
                       'data-qa': 'mobileNumberAction'
                     }
-                  }] 
+                  }]
                 } if manageUsersAccess === true
                 },
               {
@@ -169,7 +169,7 @@
                     attributes: {
                       'data-qa': 'emailAddressAction'
                     }
-                  }] 
+                  }]
                 } if manageUsersAccess === true
               },
               {
@@ -183,7 +183,7 @@
                     attributes: {
                       'data-qa': 'mainAddressAction'
                     }
-                  }] 
+                  }]
                 } if manageUsersAccess === true
               },
               {
@@ -306,7 +306,11 @@
     {% if documents.length > 0 %}
       {% for doc in documents %}
         <li>
-          <a data-ai-id="documentDownload" href="personal-details/documents/{{ doc.id }}/download" download="{{ doc.name }}">{{ doc.name }}</a><br>
+          <a data-ai-id="documentDownload" href="personal-details/documents/{{ doc.id }}/download" download="{{ doc.name }}">{{ doc.name }}</a>
+          {% if doc.status === 'Sensitive' %}
+            <span data-qa="statusValue{{loop.index}}" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--orange">{{ doc.status }}</span>
+          {% endif %}
+          <br>
           <span class="govuk-!-font-size-16">
             {% if doc.lastUpdated %}
               {{ doc.lastUpdated | lastUpdatedDate }}
@@ -414,8 +418,8 @@
   {% if personalDetails.staffContacts %}
     {% set staffContactRows = [] %}
     {% for staffContact in personalDetails.staffContacts %}
-      {% set staffName = "Unallocated" if (staffContact.isUnallocated) 
-        else 
+      {% set staffName = "Unallocated" if (staffContact.isUnallocated)
+        else
           staffContact.name %}
       {% set staffContactRows = (staffContactRows.push({
                 key: { html: '<span data-qa="staffContactRoleLabel">' + staffContact | roleDescription(true) | toSentenceCase(['(POM)']) + '</span><br><span class="govuk-body-s secondary-text" data-qa="staffContactLastUpdatedLabel">Last updated ' + staffContact.lastUpdated | dateWithYear + '</span>' },
