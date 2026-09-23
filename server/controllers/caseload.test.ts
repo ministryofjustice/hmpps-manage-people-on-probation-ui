@@ -491,14 +491,14 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
       })
-      const getDateRangeSpy = jest
-        .spyOn(dateRangeUtils, 'getDateRange')
+      const getNewDateRangeSpy = jest
+        .spyOn(dateRangeUtils, 'getNewDateRange')
         .mockReturnValue({ fromDate: '2024-01-01', toDate: '2026-01-01' })
-      res.locals.flags = { enableHomePageOutcomesWithFilter: true }
+      res.locals.flags = { enableHomePageOutcomesWithFilter: true, enable3MonthsOutcomes: true }
 
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
 
-      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_THREE_MONTHS')
+      expect(getNewDateRangeSpy).toHaveBeenCalledWith('PAST_THREE_MONTHS')
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
         page: '0',
@@ -529,6 +529,23 @@ describe('caseloadController', () => {
         url: req.url,
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
+    })
+
+    it('uses getDateRange over getNewDateRange if enable3MonthsOutcomes feature flag is disabled', async () => {
+      const req = httpMocks.createRequest({
+        query: {
+          page: '1',
+          outcomeFilter: 'PAST_TWO_YEARS',
+        },
+        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      })
+      const getDateRangeSpy = jest
+        .spyOn(dateRangeUtils, 'getDateRange')
+        .mockReturnValue({ fromDate: '2024-01-01', toDate: '2026-01-01' })
+      res.locals.flags = { enableHomePageOutcomesWithFilter: true }
+
+      await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
+      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_TWO_YEARS')
     })
   })
 
