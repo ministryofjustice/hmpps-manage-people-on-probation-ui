@@ -229,9 +229,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
           crn,
           Object.fromEntries(Object.entries(request).filter(([key]) => !['_csrf', 'allowSms'].includes(key))),
         )
-        if (res.locals?.flags?.enableAllowSms && allowSms) {
-          const value = allowSms === 'YES'
-          await masClient.updateAllowSms(crn, value)
+        if (res.locals?.flags?.enableAllowSms && ['YES', 'NO'].includes(allowSms)) {
+          await masClient.updateAllowSms(crn, allowSms === 'YES')
         }
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)
@@ -249,7 +248,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
           }
         }
         if (res.locals?.flags?.enableAllowSms && allowSms && origin === 'allowSms' && change) {
-          redirect = change
+          redirect = typeof change === 'string' && change.startsWith(`/case/${crn}/`) ? change : redirect
         }
         res.redirect(redirect)
       }

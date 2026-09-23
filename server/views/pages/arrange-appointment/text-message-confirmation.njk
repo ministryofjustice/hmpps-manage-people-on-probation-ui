@@ -25,7 +25,7 @@
     {% set smsPreview = smsConfirmation.preview %}
     {% set overviewHtml = '' %}
     {% for item in smsConfirmation.overview %}
-        {% set overviewHtml = overviewHtml + '<li>' + item + '</li>' %}
+        {% set overviewHtml = overviewHtml + '<li>' + (item | escape) + '</li>' %}
     {% endfor %}
     {% if overviewHtml %}
         {% set overviewHtml = '<ul class="govuk-list govuk-list--bullet">' + overviewHtml + '</ul>' %}
@@ -38,7 +38,7 @@
     classes: "govuk-radios--inline" if not case.mobileNumber else "",
     fieldset: {
       legend: {
-        html: 'Do you want to text ' + personForename + ' a confirmation on ' + case.mobileNumber + '?' if flags.enableAllowSms and case.mobileNumber else 'Do you want to send ' + personForename + ' a text message confirmation?',
+        text: 'Do you want to text ' + personForename + ' a confirmation on ' + case.mobileNumber + '?' if flags.enableAllowSms and case.mobileNumber else 'Do you want to send ' + personForename + ' a text message confirmation?',
         classes: "govuk-fieldset__legend--m govuk-!-margin-bottom-2",
         isPageHeading: false
       },

@@ -100,7 +100,7 @@ describe('Edit contact details nunjucks render tests', () => {
     })
     it('should display the yes radio button as checked if SMS consent is set to true', () => {
       const $ = render()
-      expect($('input#allowSms-yes').is(':checked'))
+      expect($('input#allowSms-yes').is(':checked')).toBe(true)
     })
     it('should display the no radio button as checked if SMS consent is set to false', () => {
       const $ = render({
@@ -109,7 +109,7 @@ describe('Edit contact details nunjucks render tests', () => {
           allowSms: false,
         },
       })
-      expect($('input#allowSms-no').is(':checked'))
+      expect($('input#allowSms-no').is(':checked')).toBe(true)
     })
     it('should not checked either radio button if SMS consent is not defined', () => {
       const $ = render({
@@ -118,8 +118,8 @@ describe('Edit contact details nunjucks render tests', () => {
           allowSms: undefined,
         },
       })
-      expect($('input#allowSms-yes').not(':checked'))
-      expect($('input#allowSms-no').not(':checked'))
+      expect($('input#allowSms-yes').is(':checked')).toBe(false)
+      expect($('input#allowSms-no').is(':checked')).toBe(false)
     })
   })
 })

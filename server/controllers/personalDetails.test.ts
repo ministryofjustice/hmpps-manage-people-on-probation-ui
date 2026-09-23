@@ -499,7 +499,7 @@ describe('/controllers/personalDetails', () => {
             query: {
               ...req.query,
               origin: 'allowSms',
-              change: '/location-date-time',
+              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
             },
             body: {
               ...req.body,
@@ -529,7 +529,7 @@ describe('/controllers/personalDetails', () => {
             query: {
               ...req.query,
               origin: 'allowSms',
-              change: '/location-date-time',
+              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
             },
             body: {
               ...req.body,

@@ -54,10 +54,8 @@ export const getSmsConfirmation = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       }
 
       if (res.locals?.flags?.enableLastTextMessage) {
-        const [personalDetailsUpdatedResponse, lastSmsResponse] = await Promise.all([
-          masClient.getPersonalDetailsUpdated(crn),
-          masClient.getLastSms(crn),
-        ])
+        const personalDetailsUpdatedResponse = await masClient.getPersonalDetailsUpdated(crn)
+        const lastSmsResponse = await masClient.getLastSms(crn)
         const personalDetailsUpdated = !responseIsErrorSummary<PersonalDetailsUpdatedResponse>(
           personalDetailsUpdatedResponse,
         )
