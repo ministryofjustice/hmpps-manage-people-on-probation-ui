@@ -166,9 +166,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
-      const { mobileNumber } = res.locals.case
+      const { mobileNumber, allowSms } = res.locals.case
 
-      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
+      if (smsOptIn?.includes('YES') && allowSms && res.locals.flags.enableSmsReminders && mobileNumber) {
         const {
           includeWelshPreview,
           appointmentLocation = null,

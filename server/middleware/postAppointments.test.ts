@@ -119,10 +119,11 @@ const mockAppointment: AppointmentSession = {
   },
 }
 
-const mockPersonalDetails: Partial<PersonalDetails> = {
+const mockPersonalDetails = ({ allowSms = true } = {}): Partial<PersonalDetails> => ({
   name: { forename: 'James', surname: 'Morrison' },
   mobileNumber: '07700900000',
-}
+  allowSms,
+})
 
 const appointmentTypes: AppointmentType[] = [
   {
@@ -149,7 +150,14 @@ const createMockReq = ({
   nextAppointmentId = null,
   _id = id,
   url = '/arrange-appointment/check-your-answers',
-}: { appointment?: AppointmentSession; _id?: string; nextAppointmentId?: string; url?: string } = {}) => {
+  allowSms = true,
+}: {
+  appointment?: AppointmentSession
+  _id?: string
+  nextAppointmentId?: string
+  url?: string
+  allowSms?: boolean
+} = {}) => {
   return httpMocks.createRequest({
     params: {
       crn,
@@ -172,7 +180,7 @@ const createMockReq = ({
         appointmentTypes,
         personalDetails: {
           [crn]: {
-            overview: mockPersonalDetails,
+            overview: mockPersonalDetails({ allowSms }),
           },
         },
         temp: {
@@ -291,17 +299,19 @@ const mockUser: LocalsUser = {
   token: '123ABC',
 }
 
-const mockCase: Partial<PersonalDetails> = {
+const mockCase = ({ allowSms = true } = {}): Partial<PersonalDetails> => ({
   name: { forename: 'James', surname: 'Morrison' },
   mobileNumber: '07700900000',
-}
+  allowSms,
+})
 
 const buildResponse = ({
   locals = {},
   flags = {},
-}: { locals?: Record<string, any>; flags?: Record<string, boolean> } = {}): AppResponse => {
+  allowSms = true,
+}: { locals?: Record<string, any>; flags?: Record<string, boolean>; allowSms?: boolean } = {}): AppResponse => {
   const localsRes = {
-    case: mockCase,
+    case: mockCase({ allowSms }),
     user: mockUser,
     flags: {
       enableSmsReminders: true,
@@ -832,6 +842,16 @@ describe('/middleware/postAppointments', () => {
     describe('SMS', () => {
       beforeEach(() => {
         jest.clearAllMocks()
+      })
+
+      it('should not send an SMS request if POP has not consented to receiving text messages', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const mockReq = createMockReq({ appointment: mockAppointment })
+        const mockRes = buildResponse({ allowSms: false })
+        await postAppointments(hmppsAuthClient)(mockReq, mockRes)
+        checkOutlookEventRequest(false)
       })
 
       it('should set req.session.data.isEnglishNotificationFailed to true if request does not have a englishNotificationId ', async () => {

@@ -7,7 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockContacts, mockAppResponse, mockSanIndicatorResponse } from './mocks'
-import { isValidCrn } from '../utils'
+import { isValidCrn, setDataValue } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
 import { renderError } from '../middleware'
 import {
@@ -52,6 +52,7 @@ jest.mock('../utils', () => ({
   toPredictors: jest.fn(),
   toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),
   isValidCrn: jest.fn(),
+  setDataValue: jest.fn(),
 }))
 
 const mockMiddlewareFn = jest.fn()
@@ -61,6 +62,7 @@ jest.mock('../middleware', () => ({
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
+const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 jest.mock('../utils/validationUtils', () => ({
   validateWithSpec: jest.fn(),
@@ -552,6 +554,7 @@ describe('/controllers/personalDetails', () => {
           })
           expect(updateAllowSmsSpy).toHaveBeenCalledWith(crn, false)
           expect(spy).toHaveBeenCalledWith(mockReq.query.change)
+          expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'smsOptIn'], 'NO')
         })
       })
     })

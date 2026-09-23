@@ -3,7 +3,7 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { SmsPreviewRequest, SmsPreviewResponse, SmsPreviewSession } from '../data/model/OutlookEvent'
 import { AppointmentSession } from '../models/Appointments'
-import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'
+import { getDataValue, isoFromDateTime, responseIsError, responseIsErrorSummary, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
@@ -79,9 +79,12 @@ export const getSmsPreview = (
           preview = { errors: [{ text: error.message }] }
         }
       }
+      const cachedPreview =
+        res.locals?.flags?.enableAllowSms && responseIsError<SmsPreviewResponse>(preview) ? null : preview
+
       setDataValue<Data, SmsPreviewSession>(data, ['appointments', crn, uuid, 'smsPreview'], {
         request: body,
-        preview: preview as SmsPreviewResponse | null,
+        preview: cachedPreview as SmsPreviewResponse | null,
       })
     }
     if (res.locals?.flags?.enableAllowSms && !inline) {

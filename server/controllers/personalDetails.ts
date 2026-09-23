@@ -231,6 +231,10 @@ const personalDetailsController: Controller<typeof routes, void> = {
         )
         if (res.locals?.flags?.enableAllowSms && ['YES', 'NO'].includes(allowSms)) {
           await masClient.updateAllowSms(crn, allowSms === 'YES')
+          if (allowSms === 'NO') {
+            const { data } = req.session
+            setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'NO')
+          }
         }
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)

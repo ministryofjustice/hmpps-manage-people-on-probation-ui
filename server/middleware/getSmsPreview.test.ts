@@ -225,6 +225,12 @@ describe('middleware/getSmsPreview', () => {
         postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(mockErrorSummary))
         response = await getSmsPreview(hmppsAuthClient, inline)(req, res, nextSpy)
       })
+      it('should set null as the session sms preview', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: expectedRequestBody,
+          preview: null,
+        })
+      })
       it('should return the errors', () => {
         expect(response).toEqual(mockErrorSummary)
       })
@@ -233,6 +239,12 @@ describe('middleware/getSmsPreview', () => {
       beforeEach(async () => {
         postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(null))
         response = await getSmsPreview(hmppsAuthClient, inline)(req, res, nextSpy)
+      })
+      it('should set null as the session sms preview', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: expectedRequestBody,
+          preview: null,
+        })
       })
       it('should return the errors', () => {
         expect(response).toEqual(null)

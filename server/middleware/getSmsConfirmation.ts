@@ -9,6 +9,7 @@ import { convertToTitleCase, dateWithYear, responseIsErrorSummary } from '../uti
 import { getSmsConfirmationOptions } from './getSmsConfirmationOptions'
 import { getSmsPreview } from './getSmsPreview'
 import { Option } from '../models/Option'
+import logger from '../../logger'
 
 const getPersonalDetailsUpdatedText = (personalDetailsUpdated: PersonalDetailsUpdatedResponse): string =>
   `Personal details last updated: ${dateWithYear(personalDetailsUpdated.updatedDateTime)} by ${convertToTitleCase(personalDetailsUpdated.name.forename)} ${convertToTitleCase(personalDetailsUpdated.name.surname)}`
@@ -52,46 +53,44 @@ export const getSmsConfirmation = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       } else {
         preview = previewResponse as SmsPreviewResponse
       }
+      let personalDetailsUpdatedResponse: PersonalDetailsUpdatedResponse | ErrorSummary | null
+      let personalDetailsUpdated: PersonalDetailsUpdatedResponse | null
+      let lastSmsResponse: LastSmsResponse | ErrorSummary | null
+      let lastSms: LastSmsResponse | null
+
+      try {
+        personalDetailsUpdatedResponse = await masClient.getPersonalDetailsUpdated(crn)
+        personalDetailsUpdated = !responseIsErrorSummary<PersonalDetailsUpdatedResponse>(personalDetailsUpdatedResponse)
+          ? (personalDetailsUpdatedResponse as PersonalDetailsUpdatedResponse)
+          : null
+        if (personalDetailsUpdated) {
+          overview.push(getPersonalDetailsUpdatedText(personalDetailsUpdated))
+        }
+      } catch (err: any) {
+        const error = err as Error
+        logger.error(`get personal details updated request error: ${error.message}`)
+        personalDetailsUpdated = null
+      }
 
       if (res.locals?.flags?.enableLastTextMessage) {
-        const personalDetailsUpdatedResponse = await masClient.getPersonalDetailsUpdated(crn)
-        const lastSmsResponse = await masClient.getLastSms(crn)
-        const personalDetailsUpdated = !responseIsErrorSummary<PersonalDetailsUpdatedResponse>(
-          personalDetailsUpdatedResponse,
-        )
-          ? (personalDetailsUpdatedResponse as PersonalDetailsUpdatedResponse)
-          : null
-
-        if (personalDetailsUpdated) {
-          overview.push(getPersonalDetailsUpdatedText(personalDetailsUpdated))
+        try {
+          lastSmsResponse = await masClient.getLastSms(crn)
+          lastSms = !responseIsErrorSummary<LastSmsResponse>(lastSmsResponse) ? lastSmsResponse : null
+          if (lastSms) {
+            const text = getLastSmsText(lastSms)
+            if (text) overview.push(text)
+          }
+        } catch (err: any) {
+          const error = err as Error
+          logger.error(`get last SMS request error: ${error.message}`)
+          lastSms = null
         }
-        const lastSms = !responseIsErrorSummary<LastSmsResponse>(lastSmsResponse) ? lastSmsResponse : null
-        if (lastSms) {
-          const text = getLastSmsText(lastSms)
-          if (text) overview.push(text)
-        }
-        res.locals.smsConfirmation = {
-          overview,
-          options,
-          preview,
-          errors,
-        }
-      } else {
-        const personalDetailsUpdatedResponse = await masClient.getPersonalDetailsUpdated(crn)
-        const personalDetailsUpdated = !responseIsErrorSummary<PersonalDetailsUpdatedResponse>(
-          personalDetailsUpdatedResponse,
-        )
-          ? (personalDetailsUpdatedResponse as PersonalDetailsUpdatedResponse)
-          : null
-        if (personalDetailsUpdated) {
-          overview.push(getPersonalDetailsUpdatedText(personalDetailsUpdated))
-        }
-        res.locals.smsConfirmation = {
-          overview,
-          options,
-          preview,
-          errors,
-        }
+      }
+      res.locals.smsConfirmation = {
+        overview,
+        options,
+        preview,
+        errors,
       }
     }
     return next()

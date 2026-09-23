@@ -38,10 +38,13 @@ export const getPersonalDetails = (
     let prisonsUnavailable = false
     let token: string | undefined
     const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
-    if (!req?.session?.data?.personalDetails?.[crn] || refreshCache) {
+    const masClient = new MasApiClient(token)
+    if (refreshCache && req?.session?.data?.personalDetails?.[crn]) {
+      token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      overview = await masClient.getPersonalDetails(crn)
+    } else if (!req?.session?.data?.personalDetails?.[crn]) {
       const { username } = res.locals.user
       token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
       const arnsAssessmentPlatformClient = new ArnsAssessmentPlatformApiClient(token)
