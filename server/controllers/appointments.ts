@@ -258,10 +258,10 @@ const appointmentsController: Controller<typeof routes, void> = {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
           if (res.locals.flags.enable3MonthsOutcomes) {
-            const threeMonthsAgo = DateTime.now().minus({ months: 3 })
+            const threeMonthsAgo = DateTime.now().startOf('day').minus({ months: 3 })
             return contactDate < threeMonthsAgo
           }
-          const twoYearsAgo = DateTime.now().minus({ years: 2 })
+          const twoYearsAgo = DateTime.now().startOf('day').minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
       } else if (req.session.outcomesFilter[crn] === 'ALL') {

@@ -4,14 +4,14 @@ import { Contact } from '../data/model/overdueOutcomes'
 export const filterContacts = (outcomes: Contact[], years: number = 2): Contact[] => {
   return outcomes?.filter(contact => {
     const contactDate = DateTime.fromISO(contact.date)
-    const yearsAgo = DateTime.now().minus({ years })
+    const yearsAgo = DateTime.now().startOf('day').minus({ years })
     return contactDate >= yearsAgo
   })
 }
 export const filterContactsMonths = (outcomes: Contact[], months: number = 3): Contact[] => {
   return outcomes?.filter(contact => {
     const contactDate = DateTime.fromISO(contact.date)
-    const monthsAgo = DateTime.now().minus({ months })
+    const monthsAgo = DateTime.now().startOf('day').minus({ months })
     return contactDate >= monthsAgo
   })
 }

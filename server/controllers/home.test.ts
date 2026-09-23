@@ -181,21 +181,21 @@ describe('homeController', () => {
           name: { surname: 'Recent', forename: 'Person' },
           crn: 'X000002',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ months: 1 }).toISO() as string,
+          startDateTime: DateTime.now().startOf('day').minus({ months: 1 }).toISO() as string,
         }
         const boundaryAppointment = {
           id: 3,
           name: { surname: 'Boundary', forename: 'Person' },
           crn: 'X000004',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ months: 3 }).plus({ minutes: 1 }).toISO() as string,
+          startDateTime: DateTime.now().startOf('day').minus({ months: 3 }).plus({ minutes: 1 }).toISO() as string,
         }
         const oldAppointment = {
           id: 2,
           name: { surname: 'Old', forename: 'Person' },
           crn: 'X000003',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ months: 3, days: 1 }).toISO() as string,
+          startDateTime: DateTime.now().startOf('day').minus({ months: 3, days: 1 }).toISO() as string,
         }
         const homepageWithMixedOutcomeDates = {
           ...mockHomepage,
