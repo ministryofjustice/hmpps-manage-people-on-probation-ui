@@ -10,6 +10,8 @@ import {
   getDefaultUser,
   routeChangeAttendee,
   getSmsPreview,
+  getSmsConfirmationOptions,
+  getSmsConfirmation,
   getPersonRiskFlags,
   getOverdueOutcomes,
   getPersonAppointment,
@@ -36,7 +38,6 @@ import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
-import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
 import { getUserOptions } from '../middleware/getUserOptions'
 import { returnOptions } from '../middleware/returnOptions'
 
@@ -220,7 +221,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'start', ['user', 'locationCode']] }),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getSmsPreview(hmppsAuthClient),
-    getSmsConfirmationOptions,
+    getSmsConfirmationOptions(),
+    getSmsConfirmation(hmppsAuthClient),
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',

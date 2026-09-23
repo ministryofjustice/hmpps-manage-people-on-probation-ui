@@ -1,21 +1,19 @@
 import { DateTime } from 'luxon'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import { checkPopHeader, checkRiskToStaffAlert } from './imports'
-import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import EditContactDetails from '../../pages/personalDetails/editContactDetails'
 import { crn, uuid } from './imports/common'
 import {
   completeSentencePage,
   completeTypePage,
-  completeAddNotePage,
   completeSupportingInformationPage,
   completeRescheduleAppointmentPage,
   getUuid,
-  completeOutcome,
 } from './utils'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
@@ -27,11 +25,11 @@ const loadPage = ({ urlCRN = crn, typeOptionIndex = 1 } = {}) => {
 
 describe('Pick a date, location and time for this appointment', () => {
   let locationDateTimePage: AppointmentLocationDateTimePage
-  let logOutcomePage: AttendancePage
   let locationNotInListPage: AppointmentLocationNotInListPage
   let notePage: AppointmentNotePage
   let cyaPage: AppointmentCheckYourAnswersPage
   let textMessageConfirmPage: TextMessageConfirmationPage
+  let editContactDetailsPage: EditContactDetails
 
   const now = DateTime.now()
   const yesterday = now.minus({ days: 1 })
@@ -484,10 +482,41 @@ describe('Pick a date, location and time for this appointment', () => {
     })
   })
 
+  describe('Change SMS consent link is clicked', () => {
+    beforeEach(() => {
+      loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
+    })
+    it('should link to the edit contact details page ', () => {
+      cy.get('[data-qa=changeAllowSmsLink]').click()
+      editContactDetailsPage = new EditContactDetails()
+      editContactDetailsPage.checkPageTitle('Edit contact details for Alton')
+      cy.get('input#mobileNumber').clear()
+      cy.get('input#mobileNumber').type('07777555555')
+      cy.get('[data-qa=submitBtn]').click()
+      locationDateTimePage.checkOnPage()
+    })
+  })
+
+  describe('SMS consent is set a false', () => {
+    beforeEach(() => {
+      cy.task('stubAllowSmsFalse')
+      loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
+      completeDateInFuture()
+      locationDateTimePage.getSubmitBtn().click()
+    })
+    it('should skip the text message confirmation page and direct to the supporting information page', () => {
+      notePage = new AppointmentNotePage()
+      notePage.checkOnPage()
+    })
+  })
+
   describe('Text message confirmation feature flag is disabled', () => {
     beforeEach(() => {
       cy.task('stubDisableSmsReminders')
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       completeDateInFuture()
       locationDateTimePage.getSubmitBtn().click()
     })
@@ -520,6 +549,8 @@ describe('Pick a date, location and time for this appointment', () => {
           'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new start time.',
           'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new end time.',
         ])
+        cy.pause()
+
         locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-date-error`).should($error => {
           expect($error.text().trim()).to.include(
             'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is incorrect, select a new date.',

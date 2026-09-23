@@ -21,6 +21,7 @@ import {
   timeFromTo,
   riskLevelLabel,
   shortTime,
+  toErrorList,
 } from '../utils'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
@@ -56,6 +57,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('riskLevelLabel', riskLevelLabel)
   env.addFilter('govukTime', govukTime)
   env.addFilter('shortTime', shortTime)
+  env.addFilter('toErrorList', toErrorList)
   env.addFilter('handleQuotes', handleQuotes)
   env.addGlobal('timeFromTo', timeFromTo)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {

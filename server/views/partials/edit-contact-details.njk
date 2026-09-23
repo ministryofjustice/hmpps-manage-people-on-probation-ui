@@ -67,12 +67,12 @@
                     showTitleAsHeading: false,
                     dismissible: false,
                     attributes: { "data-qa": "updateBanner" },
-                    html: 'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.'
+                    html: 'The contact details must belong to ' + headerPersonName.forename | convertToTitleCase + '. Any updates you make here will also update the NDelius record.' if flags.enableAllowSms else 'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.'
                 }) }}
             </div>
         </div>
     {% endif %}
-    <div class="govuk-!-width-one-half">
+    <div class="govuk-!-width-three-quarters">
         <form method="post" autocomplete="off" action="{{ paths.current }}">
 
             {% if personalDetails.mainAddress.to %}

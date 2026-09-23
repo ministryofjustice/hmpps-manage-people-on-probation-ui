@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/personal-details/.*/contact/allow-sms",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": true,
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

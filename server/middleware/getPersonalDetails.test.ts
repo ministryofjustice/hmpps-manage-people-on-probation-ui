@@ -149,7 +149,7 @@ const overview = (crn = 'X000001'): PersonalDetails => ({
   staffContacts: [] as Contact[],
 })
 
-const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {}): PersonalDetailsSession => {
+const mock = ({ crn = 'X000001', ogrs4Enabled = true } = {}): PersonalDetailsSession => {
   const mockPersonalDetails: PersonalDetailsSession = {
     overview: overview(crn),
     sentencePlan: {
@@ -209,10 +209,74 @@ describe('/middleware/getPersonalDetails', () => {
       const expected = {
         personalDetails: {
           X000001: mock(),
-          X000002: mock({ crn: 'X000002', lastUpdatedDate: '' }),
+          X000002: mock({ crn: 'X000002' }),
         },
       }
 
+      expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(risksSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', {
+        nameOrCrn: req.params.crn,
+      })
+      expect(getProbationPractitionerSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(getContactsSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
+      expect(predictorsSpy).not.toHaveBeenCalled()
+      expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
+      expect(req.session.data).toEqual(expected)
+      expect(res.locals.case).toEqual(overview('X000002'))
+      expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
+      expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
+      expect(res.locals.riskData).toEqual(mockRiskData)
+      expect(res.locals.predictorScores).toBeUndefined()
+      expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
+      expect(res.locals.headerCRN).toEqual(req.params.crn)
+      expect(res.locals.headerDob).toEqual('1979-08-18')
+      expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
+      expect(res.locals.managedBy).toEqual({
+        text: 'Arhsimna Xolfo (All London)',
+        href: '/case/X000002/personal-details/staff-contacts',
+      })
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('should request data from the api if cache for crn exists and enableAllowSms feature flag is enabled and url is /location-date-time', async () => {
+      process.env.NODE_ENV = 'production'
+      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+      req = httpMocks.createRequest({
+        params: {
+          crn: 'X000002',
+        },
+        url: '/location-date-time',
+        session: {
+          data: {
+            personalDetails: {
+              X000001: mock(),
+              X000002: mock({ crn: 'X000002' }),
+            },
+          },
+        },
+      })
+      res = {
+        locals: {
+          flags: {
+            enableAllowSms: true,
+          },
+          user: {
+            username: 'user-1',
+            roles: ['SENTENCE_PLAN'],
+          },
+        },
+        redirect: jest.fn().mockReturnThis(),
+      } as unknown as AppResponse
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      const expected = {
+        personalDetails: {
+          X000001: mock(),
+          X000002: mock({ crn: 'X000002' }),
+        },
+      }
       expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
       expect(risksSpy).toHaveBeenCalledWith(req.params.crn)
       expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)

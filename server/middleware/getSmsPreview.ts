@@ -7,18 +7,25 @@ import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '..
 import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
+import { ErrorSummary } from '../data/model/common'
 
 const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC', 'CHVS', 'CODC'])
 
-export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const getSmsPreview = (
+  hmppsAuthClient: HmppsAuthClient,
+  inline = true,
+): Route<Promise<SmsPreviewResponse | ErrorSummary | null | void>> => {
   return async function getSmsPreviewInner(req, res, next?) {
+    if (res.locals?.flags?.enableAllowSms && inline) {
+      return next()
+    }
     const { crn, id: uuid } = req.params as Record<string, string>
     const { username } = res.locals.user
     const {
       name: { forename: firstName },
     } = res.locals.case
     let appointmentLocation = ''
-    let preview: SmsPreviewResponse | null = null
+    let preview: SmsPreviewResponse | ErrorSummary | null = null
 
     const { data } = req.session
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
@@ -59,16 +66,28 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       const masOutlookClient = new SupervisionAppointmentClient(token)
       try {
         const response = await masOutlookClient.postSmsPreview(body)
-        if (!responseIsError<SmsPreviewResponse>(response)) {
+        if (!res.locals?.flags?.enableAllowSms && !responseIsError<SmsPreviewResponse>(response)) {
+          preview = response
+        }
+        if (res.locals?.flags?.enableAllowSms) {
           preview = response
         }
       } catch (err: any) {
         const error = err as Error
         logger.error(`SMS preview request error: ${error.message}`)
+        if (res.locals?.flags?.enableAllowSms) {
+          preview = { errors: [{ text: error.message }] }
+        }
       }
-      setDataValue<Data, SmsPreviewSession>(data, ['appointments', crn, uuid, 'smsPreview'], { request: body, preview })
+      setDataValue<Data, SmsPreviewSession>(data, ['appointments', crn, uuid, 'smsPreview'], {
+        request: body,
+        preview: preview as SmsPreviewResponse | null,
+      })
     }
-    res.locals.smsPreview = preview
+    if (res.locals?.flags?.enableAllowSms && !inline) {
+      return preview
+    }
+    res.locals.smsPreview = preview as SmsPreviewResponse
     return next()
   }
 }

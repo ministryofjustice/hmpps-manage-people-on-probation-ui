@@ -142,6 +142,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         startDate: from,
         endDate: to,
         notes,
+        allowSms,
       } = request
       let action = 'SAVE_EDIT_PERSONAL_DETAILS'
       const renderPage = req.path.split('/').pop()
@@ -169,10 +170,10 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const warningDisplayed: boolean = !request.endDate || Object.hasOwn(req.body, 'endDateWarningDisplayed')
       const isValid = Object.keys(errorMessages).length === 0 && warningDisplayed
       const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action,
         who: res.locals.user.username,
@@ -226,8 +227,12 @@ const personalDetailsController: Controller<typeof routes, void> = {
       } else {
         const personalDetails: PersonalDetails = await masClient[updateFn](
           crn,
-          Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')),
+          Object.fromEntries(Object.entries(request).filter(([key]) => !['_csrf', 'allowSms'].includes(key))),
         )
+        if (res.locals?.flags?.enableAllowSms && allowSms) {
+          const value = allowSms === 'YES'
+          await masClient.updateAllowSms(crn, value)
+        }
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)
         }
@@ -237,12 +242,14 @@ const personalDetailsController: Controller<typeof routes, void> = {
         let redirect = `/case/${crn}/personal-details?update=success`
         if (origin === 'appointments') {
           const { data } = req.session
-          const change = req?.query?.change as string
           setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
           redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
           if (change) {
             redirect = findUncompleted()(req, res)
           }
+        }
+        if (res.locals?.flags?.enableAllowSms && allowSms && origin === 'allowSms' && change) {
+          redirect = change
         }
         res.redirect(redirect)
       }

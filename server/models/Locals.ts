@@ -28,7 +28,7 @@ import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
 import { TierChangePrompt } from '../utils/tierChange'
 import { FinalThirdPrompt } from '../utils/finalThird'
 import { SupervisionPackage } from './SupervisionPackage'
-import { ErrorSummary } from '../data/model/common'
+import { ErrorSummary, ErrorSummaryItem } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { Compliance } from '../data/model/overview'
 import { BreachOrRecall, SentenceCompliance } from '../data/model/compliance'
@@ -97,6 +97,13 @@ export interface LocalsUser {
   displayName?: string
   token: string
   probationDeliveryUnits?: ProbationDeliveryUnit[]
+}
+
+export interface SmsConfirmation {
+  overview: string[]
+  options: Option[]
+  preview: SmsPreviewResponse | null
+  errors?: ErrorSummaryItem[]
 }
 
 interface Locals {
@@ -179,6 +186,7 @@ interface Locals {
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
+  smsConfirmation: SmsConfirmation
   personRisks?: PersonRiskFlags
   riskToStaff?: { id: number; level: RiskScore | null }
   riskToProbationStaff?: { id: number }

@@ -23,7 +23,8 @@ export const getPersonalDetails = (
   arnsComponents: ArnsComponents,
 ): Route<Promise<void>> => {
   return async function getPersonalDetailsInner(req, res, next) {
-    const { crn } = req.params as Record<string, string>
+    const { url, params } = req
+    const { crn } = params as Record<string, string>
     let sentencePlan: SentencePlan
     let overview: PersonalDetails
     let risks: RiskSummary
@@ -36,7 +37,8 @@ export const getPersonalDetails = (
     let arnsUnavailable = false
     let prisonsUnavailable = false
     let token: string | undefined
-    if (!req?.session?.data?.personalDetails?.[crn]) {
+    const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
+    if (!req?.session?.data?.personalDetails?.[crn] || refreshCache) {
       const { username } = res.locals.user
       token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)

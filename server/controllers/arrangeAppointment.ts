@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { Request, Response } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
-  convertToTitleCase,
   dateIsInPast,
   dateWithYear,
   getDataValue,
@@ -312,7 +311,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async function getLocationDateTime(req, res) {
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
-      const { change, validation } = req.query as Record<string, string>
+      const { change } = req.query as Record<string, string>
       const isInPast = appointmentDateIsInPast(req, res)
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       const isReschedule = isRescheduleAppointment(req)
@@ -360,6 +359,9 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         alertDismissed,
         isReschedule,
+        ...(res.locals?.flags?.enableAllowSms
+          ? { allowSms: getDataValue(data, ['personalDetails', crn, 'overview', 'allowSms']) }
+          : {}),
       })
     }
   },
@@ -378,6 +380,12 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const selectedLocation = getDataValue(data, [...path, 'user', 'locationCode'])
       let nextPage = res.locals?.flags?.enableSmsReminders ? `text-message-confirmation` : `supporting-information`
 
+      if (res.locals?.flags?.enableAllowSms) {
+        const allowSms = getDataValue(data, ['personalDetails', crn, 'overview', 'allowSms'])
+        if (allowSms === false) {
+          nextPage = 'supporting-information'
+        }
+      }
       if (appointmentDateIsInPast(req, res)) {
         nextPage = 'outcome'
       }

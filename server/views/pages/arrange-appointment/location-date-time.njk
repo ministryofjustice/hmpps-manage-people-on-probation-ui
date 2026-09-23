@@ -24,6 +24,15 @@
 {% set relationship = '' %}
 {% set provisions = [] %}
 {% set personForename = headerPersonName.forename %}
+{% if flags.enableAllowSms %}
+{% set allowSms = 'Not provided' %}
+{% if case.allowSms %}
+{% set allowSms = 'Yes' %}
+{% endif %}
+{% if case.allowSms == false %}
+{% set allowSms = 'No' %}
+{% endif %}
+{% endif %}
 {% block alertBanner %}
     {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
@@ -239,6 +248,23 @@
     items: locationItems
    } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
 
+   {% if flags.enableAllowSms %}
+     {# Text message consent #}
+  <section data-qa="allowSms">
+    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">Has {{ case.name.forename | convertToTitleCase }} given permission to receive text messages? (optional)</h3>
+    {% if case.allowSms == false %}
+    <p class="govuk-caption-m" data-qa="allowSmsHint">You cannot send text message reminders as {{ case.name.forename | convertToTitleCase }} has not consented.</p>
+    {% endif %}
+    <div class="govuk-grid-row govuk-!-font-size-19 govuk-!-margin-top-2">
+      <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body" data-qa="allowSmsAnswer">{{ allowSms }}</p>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <a href="/case/{{ crn }}/personal-details/edit-contact-details?origin=allowSms&change=/case/{{ crn }}/arrange-appointment/{{ id }}/location-date-time" class="govuk-link govuk-!-text-align-right" data-qa="changeAllowSmsLink">Change</a>
+      </div>
+    </div>
+  </section>
+{% endif %}
     <input type="hidden" name="_minDate" value="{{ _minDate }}">
     <input type="hidden" name="_maxDate" value="{{ _maxDate }}">
 {% endblock %}
