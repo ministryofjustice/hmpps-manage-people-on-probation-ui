@@ -230,7 +230,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
           crn,
           Object.fromEntries(Object.entries(request).filter(([key]) => !['_csrf', 'allowSms'].includes(key))),
         )
-        if (res.locals?.flags?.enableAllowSms && ['YES', 'NO'].includes(allowSms)) {
+        if (res.locals?.flags?.enableAllowSms && !!allowSms) {
           await masClient.updateAllowSms(crn, allowSms === 'YES')
           const { data } = req.session
           const path = ['appointments', crn, id, 'smsOptIn']
@@ -247,7 +247,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
         let redirect = `/case/${crn}/personal-details?update=success`
         if (origin === 'appointments') {
           const { data } = req.session
-          setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
+          if (res.locals?.flags?.enableAllowSms) {
+            setDataValue(data, ['appointments', crn, id, 'smsOptIn'], allowSms === 'YES' ? 'YES' : 'NO')
+          } else {
+            setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
+          }
           redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
           if (change) {
             redirect = findUncompleted()(req, res)

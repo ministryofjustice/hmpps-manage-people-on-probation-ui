@@ -36,9 +36,13 @@ export const getPersonalDetails = (
     let personPhotoSrc: string | undefined
     let arnsUnavailable = false
     let prisonsUnavailable = false
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-    const masClient = new MasApiClient(token)
+    let token: string
+    let masClient: MasApiClient
     const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
+    if (refreshCache || !req?.session?.data?.personalDetails?.[crn]) {
+      token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      masClient = new MasApiClient(token)
+    }
     if (refreshCache && req?.session?.data?.personalDetails?.[crn]) {
       overview = await masClient.getPersonalDetails(crn)
       req.session.data.personalDetails[crn].overview = overview
