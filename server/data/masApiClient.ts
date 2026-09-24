@@ -369,7 +369,7 @@ export default class MasApiClient extends RestClient {
   ): Promise<{ statusCode: number } | ErrorSummary | null> {
     const sanitizedFile: Express.Multer.File = {
       ...file,
-      originalname: sanitizeFilename(file.originalname),
+      originalname: Buffer.from(sanitizeFilename(file.originalname), 'latin1').toString('utf8'),
     }
     return this.patch({
       path: `/documents/${crn}/update/contact/${id}`,
