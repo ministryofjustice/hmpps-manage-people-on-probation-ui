@@ -31,7 +31,6 @@
 {% if appointment.location == 'NO_LOCATION_REQUIRED' %}
     {% set locationHtml = 'Not required' %}
 {% endif %}
-
 {% set typeValue = 'Not entered' if not appointment.type else
     appointment.type.description | toSentenceCase(['(NS)']) %}
 {% set locationValue = 'Not entered' if not locationHtml else
@@ -65,6 +64,13 @@
         ''
     ) %}
 {% endif %}
+{% set showTextMessageConfirmation = false %}
+{% if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast and not flags.enableAllowSms %}
+{% set showTextMessageConfirmation = true %}
+{% endif %}
+{% if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast and appointment.allowSms and flags.enableAllowSms %}
+{% set showTextMessageConfirmation = true %}
+{% endif %}
 
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {% set showAction = true %}
@@ -83,7 +89,10 @@
     </ul>
     {% endset %}
     {{ govukSummaryList({
-        classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',
+        attributes: {
+            'data-text-message-confirmation': true if showTextMessageConfirmation else false
+        } if flags.enableAllowSms,
+        classes: 'govuk-!-margin-bottom-' + ('6' if showCalendarInsetText else '9'),
         rows: [
             { key: { text: "Appointment for" },
             value: { html: 'Not entered' if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else sentenceHtml | safe  },
@@ -173,7 +182,7 @@
         }
     } if appointmentOutcome.summary.evidenceDueDate and isInPast,
 
-           { key: { text: "Text message confirmation" },
+           { key: { text: 'Text message confirmation' },
     value: { html: textMessageConfirmationHtml + ('<span class="govuk-summary-list__hint">' + noDateHint + '</span>' if not appointment.date )  },
     actions: {
     items: [ {
@@ -182,7 +191,7 @@
     visuallyHiddenText: "text message confirmation"
      }
      ]
-     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast,
+     } if showAction and appointment.date } if showTextMessageConfirmation,
        { key: { text: "Notes" if isInPast else "Supporting information" },
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
@@ -204,6 +213,7 @@
      ]
      } if showAction and not sensitivityLocked }
 ] }) }}
+
     {% if showCalendarInsetText %}
         {{ govukInsetText({
   text: insertText,

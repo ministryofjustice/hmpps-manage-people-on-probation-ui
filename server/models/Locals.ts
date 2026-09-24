@@ -80,6 +80,7 @@ export interface AppointmentLocals {
   sensitivity?: string
   outcomeRecorded?: string
   isReschedule?: boolean
+  allowSms?: boolean
 }
 
 export interface LocalsUser {

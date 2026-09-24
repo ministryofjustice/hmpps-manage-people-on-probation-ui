@@ -47,13 +47,17 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
-jest.mock('../utils', () => ({
-  toRoshWidget: jest.fn(),
-  toPredictors: jest.fn(),
-  toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),
-  isValidCrn: jest.fn(),
-  setDataValue: jest.fn(),
-}))
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    toRoshWidget: jest.fn(),
+    toPredictors: jest.fn(),
+    toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),
+    isValidCrn: jest.fn(),
+    setDataValue: jest.fn(),
+  }
+})
 
 const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
@@ -539,6 +543,17 @@ describe('/controllers/personalDetails', () => {
               allowSms: 'NO',
               _csrf: '1234',
             },
+            session: {
+              data: {
+                appointments: {
+                  [crn]: {
+                    [id]: {
+                      smsOptIn: 'YES',
+                    },
+                  },
+                },
+              },
+            },
             path: 'personal-details/edit-contact-details',
           } as httpMocks.MockRequest<any>
           const mockRes = buildResponse({ enableAllowSms: true })
@@ -554,7 +569,11 @@ describe('/controllers/personalDetails', () => {
           })
           expect(updateAllowSmsSpy).toHaveBeenCalledWith(crn, false)
           expect(spy).toHaveBeenCalledWith(mockReq.query.change)
-          expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['appointments', crn, id, 'smsOptIn'], 'NO')
+          expect(setDataValueSpy).toHaveBeenCalledWith(
+            mockReq.session.data,
+            ['appointments', crn, id, 'smsOptIn'],
+            'NO',
+          )
         })
       })
     })

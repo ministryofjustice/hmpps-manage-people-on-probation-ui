@@ -36,15 +36,14 @@ export const getPersonalDetails = (
     let personPhotoSrc: string | undefined
     let arnsUnavailable = false
     let prisonsUnavailable = false
-    let token: string | undefined
-    const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
+    const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
     if (refreshCache && req?.session?.data?.personalDetails?.[crn]) {
-      token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       overview = await masClient.getPersonalDetails(crn)
+      req.session.data.personalDetails[crn].overview = overview
     } else if (!req?.session?.data?.personalDetails?.[crn]) {
       const { username } = res.locals.user
-      token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
       const arnsAssessmentPlatformClient = new ArnsAssessmentPlatformApiClient(token)

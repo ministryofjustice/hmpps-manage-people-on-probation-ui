@@ -6,6 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import { Overview } from '../data/model/overview'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 const crn = 'X000001'
 
@@ -39,15 +40,17 @@ jest.mock('../utils', () => {
   }
 })
 
-const mockOverview = {
-  personalDetails: {
-    name: {
-      forename: 'Joe',
-      surname: 'Bloggs',
+const mockOverview = ({ allowSms = true } = {}) =>
+  ({
+    personalDetails: {
+      name: {
+        forename: 'Joe',
+        surname: 'Bloggs',
+      },
+      allowSms,
     },
-  },
-  registrations: ['Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
-} as unknown as Overview
+    registrations: ['Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
+  }) as unknown as Overview
 
 const nextSpy = jest.fn()
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -89,7 +92,7 @@ describe('/middleware/getAppointment', () => {
   it('should assign appointment to locals var if found in session', async () => {
     const getOverviewSpy = jest
       .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview))
+      .mockImplementation(() => Promise.resolve(mockOverview()))
 
     const req = httpMocks.createRequest({
       params: {
@@ -174,10 +177,10 @@ describe('/middleware/getAppointment', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should assign appointment to locals var if reschedule appointment journey', async () => {
+  it('should assign appointment to locals var if reschedule appointment journey and allow sms is false', async () => {
     const getOverviewSpy = jest
       .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview))
+      .mockImplementation(() => Promise.resolve(mockOverview({ allowSms: false })))
 
     const req = httpMocks.createRequest({
       params: {
@@ -218,6 +221,9 @@ describe('/middleware/getAppointment', () => {
           team: '',
           username: '',
         },
+        flags: {
+          enableAllowSms: true,
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
@@ -247,7 +253,7 @@ describe('/middleware/getAppointment', () => {
       },
       attending: { name: '', team: '', region: '', html: '' },
       location: '',
-      textMessageConfirmation: 'Yes',
+      textMessageConfirmation: null,
       date: '2044-12-22T09:15:00.382936Z',
       start: '2044-12-22T09:15:00.382936Z',
       previousStart: '',
@@ -257,6 +263,7 @@ describe('/middleware/getAppointment', () => {
       sensitivity: null,
       outcomeRecorded: null,
       isReschedule: true,
+      allowSms: false,
     })
     expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
@@ -264,7 +271,7 @@ describe('/middleware/getAppointment', () => {
 
   it('should set the meta data correctly if visor in registrations', async () => {
     const overview: Overview = {
-      ...mockOverview,
+      ...mockOverview(),
       registrations: ['visor'],
     }
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
@@ -306,7 +313,7 @@ describe('/middleware/getAppointment', () => {
 
   it('should set the meta data correctly if change in query params', async () => {
     const overview: Overview = {
-      ...mockOverview,
+      ...mockOverview(),
       registrations: ['visor'],
     }
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
@@ -350,7 +357,7 @@ describe('/middleware/getAppointment', () => {
   })
 
   it('should not set the locals var if appointment not found in session', async () => {
-    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(mockOverview))
+    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(mockOverview()))
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',

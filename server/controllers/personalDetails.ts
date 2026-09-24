@@ -5,13 +5,14 @@ import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
 import TierApiClient from '../data/tierApiClient'
 import RoleService from '../services/roleService'
-import { toIsoDateFromPicker, isValidCrn, setDataValue } from '../utils'
+import { toIsoDateFromPicker, isValidCrn, setDataValue, getDataValue } from '../utils'
 import type { Controller } from '../@types'
 import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
 import { findUncompleted, renderError } from '../middleware'
 import { type Needs } from '../data/model/risk'
+import { SmsOptInOptions } from '../data/model/OutlookEvent'
 
 const routes = [
   'getPersonalDetails',
@@ -231,9 +232,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
         )
         if (res.locals?.flags?.enableAllowSms && ['YES', 'NO'].includes(allowSms)) {
           await masClient.updateAllowSms(crn, allowSms === 'YES')
-          if (allowSms === 'NO') {
-            const { data } = req.session
-            setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'NO')
+          const { data } = req.session
+          const path = ['appointments', crn, id, 'smsOptIn']
+          console.log({ crn, id })
+          if (allowSms === 'NO' && getDataValue<SmsOptInOptions>(data, path)?.includes('YES')) {
+            setDataValue(data, path, 'NO')
           }
         }
         if (!isValidCrn(crn)) {

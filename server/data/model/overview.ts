@@ -1,5 +1,5 @@
 import { Mappa } from './risk'
-import { Name, PersonalCircumstance } from './personalDetails'
+import { PersonalDetails } from './personalDetails'
 
 export interface Overview {
   absencesWithoutEvidence: number
@@ -60,18 +60,6 @@ export interface Appointment {
   description: string
 }
 
-export interface PersonalDetails {
-  name: Name
-  preferredGender: string
-  preferredName?: string
-  telephoneNumber?: string
-  mobileNumber?: string
-  disabilities: Disability[]
-  provisions: Provision[]
-  personalCircumstances: PersonalCircumstance[]
-  dateOfBirth: string
-  dateOfDeath?: string
-}
 export interface Disability {
   description: string
 }

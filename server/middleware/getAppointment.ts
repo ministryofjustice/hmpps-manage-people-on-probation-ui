@@ -18,6 +18,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
+    const allowSms = currentCase?.personalDetails?.allowSms
     const { data } = req.session
 
     // eslint-disable-next-line no-useless-escape
@@ -75,10 +76,19 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
       let textMessageConfirmation: YesNo | null | undefined
-      if (smsOptIn === null) textMessageConfirmation = null
-      if (![null, undefined].includes(smsOptIn)) {
-        textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
+
+      if (res.locals?.flags?.enableAllowSms) {
+        textMessageConfirmation = null
+        if (smsOptIn && allowSms) {
+          textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
+        }
+      } else {
+        if (smsOptIn === null) textMessageConfirmation = null
+        if (![null, undefined].includes(smsOptIn)) {
+          textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
+        }
       }
+
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(_sentence => _sentence.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
@@ -169,6 +179,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sensitivity: sensitivityLocked ? 'Yes' : (sensitivity ?? null),
         outcomeRecorded: outcomeRecorded ?? null,
         isReschedule: rescheduleAppointment?.contactId !== undefined,
+      }
+      if (res.locals?.flags?.enableAllowSms) {
+        appointment.allowSms = allowSms
       }
     }
     res.locals.appointment = appointment
