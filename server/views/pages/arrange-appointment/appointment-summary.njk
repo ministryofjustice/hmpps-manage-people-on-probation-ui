@@ -68,10 +68,9 @@
 {% if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast and not flags.enableAllowSms %}
 {% set showTextMessageConfirmation = true %}
 {% endif %}
-{% if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast and appointment.allowSms and flags.enableAllowSms %}
+{% if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast and appointment.allowSms != false and flags.enableAllowSms %}
 {% set showTextMessageConfirmation = true %}
-{% endif %}
-
+{% endif %} 
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {% set showAction = true %}
     {% set appointmentDates = [] %}
@@ -90,7 +89,7 @@
     {% endset %}
     {{ govukSummaryList({
         attributes: {
-            'data-text-message-confirmation': true if showTextMessageConfirmation else false
+            'data-text-message-confirmation': showTextMessageConfirmation
         } if flags.enableAllowSms,
         classes: 'govuk-!-margin-bottom-' + ('6' if showCalendarInsetText else '9'),
         rows: [

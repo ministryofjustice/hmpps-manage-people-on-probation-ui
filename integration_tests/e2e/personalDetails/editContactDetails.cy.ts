@@ -46,7 +46,7 @@ context('Edit contact details', () => {
       .should('be.visible')
       .and(
         'contain',
-        'The contact details must belong to Stuart. Any updates you make here will also update the NDelius record.',
+        'The contact details must belong to Caroline. Any updates you make here will also update the NDelius record.',
       )
     page.getElement('submitBtn').should('contain.text', 'Save changes')
     page
