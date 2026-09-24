@@ -234,7 +234,6 @@ const personalDetailsController: Controller<typeof routes, void> = {
           await masClient.updateAllowSms(crn, allowSms === 'YES')
           const { data } = req.session
           const path = ['appointments', crn, id, 'smsOptIn']
-          console.log({ crn, id })
           if (allowSms === 'NO' && getDataValue<SmsOptInOptions>(data, path)?.includes('YES')) {
             setDataValue(data, path, 'NO')
           }
