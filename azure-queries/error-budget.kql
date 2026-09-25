@@ -26,9 +26,9 @@ requests
 | project
     TotalRequests,
     FailedRequests,
-    ActualSuccessRate,
-    ErrorRate,
+    ActualSuccessRate = round(ActualSuccessRate, 2),
+    ErrorRate = round(ErrorRate, 2),
     ServiceLevelObjective = slo,
-    ErrorBudget,
-    ErrorBudgetRemaining,
-    ErrorBudgetConsumedPct = ErrorBudgetConsumed
+    ErrorBudget = round(ErrorBudget, 2),
+    ErrorBudgetRemaining = round(ErrorBudgetRemaining, 2),
+    ErrorBudgetConsumedPct = round(ErrorBudgetConsumed, 2)

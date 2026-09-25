@@ -27,12 +27,12 @@ requests
     ErrorBudgetConsumedPct = ((SlowRequests * 100.0) / TotalRequests) / (100 - slo_target) * 100
 | project
     TotalRequests,
-    p50, p95, p99, p999,
+    p50 = round(p50, 2), p95 = round(p95, 2), p99 = round(p99, 2), p999 = round(p999, 2),
     ServiceLevelObjectiveThreshold = slo_p95_threshold,
     ServiceLevelObjectiveTarget = slo_target,
     SlowRequests,
-    SlowRequestRate,
-    FastRequestRate,
-    ErrorBudget,
-    ErrorBudgetRemaining,
-    ErrorBudgetConsumedPct
+    SlowRequestRate = round(SlowRequestRate, 2),
+    FastRequestRate = round(FastRequestRate, 2),
+    ErrorBudget = round(ErrorBudget, 2),
+    ErrorBudgetRemaining = round(ErrorBudgetRemaining, 2),
+    ErrorBudgetConsumedPct = round(ErrorBudgetConsumedPct, 2)
