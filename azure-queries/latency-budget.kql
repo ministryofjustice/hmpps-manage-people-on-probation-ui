@@ -32,16 +32,16 @@ requests
     ErrorBudgetConsumedPct = ((SlowRequests * 100.0) / TotalRequests) / (100 - slo_target) * 100
 | project
     Status = iff(TotalRequests == 0, "⚪ No data", iff(ErrorBudgetRemaining < 0, "🔴 Breached", "✅ Within budget")),
-    ErrorBudgetConsumed = strcat(tostring(round(ErrorBudgetConsumedPct, 2)), "%"),
-    ErrorBudgetRemaining = strcat(tostring(round(ErrorBudgetRemaining, 2)), "%"),
+    ErrorBudgetConsumed = iff(TotalRequests == 0, "N/A", strcat(tostring(round(ErrorBudgetConsumedPct, 2)), "%")),
+    ErrorBudgetRemaining = iff(TotalRequests == 0, "N/A", strcat(tostring(round(ErrorBudgetRemaining, 2)), "%")),
     TotalRequests = FormatWithCommas(TotalRequests),
     SlowRequests = FormatWithCommas(SlowRequests),
-    SlowRequestRate = strcat(tostring(round(SlowRequestRate, 2)), "%"),
-    FastRequestRate = strcat(tostring(round(FastRequestRate, 2)), "%"),
-    p50 = strcat(tostring(round(p50 / 1000.0, 2)), "s"),
-    p95 = strcat(tostring(round(p95 / 1000.0, 2)), "s"),
-    p99 = strcat(tostring(round(p99 / 1000.0, 2)), "s"),
-    p999 = strcat(tostring(round(p999 / 1000.0, 2)), "s"),
+    SlowRequestRate = iff(TotalRequests == 0, "N/A", strcat(tostring(round(SlowRequestRate, 2)), "%")),
+    FastRequestRate = iff(TotalRequests == 0, "N/A", strcat(tostring(round(FastRequestRate, 2)), "%")),
+    p50 = iff(TotalRequests == 0, "N/A", strcat(tostring(round(p50 / 1000.0, 2)), "s")),
+    p95 = iff(TotalRequests == 0, "N/A", strcat(tostring(round(p95 / 1000.0, 2)), "s")),
+    p99 = iff(TotalRequests == 0, "N/A", strcat(tostring(round(p99 / 1000.0, 2)), "s")),
+    p999 = iff(TotalRequests == 0, "N/A", strcat(tostring(round(p999 / 1000.0, 2)), "s"))
     ServiceLevelObjectiveThreshold = strcat(tostring(round(slo_p95_threshold / 1000.0, 2)), "s"),
     ServiceLevelObjectiveTarget = strcat(tostring(slo_target), "%"),
     ErrorBudget = strcat(tostring(round(ErrorBudget, 2)), "%")
