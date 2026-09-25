@@ -2,8 +2,13 @@
   "mappings": [
     {
       "request": {
+        "method": "POST",
         "urlPathPattern": "/mas/personal-details/.*/contact/allow-sms",
-        "method": "POST"
+        "queryParameters": {
+          "smsAllowed": {
+            "matches": "true|false"
+          }
+        }
       },
       "response": {
         "status": 200,
