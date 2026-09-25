@@ -39,6 +39,7 @@ export const getPersonalDetails = (
     let token: string
     let masClient: MasApiClient
     const refreshCache =
+      !res.locals.case &&
       res.locals?.flags?.enableAllowSms &&
       ['/location-date-time', '/check-your-answers'].some(cacheUrl => url.includes(cacheUrl))
 

@@ -424,6 +424,7 @@ describe('/controllers/personalDetails', () => {
               telephoneNumber: '',
               mobileNumber,
               email,
+              allowSms: false,
             },
             needs: mockNeeds,
             origin: 'appointments',

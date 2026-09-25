@@ -215,6 +215,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
             telephoneNumber,
             mobileNumber,
             email,
+            allowSms: allowSms === 'YES',
           }
         }
         res.render(`pages/edit-contact-details/${renderPage}`, {
