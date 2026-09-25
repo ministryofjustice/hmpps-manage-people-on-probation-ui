@@ -125,10 +125,12 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
       }
       const backParam = `back=${baseOutcomeUrl}/add-note`
-      if (redirect.includes('back=')) {
-        redirect = redirect.replace(/back=[^&]*/, backParam)
-      } else {
-        redirect = `${redirect}${redirect.includes('?') ? '&' : '?'}${backParam}`
+      if (!put) {
+        if (redirect.includes('back=')) {
+          redirect = redirect.replace(/back=[^&]*/, backParam)
+        } else {
+          redirect = `${redirect}${redirect.includes('?') ? '&' : '?'}${backParam}`
+        }
       }
       return res.redirect(redirect)
     }
