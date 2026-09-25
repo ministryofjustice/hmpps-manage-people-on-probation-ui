@@ -40,17 +40,30 @@ export const getPersonalDetails = (
     let masClient: MasApiClient
     const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
 
+    const getDataFromCache = (): void => {
+      ;({
+        overview,
+        sentencePlan,
+        risks,
+        tierCalculation,
+        riskData,
+        probationPractitioner,
+        professionalContact,
+        personPhotoSrc,
+        arnsUnavailable,
+        prisonsUnavailable,
+      } = req.session.data.personalDetails[crn])
+    }
+
     if (refreshCache || !req?.session?.data?.personalDetails?.[crn]) {
       token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       masClient = new MasApiClient(token)
     }
-
     if (refreshCache && req?.session?.data?.personalDetails?.[crn]) {
       overview = await masClient.getPersonalDetails(crn)
       req.session.data.personalDetails[crn].overview = overview
-    }
-
-    if (!req?.session?.data?.personalDetails?.[crn]) {
+      getDataFromCache()
+    } else if (!req?.session?.data?.personalDetails?.[crn]) {
       const { username } = res.locals.user
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
@@ -138,23 +151,9 @@ export const getPersonalDetails = (
           },
         }
       }
+    } else {
+      getDataFromCache()
     }
-
-    if (!req?.session?.data?.personalDetails?.[crn]) {
-      ;({
-        overview,
-        sentencePlan,
-        risks,
-        tierCalculation,
-        riskData,
-        probationPractitioner,
-        professionalContact,
-        personPhotoSrc,
-        arnsUnavailable,
-        prisonsUnavailable,
-      } = req.session.data.personalDetails[crn])
-    }
-
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
     res.locals.tierCalculation = tierCalculation
