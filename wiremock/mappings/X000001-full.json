@@ -46,8 +46,7 @@
                 "subType": "Life imprisonment (Adult)",
                 "type": "Committed/ Transferred to Crown"
               }
-            ],
-            "allowSms": true
+            ]
           },
           "previousOrders": {
             "breaches": 0,
@@ -181,8 +180,7 @@
                 "subType": "Life imprisonment (Adult)",
                 "type": "Committed/ Transferred to Crown"
               }
-            ],
-            "allowSms": true
+            ]
           },
           "previousOrders": {
             "breaches": 0,

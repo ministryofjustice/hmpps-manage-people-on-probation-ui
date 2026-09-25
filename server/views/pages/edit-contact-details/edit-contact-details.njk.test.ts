@@ -69,7 +69,7 @@ describe('Edit contact details nunjucks render tests', () => {
       expect($('[data-qa=phoneNumber]').length).toBe(0)
     })
     it('should not display the allow sms question', () => {
-      expect($('[data-qa=smsOptIn]').length).toBe(0)
+      expect($('[data-qa=allowSms]').length).toBe(0)
     })
     it('should display the correct update alert', () => {
       expect($('[data-qa=updateBanner]').text()).toContain(

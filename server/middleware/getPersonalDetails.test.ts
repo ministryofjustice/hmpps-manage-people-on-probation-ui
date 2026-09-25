@@ -241,46 +241,49 @@ describe('/middleware/getPersonalDetails', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
 
-    it('should re-request the personal details from the API if cache for crn exists and enableAllowSms feature flag is enabled and url is /location-date-time', async () => {
-      process.env.NODE_ENV = 'production'
-      getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
-      req = httpMocks.createRequest({
-        params: {
-          crn: 'X000002',
-        },
-        url: '/location-date-time',
-        session: {
-          data: {
-            personalDetails: {
-              X000001: mock(),
-              X000002: mock({ crn: 'X000002' }),
+    it.each(['/location-date-time', '/check-your-answers'])(
+      'should re-request the personal details from the API if cache for crn exists and enableAllowSms feature flag is enabled and url is %s',
+      async url => {
+        process.env.NODE_ENV = 'production'
+        getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+        req = httpMocks.createRequest({
+          params: {
+            crn: 'X000002',
+          },
+          url,
+          session: {
+            data: {
+              personalDetails: {
+                X000001: mock(),
+                X000002: mock({ crn: 'X000002' }),
+              },
             },
           },
-        },
-      })
-      res = {
-        locals: {
-          flags: {
-            enableAllowSms: true,
+        })
+        res = {
+          locals: {
+            flags: {
+              enableAllowSms: true,
+            },
+            user: {
+              username: 'user-1',
+              roles: ['SENTENCE_PLAN'],
+            },
           },
-          user: {
-            username: 'user-1',
-            roles: ['SENTENCE_PLAN'],
-          },
-        },
-        redirect: jest.fn().mockReturnThis(),
-      } as unknown as AppResponse
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
-      expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(tierCalculationSpy).not.toHaveBeenCalled()
-      expect(searchUserCaseloadSpy).not.toHaveBeenCalled()
-      expect(getProbationPractitionerSpy).not.toHaveBeenCalled()
-      expect(getContactsSpy).not.toHaveBeenCalled()
-      expect(getRiskDataSpy).not.toHaveBeenCalled()
-      expect(predictorsSpy).not.toHaveBeenCalled()
-      expect(res.locals.case).toEqual(overview('X000002'))
-      expect(nextSpy).toHaveBeenCalled()
-    })
+          redirect: jest.fn().mockReturnThis(),
+        } as unknown as AppResponse
+        await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+        expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
+        expect(tierCalculationSpy).not.toHaveBeenCalled()
+        expect(searchUserCaseloadSpy).not.toHaveBeenCalled()
+        expect(getProbationPractitionerSpy).not.toHaveBeenCalled()
+        expect(getContactsSpy).not.toHaveBeenCalled()
+        expect(getRiskDataSpy).not.toHaveBeenCalled()
+        expect(predictorsSpy).not.toHaveBeenCalled()
+        expect(res.locals.case).toEqual(overview('X000002'))
+        expect(nextSpy).toHaveBeenCalled()
+      },
+    )
 
     it('should not request data from the api if personal details for crn already exist in the session and env is not development', async () => {
       process.env.NODE_ENV = 'production'

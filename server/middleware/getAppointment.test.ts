@@ -6,7 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import { Overview } from '../data/model/overview'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
-import { PersonalDetails } from '../data/model/personalDetails'
+import { mockAppResponse } from '../controllers/mocks'
 
 const crn = 'X000001'
 
@@ -40,17 +40,15 @@ jest.mock('../utils', () => {
   }
 })
 
-const mockOverview = ({ allowSms = true } = {}) =>
-  ({
-    personalDetails: {
-      name: {
-        forename: 'Joe',
-        surname: 'Bloggs',
-      },
-      allowSms,
+const mockOverview = {
+  personalDetails: {
+    name: {
+      forename: 'Joe',
+      surname: 'Bloggs',
     },
-    registrations: ['Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
-  }) as unknown as Overview
+  },
+  registrations: ['Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
+} as unknown as Overview
 
 const nextSpy = jest.fn()
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -85,6 +83,27 @@ const mockSentences = [
   },
 ] as unknown as Sentence[]
 
+const mockResponse = ({ allowSms = true } = {}): AppResponse => {
+  const locals = {
+    user: {
+      username,
+    },
+    attendingUser: {
+      staffCode: '',
+      homeArea: '',
+      team: '',
+      username: '',
+    },
+    flags: {
+      enableAllowSms: true,
+    },
+    case: {
+      allowSms,
+    },
+  }
+  return mockAppResponse(locals)
+}
+
 describe('/middleware/getAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -92,7 +111,7 @@ describe('/middleware/getAppointment', () => {
   it('should assign appointment to locals var if found in session', async () => {
     const getOverviewSpy = jest
       .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview()))
+      .mockImplementation(() => Promise.resolve(mockOverview))
 
     const req = httpMocks.createRequest({
       params: {
@@ -122,20 +141,8 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username,
-        },
-        attendingUser: {
-          staffCode: '',
-          homeArea: '',
-          team: '',
-          username: '',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    const res = mockResponse()
+
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -172,6 +179,7 @@ describe('/middleware/getAppointment', () => {
       sensitivity: null,
       outcomeRecorded: null,
       isReschedule: false,
+      allowSms: true,
     })
     expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
@@ -180,8 +188,8 @@ describe('/middleware/getAppointment', () => {
   it('should assign appointment to locals var if reschedule appointment journey and allow sms is false', async () => {
     const getOverviewSpy = jest
       .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview({ allowSms: false })))
-
+      .mockImplementation(() => Promise.resolve(mockOverview))
+    const res = mockResponse({ allowSms: false })
     const req = httpMocks.createRequest({
       params: {
         crn,
@@ -210,23 +218,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username,
-        },
-        attendingUser: {
-          staffCode: '',
-          homeArea: '',
-          team: '',
-          username: '',
-        },
-        flags: {
-          enableAllowSms: true,
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -271,7 +263,7 @@ describe('/middleware/getAppointment', () => {
 
   it('should set the meta data correctly if visor in registrations', async () => {
     const overview: Overview = {
-      ...mockOverview(),
+      ...mockOverview,
       registrations: ['visor'],
     }
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
@@ -290,14 +282,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    const res = mockResponse()
 
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
@@ -313,7 +298,7 @@ describe('/middleware/getAppointment', () => {
 
   it('should set the meta data correctly if change in query params', async () => {
     const overview: Overview = {
-      ...mockOverview(),
+      ...mockOverview,
       registrations: ['visor'],
     }
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
@@ -335,15 +320,8 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
 
+    const res = mockResponse()
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -357,7 +335,7 @@ describe('/middleware/getAppointment', () => {
   })
 
   it('should not set the locals var if appointment not found in session', async () => {
-    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(mockOverview()))
+    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(mockOverview))
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',
@@ -373,14 +351,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    const res = mockResponse()
 
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({

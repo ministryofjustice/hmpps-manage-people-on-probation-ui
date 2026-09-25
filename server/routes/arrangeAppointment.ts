@@ -149,7 +149,11 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.postSupportingInformation(),
   )
 
-  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', restrictPageAccess())
+  router.get(
+    '/case/:crn/arrange-appointment/:id/check-your-answers',
+    restrictPageAccess(),
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
+  )
 
   router.all(
     [

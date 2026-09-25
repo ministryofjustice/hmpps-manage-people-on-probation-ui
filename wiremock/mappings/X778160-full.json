@@ -26,8 +26,7 @@
             "dateOfBirth": "2012-03-12",
             "disabilities": [],
             "provisions": [],
-            "personalCircumstances": [],
-            "allowSms": true
+            "personalCircumstances": []
           },
           "previousOrders": {
             "breaches": 0,
@@ -150,8 +149,7 @@
             "dateOfBirth": "2012-03-12",
             "disabilities": [],
             "provisions": [],
-            "personalCircumstances": [],
-            "allowSms": true
+            "personalCircumstances": []
           },
           "previousOrders": {
             "breaches": 0,

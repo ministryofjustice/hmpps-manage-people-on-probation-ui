@@ -16,9 +16,10 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
     const masClient = new MasApiClient(token)
     const currentCase = await masClient.getOverview(crn)
+    const overview = res.locals.case
     const { forename } = currentCase.personalDetails.name
     const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
-    const allowSms = currentCase?.personalDetails?.allowSms
+    const allowSms = overview?.allowSms
     const { data } = req.session
 
     // eslint-disable-next-line no-useless-escape

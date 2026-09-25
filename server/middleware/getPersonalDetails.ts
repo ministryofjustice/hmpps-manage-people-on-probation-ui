@@ -38,7 +38,9 @@ export const getPersonalDetails = (
     let prisonsUnavailable = false
     let token: string
     let masClient: MasApiClient
-    const refreshCache = res.locals?.flags?.enableAllowSms && url.includes('/location-date-time')
+    const refreshCache =
+      res.locals?.flags?.enableAllowSms &&
+      ['/location-date-time', '/check-your-answers'].some(cacheUrl => url.includes(cacheUrl))
 
     const getDataFromCache = (): void => {
       ;({
