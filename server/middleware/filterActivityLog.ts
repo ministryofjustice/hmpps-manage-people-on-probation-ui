@@ -113,9 +113,9 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     hideContact,
   }
 
-  const keysWithClearValue = ['compliance', 'category', 'sparks', 'supervisionPackage', 'hideContact']
+  const keysWithClearValue = new Set(['compliance', 'category', 'sparks', 'supervisionPackage', 'hideContact'])
   const filterHref = (key: string, value: string): string => {
-    const base = keysWithClearValue.includes(key)
+    const base = keysWithClearValue.has(key)
       ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
       : `${baseUrl}?clearFilterKey=${key}`
     return view ? `${base}&view=${view}` : base
