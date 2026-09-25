@@ -4,17 +4,41 @@
   pageHeading: [title, "Arrange appointment"]
 }) %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/location-date-time?back=text-message-confirmation' %}
-{% set personForename = headerPersonName.forename %}
+{% set personForename = headerPersonName.forename | convertToTitleCase %}
+
+{% set hint = "They do not have a mobile number saved, so you´ll need to check if they have one." %}
+{% if flags.enableAllowSms and case.mobileNumber %}
+    {% set hint = "Check if " + personForename + "’s number is correct." %}
+{% endif %}
+{% if not flags.enableAllowSms and case.mobileNumber %}
+    {% set hint = "Their mobile number is " + case.mobileNumber + "." %}
+{% endif %}
 
 {% block alertBanner %}
     {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
 {% block form %}
+
+
+{% if flags.enableAllowSms %}
+    {% set smsConfirmationOptions = smsConfirmation.options %}
+    {% set smsPreview = smsConfirmation.preview %}
+    {% set overviewHtml = '' %}
+    {% for item in smsConfirmation.overview %}
+        {% set overviewHtml = overviewHtml + '<li>' + (item | escape) + '</li>' %}
+    {% endfor %}
+    {% if overviewHtml %}
+        {% set overviewHtml = '<ul class="govuk-list govuk-list--bullet">' + overviewHtml + '</ul>' %}
+        {{ govukInsetText({
+            html: overviewHtml
+        }) }}
+    {% endif %}   
+{% endif %}
     {{ govukRadios({
     classes: "govuk-radios--inline" if not case.mobileNumber else "",
     fieldset: {
       legend: {
-        html: 'Do you want to send ' + personForename + ' a text message confirmation?',
+        text: 'Do you want to text ' + personForename + ' a confirmation on ' + case.mobileNumber + '?' if flags.enableAllowSms and case.mobileNumber else 'Do you want to send ' + personForename + ' a text message confirmation?',
         classes: "govuk-fieldset__legend--m govuk-!-margin-bottom-2",
         isPageHeading: false
       },
@@ -23,7 +47,7 @@
       }
     },
     hint: {
-        text: ("Their mobile number is " + case.mobileNumber + ".") if case.mobileNumber else "They do not have a mobile number saved, so you´ll need to check if they have one."
+        text: hint
       },
     items: smsConfirmationOptions
    } | decorateFormAttributes(['appointments', crn, id, 'smsOptIn'])) }}

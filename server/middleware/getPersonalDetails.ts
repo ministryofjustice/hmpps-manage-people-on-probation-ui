@@ -23,7 +23,8 @@ export const getPersonalDetails = (
   arnsComponents: ArnsComponents,
 ): Route<Promise<void>> => {
   return async function getPersonalDetailsInner(req, res, next) {
-    const { crn } = req.params as Record<string, string>
+    const { url, params } = req
+    const { crn } = params as Record<string, string>
     let sentencePlan: SentencePlan
     let overview: PersonalDetails
     let risks: RiskSummary
@@ -35,11 +36,38 @@ export const getPersonalDetails = (
     let personPhotoSrc: string | undefined
     let arnsUnavailable = false
     let prisonsUnavailable = false
-    let token: string | undefined
-    if (!req?.session?.data?.personalDetails?.[crn]) {
-      const { username } = res.locals.user
+    let token: string
+    let masClient: MasApiClient
+    const refreshCache =
+      !res.locals.case &&
+      res.locals?.flags?.enableAllowSms &&
+      ['/location-date-time', '/check-your-answers'].some(cacheUrl => url.includes(cacheUrl))
+
+    const getDataFromCache = (): void => {
+      ;({
+        overview,
+        sentencePlan,
+        risks,
+        tierCalculation,
+        riskData,
+        probationPractitioner,
+        professionalContact,
+        personPhotoSrc,
+        arnsUnavailable,
+        prisonsUnavailable,
+      } = req.session.data.personalDetails[crn])
+    }
+
+    if (refreshCache || !req?.session?.data?.personalDetails?.[crn]) {
       token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
+      masClient = new MasApiClient(token)
+    }
+    if (refreshCache && req?.session?.data?.personalDetails?.[crn]) {
+      overview = await masClient.getPersonalDetails(crn)
+      req.session.data.personalDetails[crn].overview = overview
+      getDataFromCache()
+    } else if (!req?.session?.data?.personalDetails?.[crn]) {
+      const { username } = res.locals.user
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
       const arnsAssessmentPlatformClient = new ArnsAssessmentPlatformApiClient(token)
@@ -127,18 +155,7 @@ export const getPersonalDetails = (
         }
       }
     } else {
-      ;({
-        overview,
-        sentencePlan,
-        risks,
-        tierCalculation,
-        riskData,
-        probationPractitioner,
-        professionalContact,
-        personPhotoSrc,
-        arnsUnavailable,
-        prisonsUnavailable,
-      } = req.session.data.personalDetails[crn])
+      getDataFromCache()
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview

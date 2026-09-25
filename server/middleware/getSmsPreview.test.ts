@@ -10,6 +10,8 @@ import { SmsPreviewRequest, SmsPreviewResponse, SmsPreviewSession } from '../dat
 import logger from '../../logger'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
+import { AppResponse } from '../models/Locals'
+import { ErrorSummary } from '../data/model/common'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
@@ -32,7 +34,6 @@ const appointmentLocation = 'Leamington Probation Office'
 const buildingName = 'Building One'
 const practitionerEmail = 'test@test.com'
 const practitionerFirstName = 'Sam'
-
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const date = '2026-12-22'
 const start = '15:00'
@@ -77,19 +78,13 @@ const postSmsPreviewSpy = jest
   .spyOn(SupervisionAppointmentClient.prototype, 'postSmsPreview')
   .mockImplementation(() => Promise.resolve(mockSmsPreview))
 
-const res = mockAppResponse({
-  case: {
-    name: { forename: 'James', surname: 'Morrison' },
-    mainAddress: {
-      postcode: 'MN12 4PP',
-    },
-  },
-})
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
 const nextSpy = jest.fn()
 
 const mockLocations: Location[] = [{ id: 1, code: locationCode, address: { officeName: appointmentLocation } }]
+
+const mockErrorSummary: ErrorSummary = { errors: [{ text: 'Error message' }] }
 
 const buildRequest = ({
   appointment = constructMockAppointmentSession(),
@@ -117,11 +112,28 @@ const buildRequest = ({
       },
     },
   }
-
   return httpMocks.createRequest(req)
 }
 
-const apiRequestChecks = (data: Data, requestBody: SmsPreviewRequest, expectedSession: SmsPreviewSession) => {
+const buildResponse = ({ enableAllowSms = true } = {}): AppResponse => {
+  const locals = {
+    flags: { enableAllowSms },
+    case: {
+      name: { forename: 'James', surname: 'Morrison' },
+      mainAddress: {
+        postcode: 'MN12 4PP',
+      },
+    },
+  }
+  return mockAppResponse(locals)
+}
+
+const apiRequestChecks = (
+  res: httpMocks.MockResponse<any>,
+  data: Data,
+  requestBody: SmsPreviewRequest,
+  expectedSession: SmsPreviewSession,
+) => {
   it('should request the sms preview(s) from the api', () => {
     expect(postSmsPreviewSpy).toHaveBeenCalledWith(requestBody)
   })
@@ -154,24 +166,22 @@ describe('middleware/getSmsPreview', () => {
     }
   }
 
-  describe('SMS preview session exists for current crn', () => {
-    const req = buildRequest()
-    beforeEach(async () => {
+  describe('enableAllowSms feature flag is enabled and middleware is inline', () => {
+    it('should only return next()', async () => {
+      const req = buildRequest()
+      const res = buildResponse()
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should not request the sms preview(s) from the api', () => {
-      expect(postSmsPreviewSpy).not.toHaveBeenCalled()
-    })
-    it('should set res.locals.smsPreview to the session value', () => {
-      expect(res.locals.smsPreview).toEqual(mockSmsPreview)
-    })
-    it('should return next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
+      expect(res.locals.smsPreview).toBeUndefined()
+      expect(postSmsPreviewSpy).not.toHaveBeenCalled()
     })
   })
 
-  describe('SMS preview session does not exist for current crn', () => {
+  describe('enableAllowSms feature flag is enabled and middleware is not inline', () => {
+    const inline = false
+    let response: void | SmsPreviewResponse | ErrorSummary | null
     const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+    const res = buildResponse()
     const mockAppointmentSession = constructMockAppointmentSession()
     const expectedRequestBody: SmsPreviewRequest = {
       firstName: 'James',
@@ -186,395 +196,515 @@ describe('middleware/getSmsPreview', () => {
       request: expectedRequestBody,
       preview: mockSmsPreview,
     }
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    describe('API returns a 200 response', () => {
+      beforeEach(async () => {
+        response = await getSmsPreview(hmppsAuthClient, inline)(req, res, nextSpy)
+      })
+      it('should request the sms preview(s) from the api', () => {
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
+      })
+      it('should set the api response as the session sms preview', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(
+          req.session.data,
+          ['appointments', crn, uuid, 'smsPreview'],
+          expectedSession,
+        )
+      })
+      it('should not set res.locals.smsPreview with the api response', () => {
+        expect(res.locals.smsPreview).toBeUndefined()
+      })
+      it('should not return next()', () => {
+        expect(nextSpy).not.toHaveBeenCalled()
+      })
+      it('should return the api response', () => {
+        expect(response).toEqual(mockSmsPreview)
+      })
     })
-    it('should request the sms preview(s) from the api', () => {
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
-    })
-    it('should set the api response as the session sms preview', () => {
-      expect(mockSetDataValue).toHaveBeenCalledWith(
-        req.session.data,
-        ['appointments', crn, uuid, 'smsPreview'],
-        expectedSession,
-      )
-    })
-    it('should set res.locals.smsPreview to the api response', () => {
-      expect(res.locals.smsPreview).toEqual(mockSmsPreview)
-    })
-    it('should return next()', () => {
-      expect(nextSpy).toHaveBeenCalledTimes(1)
-    })
-  })
-
-  describe('SMS preview session recipient email does not match request', () => {
-    const requestBody = getRequestBody()
-    const expectedSession = { request: requestBody, preview: mockSmsPreview }
-    const req = buildRequest({
-      appointment: {
-        ...constructMockAppointmentSession(),
-        smsPreview: {
-          request: { ...requestBody, recipientEmail: 'previous.practitioner@example.com' },
-          preview: mockSmsPreview,
-        },
-      },
-    })
-
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-
-    apiRequestChecks(req.session.data, requestBody, expectedSession)
-  })
-
-  describe('SMS preview session practitioner first name does not match request', () => {
-    const requestBody = getRequestBody()
-    const expectedSession = { request: requestBody, preview: mockSmsPreview }
-    const req = buildRequest({
-      appointment: {
-        ...constructMockAppointmentSession(),
-        smsPreview: {
-          request: { ...requestBody, practitionerFirstName: 'Previous' },
-          preview: mockSmsPreview,
-        },
-      },
-    })
-
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-
-    apiRequestChecks(req.session.data, requestBody, expectedSession)
-  })
-
-  describe('SMS preview session location does not match request', () => {
-    const requestBody = getRequestBody()
-    const expectedSession = { request: requestBody, preview: mockSmsPreview }
-    const req = buildRequest({
-      appointment: {
-        ...constructMockAppointmentSession(),
-        smsPreview: { request: { ...requestBody, appointmentLocation: undefined }, preview: mockSmsPreview },
-      },
-    })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    apiRequestChecks(req.session.data, requestBody, expectedSession)
-  })
-
-  describe('SMS preview session date and time does not match request', () => {
-    const requestBody = getRequestBody()
-    const expectedSession = { request: requestBody, preview: mockSmsPreview }
-    const req = buildRequest({
-      appointment: {
-        ...constructMockAppointmentSession(),
-        smsPreview: {
-          request: { ...requestBody, dateAndTimeOfAppointment: `2026-11-12T13:00:00.000Z` },
-          preview: mockSmsPreview,
-        },
-      },
-    })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    apiRequestChecks(req.session.data, requestBody, expectedSession)
-  })
-
-  describe('SMS preview session type does not match request', () => {
-    const requestBody = getRequestBody()
-    const expectedSession = { request: requestBody, preview: mockSmsPreview }
-    const req = buildRequest({
-      appointment: {
-        ...constructMockAppointmentSession(),
-        smsPreview: {
-          request: { ...requestBody, appointmentTypeCode: 'XXX' },
-          preview: mockSmsPreview,
-        },
-      },
-    })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    apiRequestChecks(req.session.data, requestBody, expectedSession)
-  })
-
-  describe('No location code in appointment session', () => {
-    const appointmentSession = constructMockAppointmentSession()
-    const appointment: AppointmentSession = {
-      ...appointmentSession,
-      user: {
-        ...appointmentSession.user,
-        locationCode: null,
-      },
-    }
-    const req = buildRequest({ appointment })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    const expectedRequestBody: SmsPreviewRequest = {
-      ...getRequestBody(),
-      appointmentLocation: undefined,
-    }
-    const expectedSession = {
-      request: expectedRequestBody,
-      preview: mockSmsPreview,
-    }
-    apiRequestChecks(req.session.data, expectedRequestBody, expectedSession)
-  })
-
-  describe('Sms preview session request matches but preview is null', () => {
-    const requestBody = getRequestBody()
-    const expectedSession = { request: requestBody, preview: mockSmsPreview }
-    const req = buildRequest({
-      appointment: {
-        ...constructMockAppointmentSession(),
-        smsPreview: {
-          request: requestBody,
+    describe('API returns a 500 error', () => {
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(mockErrorSummary))
+        response = await getSmsPreview(hmppsAuthClient, inline)(req, res, nextSpy)
+      })
+      it('should set null as the session sms preview', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: expectedRequestBody,
           preview: null,
+        })
+      })
+      it('should return the errors', () => {
+        expect(response).toEqual(mockErrorSummary)
+      })
+    })
+    describe('API returns a 404 error', () => {
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(null))
+        response = await getSmsPreview(hmppsAuthClient, inline)(req, res, nextSpy)
+      })
+      it('should set null as the session sms preview', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: expectedRequestBody,
+          preview: null,
+        })
+      })
+      it('should return the errors', () => {
+        expect(response).toEqual(null)
+      })
+    })
+    describe('Server returns an unknown error', () => {
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.reject(new Error('Mock error')))
+        response = await getSmsPreview(hmppsAuthClient, inline)(req, res, nextSpy)
+      })
+      it('should return the error', () => {
+        expect(response).toEqual({ errors: [{ text: 'Mock error' }] })
+      })
+    })
+  })
+
+  describe('enableAllowSms feature flag is disabled and middleware is inline', () => {
+    const res = buildResponse({ enableAllowSms: false })
+    describe('API returns a 500 error', () => {
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(mockErrorSummary))
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should set res.locals.smsPreview as null', () => {
+        expect(res.locals.smsPreview).toBeNull()
+      })
+    })
+
+    describe('API returns a 404 error', () => {
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(null))
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should set res.locals.smsPreview as null', () => {
+        expect(res.locals.smsPreview).toBeNull()
+      })
+    })
+    describe('Server returns an unknown error', () => {
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.reject(new Error('Mock error')))
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should set res.locals.smsPreview as null', () => {
+        expect(res.locals.smsPreview).toBeNull()
+      })
+    })
+    describe('SMS preview session exists for current crn', () => {
+      const req = buildRequest()
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient, false)(req, res, nextSpy)
+      })
+      it('should not request the sms preview(s) from the api', () => {
+        expect(postSmsPreviewSpy).not.toHaveBeenCalled()
+      })
+      it('should set res.locals.smsPreview to the session value', () => {
+        expect(res.locals.smsPreview).toEqual(mockSmsPreview)
+      })
+      it('should return next()', () => {
+        expect(nextSpy).toHaveBeenCalledTimes(1)
+      })
+    })
+    describe('SMS preview session does not exist for current crn', () => {
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      const mockAppointmentSession = constructMockAppointmentSession()
+      const expectedRequestBody: SmsPreviewRequest = {
+        firstName: 'James',
+        appointmentLocation,
+        recipientEmail: practitionerEmail,
+        practitionerFirstName,
+        dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+        includeWelshPreview: false,
+        appointmentTypeCode: mockAppointmentSession.type,
+      }
+      const expectedSession: SmsPreviewSession = {
+        request: expectedRequestBody,
+        preview: mockSmsPreview,
+      }
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should request the sms preview(s) from the api', () => {
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
+      })
+      it('should set the api response as the session sms preview', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(
+          req.session.data,
+          ['appointments', crn, uuid, 'smsPreview'],
+          expectedSession,
+        )
+      })
+      it('should set res.locals.smsPreview to the api response', () => {
+        expect(res.locals.smsPreview).toEqual(mockSmsPreview)
+      })
+      it('should return next()', () => {
+        expect(nextSpy).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('SMS preview session recipient email does not match request', () => {
+      const requestBody = getRequestBody()
+      const expectedSession = { request: requestBody, preview: mockSmsPreview }
+      const req = buildRequest({
+        appointment: {
+          ...constructMockAppointmentSession(),
+          smsPreview: {
+            request: { ...requestBody, recipientEmail: 'previous.practitioner@example.com' },
+            preview: mockSmsPreview,
+          },
         },
-      },
-    })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    apiRequestChecks(req.session.data, requestBody, expectedSession)
-  })
-
-  describe('POP postcode is welsh', () => {
-    const mockAppointmentSession = constructMockAppointmentSession()
-    const req = buildRequest({
-      preferredLanguage: 'Welsh',
-      appointment: { ...mockAppointmentSession, smsPreview: undefined },
-    })
-    const expectedRequestBody: SmsPreviewRequest = {
-      firstName: 'James',
-      appointmentLocation,
-      dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
-      includeWelshPreview: true,
-      appointmentTypeCode: mockAppointmentSession.type,
-      recipientEmail: practitionerEmail,
-      practitionerFirstName,
-    }
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should request the sms preview(s) from the api', () => {
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
-    })
-  })
-
-  describe('api request returns a 500 error', () => {
-    const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
-    beforeEach(async () => {
-      postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve({ errors: [{ text: '500 error' }] }))
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should set the session sms preview as null', () => {
-      expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
-        request: getRequestBody(),
-        preview: null,
       })
-    })
-    it('should set res.locals.smsPreview to null', () => {
-      expect(res.locals.smsPreview).toBeNull()
-    })
-  })
 
-  describe('api request returns a 404 error (null)', () => {
-    const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
-    beforeEach(async () => {
-      postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(null))
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should set the session sms preview as null', () => {
-      expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
-        request: getRequestBody(),
-        preview: null,
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
       })
-    })
-    it('should set res.locals.smsPreview to null', () => {
-      expect(res.locals.smsPreview).toBeNull()
-    })
-  })
 
-  describe('server throws an error', () => {
-    const loggerSpy = jest.spyOn(logger, 'error')
-    const error = 'Server timeout'
-    const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
-    beforeEach(async () => {
-      postSmsPreviewSpy.mockImplementationOnce(() => Promise.reject(new Error(error)))
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      apiRequestChecks(res, req.session.data, requestBody, expectedSession)
     })
-    it('should log the error', () => {
-      expect(loggerSpy).toHaveBeenCalledWith(`SMS preview request error: ${error}`)
-    })
-    it('should set the session sms preview as null', () => {
-      expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
-        request: getRequestBody(),
-        preview: null,
+
+    describe('SMS preview session practitioner first name does not match request', () => {
+      const requestBody = getRequestBody()
+      const expectedSession = { request: requestBody, preview: mockSmsPreview }
+      const req = buildRequest({
+        appointment: {
+          ...constructMockAppointmentSession(),
+          smsPreview: {
+            request: { ...requestBody, practitionerFirstName: 'Previous' },
+            preview: mockSmsPreview,
+          },
+        },
       })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      apiRequestChecks(res, req.session.data, requestBody, expectedSession)
     })
-    it('should set res.locals.smsPreview to null', () => {
-      expect(res.locals.smsPreview).toBeNull()
-    })
-  })
 
-  describe('Only building name listed for matching location', () => {
-    const locations: Location[] = [{ id: 1, code: locationCode, address: { buildingName } }]
-    const req = buildRequest({
-      locations,
-      appointment: { ...constructMockAppointmentSession(), smsPreview: undefined },
+    describe('SMS preview session location does not match request', () => {
+      const requestBody = getRequestBody()
+      const expectedSession = { request: requestBody, preview: mockSmsPreview }
+      const req = buildRequest({
+        appointment: {
+          ...constructMockAppointmentSession(),
+          smsPreview: { request: { ...requestBody, appointmentLocation: undefined }, preview: mockSmsPreview },
+        },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      apiRequestChecks(res, req.session.data, requestBody, expectedSession)
     })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+    describe('SMS preview session date and time does not match request', () => {
+      const requestBody = getRequestBody()
+      const expectedSession = { request: requestBody, preview: mockSmsPreview }
+      const req = buildRequest({
+        appointment: {
+          ...constructMockAppointmentSession(),
+          smsPreview: {
+            request: { ...requestBody, dateAndTimeOfAppointment: `2026-11-12T13:00:00.000Z` },
+            preview: mockSmsPreview,
+          },
+        },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      apiRequestChecks(res, req.session.data, requestBody, expectedSession)
     })
-    it('should request the sms preview(s) from the api', () => {
-      const expectedRequestBody: SmsPreviewRequest = {
-        ...getRequestBody(),
-        appointmentLocation: buildingName,
+
+    describe('SMS preview session type does not match request', () => {
+      const requestBody = getRequestBody()
+      const expectedSession = { request: requestBody, preview: mockSmsPreview }
+      const req = buildRequest({
+        appointment: {
+          ...constructMockAppointmentSession(),
+          smsPreview: {
+            request: { ...requestBody, appointmentTypeCode: 'XXX' },
+            preview: mockSmsPreview,
+          },
+        },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      apiRequestChecks(res, req.session.data, requestBody, expectedSession)
+    })
+
+    describe('No location code in appointment session', () => {
+      const appointmentSession = constructMockAppointmentSession()
+      const appointment: AppointmentSession = {
+        ...appointmentSession,
+        user: {
+          ...appointmentSession.user,
+          locationCode: null,
+        },
       }
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
-    })
-  })
-
-  describe('Only description listed for matching location', () => {
-    const locations: Location[] = [
-      { id: 1, code: locationCode, description: buildingName, address: { buildingName: '', officeName: '' } },
-    ]
-    const req = buildRequest({
-      locations,
-      appointment: { ...constructMockAppointmentSession(), smsPreview: undefined },
-    })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should request the sms preview(s) from the api', () => {
+      const req = buildRequest({ appointment })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
       const expectedRequestBody: SmsPreviewRequest = {
-        ...getRequestBody(),
-        appointmentLocation: buildingName,
-      }
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
-    })
-  })
-
-  describe('No matching location found', () => {
-    const locations: Location[] = [{ id: 1, code: '5678', address: { officeName: appointmentLocation } }]
-    const req = buildRequest({
-      locations,
-      appointment: { ...constructMockAppointmentSession(), smsPreview: undefined },
-    })
-    beforeEach(async () => {
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should request the sms preview(s) from the api', () => {
-      const expectedRequest: SmsPreviewRequest = {
         ...getRequestBody(),
         appointmentLocation: undefined,
       }
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
-    })
-  })
-
-  describe('appointmentTypesWithoutLocation', () => {
-    it('should not include appointmentLocation when appointmentTypeCode is COPT (telephone)', async () => {
-      const appointment: AppointmentSession = {
-        ...constructMockAppointmentSession(),
-        type: 'COPT',
-        smsPreview: undefined,
+      const expectedSession = {
+        request: expectedRequestBody,
+        preview: mockSmsPreview,
       }
-      const req = buildRequest({ appointment })
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.not.objectContaining({
-          appointmentLocation: expect.anything(),
-        }),
-      )
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appointmentTypeCode: 'COPT',
-        }),
-      )
+      apiRequestChecks(res, req.session.data, expectedRequestBody, expectedSession)
     })
 
-    it('should not include appointmentLocation when appointmentTypeCode is COVC (video)', async () => {
-      const appointment: AppointmentSession = {
-        ...constructMockAppointmentSession(),
-        type: 'COVC',
-        smsPreview: undefined,
-      }
-      const req = buildRequest({ appointment })
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.not.objectContaining({
-          appointmentLocation: expect.anything(),
-        }),
-      )
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appointmentTypeCode: 'COVC',
-        }),
-      )
+    describe('Sms preview session request matches but preview is null', () => {
+      const requestBody = getRequestBody()
+      const expectedSession = { request: requestBody, preview: mockSmsPreview }
+      const req = buildRequest({
+        appointment: {
+          ...constructMockAppointmentSession(),
+          smsPreview: {
+            request: requestBody,
+            preview: null,
+          },
+        },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      apiRequestChecks(res, req.session.data, requestBody, expectedSession)
     })
 
-    it('should not include appointmentLocation when appointmentTypeCode is CHVS Home Visit to Case', async () => {
-      const appointment: AppointmentSession = {
-        ...constructMockAppointmentSession(),
-        type: 'CHVS',
-        smsPreview: undefined,
+    describe('POP postcode is welsh', () => {
+      const mockAppointmentSession = constructMockAppointmentSession()
+      const req = buildRequest({
+        preferredLanguage: 'Welsh',
+        appointment: { ...mockAppointmentSession, smsPreview: undefined },
+      })
+      const expectedRequestBody: SmsPreviewRequest = {
+        firstName: 'James',
+        appointmentLocation,
+        dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+        includeWelshPreview: true,
+        appointmentTypeCode: mockAppointmentSession.type,
+        recipientEmail: practitionerEmail,
+        practitionerFirstName,
       }
-      const req = buildRequest({ appointment })
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.not.objectContaining({
-          appointmentLocation: expect.anything(),
-        }),
-      )
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appointmentTypeCode: 'CHVS',
-        }),
-      )
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should request the sms preview(s) from the api', () => {
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
+      })
     })
 
-    it('should not include appointmentLocation when appointmentTypeCode is CODC Planned Doorstep Contact', async () => {
-      const appointment: AppointmentSession = {
-        ...constructMockAppointmentSession(),
-        type: 'CODC',
-        smsPreview: undefined,
-      }
-      const req = buildRequest({ appointment })
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
-
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.not.objectContaining({
-          appointmentLocation: expect.anything(),
-        }),
-      )
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appointmentTypeCode: 'CODC',
-        }),
-      )
+    describe('api request returns a 500 error', () => {
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve({ errors: [{ text: '500 error' }] }))
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should set the session sms preview as null', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: getRequestBody(),
+          preview: null,
+        })
+      })
+      it('should set res.locals.smsPreview to null', () => {
+        expect(res.locals.smsPreview).toBeNull()
+      })
     })
 
-    it('should include appointmentLocation for other appointment types', async () => {
-      const appointment: AppointmentSession = {
-        ...constructMockAppointmentSession(),
-        type: 'OTHER',
-        smsPreview: undefined,
-      }
-      const req = buildRequest({ appointment })
-      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    describe('api request returns a 404 error (null)', () => {
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(null))
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should set the session sms preview as null', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: getRequestBody(),
+          preview: null,
+        })
+      })
+      it('should set res.locals.smsPreview to null', () => {
+        expect(res.locals.smsPreview).toBeNull()
+      })
+    })
 
-      expect(postSmsPreviewSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appointmentTypeCode: 'OTHER',
-          appointmentLocation,
-        }),
-      )
+    describe('server throws an error', () => {
+      const loggerSpy = jest.spyOn(logger, 'error')
+      const error = 'Server timeout'
+      const req = buildRequest({ appointment: { ...constructMockAppointmentSession(), smsPreview: undefined } })
+      beforeEach(async () => {
+        postSmsPreviewSpy.mockImplementationOnce(() => Promise.reject(new Error(error)))
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should log the error', () => {
+        expect(loggerSpy).toHaveBeenCalledWith(`SMS preview request error: ${error}`)
+      })
+      it('should set the session sms preview as null', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid, 'smsPreview'], {
+          request: getRequestBody(),
+          preview: null,
+        })
+      })
+      it('should set res.locals.smsPreview to null', () => {
+        expect(res.locals.smsPreview).toBeNull()
+      })
+    })
+
+    describe('Only building name listed for matching location', () => {
+      const locations: Location[] = [{ id: 1, code: locationCode, address: { buildingName } }]
+      const req = buildRequest({
+        locations,
+        appointment: { ...constructMockAppointmentSession(), smsPreview: undefined },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should request the sms preview(s) from the api', () => {
+        const expectedRequestBody: SmsPreviewRequest = {
+          ...getRequestBody(),
+          appointmentLocation: buildingName,
+        }
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
+      })
+    })
+
+    describe('Only description listed for matching location', () => {
+      const locations: Location[] = [
+        { id: 1, code: locationCode, description: buildingName, address: { buildingName: '', officeName: '' } },
+      ]
+      const req = buildRequest({
+        locations,
+        appointment: { ...constructMockAppointmentSession(), smsPreview: undefined },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should request the sms preview(s) from the api', () => {
+        const expectedRequestBody: SmsPreviewRequest = {
+          ...getRequestBody(),
+          appointmentLocation: buildingName,
+        }
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequestBody)
+      })
+    })
+
+    describe('No matching location found', () => {
+      const locations: Location[] = [{ id: 1, code: '5678', address: { officeName: appointmentLocation } }]
+      const req = buildRequest({
+        locations,
+        appointment: { ...constructMockAppointmentSession(), smsPreview: undefined },
+      })
+      beforeEach(async () => {
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should request the sms preview(s) from the api', () => {
+        const expectedRequest: SmsPreviewRequest = {
+          ...getRequestBody(),
+          appointmentLocation: undefined,
+        }
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
+      })
+    })
+
+    describe('appointmentTypesWithoutLocation', () => {
+      it('should not include appointmentLocation when appointmentTypeCode is COPT (telephone)', async () => {
+        const appointment: AppointmentSession = {
+          ...constructMockAppointmentSession(),
+          type: 'COPT',
+          smsPreview: undefined,
+        }
+        const req = buildRequest({ appointment })
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            appointmentLocation: expect.anything(),
+          }),
+        )
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            appointmentTypeCode: 'COPT',
+          }),
+        )
+      })
+      it('should not include appointmentLocation when appointmentTypeCode is COVC (video)', async () => {
+        const appointment: AppointmentSession = {
+          ...constructMockAppointmentSession(),
+          type: 'COVC',
+          smsPreview: undefined,
+        }
+        const req = buildRequest({ appointment })
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            appointmentLocation: expect.anything(),
+          }),
+        )
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            appointmentTypeCode: 'COVC',
+          }),
+        )
+      })
+      it('should not include appointmentLocation when appointmentTypeCode is CHVS Home Visit to Case', async () => {
+        const appointment: AppointmentSession = {
+          ...constructMockAppointmentSession(),
+          type: 'CHVS',
+          smsPreview: undefined,
+        }
+        const req = buildRequest({ appointment })
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            appointmentLocation: expect.anything(),
+          }),
+        )
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            appointmentTypeCode: 'CHVS',
+          }),
+        )
+      })
+      it('should not include appointmentLocation when appointmentTypeCode is CODC Planned Doorstep Contact', async () => {
+        const appointment: AppointmentSession = {
+          ...constructMockAppointmentSession(),
+          type: 'CODC',
+          smsPreview: undefined,
+        }
+        const req = buildRequest({ appointment })
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.not.objectContaining({
+            appointmentLocation: expect.anything(),
+          }),
+        )
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            appointmentTypeCode: 'CODC',
+          }),
+        )
+      })
+      it('should include appointmentLocation for other appointment types', async () => {
+        const appointment: AppointmentSession = {
+          ...constructMockAppointmentSession(),
+          type: 'OTHER',
+          smsPreview: undefined,
+        }
+        const req = buildRequest({ appointment })
+        await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+        expect(postSmsPreviewSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            appointmentTypeCode: 'OTHER',
+            appointmentLocation,
+          }),
+        )
+      })
     })
   })
 })

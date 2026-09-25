@@ -11,6 +11,8 @@ import type {
 
 export type YesNo = '' | 'Yes' | 'No'
 
+export type AllowSms = 'YES' | 'NO' | '' | undefined
+
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
@@ -369,6 +371,7 @@ export interface LocalParams {
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
   isSensitive?: boolean
+  allowSms?: boolean
 }
 
 export interface ProbationDeliveryUnit {

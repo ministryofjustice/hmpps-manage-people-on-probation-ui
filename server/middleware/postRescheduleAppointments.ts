@@ -71,6 +71,16 @@ export const postRescheduleAppointments = (
     const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
+
+    const { mobileNumber, allowSms } = res.locals.case
+
+    let sendSms = false
+    if (res.locals?.flags?.enableAllowSms) {
+      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+    } else {
+      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+    }
+
     if (email) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
@@ -97,9 +107,8 @@ export const postRescheduleAppointments = (
         },
         oldSupervisionAppointmentUrn,
       }
-      const { mobileNumber } = res.locals.case
 
-      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
+      if (sendSms) {
         const {
           includeWelshPreview,
           appointmentLocation = null,
@@ -161,10 +170,10 @@ export const postRescheduleAppointments = (
 
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
-    if (smsOptIn?.includes('YES') && !eventResponse?.smsResponse?.englishNotificationId)
+    if (smsOptIn?.includes('YES') && sendSms && !eventResponse?.smsResponse?.englishNotificationId)
       data.isEnglishNotificationFailed = true
 
-    if (smsOptIn?.includes('YES') && isWelshTranslation && !eventResponse?.smsResponse?.welshNotificationId)
+    if (smsOptIn?.includes('YES') && sendSms && isWelshTranslation && !eventResponse?.smsResponse?.welshNotificationId)
       data.isWelshNotificationFailed = true
 
     return response

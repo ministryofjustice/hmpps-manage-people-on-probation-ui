@@ -147,6 +147,15 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
+
+    const { mobileNumber, allowSms } = res.locals.case
+    let sendSms = false
+    if (res.locals?.flags?.enableAllowSms) {
+      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+    } else {
+      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+    }
+
     if (email && firstName && surname) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
@@ -166,9 +175,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
-      const { mobileNumber } = res.locals.case
-
-      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
+      if (sendSms) {
         const {
           includeWelshPreview,
           appointmentLocation = null,
@@ -226,10 +233,15 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
 
-    if (smsOptIn?.includes('YES') && !outlookEventResponse?.smsResponse?.englishNotificationId)
+    if (smsOptIn?.includes('YES') && sendSms && !outlookEventResponse?.smsResponse?.englishNotificationId)
       data.isEnglishNotificationFailed = true
 
-    if (smsOptIn?.includes('YES') && isWelshTranslation && !outlookEventResponse?.smsResponse?.welshNotificationId)
+    if (
+      smsOptIn?.includes('YES') &&
+      sendSms &&
+      isWelshTranslation &&
+      !outlookEventResponse?.smsResponse?.welshNotificationId
+    )
       data.isWelshNotificationFailed = true
 
     return response

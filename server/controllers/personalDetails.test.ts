@@ -7,7 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockContacts, mockAppResponse, mockSanIndicatorResponse } from './mocks'
-import { isValidCrn } from '../utils'
+import { isValidCrn, setDataValue } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
 import { renderError } from '../middleware'
 import {
@@ -24,6 +24,7 @@ import {
 import controllers from '.'
 import { checkAuditMessage } from './testutils'
 import { Needs } from '../data/model/risk'
+import { AppResponse } from '../models/Locals'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -46,12 +47,17 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
-jest.mock('../utils', () => ({
-  toRoshWidget: jest.fn(),
-  toPredictors: jest.fn(),
-  toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),
-  isValidCrn: jest.fn(),
-}))
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    toRoshWidget: jest.fn(),
+    toPredictors: jest.fn(),
+    toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),
+    isValidCrn: jest.fn(),
+    setDataValue: jest.fn(),
+  }
+})
 
 const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
@@ -60,6 +66,7 @@ jest.mock('../middleware', () => ({
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
+const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 jest.mock('../utils/validationUtils', () => ({
   validateWithSpec: jest.fn(),
@@ -101,8 +108,15 @@ const req = httpMocks.createRequest({
   url: '/sentence',
 })
 
-const res = mockAppResponse()
-
+const buildResponse = ({ enableAllowSms = false } = {}): AppResponse => {
+  const locals = {
+    flags: {
+      enableAllowSms,
+    },
+  }
+  return mockAppResponse(locals)
+}
+const res = buildResponse()
 const renderSpy = jest.spyOn(res, 'render')
 const redirectSpy = jest.spyOn(res, 'redirect')
 
@@ -141,7 +155,6 @@ describe('/controllers/personalDetails', () => {
         },
         path: 'personal-details/edit-contact-details',
       } as httpMocks.MockRequest<any>
-
       describe('If user does not have access', () => {
         beforeEach(async () => {
           mockedIsValidCrn.mockReturnValue(true)
@@ -411,6 +424,7 @@ describe('/controllers/personalDetails', () => {
               telephoneNumber: '',
               mobileNumber,
               email,
+              allowSms: false,
             },
             needs: mockNeeds,
             origin: 'appointments',
@@ -420,8 +434,9 @@ describe('/controllers/personalDetails', () => {
           })
         })
       })
-      describe('Form is valid', () => {
+      describe('Form is valid - enableAllowSms feature flag disabled', () => {
         const updatePersonalDetailsContactSpy = jest.spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
+        const updateAllowSmsSpy = jest.spyOn(MasApiClient.prototype, 'updateAllowSms')
         const mockReq = {
           ...req,
           query: {
@@ -447,9 +462,119 @@ describe('/controllers/personalDetails', () => {
             mobileNumber: trimmedMobileNumber,
             emailAddress,
           })
+          expect(updateAllowSmsSpy).not.toHaveBeenCalled()
         })
         it('should redirect to the personal details url with update=success query param', () => {
           expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/personal-details?update=success`)
+        })
+      })
+      describe('Form is valid - enableAllowSms feature flag enabled', () => {
+        const updatePersonalDetailsContactSpy = jest.spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
+        const updateAllowSmsSpy = jest.spyOn(MasApiClient.prototype, 'updateAllowSms')
+        it('should update the personal details if allow sms question not completed', async () => {
+          const mockReq = {
+            ...req,
+            query: {
+              ...req.query,
+              origin: 'allowSms',
+              change: '/location-date-time',
+            },
+            body: {
+              ...req.body,
+              ...contactDetailsBody,
+              _csrf: '1234',
+            },
+            path: 'personal-details/edit-contact-details',
+          } as httpMocks.MockRequest<any>
+          const mockRes = buildResponse({ enableAllowSms: true })
+          jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({}))
+          const spy = jest.spyOn(mockRes, 'redirect')
+          await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, mockRes)
+          const { emailAddress } = contactDetailsBody
+          const trimmedMobileNumber = '07882 458594'
+          expect(updatePersonalDetailsContactSpy).toHaveBeenCalledWith(crn, {
+            phoneNumber,
+            mobileNumber: trimmedMobileNumber,
+            emailAddress,
+          })
+          expect(updateAllowSmsSpy).not.toHaveBeenCalled()
+          expect(spy).toHaveBeenCalledWith(`/case/${crn}/personal-details?update=success`)
+        })
+        it('should update the personal details if allow sms value is YES', async () => {
+          const mockReq = {
+            ...req,
+            query: {
+              ...req.query,
+              origin: 'allowSms',
+              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+            },
+            body: {
+              ...req.body,
+              ...contactDetailsBody,
+              allowSms: 'YES',
+              _csrf: '1234',
+            },
+            path: 'personal-details/edit-contact-details',
+          } as httpMocks.MockRequest<any>
+          const mockRes = buildResponse({ enableAllowSms: true })
+          const spy = jest.spyOn(mockRes, 'redirect')
+          jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({}))
+          await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, mockRes)
+          const { emailAddress } = contactDetailsBody
+          const trimmedMobileNumber = '07882 458594'
+          expect(updatePersonalDetailsContactSpy).toHaveBeenCalledWith(crn, {
+            phoneNumber,
+            mobileNumber: trimmedMobileNumber,
+            emailAddress,
+          })
+          expect(updateAllowSmsSpy).toHaveBeenCalledWith(crn, true)
+          expect(spy).toHaveBeenCalledWith(mockReq.query.change)
+        })
+        it('should update the personal details if allow sms value is NO', async () => {
+          const mockReq = {
+            ...req,
+            query: {
+              ...req.query,
+              origin: 'allowSms',
+              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+            },
+            body: {
+              ...req.body,
+              ...contactDetailsBody,
+              allowSms: 'NO',
+              _csrf: '1234',
+            },
+            session: {
+              data: {
+                appointments: {
+                  [crn]: {
+                    [id]: {
+                      smsOptIn: 'YES',
+                    },
+                  },
+                },
+              },
+            },
+            path: 'personal-details/edit-contact-details',
+          } as httpMocks.MockRequest<any>
+          const mockRes = buildResponse({ enableAllowSms: true })
+          const spy = jest.spyOn(mockRes, 'redirect')
+          jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({}))
+          await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, mockRes)
+          const { emailAddress } = contactDetailsBody
+          const trimmedMobileNumber = '07882 458594'
+          expect(updatePersonalDetailsContactSpy).toHaveBeenCalledWith(crn, {
+            phoneNumber,
+            mobileNumber: trimmedMobileNumber,
+            emailAddress,
+          })
+          expect(updateAllowSmsSpy).toHaveBeenCalledWith(crn, false)
+          expect(spy).toHaveBeenCalledWith(mockReq.query.change)
+          expect(setDataValueSpy).toHaveBeenCalledWith(
+            mockReq.session.data,
+            ['appointments', crn, id, 'smsOptIn'],
+            'NO',
+          )
         })
       })
     })

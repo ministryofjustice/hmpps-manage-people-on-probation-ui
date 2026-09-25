@@ -21,7 +21,9 @@ import {
   timeFromTo,
   riskLevelLabel,
   shortTime,
+  toErrorList,
 } from '../utils'
+import { to12HourTimeWithMinutes } from '../utils/to12HourTimeWithMinutes'
 import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
 import { activityLinkUrl } from '../utils/activityContactLinkUrl'
@@ -56,8 +58,10 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('riskLevelLabel', riskLevelLabel)
   env.addFilter('govukTime', govukTime)
   env.addFilter('shortTime', shortTime)
+  env.addFilter('toErrorList', toErrorList)
   env.addFilter('handleQuotes', handleQuotes)
   env.addGlobal('timeFromTo', timeFromTo)
+  env.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
     if (!req || !res) {
       logger.warn('decorateFormAttributes called without request context')

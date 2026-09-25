@@ -1,3 +1,4 @@
+import { type AllowSms } from '../../models/Appointments'
 import { Note } from './note'
 
 export interface Name {
@@ -83,6 +84,7 @@ export interface PersonalDetails {
   lastUpdatedBy?: Name
   addressTypes: AddressType[]
   staffContacts: Contact[]
+  allowSms?: boolean | null
 }
 
 export interface PersonalDetailsMainAddress {
@@ -110,6 +112,13 @@ export interface PersonalDetailsUpdateRequest {
   startDate?: string
   endDate?: string
   notes?: string
+  allowSms?: AllowSms
+}
+
+export interface PersonalDetailsUpdatedResponse {
+  username: string
+  name: Name
+  updatedDateTime: string
 }
 
 export interface PersonalContact {

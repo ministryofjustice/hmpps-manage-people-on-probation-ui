@@ -49,10 +49,11 @@ const mockEventResponse: EventResponse = {
   smsResponse: null,
 }
 
-const mockPersonalDetails: Partial<PersonalDetails> = {
+const mockPersonalDetails = (allowSms = true): Partial<PersonalDetails> => ({
   name: { forename: 'James', surname: 'Morrison' },
   mobileNumber: '07700900000',
-}
+  allowSms,
+})
 
 const putRescheduleAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'putRescheduleAppointment')
@@ -149,7 +150,10 @@ const mockAppointmentTypes: AppointmentType[] = [
   },
 ]
 
-const buildRequest = (appointment?: Record<string, any>): [httpMocks.MockRequest<any>, AppointmentSession] => {
+const buildRequest = (
+  appointment?: Record<string, any>,
+  allowSms = true,
+): [httpMocks.MockRequest<any>, AppointmentSession] => {
   const req = {
     params: {
       crn,
@@ -166,7 +170,7 @@ const buildRequest = (appointment?: Record<string, any>): [httpMocks.MockRequest
         appointmentTypes: mockAppointmentTypes,
         personalDetails: {
           [crn]: {
-            overview: mockPersonalDetails,
+            overview: mockPersonalDetails(allowSms),
           },
         },
       },
@@ -447,6 +451,20 @@ describe('middleware/postRescheduleAppointments', () => {
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       expect(req.session.data.isEnglishNotificationFailed).toBeUndefined()
       expect(req.session.data.isWelshNotificationFailed).toBeUndefined()
+    })
+
+    it('should not include smsEventRequest when smsOptIn is YES and POP has not consented to receiving text messages', async () => {
+      const allowSms = false
+      const [req] = buildRequest({ smsOptIn: 'YES' }, allowSms)
+      const res = buildResponse({ flags: { ...baseFlags, enableAllowSms: true } })
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.not.objectContaining({
+            smsEventRequest: expect.anything(),
+          }),
+        }),
+      )
     })
 
     it('should not include smsEventRequest when smsOptIn is not YES', async () => {

@@ -6,12 +6,12 @@
 {% set showContactAlert = true %}
 
 {% block editForm %}
-    {% if origin != 'appointments' %}
+    {% if origin not in ['appointments', 'allowSms'] %}
         {{ govukInput({
                 value: personalDetails.telephoneNumber if personalDetails.telephoneNumber,
                 label: {
                     text: "Phone number (optional)",
-                    classes: "govuk-label--s govuk-!-font-weight-bold"
+                    classes: "govuk-label--m govuk-!-font-weight-bold"
                 },
                 hint: {
                     text: "For example, 01632 960 000"
@@ -36,7 +36,7 @@
                 value: personalDetails.mobileNumber if personalDetails.mobileNumber,
                 label: {
                     text: "Mobile number" + ( " (optional)" if origin != 'appointments' else ""),
-                    classes: "govuk-label--s govuk-!-font-weight-bold"
+                    classes: "govuk-label--m govuk-!-font-weight-bold"
                 },
                 hint: {
                     text: "For example, 07771 900 900"
@@ -56,12 +56,46 @@
                     }
                 } if errorMessages.mobileNumber
             }) }}
+{% if flags.enableAllowSms %}
+          {{ govukRadios({
+    classes: "govuk-radios--inline",
+    id: "allowSms",
+    name: "allowSms",
+    fieldset: {
+      legend: {
+        text: 'Has ' + personalDetails.name.forename | convertToTitleCase + ' given permission to receive text messages on this number? (optional)',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    formGroup: {
+      classes: "govuk-!-margin-bottom-4",
+      attributes: {
+        'data-qa': 'allowSms'
+      }
+    },
+    items: [
+      {
+        text: "Yes",
+        id: "allowSms-yes",
+        value: "YES",
+        checked: true if personalDetails.allowSms else false
+      },
+      {
+        text: "No",
+        id: "allowSms-no",
+        value: "NO",
+        checked: true if personalDetails.allowSms == false else false
+      }
+    ]
+  }) }}
+{% endif %}
     {% if origin != 'appointments' %}
         {{ govukInput({
                 value: personalDetails.email if personalDetails.email,
                 label: {
                     text: "Email address (optional)",
-                    classes: "govuk-label--s govuk-!-font-weight-bold"
+                    classes: "govuk-label--m govuk-!-font-weight-bold"
                 },
                 hint: {
                     text: "For example, name@example.com"

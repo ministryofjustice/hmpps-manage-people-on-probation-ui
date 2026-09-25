@@ -19,6 +19,7 @@ import {
   PersonalContact,
   PersonalDetails,
   PersonalDetailsMainAddress,
+  PersonalDetailsUpdatedResponse,
   PersonalDetailsUpdateRequest,
   PersonSummary,
   ProfessionalContact,
@@ -64,6 +65,7 @@ import {
   mapScheduleWithApprovedContactDisplayNames,
 } from '../utils/contactDisplayNames'
 import { sanitizeFilename } from '../utils/sanitizeFilename'
+import { LastSmsResponse } from '../models/LastSmsResponse'
 
 interface GetUserScheduleProps {
   username: string
@@ -187,6 +189,28 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/personal-details/${crn}/address`,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
+  async updateAllowSms(crn: string, allowSms: boolean): Promise<boolean> {
+    return this.post({
+      path: `/personal-details/${crn}/contact/allow-sms?smsAllowed=${allowSms}`,
+    })
+  }
+
+  async getPersonalDetailsUpdated(crn: string): Promise<PersonalDetailsUpdatedResponse | ErrorSummary | null> {
+    return this.get({
+      path: `/personal-details/${crn}/updated`,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
+  async getLastSms(crn: string): Promise<LastSmsResponse | ErrorSummary | null> {
+    return this.get({
+      path: `/last-sms/${crn}`,
       handle404: true,
       handle500: true,
     })

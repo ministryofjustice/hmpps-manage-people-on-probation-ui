@@ -127,7 +127,7 @@ describe('Confirmation page', () => {
         .getSMSConfirmationMsg()
         .should(
           'contain.text',
-          'Alton should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.',
+          'Alton should receive a confirmation text message within a few minutes with the appointment details.',
         )
       confirmPage
         .getWhatHappensNext()
@@ -321,7 +321,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.`,
+              `Caroline should receive a confirmation text message within a few minutes with the appointment details.`,
             )
           })
         cy.get('[data-qa="what-happens-next"]')
@@ -415,7 +415,7 @@ describe('Confirmation page', () => {
         .getSMSConfirmationMsg()
         .should(
           'contain.text',
-          'Caroline should receive a confirmation text message within a few minutes with the appointment details. We’ll try to deliver the message for up to 72 hours, but it may not be delivered if their phone is unavailable.',
+          'Caroline should receive a confirmation text message within a few minutes with the appointment details.',
         )
     })
   })

@@ -263,7 +263,8 @@
               "lastUpdated": "2023-04-06T11:21:17.06356+01:00",
               "status": "Sensitive"
             }
-          ]
+          ],
+          "allowSms": true
         },
         "headers": {
           "Content-Type": "application/json"

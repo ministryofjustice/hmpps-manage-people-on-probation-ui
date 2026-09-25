@@ -57,6 +57,9 @@ const appointments: Route<void> = (req, res, next) => {
       isInPast: appointmentDateIsInPast(req, res),
       _maxDate,
     }
+    if (res?.locals?.flags?.enableAllowSms) {
+      localParams.allowSms = getDataValue(data, ['personalDetails', crn, 'overview', 'allowSms'])
+    }
   }
 
   const baseUrl = req.url.split('?')[0]

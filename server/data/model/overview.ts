@@ -72,6 +72,7 @@ export interface PersonalDetails {
   dateOfBirth: string
   dateOfDeath?: string
 }
+
 export interface Disability {
   description: string
 }
