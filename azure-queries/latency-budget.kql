@@ -8,6 +8,11 @@
 let slo_p95_threshold = 1000; // milliseconds
 let slo_target = 95.0; // 95% of requests should meet latency target
 let timeRange = 30d;
+// Formats a whole number with thousand separators (e.g. 3469361 -> "3,469,361") for readability,
+let FormatWithCommas = (n: long) {
+    let s = tostring(n);
+    trim_start(@",", reverse(replace_regex(reverse(s), @"(\d{3})", @"\1,")))
+};
 // Calculate latency-based error budget
 requests
 | where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
@@ -24,15 +29,20 @@ requests
     FastRequestRate = ((TotalRequests - SlowRequests) * 100.0) / TotalRequests,
     ErrorBudget = 100 - slo_target,
     ErrorBudgetRemaining = (100 - slo_target) - ((SlowRequests * 100.0) / TotalRequests),
-    ErrorBudgetConsumedPct = ((SlowRequests * 100.0) / TotalRequests) / (100 - slo_target) * 100
+    ErrorBudgetConsumedPct = ((SlowRequests * 100.0) / TotalRequests) / (100 - slo_target) * 100,
+    NoData = TotalRequests == 0
 | project
-    TotalRequests,
-    p50 = round(p50, 2), p95 = round(p95, 2), p99 = round(p99, 2), p999 = round(p999, 2),
-    ServiceLevelObjectiveThreshold = slo_p95_threshold,
-    ServiceLevelObjectiveTarget = slo_target,
-    SlowRequests,
-    SlowRequestRate = round(SlowRequestRate, 2),
-    FastRequestRate = round(FastRequestRate, 2),
-    ErrorBudget = round(ErrorBudget, 2),
-    ErrorBudgetRemaining = round(ErrorBudgetRemaining, 2),
-    ErrorBudgetConsumedPct = round(ErrorBudgetConsumedPct, 2)
+    Status = iff(NoData, "⚪ No data", iff(ErrorBudgetRemaining < 0, "🔴 Breached", "✅ Within budget")),
+    ErrorBudgetConsumed = iff(NoData, "N/A", strcat(tostring(round(ErrorBudgetConsumedPct, 2)), "%")),
+    ErrorBudgetRemaining = iff(NoData, "N/A", strcat(tostring(round(ErrorBudgetRemaining, 2)), "%")),
+    TotalRequests = FormatWithCommas(TotalRequests),
+    SlowRequests = FormatWithCommas(SlowRequests),
+    SlowRequestRate = iff(NoData, "N/A", strcat(tostring(round(SlowRequestRate, 2)), "%")),
+    FastRequestRate = iff(NoData, "N/A", strcat(tostring(round(FastRequestRate, 2)), "%")),
+    p50 = iff(NoData, "N/A", strcat(tostring(round(p50 / 1000.0, 2)), "s")),
+    p95 = iff(NoData, "N/A", strcat(tostring(round(p95 / 1000.0, 2)), "s")),
+    p99 = iff(NoData, "N/A", strcat(tostring(round(p99 / 1000.0, 2)), "s")),
+    p999 = iff(NoData, "N/A", strcat(tostring(round(p999 / 1000.0, 2)), "s")),
+    ServiceLevelObjectiveThreshold = strcat(tostring(round(slo_p95_threshold / 1000.0, 2)), "s"),
+    ServiceLevelObjectiveTarget = strcat(tostring(slo_target), "%"),
+    ErrorBudget = strcat(tostring(round(ErrorBudget, 2)), "%")
