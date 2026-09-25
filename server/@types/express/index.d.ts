@@ -4,6 +4,7 @@ import { Errors } from '../../models/Errors'
 import { DocumentLevel } from '../../data/model/documents'
 import { Data } from '../../models/Data'
 import { ProbationSearch } from '../../data/model/search'
+import { NewRangeType, RangeType } from '../../utils/getDateRange'
 
 export default {}
 
@@ -30,7 +31,7 @@ declare module 'express-session' {
     documentFilters?: DocumentFilters
     documentLevels?: DocumentLevel[]
     outcomesFilter?: {
-      [crn: string]: 'PAST_TWO_YEARS' | 'OLDER_THAN_TWO_YEARS' | 'ALL'
+      [crn: string]: NewRangeType | RangeType
     }
     data?: Data
     errors?: Errors

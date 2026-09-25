@@ -59,8 +59,8 @@ const buildResponse = ({
       crn,
       id,
       appointment: {
-        startDateTime: '2025-12-22T09:15:00.382936Z[Europe/London]',
-        endDateTime: '2025-12-22T09:30:00.382936Z[Europe/London]',
+        startDateTime: '2025-12-22T09:15:00.382936Z',
+        endDateTime: '2025-12-22T09:30:00.382936Z',
         type,
       },
       sentence: {

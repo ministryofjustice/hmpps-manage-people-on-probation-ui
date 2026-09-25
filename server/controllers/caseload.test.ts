@@ -83,10 +83,8 @@ tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const nextSpy = jest.fn()
 const showCaseloadSpy = jest.spyOn(caseloadController, 'showCaseload')
-const res = mockAppResponse()
-const resFlag = mockAppResponse({ flags: {} })
+const res = mockAppResponse({ flags: { enable3MonthsOutcomes: true } })
 const renderSpy = jest.spyOn(res, 'render')
-const flagRenderSpy = jest.spyOn(resFlag, 'render')
 const mockCaseload = { caseload: undefined, sortedBy: undefined } as UserCaseload
 const tiers = { X801756: { tierScore: 'A0' }, X801758: { tierScore: 'D2' } }
 const mockFilters = {} as CaseSearchFilter
@@ -190,12 +188,12 @@ describe('caseloadController', () => {
         expectedCaseFilter,
       )
     })
-    it('should request the tiers from the api when flag set', async () => {
-      await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
+    it('should request the tiers from the api', async () => {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
       expect(tiersSpy).toHaveBeenCalled()
     })
 
-    it('should link tiers with cases when flag set', async () => {
+    it('should link tiers with cases', async () => {
       searchUserCaseloadSpy.mockImplementationOnce(() => Promise.resolve(mockUserCaseload))
       const mockNewCaseload = {
         caseload: [
@@ -211,8 +209,8 @@ describe('caseloadController', () => {
           },
         ],
       }
-      await controllers.caseload.postCase(hmppsAuthClient)(req, resFlag, nextSpy)
-      expect(flagRenderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
         pagination: mockPagination,
         caseload: mockNewCaseload,
         currentNavSection: 'yourCases',
@@ -311,7 +309,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -351,7 +349,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -391,7 +389,7 @@ describe('caseloadController', () => {
         type: 'upcoming',
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
         userSchedule: expectedUserSchedule,
         type: 'upcoming',
         sortBy,
@@ -419,7 +417,7 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?page=1',
       })
-      res.locals.flags = { enableHomePageOutcomesWithFilter: false }
+      res.locals.flags = { enableHomePageOutcomesWithFilter: false, enable3MonthsOutcomes: true }
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
@@ -442,7 +440,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
     it('renders the outcomes to log page with the sortBy search param included in the url', async () => {
@@ -458,7 +456,7 @@ describe('caseloadController', () => {
         },
         url: '/caseload/appointments/no-outcome?sortBy=sentence.desc',
       })
-      res.locals.flags = { enableHomePageOutcomesWithFilter: false }
+      res.locals.flags = { enableHomePageOutcomesWithFilter: false, enable3MonthsOutcomes: true }
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
@@ -481,7 +479,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
 
@@ -489,18 +487,18 @@ describe('caseloadController', () => {
       const req = httpMocks.createRequest({
         query: {
           page: '1',
-          outcomeFilter: 'PAST_TWO_YEARS',
+          outcomeFilter: 'PAST_THREE_MONTHS',
         },
-        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
       })
-      const getDateRangeSpy = jest
-        .spyOn(dateRangeUtils, 'getDateRange')
+      const getNewDateRangeSpy = jest
+        .spyOn(dateRangeUtils, 'getNewDateRange')
         .mockReturnValue({ fromDate: '2024-01-01', toDate: '2026-01-01' })
-      res.locals.flags = { enableHomePageOutcomesWithFilter: true }
+      res.locals.flags = { enableHomePageOutcomesWithFilter: true, enable3MonthsOutcomes: true }
 
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
 
-      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_TWO_YEARS')
+      expect(getNewDateRangeSpy).toHaveBeenCalledWith('PAST_THREE_MONTHS')
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
         page: '0',
@@ -527,10 +525,27 @@ describe('caseloadController', () => {
           page => addParameters(req, { page: page.toString() }),
           mockResponse.size,
         ),
-        sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+        sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
-        outcomesFilter: 'PAST_TWO_YEARS',
+        outcomesFilter: 'PAST_THREE_MONTHS',
       })
+    })
+
+    it('uses getDateRange over getNewDateRange if enable3MonthsOutcomes feature flag is disabled', async () => {
+      const req = httpMocks.createRequest({
+        query: {
+          page: '1',
+          outcomeFilter: 'PAST_TWO_YEARS',
+        },
+        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS',
+      })
+      const getDateRangeSpy = jest
+        .spyOn(dateRangeUtils, 'getDateRange')
+        .mockReturnValue({ fromDate: '2024-01-01', toDate: '2026-01-01' })
+      res.locals.flags = { enableHomePageOutcomesWithFilter: true }
+
+      await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
+      expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_TWO_YEARS')
     })
   })
 
@@ -540,20 +555,20 @@ describe('caseloadController', () => {
     it('redirects to the same path with outcomeFilter query parameter', async () => {
       const req = httpMocks.createRequest({
         body: {
-          outcomesFilter: 'PAST_TWO_YEARS',
+          outcomesFilter: 'PAST_THREE_MONTHS',
         },
         url: '/caseload/appointments/no-outcome',
       })
 
       await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
 
-      expect(redirectSpy).toHaveBeenCalledWith('/caseload/appointments/no-outcome?outcomeFilter=PAST_TWO_YEARS')
+      expect(redirectSpy).toHaveBeenCalledWith('/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS')
     })
 
     it('preserves existing query parameters when adding outcomeFilter', async () => {
       const req = httpMocks.createRequest({
         body: {
-          outcomesFilter: 'OLDER_THAN_TWO_YEARS',
+          outcomesFilter: 'OLDER_THAN_THREE_MONTHS',
         },
         url: '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc',
       })
@@ -561,7 +576,7 @@ describe('caseloadController', () => {
       await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(
-        '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc&outcomeFilter=OLDER_THAN_TWO_YEARS',
+        '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc&outcomeFilter=OLDER_THAN_THREE_MONTHS',
       )
     })
   })

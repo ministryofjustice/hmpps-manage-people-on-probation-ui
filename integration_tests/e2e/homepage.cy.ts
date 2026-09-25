@@ -16,7 +16,7 @@ context('Sign In', () => {
     page.getAppointments().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
-  it('Renders the the outcomes to log with 2 years filter', () => {
+  it('Renders the the outcomes to log with 3 months filter', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
     page.getOutcomesToLog().should('exist')
@@ -41,16 +41,6 @@ context('Sign In', () => {
 
     // Check for "Manage" link for the second row (Ethan Bradtke in wiremock mapping, deliusManaged: false)
     page.getEnforcementActionRows().eq(1).find('a').contains('Manage').should('exist')
-  })
-
-  it('Renders the the outcomes to log', () => {
-    cy.task('stubDisableHomePageOutcome')
-    cy.visit('/')
-    const page = Page.verifyOnPage(IndexPage)
-    page.getOutcomesToLog().should('exist')
-    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (21)')
-    page.getOutcomesToLogRows().should('have.length', 5)
-    page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
   it('Renders correctly when appointments and outcomes to log are empty', () => {

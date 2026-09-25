@@ -11,7 +11,7 @@ import { Controller } from '../@types'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
-import { getDateRange, RangeType } from '../utils/getDateRange'
+import { getDateRange, getNewDateRange, NewRangeType, RangeType } from '../utils/getDateRange'
 import TierApiClient, { TierCalculations } from '../data/tierApiClient'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
@@ -139,13 +139,16 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
       const [name, dir] = sortByQuery.split('.') as [ColName, SortDir]
       let cols = colNames
-      const outcomeFilter = req.query?.outcomeFilter ?? 'PAST_TWO_YEARS'
+      const outcomeFilter =
+        req.query?.outcomeFilter ?? (res.locals.flags.enable3MonthsOutcomes ? 'PAST_THREE_MONTHS' : 'PAST_TWO_YEARS')
       let fromDate
       let toDate
       if (type === 'no-outcome') {
         cols = cols.filter(col => col !== 'appointment')
         if (outcomeFilter && res.locals.flags.enableHomePageOutcomesWithFilter) {
-          const result = getDateRange(outcomeFilter as RangeType)
+          const result = res.locals.flags.enable3MonthsOutcomes
+            ? getNewDateRange(outcomeFilter as NewRangeType)
+            : getDateRange(outcomeFilter as RangeType)
           fromDate = result.fromDate
           toDate = result.toDate
         }

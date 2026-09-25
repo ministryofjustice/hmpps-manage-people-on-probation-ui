@@ -23,7 +23,7 @@ import {
 } from '../middleware'
 import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
 import config from '../config'
-import { filterContacts } from '../middleware/filterContacts'
+import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { OffenderEligibility } from '../data/model/esupervision'
@@ -252,11 +252,16 @@ const appointmentsController: Controller<typeof routes, void> = {
       req.session.outcomesFilter = req.session.outcomesFilter ?? {}
       req.session.outcomesFilter[crn] = req?.body?.outcomesFilter ?? req?.session?.outcomesFilter[crn]
       const content = res.locals.contactResponse?.content
-      let outcomes = filterContacts(content)
-      if (req.session.outcomesFilter[crn] === 'OLDER_THAN_TWO_YEARS') {
+      let outcomes = res.locals.flags.enable3MonthsOutcomes ? filterContactsMonths(content) : filterContacts(content)
+      const target = res.locals.flags.enable3MonthsOutcomes ? 'OLDER_THAN_THREE_MONTHS' : 'OLDER_THAN_TWO_YEARS'
+      if (req.session.outcomesFilter[crn] === target) {
         outcomes = content?.filter(contact => {
           const contactDate = DateTime.fromISO(contact.date)
-          const twoYearsAgo = DateTime.now().minus({ years: 2 })
+          if (res.locals.flags.enable3MonthsOutcomes) {
+            const threeMonthsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ months: 3 })
+            return contactDate < threeMonthsAgo
+          }
+          const twoYearsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
       } else if (req.session.outcomesFilter[crn] === 'ALL') {
@@ -269,7 +274,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
         outcomes,
-        outcomesFilter: req.session.outcomesFilter[crn] ?? 'PAST_TWO_YEARS',
+        outcomesFilter:
+          req.session.outcomesFilter[crn] ??
+          (res.locals.flags.enable3MonthsOutcomes ? 'PAST_THREE_MONTHS' : 'PAST_TWO_YEARS'),
       })
     }
   },

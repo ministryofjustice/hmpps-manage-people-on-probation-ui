@@ -14,8 +14,8 @@ const req = httpMocks.createRequest({ session: { data: {} } })
 const mockAppointment = ({ appointment = {} } = {}): Activity => ({
   id: '123',
   type: 'Planned Office Visit (NS)',
-  startDateTime: '2026-05-15T12:00:00.000[Europe/London]',
-  endDateTime: '2026-05-15T13:30:00.000[Europe/London]',
+  startDateTime: '2026-05-15T12:00:00.000',
+  endDateTime: '2026-05-15T13:30:00.000',
   ...appointment,
 })
 

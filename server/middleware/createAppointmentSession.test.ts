@@ -38,8 +38,8 @@ const rescheduleAppointment = {
   reason: 'why appointment needs to be rescheduled',
   files: ['file1', 'file2'],
   sensitivity: 'Yes',
-  previousStart: '2024-02-21T10:15:00.382936Z[Europe/London]',
-  previousEnd: '2024-02-21T10:30:00.382936Z[Europe/London]',
+  previousStart: '2024-02-21T10:15:00.382936Z',
+  previousEnd: '2024-02-21T10:30:00.382936Z',
 }
 
 const mockSentences: Sentence[] = [
@@ -73,8 +73,8 @@ const mockAppointment: Activity = {
   id: '6',
   eventNumber: '12345',
   type: 'Planned Office Visit (NS)',
-  startDateTime: '2024-02-21T10:15:00.382936Z[Europe/London]',
-  endDateTime: '2024-02-21T10:30:00.382936Z[Europe/London]',
+  startDateTime: '2024-02-21T10:15:00.382936Z',
+  endDateTime: '2024-02-21T10:30:00.382936Z',
   rarToolKit: 'Choices and Changes',
   isSensitive: false,
   didTheyComply: false,
@@ -564,8 +564,8 @@ describe('/middleware/createAppointmentSession', () => {
     createAppointmentSession(req, res, nextSpy)
     expect(res.locals.appointmentSession).toBeDefined()
     expect(res.locals.appointmentSession.rescheduleAppointment).toEqual({
-      previousEnd: '2024-02-21T10:30:00.382936Z[Europe/London]',
-      previousStart: '2024-02-21T10:15:00.382936Z[Europe/London]',
+      previousEnd: '2024-02-21T10:30:00.382936Z',
+      previousStart: '2024-02-21T10:15:00.382936Z',
     })
   })
 

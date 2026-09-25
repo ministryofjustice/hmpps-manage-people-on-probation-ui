@@ -11,7 +11,7 @@ export class FeatureFlags {
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
-  enableHomePageOutcomesWithFilter?: boolean = undefined
+  enableHomePageOutcomesWithFilter?: boolean = undefined // only PP full outcomes page should be affected
   enableEnforcementContacts?: boolean = undefined
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
@@ -33,6 +33,7 @@ export class FeatureFlags {
   enableAsYouTypeSearch?: boolean = undefined
   enableMAN3255?: boolean = undefined
   enableCombinedCYAPage?: boolean = undefined
+  enable3MonthsOutcomes?: boolean = undefined
   enableAttendeeUpdates?: boolean = undefined
   enableEsupEligibilityCheck?: boolean = undefined
   showContactInformationWarning?: boolean = undefined

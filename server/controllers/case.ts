@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/node'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
-import { filterContacts } from '../middleware/filterContacts'
+import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import { getCheckinOffenderDetails, getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
@@ -55,13 +55,14 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
+      const outcomes = res.locals.flags.enable3MonthsOutcomes
+        ? filterContactsMonths(contactResponse?.content)
+        : filterContacts(contactResponse?.content)
 
       let checkinEligibility: OffenderEligibility | undefined
       if (res.locals.flags.enableEsupEligibilityCheck) {
         checkinEligibility = await esupClient.getOffenderEligibility(crn)
       }
-
-      const outcomes = filterContacts(contactResponse?.content)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true

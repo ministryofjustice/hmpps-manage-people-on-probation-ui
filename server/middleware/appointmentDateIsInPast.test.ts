@@ -15,9 +15,9 @@ const mockAppointment: AppointmentSession = {
   },
   eventId: '1',
   type: 'C084',
-  date: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  start: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+  date: '2044-12-22T09:15:00.382936Z',
+  start: '2044-12-22T09:15:00.382936Z',
+  end: '2044-12-22T09:15:00.382936Z',
   sensitivity: 'Yes',
   outcomeRecorded: 'Yes',
 }

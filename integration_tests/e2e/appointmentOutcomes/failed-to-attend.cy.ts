@@ -49,7 +49,7 @@ const loadPage = ({
   isProbationPractitioner = false,
   enforcementActionResponseByDate = responseByDate,
   sentenceType = 'COMMUNITY',
-  startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
+  startDateTime = '2024-02-21T10:15:00.382936Z',
 }: Args = {}): void => {
   cy.task('stubAppointment', {
     eventId: '2501192724',

@@ -48,7 +48,7 @@ describe('homeController', () => {
       host: 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
     })
     const originalEnv = process.env.NODE_ENV
-    const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } = mockHomepage
+    const { upcomingAppointments, appointmentsRequiringOutcome } = mockHomepage
     let spy: jest.SpyInstance
     let masSpy: jest.SpyInstance
 
@@ -113,7 +113,7 @@ describe('homeController', () => {
         expectHomePageToBeRendered(renderSpy, {
           upcomingAppointments,
           appointmentsRequiringOutcome,
-          appointmentsRequiringOutcomeCount,
+          appointmentsRequiringOutcomeCount: 1,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           appointmentsTimeoutError: mockHomepage.timeoutError,
@@ -151,7 +151,7 @@ describe('homeController', () => {
         expectHomePageToBeRendered(renderSpy, {
           upcomingAppointments,
           appointmentsRequiringOutcome,
-          appointmentsRequiringOutcomeCount,
+          appointmentsRequiringOutcomeCount: 1,
           enforcementActions: [mockHomepage.enforcementContacts[0]],
           url,
           appointmentsTimeoutError: mockHomepage.timeoutError,
@@ -174,28 +174,28 @@ describe('homeController', () => {
       })
     })
 
-    describe('outcomes filter with feature flag enabled', () => {
-      it('should filter appointments requiring outcomes to only include the last 2 years and update count', async () => {
+    describe('outcomes filter with 3 month feature flag enabled', () => {
+      it('should filter appointments requiring outcomes to only include the last 3 months and update count', async () => {
         const recentAppointment = {
           id: 1,
           name: { surname: 'Recent', forename: 'Person' },
           crn: 'X000002',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ years: 1 }).toISO() as string,
+          startDateTime: DateTime.now().startOf('day').minus({ months: 1 }).toISO() as string,
         }
         const boundaryAppointment = {
           id: 3,
           name: { surname: 'Boundary', forename: 'Person' },
           crn: 'X000004',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ years: 2 }).plus({ minutes: 1 }).toISO() as string,
+          startDateTime: DateTime.now().startOf('day').minus({ months: 3 }).plus({ minutes: 1 }).toISO() as string,
         }
         const oldAppointment = {
           id: 2,
           name: { surname: 'Old', forename: 'Person' },
           crn: 'X000003',
           type: 'Office appointment',
-          startDateTime: DateTime.now().minus({ years: 2, days: 1 }).toISO() as string,
+          startDateTime: DateTime.now().startOf('day').minus({ months: 3, days: 1 }).toISO() as string,
         }
         const homepageWithMixedOutcomeDates = {
           ...mockHomepage,
@@ -203,7 +203,7 @@ describe('homeController', () => {
           appointmentsRequiringOutcomeCount: 3,
         }
         const resWithFilterFlag = mockAppResponse({
-          flags: { enableDeliusClient: true, enableHomePageOutcomesWithFilter: true },
+          flags: { enableDeliusClient: true, enable3MonthsOutcomes: true },
         })
         const renderSpyWithFilter = jest.spyOn(resWithFilterFlag, 'render')
         jest
@@ -275,7 +275,7 @@ describe('homeController', () => {
 
     describe('getHomeOld', () => {
       const mockAppointments = [{ id: '1', type: 'Appointment' }]
-      const mockOutcomes = [{ id: '2', type: 'Outcome' }]
+      const mockOutcomes = [{ id: '2', type: 'Outcome', startDateTime: '2025-09-17T09:00:00Z' }]
 
       beforeEach(() => {
         jest.spyOn(MasApiClient.prototype, 'getUserAppointments').mockResolvedValue({
