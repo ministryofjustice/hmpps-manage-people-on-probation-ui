@@ -30,11 +30,11 @@ requests
     ErrorBudgetConsumed = ((FailedRequests * 100.0) / TotalRequests) / (100 - slo) * 100
 | project
     Status = iff(TotalRequests == 0, "⚪ No data", iff(ErrorBudgetRemaining < 0, "🔴 Breached", "✅ Within budget")),
-    ErrorBudgetConsumed = strcat(tostring(round(ErrorBudgetConsumed, 2)), "%"),
-    ErrorBudgetRemaining = strcat(tostring(round(ErrorBudgetRemaining, 2)), "%"),
+    ErrorBudgetConsumed = iff(TotalRequests == 0, "N/A", strcat(tostring(round(ErrorBudgetConsumed, 2)), "%")),
+    ErrorBudgetRemaining = iff(TotalRequests == 0, "N/A", strcat(tostring(round(ErrorBudgetRemaining, 2)), "%")),
     TotalRequests = FormatWithCommas(TotalRequests),
     FailedRequests = FormatWithCommas(FailedRequests),
-    ActualSuccessRate = strcat(tostring(round(ActualSuccessRate, 2)), "%"),
-    ErrorRate = strcat(tostring(round(ErrorRate, 2)), "%"),
+    ActualSuccessRate = iff(TotalRequests == 0, "N/A", strcat(tostring(round(ActualSuccessRate, 2)), "%")),
+    ErrorRate = iff(TotalRequests == 0, "N/A", strcat(tostring(round(ErrorRate, 2)), "%")),
     ServiceLevelObjective = strcat(tostring(slo), "%"),
     ErrorBudget = strcat(tostring(round(ErrorBudget, 2)), "%")
