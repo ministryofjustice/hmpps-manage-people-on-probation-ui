@@ -18,7 +18,7 @@ requests
     p95 = percentile(duration, 95),
     p99 = percentile(duration, 99),
     p999 = percentile(duration, 99.9),
-    SlowRequests = countif(duration > slo_p95_threshold)
+    SlowRequests = countif(duration >= slo_p95_threshold)
 | extend
     SlowRequestRate = (SlowRequests * 100.0) / TotalRequests,
     FastRequestRate = ((TotalRequests - SlowRequests) * 100.0) / TotalRequests,
