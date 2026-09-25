@@ -8,6 +8,7 @@ import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
 import { getDataValue, setDataValue } from '../utils'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
+import { addReplaceBackParameter } from '../utils/addReplaceBackParameter'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -94,6 +95,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
+
       const file = req.file as Express.Multer.File
       if (file) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -108,29 +110,23 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
           })
         }
       }
-      let redirect = baseOutcomeUrl
 
-      redirect = uuid
-        ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
-        : `${baseOutcomeUrl}/next-appointment`
-      if (change) redirect = change
-      if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
       const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
       if (nextAppointmentId === uuid) {
         const nextAppointmentOutcome = res.locals.appointmentOutcome
         setDataValue(req.session.data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
       }
 
-      if (linkedContactId && res.locals.flags.enableCombinedCYAPage) {
+      let redirect = `${baseOutcomeUrl}/next-appointment`
+      if (uuid) redirect = `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
+      if (change) redirect = change
+      if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+      if (linkedContactId && res.locals.flags.enableCombinedCYAPage)
         redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
-      }
+
       const backParam = `back=${baseOutcomeUrl}/add-note`
       if (!put) {
-        if (redirect.includes('back=')) {
-          redirect = redirect.replace(/back=[^&]*/, backParam)
-        } else {
-          redirect = `${redirect}${redirect.includes('?') ? '&' : '?'}${backParam}`
-        }
+        redirect = addReplaceBackParameter(redirect, backParam)
       }
       return res.redirect(redirect)
     }
