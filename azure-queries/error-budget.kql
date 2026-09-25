@@ -10,7 +10,6 @@ let slo = 99.9;
 let timeRange = 30d;
 let failureCodes = dynamic(["500", "400"]);
 // Formats a whole number with thousand separators (e.g. 3469361 -> "3,469,361") for readability,
-// since Kusto has no built-in thousands-separator formatting function.
 let FormatWithCommas = (n: long) {
     let s = tostring(n);
     reverse(replace_regex(reverse(s), @"(\d{3})(?=\d)", @"\1,"))
@@ -29,8 +28,6 @@ requests
     ErrorBudget = 100 - slo,
     ErrorBudgetRemaining = (100 - slo) - ((FailedRequests * 100.0) / TotalRequests),
     ErrorBudgetConsumed = ((FailedRequests * 100.0) / TotalRequests) / (100 - slo) * 100
-// Surface the most important signals first (breach status and budget consumed), so they are
-// seen immediately without scrolling past less critical stats.
 | project
     Status = iff(ErrorBudgetRemaining < 0, "🔴 Breached", "✅ Within budget"),
     ErrorBudgetConsumed = strcat(tostring(round(ErrorBudgetConsumed, 2)), "%"),
