@@ -1,4 +1,4 @@
-import { YesNo } from '../../models/Appointments'
+import { type AllowSms } from '../../models/Appointments'
 import { Note } from './note'
 
 export interface Name {
@@ -112,7 +112,7 @@ export interface PersonalDetailsUpdateRequest {
   startDate?: string
   endDate?: string
   notes?: string
-  allowSms?: YesNo
+  allowSms?: AllowSms
 }
 
 export interface PersonalDetailsUpdatedResponse {

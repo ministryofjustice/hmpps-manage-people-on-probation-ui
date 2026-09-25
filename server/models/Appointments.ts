@@ -9,7 +9,9 @@ import type {
   AcceptableAbsenceOutcomeCode,
 } from '../properties/appointment-outcomes/code-map'
 
-export type YesNo = 'Yes' | 'No' | 'YES' | 'NO' | '' | undefined
+export type YesNo = '' | 'Yes' | 'No'
+
+export type AllowSms = 'YES' | 'NO' | '' | undefined
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
