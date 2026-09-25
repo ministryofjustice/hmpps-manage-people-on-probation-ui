@@ -399,7 +399,7 @@ describe('masApiClient', () => {
     it('should sanitise the original filename before uploading', async () => {
       const file = {
         fieldname: 'file',
-        originalname: 'my/test$file?.pdf',
+        originalname: 'my/£test$file?.pdf',
         encoding: '7bit',
         mimetype: 'application/pdf',
         destination: '',
@@ -415,8 +415,7 @@ describe('masApiClient', () => {
       fakeMasApiClient
         .patch('/documents/X000001/update/contact/1', body => {
           const bodyString = body.toString()
-
-          return bodyString.includes('Content-Disposition: form-data; name="file"; filename="my-test-file-.pdf"')
+          return bodyString.includes('Content-Disposition: form-data; name="file"; filename="my-�test-file-.pdf"')
         })
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
