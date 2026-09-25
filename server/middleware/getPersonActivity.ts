@@ -10,7 +10,6 @@ import {
   categoryFilterOptions,
   sparksCategoryFilterOption,
   supervisionPackageCategoryFilterOption,
-  supervisionPackageAppointmentsCategoryFilterOption,
   ACTIVITY_LOG_PAGE_SIZE,
 } from '../properties'
 
@@ -21,17 +20,7 @@ export const getPersonActivity = async (
 ): Promise<[TierCalculation, PersonActivity]> => {
   const { filters } = res.locals
   const { params, query } = req
-  const {
-    keywords,
-    dateFrom,
-    dateTo,
-    compliance,
-    category,
-    sparks,
-    supervisionPackage,
-    supervisionPackageAppointments,
-    hideContact,
-  } = filters
+  const { keywords, dateFrom, dateTo, compliance, category, sparks, supervisionPackage, hideContact } = filters
   const { crn } = params as Record<string, string>
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -55,11 +44,6 @@ export const getPersonActivity = async (
     Array.isArray(supervisionPackage) &&
     supervisionPackage.includes(supervisionPackageCategoryFilterOption.value)
 
-  const filterBySupervisionPackageAppointmentsContacts =
-    res.locals.flags?.enableSupervisionPackageAppointments === true &&
-    Array.isArray(supervisionPackageAppointments) &&
-    supervisionPackageAppointments.includes(supervisionPackageAppointmentsCategoryFilterOption.value)
-
   const formatCompliance = (): Array<string> => {
     const complianceArray: string[] = []
 
@@ -79,7 +63,6 @@ export const getPersonActivity = async (
     filters: [...formatCompliance()],
     filterBySparksContacts,
     filterBySupervisionPackageContacts,
-    filterBySupervisionPackageAppointmentsContacts,
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
