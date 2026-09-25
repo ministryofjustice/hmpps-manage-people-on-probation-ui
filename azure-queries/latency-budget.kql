@@ -1,0 +1,38 @@
+// Service Level Objective latency error budget report.
+// Uses a fixed 30-day rolling window, consistent with error-budget.kql, since
+// latency error budgets should be tracked over the same period as the Service Level Objective.
+//
+//   ./run-query.sh latency-budget.kql
+
+// Define your latency Service Level Objective (e.g., p95 < 500ms)
+let slo_p95_threshold = 1000; // milliseconds
+let slo_target = 95.0; // 95% of requests should meet latency target
+let timeRange = 30d;
+// Calculate latency-based error budget
+requests
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| where timestamp > ago(timeRange)
+| summarize
+    TotalRequests = count(),
+    p50 = percentile(duration, 50),
+    p95 = percentile(duration, 95),
+    p99 = percentile(duration, 99),
+    p999 = percentile(duration, 99.9),
+    SlowRequests = countif(duration > slo_p95_threshold)
+| extend
+    SlowRequestRate = (SlowRequests * 100.0) / TotalRequests,
+    FastRequestRate = ((TotalRequests - SlowRequests) * 100.0) / TotalRequests,
+    ErrorBudget = 100 - slo_target,
+    ErrorBudgetRemaining = (100 - slo_target) - ((SlowRequests * 100.0) / TotalRequests),
+    ErrorBudgetConsumedPct = ((SlowRequests * 100.0) / TotalRequests) / (100 - slo_target) * 100
+| project
+    TotalRequests,
+    p50, p95, p99, p999,
+    ServiceLevelObjectiveThreshold = slo_p95_threshold,
+    ServiceLevelObjectiveTarget = slo_target,
+    SlowRequests,
+    SlowRequestRate,
+    FastRequestRate,
+    ErrorBudget,
+    ErrorBudgetRemaining,
+    ErrorBudgetConsumedPct
