@@ -148,7 +148,7 @@ runs:
                   # Single-row results (e.g. summary/budget-style reports) read much better as a
                   # Slack "fields" grid (label above value, laid out in two columns) than as a
                   # single long pipe-separated line, so use that layout instead of a table when
-                  # there's exactly one row. Slack allows a maximum of 10 fields per section
+                  # there is exactly one row. Slack allows a maximum of 10 fields per section
                   # block, so split into multiple grid section blocks (10 fields each, chunked
                   # manually since jq has no portable built-in "chunk" filter) rather than
                   # truncating or falling back to a table.
