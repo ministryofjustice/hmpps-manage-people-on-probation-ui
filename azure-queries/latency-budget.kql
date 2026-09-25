@@ -31,7 +31,7 @@ requests
     ErrorBudgetRemaining = (100 - slo_target) - ((SlowRequests * 100.0) / TotalRequests),
     ErrorBudgetConsumedPct = ((SlowRequests * 100.0) / TotalRequests) / (100 - slo_target) * 100
 | project
-    Status = iff(ErrorBudgetRemaining < 0, "🔴 Breached", "✅ Within budget"),
+    Status = iff(TotalRequests == 0, "⚪ No data", iff(ErrorBudgetRemaining < 0, "🔴 Breached", "✅ Within budget")),
     ErrorBudgetConsumed = strcat(tostring(round(ErrorBudgetConsumedPct, 2)), "%"),
     ErrorBudgetRemaining = strcat(tostring(round(ErrorBudgetRemaining, 2)), "%"),
     TotalRequests = FormatWithCommas(TotalRequests),
