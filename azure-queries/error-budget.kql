@@ -1,0 +1,34 @@
+// Service Level Objective error budget report.
+// Uses a fixed 30-day rolling window (rather than the 1d window used by the
+// other scheduled reports) because error budgets are meant to track cumulative
+// burn over the Service Level Objective period, not a single day's error rate.
+//
+//   ./run-query.sh error-budget.kql
+
+// Define your Service Level Objective (e.g., 99.9% success rate = 0.1% error budget)
+let slo = 99.9;
+let timeRange = 30d;
+let failureCodes = dynamic(["500", "400"]);
+// Calculate error budget
+requests
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| where timestamp > ago(timeRange)
+| summarize
+    TotalRequests = count(),
+    FailedRequests = countif(resultCode in (failureCodes)), // adjust field name as needed
+    SuccessRequests = countif(resultCode !in (failureCodes))
+| extend
+    ActualSuccessRate = (SuccessRequests * 100.0) / TotalRequests,
+    ErrorRate = (FailedRequests * 100.0) / TotalRequests,
+    ErrorBudget = 100 - slo,
+    ErrorBudgetRemaining = (100 - slo) - ((FailedRequests * 100.0) / TotalRequests),
+    ErrorBudgetConsumed = ((FailedRequests * 100.0) / TotalRequests) / (100 - slo) * 100
+| project
+    TotalRequests,
+    FailedRequests,
+    ActualSuccessRate = round(ActualSuccessRate, 2),
+    ErrorRate = round(ErrorRate, 2),
+    ServiceLevelObjective = slo,
+    ErrorBudget = round(ErrorBudget, 2),
+    ErrorBudgetRemaining = round(ErrorBudgetRemaining, 2),
+    ErrorBudgetConsumedPct = round(ErrorBudgetConsumed, 2)
