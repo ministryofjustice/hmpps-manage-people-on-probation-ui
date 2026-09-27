@@ -17,6 +17,7 @@ import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { getManagedByDetails } from '../utils/getManagedByDetails'
+import { getPersonStatusTag, getPrisonerDetails } from '../utils/personStatusTag'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -156,6 +157,14 @@ export const getPersonalDetails = (
       }
     } else {
       getDataFromCache()
+    }
+
+    if (overview.noms) {
+      const prisoner = await getPrisonerDetails(token, overview.noms)
+      const personStatusTag = prisoner ? getPersonStatusTag(prisoner) : undefined
+      if (personStatusTag !== undefined) {
+        res.locals.personStatusTag = personStatusTag
+      }
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
