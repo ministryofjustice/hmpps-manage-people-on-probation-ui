@@ -248,7 +248,7 @@
     items: locationItems
    } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
 
-   {% if flags.enableAllowSms %}
+   {% if flags.enableAllowSms and case.mobileNumber %}
      {# Text message consent #}
   <section data-qa="allowSms">
     <h3 class="govuk-heading-m govuk-!-margin-bottom-2">Has {{ case.name.forename | convertToTitleCase }} given permission to receive text messages? (optional)</h3>
