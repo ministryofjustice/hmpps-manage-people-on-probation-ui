@@ -39,4 +39,5 @@ export class FeatureFlags {
   showContactInformationWarning?: boolean = undefined
   enableAllowSms?: boolean = undefined
   enableLastTextMessage?: boolean = undefined
+  enableAlertsCountCaching?: boolean = undefined
 }
