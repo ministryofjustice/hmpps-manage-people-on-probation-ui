@@ -11,7 +11,7 @@ export class FeatureFlags {
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
-  enableHomePageOutcomesWithFilter?: boolean = undefined // only PP full outcomes page should be affected
+  enableHomePageOutcomesWithFilter?: boolean = undefined
   enableEnforcementContacts?: boolean = undefined
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined

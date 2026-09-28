@@ -32,7 +32,7 @@ const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const url = 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk'
-const res = mockAppResponse({ flags: { enableDeliusClient: true } })
+const res = mockAppResponse({ flags: { enableDeliusClient: true, enableHomePageOutcomesWithFilter: true } })
 const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
@@ -203,7 +203,7 @@ describe('homeController', () => {
           appointmentsRequiringOutcomeCount: 3,
         }
         const resWithFilterFlag = mockAppResponse({
-          flags: { enableDeliusClient: true, enable3MonthsOutcomes: true },
+          flags: { enableDeliusClient: true, enable3MonthsOutcomes: true, enableHomePageOutcomesWithFilter: true },
         })
         const renderSpyWithFilter = jest.spyOn(resWithFilterFlag, 'render')
         jest
