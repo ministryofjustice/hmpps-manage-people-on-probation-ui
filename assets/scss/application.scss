@@ -637,7 +637,14 @@ body.feature-disabled {
 .feedback-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+}
+
+.feedback-container-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem
 }
 
 .feedback-container .govuk-button {
@@ -925,4 +932,8 @@ table.appointments tr > .notes {
   .govuk-grid-column-early-resize--three-quarters {
     width: 75%;
   }
+}
+
+.align-right {
+  float: right
 }
