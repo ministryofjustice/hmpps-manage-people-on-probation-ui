@@ -243,38 +243,6 @@
     </div>
     {% endif %}
     </div>
-    {% if appointmentOutcome.contactId %}
-        {% set uploadHtml %}
-        <div class="govuk-grid-row govuk-body">
-            <div class="govuk-grid-column-full" data-qa="fileUpload">
-
-                {{ govukFileUpload({
-                        id: "file-upload-1",
-                        name: "file",
-                        classes: 'moj-multi-file-upload__input',
-                        label: {
-                            text: "Upload files",
-                            classes: 'govuk-label--m'
-                        },
-                        attributes: { multiple: '' }
-                    }) }}
-
-                {{ govukButton({
-                        text: 'Upload file',
-                        classes: 'govuk-button--secondary moj-multi-file-upload__button'
-                    }) }}
-            </div>
-        </div>
-        {% endset %}
-
-        {% set errors = [] %}
-        {% if patchResponse.errors.length > 0 %}
-            {% set errors = errors.concat(patchResponse.errors) %}
-        {% endif %}
-        {% if errors.length > 0 %}
-            <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
-        {% endif %}
-    {% endif %}
     {% if not appointmentOutcome.appointmentSession.sensitivityLocked %}
         {{ govukRadios(sensitivityConfig) }}
     {% endif %}

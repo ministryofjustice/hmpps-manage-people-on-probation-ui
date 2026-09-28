@@ -33,24 +33,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
   })
 
   router.all(
-    '/case/:crn/appointments/appointment/:contactId/add-note',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getPersonAppointment(hmppsAuthClient),
-    getOutcomeProps,
-  )
-  router.get(
-    '/case/:crn/appointments/appointment/:contactId/add-note',
-    controllers.appointments.getAddNote(hmppsAuthClient),
-  )
-
-  router.post(
-    '/case/:crn/appointments/appointment/:contactId/add-note',
-    multerErrorHandler('fileUpload'),
-    validate.appointments,
-    controllers.appointments.postAddNote(hmppsAuthClient),
-  )
-
-  router.all(
     '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
     getAppointmentTypes(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),
