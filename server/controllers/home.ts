@@ -33,18 +33,20 @@ const homeController: Controller<typeof routes, void> = {
       enforcementActions = enforcementContactResponse.enforcementContacts
 
       const { upcomingAppointments } = homePage
-      let recentAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
-      recentAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
-        const contactDate = DateTime.fromISO(contact.startDateTime)
-        if (res.locals.flags.enable3MonthsOutcomes) {
-          const threeMonthsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ months: 3 })
-          return contactDate >= threeMonthsAgo
-        }
-        const twoYearsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ years: 2 })
-        return contactDate >= twoYearsAgo
-      })
-      appointmentsRequiringOutcome = recentAppointmentsRequiringOutcome
-      appointmentsRequiringOutcomeCount = recentAppointmentsRequiringOutcome?.length
+      if (res.locals.flags.enableHomePageOutcomesWithFilter) {
+        let recentAppointmentsRequiringOutcome: AppointmentSummary[] = appointmentsRequiringOutcome
+        recentAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.startDateTime)
+          if (res.locals.flags.enable3MonthsOutcomes) {
+            const threeMonthsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ months: 3 })
+            return contactDate >= threeMonthsAgo
+          }
+          const twoYearsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ years: 2 })
+          return contactDate >= twoYearsAgo
+        })
+        appointmentsRequiringOutcome = recentAppointmentsRequiringOutcome
+        appointmentsRequiringOutcomeCount = recentAppointmentsRequiringOutcome?.length
+      }
       const url = encodeURIComponent(req.url)
       await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
       return res.render('pages/homepage/homepage', {
@@ -88,20 +90,24 @@ const homeController: Controller<typeof routes, void> = {
       )
       enforcementActions = enforcementContactResponse.enforcementContacts
       let appointmentsRequiringOutcome = outcomes
-      const recentAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
-        const contactDate = DateTime.fromISO(contact.startDateTime)
-        if (res.locals.flags.enable3MonthsOutcomes) {
-          const threeMonthsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ months: 3 })
-          return contactDate >= threeMonthsAgo
-        }
-        const twoYearsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ years: 2 })
-        return contactDate >= twoYearsAgo
-      })
-      appointmentsRequiringOutcome = recentAppointmentsRequiringOutcome
+      if (res.locals.flags.enableHomePageOutcomesWithFilter) {
+        const recentAppointmentsRequiringOutcome = appointmentsRequiringOutcome?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.startDateTime)
+          if (res.locals.flags.enable3MonthsOutcomes) {
+            const threeMonthsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ months: 3 })
+            return contactDate >= threeMonthsAgo
+          }
+          const twoYearsAgo = DateTime.now().setZone('Europe/London').startOf('day').minus({ years: 2 })
+          return contactDate >= twoYearsAgo
+        })
+        appointmentsRequiringOutcome = recentAppointmentsRequiringOutcome
+      }
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
         totalAppointments,
-        totalOutcomes: appointmentsRequiringOutcome?.length ?? 0,
+        totalOutcomes: res.locals.flags.enableHomePageOutcomesWithFilter
+          ? appointmentsRequiringOutcome?.length
+          : totalOutcomes,
         appointments: appointments ?? [],
         outcomes: appointmentsRequiringOutcome ?? [],
         enforcementActions: enforcementActions ?? [],
