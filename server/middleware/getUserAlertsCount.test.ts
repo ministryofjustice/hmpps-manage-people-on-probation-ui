@@ -188,7 +188,7 @@ describe('/middleware/getUserAlertsCount', () => {
       await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
       expect(nextSpy).toHaveBeenCalled()
       expect(res.locals.alertsCount).toEqual({
-        errors: [{ text: 'Server error' }],
+        errors: [{ text: 'Alerts are currently unavailable. You can view them on NDelius.' }],
       })
     })
   })

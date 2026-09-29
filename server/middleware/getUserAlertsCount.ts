@@ -25,7 +25,7 @@ export const getUserAlertsCount = (hmppsAuthClient: HmppsAuthClient): Route<Prom
         }
       } catch (err: any) {
         const error = err as Error
-        alertsCount = { errors: [{ text: error.message }] }
+        alertsCount = { errors: [{ text: 'Alerts are currently unavailable. You can view them on NDelius.' }] }
       }
       return alertsCount
     }
