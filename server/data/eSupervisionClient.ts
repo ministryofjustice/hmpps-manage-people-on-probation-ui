@@ -157,9 +157,10 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
-  async getOffenderEligibility(crn: string): Promise<OffenderEligibility> {
+  async getOffenderEligibility(crn: string): Promise<OffenderEligibility | null> {
     return this.get({
-      path: `/v2/offenders/${crn}/eligibility`,
+      path: `/v2/offenders/crn/${crn}/eligibility`,
+      handle404: true,
     })
   }
 }

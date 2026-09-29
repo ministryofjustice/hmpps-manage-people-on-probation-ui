@@ -265,7 +265,7 @@ export interface EsupervisionUpcomingQuestionsResponse {
 
 export interface OffenderEligibility {
   outcome: 'ELIGIBLE' | 'INELIGIBLE'
-  message: string
+  message: string | null
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

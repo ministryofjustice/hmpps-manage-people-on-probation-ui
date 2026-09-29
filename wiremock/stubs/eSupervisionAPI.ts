@@ -168,7 +168,7 @@ export const stubGetOffenderEligibility = () => {
   return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       method: 'GET',
-      urlPattern: '/esupervision/v2/offenders/.+?/eligibility',
+      urlPattern: '/esupervision/v2/offenders/crn/[^/]+/eligibility',
     },
     response: {
       status: 200,

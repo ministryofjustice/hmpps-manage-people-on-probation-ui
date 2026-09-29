@@ -433,12 +433,24 @@ describe('ESupervisionClient', () => {
       }
 
       fakeESupervisionApi
-        .get(`/v2/offenders/${crn}/eligibility`)
+        .get(`/v2/offenders/crn/${crn}/eligibility`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
       const output = await client.getOffenderEligibility(crn)
       expect(output).toEqual(response)
+    })
+
+    it('should return null when the eligibility is not found', async () => {
+      const crn = 'X000001'
+
+      fakeESupervisionApi
+        .get(`/v2/offenders/crn/${crn}/eligibility`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(404)
+
+      const output = await client.getOffenderEligibility(crn)
+      expect(output).toBeNull()
     })
   })
 })

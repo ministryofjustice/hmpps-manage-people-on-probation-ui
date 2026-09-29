@@ -361,7 +361,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/v2/offenders/.+?/eligibility",
+        "urlPathPattern": "/esupervision/v2/offenders/crn/[^/]+/eligibility",
         "method": "GET"
       },
       "response": {
@@ -378,7 +378,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/v2/offenders/X000001/eligibility",
+        "urlPathPattern": "/esupervision/v2/offenders/crn/X000001/eligibility",
         "method": "GET"
       },
       "response": {
