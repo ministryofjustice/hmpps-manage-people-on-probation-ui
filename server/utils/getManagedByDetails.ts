@@ -2,6 +2,8 @@ import { Contact, ProfessionalContact } from '../data/model/personalDetails'
 
 export interface ManagedByDetails {
   text: string
+  name?: string
+  location?: string
   href?: string
 }
 
@@ -21,12 +23,17 @@ export const getManagedByDetails = (crn: string, professionalContact: Profession
   const com = preferResponsibleOfficer(contacts.filter(contact => !contact.prisonOffenderManager))
   if (com) {
     const location = com.probationDeliveryUnit ? ` (${com.probationDeliveryUnit})` : ''
-    return { text: `${com.name}${location}`, href }
+    return {
+      text: `${com.name}${location}`,
+      name: com.name,
+      ...(com.probationDeliveryUnit && { location: com.probationDeliveryUnit }),
+      href,
+    }
   }
 
   const pom = preferResponsibleOfficer(contacts.filter(contact => contact.prisonOffenderManager))
   if (pom) {
-    return { text: pom.name, href }
+    return { text: pom.name, name: pom.name, href }
   }
 
   return { text: 'Unallocated' }
