@@ -2,6 +2,7 @@ import { getDataValue } from '../utils'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { AppointmentSession } from '../models/Appointments'
 import { Route } from '../@types'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 export const findUncompleted = ({ forceValidation = false } = {}): Route<string | null> => {
   return function findUncompletedInner(req, res) {
@@ -12,6 +13,7 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     const data = req?.session?.data ?? {}
 
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+    const personalDetails = getDataValue<PersonalDetails>(data, ['personalDetails', crn, 'overview'])
     const dateInPast = appointmentDateIsInPast(req, res)
     const mapping: [string | undefined, string][] = [
       [appointment?.eventId, 'sentence'],
@@ -37,6 +39,9 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
       if (redirect === 'text-message-confirmation') {
         appointmentIsIncomplete = !value && !dateInPast
         if (res.locals?.flags?.enableSmsReminders === false) {
+          appointmentIsIncomplete = false
+        }
+        if (appointmentIsIncomplete && res.locals?.flags?.enableAllowSms && personalDetails?.allowSms === false) {
           appointmentIsIncomplete = false
         }
       }
