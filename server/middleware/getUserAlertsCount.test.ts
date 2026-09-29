@@ -182,5 +182,14 @@ describe('/middleware/getUserAlertsCount', () => {
         errors: [{ text: 'error message' }],
       })
     })
+
+    it('should assign error message to alertsCount if server returns an error', async () => {
+      getUserAlertsCountSpy.mockImplementationOnce(() => Promise.reject(new Error('Server error')))
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual({
+        errors: [{ text: 'Server error' }],
+      })
+    })
   })
 })
