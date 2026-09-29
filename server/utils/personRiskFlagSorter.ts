@@ -134,7 +134,9 @@ function getRiskRegisterType(description: string): string | undefined {
 function getRiskLevel(flag: RiskFlag): string {
   const normalisedDescription = flag.description.trim().toLowerCase()
 
-  const level = risksWithLevelDescription.has(normalisedDescription) ? flag.levelDescription ?? flag.level : flag.level
+  const level = risksWithLevelDescription.has(normalisedDescription)
+    ? (flag.levelDescription ?? flag.level)
+    : flag.level
 
   return (level ?? 'LOW').toUpperCase()
 }
