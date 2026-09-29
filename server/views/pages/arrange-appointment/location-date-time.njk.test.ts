@@ -31,6 +31,7 @@ const baseModel: TestModel = {
     disabilities: {} as Disabilities,
     provisions: {} as Provisions,
     circumstances: {} as Circumstances,
+    mobileNumber: '07368448952',
   },
   userLocations: [] as Location[],
   headerPersonName: { forename: 'Caroline', surname: 'Wolff' },
@@ -88,6 +89,10 @@ describe('Location, date and time nunjucks render tests', () => {
           enableAllowSms: false,
         },
       } as Partial<TestModel>)
+      expect($('[data-qa="allowSms"]').length).toBe(0)
+    })
+    it('should not display if enableAllowSms feature flag is enabled and pop does not have mobile number', () => {
+      const $ = render({ case: { ...baseModel.case, mobileNumber: null } })
       expect($('[data-qa="allowSms"]').length).toBe(0)
     })
     it('should display if enableAllowSms feature flag is enabled and consent is set to true', () => {
