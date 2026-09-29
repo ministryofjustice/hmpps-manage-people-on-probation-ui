@@ -9,7 +9,7 @@ import { UserAlerts } from '../models/Alerts'
 
 export const getUserAlertsCount = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getUserAlertsCountInner(req, res, next) {
-    const makeRequest = async (): Promise<string | ErrorSummary> => {
+    const makeRequest = async (): Promise<string | ErrorSummary | null> => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       let response: UserAlerts | ErrorSummary | null
@@ -37,6 +37,9 @@ export const getUserAlertsCount = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       ) {
         res.locals.alertsCount = req.session.cache.alertsCount.value
       } else {
+        if (res.locals?.alertsCleared?.error === false && req?.session?.cache?.alertsCount) {
+          delete req.session.cache.alertsCount
+        }
         const response = await makeRequest()
         if (response && !responseIsErrorSummary(response)) {
           const expiresAt = DateTime.now().plus({ minutes: config.alertsCountCacheMinutes }).toMillis()
