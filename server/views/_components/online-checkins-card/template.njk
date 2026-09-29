@@ -32,7 +32,7 @@
       rows: [
         {
           key: { html: '<span data-qa="checkinDueLabel">Status</span>' },
-          value: { html: '<span data-qa="checkinDueValue">' + (params.eligibility.message | escape) + '</span>' }
+          value: { html: '<span data-qa="checkinDueValue">' + ((params.eligibility.message or 'Online check ins not set up') | escape) + '</span>' }
         }
       ]
     }) }}

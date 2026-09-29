@@ -52,6 +52,12 @@ describe('appOnlineCheckinsCard', () => {
       expect($('[data-qa="checkinCard"] a').attr('href')).toBe(setupHref)
     })
 
+    it('shows a default status and the set up link when eligible with no message', () => {
+      const $ = render({ eligibility: { outcome: 'ELIGIBLE', message: null } })
+      expect($('[data-qa="checkinDueValue"]').text()).toBe('Online check ins not set up')
+      expect($('[data-qa="checkinCard"] a').attr('href')).toBe(setupHref)
+    })
+
     it('escapes the eligibility message', () => {
       const $ = render({ eligibility: { outcome: 'ELIGIBLE', message: 'Eligible <b>now</b>' } })
       expect($('[data-qa="checkinDueValue"]').text()).toBe('Eligible <b>now</b>')
@@ -78,8 +84,9 @@ describe('appOnlineCheckinsCard', () => {
       expect($('[data-qa="checkinCard"] a').length).toBe(0)
     })
 
-    it('hides the link when there is no eligibility result', () => {
-      const $ = render({ eligibility: undefined })
+    it('hides the link and shows a default status when there is no eligibility result', () => {
+      const $ = render({ eligibility: null })
+      expect($('[data-qa="checkinDueValue"]').text()).toBe('Online check ins not set up')
       expect($('[data-qa="checkinCard"] a').length).toBe(0)
     })
   })

@@ -253,7 +253,6 @@
     manageHref: manageCheckinLink
   }) }}
 
-
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}
   {{ overview.personalDetails.dateOfBirth | dateWithYear + (" (" + overview.personalDetails.dateOfBirth | yearsSince + " years old)" if not personalDetails.dateOfDeath ) }}
