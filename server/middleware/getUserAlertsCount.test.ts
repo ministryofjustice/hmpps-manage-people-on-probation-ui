@@ -30,11 +30,12 @@ const config = {
   alertsCountCacheMinutes: 5,
 }
 
-const mockResponse = ({ enableAlertsCountCaching = true } = {}): AppResponse => {
+const mockResponse = ({ enableAlertsCountCaching = true, alertsCleared = null } = {}): AppResponse => {
   const locals = {
     flags: {
       enableAlertsCountCaching,
     },
+    alertsCleared,
   }
   return mockAppResponse(locals)
 }
@@ -68,6 +69,25 @@ describe('/middleware/getUserAlertsCount', () => {
       const expectedTimestamp = DateTime.now().plus({ minutes: config.alertsCountCacheMinutes }).toMillis()
       const req = mockRequest()
       const res = mockResponse()
+      getUserAlertsCountSpy.mockImplementationOnce(() =>
+        Promise.resolve({
+          totalResults: 100,
+        } as UserAlerts),
+      )
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(getUserAlertsCountSpy).toHaveBeenCalledWith()
+      expect(req.session.cache.alertsCount).toStrictEqual({ value: '99+', expiresAt: expectedTimestamp })
+      expect(res.locals.alertsCount).toEqual('99+')
+      expect(nextSpy).toHaveBeenCalledWith()
+    })
+
+    it('should request the alerts count from the api if alerts have been cleared', async () => {
+      jest.setSystemTime(new Date('2026-09-01T12:00:00Z'))
+      const expectedTimestamp = DateTime.now().plus({ minutes: config.alertsCountCacheMinutes }).toMillis()
+      const expiresAt = DateTime.fromISO('2026-09-01T12:05:00Z').toMillis()
+      const alertsCount: AlertsCountCache = { value: '90', expiresAt }
+      const req = mockRequest({ alertsCount })
+      const res = mockResponse({ alertsCleared: { message: 'Alerts cleared', error: false } })
       getUserAlertsCountSpy.mockImplementationOnce(() =>
         Promise.resolve({
           totalResults: 100,
@@ -129,6 +149,11 @@ describe('/middleware/getUserAlertsCount', () => {
     const req = httpMocks.createRequest()
     const res = mockResponse({ enableAlertsCountCaching: false })
     it('should assign the alerts count to res.locals.alertsCount', async () => {
+      getUserAlertsCountSpy.mockImplementation(() =>
+        Promise.resolve({
+          totalResults: 0,
+        } as UserAlerts),
+      )
       await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
       expect(nextSpy).toHaveBeenCalled()
       expect(res.locals.alertsCount).toEqual('0')

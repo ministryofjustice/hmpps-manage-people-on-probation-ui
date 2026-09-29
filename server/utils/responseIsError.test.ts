@@ -19,6 +19,9 @@ describe('utils/responseIsError', () => {
   it('should return false if not an error', () => {
     expect(responseIsError(userDetailsResponse)).toEqual(false)
   })
+  it('should return false if value is a string', () => {
+    expect(responseIsError('99')).toEqual(false)
+  })
   it('should return true if 404 error (null)', () => {
     expect(responseIsError(null)).toEqual(true)
   })
@@ -38,6 +41,9 @@ describe('utils/responseIsError', () => {
 describe('utils/responseIsErrorSummary', () => {
   it('should return false if no response', () => {
     expect(responseIsErrorSummary(undefined)).toEqual(false)
+  })
+  it('should return false if value is not an object', () => {
+    expect(responseIsErrorSummary('99')).toEqual(false)
   })
   it('should return false if a 200 response', () => {
     expect(responseIsErrorSummary(userDetailsResponse)).toEqual(false)
