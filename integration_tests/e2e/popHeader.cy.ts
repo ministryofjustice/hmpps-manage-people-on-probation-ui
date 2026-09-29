@@ -99,7 +99,7 @@ context('PoP Header partial', () => {
 
     cy.get('[data-qa="risk-badge-3"]').should('be.visible').and('contain.text', 'Risk to known adult - Low')
 
-    cy.get('[data-qa="risk-badge-5"]').should('be.visible').and('contain.text', 'Risk to public - Low')
+    cy.get('[data-qa="risk-badge-5"]').should('be.visible').and('contain.text', 'Risk to public - High')
 
     cy.get('[data-qa="risk-badge-8"]').should('be.visible').and('contain.text', 'Sexual conviction')
 
