@@ -26,7 +26,6 @@ import config from '../config'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { OffenderEligibility } from '../data/model/esupervision'
 
 const routes = [
   'getAppointments',
@@ -64,10 +63,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         masClient.getProbationPractitioner(crn),
       ])
 
-      let checkinEligibility: OffenderEligibility | undefined
-      if (res.locals.flags.enableEsupEligibilityCheck) {
-        checkinEligibility = await esupClient.getOffenderEligibility(crn)
-      }
+      const checkinEligibility = await esupClient.getOffenderEligibility(crn)
 
       let pastAppointments = pastAppointmentsResponse
       let upcomingAppointments = upcomingAppointmentsResponse

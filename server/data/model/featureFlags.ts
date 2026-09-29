@@ -35,7 +35,6 @@ export class FeatureFlags {
   enableCombinedCYAPage?: boolean = undefined
   enable3MonthsOutcomes?: boolean = undefined
   enableAttendeeUpdates?: boolean = undefined
-  enableEsupEligibilityCheck?: boolean = undefined
   showContactInformationWarning?: boolean = undefined
   enableAllowSms?: boolean = undefined
   enableLastTextMessage?: boolean = undefined

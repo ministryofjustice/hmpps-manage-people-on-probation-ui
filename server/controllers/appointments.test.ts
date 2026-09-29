@@ -250,6 +250,7 @@ describe('controllers/appointments', () => {
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
+        checkinEligibility: mockOffenderEligibility,
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
@@ -270,6 +271,7 @@ describe('controllers/appointments', () => {
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(mockOverrideDeliusManagedFlag).toHaveBeenCalledTimes(2)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
+        checkinEligibility: mockOffenderEligibility,
         upcomingAppointments: mockScheduleWithFlag,
         pastAppointments: mockScheduleWithFlag,
         crn,
@@ -292,6 +294,7 @@ describe('controllers/appointments', () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
+        checkinEligibility: mockOffenderEligibility,
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
@@ -321,13 +324,12 @@ describe('controllers/appointments', () => {
     })
   })
 
-  describe('get appointments - checkins eligibility flag enabled', () => {
+  describe('get appointments - checkins eligibility', () => {
     it('should render the appointments page with checkinEligibility details', async () => {
       const mockRes = mockAppResponse({
         flags: {
           enableESupervisionCheckins: true,
           enableSupervisionPackageAppointments: true,
-          enableEsupEligibilityCheck: true,
         },
         supervisionPackageDetails: { context: { sentences: [] } },
       })

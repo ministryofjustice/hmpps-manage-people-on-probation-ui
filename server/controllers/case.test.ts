@@ -194,6 +194,7 @@ describe('caseController', () => {
         url: encodeURIComponent(req.url),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
+        checkinEligibility: mockOffenderEligibilityResponse,
         appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
@@ -234,6 +235,7 @@ describe('caseController', () => {
         url: encodeURIComponent(req.url),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
+        checkinEligibility: mockOffenderEligibilityResponse,
         appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
@@ -283,7 +285,7 @@ describe('caseController', () => {
     })
     beforeEach(async () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
-      res.locals.flags = { enableEsupEligibilityCheck: true, enableOutcomesV1: true }
+      res.locals.flags = { enableOutcomesV1: true }
       await controllers.case.getCase(hmppsAuthClient)(req, res)
     })
     afterEach(() => {

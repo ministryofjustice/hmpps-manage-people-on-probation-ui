@@ -1,0 +1,69 @@
+{%- from "govuk/components/summary-list/macro.njk" import govukSummaryList -%}
+{%- from "_components/summary-card/macro.njk" import appSummaryCard -%}
+
+{% set checkin = params.checkin %}
+
+{% if checkin.status === 'VERIFIED' %}
+  {% set linkText = 'Manage online check ins' %}
+  {% set linkHref = params.manageHref %}
+{% elif checkin.status === 'INACTIVE' %}
+  {% set linkText = 'View all online check in details' %}
+  {% set linkHref = params.manageHref %}
+{% elif not checkin or checkin.status === 'INITIAL' %}
+  {% set linkText = 'Set up online check ins' %}
+  {% set linkHref = params.setupHref %}
+{% endif %}
+
+{% set cardHtml %}
+  {% if checkin.status === 'VERIFIED' %}
+    {% set nextCheckinDate = (params.upcomingCheckinDate or checkin.firstCheckin) | dateWithYear %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { html: '<span data-qa="nextCheckinDueLabel">Next online check in</span>' },
+          value: { html: '<span data-qa="nextCheckInValue">' + nextCheckinDate + '</span>' }
+        }
+      ]
+    }) }}
+  {% endif %}
+
+  {% if not checkin or checkin.status === 'INITIAL' %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { html: '<span data-qa="checkinDueLabel">Status</span>' },
+          value: { html: '<span data-qa="checkinDueValue">' + (params.eligibility.message | escape) + '</span>' }
+        }
+      ]
+    }) }}
+  {% endif %}
+
+  {% if checkin.status === 'INACTIVE' %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { html: '<span data-qa="checkinDueLabel">Status</span>' },
+          value: { html: '<span data-qa="checkinDueValue">Check ins stopped</span>' }
+        }
+      ]
+    }) }}
+  {% endif %}
+{% endset %}
+
+{% set showActions = params.canAccess and params.eligibility.outcome === 'ELIGIBLE' %}
+
+{{ appSummaryCard({
+  titleText: 'Online check ins',
+  headingLevel: 3,
+  classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+  attributes: { 'data-qa': 'checkinCard' },
+  html: cardHtml,
+  actions: {
+    items: [
+      {
+        text: linkText,
+        href: linkHref
+      }
+    ]
+  } if showActions
+}) }}

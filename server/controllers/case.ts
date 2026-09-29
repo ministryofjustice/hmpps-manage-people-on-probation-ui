@@ -12,7 +12,6 @@ import { existsInEMDI } from '../middleware/existsInEMDI'
 import { PersonExistsResponse } from '../data/emdiClient'
 import logger from '../../logger'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { OffenderEligibility } from '../data/model/esupervision'
 
 const routes = ['getCase'] as const
 
@@ -59,10 +58,7 @@ const caseController: Controller<typeof routes, void> = {
         ? filterContactsMonths(contactResponse?.content)
         : filterContacts(contactResponse?.content)
 
-      let checkinEligibility: OffenderEligibility | undefined
-      if (res.locals.flags.enableEsupEligibilityCheck) {
-        checkinEligibility = await esupClient.getOffenderEligibility(crn)
-      }
+      const checkinEligibility = await esupClient.getOffenderEligibility(crn)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true

@@ -7,7 +7,6 @@ import { OffenderEligibility } from '../../data/model/esupervision'
 type TestModel = {
   flags: {
     enableSupervisionPackageAppointments?: boolean
-    enableEsupEligibilityCheck?: boolean
   }
   upcomingAppointments: Schedule
   pastAppointments: Schedule
@@ -25,7 +24,6 @@ type TestModel = {
 const baseModel: TestModel = {
   flags: {
     enableSupervisionPackageAppointments: true,
-    enableEsupEligibilityCheck: true,
   },
   headerPersonName: {
     forename: 'James',
@@ -248,23 +246,8 @@ describe('Appointments', () => {
     const $ = render({ riskToProbationStaff: { id: 2500930998, level: 'HIGH' } })
     expect($('[data-qa=riskToStaffAlert]').text()).toContain('James is a risk to probation staff')
   })
-  it('should render the page with manage check-ins button', () => {
-    const $ = render({ flags: { enableEsupEligibilityCheck: false }, canAccessCheckins: true })
-    expect($('[data-qa="online-manage-btn"]').length).toBe(1)
-    expect($('[data-qa="online-manage-btn"]').text()).toContain('Manage online check ins')
-  })
-  it('should render the page with set up check-ins button', () => {
-    const $ = render({
-      flags: { enableEsupEligibilityCheck: false },
-      canAccessCheckins: true,
-      offenderCheckinsByCRNResponse: null,
-    })
-    expect($('[data-qa="online-checkin-btn"]').length).toBe(1)
-    expect($('[data-qa="online-checkin-btn"]').text()).toContain('Set up online check ins')
-  })
   it('should render the page with manage check-ins button when eligible', () => {
     const $ = render({
-      flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
       checkinEligibility: { outcome: 'ELIGIBLE', message: 'This person is eligible for online check ins' },
     })
@@ -273,7 +256,6 @@ describe('Appointments', () => {
   })
   it('should render the page with set up check-ins button when eligible', () => {
     const $ = render({
-      flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
       offenderCheckinsByCRNResponse: null,
       checkinEligibility: { outcome: 'ELIGIBLE', message: 'This person is eligible for online check ins' },
@@ -283,16 +265,15 @@ describe('Appointments', () => {
   })
   it('should render the page without manage check-ins button when ineligible', () => {
     const $ = render({
-      flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
       checkinEligibility: { outcome: 'INELIGIBLE', message: 'This person is eligible for online check ins' },
     })
     expect($('[data-qa="online-manage-btn"]').length).toBe(0)
   })
-  it('should render the page without manage check-ins button when ineligible', () => {
+  it('should render the page without set up check-ins button when ineligible', () => {
     const $ = render({
-      flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
+      offenderCheckinsByCRNResponse: null,
       checkinEligibility: { outcome: 'INELIGIBLE', message: 'This person is eligible for online check ins' },
     })
     expect($('[data-qa="online-checkin-btn"]').length).toBe(0)
