@@ -66,7 +66,7 @@ describe('middleware/routeChangeSmsConsent', () => {
       'ABC',
     )
     expect(spy).toHaveBeenCalledWith(
-      `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${req.url}`,
+      `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(req.url)}`,
     )
   })
   it('should call next() if continue button is clicked', () => {

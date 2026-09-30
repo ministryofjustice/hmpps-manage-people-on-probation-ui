@@ -534,6 +534,7 @@ describe('controllers/arrangeAppointment', () => {
         alertDismissed: false,
         isInPast: false,
         isReschedule: true,
+        url: '',
       })
     })
     it('should render the location date and time page if past appointment feature flag is disabled', async () => {
@@ -552,6 +553,7 @@ describe('controllers/arrangeAppointment', () => {
         alertDismissed: false,
         isInPast: false,
         isReschedule: true,
+        url: '',
       })
     })
     it('If session has errors, it should delete the errors', async () => {
@@ -652,6 +654,7 @@ describe('controllers/arrangeAppointment', () => {
         alertDismissed: false,
         personRisks: undefined,
         _maxDate: '31/12/2199',
+        url: '',
       })
     })
 
@@ -715,6 +718,7 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         isReschedule: true,
         personRisks: undefined,
+        url: '',
       })
     })
   })
