@@ -4,7 +4,7 @@ import MasApiClient from '../data/masApiClient'
 import { getUserAlertsCount } from './getUserAlertsCount'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from '../controllers/mocks'
-import { UserAlerts } from '../models/Alerts'
+import { UserAlerts, UserAlertsCount } from '../models/Alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient', () => {
@@ -21,10 +21,10 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 tokenStore.getToken.mockResolvedValue('token-alerts')
 
 const req = httpMocks.createRequest()
-const res = mockAppResponse()
 
 const nextSpy = jest.fn()
 const getUserAlertsCountSpy = jest.spyOn(MasApiClient.prototype, 'getUserAlertsCount')
+const getUserAlertsCountV2Spy = jest.spyOn(MasApiClient.prototype, 'getUserAlertsCountV2')
 
 describe('/middleware/getUserAlertsCount', () => {
   beforeEach(() => {
@@ -34,35 +34,69 @@ describe('/middleware/getUserAlertsCount', () => {
         totalResults: 0,
       } as UserAlerts),
     )
-  })
-
-  it('should assign the alerts count to res.locals.alertsCount', async () => {
-    await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
-    expect(nextSpy).toHaveBeenCalled()
-    expect(res.locals.alertsCount).toEqual('0')
-  })
-
-  it('should assign the alerts count to 99+ if the count is 100 or more', async () => {
-    getUserAlertsCountSpy.mockImplementationOnce(() =>
+    getUserAlertsCountV2Spy.mockImplementation(() =>
       Promise.resolve({
-        totalResults: 100,
-      } as UserAlerts),
+        count: 0,
+      } as UserAlertsCount),
     )
-    await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
-    expect(nextSpy).toHaveBeenCalled()
-    expect(res.locals.alertsCount).toEqual('99+')
   })
 
-  it('should assign error message to alertsCount if error recieved from API', async () => {
-    getUserAlertsCountSpy.mockImplementationOnce(() =>
-      Promise.resolve({
+  describe('when the enableAlertsCountApi flag is off', () => {
+    const res = mockAppResponse({ flags: { enableAlertsCountApi: false } })
+
+    it('should assign the alerts count to res.locals.alertsCount', async () => {
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual('0')
+      expect(getUserAlertsCountSpy).toHaveBeenCalled()
+      expect(getUserAlertsCountV2Spy).not.toHaveBeenCalled()
+    })
+
+    it('should assign the alerts count to 99+ if the count is 100 or more', async () => {
+      getUserAlertsCountSpy.mockImplementationOnce(() =>
+        Promise.resolve({
+          totalResults: 100,
+        } as UserAlerts),
+      )
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual('99+')
+    })
+
+    it('should assign error message to alertsCount if error recieved from API', async () => {
+      getUserAlertsCountSpy.mockImplementationOnce(() =>
+        Promise.resolve({
+          errors: [{ text: 'error message' }],
+        } as unknown as UserAlerts),
+      )
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual({
         errors: [{ text: 'error message' }],
-      } as unknown as UserAlerts),
-    )
-    await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
-    expect(nextSpy).toHaveBeenCalled()
-    expect(res.locals.alertsCount).toEqual({
-      errors: [{ text: 'error message' }],
+      })
+    })
+  })
+
+  describe('when the enableAlertsCountApi flag is on', () => {
+    const res = mockAppResponse({ flags: { enableAlertsCountApi: true } })
+
+    it('should assign the alerts count to res.locals.alertsCount using the count endpoint', async () => {
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual('0')
+      expect(getUserAlertsCountV2Spy).toHaveBeenCalled()
+      expect(getUserAlertsCountSpy).not.toHaveBeenCalled()
+    })
+
+    it('should assign the alerts count to 99+ if the count is 100 or more', async () => {
+      getUserAlertsCountV2Spy.mockImplementationOnce(() =>
+        Promise.resolve({
+          count: 100,
+        } as UserAlertsCount),
+      )
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual('99+')
     })
   })
 })

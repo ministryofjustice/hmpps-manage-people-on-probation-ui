@@ -40,4 +40,5 @@ export class FeatureFlags {
   enableAllowSms?: boolean = undefined
   enableLastTextMessage?: boolean = undefined
   enableFeedback?: boolean = undefined
+  enableAlertsCountApi?: boolean
 }
