@@ -42,7 +42,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       }
       const query = req.query as Record<string, string>
       const success = query.update
-      const back = query?.back ? decodeURIComponent(query.back) : ''
+      const back = query?.back
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -58,9 +58,10 @@ const personalDetailsController: Controller<typeof routes, void> = {
           req.path.includes(route),
         )
       ) {
-        if (query?.origin === 'appointments') {
+        if (['appointments', 'allowSms'].includes(query?.origin)) {
           backLink = back
         }
+
         if (!manageUsersAccess) {
           return res.redirect(`/no-perm-autherror?backLink=${backLink}`)
         }
@@ -172,6 +173,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const isValid = Object.keys(errorMessages).length === 0 && warningDisplayed
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
+      const back = req?.query?.back as string
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -258,8 +260,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
             redirect = findUncompleted()(req, res)
           }
         }
-        if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && change) {
-          redirect = typeof change === 'string' && change.startsWith(`/case/${crn}/`) ? change : redirect
+        if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && back) {
+          redirect = typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : redirect
         }
         res.redirect(redirect)
       }

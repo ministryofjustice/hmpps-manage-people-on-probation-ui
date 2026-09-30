@@ -347,6 +347,13 @@ if (changeAttendeeLink) {
     e.currentTarget.closest('form').submit()
   })
 }
+const changeAllowSmsLink = document.querySelector('[data-qa=changeAllowSmsLink]')
+if (changeAllowSmsLink) {
+  changeAllowSmsLink.addEventListener('click', e => {
+    e.preventDefault()
+    e.currentTarget.closest('form').submit()
+  })
+}
 
 class DateTimeFormatting {
   constructor() {

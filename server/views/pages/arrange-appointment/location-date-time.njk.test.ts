@@ -104,7 +104,7 @@ describe('Location, date and time nunjucks render tests', () => {
       expect($('[data-qa="allowSmsAnswer"]').text()).toContain('Yes')
       expect($('[data-qa="changeAllowSmsLink"]').text()).toContain('Change')
       expect($('[data-qa="changeAllowSmsLink"]').attr('href')).toContain(
-        `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&change=/case/${crn}/arrange-appointment/${id}/location-date-time`,
+        `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=/case/${crn}/arrange-appointment/${id}/location-date-time`,
       )
     })
     it('should display if enableAllowSms feature flag is enabled and consent is set to false', () => {
@@ -118,7 +118,7 @@ describe('Location, date and time nunjucks render tests', () => {
       expect($('[data-qa="allowSmsAnswer"]').text()).toContain('No')
       expect($('[data-qa="changeAllowSmsLink"]').text()).toContain('Change')
       expect($('[data-qa="changeAllowSmsLink"]').attr('href')).toContain(
-        `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&change=/case/${crn}/arrange-appointment/${id}/location-date-time`,
+        `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=/case/${crn}/arrange-appointment/${id}/location-date-time`,
       )
     })
     it('should display if enableAllowSms feature flag is enabled and consent has not been set', () => {
@@ -130,7 +130,7 @@ describe('Location, date and time nunjucks render tests', () => {
       expect($('[data-qa="allowSmsAnswer"]').text()).toContain('Not provided')
       expect($('[data-qa="changeAllowSmsLink"]').text()).toContain('Change')
       expect($('[data-qa="changeAllowSmsLink"]').attr('href')).toContain(
-        `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&change=/case/${crn}/arrange-appointment/${id}/location-date-time`,
+        `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=/case/${crn}/arrange-appointment/${id}/location-date-time`,
       )
     })
   })

@@ -477,7 +477,7 @@ describe('/controllers/personalDetails', () => {
             query: {
               ...req.query,
               origin: 'allowSms',
-              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+              back: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
             },
             body: {
               ...req.body,
@@ -498,7 +498,7 @@ describe('/controllers/personalDetails', () => {
             emailAddress,
           })
           expect(updateAllowSmsSpy).not.toHaveBeenCalled()
-          expect(spy).toHaveBeenCalledWith(mockReq.query.change)
+          expect(spy).toHaveBeenCalledWith(mockReq.query.back)
         })
         it('should update the personal details if allow sms value is YES', async () => {
           const mockReq = {
@@ -506,7 +506,7 @@ describe('/controllers/personalDetails', () => {
             query: {
               ...req.query,
               origin: 'allowSms',
-              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+              back: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
             },
             body: {
               ...req.body,
@@ -528,7 +528,7 @@ describe('/controllers/personalDetails', () => {
             emailAddress,
           })
           expect(updateAllowSmsSpy).toHaveBeenCalledWith(crn, true)
-          expect(spy).toHaveBeenCalledWith(mockReq.query.change)
+          expect(spy).toHaveBeenCalledWith(mockReq.query.back)
         })
         it('should update the personal details if allow sms value is NO', async () => {
           const mockReq = {
@@ -536,7 +536,7 @@ describe('/controllers/personalDetails', () => {
             query: {
               ...req.query,
               origin: 'allowSms',
-              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+              back: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
             },
             body: {
               ...req.body,
@@ -569,7 +569,7 @@ describe('/controllers/personalDetails', () => {
             emailAddress,
           })
           expect(updateAllowSmsSpy).toHaveBeenCalledWith(crn, false)
-          expect(spy).toHaveBeenCalledWith(mockReq.query.change)
+          expect(spy).toHaveBeenCalledWith(mockReq.query.back)
           expect(setDataValueSpy).toHaveBeenCalledWith(
             mockReq.session.data,
             ['appointments', crn, id, 'smsOptIn'],
