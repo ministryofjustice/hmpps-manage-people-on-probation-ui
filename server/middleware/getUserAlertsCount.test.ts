@@ -98,5 +98,25 @@ describe('/middleware/getUserAlertsCount', () => {
       expect(nextSpy).toHaveBeenCalled()
       expect(res.locals.alertsCount).toEqual('99+')
     })
+
+    it('should assign a null alertsCount if the API returns a handled 404', async () => {
+      getUserAlertsCountV2Spy.mockImplementationOnce(() => Promise.resolve(null))
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toBeNull()
+    })
+
+    it('should assign error message to alertsCount if error recieved from API', async () => {
+      getUserAlertsCountV2Spy.mockImplementationOnce(() =>
+        Promise.resolve({
+          errors: [{ text: 'error message' }],
+        } as unknown as UserAlertsCount),
+      )
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual({
+        errors: [{ text: 'error message' }],
+      })
+    })
   })
 })
