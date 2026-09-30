@@ -20,35 +20,42 @@ jest.mock('../utils', () => {
 
 const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 
-describe('middleware/routeChangeSmsConsent', () => {
-  it('should route to edit contact details page if change link is clicked', () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-        id,
-      },
-      url: change,
-      query: {
-        change,
-      },
-      session: {
-        data: {},
-      },
-      body: {
-        appointments: {
-          [crn]: {
-            [id]: {
-              date: '1/10/2026',
-              start: '09:00',
-              end: '10:00',
-              user: {
-                locationCode: 'ABC',
-              },
+const buildRequest = ({ query = {}, body = {} } = {}): httpMocks.MockRequest<any> => {
+  const req = {
+    params: {
+      crn,
+      id,
+    },
+    url: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+    query,
+    session: {
+      data: {},
+    },
+    body: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            date: '1/10/2026',
+            start: '09:00',
+            end: '10:00',
+            user: {
+              locationCode: 'ABC',
             },
           },
         },
       },
-    })
+      ...body,
+    },
+  }
+  return httpMocks.createRequest(req)
+}
+
+describe('middleware/routeChangeSmsConsent', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  it('should update the appointment session and route to edit contact details page if change link is clicked', () => {
+    const req = buildRequest()
     routeChangeSmsConsent(req, res, nextSpy)
     expect(nextSpy).not.toHaveBeenCalled()
     expect(setDataValueSpy).toHaveBeenNthCalledWith(
@@ -69,20 +76,18 @@ describe('middleware/routeChangeSmsConsent', () => {
       `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(req.url)}`,
     )
   })
+  it('should not update the appointment session and route to edit contact details page if change link is clicked and change query param exists', () => {
+    const req = buildRequest({ query: { change } })
+    routeChangeSmsConsent(req, res, nextSpy)
+    expect(nextSpy).not.toHaveBeenCalled()
+    expect(setDataValueSpy).not.toHaveBeenCalled()
+    expect(spy).toHaveBeenCalledWith(
+      `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(req.url)}`,
+    )
+  })
   it('should call next() if continue button is clicked', () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-        id,
-      },
-      query: {
-        change,
-      },
-      url: change,
-      body: {
-        'submit-btn': '',
-      },
-    })
+    const req = buildRequest({ body: { 'submit-btn': '' } })
+
     routeChangeSmsConsent(req, res, nextSpy)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
