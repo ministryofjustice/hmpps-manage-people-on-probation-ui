@@ -37,13 +37,18 @@ describe('utils/getManagedByDetails', () => {
   it('returns the COM name with PDU in brackets, linked to staff contacts', () => {
     const result = getManagedByDetails(CRN, professionalContact([contact()]))
 
-    expect(result).toEqual({ text: 'Jack Frost (Worksop)', href: STAFF_CONTACTS_HREF })
+    expect(result).toEqual({
+      text: 'Jack Frost (Worksop)',
+      name: 'Jack Frost',
+      location: 'Worksop',
+      href: STAFF_CONTACTS_HREF,
+    })
   })
 
   it('returns just the COM name, no brackets, when there is no PDU', () => {
     const result = getManagedByDetails(CRN, professionalContact([contact({ probationDeliveryUnit: '' })]))
 
-    expect(result).toEqual({ text: 'Jack Frost', href: STAFF_CONTACTS_HREF })
+    expect(result).toEqual({ text: 'Jack Frost', name: 'Jack Frost', href: STAFF_CONTACTS_HREF })
   })
 
   it('falls back to the POM name, with no brackets, when there is no COM', () => {
@@ -52,7 +57,7 @@ describe('utils/getManagedByDetails', () => {
       professionalContact([contact({ name: 'Karuna Kanumuri', prisonOffenderManager: true })]),
     )
 
-    expect(result).toEqual({ text: 'Karuna Kanumuri', href: STAFF_CONTACTS_HREF })
+    expect(result).toEqual({ text: 'Karuna Kanumuri', name: 'Karuna Kanumuri', href: STAFF_CONTACTS_HREF })
   })
 
   it('prefers the COM over the POM when both exist', () => {
