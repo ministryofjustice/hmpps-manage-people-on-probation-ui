@@ -38,7 +38,7 @@ describe('middleware/routeChangeSmsConsent', () => {
         appointments: {
           [crn]: {
             [id]: {
-              date: '2026-10-01',
+              date: '1/10/2026',
               start: '09:00',
               end: '10:00',
               user: {
@@ -51,12 +51,7 @@ describe('middleware/routeChangeSmsConsent', () => {
     })
     routeChangeSmsConsent(req, res, nextSpy)
     expect(nextSpy).not.toHaveBeenCalled()
-    expect(setDataValueSpy).toHaveBeenNthCalledWith(
-      1,
-      req.session.data,
-      ['appointments', crn, id, 'date'],
-      '2026-10-01',
-    )
+    expect(setDataValueSpy).toHaveBeenNthCalledWith(1, req.session.data, ['appointments', crn, id, 'date'], '1/10/2026')
     expect(setDataValueSpy).toHaveBeenNthCalledWith(2, req.session.data, ['appointments', crn, id, 'start'], '09:00')
     expect(setDataValueSpy).toHaveBeenNthCalledWith(3, req.session.data, ['appointments', crn, id, 'end'], '10:00')
     expect(setDataValueSpy).toHaveBeenNthCalledWith(

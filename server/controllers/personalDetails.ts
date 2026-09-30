@@ -59,11 +59,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
         )
       ) {
         if (['appointments', 'allowSms'].includes(query?.origin)) {
-          const decodeBack = decodeURIComponent(back)
           backLink =
-            typeof decodeBack === 'string' && decodeBack.startsWith(`/case/${crn}/`)
-              ? decodeBack
-              : `/case/${crn}/personal-details`
+            typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : `/case/${crn}/personal-details`
         }
 
         if (!manageUsersAccess) {
