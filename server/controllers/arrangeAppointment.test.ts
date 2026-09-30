@@ -694,6 +694,27 @@ describe('controllers/arrangeAppointment', () => {
         '2025-07-20',
       )
     })
+
+    it('should not set temp values in session when change query parameter is present and temp date session already exists', async () => {
+      const appointmentSession = {
+        date: '2025-07-20',
+        start: '10:00',
+        end: '11:00',
+        temp: {
+          dateFromCya: '2025-07-20',
+        },
+      }
+      const mockReq = createMockRequest({
+        query: { change: 'true' },
+        appointmentSession,
+      })
+      const mockRes = createMockResponse({
+        appointment: { ...appointmentSession, type: { isLocationRequired: false } },
+      })
+      await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
+
+      expect(mockedSetDataValue).not.toHaveBeenCalled()
+    })
   })
 
   describe('getLocationDateTime for double digit date', () => {

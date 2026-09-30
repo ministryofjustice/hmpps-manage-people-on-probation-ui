@@ -315,7 +315,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const isInPast = appointmentDateIsInPast(req, res)
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       const isReschedule = isRescheduleAppointment(req)
-      if (change) {
+      const tempDateInSession = getDataValue<string>(data, ['appointments', crn, id, 'temp', 'dateFromCya'])
+      if (change && !tempDateInSession) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
         const startTime = getDataValue(data, ['appointments', crn, id, 'start'])
         const endTime = getDataValue(data, ['appointments', crn, id, 'end'])

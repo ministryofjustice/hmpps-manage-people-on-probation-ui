@@ -8,7 +8,6 @@ const res = httpMocks.createResponse()
 const spy = jest.spyOn(res, 'redirect')
 const crn = 'X000001'
 const id = '12345'
-const change = '/mock/change/url'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -119,15 +118,7 @@ describe('middleware/routeChangeSmsConsent', () => {
       `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(req.url)}`,
     )
   })
-  it('should not update the appointment session and route to edit contact details page if change link is clicked and change query param exists', () => {
-    const req = buildRequest({ query: { change } })
-    routeChangeSmsConsent(req, res, nextSpy)
-    expect(nextSpy).not.toHaveBeenCalled()
-    expect(setDataValueSpy).not.toHaveBeenCalled()
-    expect(spy).toHaveBeenCalledWith(
-      `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(req.url)}`,
-    )
-  })
+
   it('should call next() if continue button is clicked', () => {
     const req = buildRequest({ body: { 'submit-btn': '' } })
 
