@@ -39,7 +39,6 @@ export const postRescheduleAppointments = (
       sensitivity,
       visorReport,
       rescheduleAppointment,
-      outcomeRecorded,
       smsOptIn,
       outcome,
       user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
