@@ -372,6 +372,7 @@ export interface LocalParams {
     | Option<EnforcementActionCreatedBy>[]
   isSensitive?: boolean
   allowSms?: boolean
+  url?: string
 }
 
 export interface ProbationDeliveryUnit {

@@ -359,6 +359,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         alertDismissed,
         isReschedule,
+        url: encodeURIComponent(req.url),
         ...(res.locals?.flags?.enableAllowSms
           ? { allowSms: getDataValue(data, ['personalDetails', crn, 'overview', 'allowSms']) }
           : {}),

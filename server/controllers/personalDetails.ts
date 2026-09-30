@@ -59,7 +59,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
         )
       ) {
         if (['appointments', 'allowSms'].includes(query?.origin)) {
-          backLink = back
+          const decodeBack = decodeURIComponent(back)
+          backLink =
+            typeof decodeBack === 'string' && decodeBack.startsWith(`/case/${crn}/`)
+              ? decodeBack
+              : `/case/${crn}/personal-details`
         }
 
         if (!manageUsersAccess) {
@@ -261,7 +265,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
           }
         }
         if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && back) {
-          redirect = typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : redirect
+          const decodeBack = decodeURIComponent(back)
+          redirect = typeof decodeBack === 'string' && decodeBack.startsWith(`/case/${crn}/`) ? decodeBack : redirect
         }
         res.redirect(redirect)
       }

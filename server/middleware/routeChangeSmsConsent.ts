@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { setDataValue } from '../utils'
+import { setDataValue, toIsoDateFromPicker } from '../utils'
 
 export const routeChangeSmsConsent = (req: Request, res: Response, next: NextFunction) => {
   const { body, url } = req
@@ -7,22 +7,18 @@ export const routeChangeSmsConsent = (req: Request, res: Response, next: NextFun
   if (body?.['submit-btn'] === '') {
     return next()
   }
-  if (req?.body?.appointments?.[crn]?.[id]?.date) {
-    setDataValue(req.session.data, ['appointments', crn, id, 'date'], req.body.appointments[crn][id].date)
+  const date = req?.body?.appointments?.[crn]?.[id]?.date
+    ? toIsoDateFromPicker(req.body.appointments[crn][id].date)
+    : ''
+  const start = req?.body?.appointments?.[crn]?.[id]?.start || ''
+  const end = req?.body?.appointments?.[crn]?.[id]?.end || ''
+  const path = ['appointments', crn, id]
+  setDataValue(req.session.data, [...path, 'date'], date)
+  setDataValue(req.session.data, [...path, 'start'], start)
+  setDataValue(req.session.data, [...path, 'end'], end)
+  if (req?.body?.appointments?.[crn]?.[id]?.user?.locationCode) {
+    setDataValue(req.session.data, [...path, 'user', 'locationCode'], req.body.appointments[crn][id].user.locationCode)
   }
-  if (req?.body?.appointments?.[crn]?.[id]?.start) {
-    setDataValue(req.session.data, ['appointments', crn, id, 'start'], req.body.appointments[crn][id].start)
-  }
-  if (req?.body?.appointments?.[crn]?.[id]?.end) {
-    setDataValue(req.session.data, ['appointments', crn, id, 'end'], req.body.appointments[crn][id].end)
-  }
-  if (req?.body?.appointments?.[crn]?.[id]?.user.locationCode) {
-    setDataValue(
-      req.session.data,
-      ['appointments', crn, id, 'user', 'locationCode'],
-      req.body.appointments[crn][id].user.locationCode,
-    )
-  }
-  const redirectUrl = `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${url}`
+  const redirectUrl = `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(url)}`
   return res.redirect(redirectUrl)
 }
