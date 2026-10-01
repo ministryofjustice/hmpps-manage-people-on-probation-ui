@@ -290,13 +290,13 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
-    cy.task('stubSentencePlanDraft')
+    cy.task('stubAuthSentencePlan')
+    cy.task('stubSentencePlanAgreementDraft')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    const sentencePlanLink = false
     const sanIndicator = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
+    checkRiskPageView({ page, sanIndicator })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload and san indicator is true', () => {
@@ -319,14 +319,28 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
-    cy.task('stubSentencePlanDraft')
+    cy.task('stubAuthSentencePlan')
+    cy.task('stubSentencePlanAgreementDraft')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
+    checkRiskPageView({ page, sanIndicator })
+  })
+
+  it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop not in users caseload and san indicator is true', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubAuthSentencePlan')
+    cy.task('stubSentencePlanAgreementDraft')
+    cy.task('stubUserNoCaseload')
+    cy.task('stubNoUserCaseloadSearch')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = true
     const sentencePlanLink = false
-    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
+    const sentencePlanText = true
+    checkRiskPageView({ page, sanIndicator, sentencePlanLink, sentencePlanText })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop not in users caseload and san indicator is true', () => {
