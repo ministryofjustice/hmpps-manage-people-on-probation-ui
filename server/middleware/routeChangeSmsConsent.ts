@@ -14,7 +14,7 @@ export const routeChangeSmsConsent = (req: Request, res: Response, next: NextFun
   const start = req?.body?.appointments?.[crn]?.[id]?.start || ''
   const end = req?.body?.appointments?.[crn]?.[id]?.end || ''
   const path = ['appointments', crn, id]
-  setDataValue(req.session.data, ['appointments', crn, id, 'temp', 'changeSmsConsentLinkClicked'], true)
+  setDataValue(req.session.data, [...path, 'temp', 'changeSmsConsentLinkClicked'], true)
   setDataValue(req.session.data, [...path, 'date'], date)
   setDataValue(req.session.data, [...path, 'start'], start)
   setDataValue(req.session.data, [...path, 'end'], end)

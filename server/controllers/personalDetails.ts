@@ -262,8 +262,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
           }
         }
         if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && back) {
-          const decodeBack = decodeURIComponent(back)
-          redirect = typeof decodeBack === 'string' && decodeBack.startsWith(`/case/${crn}/`) ? decodeBack : redirect
+          redirect = typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : redirect
         }
         res.redirect(redirect)
       }
