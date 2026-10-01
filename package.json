@@ -220,7 +220,7 @@
     "@types/superagent": "^8.1.11",
     "@types/supertest": "^7.2.1",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.70.1",
+    "@typescript-eslint/eslint-plugin": "^8.71.0",
     "@typescript-eslint/parser": "^8.32.0",
     "audit-ci": "^7.1.0",
     "autoprefixer": "^10.6.1",
