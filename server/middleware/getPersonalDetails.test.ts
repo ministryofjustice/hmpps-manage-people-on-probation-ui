@@ -634,7 +634,41 @@ describe('/middleware/getPersonalDetails', () => {
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
       .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve({ hasAgreedPlan: false, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
+      .mockImplementationOnce(() => Promise.resolve({ hasPlan: true, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {},
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop not in user caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve({ hasPlan: true, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',
@@ -653,8 +687,8 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
-      showText: false,
-      lastUpdatedDate: '',
+      showText: true,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
     })
   })
 
