@@ -197,6 +197,7 @@ export interface AppointmentSession {
     dateFromCya?: string
     startTimeFromCya?: string
     endTimeFromCya?: string
+    changeSmsConsentLinkClicked?: boolean
   }
   outcome?: AppointmentSessionOutcome
   sensitivityLocked?: boolean

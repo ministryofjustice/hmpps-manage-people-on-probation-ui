@@ -695,13 +695,14 @@ describe('controllers/arrangeAppointment', () => {
       )
     })
 
-    it('should not set temp values in session when change query parameter is present and temp date session already exists', async () => {
+    it('should not set temp values in session when change query parameter is present and changeSmsConsentLinkClicked session exists', async () => {
       const appointmentSession = {
         date: '2025-07-20',
         start: '10:00',
         end: '11:00',
         temp: {
           dateFromCya: '2025-07-20',
+          changeSmsConsentLinkClicked: true,
         },
       }
       const mockReq = createMockRequest({
@@ -712,7 +713,7 @@ describe('controllers/arrangeAppointment', () => {
         appointment: { ...appointmentSession, type: { isLocationRequired: false } },
       })
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
-
+      expect(mockReq.session.data.appointments[crn][uuid].temp.changeSmsConsentLinkClicked).toBeUndefined()
       expect(mockedSetDataValue).not.toHaveBeenCalled()
     })
   })

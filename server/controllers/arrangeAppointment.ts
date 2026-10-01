@@ -312,11 +312,20 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
       const { change } = req.query as Record<string, string>
+      const changeSmsConsentLinkClicked = getDataValue<boolean>(data, [
+        'appointments',
+        crn,
+        id,
+        'temp',
+        'changeSmsConsentLinkClicked',
+      ])
       const isInPast = appointmentDateIsInPast(req, res)
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       const isReschedule = isRescheduleAppointment(req)
-      const tempDateInSession = getDataValue<string>(data, ['appointments', crn, id, 'temp', 'dateFromCya'])
-      if (change && !tempDateInSession) {
+      if (changeSmsConsentLinkClicked) {
+        delete req.session.data.appointments[crn][id].temp.changeSmsConsentLinkClicked
+      }
+      if (change && !changeSmsConsentLinkClicked) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
         const startTime = getDataValue(data, ['appointments', crn, id, 'start'])
         const endTime = getDataValue(data, ['appointments', crn, id, 'end'])
