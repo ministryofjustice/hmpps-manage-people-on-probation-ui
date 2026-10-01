@@ -133,6 +133,8 @@
         tier: (calculation.tierScore if flags.enablePersonHeaderTierV3 else tierCalculation.tierScore) | convertToTitleCase,
         historyHref: tierUrlV3 if flags.enablePersonHeaderTierV3 else headerTierLink,
         managedBy: managedBy.text,
+        managedByName: managedBy.name,
+        managedByLocation: managedBy.location,
         managedByHref: managedBy.href,
         photo: personPhotoSrc,
         riskBadges: combinedRiskBadges,

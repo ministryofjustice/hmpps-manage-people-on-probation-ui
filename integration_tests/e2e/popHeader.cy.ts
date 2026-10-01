@@ -91,18 +91,17 @@ context('PoP Header partial', () => {
   it('person risk flags are displayed when enablePersonHeader is true', () => {
     cy.task('stubFeatureFlag', { key: 'enablePersonHeader', enabled: true })
     cy.visit('/case/X000001')
-
     cy.get('.person-header [data-qa="crn"]').should('exist').and('contain.text', 'X000001')
 
-    cy.get('[data-qa="risk-badge-5"]').should('be.visible').and('contain.text', 'Risk to public - High')
-
-    cy.get('[data-qa="risk-badge-1"]').should('be.visible').and('contain.text', 'Risk to staff - High')
+    cy.get('[data-qa="risk-badge-1"]').should('be.visible').and('contain.text', 'Risk to staff - Medium')
 
     cy.get('[data-qa="risk-badge-2"]').should('be.visible').and('contain.text', 'Domestic abuse perpetrator')
 
     cy.get('[data-qa="risk-badge-3"]').should('be.visible').and('contain.text', 'Risk to known adult - Low')
 
-    cy.get('[data-qa="risk-badge-8"]').should('be.visible').and('contain.text', 'Sexual conviction - Low')
+    cy.get('[data-qa="risk-badge-5"]').should('be.visible').and('contain.text', 'Risk to public - High')
+
+    cy.get('[data-qa="risk-badge-8"]').should('be.visible').and('contain.text', 'Sexual conviction')
 
     cy.get('[data-qa="risk-badge-6"]').should('be.visible').and('contain.text', 'County lines - victim')
 

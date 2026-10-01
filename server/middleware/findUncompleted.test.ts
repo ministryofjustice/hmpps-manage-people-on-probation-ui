@@ -33,10 +33,13 @@ const mockAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFuncti
 
 mockAppointmentDateIsInPast.mockImplementation(() => false)
 
-const buildRequest = (
-  session?: Record<string, string | Record<string, string | Name>>,
-  _nextAppointmentId: string | null = null,
-): httpMocks.MockRequest<any> => {
+const buildRequest = ({
+  session = {},
+  allowSms = true,
+}: {
+  session?: Record<string, string | Record<string, string | Name>>
+  allowSms?: boolean
+} = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
       crn,
@@ -57,7 +60,14 @@ const buildRequest = (
         },
         temp: {
           [crn]: {
-            nextAppointmentId: _nextAppointmentId,
+            nextAppointmentId: null as any,
+          },
+        },
+        personalDetails: {
+          [crn]: {
+            overview: {
+              allowSms,
+            },
           },
         },
       },
@@ -83,33 +93,37 @@ describe('middleware/findUncompleted', () => {
     expect(findUncompleted()(req, res)).toBe(change)
   })
   it('should return sentence url if no eventId', () => {
-    const req = buildRequest({ eventId: null })
+    const req = buildRequest({ session: { eventId: null } })
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/sentence?change=${change}`)
   })
   it('should return sentence url and force validation if no eventId', () => {
-    const req = buildRequest({ eventId: null })
+    const req = buildRequest({ session: { eventId: null } })
     expect(findUncompleted({ forceValidation: true })(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/sentence?change=${change}&validation=true`,
     )
   })
   it('should return type url if no type (and previous conditions not met)', () => {
-    const req = buildRequest({ type: null })
+    const req = buildRequest({ session: { type: null } })
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/type-attendance?change=${change}`)
   })
   it('should return attendance url if no user info (and previous conditions not met)', () => {
     const req = buildRequest({
-      user: {
-        ...mockAppointmentSession.user,
-        username: null,
+      session: {
+        user: {
+          ...mockAppointmentSession.user,
+          username: null,
+        },
       },
     })
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/attendance?change=${change}`)
   })
   it('should return location url if no location (and previous conditions not met)', () => {
     const req = buildRequest({
-      user: {
-        ...mockAppointmentSession.user,
-        locationCode: null,
+      session: {
+        user: {
+          ...mockAppointmentSession.user,
+          locationCode: null,
+        },
       },
     })
     expect(findUncompleted()(req, res)).toBe(
@@ -118,7 +132,9 @@ describe('middleware/findUncompleted', () => {
   })
   it('should return date-time url if no date-time (and previous conditions not met)', () => {
     const req = buildRequest({
-      date: null,
+      session: {
+        date: null,
+      },
     })
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/location-date-time?change=${change}`,
@@ -126,7 +142,9 @@ describe('middleware/findUncompleted', () => {
   })
   it('should return supporting information if no sensitivity (and previous conditions not met)', () => {
     const req = buildRequest({
-      sensitivity: null,
+      session: {
+        sensitivity: null,
+      },
     })
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/supporting-information?change=${change}`,
@@ -134,7 +152,9 @@ describe('middleware/findUncompleted', () => {
   })
   it('should return text message confirmation if no smsOptIn', () => {
     const req = buildRequest({
-      smsOptIn: null,
+      session: {
+        smsOptIn: null,
+      },
     })
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/text-message-confirmation?change=${change}`,
@@ -142,7 +162,9 @@ describe('middleware/findUncompleted', () => {
   })
   it('should not return text message confirmation if no smsOptIn and sms feature flag is disabled', () => {
     const req = buildRequest({
-      smsOptIn: null,
+      session: {
+        smsOptIn: null,
+      },
     })
     const mockRes = buildResponse({
       flags: {
@@ -151,12 +173,29 @@ describe('middleware/findUncompleted', () => {
     })
     expect(findUncompleted()(req, mockRes)).toBe(change)
   })
+  it('should not return text message confirmation if enableAllowSms feature flag is enabled and sms consent is false', () => {
+    const req = buildRequest({
+      session: {
+        smsOptIn: null,
+      },
+      allowSms: false,
+    })
+    const mockRes = buildResponse({
+      flags: {
+        enableSmsReminders: true,
+        enableAllowSms: true,
+      },
+    })
+    expect(findUncompleted()(req, mockRes)).toBe(change)
+  })
 
   it('should return outcome if no outcome type value in appointment session and appointment date is in past', () => {
     mockAppointmentDateIsInPast.mockImplementationOnce(() => true)
     const req = buildRequest({
-      outcome: {
-        type: null,
+      session: {
+        outcome: {
+          type: null,
+        },
       },
     })
 
@@ -164,8 +203,10 @@ describe('middleware/findUncompleted', () => {
   })
   it('should return change url if  no outcome type value in appointment session and appointment date is in future', () => {
     const req = buildRequest({
-      outcome: {
-        type: null,
+      session: {
+        outcome: {
+          type: null,
+        },
       },
     })
 

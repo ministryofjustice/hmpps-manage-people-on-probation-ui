@@ -471,13 +471,13 @@ describe('/controllers/personalDetails', () => {
       describe('Form is valid - enableAllowSms feature flag enabled', () => {
         const updatePersonalDetailsContactSpy = jest.spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
         const updateAllowSmsSpy = jest.spyOn(MasApiClient.prototype, 'updateAllowSms')
-        it('should update the personal details if allow sms question not completed', async () => {
+        it('should update the personal details but not sms consent if allow sms question not completed', async () => {
           const mockReq = {
             ...req,
             query: {
               ...req.query,
               origin: 'allowSms',
-              change: '/location-date-time',
+              change: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
             },
             body: {
               ...req.body,
@@ -498,7 +498,7 @@ describe('/controllers/personalDetails', () => {
             emailAddress,
           })
           expect(updateAllowSmsSpy).not.toHaveBeenCalled()
-          expect(spy).toHaveBeenCalledWith(`/case/${crn}/personal-details?update=success`)
+          expect(spy).toHaveBeenCalledWith(mockReq.query.change)
         })
         it('should update the personal details if allow sms value is YES', async () => {
           const mockReq = {
