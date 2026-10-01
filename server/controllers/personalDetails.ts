@@ -258,7 +258,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
             redirect = findUncompleted()(req, res)
           }
         }
-        if (res.locals?.flags?.enableAllowSms && allowSms && origin === 'allowSms' && change) {
+        if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && change) {
           redirect = typeof change === 'string' && change.startsWith(`/case/${crn}/`) ? change : redirect
         }
         res.redirect(redirect)

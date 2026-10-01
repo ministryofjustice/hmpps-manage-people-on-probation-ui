@@ -3,21 +3,38 @@ import { toSentenceCase } from './toSentenceCase'
 import logger from '../../logger'
 
 const riskLevelBadgeClass: Record<string, string> = {
-  'VERY HIGH': 'risk-badge--very-high', // #711A0D
-  HIGH: 'risk-badge--high', // #D4351C
-  MEDIUM: 'risk-badge--medium', // #F2590D
-  LOW: 'risk-badge--low', // #85994B
+  'VERY HIGH': 'risk-badge--very-high',
+  HIGH: 'risk-badge--high',
+  MEDIUM: 'risk-badge--medium',
+  LOW: 'risk-badge--low',
+}
+
+const risksWithLevelDescription = new Set([
+  'risk to public',
+  'risk to known adult',
+  'risk to children',
+  'risk to staff',
+  'risk to prisoner',
+])
+
+const lowRiskLevelWithDescription = new Set(['mappa'])
+
+const riskLevelPriority: Record<string, number> = {
+  'VERY HIGH': 10,
+  HIGH: 20,
+  MEDIUM: 30,
+  LOW: 40,
 }
 
 export const registerTypes = {
   publicProtection: [
+    { code: 'AV2S', description: 'Risk to Staff' },
+    { code: 'RTPS', description: 'Risk to Probation Staff' },
+    { code: 'REG17', description: 'Risk to Public' },
     { code: 'REG15', description: 'Risk to Known Adult' },
     { code: 'REG16', description: 'Risk to Prisoner' },
-    { code: 'REG17', description: 'Risk to Public' },
     { code: 'REG26', description: 'Organised Crime' },
     { code: 'RCHD', description: 'Risk to Children' },
-    { code: 'RTPS', description: 'Risk to Probation Staff' },
-    { code: 'AV2S', description: 'Risk to Staff' },
     { code: 'RSC', description: 'Sexual Conviction' },
     {
       code: 'SHPO',
@@ -85,13 +102,6 @@ export const registerTypes = {
   ],
 }
 
-const riskLevelPriority: Record<string, number> = {
-  'VERY HIGH': 10,
-  HIGH: 20,
-  MEDIUM: 30,
-  LOW: 40,
-}
-
 const registerTypePriority = ['publicProtection', 'safeguardingRisk', 'alerts', 'safeguardingNeed', 'cohort'] as const
 
 interface RiskBadge {
@@ -113,15 +123,6 @@ export interface RiskBadgeData {
 
 const MAX_RISK_BADGES = 7
 
-const riskDescriptionPriority = new Map(
-  registerTypePriority.flatMap((registerType, categoryIndex) =>
-    registerTypes[registerType].map((register, descriptionIndex) => [
-      register.description.trim().toLowerCase(),
-      categoryIndex * 1000 + descriptionIndex,
-    ]),
-  ),
-)
-
 function getRiskRegisterType(description: string): string | undefined {
   const normalisedDescription = description.trim().toLowerCase()
 
@@ -130,38 +131,18 @@ function getRiskRegisterType(description: string): string | undefined {
   )
 }
 
-function getRiskDescriptionPriority(description: string): number {
-  const normalisedDescription = description.trim().toLowerCase()
-  const priority = riskDescriptionPriority.get(normalisedDescription)
+function getRiskLevel(flag: RiskFlag): string {
+  const normalisedDescription = flag.description.trim().toLowerCase()
 
-  if (priority === undefined) {
-    logger.info(`Unexpected risk flag description received: "${description}"`)
-    return Number.MAX_SAFE_INTEGER
-  }
+  const level = risksWithLevelDescription.has(normalisedDescription)
+    ? (flag.levelDescription ?? flag.level)
+    : flag.level
 
-  return priority
+  return (level ?? 'LOW').toUpperCase()
 }
-
-export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
-  const activeRiskFlags = riskFlags.filter(flag => !flag.removed)
-
-  const sortedRiskFlags = [...activeRiskFlags].sort((a, b) => {
-    const severityPriority =
-      (riskLevelPriority[a.level ?? ''] ?? Number.MAX_SAFE_INTEGER) -
-      (riskLevelPriority[b.level ?? ''] ?? Number.MAX_SAFE_INTEGER)
-
-    if (severityPriority !== 0) {
-      return severityPriority
-    }
-
-    return getRiskDescriptionPriority(a.description) - getRiskDescriptionPriority(b.description)
-  })
-
-  const visibleRiskFlags = sortedRiskFlags.slice(0, MAX_RISK_BADGES)
-
-  const groups = visibleRiskFlags.reduce<RiskBadgeGroup[]>((result, flag) => {
-    const severity = flag.level ?? 'LOW'
-
+function getGroupedRiskBadges(visibleRiskFlags: RiskFlag[]) {
+  return visibleRiskFlags.reduce<RiskBadgeGroup[]>((result, flag) => {
+    const severity = getRiskLevel(flag)
     let group = result.find(item => item.severity === severity)
 
     if (!group) {
@@ -173,20 +154,57 @@ export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
       result.push(group)
     }
 
-    const registerType = getRiskRegisterType(flag.description)
+    const normalisedDescription = flag.description.trim().toLowerCase()
+    const description = toSentenceCase(flag.description, [], null, true, false)
+
+    let text = description
+
+    if (lowRiskLevelWithDescription.has(normalisedDescription)) {
+      text = `${description} - ${flag.levelDescription?.replace('MAPPA ', '') ?? ''}`
+    } else if (risksWithLevelDescription.has(normalisedDescription)) {
+      text = `${description} - ${toSentenceCase(severity, [], null, true, false)}`
+    }
 
     group.badges.push({
       id: flag.id,
-      text:
-        registerType === 'publicProtection'
-          ? `${toSentenceCase(flag.description, [], null, true, false)} - ${toSentenceCase(severity, [], null, true, false)}`
-          : toSentenceCase(flag.description, [], null, true, false),
+      text,
       level: severity,
       badgeClass: riskLevelBadgeClass[severity],
     })
 
     return result
   }, [])
+}
+
+export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
+  const activeRiskFlags = riskFlags.filter(flag => !flag.removed)
+
+  const sortedRiskFlags = [...activeRiskFlags].sort((a, b) => {
+    const severityPriority =
+      (riskLevelPriority[getRiskLevel(a)] ?? Number.MAX_SAFE_INTEGER) -
+      (riskLevelPriority[getRiskLevel(b)] ?? Number.MAX_SAFE_INTEGER)
+
+    if (severityPriority !== 0) {
+      return severityPriority
+    }
+
+    const aRegisterType = getRiskRegisterType(a.description)
+    const bRegisterType = getRiskRegisterType(b.description)
+
+    const aRegisterPriority = aRegisterType
+      ? registerTypePriority.indexOf(aRegisterType as (typeof registerTypePriority)[number])
+      : Number.MAX_SAFE_INTEGER
+
+    const bRegisterPriority = bRegisterType
+      ? registerTypePriority.indexOf(bRegisterType as (typeof registerTypePriority)[number])
+      : Number.MAX_SAFE_INTEGER
+
+    return aRegisterPriority - bRegisterPriority
+  })
+
+  const visibleRiskFlags = sortedRiskFlags.slice(0, MAX_RISK_BADGES)
+
+  const groups = getGroupedRiskBadges(visibleRiskFlags)
 
   return {
     groups,
