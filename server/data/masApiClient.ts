@@ -607,7 +607,7 @@ export default class MasApiClient extends RestClient {
     })
   }
 
-  async getUserAlertsCountV2(): Promise<UserAlertsCount> {
+  async getUserAlertsCountV2(): Promise<UserAlertsCount | ErrorSummary | null> {
     return this.get({
       path: `/alerts/count`,
       handle404: true,

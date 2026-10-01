@@ -8,7 +8,7 @@ export const getUserAlertsCount = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     const masClient = new MasApiClient(token)
     if (res.locals.flags?.enableAlertsCountApi) {
       const response = await masClient.getUserAlertsCountV2()
-      if (response?.count !== undefined && response?.count !== null) {
+      if (response && 'count' in response && response.count !== undefined && response.count !== null) {
         res.locals.alertsCount = response.count < 100 ? response.count.toString() : '99+'
       } else {
         res.locals.alertsCount = response as unknown as string

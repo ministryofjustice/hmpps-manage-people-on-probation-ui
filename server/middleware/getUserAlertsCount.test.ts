@@ -106,7 +106,7 @@ describe('/middleware/getUserAlertsCount', () => {
       expect(res.locals.alertsCount).toBeNull()
     })
 
-    it('should assign error message to alertsCount if error recieved from API', async () => {
+    it('should assign error message to alertsCount if error received from API', async () => {
       getUserAlertsCountV2Spy.mockImplementationOnce(() =>
         Promise.resolve({
           errors: [{ text: 'error message' }],
