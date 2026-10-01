@@ -70,16 +70,6 @@ export interface QueriesResponse {
 // Result type returned to the middleware
 
 export interface SentencePlanResult {
-  hasAgreedPlan: boolean
+  hasPlan: boolean
   lastUpdatedDate: string
-}
-
-// Helpers
-
-export function unwrapSingleValue(wrapped: Values | undefined): string | undefined {
-  if (!wrapped) {
-    return undefined
-  }
-
-  return wrapped.type === 'Single' ? wrapped.value : undefined
 }

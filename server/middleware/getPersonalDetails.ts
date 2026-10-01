@@ -121,7 +121,7 @@ export const getPersonalDetails = (
       if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {
         try {
           const planResult = await arnsAssessmentPlatformClient.getSentencePlanByCrn(crn, username)
-          if (planResult?.hasAgreedPlan) {
+          if (planResult?.hasPlan) {
             sentencePlan.lastUpdatedDate = planResult.lastUpdatedDate
             if (!popInUsersCaseload) {
               sentencePlan.showText = true
