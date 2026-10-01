@@ -598,7 +598,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
-  async getUserAlertsCount(): Promise<UserAlerts> {
+  async getUserAlertsCount(): Promise<UserAlerts | ErrorSummary | null> {
     return this.get({
       path: `/alerts`,
       handle404: true,
