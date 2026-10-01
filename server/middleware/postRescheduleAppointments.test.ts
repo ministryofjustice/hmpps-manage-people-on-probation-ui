@@ -92,7 +92,7 @@ const mockAppointment: AppointmentSession = {
     username,
   },
   type: 'COAP',
-  date: tomorrow.toFormat('yyyy-M-dd'),
+  date: tomorrow.toFormat('yyyy-MM-dd'),
   start: '09:00',
   end: '09:30',
   eventId: '250113825',
@@ -307,7 +307,7 @@ describe('middleware/postRescheduleAppointments', () => {
             ],
             durationInMinutes: 30,
             message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
-            start: null,
+            start: DateTime.fromISO(`${mockAppointment.date}T${mockAppointment.start}`).toISO(),
             subject: 'J. Morrison: planned office visit (NS)',
             supervisionAppointmentUrn: 'ABCDE',
           },
@@ -316,7 +316,7 @@ describe('middleware/postRescheduleAppointments', () => {
       )
     })
     it('should delete future outlook event if rescheduled appointment is in the past', async () => {
-      const [req] = buildRequest({ date: yesterday.toFormat('yyyy-M-dd'), until: yesterday.toFormat('yyyy-M-dd') })
+      const [req] = buildRequest({ date: yesterday.toFormat('yyyy-MM-dd'), until: yesterday.toFormat('yyyy-MM-dd') })
       const res = buildResponse()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalled()
