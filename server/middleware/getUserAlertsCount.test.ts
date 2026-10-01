@@ -113,6 +113,15 @@ describe('/middleware/getUserAlertsCount', () => {
         errors: [{ text: 'error message' }],
       })
     })
+
+    it('should assign error message to alertsCount if the request is rejected', async () => {
+      getUserAlertsCountV2Spy.mockImplementationOnce(() => Promise.reject(new Error('Server error')))
+      await getUserAlertsCount(hmppsAuthClient)(req, res, nextSpy)
+      expect(nextSpy).toHaveBeenCalled()
+      expect(res.locals.alertsCount).toEqual({
+        errors: [{ text: 'Alerts are currently unavailable. You can view them on NDelius.' }],
+      })
+    })
   })
 
   describe('enableAlertsCountCaching feature flag enabled', () => {
