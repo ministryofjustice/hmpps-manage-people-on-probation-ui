@@ -41,4 +41,5 @@ export class FeatureFlags {
   enableLastTextMessage?: boolean = undefined
   enableAlertsCountCaching?: boolean = undefined
   enableFeedback?: boolean = undefined
+  enableAlertsCountApi?: boolean = undefined
 }
