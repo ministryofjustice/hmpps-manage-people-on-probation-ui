@@ -478,7 +478,7 @@ describe('utils/getRiskBadgeGroups', () => {
         badges: [
           {
             id: 1,
-            text: 'Mappa - Level 3',
+            text: 'MAPPA - Level 3',
             level: 'HIGH',
             badgeClass: 'risk-badge--high',
           },

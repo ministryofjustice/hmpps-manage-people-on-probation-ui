@@ -156,13 +156,15 @@ function getGroupedRiskBadges(visibleRiskFlags: RiskFlag[]) {
 
     const normalisedDescription = flag.description.trim().toLowerCase()
     const description = toSentenceCase(flag.description, [], null, true, false)
+    const displayDescription = description.replace(/^Mappa\b/, 'MAPPA')
 
     let text = description
 
     if (lowRiskLevelWithDescription.has(normalisedDescription)) {
-      text = `${description} - ${flag.levelDescription?.replace('MAPPA ', '') ?? ''}`
+      const levelDescription = flag.levelDescription?.replace('MAPPA ', '') ?? ''
+      text = `${displayDescription} - ${levelDescription}`
     } else if (risksWithLevelDescription.has(normalisedDescription)) {
-      text = `${description} - ${toSentenceCase(severity, [], null, true, false)}`
+      text = `${displayDescription} - ${toSentenceCase(severity, [], null, true, false)}`
     }
 
     group.badges.push({
