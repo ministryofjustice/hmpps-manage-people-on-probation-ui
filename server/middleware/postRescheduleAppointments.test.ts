@@ -293,9 +293,12 @@ describe('middleware/postRescheduleAppointments', () => {
 
   describe('Send outlook invite', () => {
     it('should create the outlook event if user email is defined and calendar events feature flag is enabled', async () => {
-      const [req] = buildRequest()
+      const [req, mockAppointmentSession] = buildRequest()
+      const { date, start } = mockAppointmentSession
       const res = buildResponse()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      const dt = DateTime.fromISO(`${date}T${start}`)
+      const startDateTime = dt.toISO()
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           rescheduledEventRequest: {
@@ -307,7 +310,7 @@ describe('middleware/postRescheduleAppointments', () => {
             ],
             durationInMinutes: 30,
             message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
-            start: DateTime.fromISO(`${mockAppointment.date}T${mockAppointment.start}`).toISO(),
+            start: startDateTime,
             subject: 'J. Morrison: planned office visit (NS)',
             supervisionAppointmentUrn: 'ABCDE',
           },

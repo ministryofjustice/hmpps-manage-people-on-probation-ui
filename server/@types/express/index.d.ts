@@ -17,6 +17,11 @@ declare global {
   }
 }
 
+export interface AlertsCountCache {
+  value: string
+  expiresAt: number
+}
+
 declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
@@ -40,6 +45,7 @@ declare module 'express-session' {
     cache?: {
       activityLog?: ActivityLogCache
       uploadedFiles?: FileCache[]
+      alertsCount?: AlertsCountCache
     }
     body?: Record<string, any>
     probationSearch?: ProbationSearch

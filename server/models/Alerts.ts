@@ -28,6 +28,10 @@ export interface UserAlerts {
   size: number
 }
 
+export interface UserAlertsCount {
+  count: number
+}
+
 export interface ClearAlertsRequest {
   alertIds: number[]
 }

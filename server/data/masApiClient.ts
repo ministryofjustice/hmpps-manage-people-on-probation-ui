@@ -52,7 +52,7 @@ import {
   RescheduleAppointmentRequestBody,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
-import { UserAlerts, UserAlertsContent } from '../models/Alerts'
+import { UserAlerts, UserAlertsContent, UserAlertsCount } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
@@ -598,9 +598,18 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
-  async getUserAlertsCount(): Promise<UserAlerts> {
+  async getUserAlertsCount(): Promise<UserAlerts | ErrorSummary | null> {
     return this.get({
       path: `/alerts`,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
+    })
+  }
+
+  async getUserAlertsCountV2(): Promise<UserAlertsCount | ErrorSummary | null> {
+    return this.get({
+      path: `/alerts/count`,
       handle404: true,
       handle500: true,
       errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
