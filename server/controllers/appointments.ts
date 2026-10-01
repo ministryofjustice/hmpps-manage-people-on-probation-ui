@@ -335,7 +335,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
 
       const body: AppointmentPatch = {
-        id: parseInt(id, 10),
+        id: Number.parseInt(id, 10),
         notes: handleQuotes(notes),
         sensitive,
         outcomeRecorded,
