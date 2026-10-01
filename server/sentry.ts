@@ -6,7 +6,14 @@ if (config.sentry.dsn) {
     dsn: config.sentry.dsn,
     environment: config.env,
     tracesSampleRate: config.sentry.tracesSampleRate,
-    sendDefaultPii: false,
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      stackFrameVariables: false,
+    },
     beforeSend(event) {
       if (!event.request) {
         return event
