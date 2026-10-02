@@ -14,7 +14,7 @@ Try it out in the dev environment: https://manage-people-on-probation-dev.hmpps.
 
 You'll need to install:
 
-- [Node 22.x](https://nodejs.org/en/download) - Node and nvm installation.
+- [Node 24.x](https://nodejs.org/en/download) - Node and nvm installation.
 - [Docker](https://www.docker.com/)
 - [Latest version of Java with Homebrew](https://formulae.brew.sh/formula/openjdk#default) - Needed for wiremock
 

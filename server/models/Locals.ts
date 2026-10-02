@@ -178,7 +178,7 @@ interface Locals {
   defaultUser?: { username: string; homeArea: string; team: string }
   attendingUser?: DefaultUserDetails
   sentencePlan?: SentencePlan
-  alertsCount?: string
+  alertsCount?: string | ErrorSummary | null
   alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
