@@ -44,7 +44,7 @@ describe('ROSH widget', () => {
     const $ = render()
     expect($('[data-qa=roshWarning]').find('strong').text()).toContain('Check ROSH in NDelius and OASys')
     expect($('[data-qa=roshWarning]').find('p').text()).toContain(
-      'MPOP may show the last signed and locked ROSH level rather that the latest risk information.',
+      'MPOP may show the last signed and locked ROSH level rather than the latest risk information.',
     )
   })
   it('should not show the rosh warning if enableNDeliusRosh feature flag is disabled', () => {
