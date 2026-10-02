@@ -47,7 +47,10 @@ const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
 
 const mockFormattedRisks = {
   ...mockRisks,
-  riskFlags: [{ id: 1, description: 'Risk to Staff', levelDescription: 'Medium' }],
+  riskFlags: [
+    { id: 1, description: 'Risk to Staff', levelDescription: 'Medium' },
+    { id: 2, description: 'High ROSH', levelDescription: 'High' },
+  ],
   removedRiskFlags: [{ id: 2, description: 'Removed ROSH flag' }],
 } as Partial<PersonRiskFlags>
 
@@ -57,13 +60,21 @@ const getPersonRiskFlagsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
   .mockImplementation(() => Promise.resolve(mockRisks))
 
-const res = mockAppResponse()
+const createResponse = ({ enableNDeliusRosh = false } = {}) =>
+  mockAppResponse({
+    flags: {
+      enableNDeliusRosh,
+    },
+  })
+
+const res = createResponse()
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 describe('middleware/getPersonRiskFlags', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
   describe('risks session does not exist for current crn', () => {
     const req = httpMocks.createRequest({
       params: {
@@ -102,6 +113,7 @@ describe('middleware/getPersonRiskFlags', () => {
     })
     it('should set res.locals.personRisks to the api response', () => {
       expect(res.locals.personRisks).toEqual(mockFormattedRisks)
+      expect(res.locals.rosh).toBeUndefined()
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
@@ -197,5 +209,19 @@ describe('middleware/getPersonRiskFlags', () => {
     expect(res.locals.riskBadgeData).toBeUndefined()
 
     expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['riskBadgeData', crn], undefined)
+  })
+
+  it('should assign NDelius Rosh values to res.locals.rosh if enableNDeliusRosh feature flag is enabled', async () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    const mockRes = createResponse({ enableNDeliusRosh: true })
+    await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
+    expect(mockRes.locals.rosh).toEqual({ level: 'HIGH' })
   })
 })

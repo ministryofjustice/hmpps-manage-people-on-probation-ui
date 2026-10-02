@@ -65,12 +65,12 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
         .replace('rosh', '')
         .trim()
         .toUpperCase() as RiskFlagLevel
-      res.locals.personRisks = personRisks
-      res.locals.riskBadgeData = riskBadgeData
       res.locals.rosh = {
         level: riskScore,
       }
     }
+    res.locals.personRisks = personRisks
+    res.locals.riskBadgeData = riskBadgeData
 
     return next()
   }
