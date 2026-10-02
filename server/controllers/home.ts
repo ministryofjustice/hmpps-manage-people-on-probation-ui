@@ -79,7 +79,9 @@ const homeController: Controller<typeof routes, void> = {
         totalAppointments,
         totalOutcomes,
         timeoutError: appointmentsTimeoutError,
-      } = await masClient.getUserAppointments(res.locals.user.username)
+      } = res.locals.flags?.disableUserAppointments
+        ? { appointments: [], outcomes: [], totalAppointments: 0, totalOutcomes: 0, timeoutError: undefined }
+        : await masClient.getUserAppointments(res.locals.user.username)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
       let enforcementActions: EnforcementContact[] = []
@@ -113,6 +115,7 @@ const homeController: Controller<typeof routes, void> = {
         enforcementActions: enforcementActions ?? [],
         enforcementTimeoutError: enforcementContactResponse.timeoutError,
         appointmentsTimeoutError,
+        disableUserAppointments: res.locals.flags?.disableUserAppointments,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
