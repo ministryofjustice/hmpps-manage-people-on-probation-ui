@@ -39,18 +39,20 @@ const render = (model = {} as Partial<TestModel>) => {
   return cheerio.load(env.render('pages/risk/_rosh.njk', input))
 }
 
-it('should show the rosh warning if enableNDeliusRosh feature flag is enabled', () => {
-  const $ = render()
-  expect($('[data-qa=roshWarning]').find('strong').text()).toContain('Check ROSH in NDelius and OASys')
-  expect($('[data-qa=roshWarning]').find('p').text()).toContain(
-    'MPOP may show the last signed and locked ROSH level rather that the latest risk information.',
-  )
-})
-it('should not show the rosh warning if enableNDeliusRosh feature flag is disabled', () => {
-  const $ = render({
-    flags: {
-      enableNDeliusRosh: false,
-    },
+describe('ROSH widget', () => {
+  it('should show the rosh warning if enableNDeliusRosh feature flag is enabled', () => {
+    const $ = render()
+    expect($('[data-qa=roshWarning]').find('strong').text()).toContain('Check ROSH in NDelius and OASys')
+    expect($('[data-qa=roshWarning]').find('p').text()).toContain(
+      'MPOP may show the last signed and locked ROSH level rather that the latest risk information.',
+    )
   })
-  expect($('[data-qa=roshWarning]').length).toBe(0)
+  it('should not show the rosh warning if enableNDeliusRosh feature flag is disabled', () => {
+    const $ = render({
+      flags: {
+        enableNDeliusRosh: false,
+      },
+    })
+    expect($('[data-qa=roshWarning]').length).toBe(0)
+  })
 })
