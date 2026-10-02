@@ -1,4 +1,34 @@
 [
+    {
+    "heading": "View supervision package information",
+    "summary": "5 October 2026",
+    "whatsNew": [
+      "View supervision package information",
+      [
+        "You can now see a summary of a person on probation’s supervision package on the Overview and Appointment pages. This visualises key information relating to the Independent Sentencing Review (ISR) from 1 October 2026.\n\nClear, contextual information helps you understand appointment expectations and see where someone is within their sentence lifecycle. \n\nYou can view:\neligibility for a supervision package \ntier, including provisional or missing tier  \n appointment progress, including the number of remaining supervision package appointments \n current supervision stage \nupdated information when circumstances change \n \n\n The service also displays variations such as: \n breach or recall\n additional discretionary appointments for women \n Integrated Offender Management (IOM) \n Lifer, extended determinate sentence, and Imprisonment for Public Protection (IPP) cases \n offender personality disorder (OPD) treatment \n"
+      ],
+      "Get improved search results",
+      [
+      "We've added tips to help you search and use the filters. \n\n You can: \n use the 'Match all terms?' filter to narrow or widen your results \n filter results by provider \n see photos in search results, where available \n"
+      ],
+      "Upload JPEGs",
+      [
+        "You can now upload JPEG files (up to 5MB) when you create non-appointment contacts. You can also upload them when editing any contact type, including appointments that have already been created."
+      ],
+      "See outcomes to log from the last 3 months",
+      [
+        "To help you manage your outcomes more efficiently, we now only show appointments that need an outcome from the last 3 months. This helps you focus on recent outstanding outcomes. "
+      ],
+      "Confirm outcomes and arrange the next appointment more easily ",
+      [
+        "Users said it was confusing to arrange the next appointment while logging an appointment outcome. We’ve improved labels and reduced some screens to make the process clearer. \n\n You can also now record an enforcement outcome and arrange the next appointment within the same journey, helping you complete both actions together."
+      ],
+      "Manage pre-sentence appointments on NDelius",
+      [
+        "We do not fully support the range of appointment types and non-enforceable outcomes required for pre-sentence activity. For that reason, we’ve removed pre-sentence appointments from appointment creation and outcome logging. \n\n This means you can manage pre-sentence events on NDelius without moving across systems. "
+      ]
+    ]
+  },
   {
     "heading": "My cases page improvements",
     "summary": "2 September 2026",
