@@ -129,7 +129,7 @@ export interface RiskFlag {
   id: number
   description: string
   levelDescription?: string
-  level?: 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY'
+  level?: RiskFlagLevel
   riskNotes?: Note[]
   riskNote?: Note
   nextReviewDate?: string
@@ -139,6 +139,8 @@ export interface RiskFlag {
   removed: boolean
   removalHistory: RemovalHistory[]
 }
+
+export type RiskFlagLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'VERY HIGH'
 
 export type RiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
 
