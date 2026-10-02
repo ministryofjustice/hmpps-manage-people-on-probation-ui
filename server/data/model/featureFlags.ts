@@ -42,4 +42,5 @@ export class FeatureFlags {
   enableAlertsCountCaching?: boolean = undefined
   enableFeedback?: boolean = undefined
   enableAlertsCountApi?: boolean = undefined
+  disableUserAppointments?: boolean = undefined
 }

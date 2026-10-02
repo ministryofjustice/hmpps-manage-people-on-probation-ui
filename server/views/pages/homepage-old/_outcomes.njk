@@ -63,6 +63,8 @@
     <div class="govuk-!-padding-3 govuk-!-padding-top-1">
         {{ govukTable(tableData) }}
     </div>
+{% elseif disableUserAppointments %}
+    <p class="govuk-body govuk-!-padding-3" data-qa="outcomesFeatureDisabled">Appointments and outcomes are not currently available. You can view them on NDelius.</p>
 {% elseif appointmentsTimeoutError %}
     <p class="govuk-body govuk-!-padding-3" data-qa="outcomesTimeoutError">Outcomes to log are currently unavailable.</p>
 {% else %}
