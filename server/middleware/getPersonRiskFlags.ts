@@ -60,7 +60,7 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
 
     if (res.locals?.flags?.enableNDeliusRosh) {
       const riskScore = personRisks.riskFlags
-        .find(riskFlag => riskFlag.description.toLowerCase().includes('rosh'))
+        ?.find(riskFlag => riskFlag.description.toLowerCase().includes('rosh'))
         ?.description?.toLowerCase()
         .replace('rosh', '')
         .trim()

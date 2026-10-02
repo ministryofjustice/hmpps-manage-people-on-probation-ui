@@ -394,6 +394,19 @@
                   }
                 }
               ]
+            },
+            {
+              "id": 7,
+              "level": "LOW",
+              "description": "Low Rosh",
+              "notes": "Some notes",
+              "createdDate": "2022-12-18",
+              "nextReviewDate": "2024-12-15",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": false
             }
           ]
         },

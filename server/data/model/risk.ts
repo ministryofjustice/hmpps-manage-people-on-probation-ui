@@ -140,7 +140,7 @@ export interface RiskFlag {
   removalHistory: RemovalHistory[]
 }
 
-export type RiskFlagLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'VERY HIGH'
+export type RiskFlagLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY' | 'VERY HIGH'
 
 export type RiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
 
