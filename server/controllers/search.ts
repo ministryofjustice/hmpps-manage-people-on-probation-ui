@@ -33,7 +33,7 @@ const searchController: Controller<typeof routes, void> = {
     return async function getPhoto(req, res) {
       let data: Readable
       const token = await hmppsAuthClient.getSystemClientToken(req.user.username)
-      if (req.params.prisonerId) {
+      if (req.params.prisonerId && res.locals.flags?.enableSearchV2) {
         data = await new PrisonApiClient(token).getImageData(req.params.prisonerId as string)
       }
 
