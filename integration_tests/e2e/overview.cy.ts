@@ -82,14 +82,7 @@ context('Overview', () => {
         page.headerCrn().should('contain.text', 'X000001')
         page.headerName().should('contain.text', 'Caroline Wolff')
         page.pageHeading().should('contain.text', 'Overview')
-        cy.get('[data-test-id=nameAndBand')
-          .should('contain.text', 'RSR')
-          .should('contain.text', 'LOW')
-          .get('[data-test-id=score')
-          .should('contain.text', '0.05%')
-          .get('[data-test-id=staticOrDynamic')
-          .should('contain.text', 'Dynamic')
-        cy.get('[data-test-id=nameAndBand').should('not.contain.text', 'Risk of serious harm')
+        page.assertRiskTags()
       },
     },
     {
