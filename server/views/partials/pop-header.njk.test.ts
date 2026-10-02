@@ -12,6 +12,7 @@ type TestModel = {
   risksWidget: RoshRiskWidgetDto
   riskBadgeData: RiskBadgeData
   riskData: RiskData
+  headerCRN: string
 }
 
 const riskBadgeData: RiskBadgeData = {
@@ -117,6 +118,7 @@ const riskData = (assessments = {} as any): RiskData => ({
 })
 
 const baseModel: TestModel = {
+  headerCRN: 'X000001',
   flags: {
     enableNDeliusRosh: true,
     enablePersonHeader: true,
@@ -172,8 +174,31 @@ describe('POP header', () => {
           .text(),
       ).toContain('HIGH')
     })
+
+    it('should render the ROSH badge from NDelius even when the ARNS combined predictor is NOT APPLICABLE', () => {
+      const $ = render({
+        riskData: riskData({
+          combinedSeriousReoffendingPredictor: {
+            name: 'Combined serious reoffending predictor',
+            band: 'NOT APPLICABLE',
+          },
+        }),
+      })
+      expect(
+        $('.pop-header-risk-badges').find('[data-badge-base="Risk of serious harm HIGH"]').find('span').text(),
+      ).toContain('Risk of serious harm')
+      expect(
+        $('.pop-header-risk-badges').find('[data-badge-base="Combined serious reoffending predictor NOT APPLICABLE"]')
+          .length,
+      ).toBe(0)
+    })
+
+    it('should not render a ROSH badge when rosh.level is undefined', () => {
+      const $ = render({ rosh: { level: undefined } })
+      expect($('.pop-header-risk-badges').find('[data-badge-base^="Risk of serious harm"]').length).toBe(0)
+    })
   })
-  describe('enableNDeliusRosh featur flag is disabled', () => {
+  describe('enableNDeliusRosh feature flag is disabled', () => {
     it(`should render the ROSH badge with 'Risk of serious harm' label and ARNS data`, () => {
       const $ = render({ flags: { ...baseModel.flags, enableNDeliusRosh: false } })
       expect(
@@ -204,6 +229,62 @@ describe('POP header', () => {
       expect(
         $('.pop-header-risk-badges').find('[data-badge-base="ROSH MEDIUM"]').find('span').find('strong').text(),
       ).toContain('MEDIUM')
+    })
+
+    it(`should render the ROSH badge with a 'VERY HIGH' label when overallRisk is VERY_HIGH`, () => {
+      const $ = render({
+        flags: { ...baseModel.flags, enableNDeliusRosh: false },
+        risksWidget: { ...baseModel.risksWidget, overallRisk: 'VERY_HIGH' },
+      })
+      expect(
+        $('.pop-header-risk-badges')
+          .find('[data-badge-base="Risk of serious harm VERY HIGH"]')
+          .hasClass('arns-badge-base--very-high'),
+      ).toBe(true)
+      expect(
+        $('.pop-header-risk-badges')
+          .find('[data-badge-base="Risk of serious harm VERY HIGH"]')
+          .find('span')
+          .find('strong')
+          .text(),
+      ).toContain('VERY HIGH')
+    })
+
+    it('should not render any badges when the ARNS combined predictor is NOT APPLICABLE', () => {
+      const $ = render({
+        flags: { ...baseModel.flags, enableNDeliusRosh: false },
+        riskData: riskData({
+          combinedSeriousReoffendingPredictor: {
+            name: 'Combined serious reoffending predictor',
+            band: 'NOT APPLICABLE',
+          },
+        }),
+      })
+      expect($('.pop-header-risk-badges').find('[data-badge-base]').length).toBe(0)
+    })
+  })
+
+  describe('risk flag badges', () => {
+    it('should render a link for each risk flag badge', () => {
+      const $ = render()
+      riskBadgeData.groups[0].badges.forEach(badge => {
+        const link = $(`[data-qa="risk-badge-${badge.id}"]`)
+        expect(link.attr('href')).toBe(`/case/${baseModel.headerCRN}/risk/flag/${badge.id}`)
+        expect(link.find('.moj-badge').hasClass(badge.badgeClass)).toBe(true)
+        expect(link.text()).toContain(badge.text)
+      })
+    })
+
+    it('should not render a "+N active risk flags" link when remainingCount is 0', () => {
+      const $ = render()
+      expect($('[data-qa="risk-badge-more"]').length).toBe(0)
+    })
+
+    it('should render a "+N active risk flags" link when remainingCount is greater than 0', () => {
+      const $ = render({ riskBadgeData: { ...riskBadgeData, remainingCount: 3 } })
+      const link = $('[data-qa="risk-badge-more"]')
+      expect(link.attr('href')).toBe(`/case/${baseModel.headerCRN}/risk`)
+      expect(link.text().trim()).toBe('+3 active risk flags')
     })
   })
 })

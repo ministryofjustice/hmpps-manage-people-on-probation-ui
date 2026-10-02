@@ -25,9 +25,9 @@ import { Option } from './Option'
 import { Errors } from './Errors'
 import {
   PersonRiskFlags,
-  RiskFlagLevel,
   RiskScore,
   RiskSummary,
+  RoshBadgeLevel,
   RoshRiskWidgetDto,
   TimelineItem,
 } from '../data/model/risk'
@@ -138,7 +138,7 @@ interface Locals {
   personRiskFlags?: PersonRiskFlags
   riskBadgeData?: RiskBadgeData
   risksWidget?: RoshRiskWidgetDto
-  rosh?: { level: RiskFlagLevel }
+  rosh?: { level: RoshBadgeLevel }
   tierCalculation?: TierCalculation | ErrorSummary
   tierDetails?: LatestTierResponse
   tierChangePrompt?: TierChangePrompt

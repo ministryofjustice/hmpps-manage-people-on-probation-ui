@@ -73,13 +73,20 @@
                 showScore: true
             })}}
 {% endif %}
-{% if overallRisk and overallRisk !== 'NOT_FOUND' %}
+{% if not flags.enableNDeliusRosh and overallRisk and overallRisk !== 'NOT_FOUND' %}
 {{ predictorBadge({
     data: riskDataRosh,
     predictor: 'rosh',
     showScore: false
  })}}
 {% endif %}
+{% endif %}
+{% if flags.enableNDeliusRosh and overallRisk and overallRisk !== 'NOT_FOUND' %}
+{{ predictorBadge({
+    data: riskDataRosh,
+    predictor: 'rosh',
+    showScore: false
+ })}}
 {% endif %}
 {% endset %}
 

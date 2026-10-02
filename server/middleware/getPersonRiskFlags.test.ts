@@ -224,4 +224,42 @@ describe('middleware/getPersonRiskFlags', () => {
     await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
     expect(mockRes.locals.rosh).toEqual({ level: 'HIGH' })
   })
+
+  it('should assign a VERY HIGH level to res.locals.rosh when the matching risk flag description is Very High ROSH', async () => {
+    const veryHighRisks = {
+      ...mockFormattedRisks,
+      riskFlags: [{ id: 1, description: 'Very High ROSH', levelDescription: 'High' }],
+    }
+    mockFindReplace.mockImplementationOnce(() => veryHighRisks).mockImplementationOnce(() => veryHighRisks)
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    const mockRes = createResponse({ enableNDeliusRosh: true })
+    await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
+    expect(mockRes.locals.rosh).toEqual({ level: 'VERY HIGH' })
+  })
+
+  it('should not throw and should set res.locals.rosh.level to undefined when enableNDeliusRosh is enabled and riskFlags is absent', async () => {
+    getPersonRiskFlagsSpy.mockResolvedValueOnce({
+      ...mockRisks,
+      riskFlags: undefined,
+    } as PersonRiskFlags)
+    mockFindReplace.mockImplementation(data => data as Partial<PersonRiskFlags>)
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    const mockRes = createResponse({ enableNDeliusRosh: true })
+    await expect(getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)).resolves.not.toThrow()
+    expect(mockRes.locals.rosh).toEqual({ level: undefined })
+  })
 })

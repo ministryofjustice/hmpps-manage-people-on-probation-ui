@@ -140,7 +140,11 @@ export interface RiskFlag {
   removalHistory: RemovalHistory[]
 }
 
-export type RiskFlagLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY' | 'VERY HIGH'
+export type RiskFlagLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY'
+
+// The derived ROSH badge level shown in headers/widgets; 'VERY HIGH' is derived from a risk
+// flag's description rather than a value the API returns for RiskFlag.level.
+export type RoshBadgeLevel = RiskFlagLevel | 'VERY HIGH'
 
 export type RiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
 
