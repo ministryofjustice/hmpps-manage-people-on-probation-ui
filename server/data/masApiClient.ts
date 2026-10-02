@@ -83,9 +83,6 @@ export default class MasApiClient extends RestClient {
     super('Manage a Supervision API', config.apis.masApi, token)
   }
 
-  /**
-   * @deprecated use DeliusClient.getHomepage
-   */
   async getUserAppointments(username: string): Promise<UserAppontment> {
     return this.get({ path: `/user/${username}/appointments`, handleTimeout: true })
   }
