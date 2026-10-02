@@ -1,3 +1,4 @@
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% macro getOverallRiskLevelClass(level) %}
     {% if level == 'VERY_HIGH' %}
         rosh-widget--very-high
@@ -41,8 +42,23 @@
     {% endif %}
 {% endmacro %}
 
+{% set warning = '' %}
+{% if flags.enableNDeliusRosh %}
+    {% set warning %}
+    <div data-qa="roshWarning">
+        {{ govukWarningText({
+            classes: "govuk-!-margin-bottom-2",
+            text: "Check ROSH in NDelius and OASys",
+            iconFallbackText: "Warning"
+        }) }}    
+        <p class="govuk-body">MPOP may show the last signed and locked ROSH level rather than the latest risk information.</p>
+    </div>
+    {% endset %}
+{% endif %}
+
 {% if not risksWidget.overallRisk or risksWidget.overallRisk == 'NOT_FOUND' %}
     <div class="rosh-widget rosh-widget--unknown">
+        {{ warning | safe }}
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m">
             <strong>UNKNOWN</strong> ROSH</h{{ scoresHeadingLevel | default('3') }}>
         <p class="govuk-body-m">Risk of serious harm<br>
@@ -51,6 +67,7 @@
 
 {% elif risksWidget.overallRisk == 'UNAVAILABLE' %}
     <div class="rosh-widget rosh-widget--unavailable">
+        {{ warning | safe }}
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m">
             <strong>UNKNOWN</strong> ROSH</h{{ scoresHeadingLevel | default('3') }}>
         <p class="govuk-body-m">Risk of serious harm<br>
@@ -59,6 +76,7 @@
 
 {% else %}
     <div class="rosh-widget {{ getOverallRiskLevelClass(risksWidget.overallRisk) }}">
+        {{ warning | safe }}
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m" data-qa="overallRiskValue">
             <strong>{{ getRiskLevelText(risksWidget.overallRisk) | upper }}</strong> ROSH</h{{ scoresHeadingLevel | default('3') }}>
         <p class="govuk-body-m">Risk of serious harm<br>

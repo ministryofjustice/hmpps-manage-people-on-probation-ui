@@ -1,7 +1,7 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
+import { PersonRiskFlags, RiskFlag, RiskScore, RoshBadgeLevel } from '../data/model/risk'
 import { setDataValue, findReplace, getStaffRisk, getProbationRisk } from '../utils'
 import { getRiskBadgeGroups, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
@@ -57,8 +57,22 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       }
       return item
     })
+
+    if (res.locals?.flags?.enableNDeliusRosh) {
+      const riskScore = personRisks.riskFlags
+        ?.filter(riskFlag => !riskFlag.removed)
+        ?.find(riskFlag => riskFlag.description.toLowerCase().includes('rosh'))
+        ?.description?.toLowerCase()
+        .replace('rosh', '')
+        .trim()
+        .toUpperCase() as RoshBadgeLevel
+      res.locals.rosh = {
+        level: riskScore,
+      }
+    }
     res.locals.personRisks = personRisks
     res.locals.riskBadgeData = riskBadgeData
+
     return next()
   }
 }
