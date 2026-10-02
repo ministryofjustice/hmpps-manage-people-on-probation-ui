@@ -19,6 +19,10 @@ const render = (params: Record<string, unknown> = {}) =>
 
 const verifiedCheckin = { status: 'VERIFIED', firstCheckin: '2025-11-03' }
 
+// govukSummaryList appends the card title to action links as visually hidden text
+const visibleLinkText = ($: cheerio.CheerioAPI) =>
+  $('[data-qa="checkinCard"] a').clone().find('.govuk-visually-hidden').remove().end().text().trim()
+
 describe('appOnlineCheckinsCard', () => {
   it('renders the card', () => {
     const $ = render()
@@ -31,7 +35,7 @@ describe('appOnlineCheckinsCard', () => {
       const $ = render({ checkin: verifiedCheckin, upcomingCheckinDate: '2025-11-10' })
       expect($('[data-qa="nextCheckinDueLabel"]').text()).toBe('Next online check in')
       expect($('[data-qa="nextCheckInValue"]').text()).toBe('10 November 2025')
-      expect($('[data-qa="checkinCard"] a').text().trim()).toBe('Manage online check ins')
+      expect(visibleLinkText($)).toBe('Manage online check ins')
       expect($('[data-qa="checkinCard"] a').attr('href')).toBe(manageHref)
     })
 
@@ -48,7 +52,7 @@ describe('appOnlineCheckinsCard', () => {
     ])('shows the eligibility message and the set up link when %s', (_, checkin) => {
       const $ = render({ checkin })
       expect($('[data-qa="checkinDueValue"]').text()).toBe(eligible.message)
-      expect($('[data-qa="checkinCard"] a').text().trim()).toBe('Set up online check ins')
+      expect(visibleLinkText($)).toBe('Set up online check ins')
       expect($('[data-qa="checkinCard"] a').attr('href')).toBe(setupHref)
     })
 
@@ -68,7 +72,7 @@ describe('appOnlineCheckinsCard', () => {
   it('shows check ins stopped and the view details link when check ins are inactive', () => {
     const $ = render({ checkin: { status: 'INACTIVE' } })
     expect($('[data-qa="checkinDueValue"]').text()).toBe('Check ins stopped')
-    expect($('[data-qa="checkinCard"] a').text().trim()).toBe('View all online check in details')
+    expect(visibleLinkText($)).toBe('View all online check in details')
     expect($('[data-qa="checkinCard"] a').attr('href')).toBe(manageHref)
   })
 
