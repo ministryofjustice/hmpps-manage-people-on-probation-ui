@@ -374,6 +374,26 @@ describe('homeController', () => {
           }),
         )
       })
+
+      it('should not call getUserAppointments and should render empty collections when disableUserAppointments is set', async () => {
+        const resOld = mockAppResponse({ flags: { enableDeliusClient: false, disableUserAppointments: true } })
+        const renderSpyOld = jest.spyOn(resOld, 'render')
+        const getUserAppointmentsSpy = jest.spyOn(MasApiClient.prototype, 'getUserAppointments')
+
+        await controllers.home.getHomeOld(hmppsAuthClient)(req, resOld)
+
+        expect(getUserAppointmentsSpy).not.toHaveBeenCalled()
+        expect(renderSpyOld).toHaveBeenCalledWith(
+          'pages/homepage-old/homepage',
+          expect.objectContaining({
+            appointments: [],
+            outcomes: [],
+            totalAppointments: 0,
+            totalOutcomes: 0,
+            disableUserAppointments: true,
+          }),
+        )
+      })
     })
 
     describe('GET /sentry-test-error', () => {
