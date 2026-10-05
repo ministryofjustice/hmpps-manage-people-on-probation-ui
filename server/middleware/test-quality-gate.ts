@@ -1,4 +1,17 @@
-export const qualityGateSecurityTest = (): number => {
-  const result = eval('1 + 1')
-  return result
+import crypto from 'crypto'
+
+export const testQualityGate = () => {
+  const url = 'http://example.com/api'
+
+  return fetch(url)
+}
+
+export const testQualityGateCrypto = () => {
+  return crypto.createHash('md5').update('test-value').digest('hex')
+}
+
+export const testQualityGatePassword = () => {
+  const password = 'TestPassword123!'
+
+  return password
 }
