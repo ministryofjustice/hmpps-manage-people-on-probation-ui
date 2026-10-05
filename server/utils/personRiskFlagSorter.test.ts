@@ -398,9 +398,7 @@ describe('utils/getRiskBadgeGroups', () => {
 
       const result = getRiskBadgeGroups(riskFlags)
 
-      expect(result.groups[0].badges.map(badge => badge.text)).toEqual([
-        'Risk to public - High'
-      ])
+      expect(result.groups[0].badges.map(badge => badge.text)).toEqual(['Risk to public - High'])
     })
   })
 
