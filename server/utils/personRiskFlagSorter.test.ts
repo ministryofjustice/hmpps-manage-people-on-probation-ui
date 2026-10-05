@@ -8,6 +8,7 @@ describe('utils/getRiskBadgeGroups', () => {
       id: 1,
       description: 'Risk to Public',
       level: 'HIGH',
+      levelDescription: 'HIGH',
       removed: false,
       ...overrides,
     }) as RiskFlag
@@ -18,7 +19,7 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
           removed: false,
         }),
         createRiskFlag({
@@ -49,22 +50,22 @@ describe('utils/getRiskBadgeGroups', () => {
   })
 
   describe('sorts risk flags', () => {
-    it('sorts by severity with high before medium and low', () => {
+    it('sorts Public Protection risk flags by levelDescription', () => {
       const riskFlags = [
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
-          level: 'LOW',
+          levelDescription: 'LOW',
         }),
         createRiskFlag({
           id: 2,
           description: 'Risk to Public',
-          level: 'MEDIUM',
+          levelDescription: 'MEDIUM',
         }),
         createRiskFlag({
           id: 3,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
       ]
 
@@ -107,6 +108,33 @@ describe('utils/getRiskBadgeGroups', () => {
       ])
     })
 
+    it('uses level for non-Public Protection risk flags', () => {
+      const riskFlags = [
+        createRiskFlag({
+          id: 1,
+          description: 'Child Concerns',
+          level: 'LOW',
+          levelDescription: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 2,
+          description: 'Alert Notice',
+          level: 'MEDIUM',
+          levelDescription: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 3,
+          description: 'Domestic Abuse Perpetrator',
+          level: 'HIGH',
+          levelDescription: 'LOW',
+        }),
+      ]
+
+      const result = getRiskBadgeGroups(riskFlags)
+
+      expect(result.groups.map(group => group.severity)).toEqual(['HIGH', 'MEDIUM', 'LOW'])
+    })
+
     it('sorts by register description when severity is the same', () => {
       const riskFlags = [
         createRiskFlag({
@@ -117,7 +145,7 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: 2,
           description: 'Risk to Known Adult',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
         createRiskFlag({
           id: 3,
@@ -131,20 +159,21 @@ describe('utils/getRiskBadgeGroups', () => {
       expect(result.groups).toHaveLength(1)
 
       expect(result.groups[0].badges.map(badge => badge.text)).toEqual([
+        'Weapons',
         'Risk to known adult - High',
-        'Weapons - High',
         'Alert notice',
       ])
     })
   })
 
   describe('formats badge text', () => {
-    it('adds the risk level to Public Protection risk flags', () => {
+    it('uses levelDescription for Public Protection risk flags', () => {
       const result = getRiskBadgeGroups([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
-          level: 'MEDIUM',
+          level: 'LOW',
+          levelDescription: 'HIGH',
         }),
         createRiskFlag({
           id: 2,
@@ -158,33 +187,29 @@ describe('utils/getRiskBadgeGroups', () => {
           severity: 'HIGH',
           badges: [
             {
-              id: 2,
-              text: 'Risk to probation staff - High',
+              id: 1,
+              text: 'Risk to public - High',
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
-          ],
-        },
-        {
-          severity: 'MEDIUM',
-          badges: [
             {
-              id: 1,
-              text: 'Risk to public - Medium',
-              level: 'MEDIUM',
-              badgeClass: 'risk-badge--medium',
+              id: 2,
+              text: 'Risk to probation staff',
+              level: 'HIGH',
+              badgeClass: 'risk-badge--high',
             },
           ],
         },
       ])
     })
 
-    it('does not add the risk level for non-Public Protection risk flags', () => {
+    it('uses level and not levelDescription for non-Public Protection risk flags', () => {
       const result = getRiskBadgeGroups([
         createRiskFlag({
           id: 1,
           description: 'Child Concerns',
           level: 'MEDIUM',
+          levelDescription: 'HIGH',
         }),
       ])
 
@@ -203,7 +228,8 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
-          level: 'HIGH',
+          level: 'LOW',
+          levelDescription: 'HIGH',
         }),
         createRiskFlag({
           id: 2,
@@ -229,7 +255,7 @@ describe('utils/getRiskBadgeGroups', () => {
             },
             {
               id: 2,
-              text: 'Risk to probation staff - High',
+              text: 'Risk to probation staff',
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
@@ -254,17 +280,17 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
-          level: 'LOW',
+          levelDescription: 'LOW',
         }),
         createRiskFlag({
           id: 2,
           description: 'Risk to Public',
-          level: 'MEDIUM',
+          levelDescription: 'MEDIUM',
         }),
         createRiskFlag({
           id: 3,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
       ])
 
@@ -278,7 +304,7 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: index + 1,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
       )
 
@@ -295,7 +321,7 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: index + 1,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
       )
 
@@ -309,7 +335,7 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: index + 1,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
       )
 
@@ -320,12 +346,13 @@ describe('utils/getRiskBadgeGroups', () => {
   })
 
   describe('handles missing risk level', () => {
-    it('defaults the severity to LOW', () => {
+    it('defaults Public Protection severity to LOW when levelDescription is missing', () => {
       const result = getRiskBadgeGroups([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
           level: undefined,
+          levelDescription: undefined,
         }),
       ])
 
@@ -365,7 +392,7 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: 2,
           description: 'Risk to Public',
-          level: 'HIGH',
+          levelDescription: 'HIGH',
         }),
       ]
 
@@ -394,7 +421,8 @@ describe('utils/getRiskBadgeGroups', () => {
         createRiskFlag({
           id: 2501006590,
           description: 'Risk to Public',
-          level: 'MEDIUM',
+          level: 'LOW',
+          levelDescription: 'MEDIUM',
         }),
       ]
 
@@ -405,7 +433,7 @@ describe('utils/getRiskBadgeGroups', () => {
             badges: [
               {
                 id: 2501007540,
-                text: 'Risk to probation staff - High',
+                text: 'Risk to probation staff',
                 level: 'HIGH',
                 badgeClass: 'risk-badge--high',
               },
@@ -432,5 +460,30 @@ describe('utils/getRiskBadgeGroups', () => {
         remainingCount: 0,
       })
     })
+  })
+
+  it('displays the MAPPA level from levelDescription', () => {
+    const result = getRiskBadgeGroups([
+      createRiskFlag({
+        id: 1,
+        description: 'MAPPA',
+        level: 'HIGH',
+        levelDescription: 'MAPPA Level 3',
+      }),
+    ])
+
+    expect(result.groups).toEqual([
+      {
+        severity: 'HIGH',
+        badges: [
+          {
+            id: 1,
+            text: 'MAPPA - Level 3',
+            level: 'HIGH',
+            badgeClass: 'risk-badge--high',
+          },
+        ],
+      },
+    ])
   })
 })

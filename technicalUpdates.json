@@ -30,6 +30,20 @@
     ]
   },
   {
+    "heading": "Tiering service outage",
+    "summary": "2 October 2026",
+    "whatsNew": [
+      "Tiering service outage",
+      [
+        "The tiering service information will be unavailable via MPOP and NDelius between 9am and 11am on Sunday 4 October 2026. \nOvernight system updates placed significant load on the databases, resulting in serious performance issues. To fix these issues, the tiering service will be unavailable for 2 hours. "
+      ],
+      "How this affects you",
+      [
+        "\nMPOP, NDelius and OASys will remain available. \nIn MPoP, tiering information will not be available while the service is offline. \n In NDelius, any changes that would normally trigger a tier recalculation will not display an updated tier during this time. Tier information will be updated once the service is restored.  \n \n\n This change is scheduled for Sunday to minimise disruption to operational delivery.\n"
+      ]
+    ]
+  },
+  {
     "heading": "My cases page improvements",
     "summary": "2 September 2026",
     "whatsNew": [

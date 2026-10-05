@@ -108,9 +108,9 @@ export const getPersonalDetails = (
           riskData = null as unknown as RiskData
         }
       }
-      if (overview.noms) {
+      if (res.locals.flags?.enablePersonHeader && overview.noms) {
         const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => {
-          if (isolateApiFailures) prisonsUnavailable = true
+          prisonsUnavailable = true
           return null
         })
         personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : undefined

@@ -348,6 +348,7 @@ describe('masApiClient', () => {
       ],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
       ['getUserAlertsCount', '/alerts', () => masApiClient.getUserAlertsCount()],
+      ['getUserAlertsCountV2', '/alerts/count', () => masApiClient.getUserAlertsCountV2()],
       [
         'getUserAlerts (full params)',
         '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',
