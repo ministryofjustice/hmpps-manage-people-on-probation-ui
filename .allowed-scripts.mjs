@@ -7,7 +7,7 @@ export default configureAllowedScripts({
     // Needed to interface with Sentry for app monitoring
     'node_modules/@sentry/cli@3.8.0': 'ALLOW',
     // Provides capabilities for integration testing
-    'node_modules/cypress@16.1.0': 'ALLOW',
+    'node_modules/cypress@16.1.1': 'ALLOW',
     // Provides native integration, supporting ability to write dtrace probes for bunyan
     'node_modules/dtrace-provider@0.8.8': 'ALLOW',
     // ESBuild is written in GoLang - this is needed to download prebuilt binaries for the specific platform
