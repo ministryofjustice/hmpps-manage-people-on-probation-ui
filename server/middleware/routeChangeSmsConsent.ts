@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { setDataValue, toIsoDateFromPicker } from '../utils'
 
 export const routeChangeSmsConsent = (req: Request, res: Response, next: NextFunction) => {
-  const { body, url, query } = req
+  const { body, url, query, baseUrl } = req
   const { crn, id } = req.params as Record<string, string>
   if (body?.['submit-btn'] === '') {
     return next()
