@@ -6,10 +6,6 @@ export const testQualityGate = () => {
   return fetch(url)
 }
 
-export const testQualityGateCrypto = () => {
-  return crypto.createHash('md5').update('test-value').digest('hex')
-}
-
 export const testQualityGatePassword = () => {
   const password = 'TestPassword123!'
 

@@ -1,5 +1,4 @@
-import crypto from 'crypto'
-import { testQualityGate, testQualityGateCrypto, testQualityGatePassword } from './test-quality-gate'
+import { testQualityGate, testQualityGatePassword } from './test-quality-gate'
 
 describe('quality gate tests', () => {
   describe('testQualityGate', () => {
@@ -12,16 +11,6 @@ describe('quality gate tests', () => {
 
       expect(fetch).toHaveBeenCalledWith('http://example.com/api')
       expect(result).toBe(mockResponse)
-    })
-  })
-
-  describe('testQualityGateCrypto', () => {
-    it('returns the MD5 hash of the test value', () => {
-      const result = testQualityGateCrypto()
-
-      const expected = crypto.createHash('md5').update('test-value').digest('hex')
-
-      expect(result).toBe(expected)
     })
   })
 
