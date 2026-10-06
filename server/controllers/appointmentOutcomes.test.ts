@@ -350,7 +350,9 @@ describe('controllers/appointmentOutcomes', () => {
     it('should render the page if upload not successful when postAddNote is called', async () => {
       const file = new File(['file contents'], 'avatar.png', { type: 'image/png' })
       isSuccessfulUploadSpy.mockReturnValueOnce(false)
-      const req = mockReq({ request: { file, body: { notes: 'Some notes', sensitive: 'no' } } })
+      const req = mockReq({
+        request: { file, body: { appointments: { [crn]: { [contactId]: { notes: 'Some notes', sensitive: 'no' } } } } },
+      })
       const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const renderSpy = jest.spyOn(res, 'render')
       const patchDocumentsSpy = jest

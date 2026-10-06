@@ -209,6 +209,7 @@ interface Locals {
   searchResponse?: ProbationSearchResponse
   searchRequest?: ProbationSearchRequest
   searchResults?: ProbationSearchResults
+  notes?: boolean
 }
 
 export interface AppointmentOutcomeSentence {

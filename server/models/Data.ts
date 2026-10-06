@@ -46,6 +46,13 @@ export interface Data {
       responseContactId?: string
     }
   }
+  note?: {
+    [crn: string]: {
+      [id: string]: {
+        noteAdded?: boolean
+      }
+    }
+  }
   appointments?: {
     [crn: string]: {
       [id: string]: AppointmentSession
