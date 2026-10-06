@@ -71,5 +71,16 @@ export interface QueriesResponse {
 
 export interface SentencePlanResult {
   hasPlan: boolean
+  hasAgreedPlan: boolean
   lastUpdatedDate: string
+}
+
+// Helpers
+
+export function unwrapSingleValue(wrapped: Values | undefined): string | undefined {
+  if (!wrapped) {
+    return undefined
+  }
+
+  return wrapped.type === 'Single' ? wrapped.value : undefined
 }

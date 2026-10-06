@@ -1,7 +1,9 @@
 import config from '../config'
 import RestClient from './restClient'
-import { QueriesRequest, QueriesResponse, SentencePlanResult } from './model/arnsAssessmentPlatform'
+import { QueriesRequest, QueriesResponse, SentencePlanResult, unwrapSingleValue } from './model/arnsAssessmentPlatform'
 import logger from '../../logger'
+
+const DRAFT_STATUS = 'DRAFT'
 
 export default class ArnsAssessmentPlatformApiClient extends RestClient {
   constructor(token: string) {
@@ -36,7 +38,22 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
         return null
       }
 
-      return { hasPlan: true, lastUpdatedDate: result.updatedAt }
+      const planAgreementsCollection = result.collections?.find(c => c.name === 'PLAN_AGREEMENTS')
+      if (!planAgreementsCollection?.items?.length) {
+        return { hasPlan: true, hasAgreedPlan: false, lastUpdatedDate: result.updatedAt }
+      }
+
+      const sortedItems = [...planAgreementsCollection.items].sort((a, b) => {
+        const dateA = unwrapSingleValue(a.properties?.status_date) ?? ''
+        const dateB = unwrapSingleValue(b.properties?.status_date) ?? ''
+
+        return dateB.localeCompare(dateA)
+      })
+
+      const latestStatus = unwrapSingleValue(sortedItems[0].properties?.status)
+      const hasAgreedPlan = !!latestStatus && latestStatus !== DRAFT_STATUS
+
+      return { hasPlan: true, hasAgreedPlan, lastUpdatedDate: result.updatedAt }
     } catch (error) {
       logger.error(error.name, 'Failed to get sentence plan from Assessment Platform API')
 
