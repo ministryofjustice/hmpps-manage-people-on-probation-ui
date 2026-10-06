@@ -64,7 +64,7 @@
       {% if flags.enableSmsReminders == true %}
         {% if smsSent %}
           {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
-            <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} should receive a confirmation text message within a few minutes with the appointment details.</p>
+            <p class="govuk-body" data-qa="sms-confirmation-msg">We’ll send {{ case.name.forename | convertToTitleCase }} a confirmation text message with the appointment details.</p>
           {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
             {{ mojAlert({
               variant: "warning",
