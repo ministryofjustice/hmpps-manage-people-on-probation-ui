@@ -1,6 +1,7 @@
 {% from "mpop/components/pop-header/macro.njk" import popHeader %}
 {% from "mpop/components/person-header/macro.njk" import personHeader %}
 {%- from "moj/components/badge/macro.njk" import mojBadge -%}
+{% from "arns/components/predictor-badge/macro.njk" import predictorBadge %}
 
 {% set calculation = tierDetails.calculation %}
 
@@ -32,21 +33,21 @@
     }) }}
 {% endif %}
 
-{% set overallRisk = risksWidget.overallRisk %}
-{% if overallRisk == 'VERY_HIGH' %}
-    {% set overallRisk = 'VERY HIGH' %}
+{% set overallRisk = rosh.level if flags.enableNDeliusRosh else risksWidget.overallRisk %}
+{% set riskName = 'Risk of serious harm' %}
+{% if not flags.enableNDeliusRosh %}
+    {% set riskName = 'ROSH' if riskData.assessments[0].rsr.band else 'Risk of serious harm' %}
+    {% if overallRisk == 'VERY_HIGH' %}
+        {% set overallRisk = 'VERY HIGH' %}
+    {% endif %}
 {% endif %}
 {% set riskDataRosh = {
     assessments: [
         {
             rosh: {
-                name: 'ROSH' if riskData
-                    .assessments[0]
-                    .rsr
-                    .band else
-                        'Risk of serious harm',
-                        band: overallRisk
-                }
+                name: riskName,
+                band: overallRisk
+            }
         }
     ]
 } %}
@@ -72,14 +73,20 @@
                 showScore: true
             })}}
 {% endif %}
-
-{% if overallRisk and overallRisk !== 'NOT_FOUND' %}
+{% if not flags.enableNDeliusRosh and overallRisk and overallRisk !== 'NOT_FOUND' %}
 {{ predictorBadge({
-                data: riskDataRosh,
-                predictor: 'rosh',
-                showScore: false
-            })}}
+    data: riskDataRosh,
+    predictor: 'rosh',
+    showScore: false
+ })}}
 {% endif %}
+{% endif %}
+{% if flags.enableNDeliusRosh and overallRisk and overallRisk !== 'NOT_FOUND' %}
+{{ predictorBadge({
+    data: riskDataRosh,
+    predictor: 'rosh',
+    showScore: false
+ })}}
 {% endif %}
 {% endset %}
 

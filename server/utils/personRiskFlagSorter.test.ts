@@ -398,10 +398,7 @@ describe('utils/getRiskBadgeGroups', () => {
 
       const result = getRiskBadgeGroups(riskFlags)
 
-      expect(result.groups[0].badges.map(badge => badge.text)).toEqual([
-        'Risk to public - High',
-        'Some unexpected risk',
-      ])
+      expect(result.groups[0].badges.map(badge => badge.text)).toEqual(['Risk to public - High'])
     })
   })
 
@@ -478,12 +475,42 @@ describe('utils/getRiskBadgeGroups', () => {
         badges: [
           {
             id: 1,
-            text: 'Mappa - Level 3',
+            text: 'MAPPA - Level 3',
             level: 'HIGH',
             badgeClass: 'risk-badge--high',
           },
         ],
       },
     ])
+  })
+
+  it('ignores risk flags with descriptions that are not in the supported register types', () => {
+    const riskFlags = [
+      {
+        id: 1,
+        description: 'Risk to Public',
+        removed: false,
+        levelDescription: 'High',
+      },
+      {
+        id: 2,
+        description: 'Some unsupported risk',
+        removed: false,
+        levelDescription: 'High',
+      },
+      {
+        id: 3,
+        description: 'Risk to Children',
+        removed: false,
+        levelDescription: 'Medium',
+      },
+    ] as RiskFlag[]
+
+    const result = getRiskBadgeGroups(riskFlags)
+
+    const badgeIds = result.groups.flatMap(group => group.badges.map(badge => badge.id))
+
+    expect(badgeIds).toEqual([1, 3])
+    expect(result.remainingCount).toBe(0)
   })
 })

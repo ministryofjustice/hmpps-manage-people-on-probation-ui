@@ -6,11 +6,9 @@
         <a id="feedbackYes" href="{{ "https://www.smartsurvey.co.uk/s/TPWESZ/?url=" + pageUrl }}" class="govuk-button govuk-button--secondary" target="_blank">Yes (opens in new tab)</a>
         <a id="feedbackNo" href="{{ "https://www.smartsurvey.co.uk/s/XODLID/?url=" + pageUrl }}" class="govuk-button govuk-button--secondary" target="_blank">No (opens in new tab)</a>
         </div>
-        {% if flags.enableFeedback %}
-            <div class="feedback-container-inner">
-            <a id="reportProblem" href="{{ "https://mojprod.service-now.com/moj_sp?id=sc_cat_item&table=sc_cat_item&sys_id=8543b8e2fb0b03d47e6afa42aeefdc71&recordUrl=" + pageUrl }}" class="govuk-button govuk-button--secondary" target="_blank">Get help with an issue or question (opens in new tab)</a>
-            </div>
-        {% endif %}
+        <div class="feedback-container-inner">
+        <a id="reportProblem" href="{{ "https://mojprod.service-now.com/moj_sp?id=sc_cat_item&table=sc_cat_item&sys_id=8543b8e2fb0b03d47e6afa42aeefdc71&recordUrl=" + pageUrl }}" class="govuk-button govuk-button--secondary" target="_blank">Get help with an issue or question (opens in new tab)</a>
+        </div>
     </h2>
     </div>
 </div>

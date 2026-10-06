@@ -7,11 +7,7 @@
     {% include "./_fallback_prob_fe_header.njk" %}
 {% endif %}
 {% if not hideUpdateAndUserNav %}
-    {% if flags.enableFeedback %}
-        {% set htmlText = 'This is a new service - your <a class="govuk-link" href="https://www.smartsurvey.co.uk/t/AAGPPN?service=Manage%20people%20on%20probation" target="_blank" rel="noopener noreferrer">feedback (opens in new tab)</a> will help us improve it. <a class="govuk-link" href="https://mojprod.service-now.com/moj_sp?id=sc_cat_item&table=sc_cat_item&sys_id=8543b8e2fb0b03d47e6afa42aeefdc71&recordUrl=' + pageUrl + '" target="_blank" rel="noopener noreferrer">Get help with an issue or question (opens in new tab)</a>' %}
-    {% else %}
-        {% set htmlText = 'This is a new service - your <a class="govuk-link" href="https://www.smartsurvey.co.uk/t/AAGPPN?service=Manage%20people%20on%20probation" target="_blank" rel="noopener noreferrer">feedback (opens in new tab)</a> will help us improve it.' %}
-    {% endif %}
+    {% set htmlText = 'This is a new service - your <a class="govuk-link" href="https://www.smartsurvey.co.uk/t/AAGPPN?service=Manage%20people%20on%20probation" target="_blank" rel="noopener noreferrer">feedback (opens in new tab)</a> will help us improve it. <a class="govuk-link" href="https://mojprod.service-now.com/moj_sp?id=sc_cat_item&table=sc_cat_item&sys_id=8543b8e2fb0b03d47e6afa42aeefdc71&recordUrl=' + pageUrl + '" target="_blank" rel="noopener noreferrer">Get help with an issue or question (opens in new tab)</a>' %}
     {{ govukPhaseBanner({
       tag: {
         text: "Beta"
