@@ -137,9 +137,12 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% if noteAdded !== undefined %}
       {{ mojAlert({
           variant: "success" if noteAdded else "error",
-          title: "Notes added" if noteAdded else "Notes could not be added",
+          html: "<b>Notes added</b>" if noteAdded else "<b>Notes could not be added</b>",
           showTitleAsHeading: true,
-          dismissible: true
+          dismissible: true,
+          attributes: {
+            "data-qa": 'noteAlert'
+          }
       }) }}
   {% endif %}
   {% if not hidePageHeader %}

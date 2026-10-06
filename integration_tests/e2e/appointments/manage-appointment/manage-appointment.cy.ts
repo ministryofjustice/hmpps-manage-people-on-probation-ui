@@ -24,9 +24,23 @@ describe('Manage an appointment', () => {
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.getTaskLink(2).click()
     const addNotePage = new AddNotePage()
+
     addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
     addNotePage.getSubmitBtn().click()
     manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with Terry Jones')
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
+  })
+
+  it('should show alert when notes added succesfully', () => {
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
+    manageAppointmentPage.getTaskLink(2).click()
+    const addNotePage = new AddNotePage()
+    cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
+    addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+    addNotePage.getSubmitBtn().click()
+    manageAppointmentPage = new ManageAppointmentPage()
+    cy.get(`[data-qa="noteAlert"]`).should('contain.text', 'Notes added')
   })
 })
