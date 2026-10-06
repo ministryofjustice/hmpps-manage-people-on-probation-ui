@@ -116,7 +116,15 @@ const reqObject = {
   url: '',
   query: { page: '', view: 'default', category: 'mock-category', contactId },
   session: {
-    data: {},
+    data: {
+      note: {
+        [crn]: {
+          [contactId]: {
+            noteAdded: true,
+          },
+        },
+      },
+    },
   },
 }
 const req = httpMocks.createRequest({
