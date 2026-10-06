@@ -172,7 +172,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      console.log(contactId)
       const { data } = req.session
       let { back } = req.query
       if (back) {
