@@ -510,6 +510,39 @@ describe('/middleware/getPersonalDetails', () => {
       expect(req.session.data).toBeDefined()
       expect(req.session.data.personalDetails?.X000002).toBeUndefined()
     })
+
+    it('refetches, rather than reading from cache, when the session entry for this CRN has no overview (partial entry left by getNextAppointment after a degraded result)', async () => {
+      const masPersonalDetailsSpy = jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      const nextAppointmentResponse = { httpStatus: 200 }
+      req = httpMocks.createRequest({
+        params: { crn: 'X000002' },
+        session: { data: { personalDetails: { X000002: { nextAppointmentResponse } } } },
+      })
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(masPersonalDetailsSpy).toHaveBeenCalledWith('X000002')
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('keeps existing fields on a partial session entry when caching a successful result', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      const nextAppointmentResponse = { httpStatus: 200 }
+      req = httpMocks.createRequest({
+        params: { crn: 'X000002' },
+        session: { data: { personalDetails: { X000002: { nextAppointmentResponse } } } },
+      })
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(req.session.data.personalDetails.X000002.overview).toEqual(overview('X000002'))
+      expect(req.session.data.personalDetails.X000002.nextAppointmentResponse).toEqual(nextAppointmentResponse)
+    })
   })
 
   describe('ndelius', () => {

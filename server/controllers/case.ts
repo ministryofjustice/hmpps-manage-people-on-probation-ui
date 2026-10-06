@@ -48,10 +48,15 @@ const caseController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
+      // Failure isolation (MAN-2840): when ARNS is unavailable the person-header shows an error and
+      // the overview should still load, so don't let these ARNS calls fail the whole page.
+      const isolateApiFailures = res.locals.flags?.enablePersonHeader
+      const needsPromise = arnsClient.getNeeds(crn)
+      const sanIndicatorPromise = arnsClient.getSanIndicator(crn)
       const [overview, needs, sanIndicatorResponse, contactResponse, practitioner] = await Promise.all([
         masClient.getOverview(crn, sentenceNumber),
-        arnsClient.getNeeds(crn),
-        arnsClient.getSanIndicator(crn),
+        isolateApiFailures ? needsPromise.catch((): null => null) : needsPromise,
+        isolateApiFailures ? sanIndicatorPromise.catch((): null => null) : sanIndicatorPromise,
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
@@ -63,7 +68,10 @@ const caseController: Controller<typeof routes, void> = {
       if (res.locals.flags.enableEsupEligibilityCheck) {
         checkinEligibility = await esupClient.getOffenderEligibility(crn)
       }
-      const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
+      // Personal details aren't cached in the session when the header had an API failure, so fall
+      // back to the copy getPersonalDetails always puts on res.locals.
+      const personalDetails = req.session.data.personalDetails?.[crn]?.overview ?? res.locals.case
+      const hasDeceased = personalDetails?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
@@ -83,7 +91,7 @@ const caseController: Controller<typeof routes, void> = {
         crn,
         url,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
-        personalDetails: req.session.data.personalDetails[crn].overview,
+        personalDetails,
         appointmentsWithoutAnOutcomeCount: outcomes?.length ?? 0,
         hasDeceased,
         hasPractitioner,

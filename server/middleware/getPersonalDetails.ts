@@ -58,15 +58,19 @@ export const getPersonalDetails = (
       } = req.session.data.personalDetails[crn])
     }
 
-    if (refreshCache || !req?.session?.data?.personalDetails?.[crn]) {
+    // Other middleware (e.g. getNextAppointment) can create a partial entry for this CRN, so only
+    // treat it as cached once the personal details themselves have been stored.
+    const isCached = !!req?.session?.data?.personalDetails?.[crn]?.overview
+
+    if (refreshCache || !isCached) {
       token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       masClient = new MasApiClient(token)
     }
-    if (refreshCache && req?.session?.data?.personalDetails?.[crn]) {
+    if (refreshCache && isCached) {
       overview = await masClient.getPersonalDetails(crn)
       req.session.data.personalDetails[crn].overview = overview
       getDataFromCache()
-    } else if (!req?.session?.data?.personalDetails?.[crn]) {
+    } else if (!isCached) {
       const { username } = res.locals.user
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
@@ -141,6 +145,7 @@ export const getPersonalDetails = (
         req.session.data.personalDetails = {
           ...(req.session.data.personalDetails ?? {}),
           [crn]: {
+            ...(req.session.data.personalDetails?.[crn] ?? {}),
             overview,
             sentencePlan,
             risks,

@@ -461,4 +461,42 @@ describe('caseController', () => {
       expect(preloadActivitySearchSpy).not.toHaveBeenCalled()
     })
   })
+
+  describe('getCase - ARNS API failure (MAN-2840)', () => {
+    const degradedReq = () =>
+      httpMocks.createRequest({
+        params: { crn },
+        url: '/case/X000001',
+        // personal details are not cached in the session when the header had an API failure
+        session: { data: { personalDetails: { [crn]: { nextAppointmentResponse: { httpStatus: 200 } } } } },
+      })
+    afterEach(() => {
+      res.locals.flags = {}
+      res.locals.case = undefined
+    })
+
+    it('still renders the overview, without needs or SAN indicator, when ARNS is unavailable and enablePersonHeader is on', async () => {
+      res.locals.flags = { enablePersonHeader: true }
+      res.locals.case = overview
+      needsSpy.mockRejectedValueOnce(new Error('ECONNREFUSED'))
+      getSanIndicatorSpy.mockRejectedValueOnce(new Error('ECONNREFUSED'))
+      await controllers.case.getCase(hmppsAuthClient)(degradedReq(), res)
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          needs: null,
+          sanIndicator: undefined,
+          personalDetails: overview,
+          hasDeceased: false,
+        }),
+      )
+    })
+
+    it('does not isolate an ARNS failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      res.locals.case = overview
+      needsSpy.mockRejectedValueOnce(new Error('ECONNREFUSED'))
+      await expect(controllers.case.getCase(hmppsAuthClient)(degradedReq(), res)).rejects.toThrow('ECONNREFUSED')
+      expect(renderSpy).not.toHaveBeenCalled()
+    })
+  })
 })
