@@ -388,7 +388,7 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith(`${change}?back=/case/X000001/appointments/appointment/1234/outcome/add-note`)
     })
 
-    it('should record notes succesfully added and redirect to manage page if manage journey', async () => {
+    it('should record notes successfully added and redirect to manage page if manage journey', async () => {
       const req = mockReq({
         request: {
           query: { put: true },

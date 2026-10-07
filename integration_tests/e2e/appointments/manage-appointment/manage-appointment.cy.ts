@@ -31,7 +31,7 @@ describe('Manage an appointment', () => {
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
   })
 
-  it('should show alert when notes added succesfully', () => {
+  it('should show alert when notes added successfully', () => {
     loadPage()
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
