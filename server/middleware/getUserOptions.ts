@@ -5,7 +5,6 @@ import { Provider, Team, User } from '../data/model/caseload'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import logger from '../../logger'
 import { logSessionCacheChange } from '../utils/logSessionCacheChange'
-import { getUserProviders } from './getUserProviders'
 
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getUserOptionsInner(req, res, next?) {

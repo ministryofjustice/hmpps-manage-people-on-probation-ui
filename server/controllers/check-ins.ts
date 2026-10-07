@@ -1535,7 +1535,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const addedQuestions = Object.entries(questionTemplateAndInputs)
         .map(([qId, inputValue]) => {
           if (!inputValue || typeof inputValue !== 'string' || inputValue.trim() === '') return null
-          const templateId = parseInt(qId.split('-')[0], 10)
+          const templateId = Number.parseInt(qId.split('-')[0], 10)
 
           const templateData = parseQuestionTemplate(availableTemplates, templateId)
 
@@ -1569,7 +1569,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const questionTemplateAndInputs = manageQuestionsSession.questionTemplateAndInputs || {}
       const availableTemplates = manageQuestionsSession.availableTemplates || []
       const formattedQuestions = Object.entries(questionTemplateAndInputs).map(([draftId, inputValue]) => {
-        const templateId = parseInt(draftId.split('-')[0], 10)
+        const templateId = Number.parseInt(draftId.split('-')[0], 10)
         const originalTemplate = availableTemplates.find((t: any) => String(t.id) === String(templateId))
 
         return {

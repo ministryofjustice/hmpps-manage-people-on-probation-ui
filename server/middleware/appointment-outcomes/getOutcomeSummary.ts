@@ -10,7 +10,7 @@ import {
 } from '../../utils'
 import { outcomeRedirectMap } from '../../properties/appointment-outcomes/outcome-redirect-map'
 import type { Activity } from '../../data/model/schedule'
-import type { AppointmentOutcomeProps, OutcomeSummary, OutcomeNextAppointment } from '../../models/Locals'
+import type { AppointmentOutcomeProps, OutcomeSummary } from '../../models/Locals'
 
 export const getOutcomeSummary: Route<void> = (_req, res, next) => {
   let summary: OutcomeSummary

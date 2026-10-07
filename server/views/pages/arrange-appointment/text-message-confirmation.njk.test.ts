@@ -106,7 +106,7 @@ describe('Text message confirmation nunjucks render tests', () => {
     } as Partial<TestModel>)
 
     it('should not display the inset text', () => {
-      expect($('.govuk-inset-text').length).toBe(0)
+      expect($('.govuk-inset-text')).toHaveLength(0)
     })
     it('should display the correct sms opt-in heading and hint', () => {
       expect($('[data-qa=smsOptIn]').find('legend').text()).toContain(
@@ -171,7 +171,7 @@ describe('Text message confirmation nunjucks render tests', () => {
       expect($('[data-qa=smsOptIn]').find('.govuk-hint').text()).toContain('Check if Caroline’s number is correct.')
     })
     it('should display the correct options', () => {
-      expect($('[data-qa=smsOptIn]').find('.govuk-radios').find('.govuk-radios__item').length).toBe(3)
+      expect($('[data-qa=smsOptIn]').find('.govuk-radios').find('.govuk-radios__item')).toHaveLength(3)
       for (let i = 0; i < 3; i += 1) {
         expect(
           $('[data-qa=smsOptIn]').find('.govuk-radios').find('.govuk-radios__item').eq(i).find('label').text(),

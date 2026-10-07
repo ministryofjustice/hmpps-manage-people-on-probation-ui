@@ -1,16 +1,5 @@
 import { PersonSummary } from './personalDetails'
-import {
-  ActivityCount,
-  Compliance,
-  ContactType,
-  NonComplianceContact,
-  NonComplianceHistoryResponse,
-  Offence,
-  Order,
-  PreviousOrders,
-} from './overview'
-
-export { ContactType, NonComplianceContact, NonComplianceHistoryResponse }
+import { ActivityCount, Compliance, Offence, Order, PreviousOrders } from './overview'
 
 export interface PersonCompliance {
   personSummary: PersonSummary
@@ -33,3 +22,5 @@ export interface BreachOrRecall {
   startDate: string
   status: string
 }
+
+export { ContactType, NonComplianceContact, NonComplianceHistoryResponse } from './overview'

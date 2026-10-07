@@ -24,17 +24,17 @@ export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       }
     })
     req.session.data = {
-      ...(req?.session?.data ?? {}),
+      ...req?.session?.data,
       providers: {
-        ...(req?.session?.data?.providers ?? {}),
+        ...req?.session?.data?.providers,
         [username]: providers,
       },
       teams: {
-        ...(req?.session?.data?.teams ?? {}),
+        ...req?.session?.data?.teams,
         [username]: teams,
       },
       staff: {
-        ...(req?.session?.data?.staff ?? {}),
+        ...req?.session?.data?.staff,
         [username]: displayedUsers,
       },
     }

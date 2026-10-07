@@ -116,7 +116,7 @@ export default class RestClient {
           logger.info(`Sentry timeout eventId: ${eventId}`)
         }
         return {
-          ...(error.response ?? {}),
+          ...error.response,
           timeoutError: warnings,
         }
       }

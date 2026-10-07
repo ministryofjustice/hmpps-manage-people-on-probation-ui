@@ -142,7 +142,7 @@ export const getPersonalDetails = (
 
       if (!arnsUnavailable && !prisonsUnavailable) {
         req.session.data.personalDetails = {
-          ...(req.session.data.personalDetails ?? {}),
+          ...req.session.data.personalDetails,
           [crn]: {
             overview,
             sentencePlan,
