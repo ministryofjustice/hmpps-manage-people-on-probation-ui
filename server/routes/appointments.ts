@@ -83,12 +83,4 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopCo
     '/case/:crn/appointments/appointment/:contactId/manage/note/:noteId',
     controllers.appointments.getAppointmentNote(hmppsAuthClient),
   )
-
-  router.get(
-    ['/case/:crn/appointments/appointment/:contactId/check-your-answers'],
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    checkAnswers,
-    controllers.arrangeAppointments.getCheckYourAnswers(),
-  )
 }
