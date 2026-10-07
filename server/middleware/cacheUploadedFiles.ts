@@ -49,7 +49,7 @@ export const cacheUploadedFiles = (req: Request, res: AppResponse, next: NextFun
     uploadedFiles.push(fileCache)
   }
   req.session.cache = {
-    ...req?.session?.cache,
+    ...(req?.session?.cache ?? {}),
     uploadedFiles,
   }
   return next()
