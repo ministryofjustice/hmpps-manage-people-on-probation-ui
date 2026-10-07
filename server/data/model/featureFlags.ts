@@ -42,4 +42,5 @@ export class FeatureFlags {
   enableAlertsCountCaching?: boolean = undefined
   enableAlertsCountApi?: boolean = undefined
   enableNDeliusRosh?: boolean = undefined
+  enableAppointmentPatchAlerts?: boolean = undefined
 }

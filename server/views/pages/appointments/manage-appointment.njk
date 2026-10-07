@@ -134,7 +134,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% endif %}
 {% endblock %}
 {% block content %}
-  {% if noteAdded !== undefined %}
+  {% if noteAdded !== undefined and flags.enableAppointmentPatchAlerts %}
     {% if noteAdded === "Success" %}
       {% set noteAlertVariant = "success" %}
       {% set noteAlertHtml = "<b>Notes added</b>" %}
