@@ -1,6 +1,5 @@
 import { RiskFlag } from '../data/model/risk'
 import { toSentenceCase } from './toSentenceCase'
-import logger from '../../logger'
 
 const riskLevelBadgeClass: Record<string, string> = {
   'VERY HIGH': 'risk-badge--very-high',

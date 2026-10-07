@@ -12,7 +12,7 @@ import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { getDateRange, getNewDateRange, NewRangeType, RangeType } from '../utils/getDateRange'
-import TierApiClient, { TierCalculations } from '../data/tierApiClient'
+import TierApiClient from '../data/tierApiClient'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 

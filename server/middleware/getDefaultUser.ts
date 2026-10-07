@@ -3,7 +3,6 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { getDataValue, setDataValue } from '../utils'
 import { Name } from '../data/model/personalDetails'
-import { ProbationPractitioner } from '../models/CaseDetail'
 import { logSessionCacheChange } from '../utils/logSessionCacheChange'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
