@@ -124,7 +124,8 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (change) redirect = change
       if (put) {
         redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
-        if (notes) setDataValue(data, ['note', crn, id, 'noteAdded'], true)
+        if (notes) setDataValue(data, ['note', crn, id, 'noteAdded'], 'Success')
+        else setDataValue(data, ['note', crn, id, 'noteAdded'], 'None')
       }
       if (linkedContactId && res.locals.flags.enableCombinedCYAPage)
         redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`

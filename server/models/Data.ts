@@ -49,7 +49,7 @@ export interface Data {
   note?: {
     [crn: string]: {
       [id: string]: {
-        noteAdded?: boolean
+        noteAdded?: string
       }
     }
   }

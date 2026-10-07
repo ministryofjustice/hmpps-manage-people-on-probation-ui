@@ -120,7 +120,7 @@ const reqObject = {
       note: {
         [crn]: {
           [contactId]: {
-            noteAdded: true,
+            noteAdded: 'Success',
           },
         },
       },

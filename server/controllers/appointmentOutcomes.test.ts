@@ -399,7 +399,7 @@ describe('controllers/appointmentOutcomes', () => {
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/X000001/appointments/appointment/1234/manage`)
-      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['note', crn, contactId, 'noteAdded'], true)
+      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['note', crn, contactId, 'noteAdded'], 'Success')
     })
 
     it('should not record notes added if no notes and redirect to manage page if manage journey', async () => {
@@ -413,7 +413,7 @@ describe('controllers/appointmentOutcomes', () => {
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/X000001/appointments/appointment/1234/manage`)
-      expect(setDataValueSpy).not.toHaveBeenCalled()
+      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['note', crn, contactId, 'noteAdded'], 'None')
     })
 
     it('should redirect to combined check your answers page if flag set and linked contact', async () => {

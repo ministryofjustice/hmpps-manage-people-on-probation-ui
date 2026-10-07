@@ -135,15 +135,25 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% endblock %}
 {% block content %}
   {% if noteAdded !== undefined %}
-      {{ mojAlert({
-          variant: "success" if noteAdded else "error",
-          html: "<b>Notes added</b>" if noteAdded else "<b>Notes could not be added</b>",
-          showTitleAsHeading: true,
-          dismissible: true,
-          attributes: {
-            "data-qa": 'noteAlert'
-          }
-      }) }}
+    {% if noteAdded === "Success" %}
+      {% set noteAlertVariant = "success" %}
+      {% set noteAlertHtml = "<b>Notes added</b>" %}
+    {% elif noteAdded === "None" %}
+      {% set noteAlertVariant = "warning" %}
+      {% set noteAlertHtml = "<b>No notes added</b>" %}
+    {% else %}
+      {% set noteAlertVariant = "error" %}
+      {% set noteAlertHtml = "<b>Notes could not be added</b>" %}
+    {% endif %}
+    {{ mojAlert({
+        variant: noteAlertVariant,
+        html: noteAlertHtml,
+        showTitleAsHeading: true,
+        dismissible: true,
+        attributes: {
+          "data-qa": 'noteAlert'
+        }
+    }) }}
   {% endif %}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}

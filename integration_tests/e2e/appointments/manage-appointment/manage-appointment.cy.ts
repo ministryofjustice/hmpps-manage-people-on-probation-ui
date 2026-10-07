@@ -43,4 +43,16 @@ describe('Manage an appointment', () => {
     manageAppointmentPage = new ManageAppointmentPage()
     cy.get(`[data-qa="noteAlert"]`).should('contain.text', 'Notes added')
   })
+
+  it('should show warning when no note added', () => {
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
+    manageAppointmentPage.getTaskLink(2).click()
+    const addNotePage = new AddNotePage()
+    addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()
+    addNotePage.getSubmitBtn().click()
+    manageAppointmentPage = new ManageAppointmentPage()
+    cy.get(`[data-qa="noteAlert"]`).should('contain.text', 'No notes added')
+  })
 })
