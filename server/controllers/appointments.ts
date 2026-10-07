@@ -180,8 +180,28 @@ const appointmentsController: Controller<typeof routes, void> = {
         back = getDataValue(data, ['backLink', 'manage'])
       }
       const noteAdded = getDataValue(data, ['note', crn, contactId, 'noteAdded'])
+      let noteAlert: { variant: 'success' | 'warning' | 'error'; html: string } | undefined
       if (noteAdded !== undefined) {
         delete req.session?.data?.note?.[crn]?.[contactId]?.noteAdded
+        switch (noteAdded) {
+          case 'Success':
+            noteAlert = {
+              variant: 'success',
+              html: '<b>Notes added</b>',
+            }
+            break
+          case 'None':
+            noteAlert = {
+              variant: 'warning',
+              html: '<b>No notes added</b>',
+            }
+            break
+          default:
+            noteAlert = {
+              variant: 'error',
+              html: '<b>Notes could not be added</b>',
+            }
+        }
       }
       deleteOutcomeVars(crn)(req, res)
       const url = encodeURIComponent(req.url)
@@ -222,7 +242,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         hasDeceased,
         relatedContacts,
         sentence,
-        noteAdded,
+        noteAlert,
       })
     }
   },

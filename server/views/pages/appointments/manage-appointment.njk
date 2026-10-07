@@ -134,20 +134,10 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% endif %}
 {% endblock %}
 {% block content %}
-  {% if noteAdded !== undefined and flags.enableAppointmentPatchAlerts %}
-    {% if noteAdded === "Success" %}
-      {% set noteAlertVariant = "success" %}
-      {% set noteAlertHtml = "<b>Notes added</b>" %}
-    {% elif noteAdded === "None" %}
-      {% set noteAlertVariant = "warning" %}
-      {% set noteAlertHtml = "<b>No notes added</b>" %}
-    {% else %}
-      {% set noteAlertVariant = "error" %}
-      {% set noteAlertHtml = "<b>Notes could not be added</b>" %}
-    {% endif %}
+  {% if noteAlert and flags.enableAppointmentPatchAlerts %}
     {{ mojAlert({
-        variant: noteAlertVariant,
-        html: noteAlertHtml,
+        variant: noteAlert.variant,
+        html: noteAlert.html,
         showTitleAsHeading: true,
         dismissible: true,
         attributes: {

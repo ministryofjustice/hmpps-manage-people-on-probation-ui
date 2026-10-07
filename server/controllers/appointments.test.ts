@@ -116,17 +116,10 @@ const reqObject = {
   url: '',
   query: { page: '', view: 'default', category: 'mock-category', contactId },
   session: {
-    data: {
-      note: {
-        [crn]: {
-          [contactId]: {
-            noteAdded: 'Success',
-          },
-        },
-      },
-    },
+    data: {},
   },
 }
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -425,19 +418,6 @@ describe('controllers/appointments', () => {
     it('should request related contacts', () => {
       expect(MasApiClient.prototype.getRelatedContacts).toHaveBeenCalledWith(crn, id)
     })
-    it('should render the manage appointment page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
-        crn,
-        back: undefined,
-        nextAppointment: nextApptResponse(),
-        hasDeceased: false,
-        url: '',
-        canReschedule: true,
-        contactId: '1234',
-        relatedContacts: mockRelatedContacts,
-        sentence,
-      })
-    })
 
     it('should not set a location for a telephone appointment', async () => {
       getNextAppointmentSpy.mockResolvedValueOnce(
@@ -450,6 +430,100 @@ describe('controllers/appointments', () => {
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
 
       expect(res.locals.nextAppointmentLocation).toBeNull()
+    })
+
+    it('should render the manage appointment page with note added', async () => {
+      const reqNoteAdded = httpMocks.createRequest({
+        ...reqObject,
+        session: {
+          data: {
+            note: {
+              [crn]: {
+                [contactId]: {
+                  noteAdded: 'Success',
+                },
+              },
+            },
+          },
+        },
+      })
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoteAdded, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        hasDeceased: false,
+        url: '',
+        canReschedule: true,
+        contactId: '1234',
+        relatedContacts: mockRelatedContacts,
+        sentence,
+        noteAlert: { variant: 'success', html: '<b>Notes added</b>' },
+      })
+    })
+    it('should render the manage appointment page with no note', async () => {
+      const reqNoNoteAdded = httpMocks.createRequest({
+        ...reqObject,
+        session: {
+          data: {
+            note: {
+              [crn]: {
+                [contactId]: {
+                  noteAdded: 'None',
+                },
+              },
+            },
+          },
+        },
+      })
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoNoteAdded, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        hasDeceased: false,
+        url: '',
+        canReschedule: true,
+        contactId: '1234',
+        relatedContacts: mockRelatedContacts,
+        sentence,
+        noteAlert: { variant: 'warning', html: '<b>No notes added</b>' },
+      })
+    })
+    it('should render the manage appointment page when note failed', async () => {
+      const reqNoteFailed = httpMocks.createRequest({
+        ...reqObject,
+        session: {
+          data: {
+            note: {
+              [crn]: {
+                [contactId]: {
+                  noteAdded: 'Failed',
+                },
+              },
+            },
+          },
+        },
+      })
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoteFailed, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        hasDeceased: false,
+        url: '',
+        canReschedule: true,
+        contactId: '1234',
+        relatedContacts: mockRelatedContacts,
+        sentence,
+        noteAlert: { variant: 'error', html: '<b>Notes could not be added</b>' },
+      })
     })
   })
 
