@@ -33,8 +33,6 @@ const routes = [
   'getAllUpcomingAppointments',
   'postAppointments',
   'getRecordAnOutcome',
-  'getAddNote',
-  'postAddNote',
   'getManageAppointment',
   'getNextAppointment',
   'postNextAppointment',
@@ -181,6 +179,30 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         back = getDataValue(data, ['backLink', 'manage'])
       }
+      const noteAdded = getDataValue(data, ['note', crn, contactId, 'noteAdded'])
+      let noteAlert: { variant: 'success' | 'warning' | 'error'; html: string } | undefined
+      if (noteAdded !== undefined) {
+        delete req.session?.data?.note?.[crn]?.[contactId]?.noteAdded
+        switch (noteAdded) {
+          case 'Success':
+            noteAlert = {
+              variant: 'success',
+              html: '<b>Notes added</b>',
+            }
+            break
+          case 'None':
+            noteAlert = {
+              variant: 'warning',
+              html: '<b>No notes added</b>',
+            }
+            break
+          default:
+            noteAlert = {
+              variant: 'error',
+              html: '<b>Notes could not be added</b>',
+            }
+        }
+      }
       deleteOutcomeVars(crn)(req, res)
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -220,6 +242,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         hasDeceased,
         relatedContacts,
         sentence,
+        noteAlert,
       })
     }
   },
@@ -278,90 +301,6 @@ const appointmentsController: Controller<typeof routes, void> = {
           req.session.outcomesFilter[crn] ??
           (res.locals.flags.enable3MonthsOutcomes ? 'PAST_THREE_MONTHS' : 'PAST_TWO_YEARS'),
       })
-    }
-  },
-  getAddNote: _hmppsAuthClient => {
-    return async function getAddNote(req, res) {
-      const { crn } = req.params as Record<string, string>
-      await auditService.sendAuditMessage({
-        action: 'ADD_APPOINTMENT_NOTES',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      let uploadedFiles: FileCache[] = []
-      let errorMessages = null
-      let body = null
-      if (req?.session?.cache?.uploadedFiles) {
-        uploadedFiles = req.session.cache.uploadedFiles
-        delete req.session.cache.uploadedFiles
-      }
-      if (req?.session?.errorMessages) {
-        errorMessages = req.session.errorMessages
-        delete req.session.errorMessages
-      }
-      if (req?.session?.body) {
-        body = req.session.body
-        delete req.session.body
-      }
-      const url = encodeURIComponent(req.url)
-      const { maxCharCount } = config
-      const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
-      return res.render('pages/appointments/add-note', {
-        crn,
-        errorMessages,
-        body,
-        url,
-        maxCharCount,
-        isSensitive,
-      })
-    }
-  },
-  postAddNote: hmppsAuthClient => {
-    return async function postAddNote(req, res) {
-      const { crn, contactId: id } = req.params as Record<string, string>
-
-      if (!isValidCrn(crn) || !isNumericString(id)) {
-        return renderError(404)(req, res)
-      }
-
-      const { notes, sensitivity } = req.body as Record<string, string>
-      const sensitive = sensitivity === 'Yes'
-      const outcomeRecorded = res?.locals?.personAppointment?.appointment?.hasOutcome === true
-      const file = req.file as Express.Multer.File
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-
-      const body: AppointmentPatch = {
-        id: parseInt(id, 10),
-        notes: handleQuotes(notes),
-        sensitive,
-        outcomeRecorded,
-      }
-
-      if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
-        body.outcomeRecorded = true
-        delete req.session.data.appointments[crn][id].outcomeRecorded
-      }
-
-      await masClient.patchAppointment(body)
-
-      if (file) {
-        const patchResponse = await masClient.patchDocuments(crn, id, file)
-
-        if (!isSuccessfulUpload(patchResponse)) {
-          return res.render('pages/appointments/add-note', {
-            uploadError: 'File not uploaded. Please try again.',
-            patchResponse,
-            sensitive,
-            notes,
-          })
-        }
-      }
-
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
 

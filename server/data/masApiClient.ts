@@ -162,7 +162,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path })
   }
 
-  async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
+  async putContact(contactId: string, body: PutContactRequest): Promise<Response> {
     const path = `/contact/${contactId}`
     return this.put({ data: body, path })
   }

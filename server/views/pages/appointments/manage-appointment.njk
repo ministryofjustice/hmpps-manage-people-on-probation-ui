@@ -134,6 +134,17 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% endif %}
 {% endblock %}
 {% block content %}
+  {% if noteAlert and flags.enableAppointmentPatchAlerts %}
+    {{ mojAlert({
+        variant: noteAlert.variant,
+        html: noteAlert.html,
+        showTitleAsHeading: true,
+        dismissible: true,
+        attributes: {
+          "data-qa": 'noteAlert'
+        }
+    }) }}
+  {% endif %}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">

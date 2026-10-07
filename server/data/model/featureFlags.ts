@@ -43,4 +43,5 @@ export class FeatureFlags {
   enableAlertsCountApi?: boolean = undefined
   enableDraftSentencePlanAccess?: boolean = undefined
   enableNDeliusRosh?: boolean = undefined
+  enableAppointmentPatchAlerts?: boolean = undefined
 }
