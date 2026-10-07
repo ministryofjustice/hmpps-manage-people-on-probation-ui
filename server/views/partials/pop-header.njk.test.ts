@@ -270,7 +270,7 @@ describe('POP header', () => {
       riskBadgeData.groups[0].badges.forEach(badge => {
         const link = $(`[data-qa="risk-badge-${badge.id}"]`)
         expect(link.attr('href')).toBe(`/case/${baseModel.headerCRN}/risk/flag/${badge.id}`)
-        expect(link.find('.moj-badge').hasClass(badge.badgeClass)).toBe(true)
+        expect(link.hasClass(badge.badgeClass)).toBe(true)
         expect(link.text()).toContain(badge.text)
       })
     })

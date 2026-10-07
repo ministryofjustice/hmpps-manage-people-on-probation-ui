@@ -90,44 +90,18 @@
 {% endif %}
 {% endset %}
 
-{% set personRiskFlags %}
-{% for group in riskBadgeData.groups %}
-{% for risk in group.badges %}
-<a
-        href="/case/{{ headerCRN }}/risk/flag/{{ risk.id }}"
-        class="risk-badge-link"
-        data-qa="risk-badge-{{ risk.id }}"
->
-    {{ mojBadge({
-                    text: risk.text,
-                    classes: risk.badgeClass
-                }) }}
-</a>
-{% endfor %}
-{% endfor %}
-
-{% if riskBadgeData.remainingCount > 0 %}
-<a
-        href="/case/{{ headerCRN }}/risk"
-        class="govuk-link risk-badge-more"
-        data-qa="risk-badge-more"
->
-    +{{ riskBadgeData.remainingCount }} active risk flags
-</a>
-{% endif %}
-{% endset %}
-
-
-
 {% set combinedRiskBadges %}
     {% if riskBadges and (riskBadges | trim) %}
         <div class="pop-header-risk-badges">
             {{ riskBadges | safe }}
         </div>
     {% endif %}
-    {% if personRiskFlags and (personRiskFlags | trim) %}
+{% endset %}
+
+{% set personRiskFlags %}
+    {% if riskBadgeData  %}
         <div class="pop-header-risk-flags">
-            {{ personRiskFlags | safe }}
+            {{ riskBadgeData | safe }}
         </div>
     {% endif %}
 {% endset %}
@@ -145,7 +119,7 @@
         managedByHref: managedBy.href,
         photo: personPhotoSrc,
         riskBadges: combinedRiskBadges,
-        personRiskFlags: combinedRiskBadges
+        personRiskFlags: riskBadgeData
     }) }}
 {% else %}
     <div class="govuk-flex">
