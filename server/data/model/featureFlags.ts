@@ -41,6 +41,7 @@ export class FeatureFlags {
   enableLastTextMessage?: boolean = undefined
   enableAlertsCountCaching?: boolean = undefined
   enableAlertsCountApi?: boolean = undefined
+  enableDraftSentencePlanAccess?: boolean = undefined
   enableNDeliusRosh?: boolean = undefined
   enableAppointmentPatchAlerts?: boolean = undefined
 }

@@ -12,6 +12,7 @@ import overview from './overview'
 import userLocations from './userLocations'
 import activityLog from './activityLog'
 import risk from './risk'
+import sentencePlan from './sentencePlan'
 import supervisionAppointmentClient from './supervisionAppointmentClient'
 import probationFEIntegration from './probationFEIntegration'
 import alerts from './alerts'
@@ -44,6 +45,7 @@ export default {
   ...userLocations,
   ...activityLog,
   ...risk,
+  ...sentencePlan,
   ...supervisionAppointmentClient,
   ...probationFEIntegration,
   ...alerts,
