@@ -480,7 +480,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       actions: {
         items: [
           {
-            href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/add-note",
+            href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
             text: "Add to notes" if hasNotes else "Change",
             visuallyHiddenText: ""
           }
@@ -506,7 +506,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         classes: "govuk-!-white-space-nowrap",
         items: [
           {
-            href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/add-note",
+            href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
             text: "Change",
             visuallyHiddenText: ""
           }
