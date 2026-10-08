@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
-import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
+import { convertToTitleCase, firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -123,7 +123,8 @@ export const postRescheduleAppointments = (
           includeWelshTranslation: includeWelshPreview,
         }
         if (practitionerFirstName)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName = practitionerFirstName
+          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName =
+            convertToTitleCase(practitionerFirstName)
         if (appointmentLocation)
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode)

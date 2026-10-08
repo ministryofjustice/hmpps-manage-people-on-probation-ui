@@ -111,7 +111,7 @@ const mockAppointment: AppointmentSession = {
   smsPreview: {
     request: {
       firstName: 'James',
-      practitionerFirstName: 'user',
+      practitionerFirstName: 'User',
       includeWelshPreview: false,
       appointmentLocation: 'Mock Location',
       appointmentTypeCode: 'COAP',
@@ -520,7 +520,7 @@ describe('middleware/postRescheduleAppointments', () => {
           rescheduledEventRequest: expect.objectContaining({
             smsEventRequest: expect.objectContaining({
               firstName: 'James',
-              practitionerFirstName: 'user',
+              practitionerFirstName: 'User',
               mobileNumber: '07822567890',
               crn,
               smsOptIn: true,
