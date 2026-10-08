@@ -1,6 +1,5 @@
 import { RiskFlag } from '../data/model/risk'
 import { toSentenceCase } from './toSentenceCase'
-import logger from '../../logger'
 
 const riskLevelBadgeClass: Record<string, string> = {
   'VERY HIGH': 'risk-badge--very-high',
@@ -31,10 +30,10 @@ export const registerTypes = {
     { code: 'AV2S', description: 'Risk to Staff' },
     { code: 'RTPS', description: 'Risk to Probation Staff' },
     { code: 'REG17', description: 'Risk to Public' },
-    { code: 'REG15', description: 'Risk to Known Adult' },
-    { code: 'REG16', description: 'Risk to Prisoner' },
     { code: 'REG26', description: 'Organised Crime' },
     { code: 'RCHD', description: 'Risk to Children' },
+    { code: 'REG15', description: 'Risk to Known Adult' },
+    { code: 'REG16', description: 'Risk to Prisoner' },
     { code: 'RSC', description: 'Sexual Conviction' },
     {
       code: 'SHPO',
@@ -121,6 +120,16 @@ export interface RiskBadgeData {
   remainingCount: number
 }
 
+function getRiskDescriptionPriority(description: string, registerType: string | undefined): number {
+  if (!registerType) {
+    return Number.MAX_SAFE_INTEGER
+  }
+
+  const registers = registerTypes[registerType as keyof typeof registerTypes]
+
+  return registers.findIndex(register => register.description.trim().toLowerCase() === description.trim().toLowerCase())
+}
+
 const MAX_RISK_BADGES = 7
 
 function getRiskRegisterType(description: string): string | undefined {
@@ -156,13 +165,15 @@ function getGroupedRiskBadges(visibleRiskFlags: RiskFlag[]) {
 
     const normalisedDescription = flag.description.trim().toLowerCase()
     const description = toSentenceCase(flag.description, [], null, true, false)
+    const displayDescription = description.replace(/^Mappa\b/, 'MAPPA')
 
     let text = description
 
     if (lowRiskLevelWithDescription.has(normalisedDescription)) {
-      text = `${description} - ${flag.levelDescription?.replace('MAPPA ', '') ?? ''}`
+      const levelDescription = flag.levelDescription?.replace('MAPPA ', '') ?? ''
+      text = `${displayDescription} - ${levelDescription}`
     } else if (risksWithLevelDescription.has(normalisedDescription)) {
-      text = `${description} - ${toSentenceCase(severity, [], null, true, false)}`
+      text = `${displayDescription} - ${toSentenceCase(severity, [], null, true, false)}`
     }
 
     group.badges.push({
@@ -176,9 +187,16 @@ function getGroupedRiskBadges(visibleRiskFlags: RiskFlag[]) {
   }, [])
 }
 
-export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
-  const activeRiskFlags = riskFlags.filter(flag => !flag.removed)
+const validRiskDescriptions = new Set(
+  Object.values(registerTypes)
+    .flat()
+    .map(registerType => registerType.description.toLowerCase()),
+)
 
+export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
+  const activeRiskFlags = riskFlags.filter(
+    flag => !flag.removed && validRiskDescriptions.has(flag.description.trim().toLowerCase()),
+  )
   const sortedRiskFlags = [...activeRiskFlags].sort((a, b) => {
     const severityPriority =
       (riskLevelPriority[getRiskLevel(a)] ?? Number.MAX_SAFE_INTEGER) -
@@ -199,7 +217,14 @@ export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
       ? registerTypePriority.indexOf(bRegisterType as (typeof registerTypePriority)[number])
       : Number.MAX_SAFE_INTEGER
 
-    return aRegisterPriority - bRegisterPriority
+    if (aRegisterPriority !== bRegisterPriority) {
+      return aRegisterPriority - bRegisterPriority
+    }
+
+    const aDescriptionPriority = getRiskDescriptionPriority(a.description, aRegisterType)
+    const bDescriptionPriority = getRiskDescriptionPriority(b.description, bRegisterType)
+
+    return aDescriptionPriority - bDescriptionPriority
   })
 
   const visibleRiskFlags = sortedRiskFlags.slice(0, MAX_RISK_BADGES)

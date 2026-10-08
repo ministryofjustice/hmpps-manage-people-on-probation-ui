@@ -312,10 +312,20 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
       const { change } = req.query as Record<string, string>
+      const changeSmsConsentLinkClicked = getDataValue<boolean>(data, [
+        'appointments',
+        crn,
+        id,
+        'temp',
+        'changeSmsConsentLinkClicked',
+      ])
       const isInPast = appointmentDateIsInPast(req, res)
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       const isReschedule = isRescheduleAppointment(req)
-      if (change) {
+      if (changeSmsConsentLinkClicked) {
+        delete req.session.data.appointments[crn][id].temp.changeSmsConsentLinkClicked
+      }
+      if (change && !changeSmsConsentLinkClicked) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
         const startTime = getDataValue(data, ['appointments', crn, id, 'start'])
         const endTime = getDataValue(data, ['appointments', crn, id, 'end'])
@@ -359,6 +369,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         alertDismissed,
         isReschedule,
+        url: encodeURIComponent(req.url),
         ...(res.locals?.flags?.enableAllowSms
           ? { allowSms: getDataValue(data, ['personalDetails', crn, 'overview', 'allowSms']) }
           : {}),

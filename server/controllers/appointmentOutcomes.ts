@@ -90,7 +90,9 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     return async function postAddNote(req, res) {
       const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl } = res.locals.appointmentOutcome
       const { change, put } = req.query as Record<string, string>
-      const { notes, sensitive } = req.body
+      const notes = req.body?.appointments?.[crn]?.[id]?.notes
+      const sensitive = req.body?.appointments?.[crn]?.[id]?.sensitive
+      const { data } = req.session
       const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
       if (!isValidParams) {
         return renderError(404)(req, res)
@@ -120,7 +122,11 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       let redirect = `${baseOutcomeUrl}/next-appointment`
       if (uuid) redirect = `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
       if (change) redirect = change
-      if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+      if (put) {
+        redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+        if (notes) setDataValue(data, ['note', crn, id, 'noteAdded'], 'Success')
+        else if (!file) setDataValue(data, ['note', crn, id, 'noteAdded'], 'None')
+      }
       if (linkedContactId && res.locals.flags.enableCombinedCYAPage)
         redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
 

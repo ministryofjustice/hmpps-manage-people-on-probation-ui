@@ -109,9 +109,9 @@ export const getPersonalDetails = (
           riskData = null as unknown as RiskData
         }
       }
-      if (overview.noms) {
+      if (res.locals.flags?.enablePersonHeader && overview.noms) {
         const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => {
-          if (isolateApiFailures) prisonsUnavailable = true
+          prisonsUnavailable = true
           return null
         })
         personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : undefined
@@ -122,7 +122,10 @@ export const getPersonalDetails = (
       if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {
         try {
           const planResult = await arnsAssessmentPlatformClient.getSentencePlanByCrn(crn, username)
-          if (planResult?.hasAgreedPlan) {
+          const canAccessPlan = res.locals.flags?.enableDraftSentencePlanAccess
+            ? planResult?.hasPlan
+            : planResult?.hasAgreedPlan
+          if (canAccessPlan) {
             sentencePlan.lastUpdatedDate = planResult.lastUpdatedDate
             if (!popInUsersCaseload) {
               sentencePlan.showText = true

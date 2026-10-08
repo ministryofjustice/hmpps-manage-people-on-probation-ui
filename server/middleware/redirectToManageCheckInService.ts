@@ -1,15 +1,7 @@
-import { NextFunction, Request } from 'express'
+import { Request } from 'express'
 import { AppResponse } from '../models/Locals'
 import { Route } from '../@types'
 import config from '../config'
-
-export type NewCheckInServiceFlag =
-  | 'enableESUPCheckinNewReview'
-  | 'enableESUPCheckinNewQuestions'
-  | 'enableESUPCheckinNewSetup'
-  | 'enableESUPCheckinNewSettings'
-  | 'enableESUPCheckinNewStop'
-  | 'enableESUPCheckinNewRestart'
 
 const stripTrailingSlash = (url: string): string => url.replace(/\/$/, '')
 
@@ -24,14 +16,9 @@ const absoluteBackUrl = (back: unknown): string | null => {
 
 // The manage online check-ins service mirrors this service's check-in URLs, so the
 // requested path is passed through as-is rather than rebuilt per journey.
-export const redirectToManageCheckInService = (flag: NewCheckInServiceFlag): Route<void> => {
-  return function redirectToManageCheckInServiceInner(req: Request, res: AppResponse, next: NextFunction): void {
-    if (res.locals.flags?.[flag] !== true) {
-      return next()
-    }
-    const [path] = req.originalUrl.split('?')
-    const link = `${stripTrailingSlash(config.eSupervisionManageCheckins.link)}${path}`
-    const back = absoluteBackUrl(req.query.back)
-    return res.redirect(back ? `${link}?back=${encodeURIComponent(back)}` : link)
-  }
+export const redirectToManageCheckInService: Route<void> = (req: Request, res: AppResponse): void => {
+  const [path] = req.originalUrl.split('?')
+  const link = `${stripTrailingSlash(config.eSupervisionManageCheckins.link)}${path}`
+  const back = absoluteBackUrl(req.query.back)
+  res.redirect(back ? `${link}?back=${encodeURIComponent(back)}` : link)
 }

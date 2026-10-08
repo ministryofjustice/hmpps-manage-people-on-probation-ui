@@ -42,7 +42,11 @@ const fromSpy = jest.spyOn(Readable, 'from')
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
-const res = mockAppResponse()
+const res = mockAppResponse({
+  flags: {
+    enableSearchV2: true,
+  },
+})
 const redirectSpy = jest.spyOn(res, 'redirect')
 const req = httpMocks.createRequest({
   session: {},

@@ -1,8 +1,5 @@
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
-import { Request } from 'express'
-import { ParamsDictionary } from 'express-serve-static-core'
-import { ParsedQs } from 'qs'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
@@ -122,6 +119,7 @@ const reqObject = {
     data: {},
   },
 }
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -420,19 +418,6 @@ describe('controllers/appointments', () => {
     it('should request related contacts', () => {
       expect(MasApiClient.prototype.getRelatedContacts).toHaveBeenCalledWith(crn, id)
     })
-    it('should render the manage appointment page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
-        crn,
-        back: undefined,
-        nextAppointment: nextApptResponse(),
-        hasDeceased: false,
-        url: '',
-        canReschedule: true,
-        contactId: '1234',
-        relatedContacts: mockRelatedContacts,
-        sentence,
-      })
-    })
 
     it('should not set a location for a telephone appointment', async () => {
       getNextAppointmentSpy.mockResolvedValueOnce(
@@ -445,6 +430,106 @@ describe('controllers/appointments', () => {
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
 
       expect(res.locals.nextAppointmentLocation).toBeNull()
+    })
+
+    it('should render the manage appointment page with note added', async () => {
+      const reqNoteAdded = httpMocks.createRequest({
+        ...reqObject,
+        session: {
+          data: {
+            note: {
+              [crn]: {
+                [contactId]: {
+                  noteAdded: 'Success',
+                },
+              },
+            },
+          },
+        },
+      })
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoteAdded, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        hasDeceased: false,
+        url: '',
+        canReschedule: true,
+        contactId: '1234',
+        relatedContacts: mockRelatedContacts,
+        sentence,
+        noteAlert: { variant: 'success', html: '<b>Notes added</b>' },
+        noteLink:
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
+      })
+    })
+    it('should render the manage appointment page with no note', async () => {
+      const reqNoNoteAdded = httpMocks.createRequest({
+        ...reqObject,
+        session: {
+          data: {
+            note: {
+              [crn]: {
+                [contactId]: {
+                  noteAdded: 'None',
+                },
+              },
+            },
+          },
+        },
+      })
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoNoteAdded, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        hasDeceased: false,
+        url: '',
+        canReschedule: true,
+        contactId: '1234',
+        relatedContacts: mockRelatedContacts,
+        sentence,
+        noteAlert: { variant: 'warning', html: '<b>No notes added</b>' },
+        noteLink:
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
+      })
+    })
+    it('should render the manage appointment page when note failed', async () => {
+      const reqNoteFailed = httpMocks.createRequest({
+        ...reqObject,
+        session: {
+          data: {
+            note: {
+              [crn]: {
+                [contactId]: {
+                  noteAdded: 'Failed',
+                },
+              },
+            },
+          },
+        },
+      })
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
+      jest.spyOn(MasApiClient.prototype, 'getRelatedContacts').mockResolvedValue(mockRelatedContacts)
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoteFailed, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        hasDeceased: false,
+        url: '',
+        canReschedule: true,
+        contactId: '1234',
+        relatedContacts: mockRelatedContacts,
+        sentence,
+        noteAlert: { variant: 'error', html: '<b>Notes could not be added</b>' },
+        noteLink:
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
+      })
     })
   })
 
@@ -513,160 +598,6 @@ describe('controllers/appointments', () => {
       })
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(reqWithoutFilter, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
-    })
-  })
-
-  describe('get add note', () => {
-    const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
-    const errorMessages = {
-      notes: 'Notes error',
-      sensitivity: 'Sensitivity error',
-    }
-    const mockReq = httpMocks.createRequest({
-      params: {
-        crn,
-        id,
-        contactId,
-        actionType,
-      },
-      session: {
-        cache: {
-          uploadedFiles,
-        },
-        errorMessages,
-        body: {
-          fieldName: 'value',
-        },
-      },
-    })
-    beforeEach(async () => {
-      await controllers.appointments.getAddNote(hmppsAuthClient)(mockReq, res)
-    })
-    checkAuditMessage(res, 'ADD_APPOINTMENT_NOTES', uuidv4(), crn, 'CRN')
-    it('should delete uploadedFiles session value if it exists', () => {
-      expect(mockReq.session.cache.uploadedFiles).toBeUndefined()
-    })
-    it('should delete errorMessages session value if it exists', () => {
-      expect(mockReq.session.errorMessages).toBeUndefined()
-    })
-    it('should delete body session value if it exists', () => {
-      expect(mockReq.session.body).toBeUndefined()
-    })
-    it('should render the add note page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
-        body: null,
-        crn,
-        errorMessages: null,
-        url: '',
-        isSensitive: false,
-        maxCharCount: 12000,
-      })
-    })
-  })
-  describe('post add note', () => {
-    describe('If CRN request param is invalid', () => {
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(false)
-        mockIsNumericString.mockReturnValue(false)
-
-        await controllers.appointments.postAddNote(hmppsAuthClient)(req, res)
-      })
-      it('should return a 404 status and render the error page', () => {
-        expect(mockRenderError).toHaveBeenCalledWith(404)
-        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-      })
-      it('should not redirect', () => {
-        expect(redirectSpy).not.toHaveBeenCalled()
-      })
-    })
-    describe('If CRN request param is valid', () => {
-      describe('click thru from manage appointment page', () => {
-        let mockReq: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>
-        beforeEach(async () => {
-          mockIsValidCrn.mockReturnValue(true)
-          mockIsNumericString.mockReturnValue(true)
-
-          // mock successful file upload
-          jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
-            statusCode: 200,
-          })
-
-          mockReq = httpMocks.createRequest({
-            body: {
-              notes: 'some mock notes',
-              sensitivity: 'Yes',
-            },
-            params: {
-              contactId: id,
-              crn,
-            },
-            session: {
-              data: {},
-            },
-          })
-
-          await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
-        })
-        it('should send the patch request to the api', () => {
-          expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId as string, 10),
-            notes: mockReq.body.notes,
-            sensitive: true,
-            outcomeRecorded: false,
-          })
-        })
-        it('should redirect to the manage appointment page', () => {
-          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
-        })
-      })
-      describe('redirect from attended and complied page', () => {
-        let mockReq: httpMocks.MockRequest<any>
-        beforeEach(async () => {
-          mockIsValidCrn.mockReturnValue(true)
-          mockIsNumericString.mockReturnValue(true)
-
-          jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
-            statusCode: 200,
-          })
-
-          mockReq = httpMocks.createRequest({
-            body: {
-              notes: 'some mock notes',
-              sensitivity: 'No',
-            },
-            params: {
-              contactId: id,
-              crn,
-            },
-            session: {
-              data: {
-                appointments: {
-                  [crn]: {
-                    [contactId]: {
-                      outcomeRecorded: 'Yes',
-                    },
-                  },
-                },
-              },
-            },
-          })
-          await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
-        })
-        it('should delete the outcome recorded session value', () => {
-          expect(mockReq.session.data.appointments[crn][id].outcomeRecorded).toBeUndefined()
-        })
-        it('should send the patch request to the api', () => {
-          expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId as string, 10),
-            notes: mockReq.body.notes,
-            sensitive: false,
-            outcomeRecorded: true,
-          })
-        })
-        it('should redirect to the manage appointment page', () => {
-          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
-        })
-      })
     })
   })
   describe('get next appointment', () => {
@@ -864,97 +795,6 @@ describe('controllers/appointments', () => {
         }),
       )
     })
-  })
-
-  it('treats null patchDocuments response as success', async () => {
-    mockIsValidCrn.mockReturnValue(true)
-    mockIsNumericString.mockReturnValue(true)
-
-    jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue(null)
-
-    const mockReq = httpMocks.createRequest({
-      body: {
-        notes: 'some mock notes',
-        sensitivity: 'Yes',
-      },
-      params: {
-        contactId: id,
-        crn,
-      },
-      file: {
-        originalname: 'test.pdf',
-      } as Express.Multer.File,
-      session: {
-        data: {},
-      },
-    })
-
-    await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
-
-    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
-  })
-  it('renders error page when file upload fails', async () => {
-    mockIsValidCrn.mockReturnValue(true)
-    mockIsNumericString.mockReturnValue(true)
-
-    jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
-      statusCode: 415,
-      errors: [{ text: 'Upload failed' }],
-    })
-
-    const mockReq = httpMocks.createRequest({
-      body: {
-        notes: 'some mock notes',
-        sensitivity: 'Yes',
-      },
-      params: {
-        contactId: id,
-        crn,
-      },
-      file: {
-        originalname: 'test.pdf',
-      } as Express.Multer.File,
-      session: {
-        data: {},
-      },
-    })
-
-    await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
-
-    expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
-      uploadError: 'File not uploaded. Please try again.',
-      patchResponse: expect.any(Object),
-      sensitive: true,
-      notes: 'some mock notes',
-    })
-
-    expect(redirectSpy).not.toHaveBeenCalled()
-  })
-  it('does not call patchDocuments when no file is uploaded', async () => {
-    mockIsValidCrn.mockReturnValue(true)
-    mockIsNumericString.mockReturnValue(true)
-
-    const patchDocumentsSpy = jest.spyOn(MasApiClient.prototype, 'patchDocuments')
-
-    const mockReq = httpMocks.createRequest({
-      body: {
-        notes: 'some mock notes',
-        sensitivity: 'Yes',
-      },
-      params: {
-        contactId: id,
-        crn,
-      },
-      session: {
-        data: {},
-      },
-      // IMPORTANT: no req.file
-    })
-
-    await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
-
-    expect(patchDocumentsSpy).not.toHaveBeenCalled()
-    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
   })
 
   describe('isSuccessfulUpload', () => {

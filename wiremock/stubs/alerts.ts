@@ -21,6 +21,23 @@ const stubNoUserAlerts = (): SuperAgentRequest =>
     },
   })
 
+const stubNoUserAlertsCount = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/alerts/count',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        count: 0,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 const stubUserAlertsWithData = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -253,4 +270,21 @@ const stubUserAlertsWithData = (): SuperAgentRequest =>
     },
   })
 
-export default { stubNoUserAlerts, stubUserAlertsWithData }
+const stubUserAlertsCountWithData = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/alerts/count',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        count: 12,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default { stubNoUserAlerts, stubNoUserAlertsCount, stubUserAlertsWithData, stubUserAlertsCountWithData }

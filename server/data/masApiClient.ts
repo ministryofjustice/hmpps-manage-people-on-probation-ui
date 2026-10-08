@@ -52,7 +52,7 @@ import {
   RescheduleAppointmentRequestBody,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
-import { UserAlerts, UserAlertsContent } from '../models/Alerts'
+import { UserAlerts, UserAlertsContent, UserAlertsCount } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
@@ -83,9 +83,6 @@ export default class MasApiClient extends RestClient {
     super('Manage a Supervision API', config.apis.masApi, token)
   }
 
-  /**
-   * @deprecated use DeliusClient.getHomepage
-   */
   async getUserAppointments(username: string): Promise<UserAppontment> {
     return this.get({ path: `/user/${username}/appointments`, handleTimeout: true })
   }
@@ -162,7 +159,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path })
   }
 
-  async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
+  async putContact(contactId: string, body: PutContactRequest): Promise<Response> {
     const path = `/contact/${contactId}`
     return this.put({ data: body, path })
   }
@@ -601,6 +598,15 @@ export default class MasApiClient extends RestClient {
   async getUserAlertsCount(): Promise<UserAlerts | ErrorSummary | null> {
     return this.get({
       path: `/alerts`,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
+    })
+  }
+
+  async getUserAlertsCountV2(): Promise<UserAlertsCount | ErrorSummary | null> {
+    return this.get({
+      path: `/alerts/count`,
       handle404: true,
       handle500: true,
       errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',

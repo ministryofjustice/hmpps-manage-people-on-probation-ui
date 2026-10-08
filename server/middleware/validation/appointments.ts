@@ -19,6 +19,7 @@ const appointments: Route<void> = (req, res, next) => {
   const id = uuid || contactId
   const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
+  const url = encodeURIComponent(req.url)
   const { maxCharCount } = config
   const outcomeJourney = req.url.includes('outcome/next-appointment')
 
@@ -46,6 +47,7 @@ const appointments: Route<void> = (req, res, next) => {
     alertDismissed,
     isSensitive,
     outcomeJourney,
+    url,
   }
 
   if (req.url.includes('/location-date-time')) {

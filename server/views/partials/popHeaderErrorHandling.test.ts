@@ -131,7 +131,9 @@ describe('pop-header.njk API failure handling', () => {
         }),
       )
 
-      expect(html.indexOf('data-qa="headerErrors"')).toBeLessThan(html.indexOf("data-qa='personName'"))
+      const personNameIndex = html.search(/data-qa=["']personName["']/)
+      expect(personNameIndex).toBeGreaterThan(-1)
+      expect(html.indexOf('data-qa="headerErrors"')).toBeLessThan(personNameIndex)
     })
   })
 

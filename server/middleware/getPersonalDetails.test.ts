@@ -28,6 +28,7 @@ import {
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
+import { SentencePlanResult } from '../data/model/arnsAssessmentPlatform'
 import { PersonalDetailsSession } from '../models/Data'
 import {
   Circumstances,
@@ -61,6 +62,12 @@ jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   toPredictors: jest.fn(() => mockPredictorScores),
 }))
+
+const mockDraftSentencePlanResult: SentencePlanResult = {
+  hasPlan: true,
+  hasAgreedPlan: false,
+  lastUpdatedDate: '2025-10-01T16:39:23Z',
+}
 
 const mockAuthOptions: AuthOptions = {
   user: {
@@ -341,6 +348,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
       req = getReq()
       res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
     })
@@ -352,6 +360,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValueOnce(null)
       req = getReq()
       res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
@@ -371,14 +380,15 @@ describe('/middleware/getPersonalDetails', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
 
-    it('still renders the header (no crash) but leaves prisonsUnavailable false when enablePersonHeader is off - the photo fetch has always been caught defensively, independent of this flag', async () => {
+    it('does not request a photo when enablePersonHeader is off', async () => {
+      const getImageDataSpy = jest.spyOn(PrisonApiClient.prototype, 'getImageData')
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
@@ -389,6 +399,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       req = getReq()
       res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
@@ -634,7 +645,71 @@ describe('/middleware/getPersonalDetails', () => {
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
       .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve({ hasAgreedPlan: false, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: { enableDraftSentencePlanAccess: true },
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop not in user caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: { enableDraftSentencePlanAccess: true },
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: true,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and draft sentence plan access is disabled', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',

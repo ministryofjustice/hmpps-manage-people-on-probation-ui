@@ -65,7 +65,7 @@ describe('tierApiClient', () => {
       mockedIsValidHost.mockReturnValue(true)
       mockedIsValidPath.mockReturnValue(true)
       fakeTierApiClient
-        .post(`/v2/crns/tier`)
+        .post(`/v3/crns/tier`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 

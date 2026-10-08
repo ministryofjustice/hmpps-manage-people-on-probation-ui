@@ -16,12 +16,6 @@ export class FeatureFlags {
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
   enableSessionCacheLogging?: boolean = undefined
-  enableESUPCheckinNewStop?: boolean = undefined
-  enableESUPCheckinNewRestart?: boolean = undefined
-  enableESUPCheckinNewSetup?: boolean = undefined
-  enableESUPCheckinNewSettings?: boolean = undefined
-  enableESUPCheckinNewReview?: boolean = undefined
-  enableESUPCheckinNewQuestions?: boolean = undefined
   enableSparksFilter?: boolean = undefined
   enableSupervisionPackageFilter?: boolean = undefined
   enableSupervisionPackageAppointments?: boolean = undefined
@@ -40,5 +34,9 @@ export class FeatureFlags {
   enableAllowSms?: boolean = undefined
   enableLastTextMessage?: boolean = undefined
   enableAlertsCountCaching?: boolean = undefined
-  enableFeedback?: boolean = undefined
+  enableAlertsCountApi?: boolean = undefined
+  disableUserAppointments?: boolean = undefined
+  enableDraftSentencePlanAccess?: boolean = undefined
+  enableNDeliusRosh?: boolean = undefined
+  enableAppointmentPatchAlerts?: boolean = undefined
 }

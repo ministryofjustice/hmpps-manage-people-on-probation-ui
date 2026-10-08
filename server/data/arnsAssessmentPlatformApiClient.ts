@@ -40,7 +40,7 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
 
       const planAgreementsCollection = result.collections?.find(c => c.name === 'PLAN_AGREEMENTS')
       if (!planAgreementsCollection?.items?.length) {
-        return { hasAgreedPlan: false, lastUpdatedDate: result.updatedAt }
+        return { hasPlan: true, hasAgreedPlan: false, lastUpdatedDate: result.updatedAt }
       }
 
       const sortedItems = [...planAgreementsCollection.items].sort((a, b) => {
@@ -53,7 +53,7 @@ export default class ArnsAssessmentPlatformApiClient extends RestClient {
       const latestStatus = unwrapSingleValue(sortedItems[0].properties?.status)
       const hasAgreedPlan = !!latestStatus && latestStatus !== DRAFT_STATUS
 
-      return { hasAgreedPlan, lastUpdatedDate: result.updatedAt }
+      return { hasPlan: true, hasAgreedPlan, lastUpdatedDate: result.updatedAt }
     } catch (error) {
       logger.error(error.name, 'Failed to get sentence plan from Assessment Platform API')
 

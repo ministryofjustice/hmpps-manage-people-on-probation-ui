@@ -1,5 +1,3 @@
-import { Name } from '../data/model/personalDetails'
-
 export interface ProbationPractitioner {
   code: string
   name: {

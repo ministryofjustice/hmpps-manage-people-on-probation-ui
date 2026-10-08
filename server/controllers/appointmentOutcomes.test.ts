@@ -73,12 +73,15 @@ const mockRes = ({
   appointmentOutcome,
   appointmentCase,
   appointmentSession = {},
+  flags = {},
 }: {
   appointmentOutcome?: Partial<AppointmentOutcomeProps<Activity>>
   appointmentCase?: Record<string, any>
   appointmentSession?: Partial<AppointmentSession>
+  flags?: Record<string, boolean>
 } = {}) => {
   return mockAppResponse({
+    flags: { ...flags },
     user: { username: 'user1' },
     case: { name: { forename: 'Stuart' }, ...(appointmentCase ?? {}) },
     appointmentOutcome: {
@@ -350,7 +353,9 @@ describe('controllers/appointmentOutcomes', () => {
     it('should render the page if upload not successful when postAddNote is called', async () => {
       const file = new File(['file contents'], 'avatar.png', { type: 'image/png' })
       isSuccessfulUploadSpy.mockReturnValueOnce(false)
-      const req = mockReq({ request: { file, body: { notes: 'Some notes', sensitive: 'no' } } })
+      const req = mockReq({
+        request: { file, body: { appointments: { [crn]: { [contactId]: { notes: 'Some notes', sensitive: 'no' } } } } },
+      })
       const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const renderSpy = jest.spyOn(res, 'render')
       const patchDocumentsSpy = jest
@@ -381,6 +386,44 @@ describe('controllers/appointmentOutcomes', () => {
       const spy = jest.spyOn(res, 'redirect')
       await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
       expect(spy).toHaveBeenCalledWith(`${change}?back=/case/X000001/appointments/appointment/1234/outcome/add-note`)
+    })
+
+    it('should record notes successfully added and redirect to manage page if manage journey', async () => {
+      const req = mockReq({
+        request: {
+          query: { put: true },
+          body: { appointments: { [crn]: { [contactId]: { notes: 'Some notes', sensitive: 'no' } } } },
+        },
+      })
+      const res = mockRes({ appointmentOutcome: { id: contactId } })
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`/case/X000001/appointments/appointment/1234/manage`)
+      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['note', crn, contactId, 'noteAdded'], 'Success')
+    })
+
+    it('should not record notes added if no notes and redirect to manage page if manage journey', async () => {
+      const req = mockReq({
+        request: {
+          query: { put: true },
+          body: { appointments: { [crn]: { [contactId]: { notes: '', sensitive: 'no' } } } },
+        },
+      })
+      const res = mockRes({ appointmentOutcome: { id: contactId } })
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(`/case/X000001/appointments/appointment/1234/manage`)
+      expect(setDataValueSpy).toHaveBeenCalledWith(req.session.data, ['note', crn, contactId, 'noteAdded'], 'None')
+    })
+
+    it('should redirect to combined check your answers page if flag set and linked contact', async () => {
+      const req = mockReq({ linkedContactId: '5678' })
+      const res = mockRes({ flags: { enableCombinedCYAPage: true } })
+      const spy = jest.spyOn(res, 'redirect')
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/X000001/appointments/appointment/5678/outcome/check-your-answers?back=/case/X000001/appointments/appointment/1234/outcome/add-note`,
+      )
     })
 
     it('should redirect to the check your answers page if arrange appointment journey', async () => {

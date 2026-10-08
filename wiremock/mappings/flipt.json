@@ -110,39 +110,6 @@
               "rollouts": []
             },
             {
-              "key": "enableESUPCheckinNewStop",
-              "name": "enableESUPCheckinNewStop",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-07-08T12:00:00.000000Z",
-              "updatedAt": "2026-07-08T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableESUPCheckinNewReview",
-              "name": "enableESUPCheckinNewReview",
-              "description": "",
-              "enabled": false,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-07-15T12:00:00.000000Z",
-              "updatedAt": "2026-07-15T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableESUPCheckinNewQuestions",
-              "name": "enableESUPCheckinNewQuestions",
-              "description": "",
-              "enabled": false,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-07-08T12:00:00.000000Z",
-              "updatedAt": "2026-07-08T12:00:00.000000Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableRescheduleFutureAppointmentWithOutcome",
               "name": "enableRescheduleFutureAppointmentWithOutcome",
               "description": "",
@@ -273,8 +240,8 @@
               "rollouts": []
             },
             {
-              "key": "enableFeedback",
-              "name": "enableFeedback",
+              "key": "enableAlertsCountCaching",
+              "name": "enableAlertsCountCaching",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
@@ -284,13 +251,35 @@
               "rollouts": []
             },
             {
-              "key": "enableAlertsCountCaching",
-              "name": "enableAlertsCountCaching",
+              "key": "enableNDeliusRosh",
+              "name": "enableNDeliusRosh",
+              "description": "",
+              "enabled": false,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-07-08T12:00:00.000000Z",
+              "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableAppointmentPatchAlerts",
+              "name": "enableAppointmentPatchAlerts",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-07-08T12:00:00.000000Z",
               "updatedAt": "2026-07-08T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableDraftSentencePlanAccess",
+              "name": "enableDraftSentencePlanAccess",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-10-06T12:00:00.000000Z",
+              "updatedAt": "2026-10-06T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             }

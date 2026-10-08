@@ -40,6 +40,7 @@ import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
 import { getUserOptions } from '../middleware/getUserOptions'
 import { returnOptions } from '../middleware/returnOptions'
+import { routeChangeSmsConsent } from '../middleware/routeChangeSmsConsent'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -120,6 +121,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',
+    routeChangeSmsConsent,
     validate.appointments,
     autoStoreSessionData(hmppsAuthClient),
     checkAnswers,

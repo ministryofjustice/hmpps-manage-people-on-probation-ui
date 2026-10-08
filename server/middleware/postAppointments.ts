@@ -1,6 +1,14 @@
 import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
+import {
+  getDataValue,
+  dateTime,
+  handleQuotes,
+  firstInitialLastName,
+  toSentenceCase,
+  isoFromDateTime,
+  convertToTitleCase,
+} from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -184,7 +192,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         isWelshTranslation = includeWelshPreview
         outlookEventRequestBody.smsEventRequest = {
           firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
-          practitionerFirstName: firstName,
+          practitionerFirstName: convertToTitleCase(firstName),
           mobileNumber,
           crn,
           smsOptIn: true,

@@ -3,7 +3,7 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { SmsPreviewRequest, SmsPreviewResponse, SmsPreviewSession } from '../data/model/OutlookEvent'
 import { AppointmentSession } from '../models/Appointments'
-import { getDataValue, isoFromDateTime, responseIsError, responseIsErrorSummary, setDataValue } from '../utils'
+import { convertToTitleCase, getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
@@ -47,7 +47,7 @@ export const getSmsPreview = (
       includeWelshPreview,
     }
     if (recipientEmail) body.recipientEmail = recipientEmail
-    if (practitionerName?.forename) body.practitionerFirstName = practitionerName.forename
+    if (practitionerName?.forename) body.practitionerFirstName = convertToTitleCase(practitionerName.forename)
 
     // we should not be sending location when its telephone or video contact
     if (!appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
