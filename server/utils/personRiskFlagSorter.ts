@@ -30,10 +30,10 @@ export const registerTypes = {
     { code: 'AV2S', description: 'Risk to Staff' },
     { code: 'RTPS', description: 'Risk to Probation Staff' },
     { code: 'REG17', description: 'Risk to Public' },
-    { code: 'REG15', description: 'Risk to Known Adult' },
-    { code: 'REG16', description: 'Risk to Prisoner' },
     { code: 'REG26', description: 'Organised Crime' },
     { code: 'RCHD', description: 'Risk to Children' },
+    { code: 'REG15', description: 'Risk to Known Adult' },
+    { code: 'REG16', description: 'Risk to Prisoner' },
     { code: 'RSC', description: 'Sexual Conviction' },
     {
       code: 'SHPO',
@@ -118,6 +118,16 @@ interface RiskBadgeGroup {
 export interface RiskBadgeData {
   groups: RiskBadgeGroup[]
   remainingCount: number
+}
+
+function getRiskDescriptionPriority(description: string, registerType: string | undefined): number {
+  if (!registerType) {
+    return Number.MAX_SAFE_INTEGER
+  }
+
+  const registers = registerTypes[registerType as keyof typeof registerTypes]
+
+  return registers.findIndex(register => register.description.trim().toLowerCase() === description.trim().toLowerCase())
 }
 
 const MAX_RISK_BADGES = 7
@@ -207,7 +217,14 @@ export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
       ? registerTypePriority.indexOf(bRegisterType as (typeof registerTypePriority)[number])
       : Number.MAX_SAFE_INTEGER
 
-    return aRegisterPriority - bRegisterPriority
+    if (aRegisterPriority !== bRegisterPriority) {
+      return aRegisterPriority - bRegisterPriority
+    }
+
+    const aDescriptionPriority = getRiskDescriptionPriority(a.description, aRegisterType)
+    const bDescriptionPriority = getRiskDescriptionPriority(b.description, bRegisterType)
+
+    return aDescriptionPriority - bDescriptionPriority
   })
 
   const visibleRiskFlags = sortedRiskFlags.slice(0, MAX_RISK_BADGES)
