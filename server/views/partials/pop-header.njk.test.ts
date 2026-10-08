@@ -271,7 +271,7 @@ describe('POP header', () => {
         const link = $(`[data-qa="risk-badge-${badge.id}"]`)
         expect(link.attr('href')).toBe(`/case/${baseModel.headerCRN}/risk/flag/${badge.id}`)
         expect(link.hasClass(badge.badgeClass)).toBe(true)
-        expect(link.text()).toContain(badge.text)
+        expect(link.text().replace(/\s+/g, ' ').trim()).toContain(badge.text)
       })
     })
 

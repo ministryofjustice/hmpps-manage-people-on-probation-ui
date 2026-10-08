@@ -159,8 +159,8 @@ describe('utils/getRiskBadgeGroups', () => {
       expect(result.groups).toHaveLength(1)
 
       expect(result.groups[0].badges.map(badge => badge.text)).toEqual([
-        'Weapons',
         'Risk to known adult - High',
+        'Weapons',
         'Alert notice',
       ])
     })
@@ -187,14 +187,14 @@ describe('utils/getRiskBadgeGroups', () => {
           severity: 'HIGH',
           badges: [
             {
-              id: 1,
-              text: 'Risk to public - High',
+              id: 2,
+              text: 'Risk to probation staff',
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
             {
-              id: 2,
-              text: 'Risk to probation staff',
+              id: 1,
+              text: 'Risk to public - High',
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
@@ -248,14 +248,14 @@ describe('utils/getRiskBadgeGroups', () => {
           severity: 'HIGH',
           badges: [
             {
-              id: 1,
-              text: 'Risk to public - High',
+              id: 2,
+              text: 'Risk to probation staff',
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
             {
-              id: 2,
-              text: 'Risk to probation staff',
+              id: 1,
+              text: 'Risk to public - High',
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
@@ -448,6 +448,95 @@ describe('utils/getRiskBadgeGroups', () => {
               {
                 id: 2501007047,
                 text: 'Child concerns',
+                level: 'MEDIUM',
+                badgeClass: 'risk-badge--medium',
+              },
+            ],
+          },
+        ],
+        remainingCount: 0,
+      })
+    })
+    it('sorts risk badges by severity, register type, then alphabetically', () => {
+      const riskFlags = [
+        createRiskFlag({
+          id: 1,
+          description: 'Risk to Probation Staff',
+          level: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 2,
+          description: 'Risk to Staff',
+          level: 'HIGH',
+          levelDescription: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 3,
+          description: 'Risk to Public',
+          level: 'HIGH',
+          levelDescription: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 4,
+          description: 'Child Protection',
+          level: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 5,
+          description: 'Child Sexual Exploitation - Perpetrator',
+          level: 'HIGH',
+        }),
+        createRiskFlag({
+          id: 6,
+          description: 'Risk to Prisoner',
+          level: 'MEDIUM',
+          levelDescription: 'MEDIUM',
+        }),
+      ]
+
+      expect(getRiskBadgeGroups(riskFlags)).toEqual({
+        groups: [
+          {
+            severity: 'HIGH',
+            badges: [
+              {
+                id: 2,
+                text: 'Risk to staff - High',
+                level: 'HIGH',
+                badgeClass: 'risk-badge--high',
+              },
+              {
+                id: 1,
+                text: 'Risk to probation staff',
+                level: 'HIGH',
+                badgeClass: 'risk-badge--high',
+              },
+              {
+                id: 3,
+                text: 'Risk to public - High',
+                level: 'HIGH',
+                badgeClass: 'risk-badge--high',
+              },
+              {
+                id: 5,
+                text: 'Child sexual exploitation - perpetrator',
+                level: 'HIGH',
+                badgeClass: 'risk-badge--high',
+              },
+              {
+                id: 4,
+                text: 'Child protection',
+                level: 'HIGH',
+                badgeClass: 'risk-badge--high',
+              },
+            ],
+          },
+          {
+            severity: 'MEDIUM',
+            badges: [
+              {
+                id: 6,
+                text: 'Risk to prisoner - Medium',
                 level: 'MEDIUM',
                 badgeClass: 'risk-badge--medium',
               },
