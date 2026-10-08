@@ -47,7 +47,7 @@
         {{ govukTable(tableData) }}
     </div>
 {% elseif disableUserAppointments %}
-    <p class="govuk-body govuk-!-padding-3" data-qa="appointmentsFeatureDisabled">Appointments and outcomes are not currently available. You can view them on NDelius.</p>
+    <p class="govuk-body govuk-!-padding-3" data-qa="appointmentsFeatureDisabled">Upcoming appointments are currently unavailable.</p>
 {% elseif appointmentsTimeoutError %}
     <p class="govuk-body govuk-!-padding-3" data-qa="appointmentsTimeoutError">Upcoming appointments are currently unavailable.</p>
 {% else %}

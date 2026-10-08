@@ -11,9 +11,7 @@ describe('pages/homepage-old/_outcomes.njk', () => {
     const html = render({ outcomes: [], disableUserAppointments: true })
     const $ = cheerio.load(html)
 
-    expect($('[data-qa="outcomesFeatureDisabled"]').text()).toContain(
-      'Appointments and outcomes are not currently available. You can view them on NDelius.',
-    )
+    expect($('[data-qa="outcomesFeatureDisabled"]').text()).toContain('Outcomes to log are currently unavailable.')
     expect($('[data-qa="outcomesTimeoutError"]').length).toBe(0)
   })
 

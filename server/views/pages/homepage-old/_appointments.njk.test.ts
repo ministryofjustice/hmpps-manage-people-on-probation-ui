@@ -12,7 +12,7 @@ describe('pages/homepage-old/_appointments.njk', () => {
     const $ = cheerio.load(html)
 
     expect($('[data-qa="appointmentsFeatureDisabled"]').text()).toContain(
-      'Appointments and outcomes are not currently available. You can view them on NDelius.',
+      'Upcoming appointments are currently unavailable.',
     )
     expect($('[data-qa="appointmentsTimeoutError"]').length).toBe(0)
   })
