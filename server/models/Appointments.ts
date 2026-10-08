@@ -11,6 +11,8 @@ import type {
 
 export type YesNo = '' | 'Yes' | 'No'
 
+export type AllowSms = 'YES' | 'NO' | '' | undefined
+
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
@@ -161,6 +163,7 @@ export interface AppointmentSessionUser {
   staffCode?: string
   name?: Name
   email?: string
+  displayName?: string
 }
 
 export interface AppointmentSession {
@@ -194,6 +197,7 @@ export interface AppointmentSession {
     dateFromCya?: string
     startTimeFromCya?: string
     endTimeFromCya?: string
+    changeSmsConsentLinkClicked?: boolean
   }
   outcome?: AppointmentSessionOutcome
   sensitivityLocked?: boolean
@@ -368,6 +372,8 @@ export interface LocalParams {
     | Option<AppointmentEnforcementAction | ''>[]
     | Option<EnforcementActionCreatedBy>[]
   isSensitive?: boolean
+  allowSms?: boolean
+  url?: string
 }
 
 export interface ProbationDeliveryUnit {

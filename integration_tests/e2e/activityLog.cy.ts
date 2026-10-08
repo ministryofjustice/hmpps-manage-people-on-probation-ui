@@ -61,7 +61,6 @@ context('Contacts', () => {
 
   it('should render the update contact button when contact is updatable', () => {
     cy.visit('/case/X000001/activity/322')
-
     cy.get('[data-qa="manage-link"]')
       .should('exist')
       .and('contain.text', 'Update contact')
@@ -188,26 +187,24 @@ context('Contacts', () => {
     page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
-  it('should show the correct validation if date from is in the future', () => {
+  it('should no longer show additional validation if the date from is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateFromInput().type(`${day}/${month}/${year + 1}`)
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 2)
-    page.getErrorSummaryLink(0).should('contain.text', 'The date from must be today or in the past')
-    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
+    page.getAllErrorSummaryLinks().should('have.length', 1)
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date to')
   })
 
-  it('should show the correct validation if date to is in the future', () => {
+  it('should no longer show additional validation if the date to is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateToInput().type(`${day}/${month}/${year + 1}`)
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page.getAllErrorSummaryLinks().should('have.length', 1)
     page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
-    page.getErrorSummaryLink(1).should('contain.text', 'The date to must be today or in the past')
   })
 
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {
@@ -669,5 +666,79 @@ context('Contacts', () => {
     page.getActivityViewLink(0).should('contain.text', 'Manage')
     // Verify it's NOT showing outcome prompt (View + Manage on NDelius)
     cy.get('.contact-activity__actions-cell').eq(0).find('[data-qa="manage-on-delius-link"]').should('not.exist')
+  })
+
+  describe('enableUserEditableActions flag', () => {
+    beforeEach(() => {
+      cy.task('stubFeatureFlag', { key: 'enableUserEditableActions', enabled: true })
+    })
+
+    it('should show Manage link for an MPOP contact type when editable is true', () => {
+      cy.task('stubActivityLogWithMpopManageableUserEditableContact')
+      cy.visit('/case/X000001/activity-log')
+      const page = Page.verifyOnPage(ActivityLogPage)
+      page.getActivity(1).should('contain.text', 'MAPPA level setting process')
+      page.getActivityViewLink(0).should('contain.text', 'Manage')
+      page.getElementByDataQA('manage-on-delius-link').should('not.exist')
+    })
+
+    it('should show Manage link for an MPOP appointment type when editable is true', () => {
+      cy.task('stubActivityLogWithMpopManageableAppointmentUserEditable')
+      cy.visit('/case/X000001/activity-log')
+      const page = Page.verifyOnPage(ActivityLogPage)
+      page.getActivity(1).should('contain.text', 'Planned office visit NS')
+      page.getActivityViewLink(0).should('contain.text', 'Manage')
+      page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/appointments/appointment/9995/manage')
+      page.getElementByDataQA('manage-on-delius-link').should('not.exist')
+    })
+
+    it('should show View and Manage on NDelius links for a non-MPOP type when editable is true', () => {
+      cy.task('stubActivityLogWithNonMpopUserEditableContact')
+      cy.visit('/case/X000001/activity-log')
+      const page = Page.verifyOnPage(ActivityLogPage)
+      page.getActivity(1).should('contain.text', 'Court appearance')
+      page.getActivityViewLink(0).should('contain.text', 'View')
+      page.getElementByDataQA('manage-on-delius-link').should('be.visible')
+      page.getElementByDataQA('manage-on-delius-link').should('contain.text', 'Manage on NDelius')
+      page
+        .getElementByDataQA('manage-on-delius-link')
+        .should('have.attr', 'href')
+        .and('include', 'component=UpdateContact')
+    })
+
+    it('should show View only when editable is false, regardless of contact type', () => {
+      cy.task('stubActivityLogWithNotUserEditableContact')
+      cy.visit('/case/X000001/activity-log')
+      const page = Page.verifyOnPage(ActivityLogPage)
+      page.getActivity(1).should('contain.text', 'Court appearance')
+      page.getActivityViewLink(0).should('contain.text', 'View')
+      page.getElementByDataQA('manage-on-delius-link').should('not.exist')
+    })
+
+    it('should use the Drug History NDelius deep link for drug test contact types', () => {
+      cy.task('stubActivityLogWithUserEditableDrugTestContact')
+      cy.visit('/case/X000001/activity-log')
+      const page = Page.verifyOnPage(ActivityLogPage)
+      page.getActivity(1).should('contain.text', 'Drug test details')
+      page.getActivityViewLink(0).should('contain.text', 'View')
+      page
+        .getElementByDataQA('manage-on-delius-link')
+        .should('have.attr', 'href')
+        .and('include', 'component=DrugHistory')
+        .and('include', 'EventNumber=7')
+    })
+
+    it('should use the UPW Worksheet NDelius deep link for CP/UPW contact types', () => {
+      cy.task('stubActivityLogWithUserEditableUpwContact')
+      cy.visit('/case/X000001/activity-log')
+      const page = Page.verifyOnPage(ActivityLogPage)
+      page.getActivity(1).should('contain.text', 'CP/UPW - Appointment/Attendance (NS)')
+      page.getActivityViewLink(0).should('contain.text', 'View')
+      page
+        .getElementByDataQA('manage-on-delius-link')
+        .should('have.attr', 'href')
+        .and('include', 'component=UPWWorksheet')
+        .and('include', 'EventNumber=8')
+    })
   })
 })

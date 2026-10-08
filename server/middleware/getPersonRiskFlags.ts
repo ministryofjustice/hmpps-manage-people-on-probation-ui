@@ -1,17 +1,24 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
+import { PersonRiskFlags, RiskFlag, RiskScore, RoshBadgeLevel } from '../data/model/risk'
 import { setDataValue, findReplace, getStaffRisk, getProbationRisk } from '../utils'
+import { getRiskBadgeGroups, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getPersonRiskFlagsInner(req, res, next) {
     const { crn } = req.params as Record<string, string>
     let personRisks: PersonRiskFlags
+    let riskBadgeData: RiskBadgeData
     if (!req.session?.data?.risks?.[crn]) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       personRisks = await masClient.getPersonRiskFlags(crn)
+
+      if (personRisks.riskFlags) {
+        riskBadgeData = getRiskBadgeGroups(personRisks.riskFlags)
+      }
+
       const term = 'RoSH'
       ;['riskFlags', 'removedRiskFlags'].forEach(path => {
         personRisks = findReplace<PersonRiskFlags, RiskFlag>({
@@ -24,8 +31,10 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       })
       const { data } = req.session
       setDataValue(data, ['risks', crn], personRisks)
+      setDataValue(data, ['riskBadgeData', crn], riskBadgeData)
     } else {
       personRisks = req.session.data.risks[crn]
+      riskBadgeData = req.session.data.riskBadgeData?.[crn] ?? getRiskBadgeGroups(personRisks.riskFlags ?? [])
     }
     const riskToStaff = getStaffRisk(personRisks.riskFlags)
     const riskToProbationStaff = getProbationRisk(personRisks.riskFlags)
@@ -48,7 +57,22 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       }
       return item
     })
+
+    if (res.locals?.flags?.enableNDeliusRosh) {
+      const riskScore = personRisks.riskFlags
+        ?.filter(riskFlag => !riskFlag.removed)
+        ?.find(riskFlag => riskFlag.description.toLowerCase().includes('rosh'))
+        ?.description?.toLowerCase()
+        .replace('rosh', '')
+        .trim()
+        .toUpperCase() as RoshBadgeLevel
+      res.locals.rosh = {
+        level: riskScore,
+      }
+    }
     res.locals.personRisks = personRisks
+    res.locals.riskBadgeData = riskBadgeData
+
     return next()
   }
 }

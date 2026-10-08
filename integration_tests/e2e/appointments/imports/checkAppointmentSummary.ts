@@ -15,7 +15,6 @@ interface SummaryProps {
   sendTextMessage?: boolean
   summaryHasDate?: boolean
   smsFeatureFlagDisabled?: boolean
-  enableNonCompliance?: boolean
   action?: AppointmentEnforcementAction
 }
 
@@ -28,7 +27,6 @@ export const checkAppointmentSummary = ({
   sendTextMessage = true,
   summaryHasDate = true,
   smsFeatureFlagDisabled = false,
-  enableNonCompliance = true,
   action = 'NO_FURTHER_ACTION',
 }: SummaryProps) => {
   const appointmentFor = reschedule ? 'Default Sentence Type (12 Months)' : '12 month Community order'
@@ -80,34 +78,24 @@ export const checkAppointmentSummary = ({
   const index = dateInPast ? 1 : 0
 
   if (dateInPast) {
-    if (!enableNonCompliance) {
-      page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
-      page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-      page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Notes')
-      page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
-      page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
-      page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-    }
-    if (enableNonCompliance) {
-      const evidenceDate = DateTime.now().plus({ days: 6 }).toFormat('dd MMMM yyyy')
-      page
-        .getSummaryListRow(6)
-        .find('.govuk-summary-list__key')
-        .should('contain.text', 'What was the outcome of this appointment?')
-      page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Attended - failed to comply')
-      page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Enforcement action')
-      const expectedActionHtml =
-        action === 'NO_FURTHER_ACTION'
-          ? 'No further action'
-          : 'I will initiate the breach<br>I will send a different enforcement letter'
-      page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.html', expectedActionHtml)
-      page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
-      page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
-      page.getSummaryListRow(9).find('.govuk-summary-list__key').should('contain.text', 'Notes')
-      page.getSummaryListRow(9).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
-      page.getSummaryListRow(10).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
-      page.getSummaryListRow(10).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-    }
+    const evidenceDate = DateTime.now().plus({ days: 6 }).toFormat('dd MMMM yyyy')
+    page
+      .getSummaryListRow(6)
+      .find('.govuk-summary-list__key')
+      .should('contain.text', 'What was the outcome of this appointment?')
+    page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Attended - failed to comply')
+    page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Enforcement action')
+    const expectedActionHtml =
+      action === 'NO_FURTHER_ACTION'
+        ? 'No further action'
+        : 'I will initiate the breach<br>I will send a different enforcement letter'
+    page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.html', expectedActionHtml)
+    page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Evidence due date')
+    page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', evidenceDate)
+    page.getSummaryListRow(9).find('.govuk-summary-list__key').should('contain.text', 'Notes')
+    page.getSummaryListRow(9).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
+    page.getSummaryListRow(10).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
+    page.getSummaryListRow(10).find('.govuk-summary-list__value').should('contain.text', 'Yes')
   }
   if (!dateInPast && !smsFeatureFlagDisabled) {
     page

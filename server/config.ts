@@ -294,10 +294,15 @@ export default {
     pdf: 'application/pdf',
     doc: 'application/msword',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    jpeg: 'image/jpeg',
+  },
+  validFileExtensions: {
+    jpeg: '.jpeg',
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
   fileUploadLimit: 5,
   maxCharCount: get('CHAR_COUNT', 12000, requiredInProduction),
   preservedWords: ['(NS)', '(Non', 'NS)'],
   preservedSeparators: ['-'],
+  alertsCountCacheMinutes: Number(get('ALERTS_COUNT_CACHE_MINUTES', 5)),
 }

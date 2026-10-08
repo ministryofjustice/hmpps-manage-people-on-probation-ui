@@ -1,5 +1,8 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "govuk/components/input/macro.njk" import govukInput -%}
 
 {% set queryString = '?' + queryParams.join('&') if queryParams.length > 0 else
   '' %}
@@ -40,7 +43,6 @@
       }
     },
     value: query.dateFrom,
-    maxDate: filters.maxDate,
     errorMessage: {
       text: errorMessages.dateFrom,
       attributes: {
@@ -62,7 +64,6 @@
       }
   },
   value: query.dateTo,
-  maxDate: filters.maxDate,
   errorMessage: {
       text: errorMessages.dateTo,
       attributes: {

@@ -88,6 +88,8 @@ const activityLogController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const baseUrl = req.url.split('?')[0]
+
+      const showContactInformationWarning = res.locals.flags?.showContactInformationWarning === true
       return res.render('pages/contact-log', {
         personActivity,
         crn,
@@ -102,6 +104,7 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsEnd,
         errorMessages: req.session.errorMessages,
         groupedActivities: groupActivitiesByDate(personActivity.activities)(req, res),
+        showContactInformationWarning,
       })
     }
   },

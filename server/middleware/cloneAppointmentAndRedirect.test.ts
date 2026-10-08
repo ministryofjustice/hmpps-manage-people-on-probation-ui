@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentSession, YesNo } from '../models/Appointments'
+import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { getDataValue, setDataValue } from '../utils'
+import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
@@ -32,9 +32,9 @@ const mockAppt: AppointmentSession = {
   },
   type: 'COAP',
   visorReport: 'Yes',
-  date: '2024-02-21T10:15:00.382936Z[Europe/London]',
-  start: '2024-02-21T10:15:00.382936Z[Europe/London]',
-  end: '2024-02-21T10:30:00.382936Z[Europe/London]',
+  date: '2024-02-21T10:15:00.382936Z',
+  start: '2024-02-21T10:15:00.382936Z',
+  end: '2024-02-21T10:30:00.382936Z',
   eventId: '2501192724',
   username: 'USER1',
   uuid: '',
@@ -88,10 +88,20 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
 
+  const apptTypes: AppointmentSessionSelection[] = ['KEEP_TYPE', 'CHANGE_TYPE']
+  it.each(apptTypes)(
+    'should set the nextAppointmentId in temp if apptType is %s and enableCombinedCYAPage is true and url includes /outcome/next-appointment',
+    a => {
+      res.locals.flags = { enableCombinedCYAPage: true }
+      req.url = '/outcome/next-appointment'
+      cloneAppointmentAndRedirect(mockAppt, a)(req, res)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['temp', crn, 'nextAppointmentId'], uuid)
+    },
+  )
+
   it('should only redirect and not clone the current appointment if the apptType is CHANGE_TYPE', () => {
     cloneAppointmentAndRedirect(mockAppt, 'CHANGE_TYPE')(req, res)
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${req.url}`)
-    expect(mockedSetDataValue).not.toHaveBeenCalled()
   })
 
   it('should reuse existing id and redirect to check answers when apptType is RESCHEDULE', () => {

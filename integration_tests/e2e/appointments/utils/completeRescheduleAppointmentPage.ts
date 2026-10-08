@@ -2,13 +2,10 @@ import { getUuid } from './common'
 import ManageAppointmentPage from '../../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../../pages/appointments/reschedule-appointment.page'
 
-export const completeRescheduleAppointmentPage = ({ enableNonCompliance = true, crn = 'X000001' } = {}) => {
-  if (!enableNonCompliance) {
-    cy.task('stubDisableNonCompliance')
-  }
+export const completeRescheduleAppointmentPage = ({ crn = 'X000001' } = {}) => {
   cy.visit(`/case/${crn}/appointments/appointment/6/manage`)
   const manageAppointmentPage = new ManageAppointmentPage()
-  const index = enableNonCompliance ? 2 : 1
+  const index = 2
   manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').find('a').click()
   getUuid(1).then(pageUuid => {
     const rescheduleAppointmentPage = new RescheduleAppointmentPage()

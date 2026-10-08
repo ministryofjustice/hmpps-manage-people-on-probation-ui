@@ -198,32 +198,9 @@ describe('getTierDetails middleware', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should show tierScore as MISSING and provisional is true', async () => {
-    mpopComponents.getTierDetails.mockResolvedValue({
-      calculation: {
-        tierScore: 'MISSING',
-        provisional: true,
-        calculationId: '1',
-        calculationDate: '',
-        changeReason: '',
-        tag: { text: 'Missing', color: 'red' },
-      } as LatestTierV3,
-      httpStatus: 200,
-    })
-    const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
-
-    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
-      req,
-      res,
-      nextSpy,
-    )
-
-    expect(res.locals.tierDetails?.calculation?.tierScore).toBe('MISSING')
-    expect(res.locals.tierDetails?.calculation?.provisional).toBe(true)
-  })
-
-  it('should show tierScore as MISSING and provisional is already false', async () => {
+  // MISSING and provisional: true never co-occur in practice - the MPoP API's tag
+  // computation always treats MISSING as taking precedence over the provisional flag.
+  it('should show tierScore as MISSING and pass through provisional as false, unmodified', async () => {
     mpopComponents.getTierDetails.mockResolvedValue({
       calculation: {
         tierScore: 'MISSING',
@@ -245,6 +222,55 @@ describe('getTierDetails middleware', () => {
     )
 
     expect(res.locals.tierDetails?.calculation?.tierScore).toBe('MISSING')
+    expect(res.locals.tierDetails?.calculation?.provisional).toBe(false)
+  })
+
+  it('should pass through provisional as false, unmodified, for an Unavailable tag', async () => {
+    mpopComponents.getTierDetails.mockResolvedValue({
+      calculation: {
+        tierScore: '',
+        provisional: false,
+        calculationId: '',
+        calculationDate: '',
+        changeReason: '',
+        tag: { text: 'Unavailable', color: 'grey' },
+      } as LatestTierV3,
+      httpStatus: 404,
+    })
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
+      req,
+      res,
+      nextSpy,
+    )
+
+    expect(res.locals.tierDetails?.calculation?.tag).toEqual({ text: 'Unavailable', color: 'grey' })
+    expect(res.locals.tierDetails?.calculation?.provisional).toBe(false)
+  })
+
+  it('should pass through provisional as false, unmodified, when there is no tag (a confirmed, non-provisional tier)', async () => {
+    mpopComponents.getTierDetails.mockResolvedValue({
+      calculation: {
+        tierScore: 'B2',
+        provisional: false,
+        calculationId: '1',
+        calculationDate: '',
+        changeReason: '',
+        tag: { text: null, color: null },
+      } as LatestTierV3,
+      httpStatus: 200,
+    })
+    const req = buildReq({ [CRN]: makeSessionEntry() })
+    const res = buildRes(true)
+
+    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
+      req,
+      res,
+      nextSpy,
+    )
+
     expect(res.locals.tierDetails?.calculation?.provisional).toBe(false)
   })
 

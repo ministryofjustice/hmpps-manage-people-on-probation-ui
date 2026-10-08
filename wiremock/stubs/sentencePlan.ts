@@ -14,7 +14,7 @@ const stubSentencePlanAgreementDraft = (): SuperAgentRequest =>
             result: {
               type: 'AssessmentVersionQueryResult',
               assessmentUuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-              updatedAt: '2025-09-29T10:54:36.782Z',
+              updatedAt: '2025-10-10T16:08:54Z',
               collections: [
                 {
                   uuid: 'c0000000-0000-0000-0000-000000000001',

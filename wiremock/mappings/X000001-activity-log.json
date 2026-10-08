@@ -1215,7 +1215,6 @@
       }
     },
 
-
     {
       "request": {
         "urlPattern": "/mas/schedule/X000001/appointment/11/note/1",

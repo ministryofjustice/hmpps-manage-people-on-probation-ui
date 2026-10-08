@@ -33,4 +33,43 @@ const stubTierHistory = ({
     },
   })
 
-export default { stubTierHistory }
+// Stubs the Tier API v3 tier endpoint consumed by MPoPComponents#getTierDetails, i.e. the
+// calculation rendered in the new PoP header.
+const stubTierDetails = ({
+  crn,
+  tierScore,
+  provisional = false,
+  calculationId = 'calc-1',
+  calculationDate = '2024-01-01T00:00:00',
+  changeReason = '',
+  status = 200,
+}: {
+  crn: string
+  tierScore: string
+  provisional?: boolean
+  calculationId?: string
+  calculationDate?: string
+  changeReason?: string
+  status?: number
+}): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPath: `/tier/v3/crn/${crn}/tier`,
+      method: 'GET',
+    },
+    response: {
+      status,
+      jsonBody: {
+        tierScore,
+        calculationId,
+        calculationDate,
+        changeReason,
+        provisional,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default { stubTierHistory, stubTierDetails }

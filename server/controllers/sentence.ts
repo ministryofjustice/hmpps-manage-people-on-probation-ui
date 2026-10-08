@@ -50,17 +50,15 @@ const sentenceController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const sentenceDetails = await masClient.getSentenceDetails(crn, queryParam)
       let personExistsResponse: PersonExistsResponse | undefined
-      if (res.locals.flags.enableEMDISentencesShowGPSData) {
-        const licenceConditions: LicenceCondition[] = sentenceDetails.sentence?.licenceConditions
-        const requirements: Requirement[] = sentenceDetails.sentence?.requirements
-        const hasLocationMonitoring: {
-          hasLicenceConditionsLMData?: boolean
-          hasRequirementsLMData?: boolean
-        } = checkLocationMonitoring(licenceConditions, requirements)
-        if (hasLocationMonitoring?.hasLicenceConditionsLMData || hasLocationMonitoring?.hasRequirementsLMData) {
-          personExistsResponse = await existsInEMDI(crn, token)
-          res.locals.personExistsResponse = personExistsResponse
-        }
+      const licenceConditions: LicenceCondition[] = sentenceDetails.sentence?.licenceConditions
+      const requirements: Requirement[] = sentenceDetails.sentence?.requirements
+      const hasLocationMonitoring: {
+        hasLicenceConditionsLMData?: boolean
+        hasRequirementsLMData?: boolean
+      } = checkLocationMonitoring(licenceConditions, requirements)
+      if (hasLocationMonitoring?.hasLicenceConditionsLMData || hasLocationMonitoring?.hasRequirementsLMData) {
+        personExistsResponse = await existsInEMDI(crn, token)
+        res.locals.personExistsResponse = personExistsResponse
       }
       return res.render('pages/sentence', {
         sentenceDetails,

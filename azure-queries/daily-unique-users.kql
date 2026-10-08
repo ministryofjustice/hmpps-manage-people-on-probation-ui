@@ -1,0 +1,16 @@
+// Count of daily unique users viewing pages, from the start of the current month to now.
+//
+//   ./run-query.sh daily-unique-users.kql
+let startOfMonth = startofmonth(datetime_utc_to_local(now(), "Europe/London"));
+pageViews
+| where timestamp >= datetime_local_to_utc(startOfMonth, "Europe/London")
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| where isnotempty(user_Id)
+| extend localTimestamp = datetime_utc_to_local(timestamp, "Europe/London")
+| extend day = startofday(localTimestamp)
+| summarize arg_min(localTimestamp, *) by user_Id, day
+| summarize Users = count() by day
+| sort by day asc
+| project
+    Date = format_datetime(day, "dd/MM/yyyy"),
+    Users

@@ -6,6 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import { Overview } from '../data/model/overview'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
+import { mockAppResponse } from '../controllers/mocks'
 
 const crn = 'X000001'
 
@@ -17,9 +18,9 @@ const mockAppt: AppointmentSession = {
     teamCode: 'NE5TTT',
     username: 'user-1',
   },
-  date: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  start: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+  date: '2044-12-22T09:15:00.382936Z',
+  start: '2044-12-22T09:15:00.382936Z',
+  end: '2044-12-22T09:15:00.382936Z',
   smsOptIn: 'YES',
   rescheduleAppointment: {
     previousStart: '',
@@ -82,6 +83,27 @@ const mockSentences = [
   },
 ] as unknown as Sentence[]
 
+const mockResponse = ({ allowSms = true } = {}): AppResponse => {
+  const locals = {
+    user: {
+      username,
+    },
+    attendingUser: {
+      staffCode: '',
+      homeArea: '',
+      team: '',
+      username: '',
+    },
+    flags: {
+      enableAllowSms: true,
+    },
+    case: {
+      allowSms,
+    },
+  }
+  return mockAppResponse(locals)
+}
+
 describe('/middleware/getAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -119,20 +141,8 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username,
-        },
-        attendingUser: {
-          staffCode: '',
-          homeArea: '',
-          team: '',
-          username: '',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    const res = mockResponse()
+
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -160,25 +170,26 @@ describe('/middleware/getAppointment', () => {
       attending: { name: '', team: '', region: '', html: '' },
       location: '',
       textMessageConfirmation: 'Yes',
-      date: '2044-12-22T09:15:00.382936Z[Europe/London]',
-      start: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      date: '2044-12-22T09:15:00.382936Z',
+      start: '2044-12-22T09:15:00.382936Z',
       previousStart: '',
-      end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      end: '2044-12-22T09:15:00.382936Z',
       previousEnd: '',
       notes: null,
       sensitivity: null,
       outcomeRecorded: null,
       isReschedule: false,
+      allowSms: true,
     })
     expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should assign appointment to locals var if reschedule appointment journey', async () => {
+  it('should assign appointment to locals var if reschedule appointment journey and allow sms is false', async () => {
     const getOverviewSpy = jest
       .spyOn(MasApiClient.prototype, 'getOverview')
       .mockImplementation(() => Promise.resolve(mockOverview))
-
+    const res = mockResponse({ allowSms: false })
     const req = httpMocks.createRequest({
       params: {
         crn,
@@ -207,20 +218,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username,
-        },
-        attendingUser: {
-          staffCode: '',
-          homeArea: '',
-          team: '',
-          username: '',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -247,16 +245,17 @@ describe('/middleware/getAppointment', () => {
       },
       attending: { name: '', team: '', region: '', html: '' },
       location: '',
-      textMessageConfirmation: 'Yes',
-      date: '2044-12-22T09:15:00.382936Z[Europe/London]',
-      start: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      textMessageConfirmation: null,
+      date: '2044-12-22T09:15:00.382936Z',
+      start: '2044-12-22T09:15:00.382936Z',
       previousStart: '',
-      end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      end: '2044-12-22T09:15:00.382936Z',
       previousEnd: '',
       notes: null,
       sensitivity: null,
       outcomeRecorded: null,
       isReschedule: true,
+      allowSms: false,
     })
     expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
@@ -283,14 +282,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    const res = mockResponse()
 
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
@@ -328,15 +320,8 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
 
+    const res = mockResponse()
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -366,14 +351,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
+    const res = mockResponse()
 
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({

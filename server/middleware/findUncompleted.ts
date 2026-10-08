@@ -2,6 +2,7 @@ import { getDataValue } from '../utils'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { AppointmentSession } from '../models/Appointments'
 import { Route } from '../@types'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 export const findUncompleted = ({ forceValidation = false } = {}): Route<string | null> => {
   return function findUncompletedInner(req, res) {
@@ -10,8 +11,10 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     const { change } = req.query as Record<string, string>
     const changeUrl = change ? encodeURIComponent(change) : encodeURIComponent(req.url)
     const data = req?.session?.data ?? {}
+
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-    const dateInPast = appointmentDateIsInPast(req)
+    const personalDetails = getDataValue<PersonalDetails>(data, ['personalDetails', crn, 'overview'])
+    const dateInPast = appointmentDateIsInPast(req, res)
     const mapping: [string | undefined, string][] = [
       [appointment?.eventId, 'sentence'],
       [appointment?.type, 'type-attendance'],
@@ -21,13 +24,8 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
       [appointment?.smsOptIn, 'text-message-confirmation'],
     ]
     if (dateInPast) {
-      if (res.locals.flags.enableNonCompliance) {
-        mapping.push([appointment?.outcome?.outcomeType, 'outcome'])
-        mapping.push([appointment?.sensitivity, 'outcome/add-note'])
-      } else {
-        mapping.push([appointment?.outcomeRecorded, 'attended-complied'])
-        mapping.push([appointment?.sensitivity, 'add-note'])
-      }
+      mapping.push([appointment?.outcome?.outcomeType, 'outcome'])
+      mapping.push([appointment?.sensitivity, 'outcome/add-note'])
     } else {
       mapping.push([appointment?.sensitivity, 'supporting-information'])
     }
@@ -35,12 +33,15 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
     let appointmentIsIncomplete = false
     for (const [value, redirect] of mapping) {
       appointmentIsIncomplete = !value
-      if (['attended-complied', 'outcome'].includes(redirect)) {
+      if (redirect === 'outcome') {
         appointmentIsIncomplete = !value && dateInPast
       }
       if (redirect === 'text-message-confirmation') {
         appointmentIsIncomplete = !value && !dateInPast
         if (res.locals?.flags?.enableSmsReminders === false) {
+          appointmentIsIncomplete = false
+        }
+        if (appointmentIsIncomplete && res.locals?.flags?.enableAllowSms && personalDetails?.allowSms === false) {
           appointmentIsIncomplete = false
         }
       }

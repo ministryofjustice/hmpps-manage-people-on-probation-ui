@@ -19,6 +19,6 @@ describe('utils/toIsoDateFromPicker', () => {
     expect(toIsoDateTimeFromPicker('2/4/2025')).toEqual('2025-04-02T00:00:00.000Z')
   })
   it('should return null when invalid date is supplied', () => {
-    expect(toIsoDateTimeFromPicker('blah')).toEqual(null)
+    expect(toIsoDateTimeFromPicker('blah')).toBeNull()
   })
 })

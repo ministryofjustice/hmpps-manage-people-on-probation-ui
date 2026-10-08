@@ -16,7 +16,8 @@ export const completeNextAppointmentPage = ({
   value = 'NO',
   dateInPast = true,
   crn = 'X000001',
-}: { value?: AppointmentSessionSelection; dateInPast?: boolean; crn?: string } = {}) => {
+  isOutcome = false,
+}: { value?: AppointmentSessionSelection; dateInPast?: boolean; crn?: string; isOutcome?: boolean } = {}) => {
   const nextAppointmentPage = new NextAppointmentPage()
   let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
   let checkYourAnswersPage: AppointmentCheckYourAnswersPage
@@ -44,9 +45,12 @@ export const completeNextAppointmentPage = ({
         completeAddNotePage({ crnOverride: crn, idOverride: uuid })
       }
     })
-    checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
-    checkYourAnswersPage.getSubmitBtn().click()
-    confirmationPage = new AppointmentConfirmationPage()
-    confirmationPage.getSubmitBtn().click()
+
+    if (!isOutcome) {
+      checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
+      checkYourAnswersPage.getSubmitBtn().click()
+      confirmationPage = new AppointmentConfirmationPage()
+      confirmationPage.getSubmitBtn().click()
+    }
   }
 }

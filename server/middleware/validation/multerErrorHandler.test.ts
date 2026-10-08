@@ -18,7 +18,7 @@ jest.mock('multer', () => {
     }
   }
 
-  const multerMock = () => ({
+  const multerMock = (options: any) => ({
     single: () => (req: any, res: any, multerCallback: any) => {
       // Simulate an error by calling the *multer callback*, not next()
       if (req.multerError) {
@@ -26,12 +26,30 @@ jest.mock('multer', () => {
       }
 
       // Simulate successful upload
-      req.file = {
+      const file = req.file ?? {
         mimetype: 'application/pdf',
         originalname: 'file.pdf',
         buffer: Buffer.from('x'),
         size: 10,
+        fieldname: 'fileUpload',
       }
+
+      if (options.fileFilter) {
+        return options.fileFilter(req, file, (error: any, accept?: boolean) => {
+          if (error) {
+            return multerCallback(error)
+          }
+
+          if (accept === false) {
+            return multerCallback(new MockMulterError('LIMIT_UNEXPECTED_FILE', file.fieldname))
+          }
+
+          req.file = file
+          return multerCallback(undefined)
+        })
+      }
+
+      req.file = file
 
       // Success → call multer callback with no error
       return multerCallback(undefined)
@@ -92,7 +110,7 @@ describe('multerErrorHandler', () => {
     })
 
     expect(res.locals.errorMessages).toEqual({
-      [field]: 'Only PDF or Word files are allowed',
+      [field]: 'Only PDF, Word or JPEG files are allowed',
     })
   })
 
@@ -107,5 +125,50 @@ describe('multerErrorHandler', () => {
     })
 
     expect(res.locals.renderPath).toBeTruthy()
+  })
+
+  describe('JPEG file validation', () => {
+    it('accepts a .jpeg file', async () => {
+      const req = httpMocks.createRequest({
+        ...baseReq,
+        file: {
+          fieldname: field,
+          mimetype: 'image/jpeg',
+          originalname: 'image.jpeg',
+          buffer: Buffer.from('x'),
+          size: 10,
+        },
+      } as any)
+
+      await new Promise<void>(resolve => {
+        handler(req, res, () => {
+          resolve()
+        })
+      })
+
+      expect(res.locals.errorMessages).toBeUndefined()
+    })
+    it('rejects a .jpg file', async () => {
+      const req = httpMocks.createRequest({
+        ...baseReq,
+        file: {
+          fieldname: field,
+          mimetype: 'image/jpeg',
+          originalname: 'image.jpg',
+          buffer: Buffer.from('x'),
+          size: 10,
+        },
+      } as any)
+
+      await new Promise<void>(resolve => {
+        handler(req, res, () => {
+          resolve()
+        })
+      })
+
+      expect(res.locals.errorMessages).toEqual({
+        [field]: 'Only PDF, Word or JPEG files are allowed',
+      })
+    })
   })
 })

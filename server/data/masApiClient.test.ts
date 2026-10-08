@@ -156,7 +156,7 @@ describe('masApiClient', () => {
       [
         'getEnforcementContacts',
         '/contact/USER1/enforcements?page=0&size=10&filterDueDate=false&months=12&sortBy=lastModifiedDate&direction=DESC',
-        () => masApiClient.getEnforcementContacts('USER1', '0', '10'),
+        () => masApiClient.getEnforcementContacts('USER1', '0', false, '10'),
       ],
       [
         'getPersonAppointment',
@@ -348,6 +348,7 @@ describe('masApiClient', () => {
       ],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
       ['getUserAlertsCount', '/alerts', () => masApiClient.getUserAlertsCount()],
+      ['getUserAlertsCountV2', '/alerts/count', () => masApiClient.getUserAlertsCountV2()],
       [
         'getUserAlerts (full params)',
         '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',
@@ -388,6 +389,41 @@ describe('masApiClient', () => {
       } else {
         expect(output).toEqual(response)
       }
+    })
+  })
+  describe('patchDocuments', () => {
+    beforeEach(() => {
+      mockedIsValidHost.mockReturnValue(true)
+      mockedIsValidPath.mockReturnValue(true)
+    })
+
+    it('should sanitise the original filename before uploading', async () => {
+      const file = {
+        fieldname: 'file',
+        originalname: 'my/£test$file?.pdf',
+        encoding: '7bit',
+        mimetype: 'application/pdf',
+        destination: '',
+        filename: 'my-test-file.pdf',
+        path: '/tmp/my-test-file.pdf',
+        size: 123,
+        buffer: Buffer.from('test file'),
+        stream: undefined,
+      } as Express.Multer.File
+
+      const response = { data: 'data' }
+
+      fakeMasApiClient
+        .patch('/documents/X000001/update/contact/1', body => {
+          const bodyString = body.toString()
+          return bodyString.includes('Content-Disposition: form-data; name="file"; filename="my-�test-file-.pdf"')
+        })
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await masApiClient.patchDocuments('X000001', '1', file)
+
+      expect(output).toEqual(response)
     })
   })
 })

@@ -2,21 +2,12 @@ import httpMocks from 'node-mocks-http'
 import { AppointmentSession } from '../models/Appointments'
 import { findUncompleted } from './findUncompleted'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { getDataValue } from '../utils'
 import { Name } from '../data/model/personalDetails'
 import { mockAppResponse } from '../controllers/mocks'
 
 const crn = 'X000001'
 const id = '1'
 const change = 'changeUrl'
-
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    getDataValue: jest.fn(),
-  }
-})
 
 jest.mock('./appointmentDateIsInPast', () => ({
   appointmentDateIsInPast: jest.fn(),
@@ -30,20 +21,25 @@ const mockAppointmentSession: AppointmentSession = {
   },
   eventId: '1',
   type: 'C084',
-  date: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  start: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+  date: '2044-12-22T09:15:00.382936Z',
+  start: '2044-12-22T09:15:00.382936Z',
+  end: '2044-12-22T09:15:00.382936Z',
   sensitivity: 'Yes',
   outcomeRecorded: 'Yes',
   smsOptIn: 'YES',
 }
 
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const mockAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
 mockAppointmentDateIsInPast.mockImplementation(() => false)
 
-const buildRequest = (session?: Record<string, string | Record<string, string | Name>>): httpMocks.MockRequest<any> => {
+const buildRequest = ({
+  session = {},
+  allowSms = true,
+}: {
+  session?: Record<string, string | Record<string, string | Name>>
+  allowSms?: boolean
+} = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
       crn,
@@ -62,6 +58,18 @@ const buildRequest = (session?: Record<string, string | Record<string, string | 
             },
           },
         },
+        temp: {
+          [crn]: {
+            nextAppointmentId: null as any,
+          },
+        },
+        personalDetails: {
+          [crn]: {
+            overview: {
+              allowSms,
+            },
+          },
+        },
       },
     },
   }
@@ -72,7 +80,7 @@ const buildResponse = (locals: Record<string, any>) => mockAppResponse(locals)
 
 const res = buildResponse({
   flags: {
-    enableNonCompliance: true,
+    enableCombinedCYAPage: true,
   },
 })
 
@@ -82,80 +90,82 @@ describe('middleware/findUncompleted', () => {
   })
   it('should return change url if all required appointment data provided', () => {
     const req = buildRequest()
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(change)
   })
   it('should return sentence url if no eventId', () => {
-    const req = buildRequest({ eventId: null })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
+    const req = buildRequest({ session: { eventId: null } })
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/sentence?change=${change}`)
   })
   it('should return sentence url and force validation if no eventId', () => {
-    const req = buildRequest({ eventId: null })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
+    const req = buildRequest({ session: { eventId: null } })
     expect(findUncompleted({ forceValidation: true })(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/sentence?change=${change}&validation=true`,
     )
   })
   it('should return type url if no type (and previous conditions not met)', () => {
-    const req = buildRequest({ type: null })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
+    const req = buildRequest({ session: { type: null } })
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/type-attendance?change=${change}`)
   })
   it('should return attendance url if no user info (and previous conditions not met)', () => {
     const req = buildRequest({
-      user: {
-        ...mockAppointmentSession.user,
-        username: null,
+      session: {
+        user: {
+          ...mockAppointmentSession.user,
+          username: null,
+        },
       },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/attendance?change=${change}`)
   })
   it('should return location url if no location (and previous conditions not met)', () => {
     const req = buildRequest({
-      user: {
-        ...mockAppointmentSession.user,
-        locationCode: null,
+      session: {
+        user: {
+          ...mockAppointmentSession.user,
+          locationCode: null,
+        },
       },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/location-date-time?change=${change}`,
     )
   })
   it('should return date-time url if no date-time (and previous conditions not met)', () => {
     const req = buildRequest({
-      date: null,
+      session: {
+        date: null,
+      },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/location-date-time?change=${change}`,
     )
   })
   it('should return supporting information if no sensitivity (and previous conditions not met)', () => {
     const req = buildRequest({
-      sensitivity: null,
+      session: {
+        sensitivity: null,
+      },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/supporting-information?change=${change}`,
     )
   })
   it('should return text message confirmation if no smsOptIn', () => {
     const req = buildRequest({
-      smsOptIn: null,
+      session: {
+        smsOptIn: null,
+      },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/text-message-confirmation?change=${change}`,
     )
   })
   it('should not return text message confirmation if no smsOptIn and sms feature flag is disabled', () => {
     const req = buildRequest({
-      smsOptIn: null,
+      session: {
+        smsOptIn: null,
+      },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     const mockRes = buildResponse({
       flags: {
         enableSmsReminders: false,
@@ -163,52 +173,43 @@ describe('middleware/findUncompleted', () => {
     })
     expect(findUncompleted()(req, mockRes)).toBe(change)
   })
-  it('should return attended-complied if enableNonCompliance feature flag is disabled, no outcomeRecorded value in appointment session and appointment date is in past', () => {
-    mockAppointmentDateIsInPast.mockImplementationOnce(() => true)
+  it('should not return text message confirmation if enableAllowSms feature flag is enabled and sms consent is false', () => {
     const req = buildRequest({
-      outcomeRecorded: null,
+      session: {
+        smsOptIn: null,
+      },
+      allowSms: false,
     })
     const mockRes = buildResponse({
       flags: {
-        enableNonCompliance: false,
+        enableSmsReminders: true,
+        enableAllowSms: true,
       },
     })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
-    expect(findUncompleted()(req, mockRes)).toBe(
-      `/case/${crn}/arrange-appointment/${id}/attended-complied?change=${change}`,
-    )
-  })
-  it('should return change url if  enableNonCompliance feature flag is disabled,  no outcomeRecorded value in appointment session and appointment date is in future', () => {
-    const req = buildRequest({
-      outcomeRecorded: null,
-    })
-    const mockRes = buildResponse({
-      flags: {
-        enableNonCompliance: false,
-      },
-    })
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, mockRes)).toBe(change)
   })
-  it('should return outcome if enableNonCompliance feature flag is enabled, no outcome type value in appointment session and appointment date is in past', () => {
+
+  it('should return outcome if no outcome type value in appointment session and appointment date is in past', () => {
     mockAppointmentDateIsInPast.mockImplementationOnce(() => true)
     const req = buildRequest({
-      outcome: {
-        type: null,
+      session: {
+        outcome: {
+          type: null,
+        },
       },
     })
 
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(`/case/${crn}/arrange-appointment/${id}/outcome?change=${change}`)
   })
-  it('should return change url if  enableNonCompliance feature flag is enabled,  no outcome type value in appointment session and appointment date is in future', () => {
+  it('should return change url if  no outcome type value in appointment session and appointment date is in future', () => {
     const req = buildRequest({
-      outcome: {
-        type: null,
+      session: {
+        outcome: {
+          type: null,
+        },
       },
     })
 
-    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted()(req, res)).toBe(change)
   })
 })

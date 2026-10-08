@@ -1,5 +1,5 @@
 import { DateTime, Settings } from 'luxon'
-import { getDateRange } from './getDateRange'
+import { getNewDateRange, getDateRange } from './getDateRange'
 
 const mockNow = (iso: string) => {
   const dt = DateTime.fromISO(iso, { zone: 'utc' })
@@ -10,6 +10,79 @@ const mockNow = (iso: string) => {
 
   Settings.now = () => dt.toMillis()
 }
+
+describe('getNewDateRange', () => {
+  afterEach(() => {
+    Settings.now = () => Date.now()
+  })
+
+  describe('PAST_THREE_MONTHS', () => {
+    it('returns correct range in UK timezone', () => {
+      mockNow('2026-04-27T10:00:00Z')
+
+      const result = getNewDateRange('PAST_THREE_MONTHS')
+
+      expect(result).toEqual({
+        fromDate: '2026-01-27',
+        toDate: '2026-04-27',
+      })
+    })
+
+    it('is inclusive of today', () => {
+      mockNow('2026-01-01T00:00:00Z')
+
+      const result = getNewDateRange('PAST_THREE_MONTHS')
+
+      expect(result.toDate).toBe('2026-01-01')
+    })
+  })
+
+  describe('OLDER_THAN_THREE_MONTHS', () => {
+    it('returns correct upper bound (no overlap)', () => {
+      mockNow('2026-04-27T10:00:00Z')
+
+      const result = getNewDateRange('OLDER_THAN_THREE_MONTHS')
+
+      expect(result).toEqual({
+        toDate: '2026-01-26',
+      })
+    })
+  })
+
+  describe('ALL', () => {
+    it('returns no filters (unbounded range)', () => {
+      mockNow('2026-04-27T10:00:00Z')
+
+      const result = getNewDateRange('ALL')
+
+      expect(result).toEqual({})
+    })
+  })
+
+  describe('timezone + DST behaviour', () => {
+    it('handles BST (summer time, UTC+1)', () => {
+      mockNow('2026-06-15T23:30:00Z')
+
+      const result = getNewDateRange('ALL')
+
+      expect(result).toEqual({})
+    })
+
+    it('handles GMT (winter time)', () => {
+      mockNow('2026-01-15T23:30:00Z')
+
+      const result = getNewDateRange('ALL')
+
+      expect(result).toEqual({})
+    })
+
+    it('throws error for unsupported range type', () => {
+      mockNow('2026-04-27T10:00:00Z')
+
+      expect(() => getNewDateRange('INVALID_TYPE' as any)).toThrow('Unhandled range type: INVALID_TYPE')
+    })
+  })
+})
 
 describe('getDateRange', () => {
   afterEach(() => {

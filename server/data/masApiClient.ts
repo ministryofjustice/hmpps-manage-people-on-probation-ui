@@ -19,6 +19,7 @@ import {
   PersonalContact,
   PersonalDetails,
   PersonalDetailsMainAddress,
+  PersonalDetailsUpdatedResponse,
   PersonalDetailsUpdateRequest,
   PersonSummary,
   ProfessionalContact,
@@ -51,7 +52,7 @@ import {
   RescheduleAppointmentRequestBody,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
-import { UserAlerts, UserAlertsContent } from '../models/Alerts'
+import { UserAlerts, UserAlertsContent, UserAlertsCount } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
@@ -63,6 +64,8 @@ import {
   mapPersonAppointmentWithApprovedContactDisplayNames,
   mapScheduleWithApprovedContactDisplayNames,
 } from '../utils/contactDisplayNames'
+import { sanitizeFilename } from '../utils/sanitizeFilename'
+import { LastSmsResponse } from '../models/LastSmsResponse'
 
 interface GetUserScheduleProps {
   username: string
@@ -84,7 +87,7 @@ export default class MasApiClient extends RestClient {
    * @deprecated use DeliusClient.getHomepage
    */
   async getUserAppointments(username: string): Promise<UserAppontment> {
-    return this.get({ path: `/user/${username}/appointments` })
+    return this.get({ path: `/user/${username}/appointments`, handleTimeout: true })
   }
 
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
@@ -159,7 +162,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path })
   }
 
-  async putContact(contactId: string, body: PutContactRequest): Promise<{ statusCode: number }> {
+  async putContact(contactId: string, body: PutContactRequest): Promise<Response> {
     const path = `/contact/${contactId}`
     return this.put({ data: body, path })
   }
@@ -186,6 +189,28 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/personal-details/${crn}/address`,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
+  async updateAllowSms(crn: string, allowSms: boolean): Promise<boolean> {
+    return this.post({
+      path: `/personal-details/${crn}/contact/allow-sms?smsAllowed=${allowSms}`,
+    })
+  }
+
+  async getPersonalDetailsUpdated(crn: string): Promise<PersonalDetailsUpdatedResponse | ErrorSummary | null> {
+    return this.get({
+      path: `/personal-details/${crn}/updated`,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
+  async getLastSms(crn: string): Promise<LastSmsResponse | ErrorSummary | null> {
+    return this.get({
+      path: `/last-sms/${crn}`,
       handle404: true,
       handle500: true,
     })
@@ -268,6 +293,7 @@ export default class MasApiClient extends RestClient {
   async getEnforcementContacts(
     username: string,
     page: string,
+    handleTimeout: boolean = false,
     size: string = '5',
     filterDueDate: string = 'false',
     months: string = '12',
@@ -292,8 +318,11 @@ export default class MasApiClient extends RestClient {
     const enforcementContacts = (await this.get({
       path: `/contact/${username}/enforcements?${queryParameters.toString()}`,
       handle404: false,
+      handleTimeout,
     })) as EnforcementContactsResponse
-
+    if ('errors' in enforcementContacts) {
+      return enforcementContacts
+    }
     return mapEnforcementContactsWithApprovedContactDisplayNames(enforcementContacts)
   }
 
@@ -362,13 +391,17 @@ export default class MasApiClient extends RestClient {
     id: string,
     file: Express.Multer.File,
   ): Promise<{ statusCode: number } | ErrorSummary | null> {
+    const sanitizedFile: Express.Multer.File = {
+      ...file,
+      originalname: Buffer.from(sanitizeFilename(file.originalname), 'latin1').toString('utf8'),
+    }
     return this.patch({
       path: `/documents/${crn}/update/contact/${id}`,
       handle404: true,
       handle415: true,
       handle500: true,
       isMultipart: true,
-      file,
+      file: sanitizedFile,
       errorMessage: 'Upload failed. Please try again later',
     })
   }
@@ -565,9 +598,18 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
-  async getUserAlertsCount(): Promise<UserAlerts> {
+  async getUserAlertsCount(): Promise<UserAlerts | ErrorSummary | null> {
     return this.get({
       path: `/alerts`,
+      handle404: true,
+      handle500: true,
+      errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',
+    })
+  }
+
+  async getUserAlertsCountV2(): Promise<UserAlertsCount | ErrorSummary | null> {
+    return this.get({
+      path: `/alerts/count`,
       handle404: true,
       handle500: true,
       errorMessage: 'Alerts are currently unavailable. You can view them on NDelius.',

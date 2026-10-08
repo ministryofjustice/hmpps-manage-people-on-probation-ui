@@ -13,7 +13,7 @@ export const mockPersonAppointment = {
     id: 1,
     eventNumber: '4',
     type: 'Phone call',
-    startDateTime: '2024-12-22T09:15:00.382936Z[Europe/London]',
+    startDateTime: '2024-12-22T09:15:00.382936Z',
     rarToolKit: 'Choices and Changes',
     isSensitive: false,
     hasOutcome: false,

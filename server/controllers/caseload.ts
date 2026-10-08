@@ -11,8 +11,8 @@ import { Controller } from '../@types'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
-import { getDateRange, RangeType } from '../utils/getDateRange'
-import TierApiClient, { TierCalculations } from '../data/tierApiClient'
+import { getDateRange, getNewDateRange, NewRangeType, RangeType } from '../utils/getDateRange'
+import TierApiClient from '../data/tierApiClient'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
@@ -48,8 +48,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
-      const { sortBy: sortByQuery = res.locals?.flags?.enableCaseloadV2 ? 'nameOrCrn.asc' : 'nextContact.asc' } =
-        req.query as Record<string, string>
+      const { sortBy: sortByQuery = 'nameOrCrn.asc' } = req.query as Record<string, string>
       const pageNum: number = req.query.page
         ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize)
         : 1
@@ -60,12 +59,9 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sortByQuery,
         req.session.caseFilter,
       )
-      let tiers: TierCalculations
-      if (res.locals?.flags?.enableCaseloadV2) {
-        const uniqueCrns = [...new Set(caseload?.caseload?.map(item => item.crn))].filter(Boolean)
-        const tierClient = new TierApiClient(token)
-        tiers = await tierClient.getTiers(uniqueCrns)
-      }
+      const uniqueCrns = [...new Set(caseload?.caseload?.map(item => item.crn))].filter(Boolean)
+      const tierClient = new TierApiClient(token)
+      const tiers = await tierClient.getTiers(uniqueCrns)
       const { filter } = args
 
       const url = encodeURIComponent(req.url)
@@ -143,13 +139,16 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
       const [name, dir] = sortByQuery.split('.') as [ColName, SortDir]
       let cols = colNames
-      const outcomeFilter = req.query?.outcomeFilter ?? 'PAST_TWO_YEARS'
+      const outcomeFilter =
+        req.query?.outcomeFilter ?? (res.locals.flags.enable3MonthsOutcomes ? 'PAST_THREE_MONTHS' : 'PAST_TWO_YEARS')
       let fromDate
       let toDate
       if (type === 'no-outcome') {
         cols = cols.filter(col => col !== 'appointment')
         if (outcomeFilter && res.locals.flags.enableHomePageOutcomesWithFilter) {
-          const result = getDateRange(outcomeFilter as RangeType)
+          const result = res.locals.flags.enable3MonthsOutcomes
+            ? getNewDateRange(outcomeFilter as NewRangeType)
+            : getDateRange(outcomeFilter as RangeType)
           fromDate = result.fromDate
           toDate = result.toDate
         }

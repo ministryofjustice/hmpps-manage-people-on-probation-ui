@@ -8,9 +8,10 @@ import {
   getAppointmentTypes,
   getAppointment,
   getDefaultUser,
-  getUserOptions,
   routeChangeAttendee,
   getSmsPreview,
+  getSmsConfirmationOptions,
+  getSmsConfirmation,
   getPersonRiskFlags,
   getOverdueOutcomes,
   getPersonAppointment,
@@ -18,6 +19,7 @@ import {
   forceValidation,
   restrictPageAccess,
   getSentenceList,
+  checkIsValidUrl,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -26,6 +28,7 @@ import {
   getContactOutcomes,
   handlePutOutcome,
   getOutcomeSentence,
+  getOutcomeNextAppointment,
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -35,7 +38,9 @@ import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
-import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
+import { getUserOptions } from '../middleware/getUserOptions'
+import { returnOptions } from '../middleware/returnOptions'
+import { routeChangeSmsConsent } from '../middleware/routeChangeSmsConsent'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -103,6 +108,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient),
   )
 
+  router.post('/case/:crn/arrange-appointment/:id/attendance/filter', getUserOptions(hmppsAuthClient), returnOptions)
+
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
   router.get(
     '/case/:crn/arrange-appointment/:id/location-date-time',
@@ -114,6 +121,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',
+    routeChangeSmsConsent,
     validate.appointments,
     autoStoreSessionData(hmppsAuthClient),
     checkAnswers,
@@ -127,22 +135,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
-  router.all(['/case/:crn/arrange-appointment/:id/attended-complied'], getOutcomeProps)
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/attended-complied',
-    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date'] }),
-    controllers.arrangeAppointments.getAttendedComplied(),
-  )
-
-  router.post(
-    '/case/:crn/arrange-appointment/:id/attended-complied',
-    validate.appointments,
-    autoStoreSessionData(hmppsAuthClient),
-    checkAnswers,
-    controllers.arrangeAppointments.postAttendedComplied(),
-  )
-
   router.get(
     '/case/:crn/arrange-appointment/:id/supporting-information',
     restrictPageAccess({ requiredValues: ['eventId', 'type', ['user', 'locationCode']] }),
@@ -153,12 +145,17 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.post(
     '/case/:crn/arrange-appointment/:id/supporting-information',
     validate.appointments,
+    getOutcomeProps,
     autoStoreSessionData(hmppsAuthClient),
     checkAnswers,
     controllers.arrangeAppointments.postSupportingInformation(),
   )
 
-  router.get('/case/:crn/arrange-appointment/:id/check-your-answers', restrictPageAccess())
+  router.get(
+    '/case/:crn/arrange-appointment/:id/check-your-answers',
+    restrictPageAccess(),
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
+  )
 
   router.all(
     [
@@ -179,6 +176,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getOutcomeProps,
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
@@ -189,11 +187,13 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
       '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     ],
     getPersonAppointment(hmppsAuthClient),
-    handlePostAppointment(hmppsAuthClient),
+    checkIsValidUrl,
     getOutcomeProps,
+    handlePostAppointment(hmppsAuthClient),
     getOutcomeSentence(hmppsAuthClient),
     getContactOutcomes(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     handlePutOutcome(hmppsAuthClient),
   )
@@ -214,6 +214,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     getContactOutcomes(hmppsAuthClient),
     getOutcomeSentence(hmppsAuthClient),
     getNotePrepend,
+    getOutcomeNextAppointment,
     getOutcomeSummary,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
@@ -226,7 +227,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'start', ['user', 'locationCode']] }),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getSmsPreview(hmppsAuthClient),
-    getSmsConfirmationOptions,
+    getSmsConfirmationOptions(),
+    getSmsConfirmation(hmppsAuthClient),
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
@@ -249,30 +251,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     const { isInPast, isToday } = dateIsInPast(date, time)
     return res.json({ isInPast, isToday, alertDismissed })
   })
-
-  /* Delete these routes after enableNonCompliance feature flag is removed 👇 */
-
-  router.all(
-    '/case/:crn/arrange-appointment/:id/add-note',
-    restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'outcomeRecorded'] }),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getAppointment(hmppsAuthClient),
-    getOutcomeProps,
-  )
-  router.get(
-    '/case/:crn/arrange-appointment/:id/add-note',
-    forceValidation,
-    controllers.arrangeAppointments.getAddNote(),
-  )
-
-  router.post(
-    '/case/:crn/arrange-appointment/:id/add-note',
-    validate.appointments,
-    autoStoreSessionData(hmppsAuthClient),
-    controllers.arrangeAppointments.postAddNote(),
-  )
-
-  /* ----------------- 👆 -----------------  */
 }
 
 export default arrangeAppointmentRoutes

@@ -59,6 +59,10 @@ context('Personal Details', () => {
       .find('a')
       .should('have.text', 'Sign in to OASys to view the sentence plan (opens in new tab)')
     page.getRowData('personalDetails', 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
+    page
+      .getRowData('personalDetails', 'documents', 'Value')
+      .get('[data-qa="statusValue1"]')
+      .should('contain.text', 'Sensitive')
     page.getRowData('identityNumber', 'crn', 'Value').should('contain.text', 'X000001')
     page.getRowData('identityNumber', 'pnc', 'Value').should('contain.text', '1954/0018147W')
     page.getRowData('identityNumber', 'noms', 'Value').should('contain.text', 'G9566GQ')

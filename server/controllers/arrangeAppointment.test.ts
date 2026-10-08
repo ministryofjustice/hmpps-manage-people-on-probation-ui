@@ -12,7 +12,6 @@ import {
   cloneAppointmentAndRedirect,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
-  getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
 } from '../middleware'
@@ -22,6 +21,7 @@ import { AppResponse } from '../models/Locals'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
+import { getUserOptions } from '../middleware/getUserOptions'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
@@ -185,7 +185,9 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         description: 'Planned Office Meeting',
       },
     ],
-    flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: true },
+    flags: {
+      enableCombinedCYAPage: true,
+    },
     ...(localsResponse || {}),
   })
 
@@ -446,25 +448,18 @@ describe('controllers/arrangeAppointment', () => {
       })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(mockGetOfficeLocationsByTeamAndProvider).toHaveBeenCalled()
-      expect(mockedGetUserOptions).toHaveBeenCalled()
       expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        1,
+        4,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'providerCode'],
         providerCode,
       )
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        2,
+        5,
         mockReq.session.data,
         ['appointments', crn, uuid, 'user', 'teamCode'],
         teamCode,
-      )
-      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
-        3,
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'user', 'username'],
-        username,
       )
 
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
@@ -539,6 +534,7 @@ describe('controllers/arrangeAppointment', () => {
         alertDismissed: false,
         isInPast: false,
         isReschedule: true,
+        url: '',
       })
     })
     it('should render the location date and time page if past appointment feature flag is disabled', async () => {
@@ -557,6 +553,7 @@ describe('controllers/arrangeAppointment', () => {
         alertDismissed: false,
         isInPast: false,
         isReschedule: true,
+        url: '',
       })
     })
     it('If session has errors, it should delete the errors', async () => {
@@ -657,6 +654,7 @@ describe('controllers/arrangeAppointment', () => {
         alertDismissed: false,
         personRisks: undefined,
         _maxDate: '31/12/2199',
+        url: '',
       })
     })
 
@@ -696,6 +694,28 @@ describe('controllers/arrangeAppointment', () => {
         '2025-07-20',
       )
     })
+
+    it('should not set temp values in session when change query parameter is present and changeSmsConsentLinkClicked session exists', async () => {
+      const appointmentSession = {
+        date: '2025-07-20',
+        start: '10:00',
+        end: '11:00',
+        temp: {
+          dateFromCya: '2025-07-20',
+          changeSmsConsentLinkClicked: true,
+        },
+      }
+      const mockReq = createMockRequest({
+        query: { change: 'true' },
+        appointmentSession,
+      })
+      const mockRes = createMockResponse({
+        appointment: { ...appointmentSession, type: { isLocationRequired: false } },
+      })
+      await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockReq.session.data.appointments[crn][uuid].temp.changeSmsConsentLinkClicked).toBeUndefined()
+      expect(mockedSetDataValue).not.toHaveBeenCalled()
+    })
   })
 
   describe('getLocationDateTime for double digit date', () => {
@@ -720,6 +740,7 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         isReschedule: true,
         personRisks: undefined,
+        url: '',
       })
     })
   })
@@ -780,7 +801,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).not.toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcomeRecorded'],
+        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
         null,
       )
       expect(mockedSetDataValue).not.toHaveBeenCalledWith(
@@ -794,7 +815,7 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the future - non compliance enabled', async () => {
+    it('should reset the outcome recorded session value if original date was in the future', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -810,34 +831,12 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
+        ['appointments', crn, uuid, 'outcome'],
         null,
       )
     })
-    it('should reset the outcome recorded session value if original date was in the future - non compliance disabled', async () => {
-      const mockReq = createMockRequest({
-        query: { change },
-        appointmentSession: {
-          date: '2029-07-07',
-          temp: {
-            date: tomorrow,
-            isInPast: false,
-          },
-        },
-      })
-      const mockRes = createMockResponse({
-        flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: false },
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'outcomeRecorded'],
-        null,
-      )
-    })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance enabled', async () => {
+
+    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date', async () => {
       const mockReq = createMockRequest({
         query: { change },
         appointmentSession: {
@@ -853,30 +852,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
-        ['appointments', crn, uuid, 'outcome', 'outcomeType'],
-        null,
-      )
-    })
-    it('should reset the outcome recorded session value if original date was in the past and original date does not equal updated date - non compliance disabled', async () => {
-      const mockReq = createMockRequest({
-        query: { change },
-        appointmentSession: {
-          date: '2025-07-08',
-          temp: {
-            date: '2025-07-07',
-            isInPast: true,
-          },
-        },
-      })
-      const mockRes = createMockResponse({
-        flags: { enableMAN2344: true, enableSensitivityRemoved: true, enableNonCompliance: false },
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'outcomeRecorded'],
+        ['appointments', crn, uuid, 'outcome'],
         null,
       )
     })
@@ -1087,6 +1063,21 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest()
       await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
+    })
+    it('should redirect to the outcome check your answers page if linkedContactId is present in the session', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        dataSession: {
+          temp: {
+            [crn]: {
+              linkedContactId: '1234',
+            },
+          },
+        },
+      })
+      await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/1234/outcome/check-your-answers`)
     })
   })
   describe('postCheckYourAnswers', () => {
@@ -1374,7 +1365,7 @@ describe('controllers/arrangeAppointment', () => {
   })
   describe('getArrangeAnotherAppointment', () => {
     it('should render the page', async () => {
-      const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment}`
+      const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
       const mockReq = createMockRequest({
         request: { url },
       })
@@ -1384,6 +1375,24 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         isInPast: null,
+        nextAppointmentId: null,
+      })
+    })
+    it('should render the page with isInPast and nextAppointmentId if present in session', async () => {
+      const url = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
+      const mockReq = createMockRequest({
+        request: { url },
+        dataSession: {
+          temp: { [crn]: { nextAppointmentId: '1234' } },
+        },
+      })
+      await controllers.arrangeAppointments.getArrangeAnotherAppointment()(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/arrange-another-appointment`, {
+        url: encodeURIComponent(url),
+        crn,
+        id: uuid,
+        isInPast: null,
+        nextAppointmentId: '1234',
       })
     })
   })

@@ -14,7 +14,7 @@ const getMockPersonAppointment = ({ hasOutcome = false, deliusManaged = false } 
     appointment: {
       id: '1234',
       type: 'Appointment type',
-      startDateTime: '2024-02-21T10:15:00.382936Z[Europe/London]',
+      startDateTime: '2024-02-21T10:15:00.382936Z',
       hasOutcome,
       deliusManaged,
     },

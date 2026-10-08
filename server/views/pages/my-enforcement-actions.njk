@@ -24,7 +24,6 @@
         </div>
     </div>
 
-    {% if flags.enableMyEnforcementActionsOverview %}
 
         {% if  enforcementContacts.enforcementContacts and enforcementContacts.enforcementContacts.length > 0 %}
             {% set head = [
@@ -117,5 +116,4 @@
         {% else %}
             <p>There are no enforcement actions to take.</p>
         {% endif %}
-    {% endif %}
 {% endblock %}

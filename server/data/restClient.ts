@@ -1,5 +1,6 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
+import * as Sentry from '@sentry/node'
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
@@ -20,6 +21,8 @@ interface Request {
   handle404?: boolean
   handle415?: boolean
   handle500?: boolean
+  handle5xxRange?: boolean
+  handleTimeout?: boolean
   handle401?: boolean
   errorMessage?: string
   file?: Express.Multer.File
@@ -31,6 +34,8 @@ interface RequestWithBody extends Request {
   data?: Record<string, any>
   retry?: boolean
 }
+
+export const standard5xxCodes = new Set(Array.from({ length: 100 }, (_, offset) => 500 + offset))
 
 export default class RestClient {
   agent: Agent
@@ -59,7 +64,9 @@ export default class RestClient {
     raw = false,
     handle404 = false,
     handle500 = false,
+    handle5xxRange = false,
     handle401 = false,
+    handleTimeout = false,
     errorMessage = '',
     retry = true,
   }: Request): Promise<TResponse | null> {
@@ -93,6 +100,33 @@ export default class RestClient {
 
       return raw ? (result as TResponse) : result.body
     } catch (error: any) {
+      if (handleTimeout && isTimeoutError(error)) {
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({
+          text: 'Some information on this page is currently unavailable.',
+        })
+        if (Sentry.getClient()) {
+          const eventId = Sentry.captureException(error, {
+            tags: {
+              'error.kind': 'timeout',
+              'request.path': path,
+              'api.name': this.name,
+            },
+          })
+          logger.info(`Sentry timeout eventId: ${eventId}`)
+        }
+        return {
+          ...(error.response ?? {}),
+          timeoutError: warnings,
+        }
+      }
+      if (handle5xxRange && standard5xxCodes.has(error?.response?.status)) {
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({ text: errorMessage })
+        error.response.errors = warnings
+        logger.info('Handling 5xx range; current code: ', error?.response?.status)
+        return error.response
+      }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })

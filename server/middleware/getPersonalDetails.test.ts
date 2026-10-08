@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { Readable } from 'stream'
 import httpMocks from 'node-mocks-http'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
@@ -7,9 +8,11 @@ import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
+import PrisonApiClient from '../data/prisonApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
+import { RiskSummary } from '../data/model/risk'
 import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
@@ -21,9 +24,11 @@ import {
   mockRiskData,
   probationPractitioner,
   mockPredictorScores,
+  mockContacts,
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
+import { SentencePlanResult } from '../data/model/arnsAssessmentPlatform'
 import { PersonalDetailsSession } from '../models/Data'
 import {
   Circumstances,
@@ -49,6 +54,7 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
 jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
+jest.mock('../data/prisonApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -56,6 +62,12 @@ jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   toPredictors: jest.fn(() => mockPredictorScores),
 }))
+
+const mockDraftSentencePlanResult: SentencePlanResult = {
+  hasPlan: true,
+  hasAgreedPlan: false,
+  lastUpdatedDate: '2025-10-01T16:39:23Z',
+}
 
 const mockAuthOptions: AuthOptions = {
   user: {
@@ -88,6 +100,9 @@ const searchUserCaseloadSpy = jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(probationPractitioner))
+const getContactsSpy = jest
+  .spyOn(MasApiClient.prototype, 'getContacts')
+  .mockImplementation(() => Promise.resolve(mockContacts))
 let getPersonalDetailsSpy: jest.SpyInstance
 let getSentencePlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
@@ -141,7 +156,7 @@ const overview = (crn = 'X000001'): PersonalDetails => ({
   staffContacts: [] as Contact[],
 })
 
-const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {}): PersonalDetailsSession => {
+const mock = ({ crn = 'X000001', ogrs4Enabled = true } = {}): PersonalDetailsSession => {
   const mockPersonalDetails: PersonalDetailsSession = {
     overview: overview(crn),
     sentencePlan: {
@@ -152,6 +167,9 @@ const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {
     risks: mockRisks,
     tierCalculation: mockTierCalculation,
     probationPractitioner,
+    professionalContact: mockContacts,
+    arnsUnavailable: false,
+    prisonsUnavailable: false,
   }
   if (ogrs4Enabled) {
     mockPersonalDetails.riskData = mockRiskData
@@ -198,7 +216,7 @@ describe('/middleware/getPersonalDetails', () => {
       const expected = {
         personalDetails: {
           X000001: mock(),
-          X000002: mock({ crn: 'X000002', lastUpdatedDate: '' }),
+          X000002: mock({ crn: 'X000002' }),
         },
       }
 
@@ -209,6 +227,7 @@ describe('/middleware/getPersonalDetails', () => {
         nameOrCrn: req.params.crn,
       })
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(getContactsSpy).toHaveBeenCalledWith(req.params.crn)
       expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
       expect(predictorsSpy).not.toHaveBeenCalled()
       expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
@@ -222,8 +241,58 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.headerCRN).toEqual(req.params.crn)
       expect(res.locals.headerDob).toEqual('1979-08-18')
       expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
+      expect(res.locals.managedBy).toEqual({
+        text: 'Arhsimna Xolfo (All London)',
+        name: 'Arhsimna Xolfo',
+        location: 'All London',
+        href: '/case/X000002/personal-details/staff-contacts',
+      })
       expect(nextSpy).toHaveBeenCalled()
     })
+
+    it.each(['/location-date-time', '/check-your-answers'])(
+      'should re-request the personal details from the API if cache for crn exists and enableAllowSms feature flag is enabled and url is %s',
+      async url => {
+        process.env.NODE_ENV = 'production'
+        getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
+        req = httpMocks.createRequest({
+          params: {
+            crn: 'X000002',
+          },
+          url,
+          session: {
+            data: {
+              personalDetails: {
+                X000001: mock(),
+                X000002: mock({ crn: 'X000002' }),
+              },
+            },
+          },
+        })
+        res = {
+          locals: {
+            flags: {
+              enableAllowSms: true,
+            },
+            user: {
+              username: 'user-1',
+              roles: ['SENTENCE_PLAN'],
+            },
+          },
+          redirect: jest.fn().mockReturnThis(),
+        } as unknown as AppResponse
+        await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+        expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
+        expect(tierCalculationSpy).not.toHaveBeenCalled()
+        expect(searchUserCaseloadSpy).not.toHaveBeenCalled()
+        expect(getProbationPractitionerSpy).not.toHaveBeenCalled()
+        expect(getContactsSpy).not.toHaveBeenCalled()
+        expect(getRiskDataSpy).not.toHaveBeenCalled()
+        expect(predictorsSpy).not.toHaveBeenCalled()
+        expect(res.locals.case).toEqual(overview('X000002'))
+        expect(nextSpy).toHaveBeenCalled()
+      },
+    )
 
     it('should not request data from the api if personal details for crn already exist in the session and env is not development', async () => {
       process.env.NODE_ENV = 'production'
@@ -268,6 +337,198 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.riskData).toEqual(mockRiskData)
       expect(res.locals.predictorScores).toBeUndefined()
       expect(nextSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('photo', () => {
+    it('sets personPhotoSrc to the prisoner-image route when a photo exists', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
+    })
+
+    it('leaves personPhotoSrc undefined, and prisonsUnavailable false, when there is no photo (404)', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValueOnce(null)
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(false)
+    })
+
+    it('leaves personPhotoSrc undefined, sets prisonsUnavailable, and still renders the header, when the Prisons API fails and enablePersonHeader is on', async () => {
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('does not request a photo when enablePersonHeader is off', async () => {
+      const getImageDataSpy = jest.spyOn(PrisonApiClient.prototype, 'getImageData')
+      jest
+        .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+        .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+      expect(res.locals.prisonsUnavailable).toBe(false)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('does not request a photo when there is no NOMS number', async () => {
+      const getImageDataSpy = jest.spyOn(PrisonApiClient.prototype, 'getImageData')
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(res.locals.personPhotoSrc).toBeUndefined()
+    })
+  })
+
+  describe('arns', () => {
+    it('sets arnsUnavailable and still renders the header when getRisks fails and enablePersonHeader is on', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable and still renders the header when getRiskData fails and enablePersonHeader is on', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable when getRisks resolves an error-summary object (real 500/401 behaviour, not a rejection)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockResolvedValueOnce({
+        errors: [{ text: 'Risk information from the ARNS service is currently unavailable.' }],
+      } as unknown as RiskSummary)
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.risksWidget.overallRisk).toBe('NOT_FOUND')
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets arnsUnavailable when getRiskData resolves a non-200/404 httpStatus (real 500/401 behaviour, not a rejection)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 500 })
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(res.locals.riskData).toBeNull()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('leaves arnsUnavailable false when getRiskData resolves httpStatus 404 (legitimately no data, not a failure)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 404 })
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(false)
+    })
+
+    it('leaves arnsUnavailable false when both ARNS calls succeed', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      req = getReq()
+      res = getRes()
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(false)
+    })
+
+    it('does not isolate an ARNS getRisks failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not isolate an ARNS getRiskData failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not cache a degraded (arnsUnavailable) result, so the next request for this CRN retries', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(req.session.data.personalDetails.X000002).toBeUndefined()
+    })
+
+    it('still initialises req.session.data on a degraded result when it did not exist yet, so downstream middleware (e.g. getPersonRiskFlags) does not crash on a fresh session', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+      req = httpMocks.createRequest({ params: { crn: 'X000002' }, session: {} })
+      res = getRes()
+      res.locals.flags = { enablePersonHeader: true }
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      expect(res.locals.arnsUnavailable).toBe(true)
+      expect(req.session.data).toBeDefined()
+      expect(req.session.data.personalDetails?.X000002).toBeUndefined()
+    })
+  })
+
+  describe('ndelius', () => {
+    it('AC1: does not isolate an NDelius (MAS personal details) failure, so it fails the whole page', async () => {
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockRejectedValueOnce(new Error('500'))
+      req = getReq()
+      res = getRes()
+
+      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+
+      expect(nextSpy).not.toHaveBeenCalled()
+      expect(res.locals.headerCRN).toBeUndefined()
     })
   })
 
@@ -384,7 +645,71 @@ describe('/middleware/getPersonalDetails', () => {
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
       .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve({ hasAgreedPlan: false, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: { enableDraftSentencePlanAccess: true },
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop not in user caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: { enableDraftSentencePlanAccess: true },
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: true,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and draft sentence plan access is disabled', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',

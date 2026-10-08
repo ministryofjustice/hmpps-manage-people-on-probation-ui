@@ -1,0 +1,11 @@
+// Count of clicks (not page views) on the "View the sentence plan (opens in new tab)" link,
+// which only appears on the Risk page for people who have both risk and plan data
+// (sentencePlan.showLink).
+//
+//   ./run-query.sh sentence-plan-link-clicks-count.kql
+customEvents
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| where timestamp > startofday(ago(0d))
+| extend content = tostring(customDimensions.content)
+| where content contains_cs "View the sentence plan (opens in new tab)"
+| summarize ["Clicks"] = count()

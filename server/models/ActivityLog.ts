@@ -37,7 +37,6 @@ export interface ActivityLogFiltersResponse extends ActivityLogFilters {
   supervisionPackageOptions: Option[]
   hideContactOptions: Option[]
   baseUrl: string
-  maxDate: string
   query?: ActivityLogFilters
   crn: string
 }

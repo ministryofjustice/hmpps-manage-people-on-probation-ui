@@ -163,6 +163,26 @@ const stubDeleteAssignedQuestionsFromCheckIn = () => {
     },
   })
 }
+
+export const stubGetOffenderEligibility = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'GET',
+      urlPattern: '/esupervision/v2/offenders/.+?/eligibility',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        outcome: 'ELIGIBLE',
+        message: 'This person is eligible for online check ins',
+      },
+    },
+  })
+}
+
 export default {
   stubOffenderSetup422Response,
   stubOffenderSetup500Response,

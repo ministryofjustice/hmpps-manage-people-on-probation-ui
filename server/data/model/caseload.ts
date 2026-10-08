@@ -87,8 +87,10 @@ export interface UserAppontment {
     }
     crn: string
     description: string
-    date: string
+    startDateTime: string
+    endDateTime: string
   }[]
+  timeoutError?: any
 }
 
 export interface UserLocation {

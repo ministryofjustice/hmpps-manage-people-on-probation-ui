@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
-import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
+import { convertToTitleCase, firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -17,6 +17,7 @@ import { buildCaseLink } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
+import isTimeoutError from '../utils/isTimeoutError'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
@@ -38,13 +39,12 @@ export const postRescheduleAppointments = (
       sensitivity,
       visorReport,
       rescheduleAppointment,
-      outcomeRecorded,
       smsOptIn,
       outcome,
       user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
-    const isInPast = appointmentDateIsInPast(req)
+    const isInPast = appointmentDateIsInPast(req, res)
     const { contactId } = rescheduleAppointment
     const body: RescheduleAppointmentRequestBody = {
       date,
@@ -61,11 +61,8 @@ export const postRescheduleAppointments = (
       uuid,
       isInFuture: isInPast === false,
     }
-    if (res.locals.flags?.enableNonCompliance) {
-      body.outcomeRecorded = !!outcome?.outcomeCode
-    } else {
-      body.outcomeRecorded = outcomeRecorded === 'Yes'
-    }
+    body.outcomeRecorded = !!outcome?.outcomeCode
+
     if (rescheduleAppointment?.reason) {
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
     }
@@ -73,6 +70,16 @@ export const postRescheduleAppointments = (
     const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
+
+    const { mobileNumber, allowSms } = res.locals.case
+
+    let sendSms = false
+    if (res.locals?.flags?.enableAllowSms) {
+      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+    } else {
+      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+    }
+
     if (email) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
@@ -99,13 +106,13 @@ export const postRescheduleAppointments = (
         },
         oldSupervisionAppointmentUrn,
       }
-      const { mobileNumber } = res.locals.case
 
-      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
+      if (sendSms) {
         const {
           includeWelshPreview,
           appointmentLocation = null,
           appointmentTypeCode = null,
+          practitionerFirstName = null,
         } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
         isWelshTranslation = includeWelshPreview
         rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
@@ -115,40 +122,58 @@ export const postRescheduleAppointments = (
           smsOptIn: true,
           includeWelshTranslation: includeWelshPreview,
         }
+        if (practitionerFirstName)
+          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName =
+            convertToTitleCase(practitionerFirstName)
         if (appointmentLocation)
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
         if (appointmentTypeCode)
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
 
-      eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
-      const outlookEventResponse: any = eventResponse
-      if (outlookEventResponse?.status === 500) {
-        const sentryError =
-          outlookEventResponse?.error ??
-          new Error(outlookEventResponse?.errors?.[0]?.text ?? 'Rescheduling appointment event not successful.')
-        const sentryEventId = Sentry.captureException(sentryError, {
-          tags: {
-            'http.status': '500',
-            'error.type': 'internal_server_error',
-            service: 'Probation Supervision Appointments Api',
-            operation: 'postRescheduleAppointmentEvent',
-          },
-        })
-        logger.info(`Sentry eventId: ${sentryEventId}`)
-        logger.warn(
-          { sentryEventId, apiError: outlookEventResponse?.error, apiErrors: outlookEventResponse?.errors },
-          'Failed to create rescheduling calendar event',
-        )
+      try {
+        eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
+        const outlookEventResponse: any = eventResponse
+        if (outlookEventResponse?.status === 500) {
+          const sentryError =
+            outlookEventResponse?.error ??
+            new Error(outlookEventResponse?.errors?.[0]?.text ?? 'Rescheduling appointment event not successful.')
+          const sentryEventId = Sentry.captureException(sentryError, {
+            tags: {
+              'http.status': '500',
+              'error.type': 'internal_server_error',
+              service: 'Probation Supervision Appointments Api',
+              operation: 'postRescheduleAppointmentEvent',
+            },
+          })
+          logger.info(`Sentry eventId: ${sentryEventId}`)
+          logger.warn(
+            { sentryEventId, apiError: outlookEventResponse?.error, apiErrors: outlookEventResponse?.errors },
+            'Failed to create rescheduling calendar event',
+          )
+        }
+      } catch (error) {
+        if (isTimeoutError(error)) {
+          logger.warn(
+            { err: error },
+            `Outlook calendar event reschedule timed out for ${rescheduleEventRequest.rescheduledEventRequest.supervisionAppointmentUrn}`,
+          )
+
+          data.isOutlookEventPending = true
+
+          return response
+        }
+
+        throw error
       }
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
-    if (smsOptIn?.includes('YES') && !eventResponse?.smsResponse?.englishNotificationId)
+    if (smsOptIn?.includes('YES') && sendSms && !eventResponse?.smsResponse?.englishNotificationId)
       data.isEnglishNotificationFailed = true
 
-    if (smsOptIn?.includes('YES') && isWelshTranslation && !eventResponse?.smsResponse?.welshNotificationId)
+    if (smsOptIn?.includes('YES') && sendSms && isWelshTranslation && !eventResponse?.smsResponse?.welshNotificationId)
       data.isWelshNotificationFailed = true
 
     return response

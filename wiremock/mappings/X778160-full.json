@@ -34,7 +34,7 @@
           },
           "schedule": {
             "nextAppointment": {
-              "date": "2024-03-09T14:59:05.382936Z[Europe/London]",
+              "date": "2024-03-09T14:59:05.382936Z",
               "description": "Initial Appointment - In office (NS)"
             }
           },
@@ -157,7 +157,7 @@
           },
           "schedule": {
             "nextAppointment": {
-              "date": "2024-03-09T14:59:05.382936Z[Europe/London]",
+              "date": "2024-03-09T14:59:05.382936Z",
               "description": "Initial Appointment - In office (NS)"
             }
           },
@@ -377,6 +377,19 @@
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": false
+            },
+            {
+              "id": 5,
+              "level": "LOW",
+              "description": "Low Rosh",
+              "notes": "Some notes",
+              "createdDate": "2022-12-18",
+              "nextReviewDate": "2024-12-15",
               "createdBy": {
                 "forename": "Paul",
                 "surname": "Smith"
@@ -841,7 +854,8 @@
               "name": "Eula-Schmeler-X000001-UPW.pdf",
               "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
             }
-          ]
+          ],
+          "allowSms": true
         },
         "headers": {
           "Content-Type": "application/json"

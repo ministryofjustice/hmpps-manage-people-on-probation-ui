@@ -64,7 +64,7 @@
         value: body.reason
     } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'reason' ])      ) }}
 
-    {% if not isSensitive or not flags.enableSensitivityRemoved %}
+    {% if not isSensitive %}
         {{ govukRadios({
             fieldset: {
                 legend: {

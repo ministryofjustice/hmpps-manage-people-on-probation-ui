@@ -46,6 +46,8 @@
   <div class="govuk-!-padding-3 govuk-!-padding-top-1">
     {{ govukTable(tableData) }}
   </div>
+{% elseif appointmentsTimeoutError %}
+    <p class="govuk-body govuk-!-padding-3" data-qa="appointmentsTimeoutError">Upcoming appointments are currently unavailable.</p>
 {% else %}
   <p class="govuk-body govuk-!-padding-3">There are no upcoming appointments.</p>
 {% endif %}

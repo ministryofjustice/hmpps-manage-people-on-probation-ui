@@ -1,0 +1,11 @@
+// Daily pattern of clicks on the "View the sentence plan (opens in new tab)" link
+// over the last 7 calendar days (today plus the 6 preceding days).
+//
+//   ./run-query.sh sentence-plan-link-clicks-daily-pattern.kql
+customEvents
+| where cloud_RoleName == "hmpps-manage-people-on-probation-ui"
+| where timestamp > startofday(ago(6d))
+| extend content = tostring(customDimensions.content)
+| where content contains_cs "View the sentence plan (opens in new tab)"
+| summarize ["Clicks"] = count() by ["Date"] = format_datetime(bin(timestamp, 1d), "yyyy-MM-dd")
+| order by Date desc

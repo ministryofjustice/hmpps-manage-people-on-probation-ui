@@ -227,16 +227,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][outcomeRecorded]`]: {
-      optional: page !== `arrange-appointment/${id}/attended-complied`,
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: `Select if they attended and complied`,
-          log: 'Attended and complied not selected',
-        },
-      ],
-    },
     [`[appointments][${crn}][${id}][rescheduleAppointment][whoNeedsToReschedule]`]: {
       optional: page !== 'reschedule-appointment',
       checks: [
@@ -274,16 +264,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select if you want to send a text message confirmation',
           log: 'Send text message confirmation not selected',
-        },
-      ],
-    },
-    outcomeRecorded: {
-      optional: page !== `appointment/${contactId}/attended-complied`,
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select if they attended and complied',
-          log: 'Attended and complied not selected',
         },
       ],
     },

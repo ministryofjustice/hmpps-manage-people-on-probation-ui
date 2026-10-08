@@ -14,8 +14,9 @@ export type ApplicationInfo = {
   branchName: string
 }
 
-export default (): ApplicationInfo => {
+const applicationInfo = (): ApplicationInfo => {
   const packageJson = path.join(__dirname, '../package.json')
   const { name: applicationName, version } = JSON.parse(fs.readFileSync(packageJson).toString())
   return { applicationName, version, buildNumber, gitRef, gitShortHash: gitRef.substring(0, 7), productId, branchName }
 }
+export default applicationInfo

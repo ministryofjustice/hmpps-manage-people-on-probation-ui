@@ -8,14 +8,12 @@ import { crn } from './common'
 export const checkUpdateNotes = ({
   page,
   dateInPast = false,
-  enableNonCompliance = true,
 }: {
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage
   dateInPast?: boolean
-  enableNonCompliance?: boolean
 }) => {
   getUuid().then(pageUuid => {
-    const index = enableNonCompliance && dateInPast ? 9 : 7
+    const index = dateInPast ? 9 : 7
     page.getSummaryListRow(index).find('.govuk-link').click()
     const updatedNotes = 'Some updated notes'
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()

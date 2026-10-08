@@ -70,6 +70,7 @@ export interface QueriesResponse {
 // Result type returned to the middleware
 
 export interface SentencePlanResult {
+  hasPlan: boolean
   hasAgreedPlan: boolean
   lastUpdatedDate: string
 }

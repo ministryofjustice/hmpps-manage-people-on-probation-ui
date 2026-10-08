@@ -88,11 +88,6 @@
     {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id, 'sensitivity']) %}
 
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
-    {{ govukDetails({
-        classes: 'govuk-!-margin-bottom-6',
-        summaryText: 'Take notes using CRISS',
-        html: '<p class="govuk-body govuk-!-margin-bottom-1">CRISS stands for:</p><ul class="govuk-list govuk-list--bullet"><li>Check in with the person on probation</li><li>Review their progress from the last session</li><li>Intervention - target their criminogenic needs and risk</li><li>Summarise what you discussed in this session</li><li>Set tasks to review in the next session</li></ul>'
-    }) }}
     {% if hasNotes %}
         <section data-qa="previousNotes">
             <h3 class="govuk-heading-m">Previous notes</h3>
@@ -111,6 +106,7 @@
 
     {% if flags.enableCRISSV2 %}
         {{ govukRadios({
+            classes: "govuk-radios--inline",
             name: "noteFormat",
             fieldset: {
                 legend: {
@@ -121,13 +117,13 @@
             items: [
                 {
                     value: "freeform",
-                    text:"Plain text",
+                    text:"Single text box",
                     id:"format-freeform",
                     checked: true
                 },
                 {
                     value: "structured",
-                    text:"CRISS",
+                    text:"CRISS sections",
                     id:"format-structured"
                 }
             ],
@@ -146,6 +142,12 @@
             type: 'button'
         }) }}
     {% endif %}
+
+    {{ govukDetails({
+        classes: 'govuk-!-margin-bottom-6',
+        summaryText: 'Help using CRISS',
+        html: '<p class="govuk-body govuk-!-margin-bottom-1">CRISS stands for:</p><ul class="govuk-list govuk-list--bullet"><li>Check in with the person on probation</li><li>Review their progress from the last session</li><li>Intervention - target their criminogenic needs and risk</li><li>Summarise what you discussed in this session</li><li>Set tasks to review in the next session</li></ul>'
+    }) }}
 
     {% if errorMessages.fileOrNote %}
         <div class="govuk-form-group govuk-form-group--error" id="fileOrNote" data-qa="fileOrNote">
@@ -233,7 +235,7 @@
                     name: "fileUpload",
                     classes: "govuk-file-upload",
                     attributes: {
-                        accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.jpeg"
                     }
                 }) }}
             </div>
@@ -241,38 +243,6 @@
     </div>
     {% endif %}
     </div>
-    {% if appointmentOutcome.contactId %}
-        {% set uploadHtml %}
-        <div class="govuk-grid-row govuk-body">
-            <div class="govuk-grid-column-full" data-qa="fileUpload">
-
-                {{ govukFileUpload({
-                        id: "file-upload-1",
-                        name: "file",
-                        classes: 'moj-multi-file-upload__input',
-                        label: {
-                            text: "Upload files",
-                            classes: 'govuk-label--m'
-                        },
-                        attributes: { multiple: '' }
-                    }) }}
-
-                {{ govukButton({
-                        text: 'Upload file',
-                        classes: 'govuk-button--secondary moj-multi-file-upload__button'
-                    }) }}
-            </div>
-        </div>
-        {% endset %}
-
-        {% set errors = [] %}
-        {% if patchResponse.errors.length > 0 %}
-            {% set errors = errors.concat(patchResponse.errors) %}
-        {% endif %}
-        {% if errors.length > 0 %}
-            <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
-        {% endif %}
-    {% endif %}
     {% if not appointmentOutcome.appointmentSession.sensitivityLocked %}
         {{ govukRadios(sensitivityConfig) }}
     {% endif %}

@@ -1,6 +1,3 @@
-import { PersonSummary } from './personalDetails'
-import { Activity } from './schedule'
-
 export interface SmsEventRequest {
   firstName: string
   mobileNumber?: string
@@ -9,6 +6,7 @@ export interface SmsEventRequest {
   includeWelshTranslation: boolean
   appointmentLocation?: string
   appointmentTypeCode?: string
+  practitionerFirstName?: string
 }
 export interface OutlookEventRequestBody {
   recipients: Recipient[]
@@ -66,10 +64,12 @@ export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBI
 
 export interface SmsPreviewRequest {
   firstName: string
+  recipientEmail?: string
   dateAndTimeOfAppointment: string
   appointmentLocation?: string
   appointmentTypeCode?: string
   includeWelshPreview: boolean
+  practitionerFirstName?: string
 }
 
 export interface SmsPreviewResponse {

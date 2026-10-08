@@ -47,7 +47,10 @@ const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
 
 const mockFormattedRisks = {
   ...mockRisks,
-  riskFlags: [{ id: 1, description: 'Risk to Staff', levelDescription: 'Medium' }],
+  riskFlags: [
+    { id: 1, description: 'Risk to Staff', levelDescription: 'Medium' },
+    { id: 2, description: 'High ROSH', levelDescription: 'High' },
+  ],
   removedRiskFlags: [{ id: 2, description: 'Removed ROSH flag' }],
 } as Partial<PersonRiskFlags>
 
@@ -57,13 +60,21 @@ const getPersonRiskFlagsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
   .mockImplementation(() => Promise.resolve(mockRisks))
 
-const res = mockAppResponse()
+const createResponse = ({ enableNDeliusRosh = false } = {}) =>
+  mockAppResponse({
+    flags: {
+      enableNDeliusRosh,
+    },
+  })
+
+const res = createResponse()
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 describe('middleware/getPersonRiskFlags', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
   describe('risks session does not exist for current crn', () => {
     const req = httpMocks.createRequest({
       params: {
@@ -102,12 +113,17 @@ describe('middleware/getPersonRiskFlags', () => {
     })
     it('should set res.locals.personRisks to the api response', () => {
       expect(res.locals.personRisks).toEqual(mockFormattedRisks)
+      expect(res.locals.rosh).toBeUndefined()
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
   describe('risks session exists for current crn', () => {
+    const mockRiskBadgeData = {
+      remainingCount: 0,
+    }
+
     const req = httpMocks.createRequest({
       params: {
         crn,
@@ -117,24 +133,38 @@ describe('middleware/getPersonRiskFlags', () => {
           risks: {
             [crn]: mockSessionRisks,
           },
+          riskBadgeData: {
+            [crn]: mockRiskBadgeData,
+          },
         },
       },
     })
+
     beforeEach(async () => {
+      jest.clearAllMocks()
+
       await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
     })
+
     it('should not request the risk flags from the api', () => {
       expect(getPersonRiskFlagsSpy).not.toHaveBeenCalled()
     })
+
     it('should not set the risks session', () => {
       expect(mockSetDataValue).not.toHaveBeenCalled()
     })
+
     it('should set res.locals.personRisks to the session value', () => {
       expect(res.locals.personRisks).toEqual(mockSessionRisks)
     })
+
     it('should set res.locals.riskToStaff to the expected value', () => {
-      expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'MEDIUM' })
+      expect(res.locals.riskToStaff).toStrictEqual({
+        id: 1,
+        level: 'MEDIUM',
+      })
     })
+
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
@@ -157,5 +187,79 @@ describe('middleware/getPersonRiskFlags', () => {
     it('should set res.locals.riskToStaff level to VERY_HIGH', () => {
       expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'VERY_HIGH' })
     })
+  })
+
+  it('should not generate risk badge data when risk flags are not present', async () => {
+    getPersonRiskFlagsSpy.mockResolvedValueOnce({
+      ...mockRisks,
+      riskFlags: undefined,
+    } as PersonRiskFlags)
+
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+
+    await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
+
+    expect(res.locals.riskBadgeData).toBeUndefined()
+
+    expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['riskBadgeData', crn], undefined)
+  })
+
+  it('should assign NDelius Rosh values to res.locals.rosh if enableNDeliusRosh feature flag is enabled', async () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    const mockRes = createResponse({ enableNDeliusRosh: true })
+    await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
+    expect(mockRes.locals.rosh).toEqual({ level: 'HIGH' })
+  })
+
+  it('should assign a VERY HIGH level to res.locals.rosh when the matching risk flag description is Very High ROSH', async () => {
+    const veryHighRisks = {
+      ...mockFormattedRisks,
+      riskFlags: [{ id: 1, description: 'Very High ROSH', levelDescription: 'High' }],
+    }
+    mockFindReplace.mockImplementationOnce(() => veryHighRisks).mockImplementationOnce(() => veryHighRisks)
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    const mockRes = createResponse({ enableNDeliusRosh: true })
+    await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
+    expect(mockRes.locals.rosh).toEqual({ level: 'VERY HIGH' })
+  })
+
+  it('should not throw and should set res.locals.rosh.level to undefined when enableNDeliusRosh is enabled and riskFlags is absent', async () => {
+    getPersonRiskFlagsSpy.mockResolvedValueOnce({
+      ...mockRisks,
+      riskFlags: undefined,
+    } as PersonRiskFlags)
+    mockFindReplace.mockImplementation(data => data as Partial<PersonRiskFlags>)
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    const mockRes = createResponse({ enableNDeliusRosh: true })
+    await expect(getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)).resolves.not.toThrow()
+    expect(mockRes.locals.rosh).toEqual({ level: undefined })
   })
 })

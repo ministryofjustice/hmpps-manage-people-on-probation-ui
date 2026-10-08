@@ -1,6 +1,6 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Location, Provider, Team, User } from '../data/model/caseload'
-import { PersonalDetails } from '../data/model/personalDetails'
+import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
 import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
 import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
@@ -11,6 +11,9 @@ import { SentencePlan } from './Risk'
 import { ErrorSummary } from '../data/model/common'
 import { ProbationPractitioner } from './CaseDetail'
 import { NextAppointmentResponse, SupervisionPackageResponse } from './SupervisionPackage'
+import { AppointmentOutcomeProps } from './Locals'
+import { Activity } from '../data/model/schedule'
+import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -18,8 +21,13 @@ export interface PersonalDetailsSession {
   risks: RiskSummary
   tierCalculation: TierCalculation
   riskData?: RiskData
+  riskBadgeData?: RiskBadgeData
   predictors?: RiskScoresDto[] | ErrorSummary
   probationPractitioner?: ProbationPractitioner
+  professionalContact?: ProfessionalContact | null
+  personPhotoSrc?: string
+  arnsUnavailable?: boolean
+  prisonsUnavailable?: boolean
   tierDetails?: LatestTierResponse
   supervisionPackageResponse?: SupervisionPackageResponse
   nextAppointmentResponse?: NextAppointmentResponse
@@ -33,7 +41,16 @@ export interface Data {
   temp?: {
     [crn: string]: {
       linkedContactId?: string
+      nextAppointmentId?: string
+      nextAppointment?: AppointmentOutcomeProps<Activity>
       responseContactId?: string
+    }
+  }
+  note?: {
+    [crn: string]: {
+      [id: string]: {
+        noteAdded?: string
+      }
     }
   }
   appointments?: {
@@ -70,5 +87,9 @@ export interface Data {
   }
   risks?: {
     [crn: string]: PersonRiskFlags
+  }
+
+  riskBadgeData?: {
+    [crn: string]: RiskBadgeData
   }
 }

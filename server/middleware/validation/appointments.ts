@@ -19,6 +19,7 @@ const appointments: Route<void> = (req, res, next) => {
   const id = uuid || contactId
   const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
+  const url = encodeURIComponent(req.url)
   const { maxCharCount } = config
   const outcomeJourney = req.url.includes('outcome/next-appointment')
 
@@ -31,9 +32,7 @@ const appointments: Route<void> = (req, res, next) => {
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
   const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
-  const isSensitive =
-    (sensitivityLocked && res.locals.flags?.enableSensitivityRemoved) ??
-    res.locals.personAppointment?.appointment?.isSensitive
+  const isSensitive = sensitivityLocked ?? res.locals.personAppointment?.appointment?.isSensitive
 
   let localParams: LocalParams = {
     crn,
@@ -48,31 +47,21 @@ const appointments: Route<void> = (req, res, next) => {
     alertDismissed,
     isSensitive,
     outcomeJourney,
+    url,
   }
 
-  if (
-    [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
-  ) {
+  if (req.url.includes('/location-date-time')) {
     const { _maxDate } = getMinMaxDates()
 
     localParams = {
       ...localParams,
       isReschedule: isRescheduleAppointment(req),
-      isInPast: appointmentDateIsInPast(req),
+      isInPast: appointmentDateIsInPast(req, res),
       _maxDate,
     }
-  }
-
-  if (req.url.includes('/attended-complied')) {
-    localParams = { ...localParams, ...res.locals.appointmentOutcome }
-  }
-
-  if (
-    [`/arrange-appointment/${id}/attended-complied`, `/arrange-appointment/${id}/add-note`].some(urlPart =>
-      req.url.includes(urlPart),
-    )
-  ) {
-    localParams = { ...localParams, useDecorator: true }
+    if (res?.locals?.flags?.enableAllowSms) {
+      localParams.allowSms = getDataValue(data, ['personalDetails', crn, 'overview', 'allowSms'])
+    }
   }
 
   const baseUrl = req.url.split('?')[0]
@@ -158,40 +147,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateAttendedComplied = (): void => {
-    if (!req.url.includes(`/case/${crn}/arrange-appointment/${id}/attended-complied`)) return
-
-    render = 'pages/appointments/attended-complied'
-
-    errorMessages = validateWithSpec(
-      req,
-      appointmentsValidation({
-        crn,
-        id,
-        page: `arrange-appointment/${id}/attended-complied`,
-      }),
-    )
-  }
-
-  const validateManageAttendedComplied = (): void => {
-    if (!req.url.includes(`appointment/${contactId}/attended-complied`)) return
-
-    render = 'pages/appointments/attended-complied'
-
-    errorMessages = {
-      ...errorMessages,
-      ...validateWithSpec(
-        req,
-        appointmentsValidation({
-          crn,
-          id,
-          contactId,
-          page: `appointment/${contactId}/attended-complied`,
-        }),
-      ),
-    }
-  }
-
   const validateSupportingInformation = (): void => {
     if (!baseUrl.includes('/supporting-information')) return
 
@@ -206,7 +161,7 @@ const appointments: Route<void> = (req, res, next) => {
           page: 'supporting-information',
           notes: unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? '',
           maxCharCount: maxCharCount as number,
-          isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
+          isSensitive,
         }),
       ),
     }
@@ -244,7 +199,7 @@ const appointments: Route<void> = (req, res, next) => {
         page: `arrange-appointment/${id}/add-note`,
         notes: req?.body?.appointments?.[crn]?.[id]?.notes || '',
         maxCharCount: maxCharCount as number,
-        isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
+        isSensitive,
       }),
     )
   }
@@ -267,7 +222,7 @@ const appointments: Route<void> = (req, res, next) => {
           notes: req.body.notes,
           fileOrNote: req.body.fileOrNote,
           maxCharCount: maxCharCount as number,
-          isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
+          isSensitive,
         }),
       ),
     }
@@ -285,7 +240,7 @@ const appointments: Route<void> = (req, res, next) => {
             id,
             page: 'reschedule-appointment',
             maxCharCount: maxCharCount as number,
-            isSensitive: res.locals.flags?.enableSensitivityRemoved ? isSensitive : false,
+            isSensitive,
           }),
         ),
       }
@@ -314,8 +269,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
-  validateAttendedComplied()
-  validateManageAttendedComplied()
   validateAddNote()
   validateManageAddNote()
   validateReschedule()

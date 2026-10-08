@@ -1,7 +1,9 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
 import { Document, PersonalDetails } from '../data/model/personalDetails'
+import { ProbationPractitioner } from './CaseDetail'
 import { FeatureFlags } from '../data/model/featureFlags'
+import { ManagedByDetails } from '../utils/getManagedByDetails'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
@@ -21,19 +23,26 @@ import {
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
-import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import {
+  PersonRiskFlags,
+  RiskScore,
+  RiskSummary,
+  RoshBadgeLevel,
+  RoshRiskWidgetDto,
+  TimelineItem,
+} from '../data/model/risk'
 import { TierCalculation, LatestTierResponse } from '../data/tierApiClient'
 import { TierChangePrompt } from '../utils/tierChange'
 import { FinalThirdPrompt } from '../utils/finalThird'
 import { SupervisionPackage } from './SupervisionPackage'
-import { ErrorSummary } from '../data/model/common'
+import { ErrorSummary, ErrorSummaryItem } from '../data/model/common'
 import { Activity, ContactOutcome, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { Compliance } from '../data/model/overview'
 import { BreachOrRecall, SentenceCompliance } from '../data/model/compliance'
 import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import { SmsPreviewResponse } from '../data/model/OutlookEvent'
+import { SmsOptInOptions, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import {
   ESupervisionCheckIn,
   EsupervisionUpcomingQuestionsResponse,
@@ -41,6 +50,7 @@ import {
 } from '../data/model/esupervision'
 import { PersonExistsResponse } from '../data/emdiClient'
 import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
+import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export interface AppointmentLocals {
   meta: {
@@ -77,6 +87,7 @@ export interface AppointmentLocals {
   sensitivity?: string
   outcomeRecorded?: string
   isReschedule?: boolean
+  allowSms?: boolean
 }
 
 export interface LocalsUser {
@@ -96,6 +107,13 @@ export interface LocalsUser {
   probationDeliveryUnits?: ProbationDeliveryUnit[]
 }
 
+export interface SmsConfirmation {
+  overview: string[]
+  options: Option[]
+  preview: SmsPreviewResponse | null
+  errors?: ErrorSummaryItem[]
+}
+
 interface Locals {
   errorMessages: Record<string, string>
   warningMessages: Record<string, string>
@@ -110,14 +128,24 @@ interface Locals {
   headerCRN?: string
   headerDob?: string
   headerTierLink?: string
+  probationPractitioner?: ProbationPractitioner
+  managedBy?: ManagedByDetails
+  personPhotoSrc?: string
+  arnsUnavailable?: boolean
+  prisonsUnavailable?: boolean
   tierUrlV3?: string
   dateOfDeath?: string
+  personRiskFlags?: PersonRiskFlags
+  riskBadgeData?: RiskBadgeData
   risksWidget?: RoshRiskWidgetDto
+  rosh?: { level?: RoshBadgeLevel }
   tierCalculation?: TierCalculation | ErrorSummary
   tierDetails?: LatestTierResponse
   tierChangePrompt?: TierChangePrompt
   finalThirdPrompt?: FinalThirdPrompt
+  oasysLink?: string
   supervisionPackageDetails?: SupervisionPackage | null
+  supervisionPackageAttempted?: boolean
   predictorScores?: TimelineItem
   riskData?: RiskData
   risks?: RiskSummary
@@ -158,7 +186,7 @@ interface Locals {
   defaultUser?: { username: string; homeArea: string; team: string }
   attendingUser?: DefaultUserDetails
   sentencePlan?: SentencePlan
-  alertsCount?: string
+  alertsCount?: string | ErrorSummary | null
   alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
@@ -167,6 +195,7 @@ interface Locals {
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
+  smsConfirmation: SmsConfirmation
   personRisks?: PersonRiskFlags
   riskToStaff?: { id: number; level: RiskScore | null }
   riskToProbationStaff?: { id: number }
@@ -224,8 +253,14 @@ export interface OutcomeSummary {
   notes: string
   sensitivity: string
   documents?: string[]
-  nextAppointment?: string
+  nextAppointment?: OutcomeNextAppointment | string
   enforcementActionChangeLink?: string
+}
+
+export interface OutcomeNextAppointment {
+  id?: string
+  label: string
+  smsOptIn?: SmsOptInOptions
 }
 
 export interface OutcomeConfirmationAction {
@@ -305,6 +340,7 @@ export interface AppointmentOutcomeProps<TAppointment> {
   responseContactId?: string
   linkedContactId?: string
   redirectFromUpdate?: boolean
+  nextAppointment?: OutcomeNextAppointment
 }
 
 export interface AppResponse extends Response {

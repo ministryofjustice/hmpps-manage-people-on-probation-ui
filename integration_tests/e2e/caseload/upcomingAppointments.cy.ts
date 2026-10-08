@@ -65,8 +65,8 @@ context('Upcoming appointments', () => {
         'href',
         '/case/X778160/appointments/appointment/1/manage?back=/caseload/appointments/upcoming',
       )
-    page.getTableCell(1, 5).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
-    page.getTableCell(2, 5).should('contain.text', '28 March 2025').should('contain.text', '9:30am to 10:30am')
+    page.getTableCell(1, 5).should('contain.text', '27 August 2026').should('contain.text', '9:30am')
+    page.getTableCell(2, 5).should('contain.text', '28 August 2026').should('contain.text', '9:30am to 10:30am')
     cy.get('.govuk-pagination').should('exist')
     page
       .getPaginationItem(1)

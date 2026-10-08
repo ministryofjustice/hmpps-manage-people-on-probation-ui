@@ -7,6 +7,8 @@ import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
 import { getDataValue, setDataValue } from '../utils'
+import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
+import { addReplaceBackParameter } from '../utils/addReplaceBackParameter'
 
 export const appointmentOutcomeRequests = [
   'getOutcome',
@@ -88,11 +90,14 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     return async function postAddNote(req, res) {
       const { crn, isValidParams, id, contactId, uuid, baseOutcomeUrl } = res.locals.appointmentOutcome
       const { change, put } = req.query as Record<string, string>
-      const { notes, sensitive } = req.body
+      const notes = req.body?.appointments?.[crn]?.[id]?.notes
+      const sensitive = req.body?.appointments?.[crn]?.[id]?.sensitive
+      const { data } = req.session
       const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
+
       const file = req.file as Express.Multer.File
       if (file) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -107,19 +112,27 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
           })
         }
       }
-      let redirect = baseOutcomeUrl
 
-      redirect = uuid
-        ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
-        : `${baseOutcomeUrl}/next-appointment`
+      const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
+      if (nextAppointmentId === uuid) {
+        const nextAppointmentOutcome = res.locals.appointmentOutcome
+        setDataValue(req.session.data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
+      }
 
+      let redirect = `${baseOutcomeUrl}/next-appointment`
+      if (uuid) redirect = `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
       if (change) redirect = change
-      if (put) redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+      if (put) {
+        redirect = `/case/${crn}/appointments/appointment/${contactId}/manage`
+        if (notes) setDataValue(data, ['note', crn, id, 'noteAdded'], 'Success')
+        else if (!file) setDataValue(data, ['note', crn, id, 'noteAdded'], 'None')
+      }
+      if (linkedContactId && res.locals.flags.enableCombinedCYAPage)
+        redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
+
       const backParam = `back=${baseOutcomeUrl}/add-note`
-      if (redirect.includes('back=')) {
-        redirect = redirect.replace(/back=[^&]*/, backParam)
-      } else {
-        redirect = `${redirect}${redirect.includes('?') ? '&' : '?'}${backParam}`
+      if (!put) {
+        redirect = addReplaceBackParameter(redirect, backParam)
       }
       return res.redirect(redirect)
     }
@@ -127,7 +140,9 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   getCheckYourAnswers: _hmppsAuthClient => {
     return async function getCheckYourAnswers(req, res) {
       const url = encodeURIComponent(req.url)
-      return res.render('pages/appointment-outcomes/check-your-answers', { url })
+      const { crn } = res.locals.appointmentOutcome
+      const nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
+      return res.render('pages/appointment-outcomes/check-your-answers', { url, nextAppointmentId })
     }
   },
   postCheckYourAnswers: _hmppsAuthClient => {
@@ -140,8 +155,18 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
     }
   },
   getConfirmation: _hmppsAuthClient => {
-    return async function getConfirmation(_req, res) {
-      return res.render('pages/appointment-outcomes/confirmation')
+    return async function getConfirmation(req, res) {
+      let nextAppointmentId: string = null
+      if (res.locals.flags.enableCombinedCYAPage) {
+        const { crn } = res.locals.appointmentOutcome
+        const responseContactId = req?.session?.data?.temp?.[crn]?.responseContactId
+        if (responseContactId) {
+          delete req.session.data.temp[crn].responseContactId
+        }
+        nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
+        deleteOutcomeVars(crn)(req, res)
+      }
+      return res.render('pages/appointment-outcomes/confirmation', { nextAppointmentId })
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => async (_req, res) =>

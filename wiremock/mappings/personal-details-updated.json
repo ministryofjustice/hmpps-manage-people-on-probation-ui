@@ -1,0 +1,25 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/personal-details/.*/updated",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "username": "terry-jones",
+          "name": {
+            "forename": "Terry",
+            "middleName": "",
+            "surname": "Jones"
+          },
+          "updatedDateTime": "2025-10-16T14:55:23.537Z"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

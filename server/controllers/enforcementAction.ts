@@ -67,6 +67,7 @@ const enforcementContactsController: Controller<typeof routes, void> = {
       const enforcementContacts = await masClient.getEnforcementContacts(
         user.username,
         (pageNum - 1).toString(),
+        false,
         '25',
         name,
         ascending,

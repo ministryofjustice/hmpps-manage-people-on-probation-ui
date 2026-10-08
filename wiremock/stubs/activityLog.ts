@@ -21,8 +21,8 @@ const stubAppointmentNoOutcomeWithNote = (): SuperAgentRequest =>
           id: 13,
           type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
-          startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
-          endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
+          startDateTime: '2023-02-12T10:15:00.382936Z',
+          endDateTime: '2023-02-12T10:30:00.382936Z',
           rarToolKit: 'Choices and Changes',
           isSensitive: false,
           hasOutcome: false,
@@ -35,7 +35,7 @@ const stubAppointmentNoOutcomeWithNote = (): SuperAgentRequest =>
           appointmentNote: {
             id: 0,
             createdBy: 'Paul Smith',
-            createdByDate: '2023-02-12T10:15:00.382936Z[Europe/London]',
+            createdByDate: '2023-02-12T10:15:00.382936Z',
             note: 'An appointment note',
           },
           appointmentNotes: [
@@ -84,8 +84,8 @@ const stubAppointmentOutcomeWithNote = (): SuperAgentRequest =>
           id: 13,
           type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
-          startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
-          endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
+          startDateTime: '2023-02-12T10:15:00.382936Z',
+          endDateTime: '2023-02-12T10:30:00.382936Z',
           rarToolKit: 'Choices and Changes',
           isSensitive: false,
           hasOutcome: true,
@@ -98,7 +98,7 @@ const stubAppointmentOutcomeWithNote = (): SuperAgentRequest =>
           appointmentNote: {
             id: 0,
             createdBy: 'Paul Smith',
-            createdByDate: '2023-02-12T10:15:00.382936Z[Europe/London]',
+            createdByDate: '2023-02-12T10:15:00.382936Z',
             note: 'An appointment note',
           },
           appointmentNotes: [
@@ -147,8 +147,8 @@ const stubAppointmentOutcomeWithNoNotes = (): SuperAgentRequest =>
           id: 13,
           type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
-          startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
-          endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
+          startDateTime: '2023-02-12T10:15:00.382936Z',
+          endDateTime: '2023-02-12T10:30:00.382936Z',
           rarToolKit: 'Choices and Changes',
           isSensitive: false,
           hasOutcome: true,
@@ -198,8 +198,8 @@ const stubAppointmentDeepLinkWithOutcome = (): SuperAgentRequest =>
         appointment: {
           id: 12,
           type: 'Drug Test Details',
-          startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
-          endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
+          startDateTime: '2023-02-12T10:15:00.382936Z',
+          endDateTime: '2023-02-12T10:30:00.382936Z',
           isSensitive: false,
           hasOutcome: true,
           deliusManaged: true,
@@ -368,6 +368,122 @@ const stubActivityLogWithUpdatableContactNoOutcome = (): SuperAgentRequest =>
     },
   })
 
+const activityLogWithSingleActivity = (activity: Record<string, unknown>): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/activity/X000001',
+      method: 'POST',
+      queryParameters: {
+        page: { matches: '.*' },
+        size: { equalTo: '25' },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        size: 1,
+        page: 0,
+        totalResults: 1,
+        totalPages: 1,
+        personSummary: {
+          name: { forename: 'Eula', surname: 'Schmeler' },
+          crn: 'X000001',
+          dateOfBirth: '1979-08-18',
+        },
+        activities: [activity],
+      },
+      headers: { 'Content-Type': 'application/json' },
+    },
+  })
+
+const userEditableActivityFixture = {
+  startDateTime: '2024-01-10T10:00:00.000Z',
+  isSensitive: false,
+  hasOutcome: true,
+  wasAbsent: false,
+  isCommunication: false,
+  isSystemContact: false,
+  appointmentNotes: [] as unknown[],
+  officer: { name: { forename: 'Paul', surname: 'Smith' } },
+  lastUpdated: '2024-01-15',
+  lastUpdatedBy: { forename: 'Paul', surname: 'Smith' },
+}
+
+const stubActivityLogWithMpopManageableUserEditableContact = (): SuperAgentRequest =>
+  activityLogWithSingleActivity({
+    ...userEditableActivityFixture,
+    id: 9996,
+    eventNumber: '4',
+    type: 'MAPPA Level setting process',
+    displayName: 'MAPPA level setting process',
+    isAppointment: false,
+    deliusManaged: true,
+    isUpdatableContact: true,
+    editable: true,
+  })
+
+const stubActivityLogWithMpopManageableAppointmentUserEditable = (): SuperAgentRequest =>
+  activityLogWithSingleActivity({
+    ...userEditableActivityFixture,
+    id: 9995,
+    type: 'Planned Office Visit NS',
+    displayName: 'Planned office visit NS',
+    isAppointment: true,
+    deliusManaged: false,
+    isUpdatableContact: false,
+    editable: true,
+  })
+
+const stubActivityLogWithNonMpopUserEditableContact = (): SuperAgentRequest =>
+  activityLogWithSingleActivity({
+    ...userEditableActivityFixture,
+    id: 9994,
+    type: 'Court Appearance',
+    displayName: 'Court appearance',
+    isAppointment: false,
+    deliusManaged: true,
+    isUpdatableContact: false,
+    editable: true,
+  })
+
+const stubActivityLogWithNotUserEditableContact = (): SuperAgentRequest =>
+  activityLogWithSingleActivity({
+    ...userEditableActivityFixture,
+    id: 9993,
+    type: 'Court Appearance',
+    displayName: 'Court appearance',
+    isAppointment: false,
+    deliusManaged: true,
+    isUpdatableContact: false,
+    editable: false,
+  })
+
+const stubActivityLogWithUserEditableDrugTestContact = (): SuperAgentRequest =>
+  activityLogWithSingleActivity({
+    ...userEditableActivityFixture,
+    id: 9992,
+    eventNumber: '7',
+    type: 'Drug Test Details',
+    displayName: 'Drug test details',
+    isAppointment: false,
+    deliusManaged: true,
+    isUpdatableContact: false,
+    editable: true,
+  })
+
+const stubActivityLogWithUserEditableUpwContact = (): SuperAgentRequest =>
+  activityLogWithSingleActivity({
+    ...userEditableActivityFixture,
+    id: 9991,
+    eventNumber: '8',
+    type: 'CP/UPW - Appointment/Attendance (NS)',
+    displayName: 'CP/UPW - Appointment/Attendance (NS)',
+    isAppointment: true,
+    deliusManaged: true,
+    isUpdatableContact: false,
+    editable: true,
+  })
+
 export default {
   stubAppointmentNoOutcomeWithNote,
   stubAppointmentOutcomeWithNote,
@@ -376,4 +492,10 @@ export default {
   stubActivityLogWithAlcoholConsumption,
   stubActivityLogWithUnplannedContact,
   stubActivityLogWithUpdatableContactNoOutcome,
+  stubActivityLogWithMpopManageableUserEditableContact,
+  stubActivityLogWithMpopManageableAppointmentUserEditable,
+  stubActivityLogWithNonMpopUserEditableContact,
+  stubActivityLogWithNotUserEditableContact,
+  stubActivityLogWithUserEditableDrugTestContact,
+  stubActivityLogWithUserEditableUpwContact,
 }

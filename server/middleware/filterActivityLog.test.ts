@@ -4,8 +4,6 @@ import { categoryFilterOptions, filterOptions, hideContactsFilterOptions } from 
 import { AppResponse } from '../models/Locals'
 import { ActivityLogFiltersResponse } from '../models/ActivityLog'
 
-const now = new Date()
-const maxDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`
 const crn = 'X000001'
 
 interface Args {
@@ -201,7 +199,6 @@ describe('/middleware/filterActivityLog()', () => {
         hideContact: [req.query.hideContact] as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
-        maxDate,
         crn,
       }
 
@@ -411,7 +408,6 @@ describe('/middleware/filterActivityLog()', () => {
         hideContact: req.query.hideContact as string[],
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
-        maxDate,
         crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
@@ -500,7 +496,6 @@ describe('/middleware/filterActivityLog()', () => {
         hideContact: req.query.hideContact as string[],
         dateFrom: '',
         dateTo: '',
-        maxDate,
         crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
@@ -581,7 +576,6 @@ describe('/middleware/filterActivityLog()', () => {
         hideContact: ['hide NDelius system generated contacts'],
         dateFrom: '20/03/2025',
         dateTo: '23/03/2025',
-        maxDate,
         crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)

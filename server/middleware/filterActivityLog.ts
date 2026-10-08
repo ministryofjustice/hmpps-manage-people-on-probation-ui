@@ -1,6 +1,4 @@
 /* eslint-disable no-param-reassign */
-
-import { DateTime } from 'luxon'
 import { Route } from '../@types'
 
 import {
@@ -115,9 +113,9 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     hideContact,
   }
 
-  const keysWithClearValue = ['compliance', 'category', 'sparks', 'supervisionPackage', 'hideContact']
+  const keysWithClearValue = new Set(['compliance', 'category', 'sparks', 'supervisionPackage', 'hideContact'])
   const filterHref = (key: string, value: string): string => {
-    const base = keysWithClearValue.includes(key)
+    const base = keysWithClearValue.has(key)
       ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
       : `${baseUrl}?clearFilterKey=${key}`
     return view ? `${base}&view=${view}` : base
@@ -209,9 +207,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     checked: filters.hideContact.includes(value),
   }))
 
-  const today = new Date()
-  const maxDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
-
   res.locals.filters = {
     selectedFilterItems,
     complianceOptions,
@@ -228,7 +223,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     hideContact: filters.hideContact,
-    maxDate,
     crn,
   }
   return next()

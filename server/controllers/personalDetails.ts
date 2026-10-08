@@ -5,13 +5,14 @@ import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
 import TierApiClient from '../data/tierApiClient'
 import RoleService from '../services/roleService'
-import { toIsoDateFromPicker, isValidCrn, setDataValue } from '../utils'
+import { toIsoDateFromPicker, isValidCrn, setDataValue, getDataValue } from '../utils'
 import type { Controller } from '../@types'
 import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
 import { findUncompleted, renderError } from '../middleware'
 import { type Needs } from '../data/model/risk'
+import { SmsOptInOptions } from '../data/model/OutlookEvent'
 
 const routes = [
   'getPersonalDetails',
@@ -41,7 +42,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       }
       const query = req.query as Record<string, string>
       const success = query.update
-      const back = query?.back ? decodeURIComponent(query.back) : ''
+      const back = query?.back
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -57,9 +58,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
           req.path.includes(route),
         )
       ) {
-        if (query?.origin === 'appointments') {
-          backLink = back
+        if (['appointments', 'allowSms'].includes(query?.origin)) {
+          backLink =
+            typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : `/case/${crn}/personal-details`
         }
+
         if (!manageUsersAccess) {
           return res.redirect(`/no-perm-autherror?backLink=${backLink}`)
         }
@@ -142,6 +145,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         startDate: from,
         endDate: to,
         notes,
+        allowSms,
       } = request
       let action = 'SAVE_EDIT_PERSONAL_DETAILS'
       const renderPage = req.path.split('/').pop()
@@ -169,10 +173,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const warningDisplayed: boolean = !request.endDate || Object.hasOwn(req.body, 'endDateWarningDisplayed')
       const isValid = Object.keys(errorMessages).length === 0 && warningDisplayed
       const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
+      const back = req?.query?.back as string
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action,
         who: res.locals.user.username,
@@ -213,6 +218,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
             telephoneNumber,
             mobileNumber,
             email,
+            allowSms: allowSms === 'YES',
           }
         }
         res.render(`pages/edit-contact-details/${renderPage}`, {
@@ -226,8 +232,16 @@ const personalDetailsController: Controller<typeof routes, void> = {
       } else {
         const personalDetails: PersonalDetails = await masClient[updateFn](
           crn,
-          Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')),
+          Object.fromEntries(Object.entries(request).filter(([key]) => !['_csrf', 'allowSms'].includes(key))),
         )
+        if (res.locals?.flags?.enableAllowSms && !!allowSms) {
+          await masClient.updateAllowSms(crn, allowSms === 'YES')
+          const { data } = req.session
+          const path = ['appointments', crn, id, 'smsOptIn']
+          if (allowSms === 'NO' && getDataValue<SmsOptInOptions>(data, path)?.includes('YES')) {
+            setDataValue(data, path, 'NO')
+          }
+        }
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)
         }
@@ -237,12 +251,18 @@ const personalDetailsController: Controller<typeof routes, void> = {
         let redirect = `/case/${crn}/personal-details?update=success`
         if (origin === 'appointments') {
           const { data } = req.session
-          const change = req?.query?.change as string
-          setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
+          if (res.locals?.flags?.enableAllowSms) {
+            setDataValue(data, ['appointments', crn, id, 'smsOptIn'], allowSms === 'YES' ? 'YES' : 'NO')
+          } else {
+            setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
+          }
           redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
           if (change) {
             redirect = findUncompleted()(req, res)
           }
+        }
+        if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && back) {
+          redirect = typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : redirect
         }
         res.redirect(redirect)
       }

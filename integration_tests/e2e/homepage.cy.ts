@@ -16,7 +16,7 @@ context('Sign In', () => {
     page.getAppointments().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
-  it('Renders the the outcomes to log with 2 years filter', () => {
+  it('Renders the the outcomes to log with 3 months filter', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
     page.getOutcomesToLog().should('exist')
@@ -41,16 +41,6 @@ context('Sign In', () => {
 
     // Check for "Manage" link for the second row (Ethan Bradtke in wiremock mapping, deliusManaged: false)
     page.getEnforcementActionRows().eq(1).find('a').contains('Manage').should('exist')
-  })
-
-  it('Renders the the outcomes to log', () => {
-    cy.task('stubDisableHomePageOutcome')
-    cy.visit('/')
-    const page = Page.verifyOnPage(IndexPage)
-    page.getOutcomesToLog().should('exist')
-    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (21)')
-    page.getOutcomesToLogRows().should('have.length', 5)
-    page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
   it('Renders correctly when appointments and outcomes to log are empty', () => {
@@ -87,9 +77,42 @@ context('Sign In', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
 
+    cy.get('[data-qa="searchTips"]').should('contain.text', 'Tips for searching')
+
     page.getSearchSubmit().should('exist')
     page.getSearchSubmit().click()
 
     Page.verifyOnPage(SearchPage)
+  })
+
+  it('Handle API timeout in home page ', () => {
+    cy.task('stubAppointmentTimeout')
+    cy.task('stubEnforcementsTimeout')
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+
+    cy.get('[class="moj-alert__content"]').should('contain.text', 'Upcoming appointments are currently unavailable')
+    cy.get('.moj-alert__content li')
+      .should('have.length', 3)
+      .and('contain.text', 'Upcoming appointments are currently unavailable.')
+      .and('contain.text', 'Outcomes to log are currently unavailable.')
+      .and('contain.text', 'Enforcement actions are currently unavailable.')
+
+    page.getOutcomesToLog().should('exist')
+    cy.get('[data-qa="outcomesTimeoutError"]').should('contain.text', 'Outcomes to log are currently unavailable.')
+    cy.get('[data-qa="appointmentsTimeoutError"]').should(
+      'contain.text',
+      'Upcoming appointments are currently unavailable.',
+    )
+    cy.get('[data-qa="enforcementTimeoutError"]').should(
+      'contain.text',
+      'Enforcement actions are currently unavailable.',
+    )
+    cy.get('[data-qa="privacyPolicyLink"]')
+      .should('have.attr', 'href', '/privacy-policy')
+      .and('contain.text', 'Privacy policy')
+    cy.get('[data-qa="cookiesPolicyLink"]')
+      .should('have.attr', 'href', '/cookies-policy')
+      .and('contain.text', 'Cookies policy')
   })
 })

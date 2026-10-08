@@ -49,10 +49,12 @@ const mockEventResponse: EventResponse = {
   smsResponse: null,
 }
 
-const mockPersonalDetails: Partial<PersonalDetails> = {
+const mockPersonalDetails = (allowSms = true): Partial<PersonalDetails> => ({
   name: { forename: 'James', surname: 'Morrison' },
   mobileNumber: '07700900000',
-}
+  allowSms,
+})
+
 const putRescheduleAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'putRescheduleAppointment')
   .mockImplementation(() => Promise.resolve(mockRescheduleResponse))
@@ -90,7 +92,7 @@ const mockAppointment: AppointmentSession = {
     username,
   },
   type: 'COAP',
-  date: tomorrow.toFormat('yyyy-M-dd'),
+  date: tomorrow.toFormat('yyyy-MM-dd'),
   start: '09:00',
   end: '09:30',
   eventId: '250113825',
@@ -109,6 +111,7 @@ const mockAppointment: AppointmentSession = {
   smsPreview: {
     request: {
       firstName: 'James',
+      practitionerFirstName: 'User',
       includeWelshPreview: false,
       appointmentLocation: 'Mock Location',
       appointmentTypeCode: 'COAP',
@@ -123,7 +126,6 @@ const mockAppointment: AppointmentSession = {
 
 const mockFlags = (flags?: Record<string, boolean>) => ({
   enableSmsReminders: true,
-  enableNonCompliance: false,
   ...(flags ?? {}),
 })
 
@@ -148,7 +150,10 @@ const mockAppointmentTypes: AppointmentType[] = [
   },
 ]
 
-const buildRequest = (appointment?: Record<string, any>): [httpMocks.MockRequest<any>, AppointmentSession] => {
+const buildRequest = (
+  appointment?: Record<string, any>,
+  allowSms = true,
+): [httpMocks.MockRequest<any>, AppointmentSession] => {
   const req = {
     params: {
       crn,
@@ -165,7 +170,7 @@ const buildRequest = (appointment?: Record<string, any>): [httpMocks.MockRequest
         appointmentTypes: mockAppointmentTypes,
         personalDetails: {
           [crn]: {
-            overview: mockPersonalDetails,
+            overview: mockPersonalDetails(allowSms),
           },
         },
       },
@@ -204,47 +209,7 @@ describe('middleware/postRescheduleAppointments', () => {
     jest.clearAllMocks()
   })
 
-  describe('reschedule an appointment in the future - Non compliance disabled', () => {
-    const [req, mockAppointmentSession] = buildRequest({ outcomeRecorded: 'No' })
-    const {
-      date,
-      start: startTime,
-      end: endTime,
-      user: { staffCode, teamCode, locationCode },
-      notes,
-      rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
-    } = mockAppointmentSession
-    const expectedBody = {
-      date,
-      startTime,
-      endTime,
-      uuid,
-      staffCode,
-      teamCode,
-      locationCode,
-      requestedBy,
-      notes,
-      sensitive: true,
-      isInFuture: true,
-      sendToVisor: false,
-      outcomeRecorded: false,
-      reasonForRecreate: 'Reschedule reason',
-      reasonIsSensitive: false,
-    }
-    let returnedResponse: RescheduleAppointmentResponse
-    const res = buildResponse()
-    beforeEach(async () => {
-      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
-    })
-    it('should send a reschedule appointment request to the api', () => {
-      expect(putRescheduleAppointmentSpy).toHaveBeenCalledWith(contactId, expectedBody)
-    })
-    it('should return the response', () => {
-      expect(returnedResponse).toEqual(mockRescheduleResponse)
-    })
-  })
-
-  describe('reschedule an appointment in the future - Non compliance enabled', () => {
+  describe('reschedule an appointment in the future', () => {
     const [req, mockAppointmentSession] = buildRequest({ outcomeRecorded: undefined })
     const {
       date,
@@ -272,7 +237,7 @@ describe('middleware/postRescheduleAppointments', () => {
       reasonIsSensitive: false,
     }
     let returnedResponse: RescheduleAppointmentResponse
-    const flags = { enableNonCompliance: true }
+    const flags = {}
     const res = buildResponse({ flags })
     beforeEach(async () => {
       returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
@@ -285,47 +250,7 @@ describe('middleware/postRescheduleAppointments', () => {
     })
   })
 
-  describe('reschedule an appointment in the past - Non compliance disabled', () => {
-    const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10' })
-    const {
-      date,
-      start: startTime,
-      end: endTime,
-      user: { staffCode, teamCode, locationCode },
-      notes,
-      rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
-    } = mockAppointmentSession
-    let returnedResponse: RescheduleAppointmentResponse
-    const res = buildResponse()
-    beforeEach(async () => {
-      returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
-    })
-    it('should send a reschedule appointment request to the api', () => {
-      const expectedBody = {
-        date,
-        startTime,
-        endTime,
-        uuid,
-        staffCode,
-        teamCode,
-        locationCode,
-        requestedBy,
-        notes,
-        sensitive: true,
-        isInFuture: false,
-        sendToVisor: false,
-        outcomeRecorded: true,
-        reasonForRecreate: 'Reschedule reason',
-        reasonIsSensitive: false,
-      }
-      expect(putRescheduleAppointmentSpy).toHaveBeenCalledWith(contactId, expectedBody)
-    })
-    it('should return the response', () => {
-      expect(returnedResponse).toEqual(mockRescheduleResponse)
-    })
-  })
-
-  describe('reschedule an appointment in the past - Non compliance enabled', () => {
+  describe('reschedule an appointment in the past', () => {
     const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10', outcome: { outcomeCode: 'ATTC' } })
     const {
       date,
@@ -336,7 +261,7 @@ describe('middleware/postRescheduleAppointments', () => {
       rescheduleAppointment: { whoNeedsToReschedule: requestedBy },
     } = mockAppointmentSession
     let returnedResponse: RescheduleAppointmentResponse
-    const flags = { enableNonCompliance: true }
+    const flags = {}
     const res = buildResponse({ flags })
     beforeEach(async () => {
       returnedResponse = (await postRescheduleAppointments(hmppsAuthClient)(req, res)) as RescheduleAppointmentResponse
@@ -368,9 +293,12 @@ describe('middleware/postRescheduleAppointments', () => {
 
   describe('Send outlook invite', () => {
     it('should create the outlook event if user email is defined and calendar events feature flag is enabled', async () => {
-      const [req] = buildRequest()
+      const [req, mockAppointmentSession] = buildRequest()
+      const { date, start } = mockAppointmentSession
       const res = buildResponse()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      const dt = DateTime.fromISO(`${date}T${start}`)
+      const startDateTime = dt.toISO()
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           rescheduledEventRequest: {
@@ -382,7 +310,7 @@ describe('middleware/postRescheduleAppointments', () => {
             ],
             durationInMinutes: 30,
             message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
-            start: null,
+            start: startDateTime,
             subject: 'J. Morrison: planned office visit (NS)',
             supervisionAppointmentUrn: 'ABCDE',
           },
@@ -391,7 +319,7 @@ describe('middleware/postRescheduleAppointments', () => {
       )
     })
     it('should delete future outlook event if rescheduled appointment is in the past', async () => {
-      const [req] = buildRequest({ date: yesterday.toFormat('yyyy-M-dd'), until: yesterday.toFormat('yyyy-M-dd') })
+      const [req] = buildRequest({ date: yesterday.toFormat('yyyy-MM-dd'), until: yesterday.toFormat('yyyy-MM-dd') })
       const res = buildResponse()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalled()
@@ -441,6 +369,38 @@ describe('middleware/postRescheduleAppointments', () => {
         'Failed to create rescheduling calendar event',
       )
     })
+    it('should set req.session.data.isOutlookEventPending to true and return the reschedule response if postRescheduleAppointmentEvent times out', async () => {
+      const timeoutError: any = new Error('Timeout of 5000ms exceeded')
+      timeoutError.code = 'ECONNABORTED'
+      jest
+        .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')
+        .mockRejectedValueOnce(timeoutError)
+
+      const [req] = buildRequest()
+      const res = buildResponse()
+
+      const response = await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(response).toEqual(mockRescheduleResponse)
+      expect(req.session.data.isOutlookEventPending).toEqual(true)
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.objectContaining({ err: timeoutError }),
+        expect.stringContaining('Outlook calendar event reschedule timed out'),
+      )
+      expect(req.session.data.isOutLookEventFailed).toBeFalsy()
+    })
+    it('should rethrow the error if postRescheduleAppointmentEvent rejects with a non-timeout error', async () => {
+      const otherError = new Error('Some other failure')
+      jest
+        .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')
+        .mockRejectedValueOnce(otherError)
+
+      const [req] = buildRequest()
+      const res = buildResponse()
+
+      await expect(postRescheduleAppointments(hmppsAuthClient)(req, res)).rejects.toThrow(otherError)
+      expect(req.session.data.isOutlookEventPending).toBeFalsy()
+    })
   })
 
   describe('SMS reminders', () => {
@@ -458,6 +418,7 @@ describe('middleware/postRescheduleAppointments', () => {
           rescheduledEventRequest: expect.objectContaining({
             smsEventRequest: expect.objectContaining({
               firstName: mockAppointment.smsPreview.request.firstName,
+              practitionerFirstName: mockAppointment.smsPreview.request.practitionerFirstName,
               mobileNumber: mockLocals().case.mobileNumber,
               crn,
               smsOptIn: true,
@@ -493,6 +454,20 @@ describe('middleware/postRescheduleAppointments', () => {
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       expect(req.session.data.isEnglishNotificationFailed).toBeUndefined()
       expect(req.session.data.isWelshNotificationFailed).toBeUndefined()
+    })
+
+    it('should not include smsEventRequest when smsOptIn is YES and POP has not consented to receiving text messages', async () => {
+      const allowSms = false
+      const [req] = buildRequest({ smsOptIn: 'YES' }, allowSms)
+      const res = buildResponse({ flags: { ...baseFlags, enableAllowSms: true } })
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.not.objectContaining({
+            smsEventRequest: expect.anything(),
+          }),
+        }),
+      )
     })
 
     it('should not include smsEventRequest when smsOptIn is not YES', async () => {
@@ -545,6 +520,7 @@ describe('middleware/postRescheduleAppointments', () => {
           rescheduledEventRequest: expect.objectContaining({
             smsEventRequest: expect.objectContaining({
               firstName: 'James',
+              practitionerFirstName: 'User',
               mobileNumber: '07822567890',
               crn,
               smsOptIn: true,
@@ -563,6 +539,7 @@ describe('middleware/postRescheduleAppointments', () => {
         smsPreview: {
           request: {
             includeWelshPreview: true,
+            practitionerFirstName: 'Practitioner',
             appointmentLocation: 'Mock Location',
             appointmentTypeCode: 'COAP',
           },

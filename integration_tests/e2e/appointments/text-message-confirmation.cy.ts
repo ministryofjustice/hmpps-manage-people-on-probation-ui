@@ -27,6 +27,7 @@ describe('Text message confirmation', () => {
   })
   describe('POP has mobile number', () => {
     beforeEach(() => {
+      cy.task('stubFeatureFlag', { key: 'enableAllowSms', enabled: false })
       loadPage()
     })
     it('should render the page', () => {

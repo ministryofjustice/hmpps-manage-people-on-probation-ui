@@ -27,6 +27,7 @@ export interface EnforcementContactsResponse {
   totalResults: number
   totalPages: number
   enforcementContacts: EnforcementContact[]
+  timeoutError?: any
 }
 
 export interface EnforcementContact {
@@ -160,6 +161,7 @@ export interface Activity {
   externalReference?: string
   isUpdatableContact?: boolean
   isPreSentence?: boolean
+  editable?: boolean
 }
 
 export interface PersonAppointmentEnforcementAction {
