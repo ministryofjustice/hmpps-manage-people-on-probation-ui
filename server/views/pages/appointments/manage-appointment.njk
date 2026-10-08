@@ -23,6 +23,8 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
 
+{% set noteLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage' %}
+
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
@@ -230,7 +232,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         text: "Add appointment notes"
       },
 
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
+      href: noteLink,
       status: {
         tag: {
           text: notesStatus,
@@ -243,7 +245,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Upload documents"
       },
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
+      href: noteLink,
       status: {
         tag: {
           text: 'No documents',
@@ -480,7 +482,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       actions: {
         items: [
           {
-            href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
+            href: noteLink,
             text: "Add to notes" if hasNotes else "Change",
             visuallyHiddenText: ""
           }
@@ -506,7 +508,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         classes: "govuk-!-white-space-nowrap",
         items: [
           {
-            href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
+            href: noteLink,
             text: "Change",
             visuallyHiddenText: ""
           }
