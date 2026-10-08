@@ -35,7 +35,7 @@ describe('Manage an appointment', () => {
     loadPage()
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
-    manageAppointmentPage.getTaskLink(2).click()
+    manageAppointmentPage.getAppointmentDetailsListItem(8, 'actions').find('.govuk-link').click()
     const addNotePage = new AddNotePage()
     cy.get(`[id="freeform-container"]`).find('textarea').type('Test note')
     addNotePage.getSensitiveInformation().find('.govuk-radios__input').first().click()

@@ -232,6 +232,11 @@ const appointmentsController: Controller<typeof routes, void> = {
       const sentence = res.locals?.sentences?.find(
         s => s.eventNumber === res.locals.personAppointment.appointment.eventNumber,
       )
+
+      const noteLink =
+        `/case/${crn}/appointments/appointment/${contactId}/outcome` +
+        `/add-note?put=true&back=/case/${crn}/appointments/appointment/${contactId}/manage`
+
       return res.render('pages/appointments/manage-appointment', {
         crn,
         back,
@@ -243,6 +248,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         relatedContacts,
         sentence,
         noteAlert,
+        noteLink,
       })
     }
   },

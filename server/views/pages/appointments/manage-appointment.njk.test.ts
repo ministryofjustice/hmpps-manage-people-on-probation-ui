@@ -43,6 +43,7 @@ type TestModel = {
   hasDeceased: boolean
   back?: string
   relatedContacts: LinkedContactResponse
+  noteLink?: string
 }
 
 const nextAppointment: Partial<NextAppointmentResponse> = {
@@ -361,10 +362,8 @@ describe('Manage an appointment', () => {
       it('should display upload documents action', () => {
         const $ = render({
           flags: {},
-          appointmentOutcome: {
-            crn: 'X000001',
-            contactId: '123456',
-          } as AppointmentOutcomeProps<Activity>,
+          noteLink:
+            '/case/X000001/appointments/appointment/123456/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/123456/manage',
         })
         expect($('[data-qa="appointmentActions"] li:nth-child(3)').text()).toContain('Upload documents')
         expect($('[data-qa="appointmentActions"] li:nth-child(3) a').attr('href')).toBe(

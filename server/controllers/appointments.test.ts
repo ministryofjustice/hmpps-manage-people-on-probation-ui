@@ -461,6 +461,8 @@ describe('controllers/appointments', () => {
         relatedContacts: mockRelatedContacts,
         sentence,
         noteAlert: { variant: 'success', html: '<b>Notes added</b>' },
+        noteLink:
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
     })
     it('should render the manage appointment page with no note', async () => {
@@ -492,6 +494,8 @@ describe('controllers/appointments', () => {
         relatedContacts: mockRelatedContacts,
         sentence,
         noteAlert: { variant: 'warning', html: '<b>No notes added</b>' },
+        noteLink:
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
     })
     it('should render the manage appointment page when note failed', async () => {
@@ -523,6 +527,8 @@ describe('controllers/appointments', () => {
         relatedContacts: mockRelatedContacts,
         sentence,
         noteAlert: { variant: 'error', html: '<b>Notes could not be added</b>' },
+        noteLink:
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
     })
   })
