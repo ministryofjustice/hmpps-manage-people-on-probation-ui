@@ -15,7 +15,6 @@ import accessibilityController from './accessibility'
 import searchController from './search'
 import fileUploadController from './fileUpload'
 import alertsController from './alerts'
-import checkInsController from './check-ins'
 import rescheduleAppointmentController from './rescheduleAppointments'
 import whatsNewController from './whatsNewController'
 import appointmentOutcomesController from './appointmentOutcomes'
@@ -43,7 +42,6 @@ export default {
   search: searchController,
   fileUpload: fileUploadController,
   alerts: alertsController,
-  checkIns: checkInsController,
   appointmentOutcomes: appointmentOutcomesController,
   enforcementActions: enforcementContactsController,
 }
