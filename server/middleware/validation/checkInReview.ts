@@ -20,7 +20,7 @@ const checkInReview: Route<void> = (req, res, next) => {
     url
       .split('?')[0]
       .split('/')
-      .filter(item => item)
+      .filter(Boolean)
       .filter((_item, i) => ![0, 1, 2, 3].includes(i))
       .join('/'),
   ]}`

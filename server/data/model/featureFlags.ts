@@ -40,7 +40,9 @@ export class FeatureFlags {
   enableAllowSms?: boolean = undefined
   enableLastTextMessage?: boolean = undefined
   enableAlertsCountCaching?: boolean = undefined
-  enableFeedback?: boolean = undefined
   enableAlertsCountApi?: boolean = undefined
   disableUserAppointments?: boolean = undefined
+  enableDraftSentencePlanAccess?: boolean = undefined
+  enableNDeliusRosh?: boolean = undefined
+  enableAppointmentPatchAlerts?: boolean = undefined
 }

@@ -1,6 +1,3 @@
-import { PersonSummary } from './personalDetails'
-import { Activity } from './schedule'
-
 export interface SmsEventRequest {
   firstName: string
   mobileNumber?: string

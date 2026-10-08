@@ -125,10 +125,7 @@ describe('Confirmation page', () => {
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
         .getSMSConfirmationMsg()
-        .should(
-          'contain.text',
-          'Alton should receive a confirmation text message within a few minutes with the appointment details.',
-        )
+        .should('contain.text', 'We’ll send Alton a confirmation text message with the appointment details.')
       confirmPage
         .getWhatHappensNext()
         .find('p:nth-of-type(2)')
@@ -321,7 +318,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `Caroline should receive a confirmation text message within a few minutes with the appointment details.`,
+              `We’ll send Caroline a confirmation text message with the appointment details.`,
             )
           })
         cy.get('[data-qa="what-happens-next"]')
@@ -413,10 +410,7 @@ describe('Confirmation page', () => {
       confirmPage = new AppointmentConfirmationPage()
       confirmPage
         .getSMSConfirmationMsg()
-        .should(
-          'contain.text',
-          'Caroline should receive a confirmation text message within a few minutes with the appointment details.',
-        )
+        .should('contain.text', 'We’ll send Caroline a confirmation text message with the appointment details.')
     })
   })
 })

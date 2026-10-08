@@ -134,6 +134,17 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% endif %}
 {% endblock %}
 {% block content %}
+  {% if noteAlert and flags.enableAppointmentPatchAlerts %}
+    {{ mojAlert({
+        variant: noteAlert.variant,
+        html: noteAlert.html,
+        showTitleAsHeading: true,
+        dismissible: true,
+        attributes: {
+          "data-qa": 'noteAlert'
+        }
+    }) }}
+  {% endif %}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
@@ -219,7 +230,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         text: "Add appointment notes"
       },
 
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
+      href: noteLink,
       status: {
         tag: {
           text: notesStatus,
@@ -232,7 +243,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       title: {
         text: "Upload documents"
       },
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage',
+      href: noteLink,
       status: {
         tag: {
           text: 'No documents',
@@ -469,7 +480,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
       actions: {
         items: [
           {
-            href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/add-note",
+            href: noteLink,
             text: "Add to notes" if hasNotes else "Change",
             visuallyHiddenText: ""
           }
@@ -495,7 +506,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         classes: "govuk-!-white-space-nowrap",
         items: [
           {
-            href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/add-note",
+            href: noteLink,
             text: "Change",
             visuallyHiddenText: ""
           }

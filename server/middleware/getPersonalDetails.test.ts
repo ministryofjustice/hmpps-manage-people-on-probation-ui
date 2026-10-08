@@ -28,6 +28,7 @@ import {
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
+import { SentencePlanResult } from '../data/model/arnsAssessmentPlatform'
 import { PersonalDetailsSession } from '../models/Data'
 import {
   Circumstances,
@@ -61,6 +62,12 @@ jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   toPredictors: jest.fn(() => mockPredictorScores),
 }))
+
+const mockDraftSentencePlanResult: SentencePlanResult = {
+  hasPlan: true,
+  hasAgreedPlan: false,
+  lastUpdatedDate: '2025-10-01T16:39:23Z',
+}
 
 const mockAuthOptions: AuthOptions = {
   user: {
@@ -638,7 +645,71 @@ describe('/middleware/getPersonalDetails', () => {
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
       .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve({ hasAgreedPlan: false, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: { enableDraftSentencePlanAccess: true },
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop not in user caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {},
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: { enableDraftSentencePlanAccess: true },
+    })
+    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: true,
+      lastUpdatedDate: '2025-10-01T16:39:23Z',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and draft sentence plan access is disabled', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockDraftSentencePlanResult))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',

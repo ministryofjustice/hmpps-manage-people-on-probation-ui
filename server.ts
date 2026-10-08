@@ -12,7 +12,7 @@ const validatePort = (port: number) => {
 const port = validatePort(app.get('port'))
 app.set('port', port)
 app.listen(port, () => {
-  logger.info(`Server listening on port ${port}`)
+  logger.info(`Server listening on port http://localhost:${port}`)
 })
 const metricsPort = validatePort(metricsApp.get('port'))
 metricsApp.listen(metricsPort, () => {

@@ -34,19 +34,19 @@ describe('Contact log page', () => {
     it('should not display the warning when showContactInformationWarning is false', () => {
       const $ = render({ showContactInformationWarning: false })
 
-      expect($('.moj-alert').length).toBe(0)
+      expect($('.moj-alert')).toHaveLength(0)
     })
 
     it('should not display the warning when showContactInformationWarning is not set', () => {
       const $ = render({ showContactInformationWarning: undefined })
 
-      expect($('.moj-alert').length).toBe(0)
+      expect($('.moj-alert')).toHaveLength(0)
     })
 
     it('should display the warning when showContactInformationWarning is true', () => {
       const $ = render({ showContactInformationWarning: true })
 
-      expect($('.moj-alert').length).toBe(1)
+      expect($('.moj-alert')).toHaveLength(1)
       expect($('.moj-alert').text()).toContain(
         'Contacts created since Friday 18 September 2026 are currently unavailable.',
       )

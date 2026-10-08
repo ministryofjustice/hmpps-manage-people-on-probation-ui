@@ -77,7 +77,7 @@ describe('Appointment outcome form nunjucks render tests', () => {
       const $ = render({
         appointmentOutcome: {},
       } as unknown as Partial<TestModel>)
-      expect($('[data-qa="ticket-panel"]').length).toBe(0)
+      expect($('[data-qa="ticket-panel"]')).toHaveLength(0)
     })
   })
   describe('Breach or recall alert', () => {
@@ -101,7 +101,7 @@ describe('Appointment outcome form nunjucks render tests', () => {
       const $ = render({
         appointmentOutcome: {},
       } as unknown as Partial<TestModel>)
-      expect($('[data-qa="breach-warning"]').length).toBe(0)
+      expect($('[data-qa="breach-warning"]')).toHaveLength(0)
     })
   })
 })
