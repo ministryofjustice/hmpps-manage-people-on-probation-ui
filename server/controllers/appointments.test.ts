@@ -171,8 +171,6 @@ const res = mockAppResponse({
     forename: 'Forename',
     surname: 'Surname',
     appointment: mockAppointment,
-    crn: '1234',
-    contactId: '5678',
   },
   sentences: [sentence],
   personAppointment: mockPersonAppointment,
@@ -464,7 +462,7 @@ describe('controllers/appointments', () => {
         sentence,
         noteAlert: { variant: 'success', html: '<b>Notes added</b>' },
         noteLink:
-          '/case/X000001/appointments/appointment/1/outcome/add-note?put=true&back=/case/1234/appointments/appointment/5678/manage',
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
     })
     it('should render the manage appointment page with no note', async () => {
@@ -497,7 +495,7 @@ describe('controllers/appointments', () => {
         sentence,
         noteAlert: { variant: 'warning', html: '<b>No notes added</b>' },
         noteLink:
-          '/case/X000001/appointments/appointment/1/outcome/add-note?put=true&back=/case/1234/appointments/appointment/5678/manage',
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
     })
     it('should render the manage appointment page when note failed', async () => {
@@ -530,7 +528,7 @@ describe('controllers/appointments', () => {
         sentence,
         noteAlert: { variant: 'error', html: '<b>Notes could not be added</b>' },
         noteLink:
-          '/case/X000001/appointments/appointment/1/outcome/add-note?put=true&back=/case/1234/appointments/appointment/5678/manage',
+          '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
     })
   })

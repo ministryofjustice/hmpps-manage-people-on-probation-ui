@@ -234,10 +234,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       )
 
       const noteLink =
-        `/case/${crn}/appointments/appointment/${res.locals.personAppointment.appointment.id}/outcome` +
-        `/add-note?put=true&back=/case/${res.locals.appointmentOutcome.crn}/appointments/appointment/${
-          res.locals.appointmentOutcome.contactId
-        }/manage`
+        `/case/${crn}/appointments/appointment/${contactId}/outcome` +
+        `/add-note?put=true&back=/case/${crn}/appointments/appointment/${contactId}/manage`
 
       return res.render('pages/appointments/manage-appointment', {
         crn,
