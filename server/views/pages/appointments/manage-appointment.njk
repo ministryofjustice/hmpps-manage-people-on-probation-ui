@@ -23,8 +23,6 @@ appointment.officer.name | fullName | convertToTitleCase) %}
   {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
 
-{% set noteLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' + '/add-note?put=true&back=/case/' + appointmentOutcome.crn + '/appointments/appointment/' + appointmentOutcome.contactId + '/manage' %}
-
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
