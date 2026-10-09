@@ -6,6 +6,7 @@
         <input type="hidden" name="_csrf" value="{{ params.results.csrfToken }}">
 
         <div class="probation-search__input-container">
+            <div class="govuk-input__wrapper_mpop moj-search__input-wrapper">
             {{ govukInput({
                 attributes: params.attributes,
                 autocomplete: params.autocomplete,
@@ -27,6 +28,7 @@
             }) }}
 
             {{ govukButton({ text: "Search", classes: "govuk-button moj-search__button_mpop" }) }}
+            </div>
 
             <p id="{{ params.id }}-suggestions" class="probation-search__suggestions govuk-!-margin-top-1">
                 {% if params.results.suggestions | length %}
