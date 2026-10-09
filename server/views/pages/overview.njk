@@ -454,128 +454,16 @@
         ]
       }
     }) }}
+{% if flags.enableNDeliusRosh %}
+  {% set assessedOn = rosh.assessedOn %}
+  {% set overallRiskLevel = rosh.level %}
+{% else %}
+  {% set assessedOn = risks.assessedOn %}
+  {% set overallRiskLevel = risks.summary.overallRiskLevel %}
+{% endif %}
+{% set hasRosh = assessedOn and overallRiskLevel %}
 
-  {% set hasRiskAssessment = risks.assessedOn %}
-  {% set risk %}
-  {% set riskToThemselves %}
-  {% set currentRisksToThemselves = getCurrentRisksToThemselves(risks.riskToSelf) %}
-  {% set previousRisksToThemselves = getPreviousRisksToThemselves(risks.riskToSelf) %}
-
-  {% if currentRisksToThemselves.length == 1 %}
-    <p>Immediate concerns about {{ currentRisksToThemselves[0] }}</p>
-  {% elif currentRisksToThemselves.length > 0 %}
-    <p>Immediate concerns about:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      {% for risk in currentRisksToThemselves %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% if previousRisksToThemselves.length == 1 %}
-    <p>Previous concerns about {{ previousRisksToThemselves[0] }}</p>
-  {% elif previousRisksToThemselves.length > 0 %}
-    <p>Previous concerns about:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      {% for risk in previousRisksToThemselves %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  {% if currentRisksToThemselves.length == 0 and previousRisksToThemselves.length == 0 %}
-    <p>No concerns</p>
-  {% endif %}
-  {% endset %}
-  {% set riskFlags %}
-  {% set riskFlagList = overview.registrations %}
-  {% if riskFlagList.length > 0 %}
-    <ul class="govuk-list">
-      {% for risk in riskFlagList %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-          No risk flags
-        {% endif %}
-  {% endset %}
-  {% set riskLastUpdated %}
-  {% if hasRiskAssessment %}
-    <br/>
-    <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
-            Last updated {{ risks.assessedOn | dateWithYear }}
-    </span>
-  {% endif %}
-  {% endset %}
-  {% set mappaLastUpdated %}
-  {% if overview.mappa %}
-    <br/>
-    <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
-            Last updated (NDelius): {{ overview.mappa.lastUpdated | dateWithYear }}
-    </span>
-  {% endif %}
-  {% endset %}
-  {% if not overview.mappa %}
-    {% set mappaValue = 'No MAPPA data found in NDelius.' %}
-  {% else %}
-    {% set mappaCat = '' %}
-    {% set mappaLevel = '' %}
-    {% if overview.mappa.category %}
-      {% set mappaCat = 'Cat ' + overview.mappa.category %}
-    {% endif %}
-    {% if overview.mappa.level %}
-      {% set mappaLevel = ('/' if mappaCat) + 'Level ' + overview.mappa.level %}
-    {% endif %}
-    {% set mappaValue =  '<span class="govuk-!-font-weight-bold">' + mappaCat + mappaLevel + '</span>' %}
-  {% endif %}
-  {% set roshText = risks.summary.overallRiskLevel | replace("_", " ") %}
-  {% set overallRosh %}
-  {% if hasRiskAssessment and risks.summary.overallRiskLevel %}
-    <table>
-      <tr>
-        <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
-      </table>
-    {% else %}
-      {{'There is no ROSH summary.'}}
-    {% endif %}
-    {% endset %}
-    {{ govukSummaryList({
-        rows: [
-          {
-            key: { html: '<span data-qa="roshLabel">Risk of serious harm (ROSH) in the community' + riskLastUpdated + '</span>' },
-            value: { html: '<span data-qa="roshValue">' + overallRosh  + '</span>'}
-          },
-          {
-            key: { html: '<span data-qa="mappaLabel">MAPPA' + mappaLastUpdated + '</span>' },
-            value: { html: '<span data-qa="mappaValue">' + mappaValue + '</span>'}
-          },
-          {
-            key: { html: '<span data-qa="criminogenicNeedsLabel">Criminogenic needs</span>' },
-            value: { html: '<span data-qa="criminogenicNeedsValue">' + criminogenicNeedsHtml + '</span>'}
-          } if sanIndicator == false,
-          {
-            key: { html: '<span data-qa="riskFlagsLabel">NDelius risk flags</span>' },
-            value: { html: '<span data-qa="riskFlagsValue">' + riskFlagsHtml + '</span>'}
-          }
-        ]
-      }) }}
-    {% endset %}
-
-    {{ appSummaryCard({
-      titleText: 'Risk',
-      headingLevel: 3,
-      attributes: {'data-qa': 'riskCard'},
-      classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-      html: risk,
-      actions: {
-        items: [
-          {
-            text: 'View all risk details',
-            href: crn + '/risk'
-          }
-        ]
-      }
-    }) }}
+ {% include "../partials/_overview-risk-summary-card.njk" %}
 
     {% set numberOfSentences = overview.sentences.length %}
     {% if numberOfSentences > 0 %}

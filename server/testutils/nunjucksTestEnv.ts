@@ -23,6 +23,9 @@ import {
   shortTime,
   toErrorList,
   dateWithYearShortMonth,
+  getCurrentRisksToThemselves,
+  getPreviousRisksToThemselves,
+  getTagClass,
 } from '../utils'
 import { to12HourTimeWithMinutes } from '../utils/to12HourTimeWithMinutes'
 import logger from '../../logger'
@@ -64,6 +67,9 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('timeFromTo', timeFromTo)
   env.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
   env.addFilter('dateWithYearShortMonth', dateWithYearShortMonth)
+  env.addGlobal('getCurrentRisksToThemselves', getCurrentRisksToThemselves)
+  env.addGlobal('getPreviousRisksToThemselves', getPreviousRisksToThemselves)
+  env.addGlobal('getTagClass', getTagClass)
   env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
     if (!req || !res) {
       logger.warn('decorateFormAttributes called without request context')
