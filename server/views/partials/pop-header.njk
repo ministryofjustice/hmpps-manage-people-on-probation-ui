@@ -113,6 +113,7 @@
         dob: headerDob | dateWithYear,
         tier: (calculation.tierScore if flags.enablePersonHeaderTierV3 else tierCalculation.tierScore) | convertToTitleCase,
         historyHref: tierUrlV3 if flags.enablePersonHeaderTierV3 else headerTierLink,
+        provisional: calculation.provisional if flags.enablePersonHeaderTierV3 else false,
         managedBy: managedBy.text,
         managedByName: managedBy.name,
         managedByLocation: managedBy.location,
