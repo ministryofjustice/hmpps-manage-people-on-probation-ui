@@ -1,6 +1,7 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
 const defaultFrontendContext = () => ({
+  outcome: 'success',
   currentPhase: {
     supervisionPackage: { code: 'STD', description: 'Standard' },
     phase: { code: 'STD', description: 'Standard supervision' },
@@ -41,6 +42,7 @@ const defaultFrontendContext = () => ({
         supervisionPackage: { code: 'STD', description: 'Standard' },
         type: { code: 'NP', description: 'ORA Community Order', isCustodial: false },
         inBreach: false,
+        isPrimarySentence: true,
       },
     ],
     integratedOffenderManagementRedRated: false,

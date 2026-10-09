@@ -22,6 +22,7 @@ const makeSupervisionPackageResponse = (
   overrides: Partial<SupervisionPackageResponse> = {},
 ): SupervisionPackageResponse =>
   ({
+    outcome: 'success',
     currentPhase: { phase: { code: 'STD', description: 'Standard' } },
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
