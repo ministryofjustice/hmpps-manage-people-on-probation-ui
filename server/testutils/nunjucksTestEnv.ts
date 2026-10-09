@@ -23,6 +23,7 @@ import {
   shortTime,
   toErrorList,
   dateWithYearShortMonth,
+  setSortOrder,
 } from '../utils'
 import { to12HourTimeWithMinutes } from '../utils/to12HourTimeWithMinutes'
 import logger from '../../logger'
@@ -76,6 +77,8 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('dayOfWeek', dayOfWeek)
   env.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   env.addGlobal('makePageTitle', makePageTitle)
+  env.addGlobal('setSortOrder', setSortOrder)
+
   arnsNunjucksSetup(env)
   mpopNunjucksSetup(env)
   return env

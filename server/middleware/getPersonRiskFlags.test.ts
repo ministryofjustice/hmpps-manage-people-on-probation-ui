@@ -260,6 +260,6 @@ describe('middleware/getPersonRiskFlags', () => {
     })
     const mockRes = createResponse({ enableNDeliusRosh: true })
     await expect(getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)).resolves.not.toThrow()
-    expect(mockRes.locals.rosh).toEqual({ level: undefined })
+    expect(mockRes.locals.rosh).toEqual({ level: null })
   })
 })
