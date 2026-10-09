@@ -104,7 +104,7 @@ jobs:
         shell: bash
         run: |
           echo "Randomly picking 1 of 5 api keys, to help avoid veracode API rate limits."
-          X=$(( RANDOM % 4 ))
+          X=$(( RANDOM % 5 ))
           VERACODE_API_ID_X="VERACODE_API_ID_${X}"
           VERACODE_API_KEY_X="VERACODE_API_KEY_${X}"
           VERACODE_API_ID="${!VERACODE_API_ID_X}"
@@ -130,14 +130,18 @@ jobs:
         shell: bash
         run: |
           echo "Randomly picking 1 of 5 api keys, to help avoid veracode API rate limits."
-          X=$(( RANDOM % 4 ))
+          X=$(( RANDOM % 5 ))
           VERACODE_API_ID_X="VERACODE_API_ID_${X}"
           VERACODE_API_KEY_X="VERACODE_API_KEY_${X}"
           VERACODE_API_ID="${!VERACODE_API_ID_X}"
           VERACODE_API_KEY="${!VERACODE_API_KEY_X}"
           echo "Using VERACODE_API_ID_${X} from pool (${VERACODE_API_ID:0:5}...)"
+          BASELINE_ARGS=()
+          if [ -f "results.json" ]; then
+            BASELINE_ARGS+=(--baseline_file results.json)
+          fi
           java -jar "pipeline-scan.jar" \
-          '$(test -f "results.json" && echo "--baseline_file results.json")' \
+          "${BASELINE_ARGS[@]}" \
           --json_output true \
           --file "${{ inputs.veracode_artifact_name }}" \
           --policy_file "Ministry_of_Justice.json" \
