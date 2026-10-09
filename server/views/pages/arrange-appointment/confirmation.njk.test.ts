@@ -93,7 +93,7 @@ describe('pages/arrange-appointment/confirmation.njk', () => {
       const $ = render({ isOutlookEventPending: true })
 
       const alert = $('[data-qa="outlook-pending-msg"]')
-      expect(alert.length).toBe(1)
+      expect(alert).toHaveLength(1)
       expect(alert.text()).toContain('There may be a problem sending your calendar invitation')
       expect(alert.text()).toContain(
         'You may not receive a calendar invitation. If it does not arrive within a few minutes, create your own calendar event.',

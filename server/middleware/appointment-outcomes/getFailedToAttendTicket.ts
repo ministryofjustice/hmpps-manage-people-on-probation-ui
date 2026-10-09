@@ -21,11 +21,13 @@ export const getFailedToAttendTicket: Route<void> = (req, res, next) => {
     .filter(option => option?.value)
     .map(option => option.value) as AppointmentEnforcementAction[]
 
-  const actionOptionCodes = Object.entries(enforcementActionMap)
-    .filter(([key]) => actionOptionValues.includes(key as AppointmentEnforcementAction))
-    .map(([_key, { code }]) => code)
+  const actionOptionCodes = new Set(
+    Object.entries(enforcementActionMap)
+      .filter(([key]) => actionOptionValues.includes(key as AppointmentEnforcementAction))
+      .map(([_key, { code }]) => code),
+  )
 
-  const filteredActions = enforcementActions.filter(action => actionOptionCodes.includes(action.code))
+  const filteredActions = enforcementActions.filter(action => actionOptionCodes.has(action.code))
   const responsePeriodDays =
     filteredActions.length > 0 &&
     filteredActions.every(a => a.defaultResponsePeriodDays === filteredActions[0].defaultResponsePeriodDays)

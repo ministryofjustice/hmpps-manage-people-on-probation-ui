@@ -3,7 +3,6 @@ import { DateTime } from 'luxon'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { ESupervisionLog } from '../data/model/esupervision'
 
 export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
   return async function getCheckInInner(req: Request, res: AppResponse, next: NextFunction): Promise<void> {

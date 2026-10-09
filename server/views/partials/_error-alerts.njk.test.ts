@@ -14,7 +14,7 @@ describe('partials/_error-alerts.njk', () => {
     const html = render({ alertsCount: '3' })
     const $ = cheerio.load(html)
 
-    expect($('[data-qa="errors"]').length).toBe(0)
+    expect($('[data-qa="errors"]')).toHaveLength(0)
   })
 
   it('renders an error banner with the alertsCount error message when present', () => {

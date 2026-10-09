@@ -58,7 +58,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     failedToAttend,
     otherEnforcementAction,
     updateEnforcementAction,
-  ].filter(action => action) as AppointmentEnforcementAction[]
+  ].filter(Boolean) as AppointmentEnforcementAction[]
 
   const outcomes: AppointmentOutcomeType[] = [
     'ATTENDED_COMPLIED',

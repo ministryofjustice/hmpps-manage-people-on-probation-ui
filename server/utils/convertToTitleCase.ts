@@ -13,7 +13,7 @@ export const convertToTitleCase = (sentence: string, ignore: string[] = [], rege
       if (ignore.includes(word)) {
         return word
       }
-      if (regex && regex.test(word)) {
+      if (regex?.test(word)) {
         return word
       }
       return properCaseName(word)

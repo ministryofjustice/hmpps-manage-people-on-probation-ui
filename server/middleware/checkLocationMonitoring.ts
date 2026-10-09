@@ -2,7 +2,7 @@ import { LicenceCondition, Requirement, Sentence } from '../data/model/sentenceD
 
 export const LICENCE_GPS_TAGGING_CODE: string = 'EM01'
 export const REQUIREMENT_GPS_TAGGING_CODE: string = 'RM59'
-const GPS_TAGGING_CODES: string[] = [LICENCE_GPS_TAGGING_CODE, REQUIREMENT_GPS_TAGGING_CODE]
+const GPS_TAGGING_CODES: Set<string> = new Set([LICENCE_GPS_TAGGING_CODE, REQUIREMENT_GPS_TAGGING_CODE])
 
 export const checkLocationMonitoring = (
   licenceConditions: LicenceCondition[] | null | undefined,
@@ -37,4 +37,4 @@ export const hasLocationMonitoring = (
 }
 
 export const checkLocationMonitoringCode = (code: string | null | undefined): boolean =>
-  !!code && GPS_TAGGING_CODES.includes(code)
+  !!code && GPS_TAGGING_CODES.has(code)

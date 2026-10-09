@@ -23,7 +23,7 @@ const enforcementContactsController: Controller<typeof routes, void> = {
   getAllEnforcementContacts: hmppsAuthClient => {
     return async function getAllEnforcementContacts(req, res) {
       const { user } = res.locals
-      const { query, session, url } = req
+      const { query, session } = req
       const { sortBy = '' } = query as Record<string, string>
 
       const pageNum: number = query.page ? Number.parseInt(query.page as string, 10) : 1

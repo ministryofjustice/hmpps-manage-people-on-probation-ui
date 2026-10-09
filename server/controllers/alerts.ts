@@ -150,8 +150,8 @@ const alertsController: Controller<typeof routes, void> = {
 
       // Convert to array of numbers
       const alertIds = Array.isArray(selectedAlerts)
-        ? selectedAlerts.map((id: string) => parseInt(id, 10))
-        : [parseInt(selectedAlerts, 10)]
+        ? selectedAlerts.map((id: string) => Number.parseInt(id, 10))
+        : [Number.parseInt(selectedAlerts, 10)]
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)

@@ -157,8 +157,8 @@ describe('/middleware/checkAnswers', () => {
     const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
     const session = getDataValue(data, ['appointments', crn, id])
-    expect(session.type).toEqual(null)
-    expect(session.user.locationCode).toEqual(null)
+    expect(session.type).toBeNull()
+    expect(session.user.locationCode).toBeNull()
   })
   it('remove location if not valid', () => {
     const { req, res } = setup(mockAppointmentSessions[2], mockAppointments[2])
@@ -167,6 +167,6 @@ describe('/middleware/checkAnswers', () => {
     checkAnswers(req, res, nextSpy)
     const session = getDataValue(data, ['appointments', crn, id])
     expect(session.type).toEqual('COAP')
-    expect(session.user.locationCode).toEqual(null)
+    expect(session.user.locationCode).toBeNull()
   })
 })

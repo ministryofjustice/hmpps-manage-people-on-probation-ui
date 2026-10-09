@@ -2,7 +2,7 @@ import { toSentenceCase } from './toSentenceCase'
 
 describe('toSentenceCase()', () => {
   it('should expect one argument', () => {
-    expect(toSentenceCase.length).toEqual(1)
+    expect(toSentenceCase).toHaveLength(1)
   })
   it('should return an empty string if argument is undefined, null or an empty string', () => {
     expect(toSentenceCase(null)).toEqual('')

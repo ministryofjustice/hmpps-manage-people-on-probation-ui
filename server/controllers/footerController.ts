@@ -1,6 +1,4 @@
 import { Controller } from '../@types'
-import TechnicalUpdatesService from '../services/technicalUpdatesService'
-import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = ['getPrivacyPolicy', 'getCookiePolicy'] as const

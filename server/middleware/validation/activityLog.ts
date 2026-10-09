@@ -1,8 +1,11 @@
-import { ActivityLogFilters } from '../../models/ActivityLog'
 import { activityLogValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { renderError } from '../renderError'
 import { Route } from '../../@types'
+
+function isEmpty(str: string): boolean {
+  return !str || str?.trim() === ''
+}
 
 const activityLog: Route<void> = (req, res, next): void => {
   let errorMessages: Record<string, string> = {}
@@ -10,9 +13,7 @@ const activityLog: Route<void> = (req, res, next): void => {
   if (Object.keys(req.query).length === 0 && req.method === 'GET') {
     delete req.session.errorMessages
   }
-  function isEmpty(str: string): boolean {
-    return !str || (str && str.trim() === '')
-  }
+
   function clearSession() {
     if (req?.session?.errorMessages) {
       delete req.session.errorMessages

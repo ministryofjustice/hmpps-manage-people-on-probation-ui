@@ -130,7 +130,6 @@ const documentController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
 
       const textSearchRequest: TextSearchDocumentsRequest = {
         query: req.session?.documentFilters?.query ?? null,

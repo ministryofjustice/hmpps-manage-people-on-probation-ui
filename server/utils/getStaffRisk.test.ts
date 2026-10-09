@@ -3,7 +3,7 @@ import { getProbationRisk, getStaffRisk } from './getStaffRisk'
 
 describe('getProbationRisk()', () => {
   it('should return null if no data', () => {
-    expect(getProbationRisk(null)).toEqual(null)
+    expect(getProbationRisk(null)).toBeNull()
   })
   it('should return null if no "Risk to Probation Staff" flags', () => {
     const mockRiskFlags = [
@@ -31,7 +31,7 @@ describe('getProbationRisk()', () => {
         removalHistory: [],
       },
     ] as unknown as RiskFlag[]
-    expect(getProbationRisk(mockRiskFlags)).toEqual(null)
+    expect(getProbationRisk(mockRiskFlags)).toBeNull()
   })
 
   it('should return the single "Risk to Probation Staff" flag if it exists', () => {
@@ -68,7 +68,7 @@ describe('getProbationRisk()', () => {
 
 describe('getStaffRisk()', () => {
   it('should return null if no data', () => {
-    expect(getStaffRisk(null)).toEqual(null)
+    expect(getStaffRisk(null)).toBeNull()
   })
   it('should return null if no "Risk to Staff" flags', () => {
     const mockRiskFlags = [
@@ -96,7 +96,7 @@ describe('getStaffRisk()', () => {
         removalHistory: [],
       },
     ] as unknown as RiskFlag[]
-    expect(getStaffRisk(mockRiskFlags)).toEqual(null)
+    expect(getStaffRisk(mockRiskFlags)).toBeNull()
   })
 
   it('should return null if "Risk to Staff" flag is not Medium or High levelDescription', () => {
@@ -112,7 +112,7 @@ describe('getStaffRisk()', () => {
         removalHistory: [],
       },
     ]
-    expect(getStaffRisk(mockRiskFlags)).toEqual(null)
+    expect(getStaffRisk(mockRiskFlags)).toBeNull()
   })
 
   it('should return "Risk to Staff" flag if levelDescription is valid (case-insensitive)', () => {

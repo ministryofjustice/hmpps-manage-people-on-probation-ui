@@ -258,7 +258,7 @@ describe('Manage an appointment', () => {
           },
         } as AppointmentOutcomeProps<Activity>,
       })
-      expect($('[data-qa="evidenceWarning"]').length).toBe(1)
+      expect($('[data-qa="evidenceWarning"]')).toHaveLength(1)
     })
 
     it('should not display the evidence warning', () => {

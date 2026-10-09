@@ -53,6 +53,6 @@ describe('ROSH widget', () => {
         enableNDeliusRosh: false,
       },
     })
-    expect($('[data-qa=roshWarning]').length).toBe(0)
+    expect($('[data-qa=roshWarning]')).toHaveLength(0)
   })
 })

@@ -1,1 +1,1 @@
-export const isDefined = (val: unknown) => typeof val !== 'undefined'
+export const isDefined = (val: unknown) => val !== undefined
