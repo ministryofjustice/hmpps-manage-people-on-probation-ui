@@ -33,6 +33,7 @@ interface Params {
   note: boolean
   queryString: string
   url: string
+  back: string
   alertsData: UserAlerts
   crnToRiskWidgetMap?: CrnToRiskWidgetMap
   riskRoshScoreMap?: RiskRoshScoreMap
@@ -124,6 +125,7 @@ const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
     return async function getAlerts(req, res) {
       const { user } = res.locals
+      const { back } = req.query as Record<string, string>
       const url = encodeURIComponent(req.url)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
@@ -156,6 +158,7 @@ const alertsController: Controller<typeof routes, void> = {
         note: false,
         queryString,
         url,
+        back,
         alertsData,
         pagination,
         sortedBy,
@@ -176,6 +179,7 @@ const alertsController: Controller<typeof routes, void> = {
   getAlertNote: hmppsAuthClient => {
     return async function getAlertNote(req, res) {
       const { contactId, noteId } = req.params as Record<string, string>
+      const { back } = req.query as Record<string, string>
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const url = encodeURIComponent(req.url)
       const queryString = req.url.split('?')[1]
@@ -193,6 +197,7 @@ const alertsController: Controller<typeof routes, void> = {
 
       const params: Params = {
         note: true,
+        back,
         queryString,
         url,
         alertsData,

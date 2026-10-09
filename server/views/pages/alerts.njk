@@ -55,7 +55,7 @@
             <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
             {% endset %}
             {% if flags.enableNDeliusRosh %}
-                {% set roshScore = riskRoshScoreMap[alert.crn] %}
+                {% set roshScore = "VERY_HIGH" if riskRoshScoreMap[alert.crn] == "VERY HIGH" else riskRoshScoreMap[alert.crn] %}
             {% else %}
                 {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
             {% endif %}
