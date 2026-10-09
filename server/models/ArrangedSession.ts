@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon-business-days'
-import { AppointmentSession } from './Appointments'
 
 export class ArrangedSession {
   params: any
@@ -16,7 +15,11 @@ export class ArrangedSession {
       return params.date
     }
     if (params.year) {
-      return DateTime.local(parseInt(params.year, 10), parseInt(params.month, 10), parseInt(params.day, 10)).toISODate()
+      return DateTime.local(
+        Number.parseInt(params.year, 10),
+        Number.parseInt(params.month, 10),
+        Number.parseInt(params.day, 10),
+      ).toISODate()
     }
     return '2021-03-25'
   }

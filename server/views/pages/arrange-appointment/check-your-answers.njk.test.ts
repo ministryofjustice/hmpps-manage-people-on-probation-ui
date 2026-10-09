@@ -135,7 +135,7 @@ describe('Check your answers nunjucks render tests', () => {
   describe('Text message confirmation', () => {
     it('should display the text message confirmation row if confirmation answer and sms consent is true', () => {
       const $ = render()
-      expect($('[data-text-message-confirmation="true"]').length).toBe(1)
+      expect($('[data-text-message-confirmation="true"]')).toHaveLength(1)
     })
 
     it('should display the text message confirmation row if confirmation answer and sms consent is undefined', () => {
@@ -145,7 +145,7 @@ describe('Check your answers nunjucks render tests', () => {
           allowSms: undefined,
         },
       })
-      expect($('[data-text-message-confirmation="true"]').length).toBe(1)
+      expect($('[data-text-message-confirmation="true"]')).toHaveLength(1)
     })
     it('should not display the text message confirmation row if confirmation answer and sms consent is false', () => {
       const $ = render({
@@ -154,7 +154,7 @@ describe('Check your answers nunjucks render tests', () => {
           allowSms: false,
         },
       })
-      expect($('[data-text-message-confirmation="true"]').length).toBe(0)
+      expect($('[data-text-message-confirmation="true"]')).toHaveLength(0)
     })
     it('should display the the text message confirmation row if answer is YES and enableAllowSms feature flag is disabled', () => {
       const $ = render({

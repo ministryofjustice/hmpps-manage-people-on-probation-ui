@@ -5,7 +5,7 @@ import { PersonActivity } from '../data/model/activityLog'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
 import { AppResponse } from '../models/Locals'
-import { ActivityLogRequestBody, SelectedFilterItem } from '../models/ActivityLog'
+import { ActivityLogRequestBody } from '../models/ActivityLog'
 import {
   categoryFilterOptions,
   sparksCategoryFilterOption,

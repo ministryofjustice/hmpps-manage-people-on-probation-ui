@@ -188,7 +188,6 @@ const appointments: Route<void> = (req, res, next) => {
   const validateAddNote = (): void => {
     if (!baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/add-note`)) return
 
-    isAddNotePage = true
     render = 'pages/appointments/add-note'
 
     errorMessages = validateWithSpec(
@@ -207,7 +206,6 @@ const appointments: Route<void> = (req, res, next) => {
   const validateManageAddNote = (): void => {
     if (!baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) return
 
-    isAddNotePage = true
     render = 'pages/appointments/add-note'
 
     errorMessages = {

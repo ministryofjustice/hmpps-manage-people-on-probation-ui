@@ -66,10 +66,10 @@ describe('Edit contact details nunjucks render tests', () => {
       },
     } as Partial<TestModel>)
     it('should not display the telephone number', () => {
-      expect($('[data-qa=phoneNumber]').length).toBe(0)
+      expect($('[data-qa=phoneNumber]')).toHaveLength(0)
     })
     it('should not display the allow sms question', () => {
-      expect($('[data-qa=allowSms]').length).toBe(0)
+      expect($('[data-qa=allowSms]')).toHaveLength(0)
     })
     it('should display the correct update alert', () => {
       expect($('[data-qa=updateBanner]').text()).toContain(
@@ -86,7 +86,7 @@ describe('Edit contact details nunjucks render tests', () => {
     })
     it('should not display the telephone number', () => {
       const $ = render()
-      expect($('[data-qa=phoneNumber]').length).toBe(0)
+      expect($('[data-qa=phoneNumber]')).toHaveLength(0)
     })
     it('should display the mobile number', () => {
       const $ = render()

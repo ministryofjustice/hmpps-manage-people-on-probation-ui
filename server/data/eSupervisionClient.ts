@@ -21,8 +21,6 @@ import {
   OffenderSetupCompleteResponse,
   ReactivateOffenderRequest,
 } from './model/esupervision'
-import { ErrorSummary } from './model/common'
-import { esupervisionAdditionalQuestions } from '../controllers/mocks/esupervisionAdditionalQuestions'
 
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {

@@ -3,13 +3,12 @@ import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { DateTime } from 'luxon'
-import { Controller, FileCache } from '../@types'
+import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import {
   isNumericString,
   isValidCrn,
   isMatchingAddress,
-  handleQuotes,
   setDataValue,
   getDataValue,
   canRescheduleAppointment,
@@ -21,8 +20,7 @@ import {
   getCheckinOffenderDetails,
   overrideDeliusManagedFlag,
 } from '../middleware'
-import { AppointmentPatch, AppointmentSessionSelection } from '../models/Appointments'
-import config from '../config'
+import { AppointmentSessionSelection } from '../models/Appointments'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 import ESupervisionClient from '../data/eSupervisionClient'

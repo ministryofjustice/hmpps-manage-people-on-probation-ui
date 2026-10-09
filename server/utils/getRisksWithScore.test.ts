@@ -6,7 +6,6 @@ describe('gets risks with score', () => {
   const risk: Partial<Record<RiskScore, string[]>> = { VERY_HIGH: array }
   it.each([
     ['Filters empty object', risk, 'VERY_HIGH', array],
-    ['Filters empty object', risk, 'VERY_HIGH', array],
     ['Returns an empty array', risk, 'HIGH', []],
   ])(
     '%s getRisksWithScore(%s, %s)',

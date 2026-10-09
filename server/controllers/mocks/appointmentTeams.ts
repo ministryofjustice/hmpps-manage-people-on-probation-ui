@@ -15,7 +15,7 @@ export const appointmentTeams: AppointmentTeams = {
       code: 'N07IVH',
     },
     {
-      description: 'Bexley\\Bromley SP TEST1',
+      description: String.raw`Bexley\Bromley SP TEST1`,
       code: 'N07SP1',
     },
   ],

@@ -8,7 +8,7 @@ const baseController = () => {
     res.locals.applicationInsightsConnectionString = config.apis.appInsights.connectionString
     res.locals.applicationInsightsRoleName = defaultName()
     res.locals.applicationInsightsTraceId = currentTraceId()
-    const url = req.url.split('/').filter(dir => dir)
+    const url = req.url.split('/').filter(Boolean)
     res.locals.home = url.length === 0
     res.locals.cases = url[0] === 'case'
     res.locals.search = url[0] === 'search'

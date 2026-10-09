@@ -134,8 +134,8 @@ export function normalizeContactDisplayNameKey(value: string): string {
   let result = ''
   let previousWasWhitespace = false
 
-  for (let index = 0; index < normalized.length; index += 1) {
-    const character = normalized[index]
+  for (const element of normalized) {
+    const character = element
 
     if (isWhitespace(character)) {
       previousWasWhitespace = true

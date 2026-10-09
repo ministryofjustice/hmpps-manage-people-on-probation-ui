@@ -247,7 +247,7 @@ describe('middleware/getSmsPreview', () => {
         })
       })
       it('should return the errors', () => {
-        expect(response).toEqual(null)
+        expect(response).toBeNull()
       })
     })
     describe('Server returns an unknown error', () => {

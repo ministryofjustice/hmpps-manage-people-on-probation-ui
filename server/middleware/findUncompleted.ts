@@ -24,8 +24,7 @@ export const findUncompleted = ({ forceValidation = false } = {}): Route<string 
       [appointment?.smsOptIn, 'text-message-confirmation'],
     ]
     if (dateInPast) {
-      mapping.push([appointment?.outcome?.outcomeType, 'outcome'])
-      mapping.push([appointment?.sensitivity, 'outcome/add-note'])
+      mapping.push([appointment?.outcome?.outcomeType, 'outcome'], [appointment?.sensitivity, 'outcome/add-note'])
     } else {
       mapping.push([appointment?.sensitivity, 'supporting-information'])
     }

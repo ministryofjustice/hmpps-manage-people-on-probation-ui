@@ -13,7 +13,7 @@ export const validOutcomeOptions = <T extends AppointmentOutcomeType | Acceptabl
   contactOutcomes: ContactOutcome[],
   options: Option<T>[],
 ): Option<T>[] => {
-  const ignore: AppointmentOutcomeType[] = ['WILL_BE_RESCHEDULED']
+  const ignore: Set<AppointmentOutcomeType> = new Set(['WILL_BE_RESCHEDULED'])
   if (!contactOutcomes?.length) {
     return options
   }
@@ -21,7 +21,7 @@ export const validOutcomeOptions = <T extends AppointmentOutcomeType | Acceptabl
     ({ value }) =>
       (outcomeMap?.[value]?.code &&
         contactOutcomes.some(contactOutcome => contactOutcome?.code === outcomeMap[value].code)) ||
-      ignore.includes(value as AppointmentOutcomeType) ||
+      ignore.has(value as AppointmentOutcomeType) ||
       !outcomeMap?.[value],
   )
 }
@@ -32,12 +32,12 @@ export const validEnforcementActionOptions = <
   contactOutcomes: ContactOutcome[],
   options: Option<TOption | ''>[],
 ): Option<TOption | ''>[] => {
-  const ignore: AppointmentEnforcementAction[] = [
+  const ignore: Set<AppointmentEnforcementAction> = new Set([
     'SEND_LETTER',
     'SEND_ANOTHER_LETTER',
     'NO_FURTHER_ACTION',
     'DIFFERENT_ACTION',
-  ]
+  ])
 
   if (!contactOutcomes?.length) {
     return options
@@ -54,7 +54,7 @@ export const validEnforcementActionOptions = <
         )) ||
       !value ||
       divider ||
-      (value && ignore.includes(value)) ||
+      (value && ignore.has(value)) ||
       !enforcementActionMap?.[value],
   )
 }

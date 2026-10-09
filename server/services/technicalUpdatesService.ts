@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 
 const technicalUpdates = JSON.parse(fs.readFileSync('./technicalUpdates.json').toString()) as TechnicalUpdate[]
 

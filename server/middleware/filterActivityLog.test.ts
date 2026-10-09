@@ -103,7 +103,7 @@ describe('/middleware/filterActivityLog()', () => {
     const req = httpMocks.createRequest({ session: {} })
     it('should load the page setting the session activityLogFilters to undefined', () => {
       filterActivityLog(req, res, nextSpy)
-      expect(req.session.activityLogFilters).toEqual(undefined)
+      expect(req.session.activityLogFilters).toBeUndefined()
     })
   })
   describe('submit is in request query params', () => {
