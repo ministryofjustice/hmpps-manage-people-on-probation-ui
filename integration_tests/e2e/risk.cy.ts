@@ -94,7 +94,7 @@ const checkRiskPageView = ({
     page
       .getElementData('oasysScoreHistory')
       .find('.govuk-heading-m')
-      .should('contain.text', 'Risk predictor scores history')
+      .should('contain.text', 'Reoffending predictor scores history')
     page.getElementData('oasysScoreHistory').find('.arns-predictor-timeline-link-btn').eq(0).click()
     page
       .getElementData('oasysScoreHistory')
