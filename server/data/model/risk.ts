@@ -153,8 +153,8 @@ export type RiskResponse = 'YES' | 'NO' | 'DK'
 export interface Risk {
   [index: string]: string
   risk: RiskResponse | null
-  current: RiskResponse | null
-  currentConcernsText: string | null
+  current?: RiskResponse | null
+  currentConcernsText?: string | null
   previous?: RiskResponse | null
   previousConcernsText?: string | null
 }

@@ -48,8 +48,8 @@ const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
 const mockFormattedRisks = {
   ...mockRisks,
   riskFlags: [
-    { id: 1, description: 'Risk to Staff', levelDescription: 'Medium' },
-    { id: 2, description: 'High ROSH', levelDescription: 'High' },
+    { id: 1, description: 'Risk to Staff', levelDescription: 'Medium', mostRecentReviewDate: '2026-10-01' },
+    { id: 2, description: 'High ROSH', levelDescription: 'High', mostRecentReviewDate: '2026-10-01' },
   ],
   removedRiskFlags: [{ id: 2, description: 'Removed ROSH flag' }],
 } as Partial<PersonRiskFlags>
@@ -222,13 +222,15 @@ describe('middleware/getPersonRiskFlags', () => {
     })
     const mockRes = createResponse({ enableNDeliusRosh: true })
     await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
-    expect(mockRes.locals.rosh).toEqual({ level: 'HIGH' })
+    expect(mockRes.locals.rosh).toEqual({ level: 'HIGH', assessedOn: '2026-10-01' })
   })
 
   it('should assign a VERY HIGH level to res.locals.rosh when the matching risk flag description is Very High ROSH', async () => {
     const veryHighRisks = {
       ...mockFormattedRisks,
-      riskFlags: [{ id: 1, description: 'Very High ROSH', levelDescription: 'High' }],
+      riskFlags: [
+        { id: 1, description: 'Very High ROSH', levelDescription: 'High', mostRecentReviewDate: '2026-10-01' },
+      ],
     }
     mockFindReplace.mockImplementationOnce(() => veryHighRisks).mockImplementationOnce(() => veryHighRisks)
     const req = httpMocks.createRequest({
@@ -241,7 +243,7 @@ describe('middleware/getPersonRiskFlags', () => {
     })
     const mockRes = createResponse({ enableNDeliusRosh: true })
     await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
-    expect(mockRes.locals.rosh).toEqual({ level: 'VERY HIGH' })
+    expect(mockRes.locals.rosh).toEqual({ level: 'VERY HIGH', assessedOn: '2026-10-01' })
   })
 
   it('should not throw and should set res.locals.rosh.level to undefined when enableNDeliusRosh is enabled and riskFlags is absent', async () => {
@@ -260,6 +262,6 @@ describe('middleware/getPersonRiskFlags', () => {
     })
     const mockRes = createResponse({ enableNDeliusRosh: true })
     await expect(getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)).resolves.not.toThrow()
-    expect(mockRes.locals.rosh).toEqual({ level: undefined })
+    expect(mockRes.locals.rosh).toEqual({ level: null, assessedOn: null })
   })
 })
