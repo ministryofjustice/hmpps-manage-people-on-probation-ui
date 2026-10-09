@@ -454,8 +454,15 @@
         ]
       }
     }) }}
+{% if flags.enableNDeliusRosh %}
+  {% set assessedOn = rosh.assessedOn %}
+  {% set overallRiskLevel = rosh.level %}
+{% else %}
+  {% set assessedOn = risks.assessedOn %}
+  {% set overallRiskLevel = risks.summary.overallRiskLevel %}
+{% endif %}
+{% set hasRosh = assessedOn and overallRiskLevel %}
 
-  {% set hasRiskAssessment = risks.assessedOn %}
   {% set risk %}
   {% set riskToThemselves %}
   {% set currentRisksToThemselves = getCurrentRisksToThemselves(risks.riskToSelf) %}
@@ -500,10 +507,10 @@
         {% endif %}
   {% endset %}
   {% set riskLastUpdated %}
-  {% if hasRiskAssessment %}
+  {% if assessedOn %}
     <br/>
     <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
-            Last updated {{ risks.assessedOn | dateWithYear }}
+            Last updated {{ assessedOn | dateWithYear }}
     </span>
   {% endif %}
   {% endset %}
@@ -528,12 +535,12 @@
     {% endif %}
     {% set mappaValue =  '<span class="govuk-!-font-weight-bold">' + mappaCat + mappaLevel + '</span>' %}
   {% endif %}
-  {% set roshText = risks.summary.overallRiskLevel | replace("_", " ") %}
+  {% set roshText = overallRiskLevel | replace("_", " ") %}
   {% set overallRosh %}
-  {% if hasRiskAssessment and risks.summary.overallRiskLevel %}
+  {% if hasRosh %}
     <table>
       <tr>
-        <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
+        <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
       </table>
     {% else %}
       {{'There is no ROSH summary.'}}

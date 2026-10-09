@@ -66,8 +66,12 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
         .replace('rosh', '')
         .trim()
         .toUpperCase() as RoshBadgeLevel
+      const assessedOn = personRisks.riskFlags
+        ?.filter(riskFlag => !riskFlag.removed)
+        .find(riskFlag => riskFlag?.mostRecentReviewDate)?.mostRecentReviewDate
       res.locals.rosh = {
         level: riskScore,
+        assessedOn,
       }
     }
     res.locals.personRisks = personRisks
