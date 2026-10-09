@@ -13,20 +13,24 @@ import { UserAlerts } from '../models/Alerts'
 import logger from '../../logger'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
+import { Mappa, Opd, PersonRiskFlags, RiskFlag } from '../data/model/risk'
+import { PersonSummary } from '../data/model/personalDetails'
+import { toRoshWidget } from '../utils'
+import { RiskRoshScoreMap } from './alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
-let toRoshWidgetSpy: jest.Mock
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    toRoshWidget: jest.fn(),
+  }
+})
 
-jest.mock('../utils', () => ({
-  get toRoshWidget() {
-    return toRoshWidgetSpy
-  },
-}))
-
-toRoshWidgetSpy = jest.fn()
+const toRoshWidgetSpy = toRoshWidget as jest.MockedFunction<typeof toRoshWidget>
 
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
@@ -81,6 +85,84 @@ const mockUserAlertsWithCrn = {
   size: 10,
 }
 
+const mockRiskFlags: RiskFlag[] = [
+  {
+    id: 2500794874,
+    description: 'Risk to Children',
+    level: 'HIGH',
+    riskNotes: [],
+    nextReviewDate: '2026-09-09',
+    mostRecentReviewDate: '2026-06-09',
+    createdDate: '2025-03-04',
+    createdBy: { forename: 'Assessment Summary', surname: 'Service' },
+    removed: false,
+    removalHistory: [],
+  },
+  {
+    id: 2500794878,
+    description: 'Risk to Staff',
+    level: 'HIGH',
+    riskNotes: [],
+    nextReviewDate: '2026-12-09',
+    mostRecentReviewDate: '2026-06-09',
+    createdDate: '2025-03-04',
+    createdBy: { forename: 'Assessment Summary', surname: 'Service' },
+    removed: false,
+    removalHistory: [],
+  },
+  {
+    id: 2500729791,
+    description: 'Medium RoSH',
+    level: 'MEDIUM',
+    riskNotes: [],
+    nextReviewDate: '2025-03-24',
+    createdDate: '2024-09-24',
+    createdBy: { forename: 'Assessment Summary', surname: 'Service' },
+    removed: false,
+    removalHistory: [],
+  },
+  {
+    id: 2500794875,
+    description: 'Risk to Known Adult',
+    level: 'MEDIUM',
+    nextReviewDate: '2026-12-09',
+    mostRecentReviewDate: '2026-06-09',
+    createdDate: '2025-03-04',
+    createdBy: { forename: 'Assessment Summary', surname: 'Service' },
+    removed: false,
+    removalHistory: [],
+  },
+  {
+    id: 2500794876,
+    description: 'Risk to Prisoner',
+    nextReviewDate: '2026-12-09',
+    mostRecentReviewDate: '2026-06-09',
+    createdDate: '2025-03-04',
+    createdBy: { forename: 'Assessment Summary', surname: 'Service' },
+    removed: false,
+    removalHistory: [],
+  },
+  {
+    id: 2500794877,
+    description: 'Risk to Public',
+    level: 'MEDIUM',
+    nextReviewDate: '2026-12-09',
+    mostRecentReviewDate: '2026-06-09',
+    createdDate: '2025-03-04',
+    createdBy: { forename: 'Assessment Summary', surname: 'Service' },
+    removed: false,
+    removalHistory: [],
+  },
+]
+
+const mockPersonRiskFlagsResponse: PersonRiskFlags = {
+  personSummary: {} as PersonSummary,
+  opd: {} as Opd,
+  mappa: {} as Mappa,
+  riskFlags: mockRiskFlags,
+  removedRiskFlags: [],
+}
+
 const mockRisksData = {
   summary: {
     overallRiskLevel: 'LOW',
@@ -114,6 +196,7 @@ const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
 const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks')
+const getPersonRiskFlagsSpy = jest.spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
 
 const url = '/alerts'
 
@@ -209,6 +292,7 @@ describe('alertsController', () => {
       const res = mockAppResponse()
       const req = httpMocks.createRequest({ query: {}, url })
       const renderSpy = jest.spyOn(res, 'render')
+
       it('should render the alerts page when risks api request returns a 500 error', async () => {
         const errorResponse = { status: 500, statusCode: 500, errors: [{ text: apiErrors.risks }] }
         getRisksSpy.mockImplementation(() => Promise.resolve(errorResponse))
@@ -282,6 +366,7 @@ describe('alertsController', () => {
           note: false,
         })
       })
+
       it('should render the alerts page if sort params are in url query', async () => {
         const sortBy = 'name'
         const sortOrder = 'desc'
@@ -300,6 +385,48 @@ describe('alertsController', () => {
           pagination: defaultPagination,
           note: false,
         })
+      })
+    })
+  })
+  describe('enableNDeliusRosh feature flag enabled', () => {
+    const res = mockAppResponse({ flags: { enableNDeliusRosh: true } })
+    const renderSpy = jest.spyOn(res, 'render')
+    const req = httpMocks.createRequest({ query: {}, url })
+
+    it('should render the alerts page when person risk flags api request throws an error', async () => {
+      const loggerSpy = jest.spyOn(logger, 'error')
+      const expectedRiskRoshScoreMap = {}
+      const mockErrorMessage = 'Mock error message'
+      getPersonRiskFlagsSpy.mockImplementationOnce(() => Promise.reject(new Error(mockErrorMessage)))
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+      const expectedRiskErrors = [{ text: apiErrors.personRiskFlags }]
+      expect(loggerSpy).toHaveBeenCalledWith(mockErrorMessage)
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+        url: encodeURIComponent(url),
+        alertsData: mockUserAlertsWithCrn,
+        riskRoshScoreMap: expectedRiskRoshScoreMap,
+        risksErrors: expectedRiskErrors,
+        sortedBy: 'date_and_time.desc',
+        pagination: defaultPagination,
+        note: false,
+      })
+    })
+
+    it('should render the alerts page when alerts are returned from the api', async () => {
+      getPersonRiskFlagsSpy.mockResolvedValueOnce(mockPersonRiskFlagsResponse)
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+      const expectedRiskRoshScoreMap: RiskRoshScoreMap = {
+        X123456: 'MEDIUM',
+        Y789012: null,
+      }
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+        url: encodeURIComponent(url),
+        alertsData: mockUserAlertsWithCrn,
+        riskRoshScoreMap: expectedRiskRoshScoreMap,
+        sortedBy: 'date_and_time.desc',
+        risksErrors: [],
+        pagination: defaultPagination,
+        note: false,
       })
     })
   })
@@ -324,6 +451,45 @@ describe('alertsController', () => {
           note: true,
         })
         checkSendAuditMessage(res, 'VIEW_MAS_ALERT_NOTE', res.locals.user.username, SubjectType.USER)
+      })
+    })
+
+    describe('enableNDeliusRosh feature flag enabled', () => {
+      const res = mockAppResponse({ flags: { enableNDeliusRosh: true } })
+      const renderSpy = jest.spyOn(res, 'render')
+
+      it('should render the alert note page when person risk flags api request throws an error', async () => {
+        const loggerSpy = jest.spyOn(logger, 'error')
+        const expectedRiskRoshScoreMap = {}
+        const mockErrorMessage = 'Mock error message'
+        getPersonRiskFlagsSpy.mockImplementationOnce(() => Promise.reject(new Error(mockErrorMessage)))
+        await controllers.alerts.getAlertNote(hmppsAuthClient)(req, res)
+        const expectedRiskErrors = [{ text: apiErrors.personRiskFlags }]
+        expect(loggerSpy).toHaveBeenCalledWith(mockErrorMessage)
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: { content: [mockUserAlertsWithCrn.content[0]] },
+          riskRoshScoreMap: expectedRiskRoshScoreMap,
+          sortedBy: 'date_and_time.desc',
+          risksErrors: expectedRiskErrors,
+          note: true,
+        })
+      })
+
+      it('should render the alert note page when alerts are returned from the api', async () => {
+        getPersonRiskFlagsSpy.mockResolvedValueOnce(mockPersonRiskFlagsResponse)
+        await controllers.alerts.getAlertNote(hmppsAuthClient)(req, res)
+        const expectedRiskRoshScoreMap: RiskRoshScoreMap = {
+          X123456: 'MEDIUM',
+        }
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: { content: [mockUserAlertsWithCrn.content[0]] },
+          riskRoshScoreMap: expectedRiskRoshScoreMap,
+          sortedBy: 'date_and_time.desc',
+          risksErrors: [],
+          note: true,
+        })
       })
     })
   })

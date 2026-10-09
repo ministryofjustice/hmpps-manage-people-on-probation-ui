@@ -22,10 +22,10 @@ export interface UserAlertsContent {
 
 export interface UserAlerts {
   content: UserAlertsContent[]
-  totalResults: number
-  totalPages: number
-  page: number
-  size: number
+  totalResults?: number
+  totalPages?: number
+  page?: number
+  size?: number
 }
 
 export interface UserAlertsCount {

@@ -184,8 +184,12 @@ export interface RiskSummary {
   assessedOn?: string | null
 }
 
+export interface CrnToRiskWidgetMap {
+  [crn: string]: RoshRiskWidgetDto | string
+}
+
 export interface RiskInfo {
-  crnToRiskWidgetMap: { [crn: string]: RiskSummary | string }
+  crnToRiskWidgetMap: CrnToRiskWidgetMap
   risksErrors: { text: string }[]
 }
 
