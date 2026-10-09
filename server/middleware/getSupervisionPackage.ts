@@ -64,7 +64,7 @@ export const getSupervisionPackage = (
 
     if (supervisionPackageData) {
       res.locals.supervisionPackageDetails = supervisionPackageData
-      if (supervisionPackageData.context?.finalThirdEligibility) {
+      if (supervisionPackageData.outcome === 'success' && supervisionPackageData.context?.finalThirdEligibility) {
         const finalThirdEligibility = supervisionPackageData.context?.finalThirdEligibility
         if (
           finalThirdEligibility?.since &&
