@@ -125,6 +125,7 @@ interface Locals {
   appointment?: AppointmentLocals
   case?: PersonalDetails
   headerPersonName?: { forename: string; surname: string }
+  personStatusTag?: string
   headerCRN?: string
   headerDob?: string
   headerTierLink?: string

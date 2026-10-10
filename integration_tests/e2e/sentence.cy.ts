@@ -345,7 +345,7 @@ context('Sentence', () => {
       .find('p:nth-of-type(2)')
       .should('contain.text', 'Comment added by Jon Jones on 21 August 2024')
     page.getRequirementValue(1, 4).find('a').click()
-    cy.get(`[data-qa="name"]`).should('contain.text', 'Caroline Wolff')
+    cy.get(`[data-qa="personName"]`).should('contain.text', 'Caroline Wolff')
     cy.get('.app-summary-card__header').should('contain.text', '3 of 12 RAR days completed')
   })
 })

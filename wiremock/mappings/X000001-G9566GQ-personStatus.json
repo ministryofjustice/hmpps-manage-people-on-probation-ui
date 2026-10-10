@@ -1,0 +1,96 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/prisoner-search/prisoner/G9566GQ"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":{
+          "addresses": [],
+          "alerts": [
+            {
+              "alertType": "V",
+              "alertCode": "V45",
+              "active": true,
+              "expired": false
+            }
+          ],
+          "aliases": [],
+          "allConvictedOffences": [
+            {
+              "statuteCode": "OF61",
+              "offenceCode": "OF61003A",
+              "offenceDescription": "Attempt to solicit to commit murder",
+              "latestBooking": true,
+              "sentenceStartDate": "2020-03-17",
+              "primarySentence": true
+            }
+          ],
+          "bookNumber": "38373A",
+          "bookingId": "1200876",
+          "category": "C",
+          "conditionalReleaseDate": "2025-03-16",
+          "convictedStatus": "Convicted",
+          "currentFacialImageId": 1987761,
+          "currentIncentive": {
+            "level": {
+              "code": "STD",
+              "description": "Standard"
+            },
+            "dateTime": "2020-03-21T11:06:04",
+            "nextReviewDate": "2021-03-21"
+          },
+          "dateOfBirth": "1993-06-01",
+          "emailAddresses": [],
+          "ethnicity": "White: Any other background",
+          "firstName": "STANLEY",
+          "gender": "Not Known / Not Recorded",
+          "heightCentimetres": 178,
+          "identifiers": [],
+          "imprisonmentStatus": "SEC91_03",
+          "imprisonmentStatusDescription": "Serious Offence -18 CJA03 POCCA 2000",
+          "inOutStatus": "ACTIVE IN",
+          "indeterminateSentence": false,
+          "languages": [],
+          "lastAdmissionDate": "2020-03-21",
+          "lastMovementDate": "2020-03-21",
+          "lastMovementReasonCode": "UAL",
+          "lastMovementTypeCode": "REL",
+          "lastName": "SCRUFFY",
+          "lastPrisonId": "MDI",
+          "legalStatus": "SENTENCED",
+          "licenceExpiryDate": "2030-03-16",
+          "locationDescription": "Outside - released from Moorland (HMP & YOI)",
+          "mainOffence": {
+            "offenceCode": "OF61003A",
+            "offenceDescription": "Attempt to solicit to commit murder"
+          },
+          "maritalStatus": "Single-not married/in civil partnership",
+          "militaryRecord": false,
+          "mostSeriousOffence": "Attempt to solicit to commit murder",
+          "nonDtoReleaseDate": "2025-03-16",
+          "nonDtoReleaseDateType": "CRD",
+          "personalCareNeeds": [],
+          "phoneNumbers": [],
+          "prisonId": "WTI",
+          "prisonName": "Whatton",
+          "prisonerNumber": "A5127DY",
+          "raceCode": "W9",
+          "recall": false,
+          "receptionDate": "2020-03-17",
+          "releaseDate": "2025-03-16",
+          "restrictedPatient": false,
+          "sentenceExpiryDate": "2030-03-16",
+          "sentenceStartDate": "2020-03-17",
+          "status": "ACTIVE IN",
+          "weightKilograms": 66,
+          "youthOffender": false
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+]
+}
