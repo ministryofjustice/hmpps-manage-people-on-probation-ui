@@ -210,19 +210,17 @@
             }) }}
   {% endset %}
 
-  {% if flags.enableSupervisionPackage %}
-    {{ supervisionPackage({
-      historyHref: tierUrlV3 + '/history',
-      arrangeAppointmentHref: '/case/' + crn + '/arrange-appointment/sentence?back=' + url,
-      updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn),
-      crn: crn,
-      oasysReviewHref: oasysLink,
-      deliusBaseURL: deliusHomepageUrl(),
-      openInNewTab: true,
-      nextAppointmentHref: ('/case/' + crn + '/appointments/appointment/' + supervisionPackageDetails.nextAppointment.id + '/manage?back=' + url) if supervisionPackageDetails.nextAppointment.id else '',
-      allAppointmentsHref: '/case/' + crn + '/appointments'
-    } | merge(supervisionPackageDetails or {}) | merge(tierDetails.calculation or {})) }}
-  {% endif %}
+  {{ supervisionPackage({
+    historyHref: tierUrlV3 + '/history',
+    arrangeAppointmentHref: '/case/' + crn + '/arrange-appointment/sentence?back=' + url,
+    updateRiskFlagHref: deliusDeepLinkUrl('RegisterSummary', crn),
+    crn: crn,
+    oasysReviewHref: oasysLink,
+    deliusBaseURL: deliusHomepageUrl(),
+    openInNewTab: true,
+    nextAppointmentHref: ('/case/' + crn + '/appointments/appointment/' + supervisionPackageDetails.nextAppointment.id + '/manage?back=' + url) if supervisionPackageDetails.nextAppointment.id else '',
+    allAppointmentsHref: '/case/' + crn + '/appointments'
+  } | merge(supervisionPackageDetails or {}) | merge(tierDetails.calculation or {})) }}
 
   {{ appSummaryCard({
       titleText: 'Appointments',

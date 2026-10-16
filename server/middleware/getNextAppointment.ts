@@ -48,9 +48,6 @@ export const getNextAppointment = (
   }
 
   return async (req, res, next) => {
-    // If the feature flag is not enabled, skip fetching next appointment and proceed to the next middleware
-    if (!res.locals.flags?.enableSupervisionPackage) return next()
-
     const { crn } = req.params as Record<string, string>
     let nextAppointmentResponse: NextAppointmentResponse | undefined
 

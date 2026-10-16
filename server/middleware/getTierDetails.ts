@@ -43,9 +43,6 @@ export const getTierDetails = (
   }
 
   return async function getTierDetailsInner(req, res, next) {
-    // If the feature flag is not enabled, skip fetching tier details and proceed to the next middleware
-    if (!res.locals.flags?.enableSupervisionPackage) return next()
-
     const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
     const { crn } = req.params as Record<string, string>
 

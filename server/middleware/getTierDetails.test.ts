@@ -49,11 +49,11 @@ const buildReq = (sessionPersonalDetails: Record<string, any> = {}) =>
     },
   })
 
-const buildRes = (enableSupervisionPackage: boolean): AppResponse =>
+const buildRes = (): AppResponse =>
   ({
     locals: {
       user: { username: 'user-1' },
-      flags: { enableSupervisionPackage },
+      flags: {},
     },
   }) as unknown as AppResponse
 
@@ -76,21 +76,6 @@ describe('getTierDetails middleware', () => {
     process.env = ORIGINAL_ENV
   })
 
-  it('should call next() without fetching when enableSupervisionPackage flag is false', async () => {
-    const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(false)
-
-    await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
-      req,
-      res,
-      nextSpy,
-    )
-
-    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
-    expect(mpopComponents.getTierDetails).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
   it('should always fetch tierDetails even when present in session', async () => {
     const cached = makeTierResponse()
     const fresh = makeTierResponse({
@@ -98,7 +83,7 @@ describe('getTierDetails middleware', () => {
     })
     mpopComponents.getTierDetails.mockResolvedValue(fresh)
     const req = buildReq({ [CRN]: makeSessionEntry(cached) })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -115,7 +100,7 @@ describe('getTierDetails middleware', () => {
     const tierResponse = makeTierResponse()
     mpopComponents.getTierDetails.mockResolvedValue(tierResponse)
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -132,7 +117,7 @@ describe('getTierDetails middleware', () => {
   it('should send error to the logger when the API returns a non-200 status', async () => {
     mpopComponents.getTierDetails.mockResolvedValue({ calculation: null, httpStatus: 500 })
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -152,7 +137,7 @@ describe('getTierDetails middleware', () => {
   it('should send error to the logger when the try/catch catches an error', async () => {
     mpopComponents.getTierDetails.mockRejectedValue(new Error('Connection refused'))
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -171,7 +156,7 @@ describe('getTierDetails middleware', () => {
   it('should set tierDetails to undefined when the API throws an error', async () => {
     mpopComponents.getTierDetails.mockRejectedValue(new Error('Connection refused'))
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -186,7 +171,7 @@ describe('getTierDetails middleware', () => {
   it('should set tierDetails to undefined when the API throws a non-Error object', async () => {
     mpopComponents.getTierDetails.mockRejectedValue('unexpected string error')
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -213,7 +198,7 @@ describe('getTierDetails middleware', () => {
       httpStatus: 200,
     })
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -238,7 +223,7 @@ describe('getTierDetails middleware', () => {
       httpStatus: 404,
     })
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -263,7 +248,7 @@ describe('getTierDetails middleware', () => {
       httpStatus: 200,
     })
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -278,7 +263,7 @@ describe('getTierDetails middleware', () => {
     const tierResponse = makeTierResponse()
     mpopComponents.getTierDetails.mockResolvedValue(tierResponse)
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -302,7 +287,7 @@ describe('getTierDetails middleware', () => {
       httpStatus: 200,
     })
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -317,7 +302,7 @@ describe('getTierDetails middleware', () => {
   it('should set res.locals.tierUrlV3 with the CRN-specific URL', async () => {
     mpopComponents.getTierDetails.mockResolvedValue(makeTierResponse())
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,
@@ -332,7 +317,7 @@ describe('getTierDetails middleware', () => {
     const tierResponse = makeTierResponse()
     mpopComponents.getTierDetails.mockResolvedValue(tierResponse)
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getTierDetails(hmppsAuthClient as unknown as HmppsAuthClient, mpopComponents as unknown as MPoPComponents)(
       req,

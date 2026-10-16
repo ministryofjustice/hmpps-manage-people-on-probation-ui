@@ -50,11 +50,6 @@ export const getSupervisionPackage = (
     // Skip if an earlier mount of this middleware on the same request (e.g. case.ts's catch-all) already fetched it
     if (res.locals.supervisionPackageAttempted || res.locals.supervisionPackageDetails) return next()
 
-    // enableSupervisionPackageAppointments only applies to routes mounted with includeAppointmentsFlag,
-    // so it doesn't trigger a fetch on every case page when only the appointments rollout flag is on
-    const appointmentsFlagActive = includeAppointmentsFlag && res.locals.flags?.enableSupervisionPackageAppointments
-    if (!res.locals.flags?.enableSupervisionPackage && !appointmentsFlagActive) return next()
-
     res.locals.supervisionPackageAttempted = true
 
     const { crn } = req.params as Record<string, string>

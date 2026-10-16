@@ -61,11 +61,11 @@ const buildReq = (sessionPersonalDetails: Record<string, any> = {}) =>
     },
   })
 
-const buildRes = (enableSupervisionPackage: boolean): AppResponse =>
+const buildRes = (): AppResponse =>
   ({
     locals: {
       user: { username: 'user-1' },
-      flags: { enableSupervisionPackage },
+      flags: {},
     },
   }) as unknown as AppResponse
 
@@ -88,24 +88,10 @@ describe('getNextAppointment middleware', () => {
     process.env = ORIGINAL_ENV
   })
 
-  it('should call next() without fetching when enableSupervisionPackage flag is false', async () => {
-    const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(false)
-
-    await getNextAppointment(
-      hmppsAuthClient as unknown as HmppsAuthClient,
-      mpopComponents as unknown as MPoPComponents,
-    )(req, res, nextSpy)
-
-    expect(hmppsAuthClient.getSystemClientToken).not.toHaveBeenCalled()
-    expect(mpopComponents.getPersonSchedule).not.toHaveBeenCalled()
-    expect(nextSpy).toHaveBeenCalled()
-  })
-
   it('should use cached nextAppointmentResponse when already present in session', async () => {
     const cached = makeNextAppointmentResponse()
     const req = buildReq({ [CRN]: makeSessionEntry(cached) })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -121,7 +107,7 @@ describe('getNextAppointment middleware', () => {
     const appointmentResponse = makeNextAppointmentResponse()
     mpopComponents.getPersonSchedule.mockResolvedValue(appointmentResponse)
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -154,7 +140,7 @@ describe('getNextAppointment middleware', () => {
     })
     mpopComponents.getPersonSchedule.mockResolvedValue(appointmentResponse)
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -179,7 +165,7 @@ describe('getNextAppointment middleware', () => {
     })
     mpopComponents.getPersonSchedule.mockResolvedValue(fresh)
     const req = buildReq({ [CRN]: makeSessionEntry(cached) })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -194,7 +180,7 @@ describe('getNextAppointment middleware', () => {
   it('should send error to the logger when the API returns a non-200 status', async () => {
     mpopComponents.getPersonSchedule.mockResolvedValue({ personSchedule: null, httpStatus: 500 })
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -214,7 +200,7 @@ describe('getNextAppointment middleware', () => {
   it('should send error to the logger when the API call throws an error', async () => {
     mpopComponents.getPersonSchedule.mockRejectedValue(new Error('Connection refused'))
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -232,7 +218,7 @@ describe('getNextAppointment middleware', () => {
   it('should set nextAppointmentResponse to undefined when the API throws a non-Error object', async () => {
     mpopComponents.getPersonSchedule.mockRejectedValue('unexpected string error')
     const req = buildReq({ [CRN]: makeSessionEntry() })
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,
@@ -247,7 +233,7 @@ describe('getNextAppointment middleware', () => {
     const appointmentResponse = makeNextAppointmentResponse()
     mpopComponents.getPersonSchedule.mockResolvedValue(appointmentResponse)
     const req = buildReq({})
-    const res = buildRes(true)
+    const res = buildRes()
 
     await getNextAppointment(
       hmppsAuthClient as unknown as HmppsAuthClient,

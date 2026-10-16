@@ -6,10 +6,7 @@ context('PoP Header partial', () => {
   })
 
   const enablePopHeaderWithTier = (tier: { tierScore: string; provisional?: boolean }) => {
-    cy.task('stubFeatureFlags', [
-      { key: 'enableSupervisionPackagePoPHeader', enabled: true },
-      { key: 'enableSupervisionPackage', enabled: true },
-    ])
+    cy.task('stubFeatureFlags', [{ key: 'enableSupervisionPackagePoPHeader', enabled: true }])
     cy.task('stubTierDetails', { crn: CRN, ...tier })
   }
 
@@ -51,10 +48,7 @@ context('PoP Header partial', () => {
   // Known gap: same as above but for the Unavailable tag returned when the calculation can't
   // be found (404) - the API/library always reports provisional: false in this case.
   it('shows no tag when the tier calculation cannot be found', () => {
-    cy.task('stubFeatureFlags', [
-      { key: 'enableSupervisionPackagePoPHeader', enabled: true },
-      { key: 'enableSupervisionPackage', enabled: true },
-    ])
+    cy.task('stubFeatureFlags', [{ key: 'enableSupervisionPackagePoPHeader', enabled: true }])
     cy.task('stubTierDetails', { crn: CRN, tierScore: '', status: 404 })
     cy.visit('/case/X000001')
 

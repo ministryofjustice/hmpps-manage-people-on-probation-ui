@@ -4,7 +4,6 @@ export class FeatureFlags {
   enableSmsReminders?: boolean = undefined
   enableCompliancePage?: boolean = undefined
   enableDeliusClient?: boolean = undefined
-  enableSupervisionPackage?: boolean = undefined
   enableSupervisionPackagePoPHeader?: boolean = undefined
   enablePersonHeader?: boolean = undefined
   enablePersonHeaderTierV3?: boolean = undefined
