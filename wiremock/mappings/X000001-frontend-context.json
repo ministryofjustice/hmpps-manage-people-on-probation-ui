@@ -24,7 +24,42 @@
             "finalThirdEligibility": {
               "eligible": true,
               "since": "2026-08-15T09:00:00.000Z"
-            }
+            },
+            "sentences": [
+              {
+                "eventNumber": "9",
+                "startDate": "2026-06-16",
+                "endDate": "2029-06-15",
+                "type": {
+                  "code": "327",
+                  "description": "ORA Adult Custody (not PSS)",
+                  "isCustodial": true,
+                  "isSuspendedSentence": false
+                },
+                "supervisionPackage": {
+                  "code": "SPNK",
+                  "description": "Not Yet Known"
+                },
+                "custody": {
+                  "status": {
+                    "code": "D",
+                    "description": "In Custody"
+                  },
+                  "location": {
+                    "code": "XXX084",
+                    "description": "Warren Court"
+                  },
+                  "releases": [
+                    {
+                      "releaseDate": "2026-09-09",
+                      "recallDate": "2026-09-09"
+                    }
+                  ]
+                },
+                "inBreach": false,
+                "isPrimarySentence": true
+              }
+            ]
           }
         }
       }

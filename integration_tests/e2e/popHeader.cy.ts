@@ -125,4 +125,14 @@ context('PoP Header partial', () => {
 
     cy.get('[data-qa="risk-badge-more"]').should('be.visible').and('contain.text', '+1 active risk flags')
   })
+
+  it('person status tag is displayed when enablePersonHeader is true', () => {
+    cy.task('stubFeatureFlag', { key: 'enablePersonHeader', enabled: true })
+    cy.visit('/case/X000001')
+
+    cy.get('[data-qa="personStatusTag"]')
+      .should('be.visible')
+      .and('have.class', 'govuk-tag--yellow')
+      .and('contain.text', 'In custody')
+  })
 })

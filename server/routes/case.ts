@@ -16,10 +16,10 @@ export default function caseRoutes(router: Router, { hmppsAuthClient, arnsCompon
   router.all(
     ['/case/:crn', '/case/:crn/*path'],
     getOasysLink(),
+    getSupervisionPackage(hmppsAuthClient, mpopComponents),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
     getPersonRiskFlags(hmppsAuthClient),
     getTierDetails(hmppsAuthClient, mpopComponents),
-    getSupervisionPackage(hmppsAuthClient, mpopComponents),
     getNextAppointment(hmppsAuthClient, mpopComponents),
   )
   router.get(

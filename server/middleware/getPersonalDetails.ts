@@ -17,6 +17,7 @@ import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { getManagedByDetails } from '../utils/getManagedByDetails'
+import { getStatusTag } from '../utils/personStatusTag'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -171,6 +172,10 @@ export const getPersonalDetails = (
     if (!photoEnabled) {
       personPhotoSrc = undefined
       prisonsUnavailable = false
+    }
+
+    if (res.locals.flags?.enablePersonHeader && overview.noms) {
+      res.locals.personStatusTag = await getStatusTag(token, overview, res.locals.supervisionPackageDetails)
     }
 
     res.locals.sentencePlan = sentencePlan

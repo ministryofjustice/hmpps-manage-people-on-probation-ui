@@ -44,6 +44,14 @@ import {
 import config from '../config'
 import logger from '../../logger'
 
+import * as personStatusTag from '../utils/personStatusTag'
+
+jest.mock('../utils/personStatusTag', () => ({
+  ...jest.requireActual('../utils/personStatusTag'),
+  getStatusTag: jest.fn(),
+}))
+
+const mockedGetStatusTag = jest.mocked(personStatusTag.getStatusTag)
 enum TokenType {
   USER_TOKEN = 'USER_TOKEN',
   SYSTEM_TOKEN = 'SYSTEM_TOKEN',
@@ -154,6 +162,7 @@ const overview = (crn = 'X000001'): PersonalDetails => ({
   documents: [] as Document[],
   addressTypes: [] as AddressType[],
   staffContacts: [] as Contact[],
+  noms: 'A6087EA',
 })
 
 const mock = ({ crn = 'X000001', ogrs4Enabled = true } = {}): PersonalDetailsSession => {
@@ -510,25 +519,45 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not request a photo when there is no NOMS number', async () => {
-      const getImageDataSpy = jest.spyOn(PrisonApiClient.prototype, 'getImageData')
-      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+      const getImageDataSpy = jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValue(null)
+
+      getImageDataSpy.mockClear()
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce({
+        ...overview('X000002'),
+        noms: '',
+      })
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
     })
   })
 
   describe('arns', () => {
+    beforeEach(() => {
+      // The middleware expects these methods to return Promises.
+      jest.spyOn(MasApiClient.prototype, 'getContacts').mockResolvedValue(mockContacts)
+
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValue(null)
+
+      jest.mocked(hmppsAuthClient.getSystemClientToken).mockResolvedValue('token')
+    })
+
     it('sets arnsUnavailable and still renders the header when getRisks fails and enablePersonHeader is on', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
     })
@@ -536,10 +565,13 @@ describe('/middleware/getPersonalDetails', () => {
     it('sets arnsUnavailable and still renders the header when getRiskData fails and enablePersonHeader is on', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
     })
@@ -549,10 +581,13 @@ describe('/middleware/getPersonalDetails', () => {
       jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockResolvedValueOnce({
         errors: [{ text: 'Risk information from the ARNS service is currently unavailable.' }],
       } as unknown as RiskSummary)
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(res.locals.risksWidget.overallRisk).toBe('NOT_FOUND')
       expect(nextSpy).toHaveBeenCalled()
@@ -561,10 +596,13 @@ describe('/middleware/getPersonalDetails', () => {
     it('sets arnsUnavailable when getRiskData resolves a non-200/404 httpStatus (real 500/401 behaviour, not a rejection)', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 500 })
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(res.locals.riskData).toBeNull()
       expect(nextSpy).toHaveBeenCalled()
@@ -573,24 +611,31 @@ describe('/middleware/getPersonalDetails', () => {
     it('leaves arnsUnavailable false when getRiskData resolves httpStatus 404 (legitimately no data, not a failure)', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockResolvedValueOnce({ assessments: [], httpStatus: 404 })
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(false)
     })
 
     it('leaves arnsUnavailable false when both ARNS calls succeed', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
+
       req = getReq()
       res = getRes()
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(false)
     })
 
     it('does not isolate an ARNS getRisks failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+
       req = getReq()
       res = getRes()
 
@@ -602,6 +647,7 @@ describe('/middleware/getPersonalDetails', () => {
     it('does not isolate an ARNS getRiskData failure when enablePersonHeader is off (legacy header keeps the old crash behaviour)', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsComponents.prototype, 'getRiskData').mockRejectedValueOnce(new Error('500'))
+
       req = getReq()
       res = getRes()
 
@@ -613,10 +659,13 @@ describe('/middleware/getPersonalDetails', () => {
     it('does not cache a degraded (arnsUnavailable) result, so the next request for this CRN retries', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(req.session.data.personalDetails.X000002).toBeUndefined()
     })
@@ -624,10 +673,13 @@ describe('/middleware/getPersonalDetails', () => {
     it('still initialises req.session.data on a degraded result when it did not exist yet, so downstream middleware (e.g. getPersonRiskFlags) does not crash on a fresh session', async () => {
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(overview('X000002'))
       jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockRejectedValueOnce(new Error('500'))
+
       req = httpMocks.createRequest({ params: { crn: 'X000002' }, session: {} })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
+
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(req.session.data).toBeDefined()
       expect(req.session.data.personalDetails?.X000002).toBeUndefined()
@@ -902,6 +954,81 @@ describe('/middleware/getPersonalDetails', () => {
       showLink: false,
       showText: false,
       lastUpdatedDate: '',
+    })
+  })
+  describe('person status tag', () => {
+    beforeEach(() => {
+      jest.clearAllMocks()
+      mockedGetStatusTag.mockReset()
+
+      jest.spyOn(MasApiClient.prototype, 'getContacts').mockResolvedValue(mockContacts)
+
+      jest.spyOn(PrisonApiClient.prototype, 'getImageData').mockResolvedValue(null)
+
+      jest.mocked(hmppsAuthClient.getSystemClientToken).mockResolvedValue('token')
+
+      req = getReq()
+      res = getRes()
+    })
+
+    it('sets personStatusTag when the feature flag is enabled and NOMS number exists', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+
+      mockedGetStatusTag.mockResolvedValueOnce('In custody')
+
+      res.locals.flags = { enablePersonHeader: true }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
+      expect(mockedGetStatusTag).toHaveBeenCalledWith('token', personOverview, res.locals.supervisionPackageDetails)
+      expect(res.locals.personStatusTag).toBe('In custody')
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('does not call getStatusTag when the feature flag is disabled', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+
+      res.locals.flags = { enablePersonHeader: false }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
+      expect(mockedGetStatusTag).not.toHaveBeenCalled()
+      expect(res.locals.personStatusTag).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('does not call getStatusTag when the NOMS number is missing', async () => {
+      const personOverview = { ...overview('X000002'), noms: '' }
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+
+      res.locals.flags = { enablePersonHeader: true }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
+      expect(mockedGetStatusTag).not.toHaveBeenCalled()
+      expect(res.locals.personStatusTag).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('sets personStatusTag to undefined when getStatusTag returns undefined', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+
+      mockedGetStatusTag.mockResolvedValueOnce(undefined)
+
+      res.locals.flags = { enablePersonHeader: true }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
+      expect(mockedGetStatusTag).toHaveBeenCalledWith('token', personOverview, res.locals.supervisionPackageDetails)
+      expect(res.locals.personStatusTag).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
     })
   })
 })
