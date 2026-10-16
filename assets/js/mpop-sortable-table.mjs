@@ -55,7 +55,11 @@ class MpopSortableTable extends ConfigurableComponent {
     const $button = document.createElement('button')
     $button.type = 'button'
     $button.dataset.index = index
-    $button.innerHTML = `${text}<span class="sort-icon" aria-hidden="true"></span>`
+    $button.textContent = text
+    const $icon = document.createElement('span')
+    $icon.className = 'sort-icon'
+    $icon.setAttribute('aria-hidden', 'true')
+    $button.appendChild($icon)
     $heading.textContent = ''
     $heading.appendChild($button)
   }

@@ -79,6 +79,13 @@ const attendanceSelectors = () => {
   const params = new URL(window.location.toString()).searchParams
   const change = params.get('change')
   let providerCode = ''
+  const attendanceUrl = (crn, uuid, query) => {
+    const search = new URLSearchParams()
+    Object.entries(query).forEach(([key, value]) => {
+      if (value) search.set(key, value)
+    })
+    return `/case/${encodeURIComponent(crn)}/arrange-appointment/${encodeURIComponent(uuid)}/attendance?${search.toString()}`
+  }
   if (providerSelect) {
     providerCode = providerSelect.value
     providerSelect.addEventListener('change', event => {
@@ -92,7 +99,7 @@ const attendanceSelectors = () => {
       const crn = urlParts[4]
       const uuid = urlParts[6]
       const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
-      fetch(`${baseUrl}?providerCode=${value}`, {
+      fetch(`${baseUrl}?providerCode=${encodeURIComponent(value)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +108,7 @@ const attendanceSelectors = () => {
       })
         .then(async response => {
           if (!response.ok) {
-            location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
+            location.href = attendanceUrl(crn, uuid, { providerCode: value, change }) // this will refresh the page and reach error page if API fails again
           } else {
             const json = await response.json()
             removeOptions(teamSelect)
@@ -123,7 +130,7 @@ const attendanceSelectors = () => {
           return response
         })
         .catch(() => {
-          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${value}${change ? `&change=${change}` : ''}`
+          location.href = attendanceUrl(crn, uuid, { providerCode: value, change })
         })
     })
   }
@@ -138,16 +145,19 @@ const attendanceSelectors = () => {
       const crn = urlParts[4]
       const uuid = urlParts[6]
       const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance/filter`
-      fetch(`${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      fetch(
+        `${baseUrl}?${providerCode ? `providerCode=${encodeURIComponent(providerCode)}&` : ''}teamCode=${encodeURIComponent(value)}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ _csrf: window.csrfToken }),
         },
-        body: JSON.stringify({ _csrf: window.csrfToken }),
-      })
+      )
         .then(async response => {
           if (!response.ok) {
-            location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}` // this will refresh the page and reach error page if API fails again
+            location.href = attendanceUrl(crn, uuid, { providerCode, teamCode: value, change }) // this will refresh the page and reach error page if API fails again
           } else {
             const json = await response.json()
             removeOptions(userSelect)
@@ -164,7 +174,7 @@ const attendanceSelectors = () => {
           return response
         })
         .catch(() => {
-          location.href = `/case/${crn}/arrange-appointment/${uuid}/attendance?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
+          location.href = attendanceUrl(crn, uuid, { providerCode, teamCode: value, change })
         })
     })
   }

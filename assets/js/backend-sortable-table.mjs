@@ -72,7 +72,11 @@ class BackendSortableTable extends ConfigurableComponent {
     const $button = document.createElement('button')
     $button.type = 'button'
     $button.dataset.index = index
-    $button.innerHTML = `${text}<span class="sort-icon" aria-hidden="true"></span>`
+    $button.textContent = text
+    const $icon = document.createElement('span')
+    $icon.className = 'sort-icon'
+    $icon.setAttribute('aria-hidden', 'true')
+    $button.appendChild($icon)
     $heading.textContent = ''
     $heading.appendChild($button)
   }
@@ -108,15 +112,14 @@ class BackendSortableTable extends ConfigurableComponent {
 
     if (!columnName || !action) return
 
-    const sortBy = `${columnName}.${newDirection}`
-    const suffix = action.includes('?') ? '&' : '?'
-    const newUrl = `${action}${suffix}sortBy=${sortBy}`
+    const url = new URL(action, window.location.origin)
+    url.searchParams.set('sortBy', `${columnName}.${newDirection}`)
 
     this.$status.textContent = this.config.statusMessage
       .replace(/%heading%/, columnName)
       .replace(/%direction%/, newDirection)
 
-    window.location.assign(newUrl)
+    window.location.assign(`${window.location.origin}${url.pathname}${url.search}`)
   }
 
   /**
