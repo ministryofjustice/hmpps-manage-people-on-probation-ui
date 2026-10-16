@@ -89,7 +89,7 @@ describe('middleware/routeChangeSmsConsent', () => {
       `/case/${crn}/personal-details/${id}/edit-contact-details?origin=allowSms&back=${encodeURIComponent(req.url)}`,
     )
   })
-  it('should update the appointment date, start, end and locationCode session and route to edit contact details page if change link is clicked', () => {
+  it('should update the appointment date, start, end and locationCode session and route to edit contact details page if change link is clicked, when dates, start and end time are not provided', () => {
     const req = buildRequest({ date: '', start: '', end: '' })
     routeChangeSmsConsent(req, res, nextSpy)
     expect(nextSpy).not.toHaveBeenCalled()

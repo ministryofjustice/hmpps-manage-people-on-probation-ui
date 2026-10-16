@@ -1,4 +1,4 @@
-import { Socket } from 'net'
+import { Socket } from 'node:net'
 import promClient from 'prom-client'
 import { Response, SuperAgentRequest } from 'superagent'
 import UrlValueParser from 'url-value-parser'

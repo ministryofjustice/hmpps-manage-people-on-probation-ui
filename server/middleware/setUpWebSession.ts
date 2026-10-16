@@ -44,7 +44,7 @@ export default function setUpWebSession(): Router {
   router.use(function setId(req, res, next) {
     const headerName = 'X-Request-Id'
     const oldValue = req.get(headerName)
-    const id = oldValue === undefined ? uuidv4() : oldValue
+    const id = oldValue ?? uuidv4()
 
     res.set(headerName, id)
     req.id = id

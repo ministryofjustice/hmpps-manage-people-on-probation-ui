@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import path from 'path'
+import path from 'node:path'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import nunjucks from 'nunjucks'
 

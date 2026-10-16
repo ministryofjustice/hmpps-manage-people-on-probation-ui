@@ -56,7 +56,7 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
       responseContactId = response.id
     } else {
       const response: AppointmentsPostResponse = await postAppointments(hmppsAuthClient)(req, res)
-      responseContactId = response.appointments[response.appointments.length - 1].id
+      responseContactId = response.appointments.at(-1).id
     }
 
     // add the responseContactId to session 👇

@@ -318,9 +318,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     return async function getPersonalContactNote(req, res) {
       const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_PERSONAL_CONTACT_NOTE',
         who: res.locals.user.username,

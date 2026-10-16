@@ -117,7 +117,7 @@ describe('Text message confirmation nunjucks render tests', () => {
       )
     })
     it('should display the correct options', () => {
-      expect($('[data-qa=smsOptIn]').find('.govuk-radios').find('.govuk-radios__item').length).toBe(3)
+      expect($('[data-qa=smsOptIn]').find('.govuk-radios').find('.govuk-radios__item')).toHaveLength(3)
       for (let i = 0; i < 3; i += 1) {
         expect(
           $('[data-qa=smsOptIn]').find('.govuk-radios').find('.govuk-radios__item').eq(i).find('label').text(),
@@ -159,7 +159,7 @@ describe('Text message confirmation nunjucks render tests', () => {
       },
     } as Partial<TestModel>)
     it('should display the overview inset text', () => {
-      expect($('.govuk-inset-text').find('li').length).toBe(2)
+      expect($('.govuk-inset-text').find('li')).toHaveLength(2)
       for (let i = 0; i < overview.length; i += 1) {
         expect($('.govuk-inset-text').find('li').eq(i).text()).toContain(overview[i])
       }

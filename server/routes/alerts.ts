@@ -7,8 +7,6 @@ import { getUserAlertsCount } from '../middleware/getUserAlertsCount'
 
 export default function alertsRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
-  const post = (path: string | string[], handler: Route<void>) => router.post(path, asyncMiddleware(handler))
-
   get('/alerts', controllers.alerts.getAlerts(hmppsAuthClient))
   router.post(
     '/alerts',

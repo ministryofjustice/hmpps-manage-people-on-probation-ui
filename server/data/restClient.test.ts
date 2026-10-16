@@ -145,7 +145,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
           handle404: true,
           errorMessage: 'A 404 error',
         })
-        expect(response).toEqual(null)
+        expect(response).toBeNull()
         expect(nock.isDone()).toBe(true)
       })
 
@@ -189,7 +189,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         handle404: true,
         errorMessage: 'Another 404 error',
       })
-      expect(response).toEqual(null)
+      expect(response).toBeNull()
       expect(nock.isDone()).toBe(true)
     })
 

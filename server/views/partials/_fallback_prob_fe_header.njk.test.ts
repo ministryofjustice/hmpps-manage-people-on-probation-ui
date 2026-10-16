@@ -18,7 +18,7 @@ describe('partials/_fallback_prob_fe_header.njk', () => {
     const html = render({ environmentName: 'PRE-PRODUCTION', environmentNameColour: 'govuk-tag--green' })
     const $ = cheerio.load(html)
 
-    expect($('.govuk-tag.govuk-tag--green').length).toBe(1)
+    expect($('.govuk-tag.govuk-tag--green')).toHaveLength(1)
     expect($('.govuk-tag.govuk-tag--green').text().trim()).toBe('PRE-PRODUCTION')
   })
 
@@ -26,7 +26,7 @@ describe('partials/_fallback_prob_fe_header.njk', () => {
     const html = render({ environmentName: 'PRODUCTION', environmentNameColour: '' })
     const $ = cheerio.load(html)
 
-    expect($('.govuk-tag').length).toBe(0)
+    expect($('.govuk-tag')).toHaveLength(0)
   })
 
   it('renders links based on env', () => {

@@ -14,7 +14,7 @@ describe('pages/homepage-old/_myEnforcementActions.njk', () => {
     expect($('[data-qa="enforcementFeatureDisabled"]').text()).toContain(
       'Enforcement actions are currently unavailable.',
     )
-    expect($('[data-qa="enforcementTimeoutError"]').length).toBe(0)
+    expect($('[data-qa="enforcementTimeoutError"]')).toHaveLength(0)
   })
 
   it('renders the timeout error message when enforcementTimeoutError is set and disableEnforcementContacts is not', () => {
@@ -22,7 +22,7 @@ describe('pages/homepage-old/_myEnforcementActions.njk', () => {
     const $ = cheerio.load(html)
 
     expect($('[data-qa="enforcementTimeoutError"]').text()).toContain('Enforcement actions are currently unavailable.')
-    expect($('[data-qa="enforcementFeatureDisabled"]').length).toBe(0)
+    expect($('[data-qa="enforcementFeatureDisabled"]')).toHaveLength(0)
   })
 
   it('renders the no enforcement actions message when neither flag nor timeout error is set', () => {
@@ -30,7 +30,7 @@ describe('pages/homepage-old/_myEnforcementActions.njk', () => {
     const $ = cheerio.load(html)
 
     expect(html).toContain('There are no enforcement actions to take.')
-    expect($('[data-qa="enforcementFeatureDisabled"]').length).toBe(0)
-    expect($('[data-qa="enforcementTimeoutError"]').length).toBe(0)
+    expect($('[data-qa="enforcementFeatureDisabled"]')).toHaveLength(0)
+    expect($('[data-qa="enforcementTimeoutError"]')).toHaveLength(0)
   })
 })

@@ -78,9 +78,9 @@ export const persistOutcomeAndAction = ({
         if (pageValue) {
           if (match?.options?.find(option => option?.value === pageValue)) {
             pageKey = match.key
-          } else if (letterTypeOptions.find(option => option.value === pageValue)) {
+          } else if (letterTypeOptions.some(option => option.value === pageValue)) {
             pageKey = 'letterType'
-          } else if (enforcementActionOptions().find(option => option.value === pageValue)) {
+          } else if (enforcementActionOptions().some(option => option.value === pageValue)) {
             pageKey = 'otherEnforcementAction'
           }
           outcomeSession = { ...outcomeSession, enforcementActionCode: [actionCode] }

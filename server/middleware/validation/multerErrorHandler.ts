@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import multer, { MulterError } from 'multer'
-import path from 'path'
+import path from 'node:path'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 import config from '../../config'
 

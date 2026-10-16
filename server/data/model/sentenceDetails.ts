@@ -1,5 +1,4 @@
 import { PersonSummary } from './personalDetails'
-import { Note } from './note'
 
 export interface SentenceDetails {
   personSummary: PersonSummary

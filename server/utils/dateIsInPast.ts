@@ -20,8 +20,6 @@ export const dateIsInPast = (
           day,
         })
         isInPast = appointmentTime < now
-      } else {
-        isInPast = false
       }
     } else {
       isInPast = dt < now

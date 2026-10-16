@@ -1,5 +1,5 @@
 import { type Router } from 'express'
-import asyncMiddleware from '../middleware/asyncMiddleware'
+
 import {
   autoStoreSessionData,
   getPersonalDetails,

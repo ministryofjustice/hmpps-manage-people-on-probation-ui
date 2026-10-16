@@ -38,7 +38,12 @@ export const resetEnforcementActionSelection = (req: Request, res: AppResponse, 
 
   const postedOtherEnforcementAction = req.body?.appointments?.[crn]?.[id]?.outcome?.otherEnforcementAction
   const postedUpdateEnforcementAction = req.body?.appointments?.[crn]?.[id]?.outcome?.updateEnforcementAction
-  const nonCompliantActions = [attendedFailedToComply, unacceptableAbsence, failedToAttend, updateEnforcementAction]
+  const nonCompliantActions = new Set([
+    attendedFailedToComply,
+    unacceptableAbsence,
+    failedToAttend,
+    updateEnforcementAction,
+  ])
 
   const resetLetterAction = (source: string) => {
     if (letterType) {
@@ -51,7 +56,7 @@ export const resetEnforcementActionSelection = (req: Request, res: AppResponse, 
     }
   }
 
-  if (!nonCompliantActions.includes('SEND_LETTER') && postedAction.includes('SEND_LETTER')) {
+  if (!nonCompliantActions.has('SEND_LETTER') && postedAction.includes('SEND_LETTER')) {
     resetLetterAction('resetEnforcementAction:sendLetter')
   }
 
@@ -65,7 +70,7 @@ export const resetEnforcementActionSelection = (req: Request, res: AppResponse, 
   }
 
   if (
-    !nonCompliantActions.includes('BREACH_RECALL_INITIATED_AND_SEND_LETTER') &&
+    !nonCompliantActions.has('BREACH_RECALL_INITIATED_AND_SEND_LETTER') &&
     postedAction.includes('BREACH_RECALL_INITIATED_AND_SEND_LETTER')
   ) {
     if (letterType) {
@@ -135,7 +140,7 @@ export const resetEnforcementActionSelection = (req: Request, res: AppResponse, 
     )
   }
 
-  if (!skipReset && enforcementActionPages.some(url => reqUrl === url)) {
+  if (!skipReset && enforcementActionPages.includes(reqUrl)) {
     logSessionCacheChange(
       'resetEnforcementAction:mainReset',
       data,

@@ -7,14 +7,12 @@ export const standardiseDateValue = (dateValue: string | undefined): string | un
   const separators = ['/', '-', '.', ' ', '_', ':']
   const formats: string[] = []
   for (const seperator of separators) {
-    formats.push(`d${seperator}M${seperator}yyyy`)
-    formats.push(`d${seperator}M${seperator}yy`)
+    formats.push(`d${seperator}M${seperator}yyyy`, `d${seperator}M${seperator}yy`)
   }
   for (const format of formats) {
     const date = DateTime.fromFormat(dateValue, format)
     if (date.isValid) {
-      const newDateValue = date.toFormat('d/M/yyyy')
-      return newDateValue
+      return date.toFormat('d/M/yyyy')
     }
   }
   return dateValue

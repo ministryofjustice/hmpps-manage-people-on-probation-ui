@@ -1,5 +1,5 @@
-import { Readable } from 'stream'
-import { pipeline } from 'stream/promises'
+import { Readable } from 'node:stream'
+import { pipeline } from 'node:stream/promises'
 import { Controller } from '../@types'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { HmppsAuthClient } from '../data'

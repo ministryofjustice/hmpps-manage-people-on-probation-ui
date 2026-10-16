@@ -11,7 +11,7 @@ export function mapResults(response: ProbationSearchResponse, request: Probation
     })) ?? []
   const selectedProviders =
     request.providersFilter
-      ?.filter(p => !returnedProviders.find(r => r.value === p))
+      ?.filter(p => !returnedProviders.some(r => r.value === p))
       .map(p => ({
         value: p,
         text: `${p.substring(4)} (0)`,

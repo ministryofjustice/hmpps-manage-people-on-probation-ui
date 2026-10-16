@@ -5,7 +5,6 @@ import { addParameters } from '@ministryofjustice/probation-search-frontend/util
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import { toIsoDateTimeFromPicker } from '../utils'
 import { validateWithSpec } from '../utils/validationUtils'
 import { documentSearchValidation } from '../properties'

@@ -88,8 +88,8 @@ describe('partials/_overview-risk-summary-card.njk', () => {
       $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
         .eq(0)
         .find('.govuk-summary-list__value')
-        .find('[data-qa=overallRiskValue]').length,
-    ).toBe(0)
+        .find('[data-qa=overallRiskValue]'),
+    ).toHaveLength(0)
     expect(
       $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
         .eq(0)

@@ -121,29 +121,40 @@ describe('checkLocationMonitoringByEventNumber', () => {
     },
   ] as unknown as Sentence[]
 
-  it('should return true for licence conditions when event matches and has LM data', () => {
-    const result = checkLocationMonitoringByEventNumber('1', sentences)
-    expect(result.hasLicenceConditionsLMData).toBe(true)
-    expect(result.hasRequirementsLMData).toBe(false)
-  })
+  it.each([
+    {
+      eventNumber: '1',
+      hasLicenceConditionsLMData: true,
+      hasRequirementsLMData: false,
+      description: 'licence conditions when event matches and has LM data',
+    },
+    {
+      eventNumber: '2',
+      hasLicenceConditionsLMData: false,
+      hasRequirementsLMData: true,
+      description: 'requirements when event matches and has LM data',
+    },
+    {
+      eventNumber: '3',
+      hasLicenceConditionsLMData: false,
+      hasRequirementsLMData: false,
+      description: 'event matches but has no LM data',
+    },
+    {
+      eventNumber: '4',
+      hasLicenceConditionsLMData: false,
+      hasRequirementsLMData: false,
+      description: 'event number does not match',
+    },
+  ])(
+    'should return correct LM data flags for $description',
+    ({ eventNumber, hasLicenceConditionsLMData, hasRequirementsLMData }) => {
+      const result = checkLocationMonitoringByEventNumber(eventNumber, sentences)
 
-  it('should return true for requirements when event matches and has LM data', () => {
-    const result = checkLocationMonitoringByEventNumber('2', sentences)
-    expect(result.hasLicenceConditionsLMData).toBe(false)
-    expect(result.hasRequirementsLMData).toBe(true)
-  })
-
-  it('should return false when event matches but has no LM data', () => {
-    const result = checkLocationMonitoringByEventNumber('3', sentences)
-    expect(result.hasLicenceConditionsLMData).toBe(false)
-    expect(result.hasRequirementsLMData).toBe(false)
-  })
-
-  it('should return false when event number does not match', () => {
-    const result = checkLocationMonitoringByEventNumber('4', sentences)
-    expect(result.hasLicenceConditionsLMData).toBe(false)
-    expect(result.hasRequirementsLMData).toBe(false)
-  })
+      expect(result.hasLicenceConditionsLMData).toBe(hasLicenceConditionsLMData)
+      expect(result.hasRequirementsLMData).toBe(hasRequirementsLMData)
+    },
+  )
 })
 
 describe('hasLocationMonitoring', () => {

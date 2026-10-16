@@ -188,14 +188,13 @@ describe('POP header', () => {
         $('.pop-header-risk-badges').find('[data-badge-base="Risk of serious harm HIGH"]').find('span').text(),
       ).toContain('Risk of serious harm')
       expect(
-        $('.pop-header-risk-badges').find('[data-badge-base="Combined serious reoffending predictor NOT APPLICABLE"]')
-          .length,
-      ).toBe(0)
+        $('.pop-header-risk-badges').find('[data-badge-base="Combined serious reoffending predictor NOT APPLICABLE"]'),
+      ).toHaveLength(0)
     })
 
     it('should not render a ROSH badge when rosh.level is undefined', () => {
       const $ = render({ rosh: { level: undefined } })
-      expect($('.pop-header-risk-badges').find('[data-badge-base^="Risk of serious harm"]').length).toBe(0)
+      expect($('.pop-header-risk-badges').find('[data-badge-base^="Risk of serious harm"]')).toHaveLength(0)
     })
   })
   describe('enableNDeliusRosh feature flag is disabled', () => {
@@ -277,7 +276,7 @@ describe('POP header', () => {
 
     it('should not render a "+N active risk flags" link when remainingCount is 0', () => {
       const $ = render()
-      expect($('[data-qa="risk-badge-more"]').length).toBe(0)
+      expect($('[data-qa="risk-badge-more"]')).toHaveLength(0)
     })
 
     it('should render a "+N active risk flags" link when remainingCount is greater than 0', () => {

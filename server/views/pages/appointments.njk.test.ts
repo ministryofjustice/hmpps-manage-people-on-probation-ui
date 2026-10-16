@@ -281,7 +281,7 @@ describe('Appointments', () => {
     expect($('[data-qa="online-checkin-btn"]')).toHaveLength(1)
     expect($('[data-qa="online-checkin-btn"]').text()).toContain('Set up online check ins')
   })
-  it('should render the page without manage check-ins button when ineligible', () => {
+  it('should render the page without manage button when ineligible', () => {
     const $ = render({
       flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
@@ -289,7 +289,7 @@ describe('Appointments', () => {
     })
     expect($('[data-qa="online-manage-btn"]')).toHaveLength(0)
   })
-  it('should render the page without manage check-ins button when ineligible', () => {
+  it('should render the page without check-ins button when ineligible', () => {
     const $ = render({
       flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,

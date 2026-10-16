@@ -408,22 +408,27 @@ describe('validates documents filter request with spec', () => {
 })
 
 describe('isValidDateFormat()', () => {
-  it('should return true if a correct date format', () => {
+  it('should return true for a single-digit day and month', () => {
     expect(isValidDateFormat(['9/4/2025'])).toEqual(true)
   })
-  it('should return true if a correct date format', () => {
+
+  it('should return true for a double-digit day and month', () => {
     expect(isValidDateFormat(['19/10/2025'])).toEqual(true)
   })
-  it('should return false if date is not correct format', () => {
+
+  it('should return false for a zero-padded day and month', () => {
     expect(isValidDateFormat(['09/04/2025'])).toEqual(false)
   })
-  it('should return false if date is not correct format', () => {
+
+  it('should return false for a double-digit day with an invalid format', () => {
     expect(isValidDateFormat(['19/04/2025'])).toEqual(false)
   })
-  it('should return false if date is not correct format', () => {
+
+  it('should return false for a two-digit year with a double-digit day and month', () => {
     expect(isValidDateFormat(['19/04/25'])).toEqual(false)
   })
-  it('should return false if date is not correct format', () => {
+
+  it('should return false for a two-digit year with a single-digit day and month', () => {
     expect(isValidDateFormat(['9/4/25'])).toEqual(false)
   })
 })
@@ -466,7 +471,7 @@ describe('getNestedValue()', () => {
     }
     expect(getNestedValue(mockData, path)).toBeUndefined()
   })
-  it('should return undefined', () => {
+  it('should return undefined, when sentence is null', () => {
     const path = ['appointments', crn, id, 'type']
     const mockData = {
       appointments: {

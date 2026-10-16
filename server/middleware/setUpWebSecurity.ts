@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import express, { Router, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import config from '../config'
@@ -63,8 +63,7 @@ export default function setUpWebSecurity(): Router {
             ]
             // Allow localhost for local development only
             if (config.env === 'local') {
-              sources.push('http://localhost:9091')
-              sources.push('http://localhost:3000')
+              sources.push('http://localhost:9091', 'http://localhost:3000')
             }
             return sources
           })(),

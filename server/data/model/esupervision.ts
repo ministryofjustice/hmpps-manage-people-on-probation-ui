@@ -68,10 +68,9 @@ export interface ESupervisionNote {
   sensitive?: boolean
 }
 
-export type ExternalUserId = string
 export interface OffenderSetup {
   uuid: string
-  practitioner: ExternalUserId
+  practitioner: string
   offender: string
   createdAt: string
 }

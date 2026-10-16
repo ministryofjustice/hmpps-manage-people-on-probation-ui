@@ -12,7 +12,7 @@ describe('utils/isMatchingAddress', () => {
     postcode: 'NW10 1EP',
   }
   it('should accept 2 arguments', () => {
-    expect(isMatchingAddress.length).toEqual(2)
+    expect(isMatchingAddress).toHaveLength(2)
   })
   it('should return true if both addresses are undefined', () => {
     expect(isMatchingAddress(undefined, undefined)).toEqual(true)
