@@ -2,6 +2,7 @@ import { activityLogValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { renderError } from '../renderError'
 import { Route } from '../../@types'
+import { safeRedirect } from '../../utils/safeRedirect'
 
 function isEmpty(str: string): boolean {
   return !str || str?.trim() === ''
@@ -52,7 +53,7 @@ const activityLog: Route<void> = (req, res, next): void => {
         return renderError(404)(req, res)
       }
       const query = view ? `error=true&view=${view}` : `error=true`
-      return res.redirect(`${path}?${query}`)
+      return res.redirect(safeRedirect(`${path}?${query}`))
     }
   }
   return next()

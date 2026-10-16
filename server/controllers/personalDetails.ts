@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
 import TierApiClient from '../data/tierApiClient'
 import RoleService from '../services/roleService'
-import { toIsoDateFromPicker, isValidCrn, setDataValue, getDataValue } from '../utils'
+import { toIsoDateFromPicker, isValidCrn, setDataValue, getDataValue, safeRedirect } from '../utils'
 import type { Controller } from '../@types'
 import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
@@ -264,7 +264,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         if (res.locals?.flags?.enableAllowSms && origin === 'allowSms' && back) {
           redirect = typeof back === 'string' && back.startsWith(`/case/${crn}/`) ? back : redirect
         }
-        res.redirect(redirect)
+        res.redirect(safeRedirect(redirect, `/case/${crn}/personal-details`))
       }
     }
   },

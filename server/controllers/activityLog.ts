@@ -7,6 +7,7 @@ import { getPersonActivity, overrideDeliusManagedFlag, groupActivitiesByDate } f
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
 import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/contactDisplayNames'
+import { safeRedirect } from '../utils/safeRedirect'
 
 const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
 
@@ -49,7 +50,9 @@ const activityLogController: Controller<typeof routes, void> = {
         cleanParams.delete('showSuccessBanner')
         cleanParams.delete('uploadFailed')
         const cleanQuery = cleanParams.toString()
-        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
+        return res.redirect(
+          safeRedirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path, `/case/${crn}/activity-log`),
+        )
       }
 
       const { query } = req
@@ -118,7 +121,9 @@ const activityLogController: Controller<typeof routes, void> = {
         cleanParams.delete('showSuccessBanner')
         cleanParams.delete('uploadFailed')
         const cleanQuery = cleanParams.toString()
-        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
+        return res.redirect(
+          safeRedirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path, `/case/${crn}/activity-log`),
+        )
       }
       const contactUpdatedFlash = req.flash('contactUpdated')?.[0]
       const showSuccessBanner = !!contactUpdatedFlash
