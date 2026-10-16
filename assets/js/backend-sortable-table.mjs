@@ -112,7 +112,7 @@ class BackendSortableTable extends ConfigurableComponent {
 
     if (!columnName || !action) return
 
-    const url = new URL(action, window.location.origin)
+    const url = new URL(action, window.location.href)
     url.searchParams.set('sortBy', `${columnName}.${newDirection}`)
 
     this.$status.textContent = this.config.statusMessage
