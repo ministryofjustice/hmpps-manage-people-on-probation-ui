@@ -2,7 +2,7 @@ name: Security veracode pipeline scan
 on:
   workflow_dispatch:
   schedule:
-    - cron: "58 05 * * MON-FRI" # Every weekday
+    - cron: "58 5 * * MON-FRI" # Every weekday
 
 jobs:
   security-veracode-pipeline-scan:
@@ -11,7 +11,18 @@ jobs:
       actions: read
       security-events: write
     name: Project security veracode pipeline scan
-    uses: ./.github/workflows/pipeline_scan.yml
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_pipeline_scan.yml@v2 # WORKFLOW_VERSION
     with:
       channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
-    secrets: inherit
+    secrets:
+      HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+      HMPPS_VERACODE_API_ID_0: ${{ secrets.HMPPS_VERACODE_API_ID_0 }}
+      HMPPS_VERACODE_API_ID_1: ${{ secrets.HMPPS_VERACODE_API_ID_1 }}
+      HMPPS_VERACODE_API_ID_2: ${{ secrets.HMPPS_VERACODE_API_ID_2 }}
+      HMPPS_VERACODE_API_ID_3: ${{ secrets.HMPPS_VERACODE_API_ID_3 }}
+      HMPPS_VERACODE_API_ID_4: ${{ secrets.HMPPS_VERACODE_API_ID_4 }}
+      HMPPS_VERACODE_API_KEY_0: ${{ secrets.HMPPS_VERACODE_API_KEY_0 }}
+      HMPPS_VERACODE_API_KEY_1: ${{ secrets.HMPPS_VERACODE_API_KEY_1 }}
+      HMPPS_VERACODE_API_KEY_2: ${{ secrets.HMPPS_VERACODE_API_KEY_2 }}
+      HMPPS_VERACODE_API_KEY_3: ${{ secrets.HMPPS_VERACODE_API_KEY_3 }}
+      HMPPS_VERACODE_API_KEY_4: ${{ secrets.HMPPS_VERACODE_API_KEY_4 }}
