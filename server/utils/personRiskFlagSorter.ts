@@ -18,7 +18,8 @@ const riskLevelByDescription: Record<string, string> = {
   // LOW
   'county lines - victim': 'LOW',
   'domestic abuse safety officer': 'LOW',
-
+  'home office interest': 'LOW',
+  'street gangs': 'LOW',
   // MEDIUM
   'child concerns': 'MEDIUM',
   'victim contact': 'MEDIUM',
@@ -60,7 +61,7 @@ const cohortDescriptions = new Set([
   'cyber - dependent',
   'cyber - enabled',
   'grand avenues cohort',
-  'home office interest',
+  'Home Office Interest',
   'lifer - supervised',
   'lifer - not supervised',
   'organised crime - overt',
@@ -201,6 +202,11 @@ function getRiskBadgeClass(description: string, severity: string): string {
 function getRiskLevel(flag: RiskFlag): string | undefined {
   const normalisedDescription = flag.description.trim().toLowerCase()
 
+  // Cohort badges do not have a risk severity
+  if (cohortDescriptions.has(normalisedDescription)) {
+    return 'LOW'
+  }
+
   if (risksWithLevelDescription.has(normalisedDescription)) {
     return (flag.levelDescription ?? flag.level)?.toUpperCase()
   }
@@ -253,6 +259,11 @@ const validRiskDescriptions = new Set(
 )
 
 export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
+
+  console.log('************** riskFlags *****************')
+  console.dir(riskFlags, { depth: null })
+  console.log('*******************************')
+
   const activeRiskFlags = riskFlags.filter(
     flag =>
       !flag.removed &&
