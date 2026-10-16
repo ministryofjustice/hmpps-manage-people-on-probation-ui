@@ -54,7 +54,6 @@ const buildResponse = ({
   _nextAppointment?: OutcomeNextAppointment
 } = {}): AppResponse => {
   const response = {
-    flags: { enableCombinedCYAPage: true },
     appointmentOutcome: {
       crn,
       id,

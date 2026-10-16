@@ -35,7 +35,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
     let id = uuid
-    if (res?.locals?.flags?.enableCombinedCYAPage && req.url.includes('/outcome/check-your-answers')) {
+    if (req.url.includes('/outcome/check-your-answers')) {
       const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
       id = nextAppointmentId || id
     }

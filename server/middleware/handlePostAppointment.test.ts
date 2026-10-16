@@ -138,9 +138,6 @@ const appointmentOutcome: Partial<AppointmentOutcomeProps<Activity>> = {
 
 const buildResponse = () => {
   const locals = {
-    flags: {
-      enableCombinedCYAPage: true,
-    },
     appointmentOutcome,
   }
   return mockAppResponse(locals)
@@ -156,7 +153,7 @@ describe('middleware/handlePostAppointment', () => {
     jest.clearAllMocks()
   })
 
-  it('should call next() if enableCombinedCYAPage flag is true and the url includes /outcome/check-your-answers and there is no nextAppointmentId', async () => {
+  it('should call next() if the url includes /outcome/check-your-answers and there is no nextAppointmentId', async () => {
     const req = buildRequest({
       url: `/case/${crn}/appointments/appointment/${id}/outcome/check-your-answers`,
       _nextAppointmentId: null,
@@ -170,7 +167,7 @@ describe('middleware/handlePostAppointment', () => {
     expect(postRescheduleAppointmentsSpy).not.toHaveBeenCalled()
   })
 
-  it('should redirect to the outcome check your answers page if enableCombinedCYAPage flag is true and the url includes /arrange-another-appointment and nextAppointmentId and linkedContactId exist', async () => {
+  it('should redirect to the outcome check your answers page if the url includes /arrange-another-appointment and nextAppointmentId and linkedContactId exist', async () => {
     const linkedContactId = '5678'
     const req = buildRequest({
       url: `/case/${crn}/arrange-appointment/${id}/arrange-another-appointment`,

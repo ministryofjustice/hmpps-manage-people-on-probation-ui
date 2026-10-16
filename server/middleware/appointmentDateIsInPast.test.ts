@@ -68,13 +68,7 @@ const buildRequest = ({
   return httpMocks.createRequest(req)
 }
 
-const res = httpMocks.createResponse({
-  locals: {
-    flags: {
-      enableCombinedCYAPage: true,
-    },
-  },
-})
+const res = httpMocks.createResponse({})
 
 const now = DateTime.now()
 const date = now.plus({ days: 1 }).toFormat('d/M/yyyy')

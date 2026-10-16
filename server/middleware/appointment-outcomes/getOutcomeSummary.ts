@@ -88,17 +88,6 @@ export const getOutcomeSummary: Route<void> = (_req, res, next) => {
       documents,
     }
 
-    if (!res?.locals?.flags?.enableCombinedCYAPage) {
-      const nextAppt = res?.locals?.nextAppointment?.appointment
-      let nextAppointment = 'No next appointment'
-      if (nextAppt) {
-        const { type, startDateTime, endDateTime } = nextAppt
-        const endStr = endDateTime ? ` to ${govukTime(endDateTime)}` : ''
-        nextAppointment = `${toSentenceCase(type)} on ${dateWithDayAndWithYear(startDateTime)} at ${govukTime(startDateTime)}${endStr}`
-      }
-      summary.nextAppointment = nextAppointment
-    }
-
     if (
       attendedFailedToComply ||
       unacceptableAbsence ||

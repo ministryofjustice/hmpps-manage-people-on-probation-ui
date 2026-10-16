@@ -470,17 +470,14 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      if (res.locals.flags.enableCombinedCYAPage) {
-        const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
-        if (change && !linkedContactId) {
-          return res.redirect(change)
-        }
-        const path = linkedContactId
-          ? `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
-          : `/case/${crn}/arrange-appointment/${id}/check-your-answers`
-        return res.redirect(path)
+      const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
+      if (change && !linkedContactId) {
+        return res.redirect(change)
       }
-      return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
+      const path = linkedContactId
+        ? `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
+        : `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      return res.redirect(path)
     }
   },
   getTextMessageConfirmation: _hmppsAuthClient => {
@@ -549,13 +546,13 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (change) {
         redirect = findUncompleted()(req, res)
       }
-      if (res.locals.flags.enableCombinedCYAPage) {
-        const { data } = req.session
-        const linkedContactId = getDataValue<string>(data, ['temp', crn, 'linkedContactId']) || null
-        if (linkedContactId) {
-          redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
-        }
+
+      const { data } = req.session
+      const linkedContactId = getDataValue<string>(data, ['temp', crn, 'linkedContactId']) || null
+      if (linkedContactId) {
+        redirect = `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
       }
+
       const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
       if (nextAppointmentId) {
         const nextAppointmentOutcome = res.locals.appointmentOutcome
@@ -673,11 +670,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           username: res.locals.user?.username,
           enabled: res.locals.flags.enableSessionCacheLogging,
         })
-        if (res.locals.flags.enableCombinedCYAPage) {
-          delete req.session.data.temp[crn].responseContactId
-        } else {
-          setDataValue(data, ['temp', crn, 'responseContactId'], null)
-        }
+        delete req.session.data.temp[crn].responseContactId
       }
       const {
         isOutLookEventFailed = null,

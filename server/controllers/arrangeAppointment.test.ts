@@ -185,9 +185,7 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         description: 'Planned Office Meeting',
       },
     ],
-    flags: {
-      enableCombinedCYAPage: true,
-    },
+    flags: {},
     ...(localsResponse || {}),
   })
 

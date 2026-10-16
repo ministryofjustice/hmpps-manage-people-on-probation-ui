@@ -19,7 +19,7 @@ export const getConfirmation: Route<void> = (req, res, next): void => {
     sentence: { type: sentenceType },
   } = appointmentOutcome
   const nextAppointmentId = getDataValue<string>(req.session.data, ['temp', crn, 'nextAppointmentId'])
-  const confirmNextAppointment = nextAppointmentId && res.locals.flags.enableCombinedCYAPage
+  const confirmNextAppointment = nextAppointmentId
   let title = 'Enforcement outcome added'
   if (confirmNextAppointment) {
     title = 'Enforcement outcome updated and next appointment arranged'

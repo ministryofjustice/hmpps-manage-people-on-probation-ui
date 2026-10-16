@@ -13,7 +13,7 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId'])
     let id = uuid || contactId
-    if (res.locals.flags.enableCombinedCYAPage && nextAppointmentId) {
+    if (nextAppointmentId) {
       id = nextAppointmentId
     }
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
@@ -33,22 +33,15 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
       }
     }
 
-    // if on outcome check your answers page and there is no nextAppointmentId, call next() 👇
-    if (!res?.locals?.flags?.enableCombinedCYAPage && isOutcomeCYAPage && !nextAppointmentId) {
+    const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+    if (isOutcomeCYAPage && !nextAppointmentId) {
       return next()
     }
-
-    if (res?.locals?.flags?.enableCombinedCYAPage) {
-      const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
-      if (isOutcomeCYAPage && !nextAppointmentId) {
-        return next()
-      }
-      // if on arrange another appointment page and nextAppointmentId and linkedContactId exist, redirect to outcome check your answers page 👇
-      if (linkedContactId && nextAppointmentId && url.includes('/arrange-another-appointment')) {
-        const nextAppointmentOutcome = res.locals.appointmentOutcome
-        setDataValue(data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
-        return res.redirect(`/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`)
-      }
+    // if on arrange another appointment page and nextAppointmentId and linkedContactId exist, redirect to outcome check your answers page 👇
+    if (linkedContactId && nextAppointmentId && url.includes('/arrange-another-appointment')) {
+      const nextAppointmentOutcome = res.locals.appointmentOutcome
+      setDataValue(data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
+      return res.redirect(`/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`)
     }
 
     if (rescheduleAppointment?.contactId) {

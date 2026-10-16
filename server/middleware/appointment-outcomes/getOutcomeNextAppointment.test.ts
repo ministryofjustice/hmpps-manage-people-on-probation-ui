@@ -56,11 +56,8 @@ const buildRequest = ({ id = null }: { id?: string | null } = {}): httpMocks.Moc
   return httpMocks.createRequest(req)
 }
 
-const buildResponse = ({ enableCombinedCYAPage = true } = {}): AppResponse => {
+const buildResponse = (): AppResponse => {
   const locals = {
-    flags: {
-      enableCombinedCYAPage,
-    },
     appointmentTypes,
     appointmentOutcome: { crn },
     nextAppointment: {
@@ -95,13 +92,6 @@ describe('middleware/appointment-outcomes/getOutcomeNextAppointment', () => {
       label: 'Planned office visit (NS) on Saturday 1 August 2026 at 11am to 11:30am',
       smsOptIn: 'YES',
     })
-    expect(nextSpy).toHaveBeenCalledTimes(1)
-  })
-  it('should set the next appointment to null if enableCombinedCYAPage is false', () => {
-    const req = buildRequest()
-    const res = buildResponse({ enableCombinedCYAPage: false })
-    getOutcomeNextAppointment(req, res, nextSpy)
-    expect(res.locals.appointmentOutcome.nextAppointment).toBeUndefined()
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

@@ -18,7 +18,7 @@ export const cloneAppointmentAndRedirect = (
     deleteOutcomeVars(crn)(req, res)
     if (req.url.includes('/outcome/next-appointment')) {
       setDataValue(data, ['temp', crn, 'linkedContactId'], contactId)
-      if (['KEEP_TYPE', 'CHANGE_TYPE'].includes(apptType) && uuid && res?.locals?.flags?.enableCombinedCYAPage) {
+      if (['KEEP_TYPE', 'CHANGE_TYPE'].includes(apptType) && uuid) {
         setDataValue(data, ['temp', crn, 'nextAppointmentId'], uuid)
       }
     }

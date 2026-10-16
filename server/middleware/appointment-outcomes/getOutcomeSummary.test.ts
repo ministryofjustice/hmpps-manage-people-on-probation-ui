@@ -117,16 +117,13 @@ const buildResponse = ({
   nextAppointment = null as any,
   outcome = {},
   notes = 'Some notes',
-  enableCombinedCYAPage = true,
 }: {
   appointment?: Activity
   nextAppointment?: Activity
   outcome?: Partial<AppointmentSessionOutcome>
   notes?: string
-  enableCombinedCYAPage?: boolean
 } = {}): AppResponse => {
   const locals = {
-    flags: { enableCombinedCYAPage },
     appointmentOutcome: mockAppointmentOutcome({ outcome, notes, appointment }),
     nextAppointment: {
       appointment: nextAppointment,
@@ -168,28 +165,6 @@ describe('middleware/appointment-outcomes/getOutcomeSummary', () => {
       notes: 'Some notes',
       sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
       documents: null,
-    }
-    expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
-  })
-
-  it('should create the correct summary with next appointment when enableCombinedCYAPage is false', () => {
-    const outcome: AppointmentSessionOutcome = {
-      outcomeType: 'ATTENDED_FAILED_TO_COMPLY',
-      outcomeCode: 'AFTC',
-      attendedFailedToComply: 'NO_FURTHER_ACTION',
-      enforcementActionCode: ['NFA'],
-    }
-    const res = buildResponse({ outcome, enableCombinedCYAPage: false, nextAppointment: mockAppointment() })
-    getOutcomeSummary(req, res, nextSpy)
-    const expectedSummary: OutcomeSummary = {
-      appointmentDetails: expectedAppointmentDetails,
-      outcome: 'Attended - failed to comply',
-      enforcementAction: 'No further action',
-      enforcementActionChangeLink: '/base/outcome/url/attended-failed-to-comply',
-      notes: 'Some notes',
-      sensitivity: mockAppointmentOutcome().appointmentSession.sensitivity,
-      documents: null,
-      nextAppointment: 'Planned office visit (NS) on Friday 15 May 2026 at 12pm to 1:30pm',
     }
     expect(res.locals.appointmentOutcome.summary).toStrictEqual(expectedSummary)
   })

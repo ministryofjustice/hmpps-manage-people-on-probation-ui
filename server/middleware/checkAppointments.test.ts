@@ -22,24 +22,8 @@ const res = mockAppResponse({
   user: {
     username,
   },
-  flags: {
-    enableCombinedCYAPage: true,
-  },
   case: { name: { forename: 'Test', surname: 'User' } },
 })
-// const res = {
-//   locals: {
-//     user: {
-//       username,
-//     },
-//     flags: {
-//       enableCombinedCYAPage: true,
-//     },
-//     case: { name: { forename: 'Test', surname: 'User' } },
-//   },
-//   render: jest.fn().mockReturnThis(),
-//   redirect: jest.fn().mockReturnThis(),
-// } as unknown as AppResponse
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
@@ -199,9 +183,6 @@ describe('past appointments feature flag is disabled', () => {
     locals: {
       user: {
         username,
-      },
-      flags: {
-        enableCombinedCYAPage: true,
       },
       case: { name: { forename: 'Test', surname: 'User' } },
     },

@@ -78,11 +78,7 @@ const buildRequest = ({
 
 const buildResponse = (locals: Record<string, any>) => mockAppResponse(locals)
 
-const res = buildResponse({
-  flags: {
-    enableCombinedCYAPage: true,
-  },
-})
+const res = buildResponse({})
 
 describe('middleware/findUncompleted', () => {
   beforeEach(() => {

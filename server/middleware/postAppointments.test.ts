@@ -315,7 +315,6 @@ const buildResponse = ({
     user: mockUser,
     flags: {
       enableSmsReminders: true,
-      enableCombinedCYAPage: true,
       ...flags,
     },
     ...locals,
@@ -353,7 +352,7 @@ describe('/middleware/postAppointments', () => {
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
       expect(response).toEqual(mockAppointmentsPostResponse)
     })
-    it('should use nextAppointmentId from session if enableCombinedCYAPage flag is true and on outcome cya page', async () => {
+    it('should use nextAppointmentId from session if on outcome cya page', async () => {
       const nextAppointmentId = '1234'
       const appointment: AppointmentSession = {
         ...mockAppointment,

@@ -90,9 +90,8 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
 
   const apptTypes: AppointmentSessionSelection[] = ['KEEP_TYPE', 'CHANGE_TYPE']
   it.each(apptTypes)(
-    'should set the nextAppointmentId in temp if apptType is %s and enableCombinedCYAPage is true and url includes /outcome/next-appointment',
+    'should set the nextAppointmentId in temp if apptType is %s and url includes /outcome/next-appointment',
     a => {
-      res.locals.flags = { enableCombinedCYAPage: true }
       req.url = '/outcome/next-appointment'
       cloneAppointmentAndRedirect(mockAppt, a)(req, res)
       expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['temp', crn, 'nextAppointmentId'], uuid)

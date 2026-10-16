@@ -1,6 +1,6 @@
 {% set changePath = appointmentOutcome.baseOutcomeUrl %}
 {% set showAction = true %}
-{% set buttonText = 'Confirm appointment outcome and arrange appointment' if nextAppointment and nextAppointmentId and flags.enableCombinedCYAPage else ('Confirm this appointment' if flags.enableCombinedCYAPage else 'Confirm appointment outcome') %}
+{% set buttonText = 'Confirm appointment outcome and arrange appointment' if nextAppointment and nextAppointmentId else 'Confirm this appointment' %}
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',
@@ -90,20 +90,7 @@
                         }
                     ]
                 } if showAction
-            } if appointmentOutcome.nextAppointment and flags.enableCombinedCYAPage,
-             {
-                key: { text: "Next appointment"},
-                value: { text: appointmentOutcome.summary.nextAppointment },
-                actions: {
-                    items: [
-                        {
-                            href: changePath + "/next-appointment?change=" + url,
-                            text: "Change",
-                            visuallyHiddenText: "next appointment"
-                        }
-                    ]
-                } if showAction
-            } if appointmentOutcome.summary.nextAppointment and not flags.enableCombinedCYAPage
+            } if appointmentOutcome.nextAppointment
 ] }) }}
     <div class="govuk-button-group">
         {{ govukButton({
