@@ -474,14 +474,14 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (res.locals.flags.enableCombinedCYAPage) {
         const linkedContactId = getDataValue<string>(req.session.data, ['temp', crn, 'linkedContactId']) || null
         if (change && !linkedContactId) {
-          return res.redirect(change)
+          return res.redirect(safeRedirect(change, `/case/${crn}/arrange-appointment/${id}/check-your-answers`))
         }
         const path = linkedContactId
           ? `/case/${crn}/appointments/appointment/${linkedContactId}/outcome/check-your-answers`
           : `/case/${crn}/arrange-appointment/${id}/check-your-answers`
         return res.redirect(path)
       }
-      return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
+      return res.redirect(safeRedirect(change, `/case/${crn}/arrange-appointment/${id}/check-your-answers`))
     }
   },
   getTextMessageConfirmation: _hmppsAuthClient => {
