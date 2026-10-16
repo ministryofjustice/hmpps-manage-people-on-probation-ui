@@ -2,7 +2,7 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { AppointmentSession, RescheduleAppointmentResponse, AppointmentsPostResponse } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { getDataValue, setDataValue } from '../utils'
+import { getDataValue, setDataValue, safeRedirect } from '../utils'
 import { findUncompleted } from './findUncompleted'
 import { postAppointments } from './postAppointments'
 import { postRescheduleAppointments } from './postRescheduleAppointments'
@@ -29,7 +29,7 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
     if (!isOutcomeCYAPage) {
       const uncompleted = findUncompleted({ forceValidation: true })(req, res)
       if (uncompleted?.includes('?change')) {
-        return res.redirect(uncompleted)
+        return res.redirect(safeRedirect(uncompleted, `/case/${crn}/arrange-appointment/${id}/check-your-answers`))
       }
     }
 

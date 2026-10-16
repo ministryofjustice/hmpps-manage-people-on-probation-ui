@@ -1080,6 +1080,34 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/1234/outcome/check-your-answers`)
     })
   })
+  describe('postAddNote', () => {
+    const cyaUrl = `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
+    beforeEach(() => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+    })
+    it('should redirect to a local change url', async () => {
+      const mockReq = createMockRequest({ query: { change } })
+      await controllers.arrangeAppointments.postAddNote(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(change)
+    })
+    it('should not redirect to an external change url when the combined CYA page is enabled', async () => {
+      const mockReq = createMockRequest({ query: { change: 'https://evil.example' } })
+      await controllers.arrangeAppointments.postAddNote(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(cyaUrl)
+    })
+    it('should not redirect to an external change url when the combined CYA page is disabled', async () => {
+      const mockReq = createMockRequest({ query: { change: '//evil.example' } })
+      const mockRes = createMockResponse({ flags: { enableCombinedCYAPage: false } })
+      await controllers.arrangeAppointments.postAddNote(hmppsAuthClient)(mockReq, mockRes)
+      expect(mockRes.redirect).toHaveBeenCalledWith(cyaUrl)
+    })
+    it('should redirect to the check your answers page if no change url', async () => {
+      const mockReq = createMockRequest()
+      await controllers.arrangeAppointments.postAddNote(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(cyaUrl)
+    })
+  })
   describe('postCheckYourAnswers', () => {
     it('should redirect to the confirmation page if all data provided', async () => {
       const appointmentSession: AppointmentSession = {

@@ -6,7 +6,7 @@ import { DateTime } from 'luxon'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
-import { checkRecentlyViewedAccess } from '../utils'
+import { checkRecentlyViewedAccess, safeRedirect } from '../utils'
 import { Controller } from '../@types'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
@@ -210,7 +210,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
 
       query.set('outcomeFilter', outcomesFilter)
 
-      return res.redirect(`${path}?${query.toString()}`)
+      return res.redirect(safeRedirect(`${path}?${query.toString()}`, '/caseload/appointments'))
     }
   },
   getTeams: hmppsAuthClient => {

@@ -6,7 +6,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
 import { isSuccessfulUpload } from './appointments'
 import { outcomeRedirectMap, type OutcomeRedirectMap } from '../properties/appointment-outcomes/outcome-redirect-map'
-import { getDataValue, setDataValue } from '../utils'
+import { getDataValue, setDataValue, safeRedirect } from '../utils'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 import { addReplaceBackParameter } from '../utils/addReplaceBackParameter'
 
@@ -134,7 +134,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       if (!put) {
         redirect = addReplaceBackParameter(redirect, backParam)
       }
-      return res.redirect(redirect)
+      return res.redirect(safeRedirect(redirect, `${baseOutcomeUrl}/next-appointment`))
     }
   },
   getCheckYourAnswers: _hmppsAuthClient => {

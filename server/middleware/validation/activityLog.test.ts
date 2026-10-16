@@ -17,6 +17,7 @@ const req = httpMocks.createRequest({
 
 const reqCompact = httpMocks.createRequest({
   method: 'POST',
+  path: `/case/${crn}/activity-log`,
   params: {
     crn,
   },
@@ -36,6 +37,7 @@ const reqCompact = httpMocks.createRequest({
 
 const reqNoView = httpMocks.createRequest({
   method: 'POST',
+  path: `/case/${crn}/activity-log`,
   params: {
     crn,
   },
@@ -88,11 +90,11 @@ describe('/controllers/activityLogController', () => {
     })
     it('POST with compact view with no date should clear session and create new error - continues to redirect', async () => {
       validation.activityLog(reqCompact, res)
-      expect(res.redirect).toHaveBeenCalledWith('?error=true&view=compact')
+      expect(res.redirect).toHaveBeenCalledWith(`/case/${crn}/activity-log?error=true&view=compact`)
     })
     it('POST with no view with no date should clear session and create new error - continues to redirect', async () => {
       validation.activityLog(reqNoView, res)
-      expect(res.redirect).toHaveBeenCalledWith('?error=true')
+      expect(res.redirect).toHaveBeenCalledWith(`/case/${crn}/activity-log?error=true`)
     })
     it('POST with no view with valid dates should clear session and create no errors - continues to next', async () => {
       let next = false
