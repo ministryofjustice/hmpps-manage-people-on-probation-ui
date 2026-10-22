@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import config from '../config'
-import DeliusClient, { AppointmentSummary, Homepage } from '../data/deliusClient'
+import DeliusClient, { Homepage } from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { EnforcementContact, EnforcementContactsResponse } from '../data/model/schedule'
