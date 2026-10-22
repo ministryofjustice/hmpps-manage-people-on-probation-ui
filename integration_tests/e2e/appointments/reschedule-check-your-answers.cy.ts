@@ -141,7 +141,7 @@ describe('Change appointment details and reschedule', () => {
         completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
         const outcomePage = new OutcomePage()
-        outcomePage.checkOnPage()
+        outcomePage.checkPageTitle('empty')
       })
     })
     it('should redirect to the correct enforcement page when change link is clicked', () => {
@@ -158,7 +158,7 @@ describe('Change appointment details and reschedule', () => {
         completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__actions').find('a').click()
         const attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-        attendedFailedToComplyPage.checkOnPage()
+        attendedFailedToComplyPage.checkPageTitle('failure to comply')
         cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
       })
     })

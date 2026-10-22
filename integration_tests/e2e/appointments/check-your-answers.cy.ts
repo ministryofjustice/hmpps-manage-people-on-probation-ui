@@ -168,7 +168,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should submit the appointment and redirect to the confirmation page', () => {
         const appointmentConfirmationPage = new AppointmentConfirmationPage()
-        appointmentConfirmationPage.checkOnPage()
+        appointmentConfirmationPage.checkPageTitle('Appointment arranged')
       })
     })
     describe('Duplicate appointment', () => {

@@ -214,7 +214,7 @@ describe('Arrange another appointment', () => {
         checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         const appointmentConfirmationPage = new AppointmentConfirmationPage()
-        appointmentConfirmationPage.checkOnPage()
+        appointmentConfirmationPage.checkPageTitle('Appointment arranged')
       })
     })
   })
