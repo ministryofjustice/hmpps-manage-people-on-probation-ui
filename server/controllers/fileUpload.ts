@@ -2,9 +2,7 @@ import { Controller, FileUploadResponse } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = ['postUploadFile', 'postDeleteFile'] as const
-
-const fileUploadController: Controller<typeof routes, any> = {
+const fileUploadController: Controller<readonly ['postUploadFile', 'postDeleteFile'], any> = {
   postUploadFile: hmppsAuthClient => {
     return async function postUploadFile(req, res) {
       const sleep = (ms: number) => {

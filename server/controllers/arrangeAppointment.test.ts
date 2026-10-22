@@ -21,7 +21,6 @@ import { AppResponse } from '../models/Locals'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
-import { getUserOptions } from '../middleware/getUserOptions'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
@@ -91,7 +90,6 @@ const mockedCheckAnswers = checkAnswers as jest.MockedFunction<typeof checkAnswe
 const mockGetOfficeLocationsByTeamAndProvider = getOfficeLocationsByTeamAndProvider as jest.MockedFunction<
   typeof getOfficeLocationsByTeamAndProvider
 >
-const mockedGetUserOptions = getUserOptions as jest.MockedFunction<typeof getUserOptions>
 const mockedFindUncompleted = findUncompleted as jest.MockedFunction<typeof findUncompleted>
 const mockedAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 

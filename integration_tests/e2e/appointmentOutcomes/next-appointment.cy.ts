@@ -21,7 +21,6 @@ import CheckYourAnswersOutcomePage from '../../pages/appointmentOutcomes/check-y
 const crn = 'X000001'
 let manageAppointmentPage: ManageAppointmentPage
 let rescheduleCheckYourAnswerPage: RescheduleCheckYourAnswerPage
-let addNotePage: AddNotePage
 let nextAppointmentPage: NextAppointmentPage
 let checkYourAnswersPage: AppointmentCheckYourAnswersPage
 let checkYourAnswersOutcomePage: CheckYourAnswersOutcomePage
@@ -33,7 +32,8 @@ const loadNextAppointmentPage = (): void => {
   manageAppointmentPage.getTaskLink(1).click()
   completeOutcome()
   getUuid(3).then(uuid => {
-    addNotePage = new AddNotePage()
+    const addNotePage = new AddNotePage()
+    addNotePage.checkOnPage()
     completeAddNotePage({ crnOverride: crn, idOverride: uuid })
   })
 }
@@ -55,7 +55,8 @@ const completeRescheduleJourney = () => {
   })
   completeOutcome()
   getUuid(3).then(uuid => {
-    addNotePage = new AddNotePage()
+    const addNotePage = new AddNotePage()
+    addNotePage.checkOnPage()
     completeAddNotePage({ crnOverride: crn, idOverride: uuid })
   })
 }

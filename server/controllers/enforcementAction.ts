@@ -5,7 +5,6 @@ import { addParameters } from '@ministryofjustice/probation-search-frontend/util
 import MasApiClient from '../data/masApiClient'
 import { Controller } from '../@types'
 
-const routes = ['getAllEnforcementContacts'] as const
 const colNames = ['surname', 'details', 'outcome', 'action']
 
 const directions = {
@@ -19,7 +18,7 @@ type SortDir = 'asc' | 'desc'
 const isValidColName = (value: string): value is ColName => colNames.includes(value as any)
 const isValidDir = (value: string): value is SortDir => value === 'asc' || value === 'desc'
 
-const enforcementContactsController: Controller<typeof routes, void> = {
+const enforcementContactsController: Controller<readonly ['getAllEnforcementContacts'], void> = {
   getAllEnforcementContacts: hmppsAuthClient => {
     return async function getAllEnforcementContacts(req, res) {
       const { user } = res.locals

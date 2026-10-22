@@ -77,7 +77,6 @@ const loadPage = ({
 }
 
 describe('Check your answers then confirm the appointment', () => {
-  let confirmPage: AppointmentConfirmationPage
   beforeEach(() => {
     cy.task('resetMocks')
   })
@@ -168,7 +167,8 @@ describe('Check your answers then confirm the appointment', () => {
         cyaPage.getSubmitBtn().click()
       })
       it('should submit the appointment and redirect to the confirmation page', () => {
-        confirmPage = new AppointmentConfirmationPage()
+        const appointmentConfirmationPage = new AppointmentConfirmationPage()
+        appointmentConfirmationPage.checkOnPage()
       })
     })
     describe('Duplicate appointment', () => {
@@ -230,8 +230,6 @@ describe('Check your answers then confirm the appointment', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
     let supportingInfoPage: AppointmentNotePage
     let textMessageConfirmPage: TextMessageConfirmationPage
-
-    const recordOutcome = `appointments-${crn}-${uuid}-outcomeRecorded`
 
     const changeDate = ({ dateInPast = false } = {}) => {
       loadPage({ dateInPast })

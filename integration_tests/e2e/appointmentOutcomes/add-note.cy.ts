@@ -116,8 +116,7 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   if (journey === 'MANAGE') {
     it('switch to criss headers format when option selected', () => {
       loadPage({ journey })
-      getUuid(3).then(uuid => {
-        const id = journey === 'MANAGE' ? appointmentId : uuid
+      getUuid(3).then(_ => {
         addNotePage.getCrissRadio().eq(1).check()
         cy.get(`[id="freeform-container"]`).should('have.class', 'govuk-!-display-none')
         cy.get(`[id="structured-container"]`).should('not.have.class', 'govuk-!-display-none')

@@ -576,7 +576,7 @@ describe('caseloadController', () => {
         url: '/caseload/appointments/no-outcome',
       })
 
-      await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
+      await controllers.caseload.postOutcomesAppointmentsFilter()(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith('/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS')
     })
@@ -589,7 +589,7 @@ describe('caseloadController', () => {
         url: '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc',
       })
 
-      await controllers.caseload.postOutcomesAppointmentsFilter(hmppsAuthClient)(req, res)
+      await controllers.caseload.postOutcomesAppointmentsFilter()(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(
         '/caseload/appointments/no-outcome?page=2&sortBy=sentence.desc&outcomeFilter=OLDER_THAN_THREE_MONTHS',
@@ -633,7 +633,7 @@ describe('caseloadController', () => {
         })
         describe('If user has one team', () => {
           it('should set req.session.mas.team to the team code then redirect to /team/case', async () => {
-            const [_, mockUserTeams] = setMockTeamResponse(1)
+            const [, mockUserTeams] = setMockTeamResponse(1)
             await controllers.caseload.getTeams(hmppsAuthClient)(req, res)
             expect(req.session.mas.team).toEqual(mockUserTeams.teams[0].code)
             expect(redirectSpy).toHaveBeenCalledWith('/team/case')
@@ -649,9 +649,8 @@ describe('caseloadController', () => {
         })
         describe('If user has two teams', () => {
           let userTeams: UserTeam
-          let spy: jest.SpyInstance
           beforeEach(async () => {
-            ;[spy, userTeams] = setMockTeamResponse(2)
+            ;[, userTeams] = setMockTeamResponse(2)
             await controllers.caseload.getTeams(hmppsAuthClient)(req, res)
           })
           checkAuditMessage(res, 'VIEW_MAS_TEAMS', uuidv4())

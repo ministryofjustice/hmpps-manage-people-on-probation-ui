@@ -94,7 +94,7 @@ describe('contactDisplayNames', () => {
       ],
     } as unknown as EnforcementContactsResponse
 
-    const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
+    mapEnforcementContactsWithApprovedContactDisplayNames(response)
     // TODO: Add assertion
   })
 

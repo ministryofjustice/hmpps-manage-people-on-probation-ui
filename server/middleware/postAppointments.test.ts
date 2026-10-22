@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import * as Sentry from '@sentry/node'
-import { postAppointments, buildCaseLink } from './postAppointments'
+import { postAppointments } from './postAppointments'
 import { dateTime, isoFromDateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'

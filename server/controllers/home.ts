@@ -7,9 +7,7 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { EnforcementContact, EnforcementContactsResponse } from '../data/model/schedule'
 import { UserAppontment } from '../data/model/caseload'
 
-const routes = ['getHome', 'getHomeOld'] as const
-
-const homeController: Controller<typeof routes, void> = {
+const homeController: Controller<readonly ['getHome', 'getHomeOld'], void> = {
   getHome: hmppsAuthClient => {
     return async function getHome(req, res) {
       if (!res.locals.flags?.enableDeliusClient) return homeController.getHomeOld(hmppsAuthClient)(req, res)

@@ -539,7 +539,8 @@ context('Risk', () => {
     cy.visit('/case/X000002/risk', {
       failOnStatusCode: false,
     })
-    const page = new RiskDetailPage()
+    const riskDetailPage = new RiskDetailPage()
+    riskDetailPage.checkOnPage()
 
     cy.get(`[data-qa=errors]`).should(
       'contain.text',

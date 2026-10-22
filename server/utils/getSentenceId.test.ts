@@ -1,4 +1,3 @@
-import { mock } from 'node:test'
 import { Sentences } from '../data/model/sentenceDetails'
 import { getSentenceId } from './getSentenceId'
 

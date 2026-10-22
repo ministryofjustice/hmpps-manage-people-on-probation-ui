@@ -19,7 +19,6 @@ const loadPage = ({
   sentenceType = 'COMMUNITY',
   acceptableAbsence = false,
   enforcementAction = 'FIRST_WARNING_LETTER_SENT',
-  hasComplied = false,
 }: {
   sentenceType?: SentenceType
   acceptableAbsence?: boolean

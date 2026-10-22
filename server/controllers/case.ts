@@ -14,9 +14,7 @@ import logger from '../../logger'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { eligibilityCheckDisabled, fullName, resolveCheckinEligibility } from '../utils'
 
-const routes = ['getCase'] as const
-
-const caseController: Controller<typeof routes, void> = {
+const caseController: Controller<readonly ['getCase'], void> = {
   getCase: hmppsAuthClient => {
     return async function getCase(req, res) {
       const { crn } = req.params as Record<string, string>

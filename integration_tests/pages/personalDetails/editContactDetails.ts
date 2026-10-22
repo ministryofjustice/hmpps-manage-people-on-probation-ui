@@ -5,7 +5,7 @@ export default class EditContactDetails extends Page {
     super('Edit contact details')
   }
 
-  getNoFixedAddress = (addressId: string, rowName: string, type: string): PageElement => {
+  getNoFixedAddress = (): PageElement => {
     return cy.get(`#noFixedAddress`)
   }
 

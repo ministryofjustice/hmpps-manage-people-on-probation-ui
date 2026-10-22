@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'

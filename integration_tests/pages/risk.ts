@@ -9,5 +9,5 @@ export default class RiskPage extends Page {
 
   getInsetText = (): PageElement => cy.get(`.govuk-inset-text`)
 
-  getRSR = (name: string): PageElement => cy.get(`[data-qa=rsr]`)
+  getRSR = (): PageElement => cy.get(`[data-qa=rsr]`)
 }

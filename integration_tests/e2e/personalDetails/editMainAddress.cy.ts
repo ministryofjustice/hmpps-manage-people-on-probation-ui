@@ -30,7 +30,7 @@ context('Edit main address', () => {
       .getElementData('noFixedAddressGroup')
       .find('.govuk-label--s')
       .should('contain.text', 'Select if they have no fixed main address')
-    page.getCheckboxField('noFixedAddress').should('be.checked')
+    page.getCheckboxField().should('be.checked')
     page
       .getElementData('noFixedAddressGroup')
       .find('.govuk-checkboxes__label')
@@ -186,7 +186,7 @@ context('Edit main address', () => {
   it('Unchecking no fixed address should display the address fields', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
-    page.getCheckboxField('noFixedAddress').click()
+    page.getCheckboxField().click()
 
     for (const field of optionalFields) {
       page.getElementData(field[0]).should('be.visible').find('label').should('contain.text', `${field[1]} (optional)`)
@@ -199,10 +199,10 @@ context('Edit main address', () => {
   it('Checking no fixed address, removing start address and submitting should persist the checkbox selection and not show address fields', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
-    page.getCheckboxField('noFixedAddress').click()
+    page.getCheckboxField().click()
     page.getElementInput('startDate').clear()
     page.getElementData('submitBtn').click()
-    page.getCheckboxField('noFixedAddress').should('not.be.checked')
+    page.getCheckboxField().should('not.be.checked')
     page.getElementInput('buildingName').should('be.visible')
   })
   it('Unchecking no fixed address and removing start address should persist the checkbox selection and show address fields', () => {
@@ -210,13 +210,13 @@ context('Edit main address', () => {
     const page = Page.verifyOnPage(EditMainAddress)
     page.getElementInput('startDate').clear()
     page.getElementData('submitBtn').click()
-    page.getCheckboxField('noFixedAddress').should('be.checked')
+    page.getCheckboxField().should('be.checked')
     page.getElementInput('buildingName').should('not.contain.text')
   })
   it('Submitting with no fixed address unchecked and no address details filled, should redirect to Personal details screen and update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
-    page.getCheckboxField('noFixedAddress').click()
+    page.getCheckboxField().click()
     for (const field of optionalFields) {
       page.getElementData(field[0]).find('input').clear()
     }
@@ -226,7 +226,7 @@ context('Edit main address', () => {
   it('Submitting with no fixed address unchecked and address details filled, should redirect to Personal details screen and update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
-    page.getCheckboxField('noFixedAddress').click()
+    page.getCheckboxField().click()
     page.getElementData('submitBtn').click()
     page.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })

@@ -3,9 +3,7 @@ import TechnicalUpdatesService from '../services/technicalUpdatesService'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = ['getWhatsNew'] as const
-
-const whatsNewController: Controller<typeof routes, void> = {
+const whatsNewController: Controller<readonly ['getWhatsNew'], void> = {
   getWhatsNew: () => {
     const technicalUpdatesService = new TechnicalUpdatesService()
     return async function getWhatsNew(req, res) {

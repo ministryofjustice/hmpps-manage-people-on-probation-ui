@@ -1,9 +1,7 @@
 import { Controller } from '../@types'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = ['getPrivacyPolicy', 'getCookiePolicy'] as const
-
-const footerController: Controller<typeof routes, void> = {
+const footerController: Controller<readonly ['getPrivacyPolicy', 'getCookiePolicy'], void> = {
   getPrivacyPolicy: () => {
     return async function getPrivacyPolicy(req, res) {
       await sendAuditMessage(res, 'VIEW_MAS_PRIVACY_POLICY', res.locals.user.username, SubjectType.USER)

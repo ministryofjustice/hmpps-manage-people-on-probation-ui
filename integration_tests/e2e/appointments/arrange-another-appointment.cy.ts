@@ -204,7 +204,6 @@ describe('Arrange another appointment', () => {
   })
 
   describe('Practitioner submits the appointment', () => {
-    let confirmPage: AppointmentConfirmationPage
     beforeEach(() => {
       cy.task('stubNextAppointment')
       loadPage()
@@ -214,7 +213,8 @@ describe('Arrange another appointment', () => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
         checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
-        confirmPage = new AppointmentConfirmationPage()
+        const appointmentConfirmationPage = new AppointmentConfirmationPage()
+        appointmentConfirmationPage.checkOnPage()
       })
     })
   })

@@ -5,7 +5,6 @@ import { SentenceType } from '../../data/model/sentenceDetails'
 import { AppointmentEnforcementAction, AppointmentSessionOutcome } from '../../models/Appointments'
 import { ContactOutcome, ContactEnforcementAction } from '../../data/model/schedule'
 import { letterSentByOptions, letterTypeOptions } from '../../properties/appointment-outcomes'
-import { validEnforcementActionOptions } from '../../utils'
 
 interface Props {
   sentenceType?: SentenceType
@@ -55,10 +54,6 @@ const buildResponse = ({
 jest.mock('../../utils', () => ({
   validEnforcementActionOptions: jest.fn(() => letterTypeOptions),
 }))
-
-const validEnforcementActionOptionsSpy = validEnforcementActionOptions as jest.MockedFunction<
-  typeof validEnforcementActionOptions
->
 
 const nextSpy = jest.fn()
 const req = httpMocks.createRequest()

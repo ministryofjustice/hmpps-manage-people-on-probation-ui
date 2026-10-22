@@ -28,7 +28,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopCo
     '/case/:crn/appointments',
     getPersonRiskFlags(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    getSupervisionPackage(hmppsAuthClient, mpopComponents, { includeAppointmentsFlag: true }),
+    getSupervisionPackage(hmppsAuthClient, mpopComponents),
     controllers.appointments.getAppointments(hmppsAuthClient),
   )
 

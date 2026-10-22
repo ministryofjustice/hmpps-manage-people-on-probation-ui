@@ -10,8 +10,6 @@ import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
 describe('Change appointment details and reschedule', () => {
   let checkYourAnswerPage: AppointmentCheckYourAnswersPage
   let dateTimePage: AppointmentLocationDateTimePage
-  let outcomePage: OutcomePage
-  let attendedFailedToComplyPage: AttendedFailedToComplyPage
   const crn = 'X000001'
   const future = DateTime.now().plus({ days: 2 })
   const startTime = '09:10'
@@ -142,14 +140,16 @@ describe('Change appointment details and reschedule', () => {
       getUuid().then(uuid => {
         completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
-        outcomePage = new OutcomePage()
+        const outcomePage = new OutcomePage()
+        outcomePage.checkOnPage()
       })
     })
     it('should redirect to the correct enforcement page when change link is clicked', () => {
       getUuid().then(uuid => {
         completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
-        attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+        const attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+        attendedFailedToComplyPage.checkOnPage()
         cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
       })
     })
@@ -157,7 +157,8 @@ describe('Change appointment details and reschedule', () => {
       getUuid().then(uuid => {
         completeRescheduling({ id: uuid, inPast: true })
         checkYourAnswerPage.getSummaryListRow(8).find('.govuk-summary-list__actions').find('a').click()
-        attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+        const attendedFailedToComplyPage = new AttendedFailedToComplyPage()
+        attendedFailedToComplyPage.checkOnPage()
         cy.get(`.govuk-radios__input[value=NO_FURTHER_ACTION]`).should('be.checked')
       })
     })

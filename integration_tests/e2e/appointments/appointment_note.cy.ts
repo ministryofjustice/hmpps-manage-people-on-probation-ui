@@ -1,8 +1,6 @@
 import ActivityLogPage from '../../pages/activityLog'
 import AppointmentPage from '../../pages/appointment'
 
-const loadPage = () => {}
-
 describe('View appointment note page', () => {
   it('Appointment note page is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/11/manage/note/1')

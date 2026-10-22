@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import Page from '../page'
 
 export default class ManageAppointmentPage extends Page {

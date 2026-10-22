@@ -1,30 +1,14 @@
-import AppointmentsPage from '../../pages/appointments'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
-import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import { checkPopHeader } from './imports'
-import {
-  completeSentencePage,
-  completeTypePage,
-  completeLocationDateTimePage,
-  completeSupportingInformationPage,
-  completeCYAPage,
-} from './utils'
 
 const crn = 'X000001'
 const appointmentId = '2'
 
 const loadPage = () => {
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/next-appointment`)
-}
-const completeAppointment = () => {
-  completeSentencePage()
-  completeTypePage()
-  completeLocationDateTimePage()
-  completeSupportingInformationPage()
-  completeCYAPage()
 }
 
 describe('Create next appointment', () => {
@@ -252,8 +236,6 @@ describe('Create next appointment', () => {
   })
   describe('Another appointment type', () => {
     let sentencePage: AppointmentSentencePage
-    let confirmPage: AppointmentConfirmationPage
-    let appointmentsPage: AppointmentsPage
     beforeEach(() => {
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()

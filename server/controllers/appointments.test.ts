@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment, eligibilityCheckDisabled } from '../utils'
+import { isValidCrn, isNumericString, canRescheduleAppointment, eligibilityCheckDisabled } from '../utils'
 import { mockAppResponse, mockPersonSchedule, mockPersonAppointment, mockTierCalculation } from './mocks'
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
 import { cloneAppointmentAndRedirect, renderError, overrideDeliusManagedFlag } from '../middleware'
@@ -65,6 +65,7 @@ jest.mock('../utils', () => {
     isMatchingAddress: jest.fn(() => true),
     setDataValue: jest.fn(),
     canRescheduleAppointment: jest.fn(),
+    eligibilityCheckDisabled: jest.fn(),
   }
 })
 
@@ -102,7 +103,6 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
-const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
 
 const reqObject = {
@@ -208,10 +208,6 @@ const nextApptResponse = (appointment = {} as Activity | null): NextAppointmentR
 const getNextAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getNextAppointment')
   .mockImplementation(() => Promise.resolve(nextApptResponse()))
-
-const patchAppointmentSpy = jest
-  .spyOn(MasApiClient.prototype, 'patchAppointment')
-  .mockImplementation(() => Promise.resolve(mockPersonAppointment))
 
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')

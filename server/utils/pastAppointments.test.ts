@@ -1,4 +1,3 @@
-import { Activity } from '../data/model/schedule'
 import { appointments } from './mocks'
 import { pastAppointments } from './pastAppointments'
 

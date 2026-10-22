@@ -7,9 +7,7 @@ import PersonRecordApiClient from '../data/personRecordApiClient'
 import { mapResults } from '../utils/mapResults'
 import ESupervisionClient from '../data/eSupervisionClient'
 
-const routes = ['getSearch', 'getPhoto'] as const
-
-const searchController: Controller<typeof routes, void> = {
+const searchController: Controller<readonly ['getSearch', 'getPhoto'], void> = {
   getSearch: (hmppsAuthClient: HmppsAuthClient) => {
     return async function getSearch(req, res) {
       req.session.backLink = '/search'

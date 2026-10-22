@@ -2,7 +2,6 @@ import CaseSearchService from '@ministryofjustice/probation-search-frontend/serv
 import { getPdu, getManagedBy, services } from './index'
 import config from '../config'
 import { dataAccess } from '../data'
-import auth from '../authentication/auth'
 
 jest.mock('../config', () => ({
   env: 'test-env',

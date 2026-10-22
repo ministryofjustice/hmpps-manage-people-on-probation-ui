@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { AppointmentSession } from '../models/Appointments'
 import { mockAppResponse } from './mocks'
 import { isValidCrn, isValidUUID } from '../utils'
-import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import rescheduleAppointmentController from './rescheduleAppointments'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { checkSendAuditMessage } from './testutils'
@@ -33,7 +33,6 @@ const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
-const mockedAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
 const crn = 'X000001'
 const contactId = '12345'

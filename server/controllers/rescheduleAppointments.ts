@@ -6,9 +6,10 @@ import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = ['redirectToRescheduleAppointment', 'getRescheduleAppointment', 'postRescheduleAppointment'] as const
-
-const rescheduleAppointmentController: Controller<typeof routes, void> = {
+const rescheduleAppointmentController: Controller<
+  readonly ['redirectToRescheduleAppointment', 'getRescheduleAppointment', 'postRescheduleAppointment'],
+  void
+> = {
   redirectToRescheduleAppointment: () => {
     return async function redirectToRescheduleAppointment(req, res) {
       const { crn, contactId } = req.params as Record<string, string>

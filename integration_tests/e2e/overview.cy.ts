@@ -32,22 +32,6 @@ context('Overview', () => {
     page.getRowData('personalDetails', 'contactNumber', 'Value').should('contain.text', '07989654824')
   }
 
-  const verifyAppointments = (page: OverviewPage) => {
-    page.getCardHeader('schedule').should('contain.text', 'Appointments')
-    page
-      .getAppointmentsLink('X000001')
-      .should('exist')
-      .invoke('text')
-      .then(text => {
-        const normalized = text.replace(/\s+/g, ' ').trim()
-        expect(normalized).to.include('You need to record an outcome for 2 appointments')
-      })
-
-    page
-      .getRowData('schedule', 'nextAppointment', 'Value')
-      .should('contain.text', 'Saturday 9 March at 2:59pm (Initial appointment - in office (NS))')
-  }
-
   const verifySentences = (page: OverviewPage) => {
     page.getCardHeader('sentence2').should('contain.text', 'ORA Community Order')
     page
