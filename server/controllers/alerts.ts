@@ -18,8 +18,6 @@ import logger from '../../logger'
 import { apiErrors } from '../properties'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = ['getAlerts', 'getAlertNote', 'clearSelectedAlerts'] as const
-
 interface RestClientError {
   status: number
   errors: ErrorSummaryItem[]
@@ -121,7 +119,7 @@ const getCrnRiskMap = async (alertsData: UserAlertsContent[], arnsClient: ArnsAp
   return { crnToRiskWidgetMap, risksErrors }
 }
 
-const alertsController: Controller<typeof routes, void> = {
+const alertsController: Controller<readonly ['getAlerts', 'getAlertNote', 'clearSelectedAlerts'], void> = {
   getAlerts: hmppsAuthClient => {
     return async function getAlerts(req, res) {
       const { user } = res.locals
