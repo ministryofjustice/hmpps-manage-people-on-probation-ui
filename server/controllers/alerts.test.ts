@@ -171,18 +171,6 @@ const mockRisksData = {
   assessedOn: '2025-11-19',
 } as any
 
-const mockErrorSummary = {
-  errors: [
-    {
-      text: apiErrors.risks,
-    },
-    { text: 'A different unique error' },
-    {
-      text: 'Risk information from the Assess and plan service is currently unavailable.',
-    },
-  ],
-} as any
-
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue('token-alerts')
@@ -190,7 +178,7 @@ tokenStore.getToken.mockResolvedValue('token-alerts')
 const getUserAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserAlerts')
   .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn))
-const getUserAlertNoteSpy = jest
+jest
   .spyOn(MasApiClient.prototype, 'getUserAlertNote')
   .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn.content[0]))
 const clearAlertsSpy = jest
