@@ -16,6 +16,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { setDataValue } from '../utils'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 const crn = 'X000001'
 const id = '1234'
@@ -76,7 +77,7 @@ const mockRes = ({
   flags = {},
 }: {
   appointmentOutcome?: Partial<AppointmentOutcomeProps<Activity>>
-  appointmentCase?: Record<string, any>
+  appointmentCase?: Record<string, PersonalDetails>
   appointmentSession?: Partial<AppointmentSession>
   flags?: Record<string, boolean>
 } = {}) => {
@@ -109,7 +110,7 @@ const mockReq = ({
   responseContactId = null,
   nextAppointmentId = null,
 }: {
-  request?: Record<string, any>
+  request?: httpMocks.RequestOptions
   type?: AppointmentOutcomeType
   enforcementAction?: { [K in keyof AppointmentSessionOutcome]: AppointmentEnforcementAction }
   linkedContactId?: string

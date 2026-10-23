@@ -12,11 +12,11 @@ export interface WiremockMapping {
   response: {
     status: number
     headers: Record<string, string>
-    jsonBody?: any
+    jsonBody?: unknown
   }
 }
 
-export interface Wiremock {
+export type Wiremock = {
   mappings: WiremockMapping[]
 }
 
@@ -24,7 +24,7 @@ export const getWiremockData = <TType>(mock: Wiremock, endpoint: string, prop: s
   const mapping: WiremockMapping = mock.mappings.find(
     m => m.request.urlPattern === endpoint || m.request.urlPathPattern === endpoint,
   )
-  return mapping.response.jsonBody[prop]
+  return mapping.response.jsonBody[prop as keyof typeof mapping.response.jsonBody]
 }
 
 export const getErrorMessage = (spec: ValidationSpec, name: string, validator: string): string => {

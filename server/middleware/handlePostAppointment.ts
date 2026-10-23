@@ -11,7 +11,7 @@ export const handlePostAppointment = (hmppsAuthClient: HmppsAuthClient): Route<P
   return async function handlePostAppointmentInner(req, res, next) {
     const { data } = req.session
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
-    const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId'])
+    const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) as string
     let id = uuid || contactId
     if (nextAppointmentId) {
       id = nextAppointmentId

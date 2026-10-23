@@ -10,7 +10,7 @@ export function urlToRenderPath(req: Request, res: Response): string {
         .split('?')[0]
         .split('/')
         .filter(Boolean)
-        .filter((_segment: any, index: number) => ![0, 1, 3].includes(index))
+        .filter((_segment: unknown, index: number) => ![0, 1, 3].includes(index))
         .join('/'),
     ]}`
   )

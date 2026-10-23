@@ -70,7 +70,7 @@ const riskBadgeData: RiskBadgeData = {
   remainingCount: 0,
 }
 
-const riskData = (assessments = {} as any): RiskData => ({
+const riskData = (assessments = {} as object): RiskData => ({
   assessments: [
     {
       outputVersion: '2',

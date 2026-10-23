@@ -21,7 +21,9 @@ describe('utils/parseQuestionTemplate', () => {
         'Are you currently in a relationship with someone?',
       ],
     },
-  ]
+  ] as unknown as Partial<
+    { template: string; responseSpec: { placeholders: string[] }; questionExamples: string[]; id: string }[]
+  >
 
   it('splits the template question into a prefix and suffix, and adds correct spacing ', () => {
     const result = parseQuestionTemplate(mockQuestions, 1)

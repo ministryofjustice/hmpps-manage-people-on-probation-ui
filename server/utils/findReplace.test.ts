@@ -45,7 +45,7 @@ const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue
 
 describe('utils/findReplace', () => {
   it('should not replace if term is not found', () => {
-    const value = findReplace<any, any>({
+    const value = findReplace<unknown, Record<string, unknown>>({
       data: mockData,
       path: ['doesntExist'],
       key: 'description',
@@ -64,7 +64,7 @@ describe('utils/findReplace', () => {
       ],
     }
     expect(
-      findReplace<any, any>({
+      findReplace<unknown, Record<string, unknown>>({
         data: mockData,
         path: ['riskFlags'],
         key: 'description',
@@ -86,7 +86,7 @@ describe('utils/findReplace', () => {
       },
     }
     expect(
-      findReplace<any, any>({
+      findReplace<unknown, Record<string, unknown>>({
         data: mockData,
         path: ['personSummary', 'name', 'forename'],
         find: 'Caroline',

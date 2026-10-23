@@ -12,6 +12,7 @@ import { getMockedTime } from '../../routes/testRoutes'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
+import { Data } from '../../models/Data'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
@@ -31,7 +32,7 @@ const appointments: Route<void> = (req, res, next) => {
 
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked'])
+  const sensitivityLocked = getDataValue(data, ['appointments', crn, id, 'sensitivityLocked']) as boolean
   const isSensitive = sensitivityLocked ?? res.locals.personAppointment?.appointment?.isSensitive
 
   let localParams: LocalParams = {
@@ -163,7 +164,7 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           contactId,
           page: 'supporting-information',
-          notes: unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? '',
+          notes: (unflattenBracketKeys(req.body || {}) as Data)?.appointments?.[crn]?.[id]?.notes ?? '',
           maxCharCount: maxCharCount as number,
           isSensitive,
         }),

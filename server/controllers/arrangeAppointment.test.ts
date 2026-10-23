@@ -15,12 +15,13 @@ import {
   findUncompleted,
   appointmentDateIsInPast,
 } from '../middleware'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, MasUserDetails } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { AppResponse } from '../models/Locals'
+import { AppResponse, Locals } from '../models/Locals'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
@@ -161,7 +162,7 @@ const createMockRequest = ({
   },
 })
 
-const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =>
+const createMockResponse = (localsResponse?: Partial<Locals>): AppResponse =>
   mockAppResponse({
     filters: {
       dateFrom: '',
@@ -200,8 +201,8 @@ describe('controllers/arrangeAppointment', () => {
     MockedMasApiClient.prototype.getProbationPractitioner.mockResolvedValue({
       name: { forename: 'first', surname: 'last' },
       unallocated: false,
-    } as any)
-    MockedMasApiClient.prototype.getUserDetails.mockResolvedValue({ firstName: 'first' } as any)
+    } as ProbationPractitioner)
+    MockedMasApiClient.prototype.getUserDetails.mockResolvedValue({ firstName: 'first' } as MasUserDetails)
   })
   describe('redirectToSentence', () => {
     mockedUuidv4.mockReturnValueOnce(uuid)
@@ -244,7 +245,10 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
   describe('getSentence', () => {
-    const sentence: Partial<Sentence> = { id: 1, order: { description: 'Mock sentence', startDate: '', endDate: '' } }
+    const sentence: Sentence = {
+      id: 1,
+      order: { description: 'Mock sentence', startDate: '', endDate: '' },
+    } as unknown as Sentence
     const mockReq = createMockRequest({
       dataSession: {
         errors: {
@@ -517,7 +521,7 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should render the location date and time page', async () => {
       const mockReq = createMockRequest({ query: {} })
-      const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
+      const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } } as Partial<Locals>)
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
       checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
@@ -537,7 +541,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ query: {} })
       const mockRes = createMockResponse({
         appointment: { type: { isLocationRequired: false } },
-      })
+      } as Partial<Locals>)
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
@@ -572,7 +576,7 @@ describe('controllers/arrangeAppointment', () => {
           },
         },
         userLocations: [],
-      })
+      } as Partial<Locals>)
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
@@ -589,7 +593,7 @@ describe('controllers/arrangeAppointment', () => {
           },
         },
         userLocations: [],
-      })
+      } as Partial<Locals>)
       const spy = jest.spyOn(mockRes, 'redirect')
       await controllers.arrangeAppointments.getLocationDateTime()(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list?noLocations=true`)
@@ -637,7 +641,7 @@ describe('controllers/arrangeAppointment', () => {
             },
           },
         ],
-      })
+      } as Partial<Locals>)
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
@@ -666,7 +670,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       const mockRes = createMockResponse({
         appointment: { ...appointmentSession, type: { isLocationRequired: false } },
-      })
+      } as Partial<Locals>)
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
 
       expect(mockedSetDataValue).toHaveBeenCalledWith(
@@ -707,7 +711,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       const mockRes = createMockResponse({
         appointment: { ...appointmentSession, type: { isLocationRequired: false } },
-      })
+      } as unknown as Partial<Locals>)
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       expect(mockReq.session.data.appointments[crn][uuid].temp.changeSmsConsentLinkClicked).toBeUndefined()
       expect(mockedSetDataValue).not.toHaveBeenCalled()
@@ -724,7 +728,7 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should render the date/time page', async () => {
       const mockReq = createMockRequest({ query: {} })
-      const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
+      const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } } as Partial<Locals>)
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
@@ -1116,7 +1120,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse({
         appointment: { ...appointmentSession, isReschedule: false },
         userLocations: [{ description: 'LOC1', code: 'LOC1' }],
-      })
+      } as unknown as Partial<Locals>)
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getCheckYourAnswers()(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(
@@ -1151,7 +1155,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse({
         appointment: { ...appointmentSession, isReschedule: false },
         userLocations: [{ description: 'LOC1', code: 'LOC1' }],
-      })
+      } as unknown as Partial<Locals>)
       await controllers.arrangeAppointments.getCheckYourAnswers()(mockReq, mockRes)
 
       expect(mockedSetDataValue).toHaveBeenCalledWith(

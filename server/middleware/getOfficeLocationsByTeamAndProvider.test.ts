@@ -61,10 +61,10 @@ const res = {
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
 mockGetDataValue.mockImplementation((_data, path) => {
-  if (path.join('.') === `appointments.${crn}.${id}.user.providerCode`) {
+  if ((path as string[]).join('.') === `appointments.${crn}.${id}.user.providerCode`) {
     return providerCode
   }
-  if (path.join('.') === `appointments.${crn}.${id}.user.teamCode`) {
+  if ((path as string[]).join('.') === `appointments.${crn}.${id}.user.teamCode`) {
     return teamCode
   }
   return undefined

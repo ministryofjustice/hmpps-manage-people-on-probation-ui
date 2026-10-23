@@ -73,7 +73,7 @@ const getRiskRoshScoreMap = async (
         {},
       )
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     const error = err as Error
     logger.error(error.message)
     masUnavailableError = apiErrors.personRiskFlags
@@ -102,8 +102,8 @@ const getCrnRiskMap = async (alertsData: UserAlertsContent[], arnsClient: ArnsAp
     // promise.all will complete and resolve even if response of any request is a 500 error, so check for error
     const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
     if (responseErrorIndex >= 0) arnsUnavailableError = allRiskResponses[responseErrorIndex].errors[0].text
-  } catch (err: any) {
-    logger.error(err.message)
+  } catch (err: unknown) {
+    if (err instanceof Error) logger.error(err.message)
     arnsUnavailableError = apiErrors.risks
   }
   if (allRiskResponses.length) {

@@ -12,7 +12,7 @@ jest.mock('./getRisksToThemselves', () => {
 
 describe('utils/getCurrentRisksToThemselves', () => {
   let spy: jest.SpyInstance
-  let result: any
+  let result: string[]
   beforeEach(() => {
     spy = jest.spyOn(getRisksToThemselves, 'getRisksToThemselves')
     result = getCurrentRisksToThemselves(riskToSelf)

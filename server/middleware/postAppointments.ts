@@ -36,7 +36,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const { data } = req.session
     let id = uuid
     if (req.url.includes('/outcome/check-your-answers')) {
-      const nextAppointmentId = getDataValue(data, ['temp', crn, 'nextAppointmentId']) || null
+      const nextAppointmentId = (getDataValue(data, ['temp', crn, 'nextAppointmentId']) as string) || null
       id = nextAppointmentId || id
     }
     const appointmentSession = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
