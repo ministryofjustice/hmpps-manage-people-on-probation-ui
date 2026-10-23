@@ -6,7 +6,7 @@ export interface Errors {
 }
 
 export interface ErrorCheck {
-  validator: (...args: any[]) => boolean
+  validator: (...args: unknown[]) => boolean
   msg: string
   length?: number
   crossField?: string

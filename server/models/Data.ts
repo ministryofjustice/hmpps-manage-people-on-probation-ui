@@ -34,7 +34,7 @@ export interface PersonalDetailsSession {
 
 export type Data = {
   isOutlookEventPending?: boolean
-  isOutLookEventFailed?: any
+  isOutLookEventFailed?: boolean
   isEnglishNotificationFailed?: boolean
   isWelshNotificationFailed?: boolean
   temp?: {

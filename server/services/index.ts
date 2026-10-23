@@ -1,4 +1,5 @@
 import CaseSearchService from '@ministryofjustice/probation-search-frontend/service/caseSearchService'
+import { ProbationSearchResult } from '@ministryofjustice/probation-search-frontend/data/probationSearchClient'
 import { dataAccess } from '../data'
 import UserService from './userService'
 import FlagService from './flagService'
@@ -8,8 +9,8 @@ import ProbationComponentsApiService from './ProbationComponentsService'
 import { convertToTitleCase } from '../utils'
 
 const UNALLOCATED: string = 'Unallocated'
-export const getPdu = (result: any): string => {
-  const activeManager = result?.offenderManagers?.find((item: any) => item?.active)
+export const getPdu = (result: ProbationSearchResult): string => {
+  const activeManager = result?.offenderManagers?.find((item: { active: boolean }) => item?.active)
   if (!activeManager) {
     return UNALLOCATED
   }
@@ -17,8 +18,8 @@ export const getPdu = (result: any): string => {
   return pdu?.includes(UNALLOCATED) ? UNALLOCATED : convertToTitleCase(pdu) || UNALLOCATED
 }
 
-export const getManagedBy = (result: any): string => {
-  const activeManager = result?.offenderManagers?.find((item: any) => item?.active)
+export const getManagedBy = (result: ProbationSearchResult): string => {
+  const activeManager = result?.offenderManagers?.find((item: { active: boolean }) => item?.active)
   if (activeManager?.staff?.unallocated || !activeManager) {
     return UNALLOCATED
   }
