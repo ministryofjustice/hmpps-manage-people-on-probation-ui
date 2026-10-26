@@ -11,7 +11,7 @@
 {% endif %}
 {% set hasRosh = overallRiskLevel and (flags.enableNDeliusRoshOverviewPage or assessedOn) %}
 
-{% set risk %}
+
     {% set riskToThemselves %}
         {% set currentRisksToThemselves = getCurrentRisksToThemselves(risks.riskToSelf) %}
         {% set previousRisksToThemselves = getPreviousRisksToThemselves(risks.riskToSelf) %}
@@ -133,20 +133,3 @@
             }
         ]
     }) }}
-{% endset %}
-
-{{ appSummaryCard({
-    titleText: 'Risk',
-    headingLevel: 3,
-    attributes: {'data-qa': 'riskCard'},
-    classes: cardClasses | default('govuk-!-margin-bottom-6 app-summary-card--large-title'),
-    html: risk,
-    actions: {
-        items: [
-            {
-                text: 'View all risk details',
-                href: crn + '/risk'
-            }
-        ]
-    }
-}) }}

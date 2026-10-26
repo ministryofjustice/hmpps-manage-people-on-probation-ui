@@ -52,8 +52,13 @@ context('Overview', () => {
 
   const verifyPersonalCircumstances = (page: OverviewPage) => {
     page
-      .getCardHeader('personalCircumstances')
+      .getAccordionHeader('personalCircumstances')
       .should('contain.text', 'Addresses, disabilities and personal circumstances')
+    page
+      .getAccordionHeader('personalCircumstances')
+      .find('a')
+      .should('contain.text', 'View all personal details')
+      .should('have.attr', 'href', '/case/X000001/personal-details')
     page
       .getRowData('personalCircumstances', 'currentCircumstances', 'Value')
       .should('contain.text', 'Committed/ Transferred to Crown: Life imprisonment (Adult)')
@@ -62,12 +67,12 @@ context('Overview', () => {
   }
 
   const verifyRisks = (page: OverviewPage) => {
-    page.getCardHeader('risk').should('contain.text', 'Risk')
+    page.getAccordionHeader('risk').should('contain.text', 'Risk')
     page
-      .getCardHeader('risk')
+      .getAccordionHeader('risk')
       .find('a')
-      .should('contain.text', 'View all risk details')
-      .should('have.attr', 'href', 'X000001/risk')
+      .should('contain.text', 'View all risk information')
+      .should('have.attr', 'href', '/case/X000001/risk')
     page
       .getRowData('risk', 'rosh', 'Label')
       .should('contain.text', 'Risk of serious harm (ROSH) in the community')
@@ -135,7 +140,12 @@ context('Overview', () => {
   }
 
   const verifyActivityAndCompliance = (page: OverviewPage) => {
-    page.getCardHeader('activityAndCompliance').should('contain.text', 'Activity and compliance')
+    page.getAccordionHeader('activityAndCompliance').should('contain.text', 'Activity and compliance')
+    page
+      .getAccordionHeader('activityAndCompliance')
+      .find('a')
+      .should('contain.text', 'View all compliance information')
+      .should('have.attr', 'href', '/case/X000001/compliance')
     page
       .getRowData('activityAndCompliance', 'previousOrders', 'Value')
       .should('contain.text', '1 previous orders (No breaches on previous orders)')

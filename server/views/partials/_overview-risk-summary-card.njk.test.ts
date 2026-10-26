@@ -55,19 +55,16 @@ describe('partials/_overview-risk-summary-card.njk', () => {
     })
     const $ = cheerio.load(html)
     expect(
-      $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
+      $('.govuk-summary-list .govuk-summary-list__row')
         .eq(0)
         .find('.govuk-summary-list__key')
         .find('span')
         .eq(1)
         .text(),
     ).toContain('Last updated 9 June 2026')
-    expect(
-      $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
-        .eq(0)
-        .find('[data-qa="roshValue"]')
-        .text(),
-    ).toContain('Risk of serious harm HIGH')
+    expect($('.govuk-summary-list .govuk-summary-list__row').eq(0).find('[data-qa="roshValue"]').text()).toContain(
+      'Risk of serious harm HIGH',
+    )
   })
 
   it('renders the summary card when no rosh score exists', () => {
@@ -79,23 +76,17 @@ describe('partials/_overview-risk-summary-card.njk', () => {
     })
     const $ = cheerio.load(html)
     expect(
-      $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
-        .eq(0)
-        .find('.govuk-summary-list__key')
-        .text(),
+      $('.govuk-summary-list .govuk-summary-list__row').eq(0).find('.govuk-summary-list__key').text(),
     ).not.toContain('Last updated')
     expect(
-      $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
+      $('.govuk-summary-list .govuk-summary-list__row')
         .eq(0)
         .find('.govuk-summary-list__value')
         .find('[data-qa=overallRiskValue]'),
     ).toHaveLength(0)
-    expect(
-      $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
-        .eq(0)
-        .find('.govuk-summary-list__value')
-        .text(),
-    ).toContain('There is no ROSH summary.')
+    expect($('.govuk-summary-list .govuk-summary-list__row').eq(0).find('.govuk-summary-list__value').text()).toContain(
+      'There is no ROSH summary.',
+    )
   })
 
   it.each([
@@ -114,7 +105,7 @@ describe('partials/_overview-risk-summary-card.njk', () => {
       })
       const $ = cheerio.load(html)
       expect(
-        $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
+        $('.govuk-summary-list .govuk-summary-list__row')
           .eq(0)
           .find('.govuk-summary-list__key')
           .find('span')
@@ -122,14 +113,14 @@ describe('partials/_overview-risk-summary-card.njk', () => {
           .text(),
       ).toContain('Last updated 11 October 2026')
       expect(
-        $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
+        $('.govuk-summary-list .govuk-summary-list__row')
           .eq(0)
           .find('.govuk-summary-list__value')
           .find('[data-badge-base]')
           .hasClass(expectedClass),
       ).toBe(true)
       expect(
-        $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
+        $('.govuk-summary-list .govuk-summary-list__row')
           .eq(0)
           .find('.govuk-summary-list__value')
           .find('[data-qa=roshValue]')
@@ -156,7 +147,15 @@ describe('partials/_overview-risk-summary-card.njk', () => {
         const $ = cheerio.load(html)
 
         expect(
-          $('.app-summary-card__body .govuk-summary-list .govuk-summary-list__row')
+          $('.govuk-summary-list .govuk-summary-list__row')
+            .eq(0)
+            .find('.govuk-summary-list__value')
+            .find('table')
+            .find('[data-qa=overallRiskValue]')
+            .hasClass(expectedClass),
+        ).toBe(true)
+        expect(
+          $('.govuk-summary-list .govuk-summary-list__row')
             .eq(0)
             .find('.govuk-summary-list__value')
             .find('table')

@@ -4,6 +4,7 @@
 {% from "mpop/components/supervision-package/macro.njk" import supervisionPackage %}
 {% from "_components/online-checkins-card/macro.njk" import appOnlineCheckinsCard %}
 {% from "mpop/components/risk-flag-badge/macro.njk" import riskFlagBadge %}
+{% from "_components/govuk/accordion-mpop/macro.njk" import probationAccordion %}
 {% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
@@ -448,29 +449,28 @@
     }) }}
   {% endif %}
 
-  {% if flags.enableNewOverview %}
-    {#  Addresses, disabilities and personal circumstances card  #}
+  {#  Risk flags and criminogenic needs card  #}
+  {% set riskFlagsAndCriminogenicNeeds %}
+    {% include "../partials/_overview-risk-summary-card.njk" %}
+  {% endset %}
+
+  {% if not flags.enableNewOverview %}
     {{ appSummaryCard({
-      titleText: 'Addresses, disabilities and personal circumstances',
+      titleText: 'Risk',
       headingLevel: 3,
-      attributes: {'data-qa': 'personalCircumstancesCard'},
-      classes: cardClasses,
-      html: govukSummaryList({
-        rows: circumstancesRows
-      }),
+      attributes: {'data-qa': 'riskCard'},
+      classes: cardClasses | default('govuk-!-margin-bottom-6 app-summary-card--large-title'),
+      html: riskFlagsAndCriminogenicNeeds,
       actions: {
         items: [
           {
-            text: 'View all personal details',
-            href: crn + '/personal-details'
+            text: 'View all risk details',
+            href: crn + '/risk'
           }
         ]
       }
     }) }}
   {% endif %}
-
-  {#  Risk flags and criminogenic needs card  #}
-  {% include "../partials/_overview-risk-summary-card.njk" %}
 
   {% set numberOfSentences = overview.sentences.length %}
   {% if numberOfSentences > 0 %}
@@ -669,6 +669,52 @@
       ]
     }) }}
   {% endset %}
+
+  {% if flags.enableNewOverview %}
+    {#  Addresses, disabilities and personal circumstances accordion  #}
+    {{ probationAccordion({
+      id: "personalCircumstances",
+      attributes: { 'data-qa': 'personalCircumstancesCard' },
+      rememberExpanded: false,
+      items: [
+        {
+          heading: { text: 'Addresses, disabilities and personal circumstances' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Addresses, disabilities and personal circumstances</span><a href="/case/' + crn + '/personal-details" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all personal details</a>' },
+          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + govukSummaryList({
+          rows: circumstancesRows
+        }) + '</div>' }
+        }
+      ]
+    }) }}
+
+    {#  Risk flags and criminogenic needs accordion  #}
+    {{ probationAccordion({
+      id: "risk",
+      attributes: { 'data-qa': 'riskCard' },
+      rememberExpanded: false,
+      items: [
+        {
+          heading: { text: 'Risk flags and criminogenic needs' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Risk flags and criminogenic needs</span><a href="/case/' + crn + '/risk" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all risk information</a>' },
+          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + riskFlagsAndCriminogenicNeeds + '</div>' }
+        }
+      ]
+    }) }}
+
+    {#  Activity and compliance accordion  #}
+    {{ probationAccordion({
+      id: "activityAndCompliance",
+      attributes: { 'data-qa': 'activityAndComplianceCard' },
+      rememberExpanded: false,
+      items: [
+        {
+          heading: { text: 'Activity and compliance' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Activity and compliance</span><a href="/case/' + crn + '/compliance" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all compliance information</a>' },
+          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + activityAndCompliance + '</div>' }
+        }
+      ]
+    }) }}
+  {% else %}
   {{ appSummaryCard({
     titleText: 'Activity and compliance',
     headingLevel: 3,
@@ -676,6 +722,7 @@
     classes: cardClasses,
     html: activityAndCompliance
   }) }}
+  {% endif %}
 
   <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">
   <input type="hidden" id="name" name="name"

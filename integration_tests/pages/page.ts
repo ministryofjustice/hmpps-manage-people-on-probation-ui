@@ -49,6 +49,9 @@ export default abstract class Page {
   getCardHeader = (cardName: string): PageElement =>
     cy.get(`[class=app-summary-card__header]`).get(`[data-qa=${cardName}Card]`)
 
+  getAccordionHeader = (cardName: string): PageElement =>
+    cy.get(`[data-qa=${cardName}Card] .govuk-accordion__section-header`)
+
   getCardElement = (cardName: string, element: string, index: number): PageElement =>
     this.getCardHeader(cardName).within(() => cy.get(element).eq(index))
 
