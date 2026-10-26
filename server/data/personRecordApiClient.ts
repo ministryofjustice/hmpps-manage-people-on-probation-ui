@@ -1,15 +1,15 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import RestClient from './restClient'
 import config from '../config'
 
-export default class PrisonApiClient extends RestClient {
+export default class PersonRecordApiClient extends RestClient {
   constructor(token: string) {
-    super('PrisonApiClient', config.apis.prisonApi, token)
+    super('PersonRecordClient', config.apis.personRecordApi, token)
   }
 
   async getImageData(nomsNumber: string): Promise<Readable> {
     return this.get({
-      path: `/api/bookings/offenderNo/${encodeURIComponent(nomsNumber)}/image/data`,
+      path: `/person/prison/${encodeURIComponent(nomsNumber)}/image`,
       responseType: 'stream',
       handle404: true,
     })

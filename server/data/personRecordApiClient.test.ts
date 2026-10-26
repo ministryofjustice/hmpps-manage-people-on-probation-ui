@@ -2,7 +2,7 @@ import nock from 'nock'
 import { Readable } from 'stream'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
-import PrisonApiClient from './prisonApiClient'
+import PersonRecordApiClient from './personRecordApiClient'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -20,14 +20,14 @@ jest.mock('./tokenStore/redisTokenStore')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
-describe('prisonApiClient', () => {
+describe('personRecordClient', () => {
   let fakePrisonApiClient: nock.Scope
-  let prisonApiClient: PrisonApiClient
+  let personRecordClient: PersonRecordApiClient
 
   beforeEach(() => {
     jest.clearAllMocks()
-    fakePrisonApiClient = nock(config.apis.prisonApi.url)
-    prisonApiClient = new PrisonApiClient(token.access_token)
+    fakePrisonApiClient = nock(config.apis.personRecordApi.url)
+    personRecordClient = new PersonRecordApiClient(token.access_token)
   })
 
   afterEach(() => {
@@ -51,13 +51,13 @@ describe('prisonApiClient', () => {
       mockedIsValidHost.mockReturnValue(true)
       mockedIsValidPath.mockReturnValue(true)
       fakePrisonApiClient
-        .get(`/api/bookings/offenderNo/${nomsNumber}/image/data`)
+        .get(`/person/prison/${nomsNumber}/image`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, mockStream, {
           'Content-Type': 'application/octet-stream',
         })
 
-      const output = await prisonApiClient.getImageData(nomsNumber)
+      const output = await personRecordClient.getImageData(nomsNumber)
       let result = ''
       for await (const chunk of output) {
         if (typeof chunk === 'number') {

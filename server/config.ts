@@ -275,14 +275,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('EMDI_API_TIMEOUT_RESPONSE', 10000))),
     },
-    prisonApi: {
-      url: get('PRISON_API_URL', 'http://localhost:8100', requiredInProduction),
+    personRecordApi: {
+      url: get('PERSON_RECORD_API_URL', 'http://localhost:8100', requiredInProduction),
       healthPath: '/health/ping',
       timeout: {
-        response: Number(get('PRISON_API_TIMEOUT_RESPONSE', 5000)),
-        deadline: Number(get('PRISON_API_TIMEOUT_DEADLINE', 5000)),
+        response: Number(get('PERSON_RECORD_API_TIMEOUT_RESPONSE', 5000)),
+        deadline: Number(get('PERSON_RECORD_API_TIMEOUT_DEADLINE', 5000)),
       },
-      agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_RESPONSE', 5000))),
+      agent: new AgentConfig(Number(get('PERSON_RECORD_API_TIMEOUT_RESPONSE', 5000))),
     },
     prisonerSearchApi: {
       url: get('PRISONER_SEARCH_API_URL', 'http://localhost:8100', requiredInProduction),

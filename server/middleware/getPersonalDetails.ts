@@ -3,7 +3,7 @@ import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import PrisonApiClient from '../data/prisonApiClient'
+import PersonRecordApiClient from '../data/personRecordApiClient'
 import { Route } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
@@ -159,7 +159,7 @@ export const getPersonalDetails = (
     const cachedDetails = req.session?.data?.personalDetails?.[crn]
     if (photoEnabled && overview?.noms && cachedDetails?.personPhotoSrc === undefined) {
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const photoData = await new PrisonApiClient(token).getImageData(overview.noms).catch((): null => {
+      const photoData = await new PersonRecordApiClient(token).getImageData(overview.noms).catch((): null => {
         prisonsUnavailable = true
         return null
       })
