@@ -72,7 +72,10 @@ context('Overview', () => {
       .getRowData('risk', 'rosh', 'Label')
       .should('contain.text', 'Risk of serious harm (ROSH) in the community')
       .should('contain.text', 'Last updated 24 January 2024')
-    page.getRowData('risk', 'rosh', 'Value').find('.govuk-tag--red').should('contain.text', 'HIGH RISK OF SERIOUS HARM')
+    page
+      .getRowData('risk', 'rosh', 'Value')
+      .find('[data-qa="roshValue"]')
+      .should('contain.text', 'Risk of serious harm VERY HIGH')
     page
       .getRowData('risk', 'mappa', 'Label')
       .should('contain.text', 'MAPPA')
