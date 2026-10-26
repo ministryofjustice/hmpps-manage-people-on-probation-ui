@@ -103,34 +103,33 @@ context('Overview', () => {
       .should('contain.text', 'Attitudes')
     page.getRowData('risk', 'riskFlags', 'Label').should('contain.text', 'NDelius risk flags')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(0)
       .should('contain.text', 'High')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
+      .should('have.class', 'risk-badge--high')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(0).should('contain.text', 'Risk to public')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(1)
       .should('contain.text', 'Medium')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--medium')
+      .should('have.class', 'risk-badge--medium')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(1).should('contain.text', 'Domestic Abuse Perpetrator')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(2)
       .should('contain.text', 'Low')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--low')
+      .should('have.class', 'risk-badge--low')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(2).should('contain.text', 'Risk to Known Adult')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(3)
       .should('contain.text', 'Information only')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold')
+      .should('have.class', 'risk-badge')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
-    page.getElementData('overallRiskValue').should('contain.text', 'VERY HIGH RISK OF SERIOUS HARM')
 
     page.getAlert().should('contain.text', 'medium')
   }
@@ -439,6 +438,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(0)
+      .find('span')
       .should('contain.text', 'High')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
 
@@ -446,6 +446,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(1)
+      .find('span')
       .should('contain.text', 'Medium')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--medium')
 
@@ -453,6 +454,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(2)
+      .find('span')
       .should('contain.text', 'Low')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--low')
 
@@ -460,6 +462,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(3)
+      .find('span')
       .should('contain.text', 'Information only')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold')
 

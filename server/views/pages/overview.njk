@@ -3,6 +3,7 @@
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% from "mpop/components/supervision-package/macro.njk" import supervisionPackage %}
 {% from "_components/online-checkins-card/macro.njk" import appOnlineCheckinsCard %}
+{% from "mpop/components/risk-flag-badge/macro.njk" import riskFlagBadge %}
 {% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
@@ -183,7 +184,13 @@
         </dd>
       {% endif %}
       {% if veryHighRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--very-high">Very High</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Very high', badgeClass: 'risk-badge--very-high' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--very-high">Very High</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in veryHighRiskLevel %}
@@ -193,7 +200,13 @@
         </dd>
       {% endif %}
       {% if highRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--high">High</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'High', badgeClass: 'risk-badge--high' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--high">High</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in highRiskLevel %}
@@ -203,7 +216,13 @@
         </dd>
       {% endif %}
       {% if mediumRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--medium">Medium</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Medium', badgeClass: 'risk-badge--medium' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--medium">Medium</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in mediumRiskLevel %}
@@ -213,7 +232,13 @@
         </dd>
       {% endif %}
       {% if lowRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--low">Low</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Low', badgeClass: 'risk-badge--low' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--low">Low</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in lowRiskLevel %}
@@ -223,7 +248,13 @@
         </dd>
       {% endif %}
       {% if infoOnlyRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold">Information only</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Information only' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold">Information only</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list govuk-!-margin-bottom-0">
             {% for risk in infoOnlyRiskLevel %}
