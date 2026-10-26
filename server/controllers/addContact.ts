@@ -1,9 +1,7 @@
 import { Controller } from '../@types'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
-const routes = ['getAddContact'] as const
-
-const addContactController: Controller<typeof routes, void> = {
+const addContactController: Controller<readonly ['getAddContact'], void> = {
   getAddContact: () => {
     return async function getAddContact(req, res) {
       const { crn } = req.params as Record<string, string>

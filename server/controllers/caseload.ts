@@ -24,25 +24,27 @@ const directions = {
 type ColName = (typeof colNames)[number]
 type SortDir = 'asc' | 'desc'
 
-const routes = [
-  'showCaseload',
-  'postCase',
-  'getCase',
-  'userSchedule',
-  'getTeams',
-  'getChangeTeam',
-  'getTeamCase',
-  'postTeamCase',
-  'getRecentCases',
-  'checkAccess',
-  'postOutcomesAppointmentsFilter',
-] as const
-
 interface Args {
   filter: CaseSearchFilter
 }
 
-const caseloadController: Controller<typeof routes, void, Args> = {
+const caseloadController: Controller<
+  readonly [
+    'showCaseload',
+    'postCase',
+    'getCase',
+    'userSchedule',
+    'getTeams',
+    'getChangeTeam',
+    'getTeamCase',
+    'postTeamCase',
+    'getRecentCases',
+    'checkAccess',
+    'postOutcomesAppointmentsFilter',
+  ],
+  void,
+  Args
+> = {
   showCaseload: hmppsAuthClient => {
     return async function showCaseload(req, res, _next, args) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -207,7 +209,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       })
     }
   },
-  postOutcomesAppointmentsFilter: hmppsAuthClient => {
+  postOutcomesAppointmentsFilter: _ => {
     return async function postOutcomesAppointmentsFilter(req, res) {
       const { outcomesFilter } = req.body
       const [path, queryString = ''] = req.url.split('?')

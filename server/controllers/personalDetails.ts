@@ -3,7 +3,6 @@ import { v4 } from 'uuid'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
-import TierApiClient from '../data/tierApiClient'
 import RoleService from '../services/roleService'
 import { toIsoDateFromPicker, isValidCrn, setDataValue, getDataValue } from '../utils'
 import type { Controller } from '../@types'
@@ -14,26 +13,27 @@ import { findUncompleted, renderError } from '../middleware'
 import { type Needs } from '../data/model/risk'
 import { SmsOptInOptions } from '../data/model/OutlookEvent'
 
-const routes = [
-  'getPersonalDetails',
-  'postEditDetails',
-  'getStaffContacts',
-  'getPersonalContact',
-  'getPersonalContactNote',
-  'getMainAddressNote',
-  'getAddresses',
-  'getAddressesNote',
-  'getDocumentsDownload',
-  'getHandoff',
-  'getDisabilities',
-  'getDisabilitiesNote',
-  'getAdjustments',
-  'getAdjustmentsNote',
-  'getCircumstances',
-  'getCircumstancesNote',
-] as const
-
-const personalDetailsController: Controller<typeof routes, void> = {
+const personalDetailsController: Controller<
+  readonly [
+    'getPersonalDetails',
+    'postEditDetails',
+    'getStaffContacts',
+    'getPersonalContact',
+    'getPersonalContactNote',
+    'getMainAddressNote',
+    'getAddresses',
+    'getAddressesNote',
+    'getDocumentsDownload',
+    'getHandoff',
+    'getDisabilities',
+    'getDisabilitiesNote',
+    'getAdjustments',
+    'getAdjustmentsNote',
+    'getCircumstances',
+    'getCircumstancesNote',
+  ],
+  void
+> = {
   getPersonalDetails: hmppsAuthClient => {
     return async function getPersonalDetails(req, res) {
       const { crn, id } = req.params as Record<string, string>

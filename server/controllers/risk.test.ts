@@ -5,19 +5,9 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { checkAuditMessage } from './testutils'
-import { findReplace, toPredictors, toRoshWidget } from '../utils'
-import TierApiClient from '../data/tierApiClient'
+import { findReplace } from '../utils'
 import ArnsApiClient from '../data/arnsApiClient'
-import {
-  mockAppResponse,
-  mockTierCalculation,
-  mockRisks,
-  mockPersonRiskFlag,
-  mockPredictors,
-  mockNeeds,
-  mockSanIndicatorResponse,
-  mockUserCaseload,
-} from './mocks'
+import { mockAppResponse, mockPersonRiskFlag, mockNeeds, mockSanIndicatorResponse, mockUserCaseload } from './mocks'
 import config from '../config'
 import { UserCaseload } from '../data/model/caseload'
 
@@ -58,13 +48,6 @@ tokenStore.getToken.mockResolvedValue(token.access_token)
 const getPersonRiskFlagSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlag')
   .mockImplementation(() => Promise.resolve(mockPersonRiskFlag))
-const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 const sanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))

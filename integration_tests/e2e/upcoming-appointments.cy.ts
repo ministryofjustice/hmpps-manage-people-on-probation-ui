@@ -1,9 +1,6 @@
 import Page from '../pages/page'
 import UpcomingAppointmentsPage from '../pages/appointments'
 
-const url = (contactId: number, component = 'UpdateContact') =>
-  `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
-
 context('All Upcoming Appointment', () => {
   it('Appointments page with upcoming appointments is rendered', () => {
     cy.visit('/case/X000001/upcoming-appointments')

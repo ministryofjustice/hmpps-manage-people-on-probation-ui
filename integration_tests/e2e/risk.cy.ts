@@ -539,8 +539,6 @@ context('Risk', () => {
     cy.visit('/case/X000002/risk', {
       failOnStatusCode: false,
     })
-    const page = new RiskDetailPage()
-
     cy.get(`[data-qa=errors]`).should(
       'contain.text',
       'Risk information from the Assess and plan service is currently unavailable.',

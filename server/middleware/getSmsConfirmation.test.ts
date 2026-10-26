@@ -1,6 +1,5 @@
 import httpMocks from 'node-mocks-http'
 import { getSmsConfirmation } from './getSmsConfirmation'
-import { getSmsConfirmationOptions } from './getSmsConfirmationOptions'
 import { getSmsPreview } from './getSmsPreview'
 import { Option } from '../models/Option'
 import { AppResponse, SmsConfirmation } from '../models/Locals'

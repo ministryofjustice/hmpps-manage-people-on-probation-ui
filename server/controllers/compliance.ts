@@ -4,9 +4,7 @@ import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 
-const routes = ['getCompliance'] as const
-
-const complianceController: Controller<typeof routes, void> = {
+const complianceController: Controller<readonly ['getCompliance'], void> = {
   getCompliance: hmppsAuthClient => {
     return async function getCompliance(req, res) {
       const { crn } = req.params as Record<string, string>

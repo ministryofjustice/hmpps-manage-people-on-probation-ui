@@ -79,7 +79,7 @@ context('Alerts Dashboard', () => {
 
   it('Select all alerts button aria is set based on if all alerts are selected', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'false')
     cy.get('button[id="select-all-alerts"]').click()
     cy.get('button[id="select-all-alerts"]').invoke('attr', 'aria-pressed').should('equal', 'true')
@@ -93,7 +93,7 @@ context('Alerts Dashboard', () => {
 
   it('Person link should navigate to case overview', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-table__row').eq(1).find('[data-qa="alertPerson"]').find('a').click()
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -101,7 +101,7 @@ context('Alerts Dashboard', () => {
 
   it('Update link opens in NDelius', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-table__row')
       .eq(1)
       .find('[data-qa="alertActions"]')
@@ -117,12 +117,12 @@ context('Alerts Dashboard', () => {
 
   it('Note is not visible by default', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('[data-qa="moreInfo-1"]').find('[data-qa="alertNotes-1"]').should('not.contain.text')
   })
   it('Note becomes visible after clicking', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('[data-qa="moreInfo-1"]').click()
     cy.get('[data-qa="moreInfo-1"]')
       .find('[data-qa="alertNotes-1"]')
@@ -134,7 +134,7 @@ context('Alerts Dashboard', () => {
 
   it('View full note', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('[data-qa="moreInfo-8"]').click()
     cy.get('[data-qa="moreInfo-8"]')
       .find('[data-qa="alertNotes-8"]')
@@ -144,14 +144,14 @@ context('Alerts Dashboard', () => {
 
   it('Clear alerts fails if no alerts selected', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('[data-qa="clearSelectedAlerts"]').click()
     cy.get('[class="moj-alert__content"]').should('contain.text', 'Select an alert to clear it.')
   })
 
   it('Modal dialog required when clearing alerts', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('button[id="select-all-alerts"]').click()
     cy.get('[data-qa="clearSelectedAlerts"]').click()
     cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear all 10 alerts on this page.')
@@ -161,7 +161,7 @@ context('Alerts Dashboard', () => {
 
   it('Modal dialog text depends on alerts selected', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('[data-qa="alertCheckbox"]').first().find('input').click()
     cy.get('[data-qa="clearSelectedAlerts"]').click()
     cy.get('[id="modal-description"]').should('contain.text', 'You have selected to clear 1 alert.')
@@ -173,7 +173,7 @@ context('Alerts Dashboard', () => {
 
   it('Button text, when all check boxes are selected and deselected', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('button[id="select-all-alerts"]').click()
     cy.get('button[id="select-all-alerts"]').should('contain.text', 'Deselect all alerts on this page')
     cy.get('button[id="select-all-alerts"]').click()

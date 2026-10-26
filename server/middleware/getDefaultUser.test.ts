@@ -33,16 +33,12 @@ const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue
 const crn = 'X000001'
 const uuid = 'a4615940-2808-4ab5-a8e0-feddecb8ae1a'
 const username = 'user-1'
-const displayName = 'User'
 const name = { forename: 'Terry', surname: 'Jones' }
-const email = 'terry.jones@testemail.com'
 const providerCode = 'N50'
 const teamCode = 'N07IVH'
-const nameAndRole = 'Deborah Fern (PS - Other)'
 const defaultUserProviderCode = 'N54'
 const defaultUserTeamCode = 'N07CHT'
 const defaultUsername = 'peter-parker'
-const defaultUserNameAndRole = 'Peter Parker (PS - Other)'
 
 const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} } = {}): httpMocks.MockRequest<any> => {
   const request = {

@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentSession, AppointmentType } from '../models/Appointments'
-import { AppointmentLocals, AppResponse } from '../models/Locals'
+import { AppointmentType } from '../models/Appointments'
+import { AppResponse } from '../models/Locals'
 import { getDataValue } from '../utils'
 import { checkAnswers } from './checkAnswers'
 import { Location } from '../data/model/caseload'

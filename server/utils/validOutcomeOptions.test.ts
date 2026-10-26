@@ -1,9 +1,5 @@
 import { ContactOutcome } from '../data/model/schedule'
-import {
-  AcceptableAbsenceOutcomeType,
-  AppointmentEnforcementAction,
-  AppointmentOutcomeType,
-} from '../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
 import { Option } from '../models/Option'
 import { validOutcomeOptions, validEnforcementActionOptions } from './validOutcomeOptions'
 
@@ -126,7 +122,7 @@ describe('utils/validEnforcementActionOptions', () => {
     expect(validOptions).toStrictEqual(enforcementActionOptions)
   })
   it('should return only the valid enforcement action options', () => {
-    contactOutcomes = contactOutcomes.reduce((acc, outcome, i) => {
+    contactOutcomes = contactOutcomes.reduce((acc, outcome) => {
       return [
         ...acc,
         { ...outcome, enforcementActions: outcome.enforcementActions.filter(action => action.code !== 'LCL') },

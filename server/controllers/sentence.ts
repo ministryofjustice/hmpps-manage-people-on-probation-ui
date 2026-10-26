@@ -7,22 +7,23 @@ import { checkLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
 import { PersonExistsResponse } from '../data/emdiClient'
 
-const routes = [
-  'getSentence',
-  'getProbationHistory',
-  'getPreviousOrders',
-  'getPreviousOrderDetails',
-  'getOffenceDetails',
-  'getLicenceConditionNote',
-  'getRequirementNote',
-] as const
-
 interface QueryParams {
   activeSentence: string
   number?: string
 }
 
-const sentenceController: Controller<typeof routes, void> = {
+const sentenceController: Controller<
+  readonly [
+    'getSentence',
+    'getProbationHistory',
+    'getPreviousOrders',
+    'getPreviousOrderDetails',
+    'getOffenceDetails',
+    'getLicenceConditionNote',
+    'getRequirementNote',
+  ],
+  void
+> = {
   getSentence: hmppsAuthClient => {
     return async function getSentence(req, res) {
       const { crn } = req.params as Record<string, string>

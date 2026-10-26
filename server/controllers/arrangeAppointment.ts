@@ -20,7 +20,7 @@ import {
   appointmentDateIsInPast,
   isRescheduleAppointment,
 } from '../middleware'
-import { AllowSms, AppointmentSession } from '../models/Appointments'
+import { AppointmentSession } from '../models/Appointments'
 import { SmsOptInOptions } from '../data/model/OutlookEvent'
 import { AppResponse } from '../models/Locals'
 import config from '../config'
@@ -31,31 +31,6 @@ import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { User } from '../data/model/caseload'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import logger from '../../logger'
-
-const routes = [
-  'redirectToSentence',
-  'getSentence',
-  'postSentence',
-  'getTypeAttendance',
-  'postTypeAttendance',
-  'getWhoWillAttend',
-  'postWhoWillAttend',
-  'getLocationDateTime',
-  'postLocationDateTime',
-  'getLocationNotInList',
-  'getSupportingInformation',
-  'postSupportingInformation',
-  'getCheckYourAnswers',
-  'postCheckYourAnswers',
-  'getConfirmation',
-  'postConfirmation',
-  'getArrangeAnotherAppointment',
-  'postArrangeAnotherAppointment',
-  'getAddNote',
-  'postAddNote',
-  'getTextMessageConfirmation',
-  'postTextMessageConfirmation',
-] as const
 
 const resetSessionValues = (req: Request, res: Response) => {
   const { crn, id } = req.params as Record<string, string>
@@ -86,10 +61,33 @@ const resetSessionValues = (req: Request, res: Response) => {
   }
 }
 
-// eslint-disable-next-line no-useless-escape
-const regexIgnoreValuesInParentheses = /[\(\)]/
-
-const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
+const arrangeAppointmentController: Controller<
+  readonly [
+    'redirectToSentence',
+    'getSentence',
+    'postSentence',
+    'getTypeAttendance',
+    'postTypeAttendance',
+    'getWhoWillAttend',
+    'postWhoWillAttend',
+    'getLocationDateTime',
+    'postLocationDateTime',
+    'getLocationNotInList',
+    'getSupportingInformation',
+    'postSupportingInformation',
+    'getCheckYourAnswers',
+    'postCheckYourAnswers',
+    'getConfirmation',
+    'postConfirmation',
+    'getArrangeAnotherAppointment',
+    'postArrangeAnotherAppointment',
+    'getAddNote',
+    'postAddNote',
+    'getTextMessageConfirmation',
+    'postTextMessageConfirmation',
+  ],
+  void | AppResponse
+> = {
   redirectToSentence: () => {
     return async function redirectToSentence(req, res) {
       const uuid = uuidv4()

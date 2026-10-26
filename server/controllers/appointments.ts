@@ -28,18 +28,19 @@ import { filterContacts, filterContactsMonths } from '../middleware/filterContac
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 import ESupervisionClient from '../data/eSupervisionClient'
 
-const routes = [
-  'getAppointments',
-  'getAllUpcomingAppointments',
-  'postAppointments',
-  'getRecordAnOutcome',
-  'getManageAppointment',
-  'getNextAppointment',
-  'postNextAppointment',
-  'getAppointmentNote',
-] as const
-
-const appointmentsController: Controller<typeof routes, void> = {
+const appointmentsController: Controller<
+  readonly [
+    'getAppointments',
+    'getAllUpcomingAppointments',
+    'postAppointments',
+    'getRecordAnOutcome',
+    'getManageAppointment',
+    'getNextAppointment',
+    'postNextAppointment',
+    'getAppointmentNote',
+  ],
+  void
+> = {
   getAppointments: hmppsAuthClient => {
     return async function getAppointments(req, res) {
       const { crn } = req.params as Record<string, string>

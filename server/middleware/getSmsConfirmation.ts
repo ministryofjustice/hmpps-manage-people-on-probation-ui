@@ -45,7 +45,6 @@ export const getSmsConfirmation = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const supervisionAppointmentClient = new SupervisionAppointmentClient(token)
-      const { case: _case } = res.locals
       let errors: ErrorSummaryItem[] = null
 
       const inline = false

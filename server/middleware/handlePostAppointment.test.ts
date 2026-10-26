@@ -2,13 +2,12 @@ import httpMocks from 'node-mocks-http'
 import { handlePostAppointment } from './handlePostAppointment'
 import { mockAppResponse } from '../controllers/mocks'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
-import { renderError } from './renderError'
 import { HmppsAuthClient } from '../data'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { findUncompleted } from './findUncompleted'
 import { postAppointments } from './postAppointments'
 import { postRescheduleAppointments } from './postRescheduleAppointments'
-import { AppointmentOutcomeEnforcementAction, AppointmentOutcomeProps } from '../models/Locals'
+import { AppointmentOutcomeProps } from '../models/Locals'
 import { Activity } from '../data/model/schedule'
 
 const id = '304bddc2-cfa5-4a33-92e2-ee31fc93d627'
@@ -63,7 +62,6 @@ jest.mock('./postRescheduleAppointments', () => ({
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedIsNumericString = isNumericString as jest.MockedFunction<typeof isNumericString>
-const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const setDataValueSpy = setDataValue as jest.MockedFunction<typeof setDataValue>
 const findUncompletedSpy = findUncompleted as jest.MockedFunction<typeof findUncompleted>

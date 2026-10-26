@@ -4,7 +4,7 @@ import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { redirectToManageCheckInService } from '../middleware/redirectToManageCheckInService'
 
-export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
+export default function eSuperVisionCheckInsRoutes(router: Router, _: Services) {
   router.use(
     ['/case/:crn/appointments/check-in', '/case/:crn/appointments/:id/check-in'],
     (req, res: AppResponse, next) => {

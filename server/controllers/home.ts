@@ -1,15 +1,13 @@
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import config from '../config'
-import DeliusClient, { AppointmentSummary, Homepage } from '../data/deliusClient'
+import DeliusClient, { Homepage } from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { EnforcementContact, EnforcementContactsResponse } from '../data/model/schedule'
 import { UserAppontment } from '../data/model/caseload'
 
-const routes = ['getHome', 'getHomeOld'] as const
-
-const homeController: Controller<typeof routes, void> = {
+const homeController: Controller<readonly ['getHome', 'getHomeOld'], void> = {
   getHome: hmppsAuthClient => {
     return async function getHome(req, res) {
       if (!res.locals.flags?.enableDeliusClient) return homeController.getHomeOld(hmppsAuthClient)(req, res)

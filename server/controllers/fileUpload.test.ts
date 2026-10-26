@@ -5,7 +5,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
 import { FileUploadResponse } from '../@types'
 import MasApiClient from '../data/masApiClient'
-import { checkAuditMessage, checkSendAuditMessage } from './testutils'
+import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
 
 const token = { access_token: 'token-1', expires_in: 300 }

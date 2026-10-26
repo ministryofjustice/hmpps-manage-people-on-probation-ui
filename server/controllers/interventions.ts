@@ -4,9 +4,7 @@ import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import InterventionsApiClient from '../data/interventionsApiClient'
 
-const routes = ['getInterventions'] as const
-
-const interventionsController: Controller<typeof routes, void> = {
+const interventionsController: Controller<readonly ['getInterventions'], void> = {
   getInterventions: hmppsAuthClient => {
     return async function getInterventions(req, res) {
       const { crn } = req.params as Record<string, string>

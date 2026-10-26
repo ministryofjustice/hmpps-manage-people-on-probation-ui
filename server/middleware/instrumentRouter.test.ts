@@ -76,7 +76,7 @@ describe('instrumentRouter', () => {
   it('still invokes 4-arity error-handling middleware on error, and records it in the trace', async () => {
     instrumentRouter()
 
-    function throwingController(req: express.Request, res: express.Response) {
+    function throwingController(_req: express.Request, _res: express.Response) {
       throw new Error('boom')
     }
     // Express only treats a middleware function as an error handler if it is

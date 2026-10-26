@@ -70,7 +70,6 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const baseUrl = req.url.split('?')[0]
-  let isAddNotePage: boolean
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
   let errorMessages = res?.locals?.errorMessages || {}
 

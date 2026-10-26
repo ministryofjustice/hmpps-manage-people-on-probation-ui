@@ -1,4 +1,3 @@
-import TechnicalUpdatesPage from '../pages/technicalUpdates'
 import Page from '../pages/page'
 import IndexPage from '../pages'
 
@@ -8,7 +7,7 @@ context('Cookie and privacy policy changes', () => {
   })
 
   it('Check privacy policy link in footer', () => {
-    const page = Page.verifyOnPage(IndexPage)
+    Page.verifyOnPage(IndexPage)
     cy.get('[data-qa="privacyPolicyLink"]')
       .should('have.attr', 'href', '/privacy-policy')
       .and('contain.text', 'Privacy policy')
@@ -19,8 +18,7 @@ context('Cookie and privacy policy changes', () => {
   })
 
   it('Check cookie policy link in footer', () => {
-    const page = Page.verifyOnPage(IndexPage)
-
+    Page.verifyOnPage(IndexPage)
     cy.get('[data-qa="cookiesPolicyLink"]')
       .should('have.attr', 'href', '/cookies-policy')
       .and('contain.text', 'Cookies policy')

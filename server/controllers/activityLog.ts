@@ -8,8 +8,6 @@ import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
 import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/contactDisplayNames'
 
-const routes = ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'] as const
-
 export const getQueryString = (params: ParsedQs): string[] => {
   const queryParams: string[] = []
   const usedParams = ['view', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page', 'category', 'hideContact']
@@ -25,7 +23,10 @@ export const getQueryString = (params: ParsedQs): string[] => {
   return queryParams
 }
 
-const activityLogController: Controller<typeof routes, void> = {
+const activityLogController: Controller<
+  readonly ['getOrPostActivityLog', 'getActivity', 'redirectToActivityLog'],
+  void
+> = {
   redirectToActivityLog: () => {
     return async function redirectToActivityLog(req, res) {
       const { keywords = '', compliance = [] } = req.query

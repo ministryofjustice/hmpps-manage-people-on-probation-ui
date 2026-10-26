@@ -3,7 +3,6 @@ import { postRedirectWizard } from './checkinCyaRedirect'
 import { mockAppResponse } from '../controllers/mocks'
 
 const crn = 'X000001'
-const cya = false
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const res = mockAppResponse()
 const redirectSpy = jest.spyOn(res, 'redirect')

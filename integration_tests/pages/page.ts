@@ -146,7 +146,7 @@ export default abstract class Page {
     return cy.get(`[data-qa="${id}"] .govuk-radios__item:nth-child(${index}) input`)
   }
 
-  getCheckboxField = (name: string): PageElement => {
+  getCheckboxField = (): PageElement => {
     return cy.get(`input[type="checkbox"]`)
   }
 

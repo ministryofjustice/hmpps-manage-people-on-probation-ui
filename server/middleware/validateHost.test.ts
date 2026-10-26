@@ -40,9 +40,7 @@ describe('middleware/validateHost', () => {
     jest.clearAllMocks()
   })
   checkValidHost(false)
-  let index = 0
   for (const host of allowedHosts) {
     checkValidHost(true, host)
-    index += 1
   }
 })

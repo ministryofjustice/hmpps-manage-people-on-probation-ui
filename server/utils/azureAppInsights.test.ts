@@ -1,5 +1,3 @@
-import applicationInfo from '../applicationInfo'
-
 const applicationName = 'mock application name'
 const mockVersion = '1_0_0'
 const mockTraceId = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'

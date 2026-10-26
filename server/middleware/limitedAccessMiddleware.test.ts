@@ -74,7 +74,6 @@ describe('/middleware/limitedAccess', () => {
     jest.clearAllMocks()
   })
   describe('crn url param is invalid', () => {
-    let spy: jest.SpyInstance
     beforeEach(async () => {
       mockIsValidCrn.mockReturnValue(false)
       limitedAccess(mockServices)(req, res, nextSpy)

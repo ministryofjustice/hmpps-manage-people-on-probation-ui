@@ -1,5 +1,3 @@
-import { riskLevelLabel } from '../../../../server/utils'
-
 export const checkRiskToStaffAlert = (
   _crn = 'X778160',
   name = 'Alton',

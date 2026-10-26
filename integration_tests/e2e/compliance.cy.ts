@@ -1,6 +1,5 @@
 import Page from '../pages/page'
 import CompliancePage from '../pages/compliance'
-import OverviewPage from '../pages/overview'
 import { checkPopHeader } from './appointments/imports'
 
 context('Compliance', () => {

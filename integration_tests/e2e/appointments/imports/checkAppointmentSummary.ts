@@ -4,7 +4,7 @@ import ArrangeAnotherAppointmentPage from '../../../pages/appointments/arrange-a
 import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-your-answers.page'
 import { pastDate, startTime, endTime, date } from './common'
 import { to24HourTimeWithMinutes } from '../utils'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../../../../server/models/Appointments'
+import { AppointmentEnforcementAction } from '../../../../server/models/Appointments'
 
 interface SummaryProps {
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage

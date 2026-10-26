@@ -8,7 +8,6 @@ import {
   completeLocationDateTimePage,
   completeRescheduleAppointmentPage,
   getUuid,
-  uncheckAllRadios,
 } from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
@@ -23,15 +22,6 @@ let attendedFailedToComplyPage: AttendedFailedToComplyPage
 let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 
 type RedirectPages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
-
-const completeOutcomePage = () => {
-  outcomePage = new OutcomePage()
-  uncheckAllRadios()
-  cy.get(`.govuk-radios__input[value=ATTENDED_SENT_HOME_BEHAVIOUR]`).click()
-  outcomePage.getSubmitBtn().click()
-  attendedFailedToComplyPage = new AttendedFailedToComplyPage()
-  attendedFailedToComplyPage.checkOnPage()
-}
 
 const loadPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}): void => {
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })

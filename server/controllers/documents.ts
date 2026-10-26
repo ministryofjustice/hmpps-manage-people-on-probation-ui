@@ -11,9 +11,7 @@ import { documentSearchValidation } from '../properties'
 import { TextSearchDocumentsRequest } from '../data/model/documents'
 import { highlightText } from '../utils/highlightText'
 
-const routes = ['getDocuments'] as const
-
-const documentController: Controller<typeof routes, void> = {
+const documentController: Controller<readonly ['getDocuments'], void> = {
   getDocuments: hmppsAuthClient => {
     return async function getDocuments(req, res) {
       const errors = validateWithSpec(req, documentSearchValidation())

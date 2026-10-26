@@ -1,5 +1,4 @@
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
-import * as logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { SupervisionPackage } from '../models/SupervisionPackage'
 import { getPrisonerDetails, getStatusTag, getStatusTagForPersonInCustody } from './personStatusTag'
@@ -8,8 +7,6 @@ jest.mock('../data/prisonerSearchApiClient')
 jest.mock('../../logger')
 
 const mockedPrisonerSearchApiClient = PrisonerSearchApiClient as jest.MockedClass<typeof PrisonerSearchApiClient>
-
-const mockedLogger = logger as jest.Mocked<typeof logger>
 
 const createPersonalDetails = (overrides: Partial<PersonalDetails> = {}): PersonalDetails =>
   ({

@@ -91,7 +91,7 @@ describe('utils/groupActivitiesByDate', () => {
 
   it('should call overrideDeliusManagedFlag when enablePreSentence flag is false', () => {
     const res = buildResponse(false)
-    const result = groupActivitiesByDate(activities)(req, res)
+    groupActivitiesByDate(activities)(req, res)
     expect(mockOverrideDeliusManagedFlag).toHaveBeenCalled()
   })
 })

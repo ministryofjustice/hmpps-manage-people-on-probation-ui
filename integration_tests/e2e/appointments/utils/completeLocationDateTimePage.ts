@@ -23,7 +23,6 @@ export const completeLocationDateTimePage = ({
 }: Props = {}) => {
   const suffix = index > 1 ? `-${index}` : ''
   let locationDateTimePage = new AppointmentLocationDateTimePage()
-  let editContactDetailsPage: EditContactDetails
   const yesterday = DateTime.now().minus({ days: 1 })
   const future = DateTime.now().plus({ days: 2 })
   if (dateOverride) {
@@ -57,7 +56,8 @@ export const completeLocationDateTimePage = ({
     .click()
   if (!allowSms) {
     cy.get('[data-qa=changeAllowSmsLink]').click()
-    editContactDetailsPage = new EditContactDetails()
+    const editContactDetailsPage = new EditContactDetails()
+    editContactDetailsPage.checkOnPage()
     cy.get('#mobileNumber').clear()
     cy.get('#mobileNumber').type('07800765432')
     cy.get('#allowSms-no').click()
