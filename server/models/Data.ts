@@ -32,9 +32,9 @@ export interface PersonalDetailsSession {
   nextAppointmentResponse?: NextAppointmentResponse
 }
 
-export interface Data {
+export type Data = {
   isOutlookEventPending?: boolean
-  isOutLookEventFailed?: any
+  isOutLookEventFailed?: boolean
   isEnglishNotificationFailed?: boolean
   isWelshNotificationFailed?: boolean
   temp?: {

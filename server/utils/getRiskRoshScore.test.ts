@@ -77,7 +77,7 @@ describe('utils/getRiskRoshScore', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  it.each([null, undefined, [] as any])('should return null values if no risk flags', value => {
+  it.each([null, undefined, [] as RiskFlag[][]])('should return null values if no risk flags', value => {
     const result = getRiskRoshScore(value)
     expect(result).toStrictEqual({ score: null, assessedOn: null })
   })

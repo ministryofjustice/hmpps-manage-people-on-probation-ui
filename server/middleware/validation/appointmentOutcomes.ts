@@ -5,6 +5,7 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import config from '../../config'
 import { LocalParams } from '../../models/Appointments'
 import { unflattenBracketKeys } from '../../utils'
+import { Data } from '../../models/Data'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
   const {
@@ -214,7 +215,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           crn,
           id,
           page: `outcome/add-note`,
-          notes: unflattenBracketKeys(req.body || {})?.appointments?.[crn]?.[id]?.notes ?? '',
+          notes: (unflattenBracketKeys(req.body || {}) as Data)?.appointments?.[crn]?.[id]?.notes ?? '',
           maxCharCount: maxCharCount as number,
           sensitivityLocked: appointmentSession?.sensitivityLocked || null,
         }),

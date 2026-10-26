@@ -1,5 +1,5 @@
-export function unflattenBracketKeys(flat: Record<string, any>): Record<string, any> {
-  const nested: Record<string, any> = {}
+export function unflattenBracketKeys(flat: Record<string, unknown>): Record<string, unknown> {
+  const nested: Record<string, unknown> = {}
   Object.entries(flat || {}).forEach(([rawKey, value]) => {
     // Pass through normal keys (non-bracket notation)
     if (!rawKey.startsWith('[') || !rawKey.includes(']')) {
@@ -18,7 +18,7 @@ export function unflattenBracketKeys(flat: Record<string, any>): Record<string, 
         cursor[part] = value
       } else {
         if (typeof cursor[part] !== 'object' || cursor[part] === null) cursor[part] = {}
-        cursor = cursor[part]
+        cursor = cursor[part] as Record<string, unknown>
       }
     })
   })

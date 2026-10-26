@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import request from 'supertest'
+import { Session, SessionData } from 'express-session'
 import nunjucksSetup from './nunjucksSetup'
 import type { Services } from '../services'
 import { ApplicationInfo } from '../applicationInfo'
@@ -79,7 +80,7 @@ it('keeps decorateFormAttributes request-scoped under overlapping requests', asy
 
       // Fake the session data that decorateFormAttributes reads.
       // Each request gets a different date so we can detect leaked context.
-      ;(req as any).session = {
+      ;(req as Request).session = {
         data: {
           appointments: {
             CRN1: {
@@ -89,8 +90,8 @@ it('keeps decorateFormAttributes request-scoped under overlapping requests', asy
             },
           },
         },
-      }
-      ;(req as any).body = {}
+      } as unknown as Session & Partial<SessionData>
+      ;(req as Request).body = {}
 
       // Force an overlap:
       // A starts first and waits.
@@ -158,7 +159,7 @@ it('does not use another overlapping request when that request has no session', 
 
       if (reqId === 'A') {
         // Request A has valid session data and should render successfully.
-        ;(req as any).session = {
+        ;(req as Request).session = {
           data: {
             appointments: {
               CRN1: {
@@ -168,7 +169,7 @@ it('does not use another overlapping request when that request has no session', 
               },
             },
           },
-        }
+        } as unknown as Session & Partial<SessionData>
       } else {
         // Request B deliberately has no session.
         // With the old global-filter implementation, B can overwrite the
@@ -177,10 +178,10 @@ it('does not use another overlapping request when that request has no session', 
         //
         // TypeError: Cannot destructure property 'data' of 'req.session'
         // as it is undefined.
-        ;(req as any).session = undefined
+        ;(req as Request).session = undefined
       }
 
-      ;(req as any).body = {}
+      ;(req as Request).body = {}
 
       // Force overlap:
       // A enters first and waits. B then enters and has a chance to register

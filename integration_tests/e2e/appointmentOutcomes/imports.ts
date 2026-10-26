@@ -24,7 +24,7 @@ export interface ExpectedOption<TPage extends Page> {
 
 export type Journey = 'MANAGE' | 'RESCHEDULE' | 'ARRANGE'
 
-type Constructor<T = any> = new (...args: any[]) => T
+type Constructor<T = unknown> = new (...args: unknown[]) => T
 
 export const checkOptions = <TPage extends Page>(options: ExpectedOption<TPage>[], radioGroupIndex = 0): void => {
   options.forEach(({ value, text, hint }, index) => {
@@ -57,9 +57,9 @@ type RedirectPage =
   | typeof UnacceptableAbsencePage
   | typeof UpdateEnforcementActionPage
 
-export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs extends Record<string, any>>(
+export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs extends Record<string, unknown>>(
   options: ExpectedOption<TPage>[],
-  loadPageFunc: (args: any) => void,
+  loadPageFunc: (args: unknown) => void,
   PageClass: RedirectPage,
   args: TArgs,
 ): void => {
@@ -103,8 +103,8 @@ type WarningBannerPage =
   | typeof InitiateBreachOrRecallPage
   | typeof SendLetterPage
 
-export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, any>>(
-  loadPageFunc: (args: any) => void,
+export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, unknown>>(
+  loadPageFunc: (args: unknown) => void,
   PageClass: WarningBannerPage,
   args: TArgs = {} as TArgs,
 ): void => {
@@ -156,8 +156,8 @@ export const checkBreachOrRecallWarningBanner = <TArgs extends Record<string, an
   })
 }
 
-export const checkTicketPanel = <TArgs extends Record<string, any>>(
-  loadPageFunc: (args: any) => void,
+export const checkTicketPanel = <TArgs extends Record<string, unknown>>(
+  loadPageFunc: (args: unknown) => void,
   PageClass:
     | typeof AttendedFailedToComplyPage
     | typeof UnacceptableAbsencePage

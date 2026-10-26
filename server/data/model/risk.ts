@@ -125,7 +125,7 @@ export interface RemovalHistory {
   removedBy: Name
 }
 
-export interface RiskFlag {
+export type RiskFlag = {
   id: number
   description: string
   levelDescription?: string

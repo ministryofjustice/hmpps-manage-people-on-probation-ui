@@ -9,41 +9,41 @@ import config from '../config'
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const hasAllDigits = (string: string) => /^\d+$/.test(string)
 
-export const isNotEmpty = (args: any[]) => {
+export const isNotEmpty = (args: unknown[]) => {
   return !!args[0] && args[0] !== undefined
 }
-export const contactPrefEmailCheck = (args: any[]) => {
+export const contactPrefEmailCheck = (args: string[]) => {
   if (!args[0] || args[0] === 'PHONE') {
     return true
   }
   return args[0] === 'EMAIL' && isEmail(args[1])
 }
 
-export const contactPrefMobileCheck = (args: any[]) => {
+export const contactPrefMobileCheck = (args: string[]) => {
   if (!args[0] || args[0] === 'EMAIL') {
     return true
   }
   return args[0] === 'PHONE' && isValidMobileNumber(args[1])
 }
 
-export const isNumeric = (args: any[]) => /^[\d ]+$/.test(args[0])
-export const isUkPostcode = (args: any[]) => {
+export const isNumeric = (args: string[]) => /^[\d ]+$/.test(args[0])
+export const isUkPostcode = (args: string[]) => {
   return postcodeValidator(args[0], 'GB')
 }
-export const charsOrLess = (args: any[]) => {
-  return !args[1] || args[1].length <= args[0]
+export const charsOrLess = (args: unknown[]) => {
+  return !args[1] || (args[1] as string).length <= (args[0] as number)
 }
-export const isValidDate = (args: any[]) => {
+export const isValidDate = (args: string[]) => {
   return !!args[0] && DateTime.fromFormat(args[0], 'd/M/yyyy').isValid
 }
-export const isValidDateFormat = (args: any[]): boolean => {
+export const isValidDateFormat = (args: string[]): boolean => {
   const regex = /^[1-9]?\d\/[1-9]?\d\/\d{4}$/
   return regex.test(args[0])
 }
-export const isStringNumber = (args: any[]): boolean => {
+export const isStringNumber = (args: string[]): boolean => {
   return !Number.isNaN(Number.parseInt(args[0], 10))
 }
-export const isNotLaterThanToday = (args: any[]) => {
+export const isNotLaterThanToday = (args: string[]) => {
   if (!args[0]) {
     return true
   }
@@ -51,7 +51,7 @@ export const isNotLaterThanToday = (args: any[]) => {
   return date.isValid && date <= DateTime.now()
 }
 
-export const isTodayOrLater = (args: any[]) => {
+export const isTodayOrLater = (args: string[]) => {
   if (!args[0]) {
     return false
   }
@@ -63,7 +63,7 @@ export const isTodayOrLater = (args: any[]) => {
   return date.startOf('day') >= DateTime.now().startOf('day')
 }
 
-export const isFutureDate = (args: any[]) => {
+export const isFutureDate = (args: string[]) => {
   if (!args[0]) return false
 
   const date = DateTime.fromFormat(args[0], 'd/M/yyyy', { zone: 'utc' })
@@ -72,7 +72,7 @@ export const isFutureDate = (args: any[]) => {
   const now = DateTime.utc().startOf('day')
   return date.startOf('day') > now
 }
-export const timeIsNotEarlierThan = (args: any[]) => {
+export const timeIsNotEarlierThan = (args: string[]) => {
   if (!args[0]) {
     return true
   }
@@ -84,7 +84,7 @@ export const timeIsNotEarlierThan = (args: any[]) => {
   }
   return notEarlierThanTime > date
 }
-export const timeIsValid24HourFormat = (args: any[]): boolean => {
+export const timeIsValid24HourFormat = (args: string[]): boolean => {
   if (!args[1]) {
     return false
   }
@@ -93,7 +93,7 @@ export const timeIsValid24HourFormat = (args: any[]): boolean => {
   return regex.test(timeStr)
 }
 
-export const timeIsNowOrInFuture = (args: any[], mockDateToOverride?: DateTime) => {
+export const timeIsNowOrInFuture = (args: string[], mockDateToOverride?: DateTime) => {
   if (!args[0] || !args[1]) {
     return false
   }
@@ -113,7 +113,7 @@ export const timeIsNowOrInFuture = (args: any[], mockDateToOverride?: DateTime) 
   return true
 }
 
-export const isNotEarlierThan = (args: any[]) => {
+export const isNotEarlierThan = (args: string[]) => {
   if (!args[0]) {
     return true
   }
@@ -125,7 +125,7 @@ export const isNotEarlierThan = (args: any[]) => {
   return notEarlierThanDate >= date
 }
 
-export const isNotLaterThan = (args: any[]) => {
+export const isNotLaterThan = (args: string[]) => {
   if (!args[0]) {
     return true
   }
@@ -137,7 +137,7 @@ export const isNotLaterThan = (args: any[]) => {
   return notLaterThanDate <= date
 }
 
-export const timeIsNotLaterThan = (args: any[]) => {
+export const timeIsNotLaterThan = (args: string[]) => {
   if (!args[0]) {
     return true
   }
@@ -150,7 +150,7 @@ export const timeIsNotLaterThan = (args: any[]) => {
   return notLaterThanDate < date
 }
 
-export const isValidRescheduledDateTime = (_args: any[], _now: DateTime, request: Request) => {
+export const isValidRescheduledDateTime = (_args: unknown[], _now: DateTime, request: Request) => {
   const { crn, id } = request.params as Record<string, string>
   const date = request.body?.appointments?.[crn]?.[id]?.date
   const start = request.body?.appointments?.[crn]?.[id]?.start
@@ -169,7 +169,7 @@ export const isValidRescheduledDateTime = (_args: any[], _now: DateTime, request
   return true
 }
 
-export const isValidCharCount = (args: any[]) => {
+export const isValidCharCount = (args: string[]) => {
   const value = args?.[0]
   const { maxCharCount } = config
   if (!value) {
@@ -177,7 +177,7 @@ export const isValidCharCount = (args: any[]) => {
   }
   const lineBreaks = value.split('\r\n').length - 1
   const textLength = value.replaceAll('\r\n', '').length
-  return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
+  return value.trim() !== '' && textLength + lineBreaks <= (maxCharCount as number)
 }
 
 export const isValidMobileNumber = (input: string) => {
@@ -221,7 +221,7 @@ export function validateWithSpec(request: Request, validationSpec: ValidationSpe
 function executeValidator(checks: ErrorCheck[], fieldName: string, request: Request, mocks: { now?: DateTime }) {
   for (const check of checks) {
     const { log = '' } = check
-    const args: any[] = setArgs(fieldName, check, request)
+    const args: string[] = setArgs(fieldName, check, request)
     if (!check.validator(args, mocks.now, request)) {
       if (log) {
         logger.info(check.log)
@@ -238,7 +238,7 @@ function setArgs(fieldName: string, check: ErrorCheck, request: Request) {
     const path = fieldName.slice(1, -1).split('][')
     value = getNestedValue(request.body, path)
   }
-  let args: any[] = check?.length ? [check.length, value] : [value]
+  let args: string[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
     args = [
       isObjectFieldName(check?.crossField)
@@ -254,15 +254,15 @@ function setArgs(fieldName: string, check: ErrorCheck, request: Request) {
 
 const isObjectFieldName = (fieldName: string): boolean => fieldName.includes('[') && fieldName.includes(']')
 
-export const getNestedValue = (obj: any, keys: string[]): any => {
+export const getNestedValue = (obj: Record<string, unknown>, keys: string[]): unknown => {
   let current = obj
   for (const key of keys) {
-    current = current?.[key]
+    current = current?.[key] as Record<string, unknown>
   }
   return current
 }
 
-export const hasNestedKeys = (obj: any, keys: string[]): boolean => {
+export const hasNestedKeys = (obj: Record<string, unknown>, keys: string[]): boolean => {
   return (
     keys.reduce((acc, key) => {
       if (acc && typeof acc === 'object' && key in acc) {

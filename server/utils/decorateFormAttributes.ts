@@ -3,6 +3,7 @@ import { Request } from 'express'
 import { getDataValue } from './getDataValue'
 import config from '../config'
 import { AppResponse } from '../models/Locals'
+import { Data } from '../models/Data'
 
 interface Item {
   checked?: string
@@ -12,10 +13,17 @@ interface Item {
   idPrefix?: string
 }
 
-export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: any, sections?: string[]) => {
-  const newObj = obj
-  const { data } = req.session as any
-  let storedValue = getDataValue(data, sections) || getDataValue(req.body, sections)
+export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: unknown, sections?: string[]) => {
+  const newObj = obj as {
+    items: unknown[]
+    idPrefix: unknown
+    id: unknown
+    name: unknown
+    value: unknown
+    errorMessage: unknown
+  }
+  const { data } = req.session as unknown as { data: Data }
+  let storedValue = (getDataValue(data, sections) || getDataValue(req.body, sections)) as string
   if (storedValue && config.dateFields.includes(sections!.at(-1)) && storedValue.includes('-')) {
     const [year, month, day] = storedValue
       .split('-')

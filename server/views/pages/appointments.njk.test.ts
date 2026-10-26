@@ -2,7 +2,9 @@ import * as cheerio from 'cheerio'
 import { Schedule } from '../../data/model/schedule'
 import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
 import { RiskFlag } from '../../data/model/risk'
-import { OffenderEligibility } from '../../data/model/esupervision'
+import { OffenderCheckinsByCRNResponse, OffenderEligibility } from '../../data/model/esupervision'
+import { Name } from '../../data/deliusClient'
+import { SupervisionPackage } from '../../models/SupervisionPackage'
 
 type TestModel = {
   flags: {
@@ -11,9 +13,9 @@ type TestModel = {
   }
   upcomingAppointments: Schedule
   pastAppointments: Schedule
-  supervisionPackageDetails: any
-  offenderCheckinsByCRNResponse: any
-  headerPersonName: any
+  supervisionPackageDetails?: Partial<SupervisionPackage | null>
+  offenderCheckinsByCRNResponse?: Partial<OffenderCheckinsByCRNResponse>
+  headerPersonName: Partial<Name>
   hasDeceased: boolean
   showSupaSummary: boolean
   canAccessCheckins: boolean
@@ -68,10 +70,11 @@ const baseModel: TestModel = {
     createdAt: '2026-07-10T11:21:47+01:00',
     updatedAt: '2026-07-10T11:21:47+01:00',
     context: {
-      name: { forename: 'Emely', surname: 'Harber' },
+      name: { forename: 'Emely', surname: 'Harber', middleNames: '' },
       gender: 'Male',
       sentences: [
         {
+          isPrimarySentence: true,
           eventNumber: '1',
           startDate: '2026-07-08',
           endDate: '2027-01-07',
@@ -233,7 +236,7 @@ describe('Appointments', () => {
     const $ = render({
       supervisionPackageDetails: {
         context: { sentences: [{ supervisionPackage: { code: 'SPA' }, custody: { status: { code: 'T' } } }] },
-      },
+      } as Partial<SupervisionPackage>,
     })
     expect($('aside')).toHaveLength(0)
     expect($('.govuk-grid-column-three-quarters')).toHaveLength(0)

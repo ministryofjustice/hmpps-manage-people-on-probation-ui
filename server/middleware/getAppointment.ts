@@ -7,6 +7,7 @@ import { AppointmentLocals } from '../models/Locals'
 import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
+import { Name } from '../data/deliusClient'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getAppointmentInner(req, res, next) {
@@ -122,7 +123,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         )
 
       if (!selectedUser) {
-        const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
+        const name = getDataValue(data, ['appointments', crn, id, 'user', 'name']) as Name
         if (name) {
           const { forename: first, surname: last } = name
           selectedUser = `${first} ${last}`

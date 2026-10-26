@@ -115,7 +115,7 @@ export interface SmsConfirmation {
   errors?: ErrorSummaryItem[]
 }
 
-interface Locals {
+export interface Locals {
   errorMessages: Record<string, string>
   warningMessages: Record<string, string>
   filters?: ActivityLogFiltersResponse
