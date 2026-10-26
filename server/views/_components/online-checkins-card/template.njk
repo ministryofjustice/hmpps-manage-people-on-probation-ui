@@ -1,3 +1,4 @@
+{% from "_components/summary-card/macro.njk" import appSummaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set checkin = params.checkin %}
@@ -18,36 +19,32 @@
 {% endif %}
 
 {% if params.eligibility.outcome === 'INELIGIBLE' %}
-    {% set label = 'Status' %}
-    {% set value = params.eligibility.message %}
+  {% set label = 'Status' %}
+  {% set value = params.eligibility.message %}
 {% endif %}
 
 {% set linkHref = params.manageHref if checkin.status in ['VERIFIED', 'INACTIVE'] else params.setupHref %}
 {% set showActions = params.canAccess and params.eligibility.outcome === 'ELIGIBLE' %}
 
-{{ govukSummaryList({
-  card: {
-    title: {
-      text: 'Online check ins',
-      headingLevel: 3,
-      classes: 'govuk-!-font-size-24'
-    },
-    classes: 'govuk-!-margin-bottom-6',
-    attributes: { 'data-qa': 'checkinCard' },
-    actions: {
-      items: [
-        {
-          text: linkText,
-          href: linkHref,
-          classes: 'govuk-!-font-weight-regular'
-        }
-      ]
-    } if showActions
-  },
-  rows: [
-    {
-      key: { html: '<span data-qa="checkinLabel">' + (label | escape) + '</span>' },
-      value: { html: '<span data-qa="checkinValue">' + (value | escape) + '</span>' }
-    }
-  ]
+{{ appSummaryCard({
+  titleText: 'Online check ins',
+  headingLevel: 3,
+  attributes: { 'data-qa': 'checkinCard' },
+  classes: params.cardClasses | default('govuk-!-margin-bottom-6'),
+  html: govukSummaryList({
+    rows: [
+      {
+        key: { html: '<span data-qa="checkinLabel">' + (label | escape) + '</span>' },
+        value: { html: '<span data-qa="checkinValue">' + (value | escape) + '</span>' }
+      }
+    ]
+  }),
+  actions: {
+    items: [
+      {
+        text: linkText,
+        href: linkHref
+      }
+    ]
+  } if showActions
 }) }}

@@ -423,10 +423,11 @@
     checkin: offenderCheckinsByCRNResponse,
     upcomingCheckinDate: upcomingCheckin.expectedCheckinDate if upcomingCheckin,
     eligibility: checkinEligibility,
-          canAccess: canAccessCheckins,
-      setupHref: checkinLink,
-        manageHref: manageCheckinLink
-          }) }}
+    canAccess: canAccessCheckins,
+    setupHref: checkinLink,
+    manageHref: manageCheckinLink,
+    cardClasses: cardClasses
+  }) }}
 
   {% if not flags.enableNewOverview %}
     {#  Personal details card  #}
@@ -459,7 +460,7 @@
       titleText: 'Risk',
       headingLevel: 3,
       attributes: {'data-qa': 'riskCard'},
-      classes: cardClasses | default('govuk-!-margin-bottom-6 app-summary-card--large-title'),
+      classes: cardClasses,
       html: riskFlagsAndCriminogenicNeeds,
       actions: {
         items: [
@@ -715,13 +716,13 @@
       ]
     }) }}
   {% else %}
-  {{ appSummaryCard({
-    titleText: 'Activity and compliance',
-    headingLevel: 3,
-    attributes: {'data-qa': 'activityAndComplianceCard'},
-    classes: cardClasses,
-    html: activityAndCompliance
-  }) }}
+    {{ appSummaryCard({
+      titleText: 'Activity and compliance',
+      headingLevel: 3,
+      attributes: {'data-qa': 'activityAndComplianceCard'},
+      classes: cardClasses,
+      html: activityAndCompliance
+    }) }}
   {% endif %}
 
   <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">
