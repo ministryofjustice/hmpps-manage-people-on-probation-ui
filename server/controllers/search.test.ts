@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
 import { checkSendAuditMessage } from './testutils'
 import { SubjectType } from '../middleware/sendAuditMessage'
-import PersonRecordClient from '../data/personRecordClient'
+import PersonRecordApiClient from '../data/personRecordApiClient'
 import { HmppsAuthClient } from '../data'
 
 jest.mock('../data/masApiClient')
@@ -23,7 +23,7 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
-jest.mock('../data/personRecordClient')
+jest.mock('../data/personRecordApiClient')
 jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('stream/promises', () => ({
   pipeline: jest.fn().mockResolvedValue(undefined), // Simulate a successful stream completion
@@ -35,7 +35,7 @@ mockStream.push('mock data')
 mockStream.push(null)
 
 const getPrisonerImageSpy = jest
-  .spyOn(PersonRecordClient.prototype, 'getImageData')
+  .spyOn(PersonRecordApiClient.prototype, 'getImageData')
   .mockImplementation(() => Promise.resolve(mockStream))
 const fromSpy = jest.spyOn(Readable, 'from')
 

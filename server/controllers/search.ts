@@ -3,7 +3,7 @@ import { pipeline } from 'node:stream/promises'
 import { Controller } from '../@types'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { HmppsAuthClient } from '../data'
-import PersonRecordClient from '../data/personRecordClient'
+import PersonRecordApiClient from '../data/personRecordApiClient'
 import { mapResults } from '../utils/mapResults'
 import ESupervisionClient from '../data/eSupervisionClient'
 
@@ -39,7 +39,7 @@ const searchController: Controller<typeof routes, void> = {
       let data: Readable
       const token = await hmppsAuthClient.getSystemClientToken(req.user.username)
       if (req.params.prisonerId && res.locals.flags?.enableSearchV2) {
-        data = await new PersonRecordClient(token).getImageData(req.params.prisonerId as string)
+        data = await new PersonRecordApiClient(token).getImageData(req.params.prisonerId as string)
       }
 
       if (data) {

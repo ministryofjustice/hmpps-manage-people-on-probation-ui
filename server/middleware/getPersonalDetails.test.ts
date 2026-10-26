@@ -8,7 +8,7 @@ import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import PersonRecordClient from '../data/personRecordClient'
+import PersonRecordApiClient from '../data/personRecordApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
@@ -62,7 +62,7 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
 jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
-jest.mock('../data/personRecordClient')
+jest.mock('../data/personRecordApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -372,7 +372,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -384,7 +384,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValueOnce(null)
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValueOnce(null)
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -397,7 +397,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -408,7 +408,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not request a photo when enablePersonHeader is off', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordClient.prototype, 'getImageData')
+      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData')
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -422,7 +422,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not request a photo, or show the photos unavailable error, when enablePersonHeaderPhoto is off', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordClient.prototype, 'getImageData')
+      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData')
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -456,7 +456,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -468,7 +468,7 @@ describe('/middleware/getPersonalDetails', () => {
 
     it('requests only the photo when enablePersonHeaderPhoto is turned on for a crn already in the session', async () => {
       const masSpy = jest.spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
       req = cachedReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -479,7 +479,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not look up the photo again when the session has it cached as having no image', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordClient.prototype, 'getImageData')
+      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData')
       req = cachedReq({ personPhotoSrc: null })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -489,7 +489,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not look up the photo again for a crn with no image after the session is saved and reloaded', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValue(null)
+      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -519,7 +519,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not request a photo when there is no NOMS number', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValue(null)
+      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
 
       getImageDataSpy.mockClear()
 
@@ -543,7 +543,7 @@ describe('/middleware/getPersonalDetails', () => {
       // The middleware expects these methods to return Promises.
       jest.spyOn(MasApiClient.prototype, 'getContacts').mockResolvedValue(mockContacts)
 
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValue(null)
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
 
       jest.mocked(hmppsAuthClient.getSystemClientToken).mockResolvedValue('token')
     })
@@ -963,7 +963,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       jest.spyOn(MasApiClient.prototype, 'getContacts').mockResolvedValue(mockContacts)
 
-      jest.spyOn(PersonRecordClient.prototype, 'getImageData').mockResolvedValue(null)
+      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
 
       jest.mocked(hmppsAuthClient.getSystemClientToken).mockResolvedValue('token')
 

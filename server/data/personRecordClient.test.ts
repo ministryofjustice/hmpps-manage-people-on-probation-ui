@@ -2,7 +2,7 @@ import nock from 'nock'
 import { Readable } from 'stream'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
-import PersonRecordClient from './personRecordClient'
+import PersonRecordApiClient from './personRecordApiClient'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -22,12 +22,12 @@ const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('personRecordClient', () => {
   let fakePrisonApiClient: nock.Scope
-  let personRecordClient: PersonRecordClient
+  let personRecordClient: PersonRecordApiClient
 
   beforeEach(() => {
     jest.clearAllMocks()
     fakePrisonApiClient = nock(config.apis.personRecordApi.url)
-    personRecordClient = new PersonRecordClient(token.access_token)
+    personRecordClient = new PersonRecordApiClient(token.access_token)
   })
 
   afterEach(() => {
