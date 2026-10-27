@@ -116,7 +116,7 @@ const render = (model = {} as Partial<TestModel>, session = {}) => {
   return cheerio.load(env.render('pages/appointment-outcomes/update-enforcement-action.njk', input))
 }
 
-xdescribe('Enforcement action', () => {
+describe('Enforcement action', () => {
   it('should render the page', () => {
     const $ = render()
     expect($('.govuk-back-link').attr('href')).toBe(appointmentOutcome.backLink)
@@ -188,7 +188,6 @@ xdescribe('Enforcement action', () => {
       },
     }
     const $ = render({}, session)
-    const select = $(`#appointments-${crn}-${contactId}-outcome-otherEnforcementAction`)
     expect($('.govuk-radios').find('.govuk-radios__item').eq(1).find('input').attr('checked')).toBeDefined()
   })
 })
