@@ -21,7 +21,12 @@ const searchController: Controller<readonly ['getSearch', 'getPhoto'], void> = {
             response: {
               ...res.locals.searchResults?.response,
               ...(res.locals.searchResponse
-                ? await mapResults(res.locals.searchResponse, res.locals.searchRequest, onlineCheckInsClient)
+                ? await mapResults(
+                    res.locals.searchResponse,
+                    res.locals.searchRequest,
+                    onlineCheckInsClient,
+                    res.locals.flags.enableESUPCheckInPhotosForSearch,
+                  )
                 : {}),
             },
           },

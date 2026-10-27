@@ -39,4 +39,5 @@ export class FeatureFlags {
   enableAppointmentPatchAlerts?: boolean = undefined
   enableHomePageV2API?: boolean = undefined
   enableNewOverview?: boolean = undefined
+  enableESUPCheckInPhotosForSearch?: boolean = undefined
 }

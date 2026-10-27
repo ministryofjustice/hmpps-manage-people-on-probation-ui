@@ -90,4 +90,63 @@ describe('mapResults()', () => {
     expect(results.content[0].officer).toEqual('Smith, John')
     expect(results.content[0].provider).toEqual('Provider 1')
   })
+
+  describe('enableESUPCheckInPhotosForSearch', () => {
+    it('should call getOffenderCheckinsByCRN and use photoUrl when flag is true and photo exists', async () => {
+      const photoUrl = 'http://photo-url'
+      MockedEsupervisionClient.prototype.getOffenderCheckinsByCRN.mockResolvedValue({
+        uuid: '123',
+        crn,
+        status: 'VERIFIED',
+        firstCheckin: '2023-01-01',
+        checkinInterval: 'WEEKLY',
+        mode: 'SCHEDULED',
+        contactPreference: 'PHONE',
+        photoUrl,
+      })
+
+      const response = {
+        content: [{ otherIds: { crn } }],
+      } as unknown as ProbationSearchResponse
+      const request = {} as unknown as ProbationSearchRequest
+
+      const results = await mapResults(response, request, onlineCheckInsClient, true)
+
+      expect(onlineCheckInsClient.getOffenderCheckinsByCRN).toHaveBeenCalledWith(crn)
+      expect(results.content[0].imageUrl).toEqual(photoUrl)
+    })
+
+    it('should NOT call getOffenderCheckinsByCRN when flag is false', async () => {
+      const response = {
+        content: [{ otherIds: { crn } }],
+      } as unknown as ProbationSearchResponse
+      const request = {} as unknown as ProbationSearchRequest
+
+      await mapResults(response, request, onlineCheckInsClient, false)
+
+      expect(onlineCheckInsClient.getOffenderCheckinsByCRN).not.toHaveBeenCalled()
+    })
+
+    it('should fallback to prisoner image if flag is true but no photoUrl returned', async () => {
+      MockedEsupervisionClient.prototype.getOffenderCheckinsByCRN.mockResolvedValue({
+        uuid: '123',
+        crn,
+        status: 'VERIFIED',
+        firstCheckin: '2023-01-01',
+        checkinInterval: 'WEEKLY',
+        mode: 'SCHEDULED',
+        contactPreference: 'PHONE',
+      })
+
+      const response = {
+        content: [{ otherIds: { nomsNumber: 'ABC123', crn } }],
+      } as unknown as ProbationSearchResponse
+      const request = {} as unknown as ProbationSearchRequest
+
+      const results = await mapResults(response, request, onlineCheckInsClient, true)
+
+      expect(onlineCheckInsClient.getOffenderCheckinsByCRN).toHaveBeenCalledWith(crn)
+      expect(results.content[0].imageUrl).toEqual('/search/prisoner-image/ABC123')
+    })
+  })
 })
