@@ -54,11 +54,38 @@ context('Overview', () => {
     page
       .getAccordionHeader('personalCircumstances')
       .should('contain.text', 'Addresses, disabilities and personal circumstances')
+    page.openAccordion('personalCircumstances')
     page
       .getAccordionHeader('personalCircumstances')
       .find('a')
       .should('contain.text', 'View all personal details')
       .should('have.attr', 'href', '/case/X000001/personal-details')
+
+    const addressValue = page.getRowData('personalCircumstances', 'mainAddress', 'Value')
+    addressValue
+      .should('contain.text', 'No fixed address')
+      .and('contain.text', 'Type of address')
+      .and('contain.text', 'Householder (Owner - freehold or leasehold) (verified)')
+      .and('contain.text', 'Start date')
+      .and('contain.text', '14 March 2023')
+      .and('contain.text', 'Notes')
+    addressValue
+      .find('.app-note')
+      .should('have.length', 3)
+      .eq(0)
+      .should('contain.text', 'Comment added by Tom Brady on 29 October 2024')
+      .find('a')
+      .should('contain.text', 'View full note')
+      .should('have.attr', 'href', '/case/X000001/personal-details/main-address/note/0')
+
+    const otherAddressesValue = page.getRowData('personalCircumstances', 'otherAddresses', 'Value')
+    otherAddressesValue
+      .should('contain.text', '1 other address')
+      .and('contain.text', '1 previous address')
+      .find('a')
+      .should('contain.text', 'View all addresses')
+      .and('have.attr', 'href', '/case/X000001/personal-details/addresses')
+
     page
       .getRowData('personalCircumstances', 'currentCircumstances', 'Value')
       .should('contain.text', 'Committed/ Transferred to Crown: Life imprisonment (Adult)')
@@ -68,6 +95,7 @@ context('Overview', () => {
 
   const verifyRisks = (page: OverviewPage) => {
     page.getAccordionHeader('risk').should('contain.text', 'Risk')
+    page.openAccordion('risk')
     page
       .getAccordionHeader('risk')
       .find('a')
@@ -77,10 +105,7 @@ context('Overview', () => {
       .getRowData('risk', 'rosh', 'Label')
       .should('contain.text', 'Risk of serious harm (ROSH) in the community')
       .should('contain.text', 'Last updated 24 January 2024')
-    page
-      .getRowData('risk', 'rosh', 'Value')
-      .find('[data-qa="roshValue"]')
-      .should('contain.text', 'Risk of serious harm VERY HIGH')
+    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'Risk of serious harm VERY HIGH')
     page
       .getRowData('risk', 'mappa', 'Label')
       .should('contain.text', 'MAPPA')
@@ -141,6 +166,7 @@ context('Overview', () => {
 
   const verifyActivityAndCompliance = (page: OverviewPage) => {
     page.getAccordionHeader('activityAndCompliance').should('contain.text', 'Activity and compliance')
+    page.openAccordion('activityAndCompliance')
     page
       .getAccordionHeader('activityAndCompliance')
       .find('a')
@@ -150,7 +176,7 @@ context('Overview', () => {
       .getRowData('activityAndCompliance', 'previousOrders', 'Value')
       .should('contain.text', '1 previous orders (No breaches on previous orders)')
     page
-      .getRowData('activityAndCompliance', 'compliance', 'Value')
+      .getRowData('activityAndCompliance', 'activityLog', 'Value')
       .should('contain.text', '2 without a recorded outcome')
     page
       .getRowData('activityAndCompliance', 'activityLog', 'Value')
@@ -403,7 +429,7 @@ context('Overview', () => {
       .should('contain.text', '1 previous orders (No breaches on previous orders)')
     page
       .getRowData('activityAndCompliance', 'compliance', 'Value')
-      .should('contain.text', '2 without a recorded outcome')
+      .should('contain.text', '1 prior breach on current order')
     page
       .getRowData('activityAndCompliance', 'activityLog', 'Value')
       .should('contain.text', '2 national standard appointments')
