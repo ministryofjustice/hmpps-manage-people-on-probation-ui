@@ -7,6 +7,7 @@ export async function mapResults(
   response: ProbationSearchResponse,
   request: ProbationSearchRequest,
   onlineCheckInsClient: ESupervisionClient,
+  enableESUPCheckInPhotosForSearch: boolean = false,
 ) {
   const returnedProviders =
     response.probationAreaAggregations?.map(p => ({
@@ -26,7 +27,10 @@ export async function mapResults(
     content: await Promise.all(
       response.content?.map(async result => {
         const activeManager = result.offenderManagers?.filter(manager => manager.active).shift()
-        const esupervisionDetails = await onlineCheckInsClient.getOffenderCheckinsByCRN(result.otherIds?.crn)
+        let esupervisionDetails
+        if (enableESUPCheckInPhotosForSearch) {
+          esupervisionDetails = await onlineCheckInsClient.getOffenderCheckinsByCRN(result.otherIds?.crn)
+        }
         let imageUrl = '/assets/images/NoPhoto@2x.png'
         if (esupervisionDetails?.photoUrl) {
           imageUrl = esupervisionDetails.photoUrl
