@@ -51,7 +51,7 @@ context('Sentence', () => {
     page.getRowData('conviction', 'convictionDate', 'Label').should('contain.text', 'Conviction date')
     page.getRowData('conviction', 'convictionDate', 'Value').should('contain.text', '20 March 2024')
     page.getRowData('conviction', 'additionalSentences', 'Label').should('contain.text', 'Additional sentences')
-    page.getRowData('conviction', 'additionalSentences', 'Value').should('contain.text', '20 March 2024')
+    page.getRowData('conviction', 'additionalSentences', 'Value').should('contain.text', 'Disqualified from Driving')
     page.getRowData('sentence', 'orderDescription', 'Label').should('contain.text', 'Order')
     page.getRowData('sentence', 'orderDescription', 'Value').should('contain.text', 'Default Sentence Type')
     page.getRowData('sentence', 'orderEventNumber', 'Label').should('contain.text', 'NDelius event number')

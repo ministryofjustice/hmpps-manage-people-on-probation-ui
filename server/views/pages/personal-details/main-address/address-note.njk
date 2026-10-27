@@ -76,16 +76,16 @@
         {% endif %}
         <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
             <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteLabel">Note</span>
-            <span data-qa="mainAddressNotesValue">
-                {% if mainAddress.addressNote %}
-                    <p class="govuk-body line-break">
-                        {{ mainAddress.addressNote.note }}
-                    </p>
-                {% else %}
-                                No notes
-                            {% endif %}
-            </span>
         </p>
+        <div data-qa="mainAddressNotesValue">
+          {% if mainAddress.addressNote %}
+            <p class="govuk-body line-break">
+              {{ mainAddress.addressNote.note }}
+            </p>
+          {% else %}
+            No notes
+          {% endif %}
+        </div>
     {% else %}
                 No main address
             {% endif %}
