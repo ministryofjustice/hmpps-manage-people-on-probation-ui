@@ -1,3 +1,4 @@
+import { LogLevel } from 'bunyan'
 import { getPositiveIntOr } from './utils/getPositiveIntOr'
 
 const production = process.env.NODE_ENV === 'production'
@@ -56,6 +57,7 @@ export default {
   https: production,
   applicationName: 'Manage people on probation',
   env: get('ENVIRONMENT', 'local', requiredInProduction) as 'local' | 'dev' | 'preprod' | 'prod',
+  logLevel: get('LOG_LEVEL', 'debug') as LogLevel,
   staticResourceCacheDuration: '1h',
   redis: {
     enabled: get('REDIS_ENABLED', 'false', requiredInProduction) === 'true',
