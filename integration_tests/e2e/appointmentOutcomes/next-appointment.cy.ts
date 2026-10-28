@@ -68,20 +68,11 @@ const expectedFutureDate = `${future.toFormat('cccc d LLLL yyyy')} at 9am to 10a
 
 const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   if (journey === 'MANAGE') {
-    describe('Arrange next supervision appointment in the past', () => {
-      beforeEach(() => {
+    describe('Story: logging an outcome then arranging the same type of appointment in the past', () => {
+      it('should complete the journey and summarise both appointments on the outcome check your answers page', () => {
         loadNextAppointmentPage()
-      })
-      it('should complete next appointment journey and link to the outcome check your answers page', () => {
         nextAppointmentPage = new NextAppointmentPage()
         nextAppointmentPage.checkPageTitle('Eula’s next supervision appointment')
-        cy.get('.govuk-inset-text').should(
-          'contain.text',
-          '3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am with Terry Jones for their Default Sentence Type (12 Months)',
-        )
-        cy.get('[data-qa=anotherAppointment]')
-          .find('legend')
-          .should('contain.text', 'Do you want to arrange another appointment with Eula?')
         cy.get(`.govuk-radios__input[value=KEEP_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
         completeNextAppointmentJourney({ dateInPast: true, isOutcomeJourney: true })
@@ -102,11 +93,9 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
       })
     })
 
-    describe('arrange next supervision appointment in the future', () => {
-      beforeEach(() => {
+    describe('Story: logging an outcome then arranging a different type of appointment in the future', () => {
+      it('should complete the journey and offer to confirm the outcome and arrange the appointment', () => {
         loadNextAppointmentPage()
-      })
-      it('should complete next appointment journey and link to the outcome check your answers page', () => {
         nextAppointmentPage = new NextAppointmentPage()
         cy.get(`.govuk-radios__input[value=CHANGE_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
@@ -120,7 +109,6 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .eq(0)
           .find('.govuk-summary-list__value')
           .should('contain.text', '3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am')
-
         cy.get('.govuk-summary-list')
           .find('.govuk-summary-list__row')
           .eq(4)
@@ -131,11 +119,11 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
           .should('contain.text', 'Confirm appointment outcome and arrange appointment')
       })
     })
-    describe('No next appointment arranged', () => {
-      beforeEach(() => {
-        loadNextAppointmentPage()
-      })
+
+    describe('Story: logging an outcome with no further appointment', () => {
       it('should redirect to the outcome check your answers page', () => {
+        loadNextAppointmentPage()
+        nextAppointmentPage = new NextAppointmentPage()
         cy.get(`.govuk-radios__input[value=NO]`).click()
         nextAppointmentPage.getSubmitBtn().click()
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()

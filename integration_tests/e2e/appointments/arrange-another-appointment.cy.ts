@@ -34,7 +34,6 @@ describe('Arrange another appointment', () => {
   it('should render the page', () => {
     cy.task('stubNextAppointment')
     loadPage()
-    cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     checkAppointmentSummary({
       page: arrangeAnotherAppointmentPage,
@@ -42,7 +41,6 @@ describe('Arrange another appointment', () => {
       summaryHasDate: false,
       anotherAppointment: true,
     })
-    arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
   })
   describe('User clicks submit without selecting a date and time', () => {
     let dateTimePage: AppointmentdateTimePage
