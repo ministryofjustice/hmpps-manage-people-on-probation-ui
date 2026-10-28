@@ -1,0 +1,46 @@
+{%- from "_components/note/macro.njk" import appNote -%}
+
+{%- set mainAddress = personalDetails.mainAddress -%}
+
+{% if mainAddress %}
+  <dl>
+    <dt class="govuk-visually-hidden">Address</dt>
+    <dd class="govuk-!-margin-left-0">
+      {% if mainAddress.noFixedAddress === true %}
+        No fixed address
+      {% else %}
+        {% set addressAsList = addressToList(mainAddress) %}
+        {% if addressAsList.length > 0 %}
+          {{ addressAsList.join('<br>') | safe }}
+        {% endif %}
+      {% endif %}
+    </dd>
+
+    <dt class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-0" data-qa="addressTypeLabel">
+      Type of address
+    </dt>
+    <dd class="govuk-!-margin-left-0" data-qa="addressTypeValue">
+      {{ mainAddress.type + ' (verified)' if mainAddress.verified else mainAddress.type + ' (not verified)' }}
+    </dd>
+
+    <dt class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-0" data-qa="mainAddressStartDateLabel">
+      Start date
+    </dt>
+    <dd class="govuk-!-margin-left-0" data-qa="mainAddressStartDateValue">
+      {{ mainAddress.from | dateWithYear }}
+    </dd>
+
+    <dt class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-0" data-qa="mainAddressNotesLabel">Notes</dt>
+    <dd class="govuk-!-margin-left-0" data-qa="mainAddressNotesValue">
+      {% if mainAddress.addressNotes.length %}
+        {% for addressNote in mainAddress.addressNotes %}
+          {{ appNote(addressNote, "/case/" + crn + "/personal-details/main-address/note/" + addressNote.id) }}
+        {% endfor %}
+      {% else %}
+        No notes
+      {% endif %}
+    </dd>
+  </dl>
+{% else %}
+  No main address
+{% endif %}

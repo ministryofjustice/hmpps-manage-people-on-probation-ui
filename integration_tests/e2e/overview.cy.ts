@@ -52,8 +52,40 @@ context('Overview', () => {
 
   const verifyPersonalCircumstances = (page: OverviewPage) => {
     page
-      .getCardHeader('personalCircumstances')
+      .getAccordionHeader('personalCircumstances')
       .should('contain.text', 'Addresses, disabilities and personal circumstances')
+    page.openAccordion('personalCircumstances')
+    page
+      .getAccordionHeader('personalCircumstances')
+      .find('a')
+      .should('contain.text', 'View all personal details')
+      .should('have.attr', 'href', '/case/X000001/personal-details')
+
+    const addressValue = page.getRowData('personalCircumstances', 'mainAddress', 'Value')
+    addressValue
+      .should('contain.text', 'No fixed address')
+      .and('contain.text', 'Type of address')
+      .and('contain.text', 'Householder (Owner - freehold or leasehold) (verified)')
+      .and('contain.text', 'Start date')
+      .and('contain.text', '14 March 2023')
+      .and('contain.text', 'Notes')
+    addressValue
+      .find('.app-note')
+      .should('have.length', 3)
+      .eq(0)
+      .should('contain.text', 'Comment added by Tom Brady on 29 October 2024')
+      .find('a')
+      .should('contain.text', 'View full note')
+      .should('have.attr', 'href', '/case/X000001/personal-details/main-address/note/0')
+
+    const otherAddressesValue = page.getRowData('personalCircumstances', 'otherAddresses', 'Value')
+    otherAddressesValue
+      .should('contain.text', '1 other address')
+      .and('contain.text', '1 previous address')
+      .find('a')
+      .should('contain.text', 'View all addresses')
+      .and('have.attr', 'href', '/case/X000001/personal-details/addresses')
+
     page
       .getRowData('personalCircumstances', 'currentCircumstances', 'Value')
       .should('contain.text', 'Committed/ Transferred to Crown: Life imprisonment (Adult)')
@@ -62,17 +94,18 @@ context('Overview', () => {
   }
 
   const verifyRisks = (page: OverviewPage) => {
-    page.getCardHeader('risk').should('contain.text', 'Risk')
+    page.getAccordionHeader('risk').should('contain.text', 'Risk')
+    page.openAccordion('risk')
     page
-      .getCardHeader('risk')
+      .getAccordionHeader('risk')
       .find('a')
-      .should('contain.text', 'View all risk details')
-      .should('have.attr', 'href', 'X000001/risk')
+      .should('contain.text', 'View all risk information')
+      .should('have.attr', 'href', '/case/X000001/risk')
     page
       .getRowData('risk', 'rosh', 'Label')
       .should('contain.text', 'Risk of serious harm (ROSH) in the community')
       .should('contain.text', 'Last updated 24 January 2024')
-    page.getRowData('risk', 'rosh', 'Value').find('.govuk-tag--red').should('contain.text', 'HIGH RISK OF SERIOUS HARM')
+    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'Risk of serious harm VERY HIGH')
     page
       .getRowData('risk', 'mappa', 'Label')
       .should('contain.text', 'MAPPA')
@@ -100,45 +133,50 @@ context('Overview', () => {
       .should('contain.text', 'Attitudes')
     page.getRowData('risk', 'riskFlags', 'Label').should('contain.text', 'NDelius risk flags')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(0)
       .should('contain.text', 'High')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
+      .should('have.class', 'risk-badge--high')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(0).should('contain.text', 'Risk to public')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(1)
       .should('contain.text', 'Medium')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--medium')
+      .should('have.class', 'risk-badge--medium')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(1).should('contain.text', 'Domestic Abuse Perpetrator')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(2)
       .should('contain.text', 'Low')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--low')
+      .should('have.class', 'risk-badge--low')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(2).should('contain.text', 'Risk to Known Adult')
 
-    cy.get('[data-qa="riskFlagsValue"] dt')
+    cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(3)
       .should('contain.text', 'Information only')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold')
+      .should('have.class', 'risk-badge')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
-    page.getElementData('overallRiskValue').should('contain.text', 'VERY HIGH RISK OF SERIOUS HARM')
 
     page.getAlert().should('contain.text', 'medium')
   }
 
   const verifyActivityAndCompliance = (page: OverviewPage) => {
-    page.getCardHeader('activityAndCompliance').should('contain.text', 'Activity and compliance')
+    page.getAccordionHeader('activityAndCompliance').should('contain.text', 'Activity and compliance')
+    page.openAccordion('activityAndCompliance')
+    page
+      .getAccordionHeader('activityAndCompliance')
+      .find('a')
+      .should('contain.text', 'View all compliance information')
+      .should('have.attr', 'href', '/case/X000001/compliance')
     page
       .getRowData('activityAndCompliance', 'previousOrders', 'Value')
       .should('contain.text', '1 previous orders (No breaches on previous orders)')
     page
-      .getRowData('activityAndCompliance', 'compliance', 'Value')
+      .getRowData('activityAndCompliance', 'activityLog', 'Value')
       .should('contain.text', '2 without a recorded outcome')
     page
       .getRowData('activityAndCompliance', 'activityLog', 'Value')
@@ -391,7 +429,7 @@ context('Overview', () => {
       .should('contain.text', '1 previous orders (No breaches on previous orders)')
     page
       .getRowData('activityAndCompliance', 'compliance', 'Value')
-      .should('contain.text', '2 without a recorded outcome')
+      .should('contain.text', '1 prior breach on current order')
     page
       .getRowData('activityAndCompliance', 'activityLog', 'Value')
       .should('contain.text', '2 national standard appointments')
@@ -436,6 +474,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(0)
+      .find('span')
       .should('contain.text', 'High')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
 
@@ -443,6 +482,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(1)
+      .find('span')
       .should('contain.text', 'Medium')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--medium')
 
@@ -450,6 +490,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(2)
+      .find('span')
       .should('contain.text', 'Low')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--low')
 
@@ -457,6 +498,7 @@ context('Overview', () => {
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(3)
+      .find('span')
       .should('contain.text', 'Information only')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold')
 

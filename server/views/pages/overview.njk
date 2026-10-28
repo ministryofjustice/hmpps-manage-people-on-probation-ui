@@ -3,6 +3,8 @@
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% from "mpop/components/supervision-package/macro.njk" import supervisionPackage %}
 {% from "_components/online-checkins-card/macro.njk" import appOnlineCheckinsCard %}
+{% from "mpop/components/risk-flag-badge/macro.njk" import riskFlagBadge %}
+{% from "_components/govuk/accordion-mpop/macro.njk" import probationAccordion %}
 {% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
@@ -116,6 +118,25 @@
   }
 ] %}
 
+{% set mainAddressHtml %}
+  {% include "partials/_main-address.njk" %}
+{% endset %}
+
+{% set otherAddressesHtml %}
+  {% include "partials/_other-addresses.njk" %}
+{% endset %}
+
+{% set addressesRows = [
+  {
+    key: { html: '<span data-qa="mainAddressLabel">' + 'Main address<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">' + personalDetails.mainAddress.lastUpdated | lastUpdatedDate + '</span></span>' },
+    value: { html: '<span data-qa="mainAddressValue">' + mainAddressHtml + '</span>' }
+  },
+  {
+    key: { html: '<span data-qa="otherAddressesLabel">Other addresses</span>' },
+    value: { html: '<span data-qa="otherAddressesValue">' + otherAddressesHtml + '</span>' }
+  }
+] %}
+
 {% set circumstancesRows = [
   {
     key: { html: '<span data-qa="currentCircumstancesLabel">Current circumstances</span>'},
@@ -183,7 +204,13 @@
         </dd>
       {% endif %}
       {% if veryHighRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--very-high">Very High</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Very high', badgeClass: 'risk-badge--very-high' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--very-high">Very High</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in veryHighRiskLevel %}
@@ -193,7 +220,13 @@
         </dd>
       {% endif %}
       {% if highRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--high">High</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'High', badgeClass: 'risk-badge--high' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--high">High</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in highRiskLevel %}
@@ -203,7 +236,13 @@
         </dd>
       {% endif %}
       {% if mediumRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--medium">Medium</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Medium', badgeClass: 'risk-badge--medium' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--medium">Medium</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in mediumRiskLevel %}
@@ -213,7 +252,13 @@
         </dd>
       {% endif %}
       {% if lowRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold rosh--low">Low</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Low', badgeClass: 'risk-badge--low' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold rosh--low">Low</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list">
             {% for risk in lowRiskLevel %}
@@ -223,7 +268,13 @@
         </dd>
       {% endif %}
       {% if infoOnlyRiskLevel.length %}
-        <dt class="govuk-!-font-weight-bold">Information only</dt>
+        <dt>
+          {% if flags.enableNewOverview %}
+            {{ riskFlagBadge({ text: 'Information only' }) }}
+          {% else %}
+            <span class="govuk-!-font-weight-bold">Information only</span>
+          {% endif %}
+        </dt>
         <dd class="govuk-!-margin-left-0">
           <ul class="govuk-list govuk-!-margin-bottom-0">
             {% for risk in infoOnlyRiskLevel %}
@@ -391,10 +442,11 @@
     checkin: offenderCheckinsByCRNResponse,
     upcomingCheckinDate: upcomingCheckin.expectedCheckinDate if upcomingCheckin,
     eligibility: checkinEligibility,
-          canAccess: canAccessCheckins,
-      setupHref: checkinLink,
-        manageHref: manageCheckinLink
-          }) }}
+    canAccess: canAccessCheckins,
+    setupHref: checkinLink,
+    manageHref: manageCheckinLink,
+    cardClasses: cardClasses
+  }) }}
 
   {% if not flags.enableNewOverview %}
     {#  Personal details card  #}
@@ -417,29 +469,28 @@
     }) }}
   {% endif %}
 
-  {% if flags.enableNewOverview %}
-    {#  Addresses, disabilities and personal circumstances card  #}
+  {#  Risk flags and criminogenic needs card  #}
+  {% set riskFlagsAndCriminogenicNeeds %}
+    {% include "../partials/_overview-risk-summary-card.njk" %}
+  {% endset %}
+
+  {% if not flags.enableNewOverview %}
     {{ appSummaryCard({
-      titleText: 'Addresses, disabilities and personal circumstances',
+      titleText: 'Risk',
       headingLevel: 3,
-      attributes: {'data-qa': 'personalCircumstancesCard'},
+      attributes: {'data-qa': 'riskCard'},
       classes: cardClasses,
-      html: govukSummaryList({
-        rows: circumstancesRows
-      }),
+      html: riskFlagsAndCriminogenicNeeds,
       actions: {
         items: [
           {
-            text: 'View all personal details',
-            href: crn + '/personal-details'
+            text: 'View all risk details',
+            href: crn + '/risk'
           }
         ]
       }
     }) }}
   {% endif %}
-
-  {#  Risk flags and criminogenic needs card  #}
-  {% include "../partials/_overview-risk-summary-card.njk" %}
 
   {% set numberOfSentences = overview.sentences.length %}
   {% if numberOfSentences > 0 %}
@@ -638,13 +689,63 @@
       ]
     }) }}
   {% endset %}
-  {{ appSummaryCard({
-    titleText: 'Activity and compliance',
-    headingLevel: 3,
-    attributes: {'data-qa': 'activityAndComplianceCard'},
-    classes: cardClasses,
-    html: activityAndCompliance
-  }) }}
+
+  {% if flags.enableNewOverview %}
+    {#  Addresses, disabilities and personal circumstances accordion  #}
+    {{ probationAccordion({
+      id: "personalCircumstances",
+      headingLevel: 3,
+      attributes: { 'data-qa': 'personalCircumstancesCard' },
+      rememberExpanded: false,
+      items: [
+        {
+          heading: { text: 'Addresses, disabilities and personal circumstances' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Addresses, disabilities and personal circumstances</span><a href="/case/' + crn + '/personal-details" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all personal details</a>' },
+          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + govukSummaryList({
+          rows: addressesRows.concat(circumstancesRows)
+        }) + '</div>' }
+        }
+      ]
+    }) }}
+
+    {#  Risk flags and criminogenic needs accordion  #}
+    {{ probationAccordion({
+      id: "risk",
+      headingLevel: 3,
+      attributes: { 'data-qa': 'riskCard' },
+      rememberExpanded: false,
+      items: [
+        {
+          heading: { text: 'Risk flags and criminogenic needs' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Risk flags and criminogenic needs</span><a href="/case/' + crn + '/risk" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all risk information</a>' },
+          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + riskFlagsAndCriminogenicNeeds + '</div>' }
+        }
+      ]
+    }) }}
+
+    {#  Activity and compliance accordion  #}
+    {{ probationAccordion({
+      id: "activityAndCompliance",
+      headingLevel: 3,
+      attributes: { 'data-qa': 'activityAndComplianceCard' },
+      rememberExpanded: false,
+      items: [
+        {
+          heading: { text: 'Activity and compliance' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Activity and compliance</span><a href="/case/' + crn + '/compliance" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all compliance information</a>' } if flags.enableCompliancePage,
+          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + activityAndCompliance + '</div>' }
+        }
+      ]
+    }) }}
+  {% else %}
+    {{ appSummaryCard({
+      titleText: 'Activity and compliance',
+      headingLevel: 3,
+      attributes: {'data-qa': 'activityAndComplianceCard'},
+      classes: cardClasses,
+      html: activityAndCompliance
+    }) }}
+  {% endif %}
 
   <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">
   <input type="hidden" id="name" name="name"

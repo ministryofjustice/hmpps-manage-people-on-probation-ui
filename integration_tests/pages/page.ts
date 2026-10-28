@@ -49,11 +49,17 @@ export default abstract class Page {
   getCardHeader = (cardName: string): PageElement =>
     cy.get(`[class=app-summary-card__header]`).get(`[data-qa=${cardName}Card]`)
 
+  getAccordionHeader = (cardName: string): PageElement =>
+    cy.get(`[data-qa=${cardName}Card] .govuk-accordion__section-header`)
+
+  openAccordion = (cardName: string): PageElement =>
+    this.getAccordionHeader(cardName).find('.govuk-accordion__section-toggle').click()
+
   getCardElement = (cardName: string, element: string, index: number): PageElement =>
     this.getCardHeader(cardName).within(() => cy.get(element).eq(index))
 
   getRowData = (cardName: string, rowName: string, type: string, index = 0): PageElement => {
-    return cy.get(`[data-qa=${cardName}Card]`).within(() => cy.get(`[data-qa=${rowName}${type}]`).eq(index))
+    return cy.get(`[data-qa=${cardName}Card]`).find(`[data-qa=${rowName}${type}]`).eq(index)
   }
 
   getLicenceConditionsSummaryLink = (detailsIndex = 0) =>

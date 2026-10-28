@@ -1,5 +1,6 @@
 {% from "_components/summary-card/macro.njk" import appSummaryCard %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "arns/components/predictor-badge/macro.njk" import predictorBadge %}
 
 {% if flags.enableNDeliusRoshOverviewPage %}
   {% set assessedOn = rosh.assessedOn %}
@@ -10,7 +11,7 @@
 {% endif %}
 {% set hasRosh = overallRiskLevel and (flags.enableNDeliusRoshOverviewPage or assessedOn) %}
 
-{% set risk %}
+
     {% set riskToThemselves %}
         {% set currentRisksToThemselves = getCurrentRisksToThemselves(risks.riskToSelf) %}
         {% set previousRisksToThemselves = getPreviousRisksToThemselves(risks.riskToSelf) %}
@@ -86,11 +87,28 @@
     {% set roshText = overallRiskLevel | replace("_", " ") %}
     {% set overallRosh %}
         {% if hasRosh %}
+          {% if flags.enableNewOverview %}
+            {{ predictorBadge({
+              data: {
+                assessments: [
+                  {
+                    rosh: {
+                    name: 'Risk of serious harm',
+                    band: roshText
+                  }
+                  }
+                ]
+              },
+              predictor: 'rosh',
+              showScore: false
+            }) }}
+          {% else %}
              <table>
                 <tr>
                      <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(overallRiskLevel | replace(" ", "_")) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
                 </tr>
             </table>
+          {% endif %}
         {% else %}
             {{'There is no ROSH summary.'}}
         {% endif %}
@@ -115,20 +133,3 @@
             }
         ]
     }) }}
-{% endset %}
-
-{{ appSummaryCard({
-    titleText: 'Risk',
-    headingLevel: 3,
-    attributes: {'data-qa': 'riskCard'},
-    classes: cardClasses | default('govuk-!-margin-bottom-6 app-summary-card--large-title'),
-    html: risk,
-    actions: {
-        items: [
-            {
-                text: 'View all risk details',
-                href: crn + '/risk'
-            }
-        ]
-    }
-}) }}

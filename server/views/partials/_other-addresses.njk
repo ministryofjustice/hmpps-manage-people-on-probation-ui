@@ -1,0 +1,28 @@
+{% set otherAddressCount = personalDetails.otherAddressCount %}
+{% set previousAddressCount = personalDetails.previousAddressCount %}
+{% set hasOtherAddresses = otherAddressCount > 0 %}
+{% set hasPreviousAddresses = previousAddressCount > 0 %}
+
+{% if hasOtherAddresses or hasPreviousAddresses %}
+  {% set otherAddressString = '1 other address' if otherAddressCount == 1 else
+    otherAddressCount + ' other addresses' %}
+  {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else
+    previousAddressCount + ' previous addresses' %}
+
+  {% if hasOtherAddresses and hasPreviousAddresses %}
+    <ul class="govuk-list">
+      <li>{{ otherAddressString }}</li>
+      <li>{{ previousAddressString }}</li>
+    </ul>
+    {% elif hasOtherAddresses %}
+    {{ otherAddressString }}
+  {% else %}
+    {{ previousAddressString }}
+  {% endif %}
+
+  <p>
+    <a href="/case/{{ crn }}/personal-details/addresses">View all addresses</a>
+  </p>
+{% else %}
+  No other addresses
+{% endif %}

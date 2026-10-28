@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import Page from '../pages/page'
 import RiskPage from '../pages/risk'
 import RemovedRiskPage from '../pages/removedRisk'
@@ -148,7 +149,7 @@ const checkRiskPageView = ({
     page
       .getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value')
       .should('contain.text', dateWithYear(nextReviewDate))
-    if (level === 'HIGH') {
+    if (nextReviewDate < DateTime.now().toISO()) {
       page.getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value').should('contain.text', 'Overdue')
     }
   }
@@ -403,7 +404,7 @@ context('Risk', () => {
     page
       .getRowData('riskFlag', 'mostRecentReviewDate', 'Value')
       .should('contain.text', '12 December 2023 by Paul Smith')
-    page.getRowData('riskFlag', 'createdDate', 'Value').should('contain.text', '12 December 2023 by Paul Smith')
+    page.getRowData('riskFlag', 'createdDate', 'Value').should('contain.text', '12 December 2022 by Paul Smith')
     page.assertAnchorElementAtIndex('[data-qa=riskFlagRemovedCard]', 0, '/case/X000001/risk/flag/4/risk-removal-note/0')
     page.assertAnchorElementAtIndex('[data-qa=riskFlagCard]', 0, '/case/X000001/risk/flag/4/note/1')
   })
