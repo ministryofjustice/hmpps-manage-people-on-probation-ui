@@ -82,14 +82,17 @@ export const checkOptionRedirects = <TPage extends Page>(
   options: ExpectedOption<TPage>[],
   PageClass: RedirectPage,
 ): void => {
-  options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
-    const outcomePage = new PageClass()
-    cy.get(`.govuk-radios__input[value=${value}]`).click()
-    outcomePage.getSubmitBtn().click()
-    const page = new RedirectPage()
-    page.checkPageTitle(redirectPageTitle)
-    cy.go('back')
-    cy.get('[data-module="govuk-radios"]').should('exist')
+  cy.location('pathname').then(optionsPath => {
+    options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
+      const outcomePage = new PageClass()
+      cy.get(`.govuk-radios__input[value=${value}]`).click()
+      outcomePage.getSubmitBtn().click()
+      const page = new RedirectPage()
+      page.checkPageTitle(redirectPageTitle)
+      cy.go('back')
+      cy.location('pathname').should('eq', optionsPath)
+      cy.get('[data-module="govuk-radios"]').should('exist')
+    })
   })
 }
 

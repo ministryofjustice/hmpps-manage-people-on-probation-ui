@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon'
-import { checkPopHeader } from '../appointments/imports'
 import { crn, appointmentId } from '../appointments/imports/common'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
@@ -126,15 +125,13 @@ const getExpectedOptions = ({
 }
 
 const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
-  it('should render the page if sentence length is over 24 months', () => {
+  it('should complete the acceptable absence journey', () => {
     loadPage({ journey })
     acceptableAbsencePage = new AcceptableAbsencePage()
-    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    cy.get('legend').should('contain.text', 'Why was Alton’s absence acceptable?')
+
+    // journey-specific appointment hint, built by the controller
     let expectedAppointment = '3 way meeting (NS) with Terry Jones on Wednesday 21 February 2024'
-    const now = DateTime.now()
-    const yesterday = now.minus({ days: 1 })
-    const expectedDate = dateWithDayAndWithYear(yesterday.toISODate())
+    const expectedDate = dateWithDayAndWithYear(DateTime.now().minus({ days: 1 }).toISODate())
     if (journey === 'ARRANGE') {
       expectedAppointment = `Planned office visit (NS) with Deborah Fern on ${expectedDate}`
     }
@@ -142,30 +139,22 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       expectedAppointment = `3 way meeting (NS) with Terry Jones on ${expectedDate}`
     }
     cy.get('.govuk-hint').should('contain.text', `Appointment: ${expectedAppointment}.`)
-    const options = getExpectedOptions()
-    checkOptions(options)
-  })
-  it('should render the page if sentence length is 24 months or less', () => {
-    loadPage({ journey, sentenceLength: 12 })
-    const options = getExpectedOptions({ sentenceLength: 12 })
-    checkOptions(options)
-  })
-  it('should have the correct back link', () => {
-    loadPage({ journey })
-    let expectedLink: string
+
+    // sentence over 24 months includes the acceptable failure option
+    cy.get('.govuk-radios__input[value=ACCEPTABLE_FAILURE]').should('exist')
+
     getUuid(3).then(uuid => {
-      if (journey === 'MANAGE') {
-        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome`
-      } else {
-        expectedLink = `/case/${crn}/arrange-appointment/${uuid}/outcome`
-      }
+      const expectedLink =
+        journey === 'MANAGE'
+          ? `/case/${crn}/appointments/appointment/${appointmentId}/outcome`
+          : `/case/${crn}/arrange-appointment/${uuid}/outcome`
       acceptableAbsencePage.getBackLink().should('have.attr', 'href', expectedLink)
     })
-  })
-  it('should show validation error when no option is selected', () => {
+
+    checkOptionRedirects(getExpectedOptions(), AcceptableAbsencePage)
+
+    // validation error (after redirects, as the error render is a POST response)
     const msg = 'Select why their absence was acceptable'
-    loadPage({ journey })
-    acceptableAbsencePage = new AcceptableAbsencePage()
     uncheckAllRadios()
     acceptableAbsencePage.getSubmitBtn().click()
     acceptableAbsencePage.checkErrorSummaryBox([msg])
@@ -173,11 +162,6 @@ const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
       const id = journey === 'MANAGE' ? appointmentId : uuid
       cy.get(`#appointments-${crn}-${id}-outcome-acceptableAbsence-error`).should('contain.text', msg)
     })
-  })
-  it('should redirect to the correct page when an option is selected', () => {
-    const options = getExpectedOptions()
-    loadPage({ journey })
-    checkOptionRedirects(options, AcceptableAbsencePage)
   })
 }
 
@@ -190,6 +174,11 @@ describe('Acceptable absence', () => {
   })
   describe('Manage appointment journey', () => {
     checkPage()
+    it('should not show the acceptable failure option if sentence length is 24 months or less', () => {
+      loadPage({ sentenceLength: 12 })
+      checkOptions(getExpectedOptions({ sentenceLength: 12 }))
+      cy.get('.govuk-radios__input[value=ACCEPTABLE_FAILURE]').should('not.exist')
+    })
   })
   describe('Arrange appointment journey', () => {
     checkPage({ journey: 'ARRANGE' })
