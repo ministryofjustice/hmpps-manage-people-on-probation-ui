@@ -8,6 +8,11 @@ on:
         required: false
         type: string
         default: ".nvmrc"
+      npm_version:
+        description: "Passed to npm install so it knows which version of npm to install"
+        required: false
+        type: string
+        default: "^12"
 
 permissions:
   contents: read
@@ -25,6 +30,11 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version-file: ${{ inputs.node_version_file }}
+      - name: Update npm
+        shell: bash
+        env:
+          NPM_VERSION: ${{ inputs.npm_version }}
+        run: npm install -g "npm@$NPM_VERSION"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:

@@ -13,13 +13,18 @@ on:
         required: false
         type: string
         default: "npm ci --no-audit"
+      npm_version:
+        description: "Passed to npm install so it knows which version of npm to install"
+        required: false
+        type: string
+        default: "^12"
 
 permissions:
   contents: read
 
 jobs:
   node-build:
-    name: Run the node build 
+    name: Run the node build
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
@@ -29,12 +34,14 @@ jobs:
         node-version-file: ${{ inputs.node_version_file }}
     - name: update npm
       shell: bash
+      env:
+        NPM_VERSION: ${{ inputs.npm_version }}
       run: |
-        sudo npm install -g npm@latest
+        npm install -g "npm@$NPM_VERSION"
     - name: restore cache
       id: restore-cache
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
-      env: 
+      env:
         cache-name: node-modules
       with:
         path: |
@@ -53,11 +60,11 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     - name: Linter check # Run linter after build because the integration test code depend on compiled typescript...
       shell: bash
-      run: | 
+      run: |
         npm run lint
     - name: upload the artifacts
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
-      with: 
+      with:
         name: npm_build_artifacts
         path: |
           build/
@@ -66,7 +73,7 @@ jobs:
     - name: save cache
       id: save-cache
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
-      env: 
+      env:
         cache-name: node-modules
       with:
         path: |
