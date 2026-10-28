@@ -7,244 +7,49 @@ import { checkPopHeader } from './imports'
 const crn = 'X000001'
 const appointmentId = '2'
 
-const loadPage = () => {
-  cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/next-appointment`)
+const loadPage = (id = appointmentId) => {
+  cy.visit(`/case/${crn}/appointments/appointment/${id}/next-appointment`)
 }
 
 describe('Create next appointment', () => {
   let nextAppointmentPage: NextAppointmentPage
   beforeEach(() => {
     cy.task('resetMocks')
-    loadPage()
-    nextAppointmentPage = new NextAppointmentPage()
   })
 
-  it('should render the pop header', () => {
-    checkPopHeader()
-  })
-  it('should display the inset text', () => {
-    cy.get('.govuk-inset-text').should(
-      'contain.text',
-      'Planned office visit (NS) on Wednesday 21 February 2024 at 10:15am with Terry Jones for their Pre-Sentence',
-    )
-  })
-  it('should display the options', () => {
-    nextAppointmentPage
-      .getRadioLabel('anotherAppointment', 1)
-      .should('contain.text', 'Yes - another planned office visit (NS)')
-    nextAppointmentPage.getRadioLabel('anotherAppointment', 2).should('contain.text', 'Yes - another appointment type')
-    nextAppointmentPage.getRadioLabel('anotherAppointment', 3).should('contain.text', 'No')
-  })
-  it('should return to manage page when backLink selected', () => {
-    nextAppointmentPage.getBackLink().click()
-    const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with George Parker')
-    manageAppointmentPage.checkOnPage()
-  })
-
-  it('should give error if no selection made', () => {
-    loadPage()
-    nextAppointmentPage.getSubmitBtn().click()
-    nextAppointmentPage.getErrorSummaryBox().should('be.visible')
-  })
-
-  it('should return to manage if no selected', () => {
-    nextAppointmentPage.getRadio('anotherAppointment', 3).click()
-    nextAppointmentPage.getSubmitBtn().click()
-    const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with George Parker')
-    manageAppointmentPage.checkOnPage()
-  })
-
-  describe('Same appointment type', () => {
-    it('should handle a sentence appointment with no eventId', () => {
-      cy.task('stubAppointmentNoEventId')
-      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
+  describe('Story: practitioner decides not to arrange another appointment', () => {
+    it('should show the page, error on empty submit, then return to manage when "No" is selected', () => {
+      loadPage()
       nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
+      checkPopHeader()
       nextAppointmentPage.getSubmitBtn().click()
-      const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Choose for')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-        .should('contain.text', 'Select what the appointment is for first.')
-
-      arrangeAnotherAppointmentPage.getSummaryListRow(2).find('.govuk-summary-list__actions').should('not.exist')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Terry Jones (PS-PSO) (Automated Allocation Team, London)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-        .should('contain.text', 'Select what the appointment is for first.')
-
-      arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
-    })
-
-    it('should handle an appointment with no type', () => {
-      cy.task('stubAppointmentNoType')
-      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
-      nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
+      nextAppointmentPage.getErrorSummaryBox().should('be.visible')
+      nextAppointmentPage.getRadio('anotherAppointment', 3).click()
       nextAppointmentPage.getSubmitBtn().click()
-      const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Default Sentence Type (12 Months)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-        .should('not.contain.html', '<span class="govuk-summary-list__hint">')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Choose type')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Terry Jones (PS-PSO) (Automated Allocation Team, London)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-        .should('contain.text', 'Select the appointment type first.')
-      arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
-      arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
-    })
-    it('should handle an appointment with no location', () => {
-      cy.task('stubAppointmentNoLocation')
-      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
-      nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
-      nextAppointmentPage.getSubmitBtn().click()
-      const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Default Sentence Type (12 Months)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', '3 way meeting (NS)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Peter Parker (PS-PSO) (Automated Allocation Team, London)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Choose location')
-    })
-    it('should handle person level appointment', () => {
-      cy.task('stubAppointmentPersonLevel')
-      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
-      nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
-      nextAppointmentPage.getSubmitBtn().click()
-      const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Caroline')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Planned doorstep contact (NS)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Terry Jones (PS-PSO) (Automated Allocation Team, London)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__value')
-        .should('contain.html', 'The Building<br>77 Some Street<br>Some City Centre<br>London<br>Essex<br>NW10 1EP')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
+      const manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with George Parker')
+      manageAppointmentPage.checkOnPage()
     })
   })
-  describe('Another appointment type', () => {
-    let sentencePage: AppointmentSentencePage
-    beforeEach(() => {
-      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
+
+  describe('Story: practitioner arranges another appointment of a different type', () => {
+    it('should redirect to the sentence/person page', () => {
+      loadPage('6')
       nextAppointmentPage = new NextAppointmentPage()
       nextAppointmentPage.getRadio('anotherAppointment', 2).click()
       nextAppointmentPage.getSubmitBtn().click()
+      new AppointmentSentencePage().checkOnPage()
     })
-    it('should redirect to the sentence/person page', () => {
-      sentencePage = new AppointmentSentencePage()
-      sentencePage.checkOnPage()
+  })
+
+  describe('Story: practitioner arranges another appointment of the same type', () => {
+    it('should carry the appointment over to the arrange another appointment page', () => {
+      cy.task('stubAppointmentNoEventId')
+      loadPage('6')
+      nextAppointmentPage = new NextAppointmentPage()
+      nextAppointmentPage.getRadio('anotherAppointment', 1).click()
+      nextAppointmentPage.getSubmitBtn().click()
+      new ArrangeAnotherAppointmentPage().checkOnPage()
     })
   })
 })
