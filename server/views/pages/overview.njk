@@ -732,7 +732,7 @@
       items: [
         {
           heading: { text: 'Activity and compliance' },
-          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Activity and compliance</span><a href="/case/' + crn + '/compliance" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all compliance information</a>' },
+          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Activity and compliance</span><a href="/case/' + crn + '/compliance" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all compliance information</a>' } if flags.enableCompliancePage,
           content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + activityAndCompliance + '</div>' }
         }
       ]
