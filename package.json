@@ -134,7 +134,7 @@
     "@ministryofjustice/hmpps-audit-client": "^1.1.3",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "^1.0.2",
-    "@ministryofjustice/hmpps-mpop-frontend-components-lib": "0.0.46",
+    "@ministryofjustice/hmpps-mpop-frontend-components-lib": "0.0.47",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
     "@ministryofjustice/probation-search-frontend": "4.2.3",
     "@opentelemetry/api": "1.9.0",
