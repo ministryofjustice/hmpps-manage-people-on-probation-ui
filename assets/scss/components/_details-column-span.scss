@@ -1,0 +1,15 @@
+@include govuk-media-query($from: tablet) {
+  table:has([data-details-column-span-init]) {
+    position: relative;
+  }
+
+  [data-details-column-span-init] {
+    .govuk-details__text {
+      position: absolute;
+
+      & > * {
+        width: auto;
+      }
+    }
+  }
+}
