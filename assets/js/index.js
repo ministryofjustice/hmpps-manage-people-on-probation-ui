@@ -14,6 +14,7 @@ import setupTechnicalUpdates from './technical-updates'
 import setupSearch from './delius'
 import './photo'
 import initGovUkBackLink from './back-link'
+import DetailsColumnSpan from './details-column-span'
 
 arnsFrontend.initAll()
 mpopFrontend.initAll()
@@ -505,3 +506,7 @@ initGovUkBackLink()
 setupSearch()
 criss()
 new DateTimeFormatting()
+
+document.querySelectorAll('[data-details-column-span]').forEach($el => {
+  new DetailsColumnSpan($el)
+})

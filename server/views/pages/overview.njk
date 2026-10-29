@@ -595,7 +595,8 @@
             html: govukDetails({
               summaryText: sentenceDesription,
               html: sentenceHtml,
-              classes: 'govuk-!-margin-0'
+              classes: 'govuk-!-margin-0',
+              attributes: { 'data-details-column-span': '' }
             }),
             attributes: { 'data-label': 'Sentence' }
           },
