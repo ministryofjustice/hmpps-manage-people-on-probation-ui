@@ -1,0 +1,27 @@
+
+@include govuk-media-query($until: tablet) {
+  .govuk-table--responsive {
+    & .govuk-table__head {
+      @include govuk-visually-hidden();
+    }
+
+    & td {
+      display: block;
+      border: 0;
+    }
+
+    & tr {
+      display: block;
+      border-bottom: 2px solid $govuk-border-colour;
+      padding-bottom: govuk-spacing(2);
+      margin-bottom: govuk-spacing(4);
+    }
+
+    & td[data-label]:before {
+      @include govuk-font(false, $weight: bold);
+      content: attr(data-label);
+      display: block;
+    }
+
+  }
+}
