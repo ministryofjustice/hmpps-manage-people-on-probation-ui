@@ -135,10 +135,12 @@ describe('Check your answers - outcomes', () => {
     expect(changeLink($, 5)).toBe(`${baseOutcomeUrl}/add-note?change=${url}`)
   })
 
-  it('should not render the notes row when there are no notes', () => {
-    const $ = render({ appointmentOutcome: { summary: { ...summary, notes: '' } } })
-    expect($('.govuk-summary-list__key').text()).not.toContain('Notes')
-    expect(key($, 3)).toBe('Sensitivity')
+  it('should render the notes placeholder and change link when no notes were entered', () => {
+    const $ = render({ appointmentOutcome: { summary: { ...summary, notes: 'No notes' } } })
+    expect(key($, 3)).toBe('Notes')
+    expect(value($, 3)).toBe('No notes')
+    expect(changeLink($, 3)).toBe(`${baseOutcomeUrl}/add-note?change=${url}`)
+    expect(key($, 4)).toBe('Sensitivity')
   })
 
   it('should render the change links', () => {
