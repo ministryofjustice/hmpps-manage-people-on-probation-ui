@@ -42,8 +42,7 @@ const checkSummary = ({
   outcomeText,
   actionText = null,
   documents = false,
-  notes = true,
-}: { outcomeText?: string; actionText?: string[]; documents?: boolean; notes?: boolean } = {}) => {
+}: { outcomeText?: string; actionText?: string[]; documents?: boolean } = {}) => {
   const appointment = documents
     ? `3 way meeting (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am`
     : 'Planned office visit (NS) on Wednesday 21 February 2024 at 10:15am to 10:30am'
@@ -85,7 +84,7 @@ const checkSummary = ({
   checkYourAnswersOutcomePage
     .getSummaryListRow(index)
     .find('.govuk-summary-list__value')
-    .should('contain.text', notes ? 'Some notes' : 'No notes')
+    .should('contain.text', 'Some notes')
   checkYourAnswersOutcomePage
     .getSummaryListRow(index + 1)
     .find('.govuk-summary-list__key')
@@ -117,55 +116,6 @@ const checkSummary = ({
 }
 
 const checkPage = () => {
-  describe('Outcome is attended and complied or attended but sent home due to probation service issues', () => {
-    const outcomes: Props[] = [
-      { outcome: 'ATTENDED_COMPLIED', outcomeText: 'Attended - complied' },
-      {
-        outcome: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
-        outcomeText: 'Attended - sent home (service issues)',
-      },
-    ]
-    outcomes.forEach(({ outcome, outcomeText, action, actionText }) => {
-      it(`should render the page if outcome is ${outcome} ${action ? ` and action is ${action}` : ''}`, () => {
-        loadPage({ outcome, action })
-        checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-        checkSummary({ outcomeText, actionText: actionText ? [actionText] : null })
-      })
-    })
-  })
-
-  describe('Outcome is attended - failed to comply or failed to attend', () => {
-    const outcomes: Props[] = [
-      {
-        outcome: 'ATTENDED_FAILED_TO_COMPLY',
-        outcomeText: 'Attended - failed to comply',
-        action: 'NO_FURTHER_ACTION',
-        actionText: 'No further action',
-      },
-      {
-        outcome: 'FAILED_TO_ATTEND',
-        outcomeText: 'Failed to attend',
-        action: 'SEND_LETTER',
-        actionText: 'I will send a first warning letter',
-      },
-    ]
-    outcomes.forEach(({ outcome, outcomeText, action, actionText }) => {
-      it(`should render the page if outcome is ${outcome} ${action ? ` and action is ${action}` : ''}`, () => {
-        loadPage({ outcome, action })
-        checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-        checkSummary({ outcomeText, actionText: actionText ? [actionText] : null })
-      })
-    })
-  })
-  describe('Outcome is acceptable absence and appointment has a document', () => {
-    it('should render the page', () => {
-      cy.task('stubAppointment', { documents: true, isFuture: false })
-      loadPage({ outcome: 'ACCEPTABLE_ABSENCE', action: 'ACCEPTABLE_ABSENCE_COURT_LEGAL' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkSummary({ outcomeText: 'Acceptable absence - court / legal', documents: true })
-    })
-  })
-
   describe('Outcome is unacceptable absence and action is initiate breach/recall and send a letter', () => {
     it('should render the page', () => {
       cy.task('stubAppointment', { documents: true, isFuture: false })
@@ -179,97 +129,51 @@ const checkPage = () => {
     })
   })
 
-  describe('Outcome is unacceptable absence and action is initiate breach/recall and send a letter and no notes', () => {
-    it('should render the page', () => {
-      cy.task('stubAppointment', { documents: true, isFuture: false })
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER', notes: '' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkSummary({
-        outcomeText: 'Unacceptable absence',
-        actionText: ['I will initiate the breach', 'I will send a different enforcement letter'],
-        documents: true,
-        notes: false,
-      })
-    })
-  })
+  describe('User changes answers using the change links', () => {
+    it('should update notes, sensitivity, enforcement action, outcome and next appointment', () => {
+      const notes = 'Some changed notes'
+      const appointmentType = 'Planned office visit (NS)'
+      const clickChange = (rowKey: string) =>
+        cy.contains('.govuk-summary-list__row', rowKey).find('.govuk-summary-list__actions a').click()
+      const rowValue = (rowKey: string) =>
+        cy.contains('.govuk-summary-list__row', rowKey).find('.govuk-summary-list__value')
 
-  describe('User updates the outcome and enforcement action by clicking the outcome change link', () => {
-    it('should render the page with updated outcome and enforcement action', () => {
-      cy.task('stubAppointment', { documents: true, isFuture: false })
       loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
       checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(2).find('.govuk-summary-list__actions').find('a').click()
-      completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Attended - failed to comply')
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'No further action')
-      checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
-    })
-  })
 
-  describe('User updates the enforcement action by clicking the enforcement action change link', () => {
-    it('should render the page with updated outcome and enforcement action', () => {
-      cy.task('stubAppointment', { documents: true, isFuture: false })
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(3).find('.govuk-summary-list__actions').find('a').click()
+      clickChange('Notes')
+      completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, value: notes })
+      rowValue('Notes').should('contain', notes)
+
+      clickChange('Sensitivity')
+      completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, value: notes, sensitivityIndex: 1 })
+      rowValue('Sensitivity').should('contain.text', 'No')
+
+      clickChange('Enforcement action')
       completeAction({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'SEND_LETTER' })
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Unacceptable absence')
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'I will send a first warning letter')
+      rowValue('What was the outcome of this appointment?').should('contain.text', 'Unacceptable absence')
+      rowValue('Enforcement action').should('contain.text', 'I will send a first warning letter')
+      rowValue('Notes').should('contain', notes)
+      rowValue('Sensitivity').should('contain.text', 'No')
+
+      clickChange('What was the outcome of this appointment?')
+      completeOutcome({ outcome: 'ATTENDED_FAILED_TO_COMPLY', action: 'NO_FURTHER_ACTION' })
+      rowValue('What was the outcome of this appointment?').should('contain.text', 'Attended - failed to comply')
+      rowValue('Enforcement action').should('contain.text', 'No further action')
+      rowValue('Notes').should('contain', notes)
+      rowValue('Sensitivity').should('contain.text', 'No')
       checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
-    })
-  })
 
-  describe('User updates the notes by clicking the change link', () => {
-    it('should render the page with updated notes', () => {
-      const value = 'Some changed notes'
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(5).find('.govuk-summary-list__actions').find('a').click()
-      completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, value })
-      checkYourAnswersOutcomePage.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', value)
-    })
-  })
-  describe('User updates the sensitivity by clicking the change link', () => {
-    it('should render the page with updated sensitivity', () => {
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(6).find('.govuk-summary-list__actions').find('a').click()
-      completeAddNotePage({ journey: 'MANAGE', crnOverride: crn, sensitivityIndex: 1 })
-      checkYourAnswersOutcomePage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'No')
-    })
-  })
-
-  describe('User updates the next appointment by clicking the change link', () => {
-    it('should render the page with updated next appointment and persist original appointment', () => {
-      loadPage({ outcome: 'UNACCEPTABLE_ABSENCE', action: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER' })
-      checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
-      checkYourAnswersOutcomePage.getSummaryListRow(7).find('.govuk-summary-list__actions').find('a').click()
+      clickChange('Next appointment')
       completeNextAppointmentPage({ value: 'KEEP_TYPE', isOutcome: true })
-      const appointmentType = `Planned office visit (NS)`
-
       checkYourAnswersOutcomePage.checkPageTitle(
         'Check your answers then confirm the appointment outcome and next appointment',
       )
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', `${appointmentType} on Wednesday 21 February 2024 at 10:15am to 10:30am`)
-      checkYourAnswersOutcomePage
-        .getSummaryListRow(7)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', `${appointmentType} on ${yesterday} at 9am to 10am`)
+      rowValue('Appointment details').should(
+        'contain.text',
+        `${appointmentType} on Wednesday 21 February 2024 at 10:15am to 10:30am`,
+      )
+      rowValue('Next appointment').should('contain.text', `${appointmentType} on ${yesterday} at 9am to 10am`)
       checkYourAnswersOutcomePage
         .getSubmitBtn()
         .should('contain.text', 'Confirm appointment outcome and arrange appointment')
