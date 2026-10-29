@@ -40,6 +40,7 @@ $badge-color: #0b0c0c;
 @import './components/note';
 @import './components/checkboxes';
 @import './components/modal';
+@import './components/risk-alert';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
