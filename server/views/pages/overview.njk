@@ -493,6 +493,20 @@
   {% endif %}
 
   {% set numberOfSentences = overview.sentences.length %}
+
+  {% set noSentenceHtml %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { html: '<span data-qa="orderLabel">Order</span>'},
+          value: { html: '<span data-qa="orderValue">No active sentence</span>'}
+        }
+      ]
+    }) }}
+  {%- endset %}
+
+  {% set sentencesRows = [] %}
+
   {% if numberOfSentences > 0 %}
     {% for sentence in overview.sentences %}
       {% set hasLocationMonitoring = { hasLicenceConditionsLMData: false, hasRequirementsLMData: false } %}
@@ -506,9 +520,12 @@
             {% if locationMonitoringUri %}
               {% set hasLocationMonitoring = sentence.eventNumber | checkLocationMonitoringByEventNumber(sentences) %}
             {% endif %}
-            {{ sentence.order.description }} <br />
-            From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br />
-            {{ sentence.order.startDate | monthsOrDaysElapsed }} elapsed
+            {{ sentence.order.description }}
+            {% if not flags.enableNewOverview %}
+              <br />
+              From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br />
+              {{ sentence.order.startDate | monthsOrDaysElapsed }} elapsed
+            {% endif %}
           {% else %}
             No order details
           {% endif %}
@@ -571,41 +588,80 @@
       {% endset %}
 
       {% set sentenceDesription = sentence.order.description | toSentenceDescription %}
-      {{ appSummaryCard({
-        titleText: sentenceDesription,
-        headingLevel: 3,
-        classes: cardClasses,
-        attributes: {'data-qa': 'sentence' + sentence.eventNumber + 'Card'},
-        html: sentenceHtml,
-        actions: {
-          items: [
-            {
-              text: 'View all sentence details',
-              href: crn + '/sentence'
-            }
-          ]
-        }
-      }) }}
-    {%- endfor %}
-  {% else %}
-    {% set sentenceHtml %}
-      {{ govukSummaryList({
-        rows: [
+
+      {% if flags.enableNewOverview %}
+        {% set sentencesRows = sentencesRows.concat([[
           {
-            key: { html: '<span data-qa="orderLabel">Order</span>'},
-            value: { html: '<span data-qa="orderValue">No active sentence</span>'}
+            html: govukDetails({
+              summaryText: sentenceDesription,
+              html: sentenceHtml,
+              classes: 'govuk-!-margin-0'
+            }),
+            attributes: { 'data-label': 'Sentence' }
+          },
+          { html: sentence.order.startDate | dateWithYear, attributes: { 'data-label': 'Start date' } },
+          { text: sentence.order.endDate | dateWithYear, attributes: { 'data-label': 'End date' } },
+          {
+            text: (sentence.order.length + (' month' if sentence.order.length == 1 else ' months')) if sentence.order.length else '',
+            attributes: { 'data-label': 'Length' }
+          },
+          { text: sentence.order.startDate | monthsOrDaysElapsed, attributes: { 'data-label': 'Time elapsed' } }
+        ]]) %}
+      {% else %}
+        {{ appSummaryCard({
+          titleText: sentenceDesription,
+          headingLevel: 3,
+          classes: cardClasses,
+          attributes: {'data-qa': 'sentence' + sentence.eventNumber + 'Card'},
+          html: sentenceHtml,
+          actions: {
+            items: [
+              {
+                text: 'View all sentence details',
+                href: crn + '/sentence'
+              }
+            ]
           }
-        ]
-      }) }}
-    {%- endset %}
+        }) }}
+      {% endif %}
+    {%- endfor %}
+  {% elif not flags.enableNewOverview %}
     {{ appSummaryCard({
       titleText: 'Sentence',
       headingLevel: 3,
       classes: cardClasses,
       attributes: {'data-qa': 'sentenceCard'},
-      html: sentenceHtml
+      html: noSentenceHtml
     }) }}
   {%- endif %}
+
+  {% if flags.enableNewOverview %}
+    {% set sentencesHtml %}
+      {% if numberOfSentences == 0 %}
+        {{ noSentenceHtml | safe }}
+      {% else %}
+        {{ govukTable({
+          classes: 'govuk-table--responsive',
+          head: [
+            { text: 'Sentence' },
+            { text: 'Start date' },
+            { text: 'End date' },
+            { text: 'Length' },
+            { text: 'Time elapsed' }
+          ],
+          rows: sentencesRows
+        }) }}
+      {% endif %}
+    {% endset %}
+
+    {{ appSummaryCard({
+      titleText: 'Sentences' if numberOfSentences > 1 else 'Sentence',
+      headingLevel: 3,
+      classes: cardClasses,
+      attributes: { 'data-qa': 'sentenceCard' },
+      html: sentencesHtml
+    }) }}
+  {% endif %}
 
   {#  Activity and compliance card  #}
   {% set activityAndCompliance %}

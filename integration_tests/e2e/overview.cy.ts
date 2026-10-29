@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overview'
 import { checkPopHeader, checkRiskToStaffAlert } from './appointments/imports'
+import { monthsOrDaysElapsed } from '../../server/utils'
 
 context('Overview', () => {
   const stubSupervisionPackage = (enabled: boolean) => {
@@ -33,21 +34,29 @@ context('Overview', () => {
   }
 
   const verifySentences = (page: OverviewPage) => {
-    page.getCardHeader('sentence2').should('contain.text', 'ORA Community Order')
-    page
-      .getRowData('sentence2', 'mainOffence', 'Value')
+    page.getCardHeader('sentence').should('contain.text', 'Sentences')
+    page.getColumnHeader('sentence', 0).should('contain.text', 'Sentence')
+    page.getColumnHeader('sentence', 1).should('contain.text', 'Start date')
+    page.getColumnHeader('sentence', 2).should('contain.text', 'End date')
+    page.getColumnHeader('sentence', 3).should('contain.text', 'Length')
+    page.getColumnHeader('sentence', 4).should('contain.text', 'Time elapsed')
+
+    page.getTableRow('sentence', 1).as('sentence2Row')
+    cy.get('@sentence2Row').find('td').eq(0).as('sentence2FirstCell')
+    cy.get('@sentence2FirstCell').find('.govuk-details__summary').should('contain.text', 'ORA Community Order')
+    cy.get('@sentence2FirstCell')
+      .find('.govuk-details__text')
       .should(
         'contain.text',
         '(Having possession a picklock or other implement with intent to break into any premises - 18502)',
       )
-    page.getRowData('sentence2', 'order', 'Value').should('contain.text', 'ORA Community Order')
-    page.getRowData('sentence2', 'requirements', 'Value').should('contain.text', '10 of 10 RAR days completed')
-    page.getCardHeader('sentence3').should('contain.text', '12 month Community order')
-    page
-      .getRowData('sentence3', 'mainOffence', 'Value')
-      .should('contain.text', 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831')
-    page.getRowData('sentence3', 'order', 'Value').should('contain.text', '12 month Community order')
-    page.getRowData('sentence3', 'requirements', 'Value').should('contain.text', '16 of 20 RAR days completed')
+    cy.get('@sentence2FirstCell').find('.govuk-details__text').should('contain.text', 'ORA Community Order')
+    cy.get('@sentence2FirstCell').find('.govuk-details__text').should('contain.text', '10 of 10 RAR days completed')
+    cy.get('@sentence2Row').find('td').eq(1).should('contain.text', '2 March 2020')
+    cy.get('@sentence2Row').find('td').eq(2).should('contain.text', '1 September 2024')
+    cy.get('@sentence2Row').find('td').eq(3).should('contain.text', '54 months')
+    const elapsed = monthsOrDaysElapsed('2020-03-02')
+    cy.get('@sentence2Row').find('td').eq(4).should('contain.text', elapsed)
   }
 
   const verifyPersonalCircumstances = (page: OverviewPage) => {
