@@ -62,6 +62,9 @@ export default abstract class Page {
     return cy.get(`[data-qa=${cardName}Card]`).find(`[data-qa=${rowName}${type}]`).eq(index)
   }
 
+  getTableRow = (cardName: string, rowIndex: number) =>
+    cy.get(`[data-qa=${cardName}Card]`).find('tbody tr').eq(rowIndex)
+
   getLicenceConditionsSummaryLink = (detailsIndex = 0) =>
     cy.get('[data-qa="licenceConditionsValue"]').find('details').eq(detailsIndex).find('summary')
 
