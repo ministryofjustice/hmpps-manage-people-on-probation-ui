@@ -1,0 +1,40 @@
+{%- from "govuk/components/inset-text/macro.njk" import govukInsetText -%}
+
+{%- set name = overview.personalDetails.name.forename | default(personForename) -%}
+
+{%- if riskToProbationStaff or (riskToStaff and riskToStaff.level) -%}
+  <div class="risk-alerts">
+
+    {%- if riskToProbationStaff -%}
+      {% set html -%}
+        {{ name }} is a <a href="/case/{{ crn }}/risk/flag/{{ riskToProbationStaff.id }}">risk to probation staff</a>
+      {%- endset %}
+      {{ govukInsetText({
+        html: html,
+        classes: 'risk-alert risk-alert--high',
+        attributes: { 'data-qa': 'riskToProbationStaff' }
+      }) }}
+      {%- elif riskToStaff and riskToStaff.level -%}
+      {{ govukInsetText({
+        text: name + ' may be a risk to probation staff',
+        classes: 'risk-alert risk-alert--medium',
+        attributes: { 'data-qa': 'riskToProbationStaff' }
+      }) }}
+    {%- endif -%}
+
+    {%- if riskToStaff and riskToStaff.level -%}
+      {% set html -%}
+        {{ name }} is a
+        <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">
+          {{ riskToStaff.level | replace('_', ' ') | lower }} risk to staff
+        </a>
+      {%- endset %}
+      {{ govukInsetText({
+        html: html,
+        classes: 'risk-alert risk-alert--' + (riskToStaff.level | replace('_', '-') | lower),
+        attributes: { 'data-qa': 'riskToStaff' }
+      }) }}
+    {%- endif -%}
+
+  </div>
+{%- endif -%}
