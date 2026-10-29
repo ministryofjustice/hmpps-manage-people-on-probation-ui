@@ -304,7 +304,11 @@
 {% endblock %}
 
 {% block pageContent %}
-  {% include "../partials/_risk-to-staff-alert.njk" %}
+  {% if flags.enableNewOverview %}
+    {% include "../partials/_risk-alert.njk" %}
+  {% else %}
+    {% include "../partials/_risk-to-staff-alert.njk" %}
+  {% endif %}
 
   {% if flags.enableTierChangePrompt or flags.enableFinalThirdPrompt %}
     {% set hasOutcomesItem = appointmentsWithoutAnOutcomeCount > 0 %}

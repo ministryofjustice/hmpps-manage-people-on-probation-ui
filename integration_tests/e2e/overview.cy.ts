@@ -21,6 +21,10 @@ context('Overview', () => {
     page.getTab('compliance').should('contain.text', 'Compliance')
   }
 
+  const verifyRiskAlerts = (page: OverviewPage) => {
+    page.getElementData('riskToProbationStaffAlert').should('contain.text', 'Caroline may be a risk to probation staff')
+  }
+
   const verifyPersonalDetails = (page: OverviewPage) => {
     page.getCardHeader('personalDetails').should('contain.text', 'Personal details')
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
@@ -160,8 +164,6 @@ context('Overview', () => {
       .should('have.class', 'risk-badge')
 
     cy.get('[data-qa="riskFlagsValue"] ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
-
-    page.getAlert().should('contain.text', 'medium')
   }
 
   const verifyActivityAndCompliance = (page: OverviewPage) => {
@@ -214,6 +216,7 @@ context('Overview', () => {
         page.headerTier().should('contain.text', 'Tier: B2').and('have.attr', 'href')
         verifyTabs(page)
         checkPopHeader()
+        verifyRiskAlerts(page)
         cy.get('.supervision-package').should('exist')
         page.getCardHeader('schedule').should('not.exist')
         verifyPersonalDetails(page)
