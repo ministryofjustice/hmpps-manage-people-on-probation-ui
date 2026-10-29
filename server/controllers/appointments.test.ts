@@ -518,6 +518,15 @@ describe('controllers/appointments', () => {
         noteLink:
           '/case/X000001/appointments/appointment/1234/outcome/add-note?put=true&back=/case/X000001/appointments/appointment/1234/manage',
       })
+
+      expect(reqNoteAdded.session.data.note[crn][contactId].noteAdded).toBeUndefined()
+
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(reqNoteAdded, res)
+
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/manage-appointment',
+        expect.objectContaining({ noteAlert: undefined }),
+      )
     })
     it('should render the manage appointment page with no note', async () => {
       const reqNoNoteAdded = httpMocks.createRequest({
