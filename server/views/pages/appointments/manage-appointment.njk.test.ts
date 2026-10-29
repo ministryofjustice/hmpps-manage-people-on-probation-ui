@@ -32,6 +32,7 @@ type TestModel = {
   url: string
   flags: {
     enableRescheduleFutureAppointmentWithOutcome?: boolean
+    enableAppointmentPatchAlerts?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -44,6 +45,7 @@ type TestModel = {
   back?: string
   relatedContacts: LinkedContactResponse
   noteLink?: string
+  noteAlert?: { variant: 'success' | 'warning' | 'error'; html: string }
 }
 
 const nextAppointment: Partial<NextAppointmentResponse> = {
@@ -198,6 +200,15 @@ describe('Manage an appointment', () => {
     expect($('.govuk-back-link').attr('href')).toBe(`/case/${crn}/appointments`)
     expect($('title').text()).toContain('Manage planned office visit (NS) with Terry Jones')
     expect($('body').text()).toContain('Last updated by Paul Smith on 20 March 2023')
+  })
+
+  it('should show a success alert when notes are added', () => {
+    const $ = render({
+      flags: { enableAppointmentPatchAlerts: true },
+      noteAlert: { variant: 'success', html: '<b>Notes added</b>' },
+    })
+
+    expect($('[data-qa="noteAlert"]').text()).toContain('Notes added')
   })
 
   it('should use description for title if no displayName', () => {
