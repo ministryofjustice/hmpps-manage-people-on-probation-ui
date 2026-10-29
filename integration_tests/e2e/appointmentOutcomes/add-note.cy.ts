@@ -39,7 +39,7 @@ const loadPage = ({
   if (isSensitive) {
     cy.task('stubAppointment', { isSensitive: true, isFuture: false })
   }
-  const crn = journey === 'ARRANGE' ? 'X778160' : 'X000001'
+  const crnParam = journey === 'ARRANGE' ? 'X778160' : 'X000001'
   if (journey === 'ARRANGE') {
     completeSentencePage()
     completeTypePage()
@@ -51,7 +51,7 @@ const loadPage = ({
     manageAppointmentPage.getTaskLink(1).click()
   }
   if (journey === 'RESCHEDULE') {
-    completeRescheduleAppointmentPage({ crn })
+    completeRescheduleAppointmentPage({ crn: crnParam })
     checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
     checkYourAnswersPage.getSubmitBtn().click()
     getUuid(2).then(pageUuid => {
