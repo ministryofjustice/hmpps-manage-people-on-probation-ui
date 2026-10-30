@@ -37,16 +37,16 @@ export async function getStatusTag(
       return 'Unlawfully at large'
     }
 
-    if (isRecalled(activePrimarySentence)) {
-      return 'Recalled'
+    if (hasRestrictedCustodyStatus(activePrimarySentence)) {
+      return convertToTitleCase(activePrimarySentence.custody.status.description)
     }
 
     if (activePrimarySentence.inBreach) {
       return 'In breach'
     }
 
-    if (hasRestrictedCustodyStatus(activePrimarySentence)) {
-      return convertToTitleCase(activePrimarySentence.custody.status.description)
+    if (isRecalled(activePrimarySentence)) {
+      return 'Recalled'
     }
   }
   return undefined

@@ -117,7 +117,7 @@ describe('getStatusTag', () => {
     )
   })
 
-  it('return undefined when a primary custodial sentence exists but prisoner details are unavailable', async () => {
+  it('returns undefined when a primary custodial sentence exists but prisoner details are unavailable', async () => {
     const supervisionPackage = createSupervisionPackage({
       context: {
         sentences: [
@@ -285,43 +285,6 @@ describe('getStatusTagForPersonInCustody', () => {
 
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBeUndefined()
   })
-})
-
-describe('getPrisonerDetails', () => {
-  let prisonerSearchApiClient: jest.Mocked<PrisonerSearchApiClient>
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-
-    prisonerSearchApiClient = {
-      getPrisonerDetails: jest.fn(),
-    } as unknown as jest.Mocked<PrisonerSearchApiClient>
-
-    mockedPrisonerSearchApiClient.mockImplementation(() => prisonerSearchApiClient)
-  })
-
-  it('returns prisoner details from the Prisoner Search API', async () => {
-    const prisoner: Prisoner = {
-      prisonerNumber: 'A1234BC',
-      firstName: 'Andrew',
-      lastName: 'Langley',
-      status: 'ACTIVE IN',
-      legalStatus: 'SENTENCED',
-      recall: false,
-    }
-
-    prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue(prisoner)
-
-    await expect(getPrisonerDetails('token', 'A1234BC', 'X123456')).resolves.toEqual(prisoner)
-
-    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('A1234BC')
-  })
-
-  it('returns null when the Prisoner Search API returns null', async () => {
-    prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue(null)
-
-    await expect(getPrisonerDetails('token', 'A1234BC', 'X123456')).resolves.toBeNull()
-  })
 
   it('returns Unlawfully at large when a primary sentence has custody location code UATLRG', async () => {
     const supervisionPackage = createSupervisionPackage({
@@ -341,7 +304,7 @@ describe('getPrisonerDetails', () => {
     await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
   })
 
-  it('returns In custody when a primary sentence has restricted custody status D', async () => {
+  it('returns detained when a primary sentence has restricted custody status D', async () => {
     const supervisionPackage = createSupervisionPackage({
       context: {
         sentences: [
@@ -476,7 +439,7 @@ describe('getPrisonerDetails', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('In breach')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Restricted')
   })
 
   it('does not return Unlawfully at large when the supervision package outcome is not success', async () => {
@@ -496,5 +459,42 @@ describe('getPrisonerDetails', () => {
     })
 
     await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
+  })
+})
+
+describe('getPrisonerDetails', () => {
+  let prisonerSearchApiClient: jest.Mocked<PrisonerSearchApiClient>
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+
+    prisonerSearchApiClient = {
+      getPrisonerDetails: jest.fn(),
+    } as unknown as jest.Mocked<PrisonerSearchApiClient>
+
+    mockedPrisonerSearchApiClient.mockImplementation(() => prisonerSearchApiClient)
+  })
+
+  it('returns prisoner details from the Prisoner Search API', async () => {
+    const prisoner: Prisoner = {
+      prisonerNumber: 'A1234BC',
+      firstName: 'Andrew',
+      lastName: 'Langley',
+      status: 'ACTIVE IN',
+      legalStatus: 'SENTENCED',
+      recall: false,
+    }
+
+    prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue(prisoner)
+
+    await expect(getPrisonerDetails('token', 'A1234BC', 'X123456')).resolves.toEqual(prisoner)
+
+    expect(prisonerSearchApiClient.getPrisonerDetails).toHaveBeenCalledWith('A1234BC')
+  })
+
+  it('returns null when the Prisoner Search API returns null', async () => {
+    prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue(null)
+
+    await expect(getPrisonerDetails('token', 'A1234BC', 'X123456')).resolves.toBeNull()
   })
 })
