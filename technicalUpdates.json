@@ -1,5 +1,5 @@
 [
-    {
+  {
     "heading": "View supervision package information",
     "summary": "5 October 2026",
     "whatsNew": [
@@ -31,7 +31,7 @@
       ],
       "See future dated contacts",
       [
-      "You can now see future dated contacts, including appointments, on the Contacts page. This gives you a more complete view of case activity."
+        "You can now see future dated contacts, including appointments, on the Contacts page. This gives you a more complete view of case activity."
       ],
       "More consistent alerts names",
       [
@@ -57,7 +57,7 @@
       ],
       "Sensitivity question not repeated for sensitive appointments",
       [
-      "After an appointment is marked as sensitive, we will not show the sensitivity question again. If an appointment is not marked as sensitive, we'll ask the question each time you manage it."
+        "After an appointment is marked as sensitive, we will not show the sensitivity question again. If an appointment is not marked as sensitive, we'll ask the question each time you manage it."
       ],
       "Clearer ViSOR report hint",
       [
@@ -112,7 +112,9 @@
         "You can now add the 10 contacts most frequently used by probation practitioners in this service, as well as appointments.\n\nThe contacts cover common communication contacts such as emails, texts, telephone calls and police liaisons.\n\nWe’ll be adding more contacts over the next few months."
       ],
       "Character limit increased for notes",
-      ["To make it easier for you to add complete notes to a case, we’ve increased the character limit to 12,000."],
+      [
+        "To make it easier for you to add complete notes to a case, we’ve increased the character limit to 12,000."
+      ],
       "Risk to Probation Staff flag",
       [
         "The new Risk to Probation Staff flag highlights when a person on probation poses a risk to probation staff.\n\nThis is a new registration type that is manually added and maintained within NDelius."
@@ -180,7 +182,9 @@
         "Online check ins allow people on probation to submit a short video to check their identity, and answer 3 questions to tell practitioners how they are. This can be used to replace some face-to-face appointments where appropriate, or used alongside face-to-face appointments to help manage risk."
       ],
       "Help with using online check ins",
-      ["You can get familiar with online check ins using our guidance (opens in new tab)."],
+      [
+        "You can get familiar with online check ins using our guidance (opens in new tab)."
+      ],
       "Bug fixes for Manage people on probation",
       [
         "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome.\n\nYou can now arrange planned telephone contacts (NS) without needing to select a location. This fixes a bug that was causing errors."
