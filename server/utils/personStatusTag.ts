@@ -1,7 +1,14 @@
+import {
+  hasRestrictedCustodyStatus,
+  isRecalled,
+  isUnlawfullyAtLarge,
+} from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { SupervisionPackage } from '../models/SupervisionPackage'
+
+import { convertToTitleCase } from './convertToTitleCase'
 
 export async function getStatusTag(
   personalDetails: PersonalDetails,
@@ -19,21 +26,29 @@ export async function getStatusTag(
   }
   // determine from community sentence
   if (supervisionPackage?.outcome === 'success') {
-    const activePrimarySentences = supervisionPackage?.context?.sentences?.filter(
-      sentence => sentence.isPrimarySentence,
-    )
+    // There will always be one active primary sentence
+    const activePrimarySentence = supervisionPackage?.context?.sentences?.find(sentence => sentence.isPrimarySentence)
 
-    // has custodial sentence and custody status cannot be determined
-    if (activePrimarySentences?.filter(sentence => sentence.type.isCustodial)?.length) {
-      return 'In custody'
+    if (!activePrimarySentence) {
+      return undefined
     }
-    // check for breach in community sentence
-    const inBreach = activePrimarySentences?.filter(sentence => sentence.inBreach)?.length > 0
-    if (inBreach) {
+
+    if (isUnlawfullyAtLarge(activePrimarySentence)) {
+      return 'Unlawfully at large'
+    }
+
+    if (isRecalled(activePrimarySentence)) {
+      return 'Recalled'
+    }
+
+    if (activePrimarySentence.inBreach) {
       return 'In breach'
     }
-  }
 
+    if (hasRestrictedCustodyStatus(activePrimarySentence)) {
+      return convertToTitleCase(activePrimarySentence.custody.status.description)
+    }
+  }
   return undefined
 }
 

@@ -117,7 +117,7 @@ describe('getStatusTag', () => {
     )
   })
 
-  it('defaults to In custody when a primary custodial sentence exists but prisoner details are unavailable', async () => {
+  it('return undefined when a primary custodial sentence exists but prisoner details are unavailable', async () => {
     const supervisionPackage = createSupervisionPackage({
       context: {
         sentences: [
@@ -132,7 +132,7 @@ describe('getStatusTag', () => {
       },
     })
 
-    await expect(getStatusTag(personalDetails, supervisionPackage)).resolves.toBe('In custody')
+    await expect(getStatusTag(personalDetails, supervisionPackage)).resolves.toBe(undefined)
   })
 
   it('returns In breach when a primary community sentence is in breach', async () => {
@@ -321,5 +321,180 @@ describe('getPrisonerDetails', () => {
     prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue(null)
 
     await expect(getPrisonerDetails('token', 'A1234BC', 'X123456')).resolves.toBeNull()
+  })
+
+  it('returns Unlawfully at large when a primary sentence has custody location code UATLRG', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              location: {
+                code: 'UATLRG',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
+  })
+
+  it('returns In custody when a primary sentence has restricted custody status D', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              status: {
+                code: 'D',
+                description: 'Detained',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Detained')
+  })
+
+  it('does not return In custody for an unrestricted custody status', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              status: {
+                code: 'A',
+                description: 'Active',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
+  })
+
+  it('does not return Unlawfully at large when only a non-primary sentence has custody location UATLRG', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            isPrimarySentence: false,
+            custody: {
+              location: {
+                code: 'UATLRG',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
+  })
+
+  it('does not return In custody when only a non-primary sentence has a restricted custody status', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            isPrimarySentence: false,
+            custody: {
+              status: {
+                code: 'D',
+                description: 'Detained',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
+  })
+
+  it('prioritises Unlawfully at large over restricted custody status', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              location: {
+                code: 'UATLRG',
+              },
+              status: {
+                code: 'D',
+                description: 'Detained',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
+  })
+
+  it('prioritises Unlawfully at large over community sentence breach', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            inBreach: true,
+            custody: {
+              location: {
+                code: 'UATLRG',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
+  })
+
+  it('prioritises restricted custody status over community sentence breach', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            inBreach: true,
+            custody: {
+              status: {
+                code: 'R',
+                description: 'Restricted',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('In breach')
+  })
+
+  it('does not return Unlawfully at large when the supervision package outcome is not success', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      outcome: 'failure',
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              location: {
+                code: 'UATLRG',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
   })
 })
