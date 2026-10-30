@@ -1,5 +1,27 @@
 [
   {
+    "heading": "New information in the MPOP header ",
+    "summary": "5 November 2026",
+    "whatsNew": [
+      "New information in the MPOP header",
+      [
+        "You can now view important information about a person on probation at the top of the page while using MPOP.\n\nThe new header shows:\nthe person on probation’s name, CRN, date of birth and tier\nrisk flags from NDelius\nrisk information from OASys and ARNS\na status tag showing whether they’re in custody, in breach or deceased\nthe probation practitioner managing the case\nYou can select an NDelius risk flag, their tier or ‘Managed by’ to view more detailed information.\n\nWhen adding an appointment or contact, you can hide the NDelius risk flags to help you focus on the task."
+      ],
+      "Improved CRISS structure for appointment notes",
+      [
+        "You can now add appointment notes using either a single text box or the CRISS format.\n\nIf you use CRISS, individual text boxes for each section help you organise notes under clear headings such as ‘Check in’. You can switch between the two formats at any time.\n\nThis helps you structure your notes more easily."
+      ],
+      "‘Prevent concerns’ flag",
+      [
+        "We now show when a case with a supervision package has a ‘Prevent concerns’ flag. New guidance explains that a person on probation can receive additional appointments while the flag is active. This means the usual appointment limit no longer applies."
+      ],
+      "See outcomes to log from the last 3 months",
+      [
+        "To help you manage your outcomes more efficiently, we now only show appointments that need an outcome from the last 3 months. This helps you focus on recent outstanding outcomes."
+      ]
+    ]
+  },
+  {
     "heading": "View supervision package information",
     "summary": "5 October 2026",
     "whatsNew": [
