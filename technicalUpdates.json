@@ -1,5 +1,27 @@
 [
-    {
+  {
+    "heading": "New information in the MPOP header ",
+    "summary": "5 November 2026",
+    "whatsNew": [
+      "New information in the MPOP header",
+      [
+        "You can now view important information about a person on probation at the top of the page while using MPOP.\n\nThe new header shows:\nthe person on probation’s name, CRN, date of birth and tier\nrisk flags from NDelius\nrisk information from OASys and ARNS\na status tag showing whether they’re in custody, in breach or deceased\nthe probation practitioner managing the case\nYou can select an NDelius risk flag, their tier or ‘Managed by’ to view more detailed information.\n\nWhen adding an appointment or contact, you can hide the NDelius risk flags to help you focus on the task."
+      ],
+      "Improved CRISS structure for appointment notes",
+      [
+        "You can now add appointment notes using either a single text box or the CRISS format.\n\nIf you use CRISS, individual text boxes for each section help you organise notes under clear headings such as ‘Check in’. You can switch between the two formats at any time.\n\nThis helps you structure your notes more easily."
+      ],
+      "‘Prevent concerns’ flag",
+      [
+        "We now show when a case with a supervision package has a ‘Prevent concerns’ flag. New guidance explains that a person on probation can receive additional appointments while the flag is active. This means the usual appointment limit no longer applies."
+      ],
+      "See outcomes to log from the last 3 months",
+      [
+        "To help you manage your outcomes more efficiently, we now only show appointments that need an outcome from the last 3 months. This helps you focus on recent outstanding outcomes."
+      ]
+    ]
+  },
+  {
     "heading": "View supervision package information",
     "summary": "5 October 2026",
     "whatsNew": [
@@ -31,7 +53,7 @@
       ],
       "See future dated contacts",
       [
-      "You can now see future dated contacts, including appointments, on the Contacts page. This gives you a more complete view of case activity."
+        "You can now see future dated contacts, including appointments, on the Contacts page. This gives you a more complete view of case activity."
       ],
       "More consistent alerts names",
       [
@@ -57,7 +79,7 @@
       ],
       "Sensitivity question not repeated for sensitive appointments",
       [
-      "After an appointment is marked as sensitive, we will not show the sensitivity question again. If an appointment is not marked as sensitive, we'll ask the question each time you manage it."
+        "After an appointment is marked as sensitive, we will not show the sensitivity question again. If an appointment is not marked as sensitive, we'll ask the question each time you manage it."
       ],
       "Clearer ViSOR report hint",
       [
@@ -112,7 +134,9 @@
         "You can now add the 10 contacts most frequently used by probation practitioners in this service, as well as appointments.\n\nThe contacts cover common communication contacts such as emails, texts, telephone calls and police liaisons.\n\nWe’ll be adding more contacts over the next few months."
       ],
       "Character limit increased for notes",
-      ["To make it easier for you to add complete notes to a case, we’ve increased the character limit to 12,000."],
+      [
+        "To make it easier for you to add complete notes to a case, we’ve increased the character limit to 12,000."
+      ],
       "Risk to Probation Staff flag",
       [
         "The new Risk to Probation Staff flag highlights when a person on probation poses a risk to probation staff.\n\nThis is a new registration type that is manually added and maintained within NDelius."
@@ -180,7 +204,9 @@
         "Online check ins allow people on probation to submit a short video to check their identity, and answer 3 questions to tell practitioners how they are. This can be used to replace some face-to-face appointments where appropriate, or used alongside face-to-face appointments to help manage risk."
       ],
       "Help with using online check ins",
-      ["You can get familiar with online check ins using our guidance (opens in new tab)."],
+      [
+        "You can get familiar with online check ins using our guidance (opens in new tab)."
+      ],
       "Bug fixes for Manage people on probation",
       [
         "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome.\n\nYou can now arrange planned telephone contacts (NS) without needing to select a location. This fixes a bug that was causing errors."
