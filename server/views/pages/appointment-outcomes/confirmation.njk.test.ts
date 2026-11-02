@@ -103,6 +103,22 @@ const render = (model = {} as Partial<TestModel>, session = {}) => {
 }
 
 describe('Confirmation', () => {
+  it('should render every enforcement message and hide further actions when there are none', () => {
+    const confirmation = {
+      title: 'Enforcement outcome added',
+      type: 'Planned office visit (NS)',
+      date: 'Wednesday 21 October 2026 from 9am to 10am',
+      text: [
+        'This enforcement outcome has been added to the NDelius Enforcement Diary.',
+        'Your case administrator or you will create and send a second warning letter.',
+      ],
+      actions: [] as any,
+    }
+    const $ = render({ appointmentOutcome: { confirmation } })
+    const paragraphs = $('main').find('[data-qa="what-happens-next"] p')
+    expect(paragraphs.map((_index, paragraph) => $(paragraph).text().trim()).get()).toEqual(confirmation.text)
+    expect($('main').find('[data-qa="further-actions"]').length).toBe(0)
+  })
   it('should render the page', () => {
     const $ = render()
     expect($('main').find('.person-header').length).toBe(1)
