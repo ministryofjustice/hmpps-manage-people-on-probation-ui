@@ -1,0 +1,23 @@
+.risk-alerts {
+  display: flex;
+  gap: govuk-spacing(4);
+  flex-wrap: wrap;
+  margin: 0 0 govuk-spacing(4);
+}
+
+.risk-alert {
+  @include govuk-typography-weight-bold();
+  margin: 0 govuk-spacing(2) 0 0;
+}
+
+.risk-alert--medium {
+  border-color: $medium-score-border-colour;
+}
+
+.risk-alert--high {
+  border-color: $high-score-border-colour;
+}
+
+.risk-alert--very-high {
+  border-color: $very-high-score-border-colour;
+}
