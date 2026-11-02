@@ -6,6 +6,10 @@
   [data-details-column-span-init] {
     .govuk-details__text {
       position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 1;
+      background: govuk-functional-colour('body-background');
 
       & > * {
         width: auto;
