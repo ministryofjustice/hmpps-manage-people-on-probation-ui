@@ -618,7 +618,7 @@
         "method": "GET"
       },
       "response": {
-        "status": 500,
+        "status": 200,
         "jsonBody": {
           "size": 15,
           "page": 0,
@@ -764,7 +764,7 @@
         "method": "GET"
       },
       "response": {
-        "status": 500,
+        "status": 200,
         "jsonBody": {
           "size": 15,
           "page": 0,
@@ -924,7 +924,7 @@
         }
       },
       "response": {
-        "status": 500,
+        "status": 200,
         "jsonBody": {
           "size": 15,
           "page": 0,
@@ -1084,7 +1084,7 @@
         }
       },
       "response": {
-        "status": 500,
+        "status": 200,
         "jsonBody": {
           "size": 15,
           "page": 0,
