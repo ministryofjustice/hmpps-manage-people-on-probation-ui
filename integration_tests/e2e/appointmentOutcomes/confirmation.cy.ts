@@ -39,7 +39,7 @@ describe('Confirmation - outcomes', () => {
       cy.get('[data-qa=returnToManageAppointment]').should('contain.text', 'Return to manage appointment').click()
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.checkPageTitle('Manage 3 way meeting (NS) with Terry Jones')
-      cy.go('back')
+      loadPage()
       confirmationPage.getSubmitBtn().click()
       overviewPage = new OverviewPage()
       overviewPage.checkOnPage()
