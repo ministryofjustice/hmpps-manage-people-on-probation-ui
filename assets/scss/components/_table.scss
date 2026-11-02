@@ -1,6 +1,6 @@
 
 @include govuk-media-query($until: tablet) {
-  .govuk-table--responsive {
+  .mpop-table--responsive {
     & .govuk-table__head {
       @include govuk-visually-hidden();
     }
