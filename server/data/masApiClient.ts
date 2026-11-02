@@ -94,7 +94,12 @@ export default class MasApiClient extends RestClient {
     if (fromDate) queryParameters.append('fromDate', fromDate)
     if (toDate) queryParameters.append('toDate', toDate)
 
-    return this.get({ path: `/v2/user/${username}/appointments?${queryParameters.toString()}`, handleTimeout: true })
+    return this.get({
+      path: `/v2/user/${username}/appointments?${queryParameters.toString()}`,
+      handleTimeout: true,
+      handle500: true,
+      errorMessage: 'Appointments are currently unavailable.',
+    })
   }
 
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
@@ -589,7 +594,11 @@ export default class MasApiClient extends RestClient {
     return this.get({
       path: `${version}/user/${username}/schedule/${type}${pageQuery ? '?' : ''}${pageQuery}`,
       handle404: false,
-      handle500: false,
+      handle500: true,
+      errorMessage:
+        type === 'upcoming'
+          ? 'Upcoming appointments are currently unavailable.'
+          : 'Appointment outcomes are currently unavailable.',
     })
   }
 

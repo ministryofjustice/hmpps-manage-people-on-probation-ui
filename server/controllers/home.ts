@@ -86,6 +86,7 @@ const homeController: Controller<readonly ['getHome', 'getHomeOld'], void> = {
       const appointmentsRequiringOutcome = outcomes
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage-old/homepage', {
+        homepage,
         totalAppointments,
         totalOutcomes,
         appointments: appointments ?? [],
