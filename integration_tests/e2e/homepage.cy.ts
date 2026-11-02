@@ -44,7 +44,7 @@ context('Sign In', () => {
   })
 
   it('Renders correctly when appointments and outcomes to log are empty', () => {
-    cy.task('stubEmptyHomepage')
+    cy.task('stubEmptyAppointments')
     cy.task('stubEmptyEnforcementContacts')
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)

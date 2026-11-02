@@ -1313,51 +1313,6 @@
               "type": "3 Way Meeting (Non NS)",
               "startDateTime": "2026-08-30T09:30:00.382936Z",
               "endDateTime": "2026-08-30T10:30:00.382936Z"
-            },
-            {
-              "caseName": {
-                "forename": "Kari",
-                "middleName": "",
-                "surname": "Bradtke"
-              },
-              "id": 7,
-              "crn": "X801756",
-              "dob": "1986-07-19",
-              "latestSentence": "CJA - Community Order",
-              "numberOfAdditionalSentences": 1,
-              "type": "Planned office visit",
-              "startDateTime": "2026-08-30T09:30:00.382936Z",
-              "endDateTime": "2026-08-30T10:30:00.382936Z"
-            },
-            {
-              "caseName": {
-                "forename": "Caroline",
-                "middleName": "",
-                "surname": "Wolff"
-              },
-              "id": 8,
-              "crn": "X000001",
-              "dob": "2002-01-09",
-              "latestSentence": "Adult Custody < 12m",
-              "numberOfAdditionalSentences": 0,
-              "type": "3 Way Meeting (Non NS)",
-              "startDateTime": "2026-08-30T09:30:00.382936Z",
-              "endDateTime": "2026-08-30T10:30:00.382936Z"
-            },
-            {
-              "caseName": {
-                "forename": "Wendell",
-                "middleName": "",
-                "surname": "Dooley"
-              },
-              "id": 9,
-              "crn": "X777916",
-              "dob": "2001-02-14",
-              "latestSentence": "Adult Custody < 12m",
-              "numberOfAdditionalSentences": 0,
-              "type": "Planned office visit",
-              "startDateTime": "2026-09-01T09:30:00.382936Z",
-              "endDateTime": "2026-09-01T10:30:00.382936Z"
             }
           ],
           "totalOutcomes": 32,
@@ -1437,51 +1392,6 @@
               "type": "3 Way Meeting (Non NS)",
               "startDateTime": "2026-08-30T09:30:00.382936Z",
               "endDateTime": "2026-08-30T10:30:00.382936Z"
-            },
-            {
-              "caseName": {
-                "forename": "Kari",
-                "middleName": "",
-                "surname": "Bradtke"
-              },
-              "id": 7,
-              "crn": "X801756",
-              "dob": "1986-07-19",
-              "latestSentence": "CJA - Community Order",
-              "numberOfAdditionalSentences": 1,
-              "type": "Planned office visit",
-              "startDateTime": "2026-08-30T09:30:00.382936Z",
-              "endDateTime": "2026-08-30T10:30:00.382936Z"
-            },
-            {
-              "caseName": {
-                "forename": "Caroline",
-                "middleName": "",
-                "surname": "Wolff"
-              },
-              "id": 8,
-              "crn": "X000001",
-              "dob": "2002-01-09",
-              "latestSentence": "Adult Custody < 12m",
-              "numberOfAdditionalSentences": 0,
-              "type": "3 Way Meeting (Non NS)",
-              "startDateTime": "2026-08-30T09:30:00.382936Z",
-              "endDateTime": "2026-08-30T10:30:00.382936Z"
-            },
-            {
-              "caseName": {
-                "forename": "Wendell",
-                "middleName": "",
-                "surname": "Dooley"
-              },
-              "id": 9,
-              "crn": "X777916",
-              "dob": "2001-02-14",
-              "latestSentence": "Adult Custody < 12m",
-              "numberOfAdditionalSentences": 0,
-              "type": "Planned office visit",
-              "startDateTime": "2026-09-01T09:30:00.382936Z",
-              "endDateTime": "2026-09-01T10:30:00.382936Z"
             }
           ]
         },
