@@ -135,7 +135,11 @@
             </div>
         {% else %}
             <p>
-                {% if type === 'upcoming' and appointments.errors.length == 0 %}No upcoming appointments.{% elif outcomes.errors.length == 0 %}No outcomes to log.{% endif %}
+                {% if type === 'upcoming' and (not appointments.errors or appointments.errors.length == 0) %}
+                    No upcoming appointments.
+                {% elif not outcomes.errors or outcomes.errors.length == 0 %}
+                    No outcomes to log.
+                {% endif %}
             </p>
         {% endif %}
     </div>
