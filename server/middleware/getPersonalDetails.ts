@@ -174,7 +174,7 @@ export const getPersonalDetails = (
       prisonsUnavailable = false
     }
 
-    if (res.locals.flags?.enablePersonHeader) {
+    if (res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderStatus) {
       if (overview.noms) {
         res.locals.prisoner = await getPrisonerDetails(token, overview.noms, overview.crn)
       }

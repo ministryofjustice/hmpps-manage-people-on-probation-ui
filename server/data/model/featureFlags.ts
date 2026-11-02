@@ -8,6 +8,7 @@ export class FeatureFlags {
   enablePersonHeader?: boolean = undefined
   enablePersonHeaderTierV3?: boolean = undefined
   enablePersonHeaderPhoto?: boolean = undefined
+  enablePersonHeaderStatus?: boolean = undefined
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
