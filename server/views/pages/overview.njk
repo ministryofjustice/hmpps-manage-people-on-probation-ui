@@ -417,7 +417,7 @@
         items: [
           {
             text: 'View all personal details',
-            href: crn + '/personal-details'
+            href: '/case/' + crn + '/personal-details'
           }
         ]
       }
@@ -664,7 +664,15 @@
       headingLevel: 3,
       classes: cardClasses,
       attributes: { 'data-qa': 'sentenceCard' },
-      html: sentencesHtml
+      html: sentencesHtml,
+      actions: {
+        items: [
+          {
+            text: 'View all sentence information',
+            href: '/case/' + crn + '/sentence'
+          }
+        ]
+      }
     }) }}
   {% endif %}
 
