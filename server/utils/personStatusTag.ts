@@ -38,7 +38,7 @@ export async function getStatusTag(
     }
 
     if (hasRestrictedCustodyStatus(activePrimarySentence)) {
-      return convertToTitleCase(activePrimarySentence.custody.status.description)
+      return 'In custody'
     }
 
     if (activePrimarySentence.inBreach) {
