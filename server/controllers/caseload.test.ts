@@ -334,6 +334,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
+        noResults: 'No upcoming appointments',
       })
     })
     it('renders the upcoming appointment page with page and sort name ascending search parameters set in url', async () => {
@@ -374,6 +375,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
+        noResults: 'No upcoming appointments',
       })
     })
     it('renders the upcoming appointment page with page and sort appointment descending search parameters set in url', async () => {
@@ -414,6 +416,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
+        noResults: 'No upcoming appointments',
       })
     })
     it('renders the caseload appointments page with appointments with no outcome', async () => {
@@ -454,6 +457,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
+        noResults: 'No outcomes to log',
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
@@ -495,6 +499,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
+        noResults: 'No outcomes to log',
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
@@ -543,6 +548,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
+        noResults: 'No outcomes to log',
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
@@ -562,6 +568,41 @@ describe('caseloadController', () => {
 
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getDateRangeSpy).toHaveBeenCalledWith('PAST_TWO_YEARS')
+    })
+
+    it(`doesn't display noResults text when APIs fail`, async () => {
+      const req = httpMocks.createRequest({
+        query: {
+          page: '1',
+          outcomeFilter: 'PAST_THREE_MONTHS',
+        },
+        url: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
+      })
+      res.locals.flags = { enable3MonthsOutcomes: true, enableHomePageV2API: true }
+      const errorResult = { errors: [{ text: '500 error' }] }
+      getUserScheduleV2Spy.mockReturnValueOnce(Promise.resolve(errorResult) as unknown as Promise<UserSchedule>)
+      await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        userSchedule: errorResult,
+        type: 'no-outcome',
+        sortBy: {
+          name: 'none',
+          dob: 'none',
+          sentence: 'none',
+          date: 'ascending',
+        },
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
+        sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
+        url: req.url,
+        noResults: '',
+        outcomesFilter: 'PAST_THREE_MONTHS',
+      })
     })
   })
 

@@ -13,6 +13,7 @@ import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { getDateRange, getNewDateRange, NewRangeType, RangeType } from '../utils/getDateRange'
 import TierApiClient from '../data/tierApiClient'
+import { ErrorSummaryItem } from '../data/model/common'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
@@ -198,9 +199,16 @@ const caseloadController: Controller<
         userSchedule?.size || 10,
       )
 
+      let noResults = ''
+      const { errors } = userSchedule as unknown as { errors: ErrorSummaryItem[] }
+      console.log(errors)
+      if (!errors || errors.length === 0) {
+        noResults = type === 'upcoming' ? 'No upcoming appointments' : 'No outcomes to log'
+      }
       return res.render(`pages/caseload/appointments`, {
         userSchedule,
         type,
+        noResults,
         sortBy,
         pagination,
         sortUrl: baseUrl,
