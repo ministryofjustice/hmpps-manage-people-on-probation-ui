@@ -201,7 +201,6 @@ const caseloadController: Controller<
 
       let noResults = ''
       const { errors } = userSchedule as unknown as { errors: ErrorSummaryItem[] }
-      console.log(errors)
       if (!errors || errors.length === 0) {
         noResults = type === 'upcoming' ? 'No upcoming appointments' : 'No outcomes to log'
       }
