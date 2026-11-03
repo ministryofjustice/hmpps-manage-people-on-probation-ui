@@ -30,5 +30,7 @@ context('Search', () => {
     cy.get('input[name="probation-search-input"]').type('a')
     cy.get("[data-qa='searchTips']").should('contain.text', 'Tips for searching')
     cy.get("[class='probation-search__results-container']").should('contain.text', 'Showing 1 to 2')
+    cy.get("[class='app-avatar-img']").eq(0).should('have.attr', 'src', '/assets/images/NoPhoto@2x.png')
+    cy.get("[class='app-avatar-img']").eq(1).should('have.attr', 'src', '/assets/images/NoPhoto@2x.png')
   })
 })
