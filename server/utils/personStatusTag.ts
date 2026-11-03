@@ -60,7 +60,7 @@ export async function getStatusTagForPersonInCustody(prisoner?: Prisoner): Promi
   }
 
   if (prisoner?.status === 'ACTIVE IN' || prisoner?.status === 'ACTIVE OUT') {
-    return prisoner?.recall ? 'Recalled - In custody' : 'In custody'
+    return 'In custody'
   }
 
   return undefined

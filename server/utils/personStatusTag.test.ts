@@ -84,15 +84,13 @@ describe('getStatusTag', () => {
     await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe('Deceased')
   })
 
-  it('returns Recalled - In custody when the prisoner is recalled', async () => {
+  it('returns In custody when the prisoner is recalled and in custody', async () => {
     const prisoner: Prisoner = {
       status: 'ACTIVE IN',
       recall: true,
     }
 
-    await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe(
-      'Recalled - In custody',
-    )
+    await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe('In custody')
   })
 
   it('returns Unlawfully at large when the last movement reason is UAL', async () => {
@@ -231,17 +229,14 @@ describe('getStatusTagForPersonInCustody', () => {
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('In custody')
   })
 
-  it.each(['ACTIVE IN', 'ACTIVE OUT'])(
-    'returns Recalled - In custody when status is %s and the prisoner is recalled',
-    async status => {
-      const prisoner: Prisoner = {
-        status,
-        recall: true,
-      }
+  it.each(['ACTIVE IN', 'ACTIVE OUT'])('In custody when status is %s and the prisoner is recalled', async status => {
+    const prisoner: Prisoner = {
+      status,
+      recall: true,
+    }
 
-      await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('Recalled - In custody')
-    },
-  )
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('In custody')
+  })
 
   it('returns Deceased when legal status is DEAD', async () => {
     const prisoner: Prisoner = {
