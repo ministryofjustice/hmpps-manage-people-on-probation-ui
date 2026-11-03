@@ -41,6 +41,8 @@ $badge-color: #0b0c0c;
 @import './components/checkboxes';
 @import './components/modal';
 @import './components/risk-alert';
+@import './components/responsive-table';
+@import './components/details-column-span';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
@@ -851,8 +853,8 @@ body.feature-disabled {
   display: block;
   object-fit: cover;
   border: 1px solid #b1b4b6;
-  height: 120px !important;
-  width: 90px !important;
+  height: 120px;
+  width: 90px;
 }
 
 .app-avatar-column {
