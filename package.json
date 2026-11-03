@@ -136,7 +136,7 @@
     "@ministryofjustice/hmpps-azure-telemetry": "^1.0.2",
     "@ministryofjustice/hmpps-mpop-frontend-components-lib": "0.0.49",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
-    "@ministryofjustice/probation-search-frontend": "4.2.3",
+    "@ministryofjustice/probation-search-frontend": "4.3.0",
     "@opentelemetry/api": "1.9.0",
     "@sentry/cli": "^3.8.0",
     "@sentry/node": "^11.8.0",
