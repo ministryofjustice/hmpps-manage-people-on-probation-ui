@@ -69,8 +69,9 @@ context('Overview', () => {
       .should('contain.text', 'Addresses, disabilities and personal circumstances')
     page.openAccordion('personalCircumstances')
     page
-      .getAccordionHeader('personalCircumstances')
+      .getAccordionContents('personalCircumstances')
       .find('a')
+      .last()
       .should('contain.text', 'View all personal details')
       .should('have.attr', 'href', '/case/X000001/personal-details')
 
@@ -110,8 +111,9 @@ context('Overview', () => {
     page.getAccordionHeader('risk').should('contain.text', 'Risk')
     page.openAccordion('risk')
     page
-      .getAccordionHeader('risk')
+      .getAccordionContents('risk')
       .find('a')
+      .last()
       .should('contain.text', 'View all risk information')
       .should('have.attr', 'href', '/case/X000001/risk')
     page
@@ -179,8 +181,9 @@ context('Overview', () => {
     page.getAccordionHeader('activityAndCompliance').should('contain.text', 'Activity and compliance')
     page.openAccordion('activityAndCompliance')
     page
-      .getAccordionHeader('activityAndCompliance')
+      .getAccordionContents('activityAndCompliance')
       .find('a')
+      .last()
       .should('contain.text', 'View all compliance information')
       .should('have.attr', 'href', '/case/X000001/compliance')
     page

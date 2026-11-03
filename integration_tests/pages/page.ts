@@ -52,6 +52,9 @@ export default abstract class Page {
   getAccordionHeader = (cardName: string): PageElement =>
     cy.get(`[data-qa=${cardName}Card] .govuk-accordion__section-header`)
 
+  getAccordionContents = (cardName: string): PageElement =>
+    cy.get(`[data-qa=${cardName}Card] .govuk-accordion__section-content`)
+
   openAccordion = (cardName: string): PageElement =>
     this.getAccordionHeader(cardName).find('.govuk-accordion__section-toggle').click()
 
