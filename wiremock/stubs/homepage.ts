@@ -19,6 +19,30 @@ const stubEmptyHomepage = (): SuperAgentRequest =>
     },
   })
 
+const stubEmptyAppointments = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/v2/user/USER1/appointments',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        staff: {
+          forename: 'Eula',
+          surname: 'Schmeler',
+        },
+        totalAppointments: 0,
+        appointments: [],
+        totalOutcomes: 0,
+        outcomes: [],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 const stubEmptyEnforcementContacts = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -62,7 +86,7 @@ const stubEnforcementsTimeout = (): SuperAgentRequest =>
     },
   })
 
-const stubAppointmentTimeout = (): SuperAgentRequest =>
+const stubHomepageTimeout = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/delius/user/USER1/homepage',
@@ -83,9 +107,36 @@ const stubAppointmentTimeout = (): SuperAgentRequest =>
     },
   })
 
+const stubAppointmentTimeout = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/v2/user/USER1/appointments',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        staff: {
+          forename: 'Eula',
+          surname: 'Schmeler',
+        },
+        totalAppointments: 0,
+        appointments: [],
+        totalOutcomes: 0,
+        outcomes: [],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      fixedDelayMilliseconds: 10000,
+    },
+  })
+
 export default {
   stubEmptyHomepage,
+  stubEmptyAppointments,
   stubEmptyEnforcementContacts,
   stubEnforcementsTimeout,
   stubAppointmentTimeout,
+  stubHomepageTimeout,
 }

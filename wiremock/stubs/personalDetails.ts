@@ -1403,6 +1403,21 @@ const stubNullCircumstanceNote = (): SuperAgentRequest =>
     },
   })
 
+const stubPersonalDetails500Response = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/personal-details/X000001',
+      method: 'GET',
+    },
+    response: {
+      status: 500,
+      jsonBody: { message: '500 Error message' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 const stubAllowSmsFalse = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -1668,6 +1683,7 @@ export default {
   stubPersonalDetailsWelshPostcode,
   stubNoCircumstanceNotes,
   stubNullCircumstanceNote,
+  stubPersonalDetails500Response,
   stubUpdatePersonalContact500Response,
   stubUpdatePersonalContact404Response,
   stubAllowSmsFalse,

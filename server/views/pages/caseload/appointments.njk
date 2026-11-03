@@ -133,10 +133,8 @@
                     {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
                 {% endif %}
             </div>
-        {% else %}
-            <p>
-                {% if type === 'upcoming' %}No upcoming appointments.{% else %}No outcomes to log.{% endif %}
-            </p>
+        {% elif noResults %}
+            <p>{{noResults}}</p>
         {% endif %}
     </div>
 {% endblock %}

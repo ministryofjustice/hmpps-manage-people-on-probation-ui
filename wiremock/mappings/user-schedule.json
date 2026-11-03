@@ -1223,6 +1223,182 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/v2/user/USER1/appointments",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "staff": {
+            "forename": "Eula",
+            "surname": "Schmeler"
+          },
+          "totalAppointments": 54,
+          "appointments": [
+            {
+              "caseName": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "id": 1,
+              "crn": "X778160",
+              "dob": "1975-09-25",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 3,
+              "type": "Home visit",
+              "startDateTime": "2026-08-27T09:30:00.382936Z",
+              "endDateTime": "",
+              "deliusManaged": true
+            },
+            {
+              "caseName": {
+                "forename": "Kari",
+                "middleName": "",
+                "surname": "Bradtke"
+              },
+              "id": 2,
+              "crn": "X801756",
+              "dob": "1986-07-19",
+              "latestSentence": "CJA - Community Order",
+              "numberOfAdditionalSentences": 1,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2026-08-28T09:30:00.382936Z",
+              "endDateTime": "2026-08-28T10:30:00.382936Z"
+            },
+            {
+              "caseName": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "id": 3,
+              "crn": "X000001",
+              "dob": "2002-01-09",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Planned office visit",
+              "startDateTime": "2026-08-29T09:30:00.382936Z",
+              "endDateTime": "2026-08-29T10:30:00.382936Z"
+            },
+            {
+              "caseName": {
+                "forename": "Wendell",
+                "middleName": "",
+                "surname": "Dooley"
+              },
+              "id": 4,
+              "crn": "X777916",
+              "dob": "2001-02-14",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Home visit",
+              "startDateTime": "2026-08-30T09:30:00.382936Z",
+              "endDateTime": "2026-08-30T10:30:00.382936Z"
+            },
+            {
+              "caseName": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "id": 6,
+              "crn": "X778160",
+              "dob": "1975-09-25",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 3,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2026-08-30T09:30:00.382936Z",
+              "endDateTime": "2026-08-30T10:30:00.382936Z"
+            }
+          ],
+          "totalOutcomes": 32,
+          "outcomes": [
+            {
+              "caseName": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "id": 1,
+              "crn": "X778160",
+              "dob": "1975-09-25",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 3,
+              "type": "Home visit",
+              "startDateTime": "2026-08-27T09:30:00.382936Z",
+              "endDateTime": ""
+            },
+            {
+              "caseName": {
+                "forename": "Kari",
+                "middleName": "",
+                "surname": "Bradtke"
+              },
+              "id": 2,
+              "crn": "X801756",
+              "dob": "1986-07-19",
+              "latestSentence": "CJA - Community Order",
+              "numberOfAdditionalSentences": 1,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2026-08-28T09:30:00.382936Z",
+              "endDateTime": "2026-08-28T10:30:00.382936Z",
+              "deliusManaged": true
+            },
+            {
+              "caseName": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "id": 3,
+              "crn": "X000001",
+              "dob": "2002-01-09",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Planned office visit",
+              "startDateTime": "2026-08-29T09:30:00.382936Z",
+              "endDateTime": "2026-08-29T10:30:00.382936Z"
+            },
+            {
+              "caseName": {
+                "forename": "Wendell",
+                "middleName": "",
+                "surname": "Dooley"
+              },
+              "id": 4,
+              "crn": "X777916",
+              "dob": "2001-02-14",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Home visit",
+              "startDateTime": "2026-08-30T09:30:00.382936Z",
+              "endDateTime": "2026-08-30T10:30:00.382936Z"
+            },
+            {
+              "caseName": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "id": 6,
+              "crn": "X778160",
+              "dob": "1975-09-25",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 3,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2026-08-30T09:30:00.382936Z",
+              "endDateTime": "2026-08-30T10:30:00.382936Z"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }
