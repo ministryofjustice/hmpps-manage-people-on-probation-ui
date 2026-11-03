@@ -69,7 +69,8 @@
               "order": {
                 "description": "12 month Community order",
                 "endDate": "2024-12-01",
-                "startDate": "2023-12-01"
+                "startDate": "2023-12-01",
+                "length": 12
               },
               "rarDescription": "16 of 20 RAR days completed"
             },
@@ -92,7 +93,8 @@
               "order": {
                 "description": "ORA Community Order",
                 "endDate": "2024-09-01",
-                "startDate": "2020-03-02"
+                "startDate": "2020-03-02",
+                "length": 54
               },
               "rarDescription": "10 of 10 RAR days completed"
             }
