@@ -752,6 +752,14 @@
   {% endset %}
 
   {% if flags.enableNewOverview %}
+    {% set addressesContentHtml %}
+      <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+        {{ govukSummaryList({
+          rows: addressesRows.concat(circumstancesRows)
+        }) }}
+        <a href="/case/{{ crn }}/personal-details" class="govuk-body govuk-link">View all personal details</a>
+      </div>
+    {% endset %}
     {#  Addresses, disabilities and personal circumstances accordion  #}
     {{ probationAccordion({
       id: "personalCircumstances",
@@ -761,15 +769,18 @@
       items: [
         {
           heading: { text: 'Addresses, disabilities and personal circumstances' },
-          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Addresses, disabilities and personal circumstances</span><a href="/case/' + crn + '/personal-details" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all personal details</a>' },
-          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + govukSummaryList({
-          rows: addressesRows.concat(circumstancesRows)
-        }) + '</div>' }
+          content: { html: addressesContentHtml }
         }
       ]
     }) }}
 
     {#  Risk flags and criminogenic needs accordion  #}
+    {% set riskContentHtml %}
+      <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+        {{ riskFlagsAndCriminogenicNeeds | safe }}
+        <a href="/case/{{ crn }}/risk" class="govuk-body govuk-link">View all risk information</a>
+      </div>
+    {% endset %}
     {{ probationAccordion({
       id: "risk",
       headingLevel: 3,
@@ -778,13 +789,20 @@
       items: [
         {
           heading: { text: 'Risk flags and criminogenic needs' },
-          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Risk flags and criminogenic needs</span><a href="/case/' + crn + '/risk" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all risk information</a>' },
-          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + riskFlagsAndCriminogenicNeeds + '</div>' }
+          content: { html: riskContentHtml }
         }
       ]
     }) }}
 
     {#  Activity and compliance accordion  #}
+    {% set activityAndComplianceContentHtml %}
+      <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+        {{ activityAndCompliance | safe }}
+        {% if flags.enableCompliancePage %}
+          <a href="/case/{{ crn }}/compliance" class="govuk-body govuk-link">View all compliance information</a>
+        {% endif %}
+      </div>
+    {% endset %}
     {{ probationAccordion({
       id: "activityAndCompliance",
       headingLevel: 3,
@@ -793,8 +811,7 @@
       items: [
         {
           heading: { text: 'Activity and compliance' },
-          afterHeading: { html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Activity and compliance</span><a href="/case/' + crn + '/compliance" class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9">View all compliance information</a>' } if flags.enableCompliancePage,
-          content: { html: '<div class="govuk-!-padding-3 govuk-!-padding-top-1">' + activityAndCompliance + '</div>' }
+          content: { html: activityAndComplianceContentHtml }
         }
       ]
     }) }}
