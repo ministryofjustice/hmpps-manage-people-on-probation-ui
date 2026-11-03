@@ -320,7 +320,7 @@ describe('getStatusTagForPersonInCustody', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Detained')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('In custody')
   })
 
   it('does not return In custody for an unrestricted custody status', async () => {
@@ -439,7 +439,7 @@ describe('getStatusTagForPersonInCustody', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Restricted')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('In custody')
   })
 
   it('does not return Unlawfully at large when the supervision package outcome is not success', async () => {
