@@ -40,4 +40,5 @@ export class FeatureFlags {
   enableHomePageV2API?: boolean = undefined
   enableNewOverview?: boolean = undefined
   enableESUPCheckInPhotosForSearch?: boolean = undefined
+  enableEarlyTermination20261103Squad3?: boolean = undefined
 }
