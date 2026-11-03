@@ -176,6 +176,7 @@ export const getPersonalDetails = (
 
     if (res.locals.flags?.enablePersonHeader) {
       if (overview.noms) {
+        token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         res.locals.prisoner = await getPrisonerDetails(token, overview.noms, overview.crn)
       }
       res.locals.personStatusTag = await getStatusTag(

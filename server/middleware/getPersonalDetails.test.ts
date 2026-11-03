@@ -982,6 +982,8 @@ describe('/middleware/getPersonalDetails', () => {
 
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
 
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+
       expect(mockedGetStatusTag).toHaveBeenCalledWith(
         personOverview,
         res.locals.supervisionPackageDetails,
@@ -1022,6 +1024,54 @@ describe('/middleware/getPersonalDetails', () => {
         res.locals.prisoner,
       )
       expect(res.locals.personStatusTag).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+    it('requests a system client token for the person status tag when NOMS exists in a cached overview', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+
+      // Cache the requested CRN so the middleware does not enter the cache-miss branch.
+      req = httpMocks.createRequest({
+        params: {
+          crn: 'X000002',
+        },
+        session: {
+          data: {
+            personalDetails: {
+              X000002: {
+                ...mock({ crn: 'X000002' }),
+                overview: personOverview,
+              },
+            },
+          },
+        },
+      })
+
+      res = getRes()
+
+      // Enable the header but leave photos disabled.
+      res.locals.flags = {
+        enablePersonHeader: true,
+        enablePersonHeaderPhoto: false,
+      }
+
+      mockedGetStatusTag.mockResolvedValueOnce('In custody')
+
+      const getSystemClientTokenSpy = jest.mocked(hmppsAuthClient.getSystemClientToken)
+      getSystemClientTokenSpy.mockClear()
+      getSystemClientTokenSpy.mockResolvedValue('token')
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
+      expect(getSystemClientTokenSpy).toHaveBeenCalledTimes(1)
+      expect(getSystemClientTokenSpy).toHaveBeenCalledWith('user-1')
+
+      expect(mockedGetStatusTag).toHaveBeenCalledWith(
+        personOverview,
+        res.locals.supervisionPackageDetails,
+        res.locals.prisoner,
+      )
+
+      expect(res.locals.personStatusTag).toBe('In custody')
       expect(nextSpy).toHaveBeenCalled()
     })
   })
