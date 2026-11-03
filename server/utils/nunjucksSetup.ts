@@ -192,7 +192,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('dateWithYearTimeFirst', dateWithYearTimeFirst)
   njkEnv.addFilter('isArray', (str: string | string[]) => Array.isArray(str))
 
-  njkEnv.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
+  njkEnv.addFilter('decorateFormAttributes', (obj: unknown, sections?: string[]) => {
     const ctx = requestContext.getStore()
 
     // Some render paths (for example tests or non-request rendering) may not

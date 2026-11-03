@@ -20,7 +20,7 @@ import {
   appointmentDateIsInPast,
   isRescheduleAppointment,
 } from '../middleware'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { SmsOptInOptions } from '../data/model/OutlookEvent'
 import { AppResponse } from '../models/Locals'
 import config from '../config'
@@ -28,7 +28,7 @@ import MasApiClient from '../data/masApiClient'
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
-import { User } from '../data/model/caseload'
+import { Location, User } from '../data/model/caseload'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import logger from '../../logger'
 
@@ -356,7 +356,7 @@ const arrangeAppointmentController: Controller<
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
       const { _maxDate } = getMinMaxDates()
-      res.locals.change = change as any
+      res.locals.change = change
 
       return res.render(`pages/arrange-appointment/location-date-time`, {
         crn,
@@ -585,12 +585,12 @@ const arrangeAppointmentController: Controller<
         start,
         date,
         user: { locationCode: selectedLocation },
-      } = getDataValue(data, ['appointments', crn, id])
+      } = getDataValue(data, ['appointments', crn, id]) as AppointmentSession
       let { isInPast } = dateIsInPast(date, start)
       if (backPage === 'cya') {
-        const dateFromCya = getDataValue(data, ['appointments', crn, id, 'temp', 'dateFromCya'])
-        const startTime = getDataValue(data, ['appointments', crn, id, 'temp', 'startTimeFromCya'])
-        const endTime = getDataValue(data, ['appointments', crn, id, 'temp', 'endTimeFromCya'])
+        const dateFromCya = getDataValue(data, ['appointments', crn, id, 'temp', 'dateFromCya']) as string
+        const startTime = getDataValue(data, ['appointments', crn, id, 'temp', 'startTimeFromCya']) as string
+        const endTime = getDataValue(data, ['appointments', crn, id, 'temp', 'endTimeFromCya']) as string
         ;({ isInPast } = dateIsInPast(dateFromCya, startTime))
         setDataValue(data, ['appointments', crn, id, 'start'], startTime)
         setDataValue(data, ['appointments', crn, id, 'end'], endTime)
@@ -601,7 +601,7 @@ const arrangeAppointmentController: Controller<
       }
 
       if (![`LOCATION_NOT_IN_LIST`, 'NO_LOCATION_REQUIRED'].includes(selectedLocation)) {
-        location = res.locals.userLocations.find((loc: any) => loc.description === selectedLocation)
+        location = res.locals.userLocations.find((loc: Location) => loc.description === selectedLocation)
       }
       return res.render(`pages/arrange-appointment/check-your-answers`, {
         crn,
@@ -697,7 +697,8 @@ const arrangeAppointmentController: Controller<
         linkedAppointment = {
           contactId: linkedContactId,
           date: dateWithYear(date),
-          type: res.locals.appointmentTypes.find((type: any) => type.code === typeCode)?.description || null,
+          type:
+            res.locals.appointmentTypes.find((type: AppointmentType) => type.code === typeCode)?.description || null,
         }
       }
 

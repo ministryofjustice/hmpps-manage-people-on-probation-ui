@@ -4,6 +4,7 @@ import { Route } from '../@types'
 import { getDataValue, setDataValue } from '../utils'
 import { Name } from '../data/model/personalDetails'
 import { logSessionCacheChange } from '../utils/logSessionCacheChange'
+import { Provider, Team, User } from '../data/model/caseload'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async function getDefaultUserInner(req, res, next) {
@@ -14,14 +15,15 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
 
-    let attendingUsername = getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) ?? null
-    let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
-    let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
-    let attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
-    let attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
-    let providers = getDataValue(data, ['providers', username]) ?? null
-    let teams = getDataValue(data, ['teams', username]) ?? null
-    let users = getDataValue(data, ['staff', username]) ?? null
+    let attendingUsername =
+      (getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) as string) ?? null
+    let providerCode = (getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) as string) ?? null
+    let teamCode = (getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) as string) ?? null
+    let attendingEmail = (getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) as string) ?? null
+    let attendingName = (getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) as Name) ?? null
+    let providers = (getDataValue(data, ['providers', username]) as Provider[]) ?? null
+    let teams = (getDataValue(data, ['teams', username]) as Team[]) ?? null
+    let users = (getDataValue(data, ['staff', username]) as User[]) ?? null
 
     if (!attendingUsername || !providerCode || !teamCode || !providers || !teams || !users) {
       let useProbationPractitioner = true

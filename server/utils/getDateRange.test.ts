@@ -1,5 +1,5 @@
 import { DateTime, Settings } from 'luxon'
-import { getNewDateRange, getDateRange } from './getDateRange'
+import { getNewDateRange, getDateRange, RangeType, NewRangeType } from './getDateRange'
 
 const mockNow = (iso: string) => {
   const dt = DateTime.fromISO(iso, { zone: 'utc' })
@@ -79,7 +79,9 @@ describe('getNewDateRange', () => {
     it('throws error for unsupported range type', () => {
       mockNow('2026-04-27T10:00:00Z')
 
-      expect(() => getNewDateRange('INVALID_TYPE' as any)).toThrow('Unhandled range type: INVALID_TYPE')
+      expect(() => getNewDateRange('INVALID_TYPE' as unknown as NewRangeType)).toThrow(
+        'Unhandled range type: INVALID_TYPE',
+      )
     })
   })
 })
@@ -152,7 +154,7 @@ describe('getDateRange', () => {
     it('throws error for unsupported range type', () => {
       mockNow('2026-04-27T10:00:00Z')
 
-      expect(() => getDateRange('INVALID_TYPE' as any)).toThrow('Unhandled range type: INVALID_TYPE')
+      expect(() => getDateRange('INVALID_TYPE' as unknown as RangeType)).toThrow('Unhandled range type: INVALID_TYPE')
     })
   })
 })

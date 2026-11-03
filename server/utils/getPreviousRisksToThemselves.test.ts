@@ -58,7 +58,7 @@ const mockRiskToSelf = {
 describe('utils/getPreviousRisksToThemselves', () => {
   let getCurrentRisksSpy: jest.SpyInstance
   let getPreviousRisksSpy: jest.SpyInstance
-  let result: any
+  let result: string[]
   afterEach(() => {
     jest.clearAllMocks()
   })

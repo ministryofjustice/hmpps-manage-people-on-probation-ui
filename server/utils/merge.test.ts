@@ -25,12 +25,12 @@ describe('merge', () => {
 
   it('should return the second object when the first object is a non-object type (e.g., string)', () => {
     const obj2 = { a: 1 }
-    expect(merge('some-string' as any, obj2)).toEqual(obj2)
+    expect(merge('some-string' as unknown as Record<string, string>, obj2)).toEqual(obj2)
   })
 
   it('should return the second object when it is a non-object type', () => {
     const obj1 = { a: 1 }
-    expect(merge(obj1, 42 as any)).toEqual(42)
+    expect(merge(obj1, 42 as unknown as Record<string, unknown>)).toEqual(42)
   })
 
   it('should return a new object reference', () => {

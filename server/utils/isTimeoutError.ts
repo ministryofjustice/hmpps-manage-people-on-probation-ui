@@ -1,4 +1,4 @@
-export default function isTimeoutError(error: any): boolean {
+export default function isTimeoutError(error: { message?: string; code?: string }): boolean {
   const message = String(error?.message ?? '').toLowerCase()
 
   return (

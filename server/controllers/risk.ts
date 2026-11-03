@@ -4,7 +4,7 @@ import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import config from '../config'
 import ArnsApiClient from '../data/arnsApiClient'
-import { PersonRiskFlag, TimelineItem } from '../data/model/risk'
+import { PersonRiskFlag, RiskFlag, TimelineItem } from '../data/model/risk'
 import { findReplace } from '../utils'
 
 const riskFlagTypes: Set<string> = new Set([
@@ -71,7 +71,7 @@ const riskController: Controller<
       })
       let personRiskFlag = await masClient.getPersonRiskFlag(crn, id)
       const term = 'RoSH'
-      personRiskFlag = findReplace<PersonRiskFlag>({
+      personRiskFlag = findReplace<PersonRiskFlag, RiskFlag>({
         data: personRiskFlag,
         path: ['riskFlag', 'description'],
         find: term,

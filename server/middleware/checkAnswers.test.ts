@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { getDataValue } from '../utils'
 import { checkAnswers } from './checkAnswers'
@@ -147,7 +147,7 @@ describe('/middleware/checkAnswers', () => {
     const { data } = req.session
     const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
-    const session = getDataValue(data, ['appointments', crn, id])
+    const session = getDataValue(data, ['appointments', crn, id]) as AppointmentSession
     expect(session.type).toEqual('COAP')
     expect(session.user.locationCode).toEqual('N56NTMC')
   })
@@ -156,7 +156,7 @@ describe('/middleware/checkAnswers', () => {
     const { data } = req.session
     const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
-    const session = getDataValue(data, ['appointments', crn, id])
+    const session = getDataValue(data, ['appointments', crn, id]) as AppointmentSession
     expect(session.type).toBeNull()
     expect(session.user.locationCode).toBeNull()
   })
@@ -165,7 +165,7 @@ describe('/middleware/checkAnswers', () => {
     const { data } = req.session
     const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
-    const session = getDataValue(data, ['appointments', crn, id])
+    const session = getDataValue(data, ['appointments', crn, id]) as AppointmentSession
     expect(session.type).toEqual('COAP')
     expect(session.user.locationCode).toBeNull()
   })

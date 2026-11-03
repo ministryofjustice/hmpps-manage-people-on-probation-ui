@@ -20,8 +20,8 @@ export const getOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
   const id = uuid || contactId
   const data = req?.session?.data
-  const responseContactId = getDataValue(data, ['temp', crn, 'responseContactId']) || null
-  const linkedContactId = getDataValue(data, ['temp', crn, 'linkedContactId']) || null
+  const responseContactId = (getDataValue(data, ['temp', crn, 'responseContactId']) as string) || null
+  const linkedContactId = (getDataValue(data, ['temp', crn, 'linkedContactId']) as string) || null
 
   const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
   const isValidParams = isValidCrn(crn) && isValidId

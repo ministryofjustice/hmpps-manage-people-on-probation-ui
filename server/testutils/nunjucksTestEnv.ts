@@ -75,7 +75,7 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addGlobal('getCurrentRisksToThemselves', getCurrentRisksToThemselves)
   env.addGlobal('getPreviousRisksToThemselves', getPreviousRisksToThemselves)
   env.addGlobal('getTagClass', getTagClass)
-  env.addFilter('decorateFormAttributes', (obj: any, sections?: string[]) => {
+  env.addFilter('decorateFormAttributes', (obj: unknown, sections?: string[]) => {
     if (!req || !res) {
       logger.warn('decorateFormAttributes called without request context')
       return obj

@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import superagent, { SuperAgentRequest } from 'superagent'
 import { WiremockMapping } from '../../integration_tests/utils'
-import { PersonAppointmentEnforcementAction } from '../../server/data/model/schedule'
+import { PersonAppointment, PersonAppointmentEnforcementAction } from '../../server/data/model/schedule'
 
 interface Args {
   isFuture?: boolean
@@ -82,7 +82,7 @@ const getAppointmentStub = (
           dateOfBirth: '1979-08-18',
         },
         appointment: {
-          id: 6,
+          id: '6',
           eventNumber: '7654321',
           type: 'Planned Office Visit (NS)',
           startDateTime,
@@ -157,47 +157,47 @@ const getAppointmentStub = (
           },
           nsiId: 0,
         },
-        documents,
+        documents: [],
         enforcementAction,
-      },
+      } as PersonAppointment,
       headers: {
         'Content-Type': 'application/json',
       },
     },
   }
   if (!deliusManaged) {
-    mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.type = '3 Way Meeting (NS)'
   }
   if (!inOffice) {
-    mapping.response.jsonBody.appointment.type = 'Planned Telephone Contact (NS)'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.type = 'Planned Telephone Contact (NS)'
   }
   if (personLevel) {
-    mapping.response.jsonBody.appointment.type = 'Planned Doorstep Contact (NS)'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.type = 'Planned Doorstep Contact (NS)'
   }
-  mapping.response.jsonBody.appointment.deliusManaged = deliusManaged
+  ;(mapping.response.jsonBody as PersonAppointment).appointment.deliusManaged = deliusManaged
   if (isFuture) {
-    mapping.response.jsonBody.appointment.isInPast = false
-    mapping.response.jsonBody.appointment.isPastAppointment = false
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.isInPast = false
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.isPastAppointment = false
 
     const now = DateTime.now().plus({ days: 1 })
     const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00+01:00`
-    const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00+01:00`
+    const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00+01:00` as string
 
-    mapping.response.jsonBody.appointment.startDateTime = start
-    mapping.response.jsonBody.appointment.endDateTime = end
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.startDateTime = start
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.endDateTime = end
   }
   if (rescheduled) {
-    mapping.response.jsonBody.appointment.rescheduled = true
-    mapping.response.jsonBody.appointment.rescheduledStaff = true
-    mapping.response.jsonBody.appointment.rescheduledPop = true
-    mapping.response.jsonBody.appointment.rescheduledBy = {
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.rescheduled = true
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.rescheduledStaff = true
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.rescheduledPop = true
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.rescheduledBy = {
       forename: '',
       middleName: '',
       surname: '',
     }
   }
   if (notes) {
-    mapping.response.jsonBody.appointment.appointmentNotes = [
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.appointmentNotes = [
       { id: 1, createdBy: 'Terry Jones', createdByDate: '2023-04-06', note: 'Some notes', hasNoteBeenTruncated: false },
       {
         id: 2,
@@ -209,7 +209,7 @@ const getAppointmentStub = (
     ]
   }
   if (documents) {
-    mapping.response.jsonBody.appointment.documents = [
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.documents = [
       {
         id: '83fdbf8a-a2f2-43b4-93ef-67e71c04fc58',
         name: 'Document-1.pdf',
@@ -231,38 +231,38 @@ const getAppointmentStub = (
     ]
   }
   if (locationOfficeName) {
-    mapping.response.jsonBody.appointment.location.officeName = 'Leamington Probation Office'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.location.officeName = 'Leamington Probation Office'
   }
   if (hasOutcome) {
-    mapping.response.jsonBody.appointment.hasOutcome = true
-    mapping.response.jsonBody.appointment.didTheyComply = hasComplied
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.hasOutcome = true
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.didTheyComply = hasComplied
     if (acceptableAbsence !== undefined) {
-      mapping.response.jsonBody.appointment.acceptableAbsence = acceptableAbsence
-      mapping.response.jsonBody.appointment.wasAbsent = true
-      mapping.response.jsonBody.appointment.acceptableAbsenceReason = 'Holiday'
+      ;(mapping.response.jsonBody as PersonAppointment).appointment.acceptableAbsence = acceptableAbsence
+      ;(mapping.response.jsonBody as PersonAppointment).appointment.wasAbsent = true
+      ;(mapping.response.jsonBody as PersonAppointment).appointment.acceptableAbsenceReason = 'Holiday'
     }
   }
   if (hasRarActivity) {
-    mapping.response.jsonBody.appointment.rarCategory = 'Stepping Stones'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.rarCategory = 'Stepping Stones'
   }
   if (noType) {
-    mapping.response.jsonBody.appointment.type = ''
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.type = ''
   }
   if (contactType) {
-    mapping.response.jsonBody.appointment.type = contactType
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.type = contactType
   }
   if (noEventId) {
-    mapping.response.jsonBody.appointment.eventId = 0
-    mapping.response.jsonBody.appointment.eventNumber = ''
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.eventId = 0
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.eventNumber = ''
   }
   if (noAttendee) {
-    mapping.response.jsonBody.appointment.officer.teamCode = ''
-    mapping.response.jsonBody.appointment.officer.providerCode = ''
-    mapping.response.jsonBody.appointment.officer.username = ''
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.officer.teamCode = ''
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.officer.providerCode = ''
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.officer.username = ''
   }
   if (noLocation) {
-    mapping.response.jsonBody.appointment.location = null
-    mapping.response.jsonBody.appointment.officer = {
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.location = null
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.officer = {
       code: '',
       name: {
         forename: 'Peter',
@@ -274,10 +274,10 @@ const getAppointmentStub = (
     }
   }
   if (createNext) {
-    mapping.response.jsonBody.appointment.eventNumber = '12345'
-    mapping.response.jsonBody.appointment.officer.username = 'peter-parker'
-    mapping.response.jsonBody.appointment.location.code = 'N56NTMC'
-    mapping.response.jsonBody.appointment.eventId = 2501192724
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.eventNumber = '12345'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.officer.username = 'peter-parker'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.location.code = 'N56NTMC'
+    ;(mapping.response.jsonBody as PersonAppointment).appointment.eventId = 2501192724
   }
 
   return mapping
@@ -368,11 +368,11 @@ const getNextAppointmentStub = ({ appointment = true, usernameIsCom = true, home
     },
   }
   if (!appointment) {
-    mapping.response.jsonBody.appointment = null
+    ;(mapping.response.jsonBody as PersonAppointment).appointment = null
   }
   if (homeAddress) {
-    mapping.response.jsonBody.appointment = {
-      ...mapping.response.jsonBody.appointment,
+    ;(mapping.response.jsonBody as PersonAppointment).appointment = {
+      ...(mapping.response.jsonBody as PersonAppointment).appointment,
       location: {
         buildingNumber: '32',
         streetName: 'SCOTLAND STREET',

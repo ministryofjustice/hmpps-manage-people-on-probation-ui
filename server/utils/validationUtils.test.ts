@@ -37,6 +37,7 @@ import {
   AppointmentOutcomesValidationArgs,
 } from '../properties'
 import { ValidationSpec } from '../models/Errors'
+import { Appointment } from '../data/model/overview'
 
 const loggerSpy = jest.spyOn(logger, 'info')
 const crn = 'X000001'
@@ -281,7 +282,7 @@ describe('isFutureDate', () => {
     [['31/2/2026'], false],
     [['2026-01-03'], false],
   ])('returns %p for input %p', (inputArgs, expected) => {
-    expect(isFutureDate(inputArgs as any)).toBe(expected)
+    expect(isFutureDate(inputArgs as string[])).toBe(expected)
   })
 })
 
@@ -481,7 +482,7 @@ describe('getNestedValue()', () => {
           },
         },
       },
-    } as any
+    } as Partial<Appointment>
     expect(getNestedValue(mockData, path)).toBeUndefined()
   })
 })
