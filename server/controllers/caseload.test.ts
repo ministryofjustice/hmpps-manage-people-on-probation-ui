@@ -334,7 +334,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
-        noResults: 'No upcoming appointments',
+        noResults: 'No upcoming appointments.',
       })
     })
     it('renders the upcoming appointment page with page and sort name ascending search parameters set in url', async () => {
@@ -375,7 +375,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
-        noResults: 'No upcoming appointments',
+        noResults: 'No upcoming appointments.',
       })
     })
     it('renders the upcoming appointment page with page and sort appointment descending search parameters set in url', async () => {
@@ -416,7 +416,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
-        noResults: 'No upcoming appointments',
+        noResults: 'No upcoming appointments.',
       })
     })
     it('renders the caseload appointments page with appointments with no outcome', async () => {
@@ -457,7 +457,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
-        noResults: 'No outcomes to log',
+        noResults: 'No outcomes to log.',
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
@@ -499,7 +499,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
-        noResults: 'No outcomes to log',
+        noResults: 'No outcomes to log.',
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
@@ -548,7 +548,7 @@ describe('caseloadController', () => {
         ),
         sortUrl: '/caseload/appointments/no-outcome?outcomeFilter=PAST_THREE_MONTHS',
         url: req.url,
-        noResults: 'No outcomes to log',
+        noResults: 'No outcomes to log.',
         outcomesFilter: 'PAST_THREE_MONTHS',
       })
     })
