@@ -978,7 +978,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       mockedGetStatusTag.mockResolvedValueOnce('In custody')
 
-      res.locals.flags = { enablePersonHeader: true }
+      res.locals.flags = { enablePersonHeader: true, enablePersonHeaderStatus: true }
 
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
 
@@ -1012,7 +1012,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       mockedGetStatusTag.mockResolvedValueOnce(undefined)
 
-      res.locals.flags = { enablePersonHeader: true }
+      res.locals.flags = { enablePersonHeader: true, enablePersonHeaderStatus: true }
 
       await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
 
@@ -1021,6 +1021,22 @@ describe('/middleware/getPersonalDetails', () => {
         res.locals.supervisionPackageDetails,
         res.locals.prisoner,
       )
+      expect(res.locals.personStatusTag).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('personStatusTag is not called when the enablePersonHeaderStatus is turned off', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+
+      mockedGetStatusTag.mockResolvedValueOnce(undefined)
+
+      res.locals.flags = { enablePersonHeader: true, enablePersonHeaderStatus: false }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+
+      expect(mockedGetStatusTag).not.toHaveBeenCalled()
       expect(res.locals.personStatusTag).toBeUndefined()
       expect(nextSpy).toHaveBeenCalled()
     })
