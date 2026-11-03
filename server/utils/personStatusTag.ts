@@ -8,8 +8,6 @@ import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { SupervisionPackage } from '../models/SupervisionPackage'
 
-import { convertToTitleCase } from './convertToTitleCase'
-
 export async function getStatusTag(
   personalDetails: PersonalDetails,
   supervisionPackage: SupervisionPackage,
