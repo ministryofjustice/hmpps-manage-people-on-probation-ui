@@ -1,5 +1,6 @@
 import nock from 'nock'
 
+import { DateTime, Settings } from 'luxon'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
 import MasApiClient from './masApiClient'
@@ -42,6 +43,10 @@ describe('masApiClient', () => {
     })
     fakeMasApiClient = nock(config.apis.masApi.url)
     masApiClient = new MasApiClient(token.access_token)
+
+    const nowString = DateTime.now().toISO()
+    const nowTime = DateTime.fromISO(nowString).toMillis()
+    Settings.now = () => nowTime
 
     it.each([
       ['getOverview', '/overview/X000001?sentenceNumber=1', () => masApiClient.getOverview('X000001')],
@@ -360,7 +365,7 @@ describe('masApiClient', () => {
       ],
       [
         'getUserScheduleV2',
-        '/v2/user/USER/schedule/upcoming?size=1&page=1&sortBy=user&ascending=asc',
+        `/v2/user/USER/schedule/upcoming?size=1&page=1&sortBy=user&ascending=asc&dateTime=${encodeURIComponent(nowString)}`,
         () =>
           masApiClient.getUserScheduleV2({
             ascending: 'asc',
@@ -373,7 +378,7 @@ describe('masApiClient', () => {
       ],
       [
         'getUserScheduleV2 no params',
-        '/v2/user/USER/schedule/upcoming',
+        `/v2/user/USER/schedule/upcoming?dateTime=${encodeURIComponent(nowString)}`,
         () =>
           masApiClient.getUserScheduleV2({
             ascending: undefined,
@@ -430,7 +435,6 @@ describe('masApiClient', () => {
       if (method === 'put') {
         fakeMasApiClient.put(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
       }
-
       const output = await func()
       if (raw) {
         expect(output.statusCode).toEqual(200)
