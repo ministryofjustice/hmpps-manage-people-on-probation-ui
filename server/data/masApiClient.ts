@@ -1,4 +1,5 @@
 import { Response } from 'superagent'
+import { DateTime } from 'luxon'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
@@ -587,9 +588,14 @@ export default class MasApiClient extends RestClient {
     toDate,
     version = '',
   }: GetUserScheduleProps): Promise<UserSchedule> {
-    const searchParams = Object.fromEntries(
-      Object.entries({ size, page, sortBy, ascending, fromDate, toDate }).filter(([_k, v]) => v),
-    ) as Record<string, string>
+    const searchObject =
+      version === '/v2' && type === 'upcoming'
+        ? { size, page, sortBy, ascending, fromDate, toDate, dateTime: DateTime.now().toISO() }
+        : { size, page, sortBy, ascending, fromDate, toDate }
+    const searchParams = Object.fromEntries(Object.entries(searchObject).filter(([_k, v]) => v)) as Record<
+      string,
+      string
+    >
     const pageQuery = `${new URLSearchParams(searchParams).toString()}`
     return this.get({
       path: `${version}/user/${username}/schedule/${type}${pageQuery ? '?' : ''}${pageQuery}`,
