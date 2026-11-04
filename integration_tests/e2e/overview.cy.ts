@@ -27,7 +27,12 @@ context('Overview', () => {
   }
 
   const verifyPersonalDetails = (page: OverviewPage) => {
-    page.getCardHeader('personalDetails').should('contain.text', 'Personal details')
+    page
+      .getCardHeader('personalDetails')
+      .should('contain.text', 'Personal details')
+      .find('a')
+      .should('contain.text', 'View all personal details')
+      .and('have.attr', 'href', '/case/X000001/personal-details')
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
     page.getRowData('personalDetails', 'preferredName', 'Value').should('contain.text', 'Caz')
     page.getRowData('personalDetails', 'preferredGender', 'Value').should('contain.text', 'Female')
@@ -38,7 +43,13 @@ context('Overview', () => {
   }
 
   const verifySentences = (page: OverviewPage) => {
-    page.getCardHeader('sentence').should('contain.text', 'Sentences')
+    page
+      .getCardHeader('sentence')
+      .should('contain.text', 'Sentences')
+      .find('a')
+      .should('contain.text', 'View all sentence information')
+      .and('have.attr', 'href', '/case/X000001/sentence')
+    page.getCardHeader('sentence').find('a')
     page.getColumnHeader('sentence', 0).should('contain.text', 'Sentence')
     page.getColumnHeader('sentence', 1).should('contain.text', 'Start date')
     page.getColumnHeader('sentence', 2).should('contain.text', 'End date')

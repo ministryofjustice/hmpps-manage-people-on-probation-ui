@@ -46,12 +46,12 @@ const render = (input: Record<string, unknown>) => {
 }
 
 describe('partials/_overview-risk-summary-card.njk', () => {
-  it('renders the summary card with rosh score from ARNS source if enableNDeliusRoshOverviewPage feature flag is disabled', () => {
+  it('renders the summary card with rosh score from ARNS source if enableNDeliusRosh feature flag is disabled', () => {
     const html = render({
       risks: mockRisks,
       overview: mockOverview,
       rosh,
-      flags: { enableNewOverview: true, enableNDeliusRoshOverviewPage: false },
+      flags: { enableNewOverview: true, enableNDeliusRosh: false },
     })
     const $ = cheerio.load(html)
     expect(
@@ -72,7 +72,7 @@ describe('partials/_overview-risk-summary-card.njk', () => {
       risks: mockRisks,
       overview: mockOverview,
       rosh: { ...rosh, level: null },
-      flags: { enableNewOverview: true, enableNDeliusRoshOverviewPage: true },
+      flags: { enableNewOverview: true, enableNDeliusRosh: true },
     })
     const $ = cheerio.load(html)
     expect(
@@ -95,13 +95,13 @@ describe('partials/_overview-risk-summary-card.njk', () => {
     ['HIGH', 'HIGH', 'arns-badge-base--high'],
     ['VERY HIGH', 'VERY HIGH', 'arns-badge-base--very-high'],
   ])(
-    'renders the summary card with %s rosh score from NDelius source if enableNDeliusRoshOverviewPage feature flag is enabled',
+    'renders the summary card with %s rosh score from NDelius source if enableNDeliusRosh feature flag is enabled',
     (level: RoshBadgeLevel, expectedLevel: RoshBadgeLevel, expectedClass: string) => {
       const html = render({
         risks: mockRisks,
         overview: mockOverview,
         rosh: { ...rosh, level },
-        flags: { enableNewOverview: true, enableNDeliusRoshOverviewPage: true },
+        flags: { enableNewOverview: true, enableNDeliusRosh: true },
       })
       const $ = cheerio.load(html)
       expect(
@@ -142,7 +142,7 @@ describe('partials/_overview-risk-summary-card.njk', () => {
           risks: mockRisks,
           overview: mockOverview,
           rosh: { ...rosh, level },
-          flags: { enableNewOverview: false, enableNDeliusRoshOverviewPage: true },
+          flags: { enableNewOverview: false, enableNDeliusRosh: true },
         })
         const $ = cheerio.load(html)
 
