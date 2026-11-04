@@ -1,7 +1,15 @@
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import { completeSentencePage } from './utils'
-// import AttendancePage from '../../pages/appointments/attendance.page'
+import {
+  completeLocationDateTimePage,
+  completeSentencePage,
+  completeSupportingInformationPage,
+  completeTextMessageConfirmationPage,
+  completeTypePage,
+} from './utils'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
+import ErrorPage from '../../pages/error'
+import AttendancePage from '../../pages/appointments/attendance.page'
 
 const crn = 'X778160'
 const uuid = '19a88188-6013-43a7-bb4d-6e338516818g'
@@ -12,14 +20,13 @@ const loadPage = (_crn = crn) => {
 }
 
 describe('Arrange an appointment', () => {
-  let typePage: AppointmentTypePage
-  let locationPage: AppointmentLocationDateTimePage
-  // let attendancePage: AttendancePage
-  beforeEach(() => {
-    cy.task('resetMocks')
-  })
-
   describe('Appointment type and attendance', () => {
+    let typePage: AppointmentTypePage
+    let locationPage: AppointmentLocationDateTimePage
+    let attendancePage: AttendancePage
+    beforeEach(() => {
+      cy.task('resetMocks')
+    })
     // const expectedUser = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
     it('should render the page', () => {
       cy.task('stubOverviewVisorRegistration')
@@ -37,26 +44,22 @@ describe('Arrange an appointment', () => {
       locationPage = new AppointmentLocationDateTimePage()
       locationPage.checkOnPage()
     })
-  })
-  /*
-  describe('Probation practitioner not allocated', () => {
-    beforeEach(() => {
+
+    it('should list the default user as the attendee if pp not allocated', () => {
       cy.task('stubNoAllocatedCOM')
       loadPage()
-    })
-    it('should list the default user as the attendee', () => {
       cy.get('[data-qa="attendeeDetails"]').should(
         'contain.text',
         'Peter Parker (PS-PSO) (Automated Allocation Team, London)',
       )
     })
-  })
 
-  */
-  /*
     it('should update the default user', () => {
+      cy.task('stubNoAllocatedCOM')
+      loadPage()
       const changedUser = 'Iain Chambers (PS - Other) (Breach Team (Durham and Cleveland), North East Region)'
       cy.get('[data-qa="attendee"] a').click()
+      attendancePage = new AttendancePage()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
       cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
       cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
@@ -85,16 +88,17 @@ describe('Arrange an appointment', () => {
         .should('contain.text', 'Peter Parker (PS-PSO) (Automated Allocation Team, London)')
     })
     it('should refresh to error page if API call fails', () => {
+      cy.task('stubNoAllocatedCOM')
+      loadPage()
       cy.get('[data-qa="attendee"] a').click()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
       cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
       cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
+
       cy.get('[data-qa="providerCode"]').select('N50')
       cy.get('[data-qa="teamCode"]').select('N50AHA')
       const page = new ErrorPage()
       page.checkPageTitle('Sorry, there is a problem with the service')
-      locationPage = new AppointmentLocationDateTimePage()
-      locationPage.checkOnPage()
     })
-      */
+  })
 })
