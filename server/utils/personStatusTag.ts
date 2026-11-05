@@ -8,13 +8,23 @@ import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { SupervisionPackage } from '../models/SupervisionPackage'
 
+export const PERSON_STATUS_TAGS = {
+  DECEASED: 'Deceased',
+  IN_CUSTODY: 'In custody',
+  RECALLED: 'Recalled',
+  RECALLED_IN_CUSTODY: 'In custody - recalled',
+  UNLAWFULLY_AT_LARGE: 'Unlawfully at large',
+  RECALLED_UNLAWFULLY_AT_LARGE: 'Recalled - Unlawfully at large',
+  IN_BREACH: 'In breach',
+} as const
+
 export async function getStatusTag(
   personalDetails: PersonalDetails,
   supervisionPackage: SupervisionPackage,
   prisoner?: Prisoner,
 ): Promise<string | undefined> {
   if (personalDetails?.dateOfDeath !== undefined) {
-    return 'Deceased'
+    return PERSON_STATUS_TAGS.DECEASED
   }
 
   const statusTagForPersonInCustody = await getStatusTagForPersonInCustody(prisoner)
@@ -32,19 +42,19 @@ export async function getStatusTag(
     }
 
     if (isUnlawfullyAtLarge(activePrimarySentence)) {
-      return 'Unlawfully at large'
+      return PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
     }
 
     if (hasRestrictedCustodyStatus(activePrimarySentence)) {
-      return 'In custody'
+      return PERSON_STATUS_TAGS.IN_CUSTODY
     }
 
     if (activePrimarySentence.inBreach) {
-      return 'In breach'
+      return PERSON_STATUS_TAGS.IN_BREACH
     }
 
     if (isRecalled(activePrimarySentence)) {
-      return 'Recalled'
+      return PERSON_STATUS_TAGS.RECALLED
     }
   }
   return undefined
@@ -52,15 +62,19 @@ export async function getStatusTag(
 
 export async function getStatusTagForPersonInCustody(prisoner?: Prisoner): Promise<string> {
   if (prisoner?.legalStatus === 'DEAD') {
-    return 'Deceased'
+    return PERSON_STATUS_TAGS.DECEASED
   }
 
   if (prisoner?.lastMovementReasonCode === 'UAL') {
-    return prisoner?.recall ? 'Recalled - Unlawfully at large' : 'Unlawfully at large'
+    return prisoner?.recall ? PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE : PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
   }
 
   if (prisoner?.status === 'ACTIVE IN' || prisoner?.status === 'ACTIVE OUT') {
-    return prisoner?.recall ? 'Recalled - In custody' : 'In custody'
+    return prisoner?.recall ? PERSON_STATUS_TAGS.RECALLED_IN_CUSTODY : PERSON_STATUS_TAGS.IN_CUSTODY
+  }
+
+  if (prisoner?.recall) {
+    return PERSON_STATUS_TAGS.RECALLED
   }
 
   return undefined

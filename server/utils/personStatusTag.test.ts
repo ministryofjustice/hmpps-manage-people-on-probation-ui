@@ -1,7 +1,7 @@
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { SupervisionPackage } from '../models/SupervisionPackage'
-import { getPrisonerDetails, getStatusTag, getStatusTagForPersonInCustody } from './personStatusTag'
+import { getPrisonerDetails, getStatusTag, getStatusTagForPersonInCustody, PERSON_STATUS_TAGS } from './personStatusTag'
 
 jest.mock('../data/prisonerSearchApiClient')
 jest.mock('../../logger')
@@ -48,7 +48,7 @@ describe('getStatusTag', () => {
       dateOfDeath: '2025-01-01',
     })
 
-    await expect(getStatusTag(details, createSupervisionPackage())).resolves.toBe('Deceased')
+    await expect(getStatusTag(details, createSupervisionPackage())).resolves.toBe(PERSON_STATUS_TAGS.DECEASED)
   })
 
   it('returns the custody status for a primary custodial sentence', async () => {
@@ -71,7 +71,9 @@ describe('getStatusTag', () => {
       recall: false,
     }
 
-    await expect(getStatusTag(personalDetails, supervisionPackage, prisoner)).resolves.toBe('In custody')
+    await expect(getStatusTag(personalDetails, supervisionPackage, prisoner)).resolves.toBe(
+      PERSON_STATUS_TAGS.IN_CUSTODY,
+    )
   })
 
   it('returns Deceased when the prisoner legal status is DEAD', async () => {
@@ -81,7 +83,9 @@ describe('getStatusTag', () => {
       recall: false,
     }
 
-    await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe('Deceased')
+    await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe(
+      PERSON_STATUS_TAGS.DECEASED,
+    )
   })
 
   it('returns Recalled - In custody when the prisoner is recalled', async () => {
@@ -91,7 +95,7 @@ describe('getStatusTag', () => {
     }
 
     await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe(
-      'Recalled - In custody',
+      PERSON_STATUS_TAGS.RECALLED_IN_CUSTODY,
     )
   })
 
@@ -102,7 +106,7 @@ describe('getStatusTag', () => {
     }
 
     await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe(
-      'Unlawfully at large',
+      PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE,
     )
   })
 
@@ -113,7 +117,7 @@ describe('getStatusTag', () => {
     }
 
     await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe(
-      'Recalled - Unlawfully at large',
+      PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE,
     )
   })
 
@@ -146,7 +150,7 @@ describe('getStatusTag', () => {
       },
     })
 
-    await expect(getStatusTag(personalDetails, supervisionPackage)).resolves.toBe('In breach')
+    await expect(getStatusTag(personalDetails, supervisionPackage)).resolves.toBe(PERSON_STATUS_TAGS.IN_BREACH)
   })
 
   it('does not return In breach when only a non-primary sentence is in breach', async () => {
@@ -202,7 +206,9 @@ describe('getStatusTag', () => {
       recall: false,
     }
 
-    await expect(getStatusTag(personalDetails, supervisionPackage, prisoner)).resolves.toBe('In custody')
+    await expect(getStatusTag(personalDetails, supervisionPackage, prisoner)).resolves.toBe(
+      PERSON_STATUS_TAGS.IN_CUSTODY,
+    )
   })
 
   it('does not return a custody status for a non-custodial sentence when prisoner status is unknown', async () => {
@@ -219,7 +225,7 @@ describe('getStatusTagForPersonInCustody', () => {
       recall: false,
     }
 
-    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('In custody')
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(PERSON_STATUS_TAGS.IN_CUSTODY)
   })
 
   it('returns In custody for an active-out prisoner who is not recalled', async () => {
@@ -228,7 +234,7 @@ describe('getStatusTagForPersonInCustody', () => {
       recall: false,
     }
 
-    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('In custody')
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(PERSON_STATUS_TAGS.IN_CUSTODY)
   })
 
   it.each(['ACTIVE IN', 'ACTIVE OUT'])(
@@ -239,7 +245,7 @@ describe('getStatusTagForPersonInCustody', () => {
         recall: true,
       }
 
-      await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('Recalled - In custody')
+      await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(PERSON_STATUS_TAGS.RECALLED_IN_CUSTODY)
     },
   )
 
@@ -250,7 +256,7 @@ describe('getStatusTagForPersonInCustody', () => {
       recall: false,
     }
 
-    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('Deceased')
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(PERSON_STATUS_TAGS.DECEASED)
   })
 
   it('returns Unlawfully at large when the last movement reason is UAL', async () => {
@@ -268,7 +274,9 @@ describe('getStatusTagForPersonInCustody', () => {
       recall: true,
     }
 
-    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('Recalled - Unlawfully at large')
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(
+      PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE,
+    )
   })
 
   it('returns undefined when prisoner details are not supplied', async () => {
@@ -301,7 +309,9 @@ describe('getStatusTagForPersonInCustody', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(
+      PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE,
+    )
   })
 
   it('returns detained when a primary sentence has restricted custody status D', async () => {
@@ -320,7 +330,7 @@ describe('getStatusTagForPersonInCustody', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('In custody')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(PERSON_STATUS_TAGS.IN_CUSTODY)
   })
 
   it('does not return In custody for an unrestricted custody status', async () => {
@@ -400,7 +410,9 @@ describe('getStatusTagForPersonInCustody', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(
+      PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE,
+    )
   })
 
   it('prioritises Unlawfully at large over community sentence breach', async () => {
@@ -439,7 +451,7 @@ describe('getStatusTagForPersonInCustody', () => {
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('In custody')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(PERSON_STATUS_TAGS.IN_CUSTODY)
   })
 
   it('does not return Unlawfully at large when the supervision package outcome is not success', async () => {
