@@ -159,9 +159,15 @@ export interface Activity {
   nsiId?: number
   esupervisionId?: string
   externalReference?: string
+  sparks?: Array<Spark>
   isUpdatableContact?: boolean
   isPreSentence?: boolean
   editable?: boolean
+}
+
+export type Spark = {
+  code: string
+  description: string
 }
 
 export interface PersonAppointmentEnforcementAction {

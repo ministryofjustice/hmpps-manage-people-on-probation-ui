@@ -40,4 +40,5 @@ export class FeatureFlags {
   enableNewOverview?: boolean = undefined
   enableESUPCheckInPhotosForSearch?: boolean = undefined
   enableEarlyTermination20261103Squad3?: boolean = undefined
+  enableSparksAppointmentDetails?: boolean = undefined
 }

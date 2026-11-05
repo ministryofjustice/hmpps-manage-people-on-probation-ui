@@ -4,6 +4,9 @@ import { Route } from '../@types'
 import { getDataValue } from '../utils'
 import { AppointmentSession } from '../models/Appointments'
 import { overrideDeliusManagedFlag } from './overrideDeliusManagedFlag'
+import { filterSparks } from '../utils/filterSparks'
+
+const sparkAppointmentTypes = ['Planned Office Visit (NS)']
 
 export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getPersonAppointmentInner(req, res, next) {
@@ -30,6 +33,16 @@ export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Pr
           res.locals.flags?.enablePreSentence === false
             ? overrideDeliusManagedFlag([response?.appointment])(req, res)[0]
             : response?.appointment,
+      }
+      if (
+        res.locals.flags?.enableSparksAppointmentDetails &&
+        sparkAppointmentTypes.includes(response?.appointment?.type)
+      ) {
+        const filteredSparks = filterSparks(response?.appointment?.sparks)
+        personAppointment.appointment = { ...personAppointment.appointment, sparks: filteredSparks }
+      } else if (personAppointment.appointment) {
+        personAppointment.appointment = { ...personAppointment.appointment }
+        delete personAppointment.appointment.sparks
       }
       res.locals.personAppointment = personAppointment
     }
