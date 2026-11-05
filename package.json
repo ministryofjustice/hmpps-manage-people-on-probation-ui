@@ -137,7 +137,6 @@
     "@ministryofjustice/hmpps-mpop-frontend-components-lib": "0.0.50",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.2",
     "@ministryofjustice/probation-search-frontend": "4.2.3",
-    "@opentelemetry/api": "1.10.0",
     "@sentry/cli": "^3.8.2",
     "@sentry/node": "^11.10.0",
     "@types/cypress__code-coverage": "^3.10.2",
@@ -272,7 +271,7 @@
   "allowScripts": {
     "@parcel/watcher@2.6.0": true,
     "@sentry/cli@3.8.2": true,
-    "cypress@16.2.0": true,
+    "cypress@16.2.1": true,
     "dtrace-provider@0.8.8": true,
     "esbuild@0.28.2": true,
     "fsevents@2.3.3": true,
