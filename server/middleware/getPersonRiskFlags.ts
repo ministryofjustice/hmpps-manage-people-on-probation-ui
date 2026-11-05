@@ -3,7 +3,7 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
 import { setDataValue, findReplace, getStaffRisk, getProbationRisk, getRiskRoshScore } from '../utils'
-import { getRiskBadgeGroups, RiskBadgeData } from '../utils/personRiskFlagSorter'
+import { getRiskBadges, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getPersonRiskFlagsInner(req, res, next) {
@@ -16,7 +16,7 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       personRisks = (await masClient.getPersonRiskFlags(crn)) as PersonRiskFlags
 
       if (personRisks?.riskFlags) {
-        riskBadgeData = getRiskBadgeGroups(personRisks.riskFlags)
+        riskBadgeData = getRiskBadges(personRisks.riskFlags)
       }
 
       const term = 'RoSH'
@@ -34,7 +34,7 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       setDataValue(data, ['riskBadgeData', crn], riskBadgeData)
     } else {
       personRisks = req.session.data.risks[crn]
-      riskBadgeData = req.session.data.riskBadgeData?.[crn] ?? getRiskBadgeGroups(personRisks.riskFlags ?? [])
+      riskBadgeData = req.session.data.riskBadgeData?.[crn] ?? getRiskBadges(personRisks.riskFlags ?? [])
     }
     const riskToStaff = getStaffRisk(personRisks.riskFlags)
     const riskToProbationStaff = getProbationRisk(personRisks.riskFlags)
