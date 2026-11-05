@@ -1,0 +1,23 @@
+
+name: Send message to Slack
+description: Send a JSON payload to Slack
+
+inputs:
+  payload:
+    description: Complete Slack message JSON payload
+    required: true
+
+  slack_token:
+    description: Slack bot token
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Send message to Slack
+      uses: slackapi/slack-github-action@03ea5433c137af7c0495bc0cad1af10403fc800c
+      with:
+        method: chat.postMessage
+        token: ${{ inputs.slack_token }}
+        payload: ${{ inputs.payload }}

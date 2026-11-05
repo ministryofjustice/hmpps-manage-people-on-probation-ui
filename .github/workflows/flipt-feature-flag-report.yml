@@ -1,0 +1,113 @@
+
+name: Flipt Feature Flag Report
+
+on:
+  schedule:
+    - cron: "30 7 * * 1" # Every Monday at 07:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dev:
+    name: DEV Flipt Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate DEV Flipt report
+        id: report
+        env:
+          FLIPT_ENV: dev
+          FLIPT_CHECK_URL: ${{ secrets.FLIPT_CHECK_URL }}
+          FLIPT_CHECK_TOKEN: ${{ secrets.FLIPT_CHECK_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          payload=$(node helper-scripts/flipt-flag-report.mjs --env=dev --slack \
+            | jq -ce '. + {channel: "manage-people-on-probation-alerts-nonprod"}')
+
+          echo "payload=$payload" >> "$GITHUB_OUTPUT"
+
+      - name: Send DEV report to Slack
+        uses: ./.github/actions/send-to-slack
+        with:
+          payload: ${{ steps.report.outputs.payload }}
+          slack_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+
+  preprod:
+    name: PREPROD Flipt Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate PREPROD Flipt report
+        id: report
+        env:
+          FLIPT_ENV_PREPROD: preprod
+          FLIPT_CHECK_URL_PREPROD: ${{ secrets.FLIPT_CHECK_URL_PREPROD }}
+          FLIPT_CHECK_TOKEN_PREPROD: ${{ secrets.FLIPT_CHECK_TOKEN_PREPROD }}
+        run: |
+          set -euo pipefail
+
+          payload=$(node helper-scripts/flipt-flag-report.mjs --env=preprod --slack \
+            | jq -ce '. + {channel: "manage-people-on-probation-alerts-nonprod"}')
+
+          echo "payload=$payload" >> "$GITHUB_OUTPUT"
+
+      - name: Send PREPROD report to Slack
+        uses: ./.github/actions/send-to-slack
+        with:
+          payload: ${{ steps.report.outputs.payload }}
+          slack_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+
+  prod:
+    name: PROD Flipt Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate PROD Flipt report
+        id: report
+        env:
+          FLIPT_ENV_PROD: prod
+          FLIPT_CHECK_URL_PROD: ${{ secrets.FLIPT_CHECK_URL_PROD }}
+          FLIPT_CHECK_TOKEN_PROD: ${{ secrets.FLIPT_CHECK_TOKEN_PROD }}
+        run: |
+          set -euo pipefail
+
+          payload=$(node helper-scripts/flipt-flag-report.mjs --env=prod --slack \
+            | jq -ce '. + {channel: "manage-people-on-probation-alerts"}')
+
+          echo "payload=$payload" >> "$GITHUB_OUTPUT"
+
+      - name: Send PROD report to Slack
+        uses: ./.github/actions/send-to-slack
+        with:
+          payload: ${{ steps.report.outputs.payload }}
+          slack_token: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
