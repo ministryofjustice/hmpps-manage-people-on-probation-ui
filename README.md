@@ -346,7 +346,7 @@ A disabled flag may still be actively used by an application. The report is info
 
 Scheduled Slack reports
 
-The GitHub Actions workflow .github/workflows/flipt-feature-flag-report.yml runs every Monday at 07:30 UTC and supports manual execution.
+The GitHub Actions workflow .github/workflows/flipt-feature-flag-report.yml is currently run manually only (the weekly schedule is disabled until the runners can reach Flipt).
 
 DEV and PREPROD reports are sent to manage-people-on-probation-alerts-nonprod.
 

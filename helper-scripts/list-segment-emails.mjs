@@ -67,12 +67,19 @@ async function main() {
 
     const emails = (segment.constraints || [])
       .filter(constraint => constraint.property === 'email')
-      .flatMap(constraint =>
-        (constraint.value || '')
+      .flatMap(constraint => {
+        const value = constraint.value || ''
+
+        if (['isoneof', 'isnotoneof'].includes(constraint.operator)) {
+          const parsed = JSON.parse(value || '[]')
+          return (Array.isArray(parsed) ? parsed : [parsed]).map(email => String(email).trim()).filter(Boolean)
+        }
+
+        return value
           .split(',')
           .map(email => email.trim())
-          .filter(Boolean),
-      )
+          .filter(Boolean)
+      })
 
     console.log(`Environment: ${selectedEnv}`)
     console.log(`Segment: ${segmentKey}`)
