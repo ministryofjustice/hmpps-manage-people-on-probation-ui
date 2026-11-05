@@ -11,7 +11,6 @@ export class FeatureFlags {
   enableTierChangePrompt?: boolean = undefined
   enableFinalThirdPrompt?: boolean = undefined
   enableESupervisionCheckins?: boolean = undefined
-  enableEnforcementContacts?: boolean = undefined
   enableUserEditableActions?: boolean = undefined
   enableBreachOrRecallAndSendLetterAction?: boolean = undefined
   enableSessionCacheLogging?: boolean = undefined

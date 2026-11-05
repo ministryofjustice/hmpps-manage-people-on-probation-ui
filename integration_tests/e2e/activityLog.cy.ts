@@ -626,16 +626,6 @@ context('Contacts', () => {
     page.getActivity(2).should('contain.text', 'Pre-intervention session 1')
   })
 
-  it('should show View and Manage on NDelius links for enforcement contact types when flag is enabled', () => {
-    cy.task('stubActivityLogWithAlcoholConsumption')
-    cy.visit('/case/X000001/activity-log')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    page.getActivity(1).should('contain.text', 'Alcohol consumption')
-    page.getActivityViewLink(0).should('contain.text', 'View')
-    page.getElementByDataQA('manage-on-delius-link').should('be.visible')
-    page.getElementByDataQA('manage-on-delius-link').should('contain.text', 'Manage on NDelius')
-  })
-
   it('should show View and Manage on NDelius links for Unplanned Contact from Person on Probation when flag is enabled', () => {
     cy.task('stubActivityLogWithUnplannedContact')
     cy.visit('/case/X000001/activity-log')
@@ -646,8 +636,7 @@ context('Contacts', () => {
     page.getElementByDataQA('manage-on-delius-link').should('contain.text', 'Manage on NDelius')
   })
 
-  it('should show standard Manage link for enforcement contact types when flag is disabled', () => {
-    cy.task('stubDisableEnforcementContacts')
+  it('should show standard Manage link for enforcement contact types', () => {
     cy.task('stubActivityLogWithAlcoholConsumption')
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
