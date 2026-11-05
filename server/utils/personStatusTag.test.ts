@@ -265,7 +265,7 @@ describe('getStatusTagForPersonInCustody', () => {
       recall: false,
     }
 
-    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe('Unlawfully at large')
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE)
   })
 
   it('returns Recalled - Unlawfully at large when the prisoner is recalled and UAL', async () => {
@@ -277,6 +277,14 @@ describe('getStatusTagForPersonInCustody', () => {
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(
       PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE,
     )
+  })
+
+  it('returns Recalled when the prisoner is recalled', async () => {
+    const prisoner: Prisoner = {
+      recall: true,
+    }
+
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBe(PERSON_STATUS_TAGS.RECALLED)
   })
 
   it('returns undefined when prisoner details are not supplied', async () => {
@@ -350,6 +358,25 @@ describe('getStatusTagForPersonInCustody', () => {
     })
 
     await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
+  })
+
+  it('returns recalled when a person is recalled in community', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              status: {
+                code: 'C',
+                description: 'Recalled',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(PERSON_STATUS_TAGS.RECALLED)
   })
 
   it('does not return Unlawfully at large when only a non-primary sentence has custody location UATLRG', async () => {
@@ -434,16 +461,36 @@ describe('getStatusTagForPersonInCustody', () => {
     await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
   })
 
-  it('prioritises restricted custody status over community sentence breach', async () => {
+  it('returns In custody when a person is in restricted custody', async () => {
     const supervisionPackage = createSupervisionPackage({
       context: {
         sentences: [
           createSentence({
-            inBreach: true,
+            inBreach: false,
             custody: {
               status: {
                 code: 'R',
                 description: 'Restricted',
+              },
+            },
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(PERSON_STATUS_TAGS.IN_CUSTODY)
+  })
+
+  it('returns In custody when a person is in restricted custody with code I', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            inBreach: false,
+            custody: {
+              status: {
+                code: 'I',
+                description: 'Indeterminate',
               },
             },
           }),
@@ -508,5 +555,34 @@ describe('getPrisonerDetails', () => {
     prisonerSearchApiClient.getPrisonerDetails.mockResolvedValue(null)
 
     await expect(getPrisonerDetails('token', 'A1234BC', 'X123456')).resolves.toBeNull()
+  })
+
+  it('returns Recalled when the primary sentence is recalled', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            isPrimarySentence: true,
+            inBreach: false,
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(undefined)
+  })
+
+  it('does not return Recalled when only a non-primary sentence is recalled', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            isPrimarySentence: false,
+          }),
+        ],
+      },
+    })
+
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBeUndefined()
   })
 })

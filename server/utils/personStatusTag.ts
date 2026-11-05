@@ -45,16 +45,16 @@ export async function getStatusTag(
       return PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
     }
 
-    if (hasRestrictedCustodyStatus(activePrimarySentence)) {
-      return PERSON_STATUS_TAGS.IN_CUSTODY
-    }
-
     if (activePrimarySentence.inBreach) {
       return PERSON_STATUS_TAGS.IN_BREACH
     }
 
     if (isRecalled(activePrimarySentence)) {
       return PERSON_STATUS_TAGS.RECALLED
+    }
+
+    if (hasRestrictedCustodyStatus(activePrimarySentence)) {
+      return PERSON_STATUS_TAGS.IN_CUSTODY
     }
   }
   return undefined
