@@ -9,8 +9,8 @@ const riskLevelBadgeClass: Record<string, string> = {
 }
 
 const riskTypeBadgeClass: Record<string, string> = {
-  cohort: 'risk-badge--cohort',
-  misc: 'risk-badge--misc',
+  COHORT: 'risk-badge--cohort',
+  MISCELLANEOUS: 'risk-badge--misc',
 }
 
 const riskLevelByDescription: Record<string, string> = {
@@ -81,11 +81,21 @@ const risksWithLevelDescription = new Set([
 
 const lowRiskLevelWithDescription = new Set(['mappa'])
 
+// Higher priorities sort first. Unknown values default to 0, so sort last.
 const riskLevelPriority: Record<string, number> = {
-  'VERY HIGH': 10,
-  HIGH: 20,
-  MEDIUM: 30,
-  LOW: 40,
+  'VERY HIGH': 40,
+  HIGH: 30,
+  MEDIUM: 20,
+  LOW: 10,
+}
+
+const riskGroupPriority: Record<string, number> = {
+  'Very high': 60,
+  High: 50,
+  Medium: 40,
+  Low: 30,
+  Cohort: 20,
+  Miscellaneous: 10,
 }
 
 export const registerTypes = {
@@ -154,7 +164,15 @@ export const registerTypes = {
   ],
 }
 
-const registerTypePriority = ['publicProtection', 'safeguardingRisk', 'alerts', 'safeguardingNeed', 'cohort'] as const
+type RegisterType = keyof typeof registerTypes
+
+const registerTypePriority: Record<RegisterType, number> = {
+  publicProtection: 50,
+  safeguardingRisk: 40,
+  alerts: 30,
+  safeguardingNeed: 20,
+  cohort: 10,
+}
 
 interface RiskBadge {
   id: number
@@ -163,38 +181,52 @@ interface RiskBadge {
   badgeClass: string
 }
 
+type RiskBadgeType = keyof typeof riskLevelBadgeClass | keyof typeof riskTypeBadgeClass
+
 interface RiskBadgeGroup {
   severity: string
+  title: string
+  className: string
   badges: RiskBadge[]
 }
 
 export interface RiskBadgeData {
-  groups: RiskBadgeGroup[]
+  groupedBadges: RiskBadgeGroup[]
+  headerBadges: RiskBadge[]
   remainingCount: number
 }
 
 const MAX_RISK_BADGES = 7
 
-function getRiskRegisterType(description: string): string | undefined {
+function getRiskRegisterType(description: string): RegisterType | undefined {
   const normalisedDescription = description.trim().toLowerCase()
 
-  return registerTypePriority.find(registerType =>
+  return (Object.keys(registerTypes) as RegisterType[]).find(registerType =>
     registerTypes[registerType].some(register => register.description.trim().toLowerCase() === normalisedDescription),
   )
 }
 
-function getRiskBadgeClass(description: string, severity: string): string {
+function getRiskFlagGroup(description: string, severity: string): RiskBadgeGroup {
   const normalisedDescription = description.trim().toLowerCase()
 
+  let type: RiskBadgeType = severity ?? 'LOW'
+
   if (cohortDescriptions.has(normalisedDescription)) {
-    return riskTypeBadgeClass.cohort
+    type = 'COHORT'
   }
 
   if (miscDescriptions.has(normalisedDescription)) {
-    return riskTypeBadgeClass.misc
+    type = 'MISCELLANEOUS'
   }
 
-  return riskLevelBadgeClass[severity] ?? riskLevelBadgeClass.LOW
+  const title = `${type.charAt(0).toUpperCase()}${type.substring(1).toLowerCase()}`
+
+  return {
+    severity: type,
+    title,
+    className: riskLevelBadgeClass[type] ?? riskTypeBadgeClass[type],
+    badges: [],
+  }
 }
 
 function getRiskLevel(flag: RiskFlag): string | undefined {
@@ -216,18 +248,20 @@ function getRiskSortingPriority(description: string): number {
   const normalisedDescription = description.trim().toLowerCase()
 
   if (normalisedDescription === 'risk to probation staff') {
-    return 0
+    return 2
   }
 
   if (normalisedDescription === 'risk to staff') {
     return 1
   }
 
-  return 2
+  return 0
 }
 
-function getRiskDisplayDescription(description: string): string {
-  const displayDescription = toSentenceCase(description, [], null, true, false)
+function getRiskDisplayDescription(flag: RiskFlag): string {
+  const severity = getRiskLevel(flag)
+  const normalisedDescription = flag.description.trim().toLowerCase()
+  const displayDescription = toSentenceCase(flag.description, [], null, true, false)
 
   const displayOverrides: Record<string, string> = {
     'child criminal exploitation (cce) perpetrator': 'Child Criminal Exploitation (CCE) perpetrator',
@@ -238,42 +272,51 @@ function getRiskDisplayDescription(description: string): string {
     'doris (disruption of recorded internal secretors)': 'DORIS (disruption of recorded internal secretors)',
   }
 
-  return displayOverrides[description.trim().toLowerCase()] ?? displayDescription
+  let text = displayOverrides[normalisedDescription] ?? displayDescription
+
+  if (normalisedDescription === 'lifer') {
+    const levelDescription = flag.levelDescription?.replace(/^Lifer\s*-\s*/i, '').toLowerCase()
+    text = levelDescription ? `Lifer - ${levelDescription}` : text
+  } else if (lowRiskLevelWithDescription.has(normalisedDescription)) {
+    const levelDescription = flag.levelDescription?.replace('MAPPA ', '') ?? ''
+    text = `${text} - ${levelDescription}`
+  } else if (risksWithLevelDescription.has(normalisedDescription)) {
+    text = `${text} - ${toSentenceCase(severity, [], null, true, false)}`
+  }
+
+  return text
 }
 
-function getGroupedRiskBadges(visibleRiskFlags: RiskFlag[]) {
-  return visibleRiskFlags.reduce<RiskBadgeGroup[]>((result, flag) => {
+function renderRiskBadge(flag: RiskFlag): RiskBadge {
+  const severity = getRiskLevel(flag)
+  const group = getRiskFlagGroup(flag.description, severity)
+
+  return {
+    id: flag.id,
+    text: getRiskDisplayDescription(flag),
+    level: severity,
+    badgeClass: group.className,
+  }
+}
+
+function getGroupedRiskBadges(riskFlags: RiskFlag[]) {
+  const groups = riskFlags.reduce<RiskBadgeGroup[]>((result, flag) => {
     const severity = getRiskLevel(flag)
-    const normalisedDescription = flag.description.trim().toLowerCase()
-    const displayDescription = getRiskDisplayDescription(flag.description)
+    const badgeGroup = getRiskFlagGroup(flag.description, severity)
 
-    let text = displayDescription
+    let group = result.find(g => g.title === badgeGroup.title)
 
-    if (normalisedDescription === 'lifer') {
-      const levelDescription = flag.levelDescription?.replace(/^Lifer\s*-\s*/i, '').toLowerCase()
-
-      text = levelDescription ? `Lifer - ${levelDescription}` : displayDescription
-    } else if (lowRiskLevelWithDescription.has(normalisedDescription)) {
-      const levelDescription = flag.levelDescription?.replace('MAPPA ', '') ?? ''
-      text = `${displayDescription} - ${levelDescription}`
-    } else if (risksWithLevelDescription.has(normalisedDescription)) {
-      text = `${displayDescription} - ${toSentenceCase(severity, [], null, true, false)}`
+    if (!group) {
+      group = badgeGroup
+      result.push(group)
     }
 
-    result.push({
-      severity,
-      badges: [
-        {
-          id: flag.id,
-          text,
-          level: severity,
-          badgeClass: getRiskBadgeClass(flag.description, severity),
-        },
-      ],
-    })
+    group.badges.push(renderRiskBadge(flag))
 
     return result
   }, [])
+
+  return groups.sort((a, b) => (riskGroupPriority[b.title] ?? 0) - (riskGroupPriority[a.title] ?? 0))
 }
 
 const validRiskDescriptions = new Set(
@@ -282,7 +325,7 @@ const validRiskDescriptions = new Set(
     .map(registerType => registerType.description.toLowerCase()),
 )
 
-export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
+export function getRiskBadges(riskFlags: RiskFlag[]): RiskBadgeData {
   const activeRiskFlags = riskFlags.filter(
     flag =>
       !flag.removed &&
@@ -299,7 +342,7 @@ export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
     const bRiskPriority = getRiskSortingPriority(bDescription)
 
     if (aRiskPriority !== bRiskPriority) {
-      return aRiskPriority - bRiskPriority
+      return bRiskPriority - aRiskPriority
     }
 
     const aRegisterType = getRiskRegisterType(a.description)
@@ -316,19 +359,10 @@ export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
     // 3. Within Public Protection, sort by severity when both risks
     // have a recognised severity. Otherwise, sort alphabetically.
     if (aIsPublicProtection && bIsPublicProtection) {
-      const aSeverity = getRiskLevel(a)
-      const bSeverity = getRiskLevel(b)
+      const severityComparison = (riskLevelPriority[getRiskLevel(b)] ?? 0) - (riskLevelPriority[getRiskLevel(a)] ?? 0)
 
-      const aSeverityPriority = aSeverity
-        ? (riskLevelPriority[aSeverity] ?? Number.MAX_SAFE_INTEGER)
-        : Number.MAX_SAFE_INTEGER
-
-      const bSeverityPriority = bSeverity
-        ? (riskLevelPriority[bSeverity] ?? Number.MAX_SAFE_INTEGER)
-        : Number.MAX_SAFE_INTEGER
-
-      if (aSeverityPriority !== bSeverityPriority) {
-        return aSeverityPriority - bSeverityPriority
+      if (severityComparison !== 0) {
+        return severityComparison
       }
 
       return aDescription.localeCompare(bDescription)
@@ -336,28 +370,19 @@ export function getRiskBadgeGroups(riskFlags: RiskFlag[]): RiskBadgeData {
 
     // 4. Remaining register types:
     // Safeguarding Risk → Alerts → Safeguarding Need → Cohort.
-    const aRegisterPriority = aRegisterType
-      ? registerTypePriority.indexOf(aRegisterType as (typeof registerTypePriority)[number])
-      : Number.MAX_SAFE_INTEGER
+    const registerComparison = (registerTypePriority[bRegisterType] ?? 0) - (registerTypePriority[aRegisterType] ?? 0)
 
-    const bRegisterPriority = bRegisterType
-      ? registerTypePriority.indexOf(bRegisterType as (typeof registerTypePriority)[number])
-      : Number.MAX_SAFE_INTEGER
-
-    if (aRegisterPriority !== bRegisterPriority) {
-      return aRegisterPriority - bRegisterPriority
+    if (registerComparison !== 0) {
+      return registerComparison
     }
 
     // 5. Alphabetical order within each remaining register type.
     return aDescription.localeCompare(bDescription)
   })
 
-  const visibleRiskFlags = sortedRiskFlags.slice(0, MAX_RISK_BADGES)
-
-  const groups = getGroupedRiskBadges(visibleRiskFlags)
-
   return {
-    groups,
+    groupedBadges: getGroupedRiskBadges(sortedRiskFlags),
+    headerBadges: sortedRiskFlags.slice(0, MAX_RISK_BADGES).map(renderRiskBadge),
     remainingCount: Math.max(sortedRiskFlags.length - MAX_RISK_BADGES, 0),
   }
 }

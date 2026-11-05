@@ -123,14 +123,6 @@
     {% endif %}
 {% endset %}
 
-{% set personRiskFlags %}
-    {% if riskBadgeData  %}
-        <div class="pop-header-risk-flags">
-            {{ riskBadgeData | safe }}
-        </div>
-    {% endif %}
-{% endset %}
-
 {% if flags.enablePersonHeader %}
     {{ personHeader({
         name: headerPersonName.forename + ' ' + headerPersonName.surname,

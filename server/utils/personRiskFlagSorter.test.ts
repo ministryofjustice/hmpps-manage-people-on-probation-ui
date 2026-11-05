@@ -1,7 +1,7 @@
 import { RiskFlag } from '../data/model/risk'
-import { getRiskBadgeGroups } from './personRiskFlagSorter'
+import { getRiskBadges } from './personRiskFlagSorter'
 
-describe('utils/getRiskBadgeGroups', () => {
+describe('utils/getRiskBadges', () => {
   const createRiskFlag = (overrides: Partial<RiskFlag> = {}): RiskFlag =>
     ({
       id: 1,
@@ -12,12 +12,9 @@ describe('utils/getRiskBadgeGroups', () => {
       ...overrides,
     }) as RiskFlag
 
-  const getBadges = (riskFlags: ReturnType<typeof createRiskFlag>[]) =>
-    getRiskBadgeGroups(riskFlags).groups.flatMap(group => group.badges)
-
   describe('filters removed risk flags', () => {
     it('does not include removed risk flags', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
@@ -32,9 +29,11 @@ describe('utils/getRiskBadgeGroups', () => {
       ])
 
       expect(result).toEqual({
-        groups: [
+        groupedBadges: [
           {
             severity: 'HIGH',
+            title: 'High',
+            className: 'risk-badge--high',
             badges: [
               {
                 id: 1,
@@ -43,6 +42,14 @@ describe('utils/getRiskBadgeGroups', () => {
                 badgeClass: 'risk-badge--high',
               },
             ],
+          },
+        ],
+        headerBadges: [
+          {
+            id: 1,
+            text: 'Risk to public - High',
+            level: 'HIGH',
+            badgeClass: 'risk-badge--high',
           },
         ],
         remainingCount: 0,
@@ -68,13 +75,20 @@ describe('utils/getRiskBadgeGroups', () => {
           description: 'Risk to Public',
           levelDescription: 'HIGH',
         }),
+        createRiskFlag({
+          id: 4,
+          description: 'Risk to Public',
+          levelDescription: 'MEDIUM',
+        }),
       ]
 
-      const result = getRiskBadgeGroups(riskFlags)
+      const result = getRiskBadges(riskFlags)
 
-      expect(result.groups.map(group => group.severity)).toEqual(['HIGH', 'MEDIUM', 'LOW'])
+      expect(result.headerBadges.map(b => b.level)).toEqual(['HIGH', 'MEDIUM', 'MEDIUM', 'LOW'])
+      expect(result.headerBadges.map(b => b.id)).toEqual([3, 2, 4, 1])
 
-      expect(result.groups.flatMap(group => group.badges.map(badge => badge.id))).toEqual([3, 2, 1])
+      expect(result.groupedBadges.map(g => g.severity)).toEqual(['HIGH', 'MEDIUM', 'LOW'])
+      expect(result.groupedBadges[1].badges.map(b => b.id)).toEqual([2, 4])
     })
 
     it('uses levelDescription for Public Protection and level for other risks', () => {
@@ -93,11 +107,8 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ]
 
-      const result = getRiskBadgeGroups(riskFlags)
-
-      expect(result.groups.map(group => group.severity)).toEqual(['HIGH', 'MEDIUM'])
-
-      expect(result.groups.flatMap(group => group.badges)).toEqual([
+      const result = getRiskBadges(riskFlags)
+      const expectedBadges = [
         {
           id: 1,
           text: 'Risk to staff - High',
@@ -110,7 +121,12 @@ describe('utils/getRiskBadgeGroups', () => {
           level: 'MEDIUM',
           badgeClass: 'risk-badge--medium',
         },
-      ])
+      ]
+
+      expect(result.groupedBadges.map(g => g.severity)).toEqual(['HIGH', 'MEDIUM'])
+      expect(result.groupedBadges.flatMap(group => group.badges)).toEqual(expectedBadges)
+
+      expect(result.headerBadges).toEqual(expectedBadges)
     })
 
     it('sorts by register priority and alphabetically within each register', () => {
@@ -133,15 +149,14 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ]
 
-      const result = getRiskBadgeGroups(riskFlags)
+      const result = getRiskBadges(riskFlags)
+      const expectedTitles = ['Risk to known adult - High', 'Alert notice', 'Weapons']
 
-      expect(result.groups.map(group => group.severity)).toEqual(['HIGH', 'HIGH', 'HIGH'])
+      expect(result.groupedBadges).toHaveLength(1)
+      expect(result.groupedBadges[0].severity).toEqual('HIGH')
+      expect(result.groupedBadges[0].badges.map(badge => badge.text)).toEqual(expectedTitles)
 
-      expect(result.groups.flatMap(group => group.badges.map(badge => badge.text))).toEqual([
-        'Risk to known adult - High',
-        'Alert notice',
-        'Weapons',
-      ])
+      expect(result.headerBadges.map(badge => badge.text)).toEqual(expectedTitles)
     })
 
     it('sorts special risks before Public Protection and other register types', () => {
@@ -168,15 +183,17 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ]
 
-      expect(getBadges(riskFlags).map(badge => badge.text)).toEqual([
-        'Risk to probation staff',
-        'Risk to staff - High',
-        'Risk to public - High',
-        'Weapons',
-      ])
+      const result = getRiskBadges(riskFlags)
+      const expectedTitles = ['Risk to probation staff', 'Risk to staff - High', 'Risk to public - High', 'Weapons']
+
+      expect(result.groupedBadges).toHaveLength(1)
+      expect(result.groupedBadges[0].severity).toEqual('HIGH')
+      expect(result.groupedBadges[0].badges.map(badge => badge.text)).toEqual(expectedTitles)
+
+      expect(result.headerBadges.map(badge => badge.text)).toEqual(expectedTitles)
     })
 
-    it('sorts remaining registers as Safeguarding Risk, Alerts, Safeguarding Need, then Cohort', () => {
+    it('sorts remaining registers as Safeguarding Risk, Alerts, Safeguarding Need, then Cohort, and sorts groups by severity', () => {
       const riskFlags = [
         createRiskFlag({
           id: 1,
@@ -205,19 +222,61 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ]
 
-      expect(getBadges(riskFlags).map(badge => badge.text)).toEqual([
+      const result = getRiskBadges(riskFlags)
+      const expectedTitles = [
         'Child concerns',
         'Alert notice',
         'Weapons',
         'Cuckooing - potential victim',
         'Lifer - supervised',
+      ]
+
+      expect(result.headerBadges.map(badge => badge.text)).toEqual(expectedTitles)
+      expect(
+        result.groupedBadges.map(group => ({ severity: group.severity, titles: group.badges.map(b => b.text) })),
+      ).toEqual([
+        { severity: 'HIGH', titles: ['Alert notice', 'Weapons'] },
+        { severity: 'MEDIUM', titles: ['Child concerns', 'Cuckooing - potential victim'] },
+        { severity: 'COHORT', titles: ['Lifer - supervised'] },
+      ])
+    })
+
+    it('sorts groups by severity, then cohort, then miscellaneous, leaving badges order within groups', () => {
+      const riskFlags = [
+        // Group: Medium
+        createRiskFlag({ level: 'MEDIUM', description: 'Child Concerns' }),
+        createRiskFlag({ levelDescription: 'MEDIUM', description: 'Risk to Public' }),
+        // Group: Low
+        createRiskFlag({ level: 'LOW', description: 'Domestic Abuse Safety Officer' }),
+        createRiskFlag({ level: 'LOW', description: 'County Lines - Victim' }),
+        // Group: Miscellaneous
+        createRiskFlag({ level: 'LOW', description: 'CPPC registered case' }),
+        createRiskFlag({ level: 'LOW', description: 'integrated offender management' }),
+        // Group: Cohort
+        createRiskFlag({ level: undefined, description: 'Street Gangs' }),
+        createRiskFlag({ level: undefined, description: 'Home Office Interest' }),
+        createRiskFlag({ level: undefined, description: 'Cyber - Dependent' }),
+        // Group: High
+        createRiskFlag({ level: 'HIGH', description: 'Domestic Abuse' }),
+        createRiskFlag({ level: 'HIGH', description: 'MAPPA' }),
+        createRiskFlag({ level: 'HIGH', description: 'Child Protection' }),
+      ]
+
+      const result = getRiskBadges(riskFlags)
+
+      expect(result.groupedBadges.map(({ title, badges }) => ({ title, badges: badges.map(b => b.text) }))).toEqual([
+        { title: 'High', badges: ['Domestic abuse', 'MAPPA - HIGH', 'Child protection'] },
+        { title: 'Medium', badges: ['Risk to public - Medium', 'Child concerns'] },
+        { title: 'Low', badges: ['Domestic abuse safety officer', 'County lines - victim'] },
+        { title: 'Cohort', badges: ['Cyber - dependent', 'Home office interest', 'Street gangs'] },
+        { title: 'Miscellaneous', badges: ['CPPC registered case', 'Integrated offender management'] },
       ])
     })
   })
 
   describe('formats badge text', () => {
     it('uses levelDescription for Public Protection risk flags', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
@@ -230,8 +289,7 @@ describe('utils/getRiskBadgeGroups', () => {
           level: 'HIGH',
         }),
       ])
-
-      expect(result.groups.flatMap(group => group.badges)).toEqual([
+      const expectedBadges = [
         {
           id: 2,
           text: 'Risk to probation staff',
@@ -244,11 +302,14 @@ describe('utils/getRiskBadgeGroups', () => {
           level: 'HIGH',
           badgeClass: 'risk-badge--high',
         },
-      ])
+      ]
+
+      expect(result.groupedBadges.flatMap(group => group.badges)).toEqual(expectedBadges)
+      expect(result.headerBadges).toEqual(expectedBadges)
     })
 
     it('uses level and not levelDescription for non-Public Protection risk flags', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'Child Concerns',
@@ -257,16 +318,19 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ])
 
-      expect(result.groups.flatMap(group => group.badges)[0]).toEqual({
+      const expectedBadge = {
         id: 1,
         text: 'Child concerns',
         level: 'MEDIUM',
         badgeClass: 'risk-badge--medium',
-      })
+      }
+
+      expect(result.groupedBadges[0].badges[0]).toEqual(expectedBadge)
+      expect(result.headerBadges[0]).toEqual(expectedBadge)
     })
 
     it('displays the MAPPA level from levelDescription', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'MAPPA',
@@ -275,25 +339,28 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ])
 
-      expect(result.groups).toEqual([
+      const expectedBadge = {
+        id: 1,
+        text: 'MAPPA - Level 3',
+        level: 'HIGH',
+        badgeClass: 'risk-badge--high',
+      }
+
+      expect(result.groupedBadges).toEqual([
         {
           severity: 'HIGH',
-          badges: [
-            {
-              id: 1,
-              text: 'MAPPA - Level 3',
-              level: 'HIGH',
-              badgeClass: 'risk-badge--high',
-            },
-          ],
+          title: 'High',
+          className: 'risk-badge--high',
+          badges: [expectedBadge],
         },
       ])
+      expect(result.headerBadges).toEqual([expectedBadge])
     })
   })
 
   describe('preserves sorted badge order across groups', () => {
-    it('creates a separate group for each badge while preserving sorted order', () => {
-      const result = getRiskBadgeGroups([
+    it('creates a separate group for each severity while preserving sorted order', () => {
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
@@ -312,9 +379,11 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ])
 
-      expect(result.groups).toEqual([
+      expect(result.groupedBadges).toEqual([
         {
           severity: 'HIGH',
+          title: 'High',
+          className: 'risk-badge--high',
           badges: [
             {
               id: 2,
@@ -322,11 +391,6 @@ describe('utils/getRiskBadgeGroups', () => {
               level: 'HIGH',
               badgeClass: 'risk-badge--high',
             },
-          ],
-        },
-        {
-          severity: 'HIGH',
-          badges: [
             {
               id: 1,
               text: 'Risk to public - High',
@@ -337,6 +401,8 @@ describe('utils/getRiskBadgeGroups', () => {
         },
         {
           severity: 'MEDIUM',
+          title: 'Medium',
+          className: 'risk-badge--medium',
           badges: [
             {
               id: 3,
@@ -350,7 +416,7 @@ describe('utils/getRiskBadgeGroups', () => {
     })
 
     it('preserves the severity order of Public Protection badges', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
@@ -368,12 +434,15 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ])
 
-      expect(result.groups.map(group => group.severity)).toEqual(['HIGH', 'MEDIUM', 'LOW'])
+      const expectedOrder = ['HIGH', 'MEDIUM', 'LOW']
+
+      expect(result.groupedBadges.map(g => g.severity)).toEqual(expectedOrder)
+      expect(result.headerBadges.map(b => b.level)).toEqual(expectedOrder)
     })
   })
 
   describe('limits visible risk badges', () => {
-    it('returns a maximum of 7 badges', () => {
+    it('returns a maximum of 7 header badges', () => {
       const riskFlags = Array.from({ length: 8 }, (_, index) =>
         createRiskFlag({
           id: index + 1,
@@ -382,11 +451,10 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       )
 
-      const result = getRiskBadgeGroups(riskFlags)
+      const result = getRiskBadges(riskFlags)
 
-      const totalBadges = result.groups.reduce((count, group) => count + group.badges.length, 0)
-
-      expect(totalBadges).toBe(7)
+      expect(result.groupedBadges.flatMap(group => group.badges)).toHaveLength(8)
+      expect(result.headerBadges).toHaveLength(7)
       expect(result.remainingCount).toBe(1)
     })
 
@@ -399,7 +467,7 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       )
 
-      expect(getRiskBadgeGroups(riskFlags).remainingCount).toBe(3)
+      expect(getRiskBadges(riskFlags).remainingCount).toBe(3)
     })
 
     it('returns zero remaining count when there are 7 or fewer risk flags', () => {
@@ -411,13 +479,13 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       )
 
-      expect(getRiskBadgeGroups(riskFlags).remainingCount).toBe(0)
+      expect(getRiskBadges(riskFlags).remainingCount).toBe(0)
     })
   })
 
   describe('handles missing risk level', () => {
     it('ignores Public Protection flags when levelDescription and level are missing', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         createRiskFlag({
           id: 1,
           description: 'Risk to Public',
@@ -426,15 +494,17 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ])
 
-      expect(result.groups).toEqual([])
+      expect(result.groupedBadges).toEqual([])
+      expect(result.headerBadges).toEqual([])
       expect(result.remainingCount).toBe(0)
     })
   })
 
   describe('handles empty input', () => {
     it('returns no groups and no remaining risk flags', () => {
-      expect(getRiskBadgeGroups([])).toEqual({
-        groups: [],
+      expect(getRiskBadges([])).toEqual({
+        groupedBadges: [],
+        headerBadges: [],
         remainingCount: 0,
       })
     })
@@ -455,7 +525,11 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ]
 
-      expect(getBadges(riskFlags).map(badge => badge.text)).toEqual(['Risk to public - High'])
+      const result = getRiskBadges(riskFlags)
+      const expectedTitles = ['Risk to public - High']
+
+      expect(result.groupedBadges.flatMap(group => group.badges.map(badge => badge.text))).toEqual(expectedTitles)
+      expect(result.headerBadges.map(badge => badge.text)).toEqual(expectedTitles)
     })
   })
 
@@ -480,10 +554,12 @@ describe('utils/getRiskBadgeGroups', () => {
         }),
       ]
 
-      expect(getRiskBadgeGroups(riskFlags)).toEqual({
-        groups: [
+      expect(getRiskBadges(riskFlags)).toEqual({
+        groupedBadges: [
           {
             severity: 'HIGH',
+            title: 'High',
+            className: 'risk-badge--high',
             badges: [
               {
                 id: 2501007540,
@@ -495,6 +571,8 @@ describe('utils/getRiskBadgeGroups', () => {
           },
           {
             severity: 'MEDIUM',
+            title: 'Medium',
+            className: 'risk-badge--medium',
             badges: [
               {
                 id: 2501006590,
@@ -502,11 +580,6 @@ describe('utils/getRiskBadgeGroups', () => {
                 level: 'MEDIUM',
                 badgeClass: 'risk-badge--medium',
               },
-            ],
-          },
-          {
-            severity: 'MEDIUM',
-            badges: [
               {
                 id: 2501007047,
                 text: 'Child concerns',
@@ -514,6 +587,26 @@ describe('utils/getRiskBadgeGroups', () => {
                 badgeClass: 'risk-badge--medium',
               },
             ],
+          },
+        ],
+        headerBadges: [
+          {
+            id: 2501007540,
+            text: 'Risk to probation staff',
+            level: 'HIGH',
+            badgeClass: 'risk-badge--high',
+          },
+          {
+            id: 2501006590,
+            text: 'Risk to public - Medium',
+            level: 'MEDIUM',
+            badgeClass: 'risk-badge--medium',
+          },
+          {
+            id: 2501007047,
+            text: 'Child concerns',
+            level: 'MEDIUM',
+            badgeClass: 'risk-badge--medium',
           },
         ],
         remainingCount: 0,
@@ -543,12 +636,11 @@ describe('utils/getRiskBadgeGroups', () => {
       },
     ] as RiskFlag[]
 
-    const result = getRiskBadgeGroups(riskFlags)
+    const result = getRiskBadges(riskFlags)
+    const expectedBadgeIds = [1, 3]
 
-    const badgeIds = result.groups.flatMap(group => group.badges.map(badge => badge.id))
-
-    expect(badgeIds).toEqual([1, 3])
-    expect(result.remainingCount).toBe(0)
+    expect(result.groupedBadges.flatMap(group => group.badges.map(badge => badge.id))).toEqual(expectedBadgeIds)
+    expect(result.headerBadges.map(badge => badge.id)).toEqual(expectedBadgeIds)
   })
 
   describe('Lifer risk badges', () => {
@@ -572,48 +664,49 @@ describe('utils/getRiskBadgeGroups', () => {
       ['Lifer - Supervised', 'Lifer - supervised'],
       ['Lifer - Not Supervised', 'Lifer - not supervised'],
     ])('displays "%s" as "%s"', (levelDescription, expectedText) => {
-      const result = getRiskBadgeGroups([createLiferRiskFlag(levelDescription)])
+      const result = getRiskBadges([createLiferRiskFlag(levelDescription)])
+      const expectedBadge = {
+        id: 2501027491,
+        text: expectedText,
+        level: 'LOW',
+        badgeClass: 'risk-badge--cohort',
+      }
 
       expect(result.remainingCount).toBe(0)
-      expect(result.groups).toHaveLength(1)
-      expect(result.groups[0].badges).toHaveLength(1)
-      expect(result.groups[0].badges[0]).toEqual(
-        expect.objectContaining({
-          id: 2501027491,
-          text: expectedText,
-          level: 'LOW',
-          badgeClass: 'risk-badge--cohort',
-        }),
-      )
+      expect(result.groupedBadges).toHaveLength(1)
+      expect(result.groupedBadges[0].badges).toHaveLength(1)
+      expect(result.groupedBadges[0].badges[0]).toEqual(expectedBadge)
+      expect(result.headerBadges[0]).toEqual(expectedBadge)
     })
 
     it('falls back to Lifer when levelDescription is missing', () => {
-      const result = getRiskBadgeGroups([createLiferRiskFlag(undefined)])
+      const result = getRiskBadges([createLiferRiskFlag(undefined)])
+      const expectedBadgeData = {
+        text: 'Lifer',
+        level: 'LOW',
+        badgeClass: 'risk-badge--cohort',
+      }
 
-      expect(result.groups.flatMap(group => group.badges)).toContainEqual(
-        expect.objectContaining({
-          text: 'Lifer',
-          level: 'LOW',
-          badgeClass: 'risk-badge--cohort',
-        }),
-      )
+      expect(result.groupedBadges[0].badges).toContainEqual(expect.objectContaining(expectedBadgeData))
+      expect(result.headerBadges[0]).toEqual(expect.objectContaining(expectedBadgeData))
     })
 
     it('does not display a removed Lifer flag', () => {
-      const result = getRiskBadgeGroups([
+      const result = getRiskBadges([
         {
           ...createLiferRiskFlag('Lifer - Supervised'),
           removed: true,
         },
       ])
 
-      expect(result.groups).toEqual([])
+      expect(result.groupedBadges).toEqual([])
+      expect(result.headerBadges).toEqual([])
       expect(result.remainingCount).toBe(0)
     })
   })
 
   it('formats DORIS with its display override', () => {
-    const result = getRiskBadgeGroups([
+    const result = getRiskBadges([
       createRiskFlag({
         id: 1,
         description: 'DoRIS (Disruption of Recorded Internal Secretors)',
@@ -621,14 +714,15 @@ describe('utils/getRiskBadgeGroups', () => {
       }),
     ])
 
-    expect(result.groups.flatMap(group => group.badges)).toEqual([
-      {
-        id: 1,
-        text: 'DORIS (disruption of recorded internal secretors)',
-        level: 'MEDIUM',
-        badgeClass: 'risk-badge--medium',
-      },
-    ])
+    const expectedBadgeData = {
+      id: 1,
+      text: 'DORIS (disruption of recorded internal secretors)',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
+    }
+
+    expect(result.groupedBadges[0].badges).toContainEqual(expect.objectContaining(expectedBadgeData))
+    expect(result.headerBadges[0]).toEqual(expect.objectContaining(expectedBadgeData))
   })
 
   describe('Home Office Interest cohort risk badges', () => {
@@ -649,20 +743,19 @@ describe('utils/getRiskBadgeGroups', () => {
       }) as RiskFlag
 
     it('displays Home Office Interest as a cohort badge', () => {
-      const result = getRiskBadgeGroups([createHomeOfficeInterestRiskFlag()])
+      const result = getRiskBadges([createHomeOfficeInterestRiskFlag()])
+
+      const expectedBadgeData = {
+        id: 2501027492,
+        text: 'Home office interest',
+        level: 'LOW',
+        badgeClass: 'risk-badge--cohort',
+      }
 
       expect(result.remainingCount).toBe(0)
-      expect(result.groups).toHaveLength(1)
-      expect(result.groups[0].badges).toHaveLength(1)
 
-      expect(result.groups[0].badges[0]).toEqual(
-        expect.objectContaining({
-          id: 2501027492,
-          text: 'Home office interest',
-          level: 'LOW',
-          badgeClass: 'risk-badge--cohort',
-        }),
-      )
+      expect(result.groupedBadges[0].badges).toContainEqual(expect.objectContaining(expectedBadgeData))
+      expect(result.headerBadges[0]).toEqual(expect.objectContaining(expectedBadgeData))
     })
   })
 })
