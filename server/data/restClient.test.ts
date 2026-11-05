@@ -498,4 +498,40 @@ describe('RestClient.get timeout handling', () => {
 
     expect(nock.isDone()).toBe(true)
   })
+
+  it('captures handled 403s in Sentry', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .get('/api/user/123/appointments')
+      .reply(403, { success: false })
+
+    const sentryClient = {}
+    mockedSentryGetClient.mockReturnValue(sentryClient as any)
+    mockedSentryCaptureException.mockReturnValue('sentry-event-id')
+
+    const response = await restClient.get<{
+      timeoutError: ErrorSummary[]
+    }>({
+      path: '/user/123/appointments',
+      handle403: true,
+    })
+
+    expect(response).toEqual(null)
+
+    expect(mockedSentryCaptureException).toHaveBeenCalledTimes(1)
+
+    const [capturedError, captureContext] = mockedSentryCaptureException.mock.calls[0]
+
+    expect(capturedError).toBeDefined()
+    expect(captureContext).toEqual({
+      tags: {
+        'error.kind': '403',
+        'request.path': '/user/123/appointments',
+        'api.name': 'api-name',
+      },
+    })
+
+    expect(nock.isDone()).toBe(true)
+  })
 })
