@@ -1,4 +1,3 @@
-
 import 'dotenv/config'
 
 const namespace = process.env.FLIPT_NAMESPACE
@@ -61,9 +60,7 @@ async function main() {
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Flipt API error: ${response.status} ${await response.text()}`,
-    )
+    throw new Error(`Flipt API error: ${response.status} ${await response.text()}`)
   }
 
   const data = await response.json()
@@ -95,13 +92,7 @@ async function main() {
       ...(segment.key ? [segment.key] : []),
     ]
 
-    console.log(
-      `Associated segments: ${
-        segmentKeys.length > 0
-          ? [...new Set(segmentKeys)].join(', ')
-          : 'None found'
-      }`,
-    )
+    console.log(`Associated segments: ${segmentKeys.length > 0 ? [...new Set(segmentKeys)].join(', ') : 'None found'}`)
   }
 }
 

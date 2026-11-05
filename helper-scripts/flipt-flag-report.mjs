@@ -59,6 +59,8 @@ async function getAllPages(path, field) {
       params.set('pageToken', pageToken)
     }
 
+    // Pagination is inherently sequential: each page token comes from the previous response
+    // eslint-disable-next-line no-await-in-loop
     const data = await getFliptData(`${path}?${params}`)
 
     if (!Array.isArray(data[field])) {
@@ -145,9 +147,7 @@ function buildSummary(report, totalFlags, enabledFlags, disabledFlags, slack) {
     lines.push(slack ? `*${item.namespace}*` : item.namespace)
 
     if (slack) {
-      lines.push(
-        `:large_green_circle: ${item.enabled.length} enabled | ` + `:red_circle: ${item.disabled.length} disabled`,
-      )
+      lines.push(`:large_green_circle: ${item.enabled.length} enabled | :red_circle: ${item.disabled.length} disabled`)
     } else {
       lines.push(`  Enabled: ${item.enabled.length} | Disabled: ${item.disabled.length}`)
     }
@@ -172,7 +172,6 @@ function buildFullReport(report, summary) {
 
       if (flags.length === 0) {
         lines.push('None')
-        continue
       }
 
       for (const flag of flags) {
@@ -222,21 +221,23 @@ async function main() {
   let enabledFlags = 0
   let disabledFlags = 0
 
-  for (const namespace of namespaces) {
-    const flags = await getAllPages(`/api/v1/namespaces/${encodeURIComponent(namespace.key)}/flags`, 'flags')
+  const namespaceFlagLists = await Promise.all(
+    namespaces.map(async namespace => {
+      const flags = await getAllPages(`/api/v1/namespaces/${encodeURIComponent(namespace.key)}/flags`, 'flags')
 
-    const namespaceFlags = []
+      return Promise.all(
+        flags.map(async flag => ({
+          key: flag.key,
+          enabled: flag.enabled,
+          ageDays: getAgeInDays(flag.createdAt),
+          segments: full ? await getFlagSegments(namespace.key, flag) : [],
+        })),
+      )
+    }),
+  )
 
-    for (const flag of flags) {
-      const segments = full ? await getFlagSegments(namespace.key, flag) : []
-
-      namespaceFlags.push({
-        key: flag.key,
-        enabled: flag.enabled,
-        ageDays: getAgeInDays(flag.createdAt),
-        segments,
-      })
-    }
+  for (const [index, namespace] of namespaces.entries()) {
+    const namespaceFlags = namespaceFlagLists[index]
 
     const enabled = sortByAge(namespaceFlags.filter(flag => flag.enabled === true))
 

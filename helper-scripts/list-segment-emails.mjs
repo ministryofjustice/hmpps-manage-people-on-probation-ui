@@ -1,4 +1,3 @@
-
 import 'dotenv/config'
 
 const args = process.argv.slice(2)
@@ -61,9 +60,7 @@ async function main() {
     })
 
     if (!response.ok) {
-      throw new Error(
-        `Flipt API error: ${response.status} ${await response.text()}`,
-      )
+      throw new Error(`Flipt API error: ${response.status} ${await response.text()}`)
     }
 
     const segment = await response.json()
