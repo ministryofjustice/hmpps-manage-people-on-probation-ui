@@ -228,7 +228,7 @@ describe('utils/getRiskBadgeGroups', () => {
       ).toEqual([
         { severity: 'HIGH', titles: ['Alert notice', 'Weapons'] },
         { severity: 'MEDIUM', titles: ['Child concerns', 'Cuckooing - potential victim'] },
-        { severity: 'cohort', titles: ['Lifer - supervised'] },
+        { severity: 'COHORT', titles: ['Lifer - supervised'] },
       ])
     })
 
@@ -260,7 +260,7 @@ describe('utils/getRiskBadgeGroups', () => {
         { title: 'Medium', badges: ['Risk to public - Medium', 'Child concerns'] },
         { title: 'Low', badges: ['Domestic abuse safety officer', 'County lines - victim'] },
         { title: 'Cohort', badges: ['Cyber - dependent', 'Home office interest', 'Street gangs'] },
-        { title: 'Misc', badges: ['CPPC registered case', 'Integrated offender management'] },
+        { title: 'Miscellaneous', badges: ['CPPC registered case', 'Integrated offender management'] },
       ])
     })
   })

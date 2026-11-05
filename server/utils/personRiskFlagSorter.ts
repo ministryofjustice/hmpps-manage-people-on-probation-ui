@@ -9,8 +9,8 @@ const riskLevelBadgeClass: Record<string, string> = {
 }
 
 const riskTypeBadgeClass: Record<string, string> = {
-  cohort: 'risk-badge--cohort',
-  misc: 'risk-badge--misc',
+  COHORT: 'risk-badge--cohort',
+  MISCELLANEOUS: 'risk-badge--misc',
 }
 
 const riskLevelByDescription: Record<string, string> = {
@@ -203,11 +203,11 @@ function getRiskFlagGroup(description: string, severity: string): RiskBadgeGroup
   let type: RiskBadgeType = severity ?? 'LOW'
 
   if (cohortDescriptions.has(normalisedDescription)) {
-    type = 'cohort'
+    type = 'COHORT'
   }
 
   if (miscDescriptions.has(normalisedDescription)) {
-    type = 'misc'
+    type = 'MISCELLANEOUS'
   }
 
   const title = `${type.charAt(0).toUpperCase()}${type.substring(1).toLowerCase()}`
