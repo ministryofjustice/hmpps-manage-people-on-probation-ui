@@ -14,10 +14,6 @@
       "‘Prevent concerns’ flag",
       [
         "We now show when a case with a supervision package has a ‘Prevent concerns’ flag. New guidance explains that a person on probation can receive additional appointments while the flag is active. This means the usual appointment limit no longer applies."
-      ],
-      "See outcomes to log from the last 3 months",
-      [
-        "To help you manage your outcomes more efficiently, we now only show appointments that need an outcome from the last 3 months. This helps you focus on recent outstanding outcomes."
       ]
     ]
   },
