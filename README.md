@@ -297,3 +297,97 @@ i.e. today only) and, for the trace query, a comma-separated list of `operation_
    Filter/group the CSV by `cloud_RoleName` to see each service's side of the trace, so you can
    tell whether a downstream service completed the request successfully (issue is on the network
    path between services), never received it, or failed itself.
+
+## Flipt feature flag reporting
+
+The helper-scripts/flipt-flag-report.mjs script retrieves feature flags from Flipt across DEV, PREPROD and PROD.
+
+Reports include flag counts by namespace and enabled/disabled status. The full report also shows individual flag
+ages and associated segments, where configured.
+
+### Prerequisites
+
+Configure the Flipt URLs and API tokens in your local .env file:
+
+FLIPT_ENV=dev
+FLIPT_CHECK_URL=<dev-url>
+FLIPT_CHECK_TOKEN=<dev-token>
+
+FLIPT_ENV_PREPROD=preprod
+FLIPT_CHECK_URL_PREPROD=<preprod-url>
+FLIPT_CHECK_TOKEN_PREPROD=<preprod-token>
+
+FLIPT_ENV_PROD=prod
+FLIPT_CHECK_URL_PROD=<prod-url>
+FLIPT_CHECK_TOKEN_PROD=<prod-token>
+
+### Run reports locally
+
+Run commands from the repository root.
+
+### DEV summary (default)
+node helper-scripts/flipt-flag-report.mjs
+
+### DEV full report, including segments
+node helper-scripts/flipt-flag-report.mjs --full
+
+### PREPROD full report
+node helper-scripts/flipt-flag-report.mjs --env=preprod --full
+
+### PROD full report
+node helper-scripts/flipt-flag-report.mjs --env=prod --full
+
+### Generate Slack JSON payload
+node helper-scripts/flipt-flag-report.mjs --env=prod --slack
+
+The script excludes the default namespace. All output is written to the console; no report files are created.
+
+A disabled flag may still be actively used by an application. The report is informational and does not identify unused flags.
+
+Scheduled Slack reports
+
+The GitHub Actions workflow .github/workflows/flipt-feature-flag-report.yml is currently run manually only (the weekly schedule is disabled until the runners can reach Flipt).
+
+DEV and PREPROD reports are sent to manage-people-on-probation-alerts-nonprod.
+
+PROD reports are sent to manage-people-on-probation-alerts.
+
+The Slack reports contain summary counts by namespace. Individual flags and segment associations are available using --full locally.
+
+## Inspect Flipt rollouts and segments
+
+Two additional helper scripts are available for investigating feature flag configuration.
+
+Check flag rollouts
+
+check-flipt-rollout.mjs retrieves the rollout configuration for a flag, including associated segments.
+
+Set FLIPT_NAMESPACE and FLIPT_FLAG in your .env file.
+
+### DEV (default)
+node helper-scripts/check-flipt-rollout.mjs
+
+### PREPROD
+node helper-scripts/check-flipt-rollout.mjs --env=preprod
+
+### PROD
+node helper-scripts/check-flipt-rollout.mjs --env=prod
+
+List segment email addresses
+
+list-segment-emails.mjs retrieves email addresses configured in a segment's email constraints.
+
+Set FLIPT_NAMESPACE and FLIPT_SEGMENT in your .env file.
+
+### DEV (default)
+node helper-scripts/list-segment-emails.mjs
+
+### PREPROD
+node helper-scripts/list-segment-emails.mjs --env=preprod
+
+### PROD
+node helper-scripts/list-segment-emails.mjs --env=prod
+
+Both scripts use the Flipt environment URLs and tokens configured in .env. DEV is the default when --env is omitted.
+
+The scripts are read-only and print their results to the console. Segment email output may contain personal information and should not be committed to source control or shared in logs.
