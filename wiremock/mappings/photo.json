@@ -1,0 +1,14 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/person-record/person/prison/.*/image",
+        "method": "GET"
+      },
+      "response": {
+        "status": 403,
+        "jsonBody": {}
+      }
+    }
+  ]
+}

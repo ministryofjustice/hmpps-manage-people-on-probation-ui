@@ -18,6 +18,7 @@ interface Request {
   headers?: Record<string, string>
   responseType?: string
   raw?: boolean
+  handle403?: boolean
   handle404?: boolean
   handle415?: boolean
   handle500?: boolean
@@ -62,6 +63,7 @@ export default class RestClient {
     headers = {},
     responseType = '',
     raw = false,
+    handle403 = false,
     handle404 = false,
     handle500 = false,
     handle5xxRange = false,
@@ -133,6 +135,19 @@ export default class RestClient {
         error.response.errors = warnings
         logger.info('Handling 500')
         return error.response
+      }
+      if (handle403 && error?.response?.status === 403) {
+        if (Sentry.getClient()) {
+          const eventId = Sentry.captureException(error, {
+            tags: {
+              'error.kind': '403',
+              'request.path': path,
+              'api.name': this.name,
+            },
+          })
+          logger.info(`Sentry 403 eventId: ${eventId}`)
+        }
+        return null
       }
       if (handle404 && error?.response?.status === 404) {
         logger.info('Handling 404')

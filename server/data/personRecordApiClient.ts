@@ -12,6 +12,7 @@ export default class PersonRecordApiClient extends RestClient {
       path: `/person/prison/${encodeURIComponent(nomsNumber)}/image`,
       responseType: 'stream',
       handle404: true,
+      handle403: true,
     })
   }
 }
