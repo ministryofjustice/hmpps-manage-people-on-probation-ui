@@ -12,6 +12,7 @@ appointment.officer.name | fullName | convertToTitleCase) %}
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 
+{% set sparksHtml %}{% if appointment.sparks.length > 1 %}<ul class="govuk-list" aria-label="SPARKS">{% for spark in appointment.sparks %}<li>{{ spark.description }}</li>{% endfor %}</ul>{% else %}{{ appointment.sparks[0].description }}{% endif %}{% endset %}
 {% set outcomeLabel = 'Log appointment outcome'  %}
 {% set outcomeLink = null %}
 
@@ -428,6 +429,28 @@ appointment.officer.name | fullName | convertToTitleCase) %}
         ]
       } if not appointment.deliusManaged
     },
+    {
+      key: {
+        text: "SPARKS delivered"
+      },
+      value: {
+        html: sparksHtml if appointment.sparks.length > 0 else 'None'
+      },
+      actions: {
+        classes: "govuk-!-white-space-nowrap",
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      } if not appointment.deliusManaged
+    } if appointment.isSparksAllowed and flags.enableSparksAppointmentDetails,
     {
       key: {
         text: "RAR activity"
