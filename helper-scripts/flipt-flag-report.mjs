@@ -1,4 +1,9 @@
-import 'dotenv/config'
+import { existsSync } from 'node:fs'
+
+// Local runs read .env; in GitHub Actions the values come from secrets
+if (existsSync('.env')) {
+  process.loadEnvFile()
+}
 
 const PAGE_SIZE = 100
 

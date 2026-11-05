@@ -17,10 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-
-      - name: Install dependencies
-        run: npm ci
+          node-version-file: .nvmrc
 
       - name: Generate DEV Flipt report
         id: report
@@ -51,10 +48,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-
-      - name: Install dependencies
-        run: npm ci
+          node-version-file: .nvmrc
 
       - name: Generate PREPROD Flipt report
         id: report
@@ -85,10 +79,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-
-      - name: Install dependencies
-        run: npm ci
+          node-version-file: .nvmrc
 
       - name: Generate PROD Flipt report
         id: report
