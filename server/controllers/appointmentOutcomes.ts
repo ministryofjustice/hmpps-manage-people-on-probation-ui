@@ -58,6 +58,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
   getAddNote: () => {
     return async function getAddNote(req, res) {
       const { crn } = res.locals.appointmentOutcome
+      const url = encodeURIComponent(req.url)
       let uploadedFiles: FileCache[] = []
       let errorMessages = null
       let body = null
@@ -83,6 +84,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
         fileUploadLimit,
         uploadedFiles,
         maxCharCount,
+        url,
       })
     }
   },

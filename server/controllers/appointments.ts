@@ -394,6 +394,7 @@ const appointmentsController: Controller<
         )
       }
       const { back } = req.query
+      const url = encodeURIComponent(req.url)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENT_NOTE',
         who: res.locals.user.username,
@@ -407,6 +408,7 @@ const appointmentsController: Controller<
         personAppointment: appointmentResponse,
         crn,
         contactId,
+        url,
       })
     }
   },
