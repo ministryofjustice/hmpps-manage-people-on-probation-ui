@@ -19,12 +19,6 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Update npm
-        run: npm install -g "npm@^12"
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Generate DEV Flipt report
         id: report
         env:
@@ -56,12 +50,6 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Update npm
-        run: npm install -g "npm@^12"
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Generate PREPROD Flipt report
         id: report
         env:
@@ -92,12 +80,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-
-      - name: Update npm
-        run: npm install -g "npm@^12"
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Generate PROD Flipt report
         id: report
