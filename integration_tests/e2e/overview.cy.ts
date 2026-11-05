@@ -132,11 +132,13 @@ context('Overview', () => {
       .should('contain.text', 'Risk of serious harm (ROSH) in the community')
       .should('contain.text', 'Last updated 24 January 2024')
     page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'Risk of serious harm VERY HIGH')
+
     page
       .getRowData('risk', 'mappa', 'Label')
       .should('contain.text', 'MAPPA')
       .should('contain.text', 'Last updated (NDelius): 8 October 2024')
     page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'Cat 2/Level 3')
+
     page.getRowData('risk', 'criminogenicNeeds', 'Label').should('contain.text', 'Criminogenic needs')
     cy.get('[data-qa="criminogenicNeedsValue"] dt').eq(0).should('contain.text', 'Need identified')
     cy.get('[data-qa="criminogenicNeedsValue"]')
@@ -164,28 +166,38 @@ context('Overview', () => {
       .should('contain.text', 'High')
       .should('have.class', 'risk-badge--high')
 
-    cy.get('[data-qa="riskFlagsValue"] ul').eq(0).should('contain.text', 'Risk to public')
+    cy.get('[data-qa="riskFlagsValue"] ul')
+      .eq(0)
+      .should('contain.text', 'Risk to public - High')
+      .should('contain.text', 'Sexual conviction')
 
     cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(1)
       .should('contain.text', 'Medium')
       .should('have.class', 'risk-badge--medium')
 
-    cy.get('[data-qa="riskFlagsValue"] ul').eq(1).should('contain.text', 'Domestic Abuse Perpetrator')
+    cy.get('[data-qa="riskFlagsValue"] ul')
+      .eq(1)
+      .should('contain.text', 'Risk to staff - Medium')
+      .should('contain.text', 'Stalking')
 
     cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(2)
       .should('contain.text', 'Low')
       .should('have.class', 'risk-badge--low')
 
-    cy.get('[data-qa="riskFlagsValue"] ul').eq(2).should('contain.text', 'Risk to Known Adult')
+    cy.get('[data-qa="riskFlagsValue"] ul')
+      .eq(2)
+      .should('contain.text', 'Risk to known adult - Low')
+      .should('contain.text', 'Risk to children - Low')
+      .should('contain.text', 'County lines - victim')
 
     cy.get('[data-qa="riskFlagsValue"] dt span')
       .eq(3)
-      .should('contain.text', 'Information only')
-      .should('have.class', 'risk-badge')
+      .should('contain.text', 'Cohort')
+      .should('have.class', 'risk-badge--cohort')
 
-    cy.get('[data-qa="riskFlagsValue"] ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
+    cy.get('[data-qa="riskFlagsValue"] ul').eq(3).should('contain.text', 'Contact suspended')
   }
 
   const verifyActivityAndCompliance = (page: OverviewPage) => {

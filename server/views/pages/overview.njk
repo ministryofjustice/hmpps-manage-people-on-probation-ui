@@ -192,100 +192,121 @@
 {% endset %}
 
 {% set riskFlagsHtml %}
-  {% if personRisks.riskFlags.length %}
-    <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-      {% if noRiskLevel.length %}
-        <dd class="govuk-!-margin-left-0">
-          <ul class="govuk-list">
-            {% for risk in noRiskLevel %}
-              <li>{{ risk.description }}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-      {% if veryHighRiskLevel.length %}
-        <dt>
-          {% if flags.enableNewOverview %}
-            {{ riskFlagBadge({ text: 'Very high', badgeClass: 'risk-badge--very-high' }) }}
-          {% else %}
-            <span class="govuk-!-font-weight-bold rosh--very-high">Very High</span>
-          {% endif %}
-        </dt>
-        <dd class="govuk-!-margin-left-0">
-          <ul class="govuk-list">
-            {% for risk in veryHighRiskLevel %}
-              <li>{{ risk.description }}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-      {% if highRiskLevel.length %}
-        <dt>
-          {% if flags.enableNewOverview %}
-            {{ riskFlagBadge({ text: 'High', badgeClass: 'risk-badge--high' }) }}
-          {% else %}
-            <span class="govuk-!-font-weight-bold rosh--high">High</span>
-          {% endif %}
-        </dt>
-        <dd class="govuk-!-margin-left-0">
-          <ul class="govuk-list">
-            {% for risk in highRiskLevel %}
-              <li>{{ risk.description }}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-      {% if mediumRiskLevel.length %}
-        <dt>
-          {% if flags.enableNewOverview %}
-            {{ riskFlagBadge({ text: 'Medium', badgeClass: 'risk-badge--medium' }) }}
-          {% else %}
-            <span class="govuk-!-font-weight-bold rosh--medium">Medium</span>
-          {% endif %}
-        </dt>
-        <dd class="govuk-!-margin-left-0">
-          <ul class="govuk-list">
-            {% for risk in mediumRiskLevel %}
-              <li>{{ risk.description }}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-      {% if lowRiskLevel.length %}
-        <dt>
-          {% if flags.enableNewOverview %}
-            {{ riskFlagBadge({ text: 'Low', badgeClass: 'risk-badge--low' }) }}
-          {% else %}
-            <span class="govuk-!-font-weight-bold rosh--low">Low</span>
-          {% endif %}
-        </dt>
-        <dd class="govuk-!-margin-left-0">
-          <ul class="govuk-list">
-            {% for risk in lowRiskLevel %}
-              <li>{{ risk.description }}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-      {% if infoOnlyRiskLevel.length %}
-        <dt>
-          {% if flags.enableNewOverview %}
-            {{ riskFlagBadge({ text: 'Information only' }) }}
-          {% else %}
-            <span class="govuk-!-font-weight-bold">Information only</span>
-          {% endif %}
-        </dt>
-        <dd class="govuk-!-margin-left-0">
-          <ul class="govuk-list govuk-!-margin-bottom-0">
-            {% for risk in infoOnlyRiskLevel %}
-              <li>{{ risk.description }}</li>
-            {% endfor %}
-          </ul>
-        </dd>
-      {% endif %}
-    </dl>
+  {% if flags.enableNewOverview %}
+    {% if riskBadgeData.groupedBadges | length %}
+      <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+        {% for group in riskBadgeData.groupedBadges %}
+          <dt>
+            {{ riskFlagBadge({ text: group.title, badgeClass: group.className }) }}
+          </dt>
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list">
+              {% for badge in group.badges %}
+                <li>{{ badge.text }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endfor %}
+      </dl>
+    {% else %}
+      There are no active risk flags.
+    {% endif %}
   {% else %}
-    {{ 'There are no active risk flags.' }}
+    {% if personRisks.riskFlags.length %}
+      <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+        {% if noRiskLevel.length %}
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list">
+              {% for risk in noRiskLevel %}
+                <li>{{ risk.description }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endif %}
+        {% if veryHighRiskLevel.length %}
+          <dt>
+            {% if flags.enableNewOverview %}
+              {{ riskFlagBadge({ text: 'Very high', badgeClass: 'risk-badge--very-high' }) }}
+            {% else %}
+              <span class="govuk-!-font-weight-bold rosh--very-high">Very High</span>
+            {% endif %}
+          </dt>
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list">
+              {% for risk in veryHighRiskLevel %}
+                <li>{{ risk.description }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endif %}
+        {% if highRiskLevel.length %}
+          <dt>
+            {% if flags.enableNewOverview %}
+              {{ riskFlagBadge({ text: 'High', badgeClass: 'risk-badge--high' }) }}
+            {% else %}
+              <span class="govuk-!-font-weight-bold rosh--high">High</span>
+            {% endif %}
+          </dt>
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list">
+              {% for risk in highRiskLevel %}
+                <li>{{ risk.description }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endif %}
+        {% if mediumRiskLevel.length %}
+          <dt>
+            {% if flags.enableNewOverview %}
+              {{ riskFlagBadge({ text: 'Medium', badgeClass: 'risk-badge--medium' }) }}
+            {% else %}
+              <span class="govuk-!-font-weight-bold rosh--medium">Medium</span>
+            {% endif %}
+          </dt>
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list">
+              {% for risk in mediumRiskLevel %}
+                <li>{{ risk.description }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endif %}
+        {% if lowRiskLevel.length %}
+          <dt>
+            {% if flags.enableNewOverview %}
+              {{ riskFlagBadge({ text: 'Low', badgeClass: 'risk-badge--low' }) }}
+            {% else %}
+              <span class="govuk-!-font-weight-bold rosh--low">Low</span>
+            {% endif %}
+          </dt>
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list">
+              {% for risk in lowRiskLevel %}
+                <li>{{ risk.description }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endif %}
+        {% if infoOnlyRiskLevel.length %}
+          <dt>
+            {% if flags.enableNewOverview %}
+              {{ riskFlagBadge({ text: 'Information only' }) }}
+            {% else %}
+              <span class="govuk-!-font-weight-bold">Information only</span>
+            {% endif %}
+          </dt>
+          <dd class="govuk-!-margin-left-0">
+            <ul class="govuk-list govuk-!-margin-bottom-0">
+              {% for risk in infoOnlyRiskLevel %}
+                <li>{{ risk.description }}</li>
+              {% endfor %}
+            </ul>
+          </dd>
+        {% endif %}
+      </dl>
+    {% else %}
+      {{ 'There are no active risk flags.' }}
+    {% endif %}
   {% endif %}
 {% endset %}
 
