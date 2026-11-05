@@ -137,7 +137,16 @@ export default class RestClient {
         return error.response
       }
       if (handle403 && error?.response?.status === 403) {
-        logger.info('Handling 403')
+        if (Sentry.getClient()) {
+          const eventId = Sentry.captureException(error, {
+            tags: {
+              'error.kind': '403',
+              'request.path': path,
+              'api.name': this.name,
+            },
+          })
+          logger.info(`Sentry 403 eventId: ${eventId}`)
+        }
         return null
       }
       if (handle404 && error?.response?.status === 404) {
