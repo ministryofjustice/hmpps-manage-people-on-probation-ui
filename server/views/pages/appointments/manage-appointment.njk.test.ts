@@ -33,6 +33,7 @@ type TestModel = {
   flags: {
     enableRescheduleFutureAppointmentWithOutcome?: boolean
     enableAppointmentPatchAlerts?: boolean
+    enableSparksAppointmentDetails?: boolean
   }
   deepLinkContactTypes: string[]
   personAppointment: PersonAppointment
@@ -509,6 +510,144 @@ describe('Manage an appointment', () => {
           })
 
           expect($('[data-qa="appointmentDetails"]').text()).toContain('Appointment details')
+        })
+      })
+    })
+
+    describe('Summary list rows', () => {
+      const getRow = ($: ReturnType<typeof render>, key: string) =>
+        $('[data-qa="appointmentDetails"] .govuk-summary-list__row').filter(
+          (_, el) => $(el).find('.govuk-summary-list__key').text().trim() === key,
+        )
+      const keys = ($: ReturnType<typeof render>) =>
+        $('[data-qa="appointmentDetails"] .govuk-summary-list__key')
+          .map((_, el) => $(el).text().trim())
+          .get()
+      const sparks = [
+        { code: 'B', description: 'Budgeting' },
+        { code: 'A', description: 'Anger management' },
+      ]
+
+      describe('Regression: existing rows', () => {
+        it('should still display the Attending and RAR activity rows when the SPARKS flag is off', () => {
+          const $ = render({ flags: { enableSparksAppointmentDetails: false } })
+          expect(getRow($, 'Attending').find('.govuk-summary-list__value').text()).toContain('Terry Jones')
+          expect(getRow($, 'RAR activity').find('.govuk-summary-list__value').text()).toContain('Not provided')
+          expect(getRow($, 'VISOR report')).toHaveLength(1)
+        })
+
+        it('should still display the Attending and RAR activity rows when the SPARKS flag is on', () => {
+          const $ = render({ flags: { enableSparksAppointmentDetails: true } })
+          expect(getRow($, 'Attending')).toHaveLength(1)
+          expect(getRow($, 'RAR activity')).toHaveLength(1)
+          expect(getRow($, 'VISOR report')).toHaveLength(1)
+        })
+
+        it('should display SPARKS delivered between Attending and RAR activity when the flag is on', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { sparks: [] } as Activity } as PersonAppointment,
+          })
+          const allKeys = keys($)
+          expect(allKeys.indexOf('SPARKS delivered')).toBe(allKeys.indexOf('Attending') + 1)
+          expect(allKeys.indexOf('RAR activity')).toBe(allKeys.indexOf('SPARKS delivered') + 1)
+        })
+      })
+
+      describe('SPARKS delivered row', () => {
+        it('should not display the row when the flag is off', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: false },
+            personAppointment: { appointment: { sparks } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(0)
+          expect($('[data-qa="appointmentDetails"]').text()).not.toContain('Budgeting')
+        })
+
+        it('should not display the row when the flag is undefined', () => {
+          const $ = render({
+            personAppointment: { appointment: { sparks } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(0)
+        })
+
+        it('should display the row when the flag is on and sparks is present', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { sparks: [] } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(1)
+        })
+
+        it('should not display the row when the flag is on but sparks is not present', () => {
+          const $ = render({ flags: { enableSparksAppointmentDetails: true } })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(0)
+        })
+
+        it('should not display the row when the flag is on but sparks is null', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { sparks: null } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(0)
+        })
+
+        it('should not display the row when the flag is on but sparks is undefined', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { sparks: undefined } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(0)
+        })
+
+        it('should still display the other rows when the SPARKS row is hidden', () => {
+          const $ = render({ flags: { enableSparksAppointmentDetails: true } })
+          expect(getRow($, 'SPARKS delivered')).toHaveLength(0)
+          expect(getRow($, 'Attending')).toHaveLength(1)
+          expect(getRow($, 'RAR activity')).toHaveLength(1)
+        })
+
+        it('should display None when sparks is an empty array', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { sparks: [] } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered').find('.govuk-summary-list__value').text().trim()).toBe('None')
+        })
+
+        it('should display a single spark description', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: {
+              appointment: { sparks: [{ code: 'A', description: 'Anger management' }] } as Activity,
+            } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered').find('.govuk-summary-list__value').text().trim()).toBe(
+            'Anger management',
+          )
+        })
+
+        it('should display multiple spark descriptions separated by commas', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { sparks } as Activity } as PersonAppointment,
+          })
+          expect(getRow($, 'SPARKS delivered').find('.govuk-summary-list__value').text().trim()).toBe(
+            'Budgeting, Anger management',
+          )
+        })
+
+        it('should display the change link for an MPOP managed appointment', () => {
+          const $ = render({
+            flags: { enableSparksAppointmentDetails: true },
+            personAppointment: { appointment: { deliusManaged: false, sparks: [] } as Activity } as PersonAppointment,
+          })
+          const link = getRow($, 'SPARKS delivered').find('.govuk-summary-list__actions a')
+          expect(link).toHaveLength(1)
+          expect(link.text()).toContain('Change on NDelius')
+          expect(link.attr('target')).toBe('_blank')
+          expect(link.attr('href')).toContain('component=UpdateContact')
+          expect(link.attr('href')).toContain(`CRN=${crn}`)
         })
       })
     })

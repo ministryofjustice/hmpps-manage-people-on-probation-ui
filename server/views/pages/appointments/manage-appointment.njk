@@ -430,6 +430,28 @@ appointment.officer.name | fullName | convertToTitleCase) %}
     },
     {
       key: {
+        text: "SPARKS delivered"
+      },
+      value: {
+        text: appointment.sparks | join(', ', 'description') if appointment.sparks.length > 0 else 'None'
+      },
+      actions: {
+        classes: "govuk-!-white-space-nowrap",
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      } if not appointment.deliusManaged
+    } if appointment.sparks and flags.enableSparksAppointmentDetails,
+    {
+      key: {
         text: "RAR activity"
       },
       value: {
