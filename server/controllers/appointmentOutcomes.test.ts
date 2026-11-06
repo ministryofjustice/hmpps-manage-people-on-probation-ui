@@ -243,7 +243,8 @@ describe('controllers/appointmentOutcomes', () => {
     it('should render the add note page when getAddNote is called', async () => {
       const res = mockRes()
       const spy = jest.spyOn(res, 'render')
-      await controllers.appointmentOutcomes.getAddNote()(mockReq(), res)
+      const url = `/case/${crn}/appointments/appointment/${contactId}/outcome/add-note?put=true`
+      await controllers.appointmentOutcomes.getAddNote()(mockReq({ request: { url } }), res)
       expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/add-note', {
         body: null,
         validMimeTypes: [
@@ -257,6 +258,7 @@ describe('controllers/appointmentOutcomes', () => {
         errorMessages: null,
         uploadedFiles: [],
         maxCharCount: 12000,
+        url: encodeURIComponent(url),
       })
     })
 

@@ -782,7 +782,10 @@ describe('controllers/appointments', () => {
   })
 
   describe('get appointment note', () => {
+    const noteUrl = `/case/${crn}/appointments/appointment/${contactId}/manage/note/${noteId}?back=%2Fmanage`
+    const originalUrl = req.url
     beforeEach(async () => {
+      req.url = noteUrl
       getPersonAppointmentNoteSpy.mockResolvedValue({
         personSummary: {
           crn,
@@ -828,6 +831,9 @@ describe('controllers/appointments', () => {
       })
       await controllers.appointments.getAppointmentNote(hmppsAuthClient)(req, res)
     })
+    afterEach(() => {
+      req.url = originalUrl
+    })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENT_NOTE', uuidv4(), crn, 'CRN')
     it('should request the person appointment note', () => {
       expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
@@ -841,6 +847,7 @@ describe('controllers/appointments', () => {
           crn,
           contactId,
           back: undefined,
+          url: encodeURIComponent(noteUrl),
           personAppointment: expect.objectContaining({
             appointment: expect.objectContaining({
               appointmentNotes: expect.arrayContaining([
