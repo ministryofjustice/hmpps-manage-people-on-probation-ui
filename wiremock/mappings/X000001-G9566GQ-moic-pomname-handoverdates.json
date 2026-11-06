@@ -1,0 +1,46 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/moic/api/allocation/G9566GQ"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":{
+            "primary_pom": {
+              "staff_id": 1126115,
+              "name": "Dove, Rachel"
+            },
+            "secondary_pom": {
+              "staff_id": 3,
+              "name": "John, Doe"
+            }
+          },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/moic/api/handovers/G9566GQ"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "nomsNumber": "G0862VO",
+          "handoverDate": "2026-11-06",
+          "handoverStartDate": "2026-11-06",
+          "responsibility": "COM",
+          "responsibleComName": "string",
+          "responsibleComEmail": "string",
+          "responsiblePomName": "string",
+          "responsiblePomNomisId": "string"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
