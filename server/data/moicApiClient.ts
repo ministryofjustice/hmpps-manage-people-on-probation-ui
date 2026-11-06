@@ -7,9 +7,7 @@ export interface PomToRoHandoverData {
   handoverStartDate: string | null
   responsibility: string
   responsibleComName: string
-  responsibleComEmail: string
   responsiblePomName: string
-  responsiblePomNomisId: string
 }
 
 export interface Staff {

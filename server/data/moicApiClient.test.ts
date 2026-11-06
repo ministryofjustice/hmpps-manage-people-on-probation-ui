@@ -33,9 +33,7 @@ describe('MOICApiClient', () => {
         handoverStartDate: '2026-09-26',
         responsibility: 'COM',
         responsibleComName: 'John Smith',
-        responsibleComEmail: 'john.smith@example.com',
         responsiblePomName: 'Andrew Langley',
-        responsiblePomNomisId: '123456',
       }
 
       fakeHandoverApiClient

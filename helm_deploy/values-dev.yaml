@@ -65,6 +65,7 @@ generic-service:
     PERSON_RECORD_API_URL: 'https://hmpps-person-record-dev.hmpps.service.justice.gov.uk'
     PRISONER_SEARCH_API_URL: 'https://prisoner-search-dev.prison.service.justice.gov.uk'
     MOIC_API_URL: 'https://dev.moic.service.justice.gov.uk'
+    PRISON_REGISTER_API_URL: 'https://prison-register-dev.hmpps.service.justice.gov.uk'
     ARNS_ASSESSMENT_PLATFORM_API_URL: 'https://arns-assessment-platform-api-dev.hmpps.service.justice.gov.uk'
     PROBATION_FRONTEND_COMPONENTS_API_URL: 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'
     PROBATION_FRONTEND_COMPONENTS_CONNECT_SRC: 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'
