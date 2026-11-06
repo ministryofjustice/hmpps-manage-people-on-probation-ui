@@ -116,7 +116,7 @@ const appointmentOutcomesController: Controller<typeof appointmentOutcomeRequest
       }
 
       const nextAppointmentId = getDataValue(req.session.data, ['temp', crn, 'nextAppointmentId'])
-      if (nextAppointmentId === uuid) {
+      if (nextAppointmentId && nextAppointmentId === uuid) {
         const nextAppointmentOutcome = res.locals.appointmentOutcome
         setDataValue(req.session.data, ['temp', crn, 'nextAppointment'], nextAppointmentOutcome)
       }
