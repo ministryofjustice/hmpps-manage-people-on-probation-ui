@@ -452,6 +452,20 @@ describe('controllers/appointmentOutcomes', () => {
         `/case/${crn}/appointments/appointment/${contactId}/outcome/next-appointment?back=/case/X000001/appointments/appointment/1234/outcome/add-note`,
       )
     })
+    it('should not set the next appointment when nextAppointmentId and uuid are absent', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      delete req.session.data.temp[crn].nextAppointmentId
+      delete res.locals.appointmentOutcome.uuid
+
+      await controllers.appointmentOutcomes.postAddNote(hmppsAuthClient)(req, res)
+
+      expect(setDataValueSpy).not.toHaveBeenCalledWith(
+        req.session.data,
+        ['temp', crn, 'nextAppointment'],
+        res.locals.appointmentOutcome,
+      )
+    })
     it('should set the next appointment if nextAppointmentId exists', async () => {
       const req = mockReq({ nextAppointmentId: '1234' })
       const res = mockRes({ appointmentOutcome: { uuid: '1234' } })
