@@ -16,6 +16,8 @@ export const isValidHost = (host: string): boolean => {
     process.env.E_SUPERVISION_API_URL,
     process.env.PERSON_RECORD_API_URL,
     process.env.PRISONER_SEARCH_API_URL,
+    process.env.MOIC_API_URL,
+    process.env.PRISON_REGISTER_API_URL,
     process.env.EMDI_API_URL,
     'http://localhost:8100',
     'http://localhost:9091',

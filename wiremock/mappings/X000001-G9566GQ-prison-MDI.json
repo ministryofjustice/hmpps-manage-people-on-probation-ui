@@ -1,0 +1,24 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/prison-register/prisons/id//MDI"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":{
+          "prisonId": "MDI",
+          "prisonName": "Moorland HMP",
+          "prisonNameInWelsh": "Carchar Brynbuga",
+          "active": true,
+          "male": true,
+          "female": true,
+          "contracted": true
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

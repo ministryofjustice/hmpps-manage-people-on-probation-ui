@@ -29,7 +29,7 @@ export default class PrisonerSearchApiClient extends RestClient {
       path: `/prisoner/${nomsNumber}`,
       handle404: true,
       handle500: true,
-      errorMessage: 'Tier information is currently unavailable.',
+      errorMessage: 'Prisoner information is currently unavailable.',
     })
   }
 }
