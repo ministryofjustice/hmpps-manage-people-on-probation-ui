@@ -60,7 +60,7 @@ const cohortDescriptions = new Set([
   'cyber - dependent',
   'cyber - enabled',
   'grand avenues cohort',
-  'Home Office Interest',
+  'home office interest',
   'lifer',
   'organised crime - overt',
   'short sentence service',
@@ -235,6 +235,7 @@ function getRiskDisplayDescription(description: string): string {
     'suicide/self harm': 'Suicide/Self Harm',
     'cppc registered case': 'CPPC registered case',
     mappa: 'MAPPA',
+    'doris (disruption of recorded internal secretors)': 'DORIS (disruption of recorded internal secretors)',
   }
 
   return displayOverrides[description.trim().toLowerCase()] ?? displayDescription
