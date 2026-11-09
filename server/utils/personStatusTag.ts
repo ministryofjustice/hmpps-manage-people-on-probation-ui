@@ -65,6 +65,11 @@ export async function getStatusTagForPersonInCustody(prisoner?: Prisoner): Promi
     return PERSON_STATUS_TAGS.DECEASED
   }
 
+  // Person is not in prison care - let the community logic handle the status
+  if (prisoner?.inOutStatus?.includes('INACTIVE')) {
+    return undefined
+  }
+
   if (prisoner?.lastMovementReasonCode === 'UAL') {
     return prisoner?.recall ? PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE : PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
   }

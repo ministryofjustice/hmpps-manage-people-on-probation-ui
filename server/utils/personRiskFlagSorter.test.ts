@@ -611,4 +611,58 @@ describe('utils/getRiskBadgeGroups', () => {
       expect(result.remainingCount).toBe(0)
     })
   })
+
+  it('formats DORIS with its display override', () => {
+    const result = getRiskBadgeGroups([
+      createRiskFlag({
+        id: 1,
+        description: 'DoRIS (Disruption of Recorded Internal Secretors)',
+        level: 'MEDIUM',
+      }),
+    ])
+
+    expect(result.groups.flatMap(group => group.badges)).toEqual([
+      {
+        id: 1,
+        text: 'DORIS (disruption of recorded internal secretors)',
+        level: 'MEDIUM',
+        badgeClass: 'risk-badge--medium',
+      },
+    ])
+  })
+
+  describe('Home Office Interest cohort risk badges', () => {
+    const createHomeOfficeInterestRiskFlag = (): RiskFlag =>
+      ({
+        id: 2501027492,
+        description: 'Home Office Interest',
+        levelCode: 'HOI',
+        levelDescription: 'Home Office Interest',
+        riskNotes: [],
+        createdDate: '2026-10-19',
+        createdBy: {
+          forename: 'A',
+          surname: 'B',
+        },
+        removed: false,
+        removalHistory: [],
+      }) as RiskFlag
+
+    it('displays Home Office Interest as a cohort badge', () => {
+      const result = getRiskBadgeGroups([createHomeOfficeInterestRiskFlag()])
+
+      expect(result.remainingCount).toBe(0)
+      expect(result.groups).toHaveLength(1)
+      expect(result.groups[0].badges).toHaveLength(1)
+
+      expect(result.groups[0].badges[0]).toEqual(
+        expect.objectContaining({
+          id: 2501027492,
+          text: 'Home office interest',
+          level: 'LOW',
+          badgeClass: 'risk-badge--cohort',
+        }),
+      )
+    })
+  })
 })
