@@ -7,7 +7,7 @@ import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 
-export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const getAppointment = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getAppointmentInner(req, res, next) {
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const id = uuid ?? contactId
