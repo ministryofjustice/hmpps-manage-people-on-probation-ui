@@ -302,7 +302,7 @@ describe('getStatusTagForPersonInCustody', () => {
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBeUndefined()
   })
 
-  it('returns undefined when the prisoner status is INACTIVE OUT INACTIVE', async () => {
+  it('returns undefined when the prisoner status is INACTIVE OUT', async () => {
     const prisoner: Prisoner = {
       status: 'INACTIVE OUT',
       legalStatus: 'SENTENCED',
