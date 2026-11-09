@@ -325,8 +325,6 @@ describe('getStatusTagForPersonInCustody', () => {
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBeUndefined()
   })
 
-
-
   it('returns Unlawfully at large when a primary sentence has custody location code UATLRG', async () => {
     const supervisionPackage = createSupervisionPackage({
       context: {
