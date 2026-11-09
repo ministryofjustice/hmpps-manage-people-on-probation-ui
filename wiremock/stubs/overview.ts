@@ -1,6 +1,6 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const stubOverviewVisorRegistration = (): SuperAgentRequest =>
+const stubRiskFlagsVisor = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/mas/risk-flags/X778160',
@@ -302,4 +302,4 @@ const stubOverviewRiskFlagsNoLevel = (): SuperAgentRequest =>
     },
   })
 
-export default { stubOverviewVisorRegistration, stubOverviewRiskFlagsNoLevel }
+export default { stubRiskFlagsVisor, stubOverviewRiskFlagsNoLevel }
