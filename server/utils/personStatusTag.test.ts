@@ -302,17 +302,30 @@ describe('getStatusTagForPersonInCustody', () => {
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBeUndefined()
   })
 
-  it('returns undefined when the prisoner is INACTOVE', async () => {
+  it('returns undefined when the prisoner status is INACTIVE OUT INACTIVE', async () => {
     const prisoner: Prisoner = {
-      status: 'INACTIVE',
+      status: 'INACTIVE OUT',
       legalStatus: 'SENTENCED',
       lastMovementReasonCode: 'ADM',
-      inOutStatus: 'INACTIVE',
-      recall: false,
+      inOutStatus: 'IN',
+      recall: true,
     }
 
     await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBeUndefined()
   })
+
+  it('returns undefined when the inOutStatus of prisoner is OUT', async () => {
+    const prisoner: Prisoner = {
+      legalStatus: 'SENTENCED',
+      lastMovementReasonCode: 'ADM',
+      inOutStatus: 'OUT',
+      recall: true,
+    }
+
+    await expect(getStatusTagForPersonInCustody(prisoner)).resolves.toBeUndefined()
+  })
+
+
 
   it('returns Unlawfully at large when a primary sentence has custody location code UATLRG', async () => {
     const supervisionPackage = createSupervisionPackage({
