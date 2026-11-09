@@ -66,7 +66,7 @@ export async function getStatusTagForPersonInCustody(prisoner?: Prisoner): Promi
   }
 
   // Person is not in prison care - let the community logic handle the status
-  if (prisoner?.inOutStatus?.includes('INACTIVE')) {
+  if (prisoner?.status?.includes('INACTIVE') || prisoner?.inOutStatus === 'OUT') {
     return undefined
   }
 
