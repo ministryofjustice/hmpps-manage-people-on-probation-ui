@@ -1,7 +1,6 @@
 import { upperFirst } from 'lodash'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
-import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType, YesNo } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
 import { convertToTitleCase, getDataValue } from '../utils'
@@ -13,12 +12,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const id = uuid ?? contactId
     const { username: loggedInUsername = '' } = res.locals.user
-    const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
-    const masClient = new MasApiClient(token)
-    const currentCase = await masClient.getOverview(crn)
     const overview = res.locals.case
-    const { forename } = currentCase.personalDetails.name
-    const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
+    const { forename } = res.locals.case.name
+    const mobileNumber = res.locals.case?.mobileNumber ?? ''
     const allowSms = overview?.allowSms
     const { data } = req.session
 
@@ -29,9 +25,13 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
       userIsAttending = req.session.data.appointments[crn][id].user.username === loggedInUsername
     }
+    const riskFlags = res.locals.personRisks?.riskFlags
+    if (!riskFlags) {
+      throw new Error(`Unable to get risk flags for CRN ${crn}`)
+    }
     let appointment: AppointmentLocals = {
       meta: {
-        isVisor: currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
+        isVisor: riskFlags.map(reg => reg.description.toLowerCase()).includes('visor'),
         forename,
         change: (req?.query?.change as string) ?? null,
         userIsAttending,
