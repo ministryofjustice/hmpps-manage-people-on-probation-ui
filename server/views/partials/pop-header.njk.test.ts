@@ -24,47 +24,43 @@ type TestModel = {
 }
 
 const riskBadgeData: RiskBadgeData = {
-  groups: [
+  groupedBadges: [],
+  headerBadges: [
     {
-      severity: 'MEDIUM',
-      badges: [
-        {
-          id: 1,
-          text: 'Risk to children - Medium',
-          level: 'MEDIUM',
-          badgeClass: 'risk-badge--medium',
-        },
-        {
-          id: 2,
-          text: 'Risk to staff - Medium',
-          level: 'MEDIUM',
-          badgeClass: 'risk-badge--medium',
-        },
-        {
-          id: 3,
-          text: 'Risk to known adult - Medium',
-          level: 'MEDIUM',
-          badgeClass: 'risk-badge--medium',
-        },
-        {
-          id: 4,
-          text: 'Risk to prisoner - Medium',
-          level: 'MEDIUM',
-          badgeClass: 'risk-badge--medium',
-        },
-        {
-          id: 5,
-          text: 'Risk to public - Medium',
-          level: 'MEDIUM',
-          badgeClass: 'risk-badge--medium',
-        },
-        {
-          id: 6,
-          text: 'Medium rosh',
-          level: 'MEDIUM',
-          badgeClass: 'risk-badge--medium',
-        },
-      ],
+      id: 1,
+      text: 'Risk to children - Medium',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
+    },
+    {
+      id: 2,
+      text: 'Risk to staff - Medium',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
+    },
+    {
+      id: 3,
+      text: 'Risk to known adult - Medium',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
+    },
+    {
+      id: 4,
+      text: 'Risk to prisoner - Medium',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
+    },
+    {
+      id: 5,
+      text: 'Risk to public - Medium',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
+    },
+    {
+      id: 6,
+      text: 'Medium rosh',
+      level: 'MEDIUM',
+      badgeClass: 'risk-badge--medium',
     },
   ],
   remainingCount: 0,
@@ -320,7 +316,7 @@ describe('POP header', () => {
   describe('risk flag badges', () => {
     it('should render a link for each risk flag badge', () => {
       const $ = render()
-      riskBadgeData.groups[0].badges.forEach(badge => {
+      riskBadgeData.headerBadges.forEach(badge => {
         const link = $(`[data-qa="risk-badge-${badge.id}"]`)
         expect(link.attr('href')).toBe(`/case/${baseModel.headerCRN}/risk/flag/${badge.id}`)
         expect(link.hasClass(badge.badgeClass)).toBe(true)
