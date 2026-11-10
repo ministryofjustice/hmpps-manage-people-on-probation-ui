@@ -300,6 +300,32 @@ describe('/controllers/activityLogController', () => {
       )
     })
 
+    it('should mark a cancelled online check in and render it rather than redirect', async () => {
+      getPersonAppointmentSpy.mockResolvedValue({
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          description: 'Online check in cancelled',
+          esupervisionId: '7fa85f64-5717-4562-b3fc-2c963f66afa6',
+          isAppointment: true,
+          deliusManaged: false,
+        },
+      })
+
+      await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              isCancelledCheckIn: true,
+            }),
+          }),
+        }),
+      )
+    })
+
     it('should not mark false for a non MPOP updatable contact', async () => {
       getPersonAppointmentSpy.mockResolvedValue({
         ...mockPersonAppointment,

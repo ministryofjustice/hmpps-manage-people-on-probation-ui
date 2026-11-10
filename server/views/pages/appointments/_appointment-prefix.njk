@@ -1,4 +1,6 @@
-{% if appointment.isInitial %}
+{% if appointment.isCancelledCheckIn %}
+  System generated
+{% elif appointment.isInitial %}
   Initial appointment
 {% elif appointment.isNationalStandard %}
   National standard appointment

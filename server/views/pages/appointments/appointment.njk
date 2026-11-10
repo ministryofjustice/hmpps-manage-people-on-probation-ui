@@ -4,7 +4,7 @@
 {% set personSummary = personAppointment.personSummary %}
 {% set displayName = appointment.displayName if appointment.displayName else appointment.type %}
 {% set pageTitle = makePageTitle({
-  pageHeading: [displayName, 'note']}) %}
+  pageHeading: [appointment.description if appointment.isCancelledCheckIn else displayName, 'note']}) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else
   '' %}
 {% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
@@ -41,7 +41,7 @@
 
 {% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else
   'Upcoming' %}
-{% set title = displayName + ' with ' + appointment.officer.name | fullName %}
+{% set title = appointment.description if appointment.isCancelledCheckIn else displayName + ' with ' + appointment.officer.name | fullName %}
 {% set isOutcomeRecorded = appointment.hasOutcome %}
 
 {% block content %}
@@ -103,7 +103,7 @@
 
   {{ appSummaryCard({
   attributes: {'data-qa': 'appointmentDetailsCard'},
-  titleText: 'Appointment details' if appointment.isAppointment else 'Contact details',
+  titleText: 'Appointment details' if (appointment.isAppointment and not appointment.isCancelledCheckIn) else 'Contact details',
   headingLevel: '3',
   actions: actions,
   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',

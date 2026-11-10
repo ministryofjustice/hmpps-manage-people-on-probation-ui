@@ -498,6 +498,36 @@
               },
               "deliusManaged": true,
               "esupervisionId": "5fa85f64-5717-4562-b3fc-2c963f66afa6"
+            },
+            {
+              "id": 33,
+              "type": "Online probation check in",
+              "description": "Online check in cancelled",
+              "startDateTime": "2023-02-09T09:00:00.382936Z",
+              "endDateTime": "2023-02-09T09:00:00.382936Z",
+              "isSensitive": false,
+              "hasOutcome": false,
+              "isSystemContact": true,
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Check in status: Scheduled: https://check-in.example/\nLink sent by text message: Monday 9 February 2023 at 9:00am\nReason: The person on probation is in hospital",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "officer": {
+                "name": {
+                  "forename": "William",
+                  "surname": "Philips"
+                }
+              },
+              "lastUpdated": "2023-02-09",
+              "lastUpdatedBy": {
+                "forename": "Online Check In",
+                "surname": "Service"
+              },
+              "deliusManaged": true,
+              "esupervisionId": "7fa85f64-5717-4562-b3fc-2c963f66afa6"
             }
           ]
         },
@@ -1214,7 +1244,6 @@
         }
       }
     },
-
     {
       "request": {
         "urlPattern": "/mas/schedule/X000001/appointment/11/note/1",
@@ -1785,6 +1814,59 @@
               "surname": "Smith"
             }
           }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/schedule/X000001/appointment/33",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Eula",
+              "surname": "Schmeler"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "appointment": {
+            "id": 33,
+            "type": "Online probation check in",
+            "description": "Online check in cancelled",
+            "startDateTime": "2023-02-09T09:00:00.382936Z",
+            "endDateTime": "2023-02-09T09:00:00.382936Z",
+            "isSensitive": false,
+            "hasOutcome": false,
+            "isSystemContact": true,
+            "officer": {
+              "name": {
+                "forename": "William",
+                "surname": "Philips"
+              }
+            },
+            "lastUpdated": "2023-02-09",
+            "lastUpdatedBy": {
+              "forename": "Online Check In",
+              "surname": "Service"
+            },
+            "deliusManaged": true,
+            "esupervisionId": "7fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Check in status: Scheduled: https://check-in.example/\nLink sent by text message: Monday 9 February 2023 at 9:00am\nReason: The person on probation is in hospital",
+                "hasNoteBeenTruncated": false
+              }
+            ]
+          },
+          "documents": []
         },
         "headers": {
           "Content-Type": "application/json"

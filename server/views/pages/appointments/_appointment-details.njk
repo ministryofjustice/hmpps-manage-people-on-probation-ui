@@ -3,11 +3,11 @@
 {% set documentsHtml = '' %}
 {% set contactHasNote = appointment.isUpdatableContact and appointment.appointmentNote %}
 {% set contactHasNotes = appointment.isUpdatableContact and appointment.appointmentNotes.length > 0 %}
-{% set displayName = appointment.displayName if appointment.displayName else 
+{% set displayName = appointment.displayName if appointment.displayName else
   appointment.type %}
 {% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
-{% set _docs = appointmentDocuments if appointmentDocuments else 
+{% set _docs = appointmentDocuments if appointmentDocuments else
   appointment.documents %}
 {% if _docs and _docs.length > 0 %}
   {% for document in _docs %}
@@ -21,7 +21,7 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else 
+{% set headings = ['Type of appointment', 'Appointment notes'] if (appointment.isAppointment and not appointment.isCancelledCheckIn) else
   ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
@@ -52,7 +52,7 @@
     {
       key: { html: '<span data-qa="descriptionLabel">Description</span>' },
       value: { html: '<span data-qa="descriptionValue">' + (appointment.description | nl2br | safe) + '</span>' }
-    } if appointment.description,
+    } if appointment.description and not appointment.isCancelledCheckIn,
     {
       key: { html: '<span data-qa="locationLabel">Location</span>' },
       value: { html: '<span data-qa="locationValue">' + addressToList(appointment.location).join('<br>') | safe + '</span>' }
@@ -72,7 +72,7 @@
     {
       key: { html: '<span data-qa="rarActivityLabel">RAR activity</span>' },
       value: { html: '<span data-qa="rarActivityValue">' + appointment.countsTowardsRAR | toYesNo + '</span>' }
-    } if not appointment.hasOutcome,
+    } if not appointment.hasOutcome and not appointment.isCancelledCheckIn,
     {
       key: { html: '<span data-qa="contactNotesLabel">Details</span>' },
       value: { html: '<span data-qa="contactNotesValue">' + notes + '</span>' }

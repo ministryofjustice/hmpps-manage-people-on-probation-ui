@@ -158,6 +158,7 @@ export interface Activity {
   component?: SentenceComponent
   nsiId?: number
   esupervisionId?: string
+  isCancelledCheckIn?: boolean
   externalReference?: string
   isUpdatableContact?: boolean
   isPreSentence?: boolean
