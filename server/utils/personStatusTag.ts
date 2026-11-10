@@ -42,6 +42,9 @@ export async function getStatusTag(
     }
 
     if (isUnlawfullyAtLarge(activePrimarySentence)) {
+      if (isRecalled(activePrimarySentence)) {
+        return PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE
+      }
       return PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
     }
 
