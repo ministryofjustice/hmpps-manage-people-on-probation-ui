@@ -11,6 +11,8 @@ import { metricsMiddleware } from './monitoring/metricsApp'
 
 import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpCsrf from './middleware/setUpCsrf'
+import { multerErrorHandler } from './middleware/validation/multerErrorHandler'
+import { parseMultipartBody } from './middleware/parseMultipartBody'
 import setUpCurrentUser from './middleware/setUpCurrentUser'
 import setUpHealthChecks from './middleware/setUpHealthChecks'
 import setUpStaticResources from './middleware/setUpStaticResources'
@@ -78,10 +80,15 @@ export default function createApp(services: Services): express.Application {
   const { hmppsAuthClient } = services
   app.use(getUserAlertsCount(hmppsAuthClient))
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
-  // Routes that use multer for multipart upload must be registered before csrf executes
+  // Multipart bodies must be parsed by multer before csrf executes, as the token is in the body
+  app.post(
+    '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
+    multerErrorHandler('fileUpload'),
+    parseMultipartBody,
+  )
+  app.use(setUpCsrf())
   const router = Router()
   app.use(manageAppointmentRoutes(router, services))
-  app.use(setUpCsrf())
   app.use(routes(router, services))
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)
   app.use(function pageNotFound(_req, _res, next) {

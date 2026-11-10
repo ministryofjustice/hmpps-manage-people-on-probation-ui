@@ -8,7 +8,6 @@ import {
   autoStoreSessionData,
   getAppointmentTypes,
   getSentences,
-  parseMultipartBody,
   forceValidation,
 } from '../middleware'
 import {
@@ -21,7 +20,6 @@ import {
 } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import config from '../config'
-import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function manageAppointmentRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const upload = multer({
@@ -53,8 +51,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.post(
     '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
-    multerErrorHandler('fileUpload'),
-    parseMultipartBody,
     validate.appointmentOutcomes,
     autoStoreSessionData(hmppsAuthClient),
     getOutcomeProps,

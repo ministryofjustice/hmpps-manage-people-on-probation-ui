@@ -64,6 +64,7 @@ type TestModel = {
   fileUploadLimit: number
   uploadedFiles: string[]
   maxCharCount: number
+  csrfToken?: string
 }
 
 const baseModel: TestModel = {
@@ -100,6 +101,25 @@ const render = (model = {} as Partial<TestModel>, session = {}) => {
 }
 
 describe('Add note', () => {
+  describe('csrf token', () => {
+    it('should render the token as the first field of a multipart form, so it is parsed before the file', () => {
+      const $ = render({ csrfToken: 'test-token' })
+      const form = $('main form')
+      expect(form.attr('enctype')).toBe('multipart/form-data')
+      expect(form.find('input[name=_csrf]').length).toBe(1)
+      expect(form.find('input[name=_csrf]').val()).toBe('test-token')
+      expect(form.find('input, textarea, select').first().attr('name')).toBe('_csrf')
+    })
+
+    it('should render the token once in a non-multipart form', () => {
+      const $ = render({ csrfToken: 'test-token', appointmentOutcome: { contactId: undefined } })
+      const form = $('main form')
+      expect(form.attr('enctype')).toBeUndefined()
+      expect(form.find('input[name=_csrf]').length).toBe(1)
+      expect(form.find('input[name=_csrf]').val()).toBe('test-token')
+    })
+  })
+
   it('should render the page', () => {
     const $ = render()
     expect($('main').find('.person-header').length).toBe(1)

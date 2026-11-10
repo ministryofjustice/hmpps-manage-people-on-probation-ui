@@ -25,6 +25,8 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block form %}
+    {# _form.njk omits the token for multipart forms; it must come first so multer parses it before the file #}
+    {% if multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
     {% set notesConfig = {
         rows: '10',
         maxlength: maxCharCount,
