@@ -47,7 +47,7 @@ describe('MOICApiClient', () => {
     })
   })
 
-  describe('fetch pom name', () => {
+  describe('fetch pom details', () => {
     it('should return pom details from api', async () => {
       const nomsNumber = 'A1234BC'
 

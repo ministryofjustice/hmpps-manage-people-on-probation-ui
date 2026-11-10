@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/prison-register/prisons/id//MDI"
+        "urlPattern": "/prison-register/prisons/id/MDI"
       },
       "response": {
         "status": 200,
@@ -20,7 +20,7 @@
         }
       },
       "request": {
-        "urlPattern": "/prison-register/prisons/id//WTI"
+        "urlPattern": "/prison-register/prisons/id/WTI"
       },
       "response": {
         "status": 200,
