@@ -426,23 +426,33 @@
   {{ supervisionPackageHtml | safe }}
 
   {% if flags.enableNewOverview %}
-    {{ appSummaryCard({
-      titleText: 'Personal details',
-      headingLevel: 3,
-      attributes: {'data-qa': 'personalDetailsCard'},
-      classes: cardClasses,
-      html: govukSummaryList({
-        rows: personalDetailsRows
-      }),
-      actions: {
-        items: [
-          {
-            text: 'View all personal details',
-            href: '/case/' + crn + '/personal-details'
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column {{ 'govuk-grid-column-one-half-from-desktop' if throughcare else 'govuk-grid-column-full' }}">
+        {{ appSummaryCard({
+          titleText: 'Personal details',
+          headingLevel: 3,
+          attributes: {'data-qa': 'personalDetailsCard'},
+          classes: cardClasses,
+          html: govukSummaryList({
+            rows: personalDetailsRows
+          }),
+          actions: {
+            items: [
+              {
+                text: 'View all personal details',
+                href: '/case/' + crn + '/personal-details'
+              }
+            ]
           }
-        ]
-      }
-    }) }}
+        }) }}
+      </div>
+      {% if throughcare %}
+        <div class="govuk-grid-column govuk-grid-column-one-half-from-desktop">
+          {#  Throughcare information card  #}
+          {% include "../partials/_overview-throughcare-card.njk" %}
+        </div>
+      {% endif %}
+    </div>
   {% endif %}
 
   {% if not (supervisionPackageHtml | trim) or not flags.enableNewOverview %}

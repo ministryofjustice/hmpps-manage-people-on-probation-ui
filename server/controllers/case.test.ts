@@ -35,6 +35,9 @@ import { PersonalDetailsSession } from '../models/Data'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { OffenderEligibility } from '../data/model/esupervision'
+import { getThroughcareRows } from '../utils/throughcare'
+import { SummaryList } from '../@types'
+import { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -63,6 +66,7 @@ jest.mock('../data/hmppsAuthClient', () => {
 jest.mock('../data/eSupervisionClient')
 jest.mock('../middleware/existsInEMDI')
 jest.mock('../middleware/checkLocationMonitoring')
+jest.mock('../utils/throughcare')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -144,6 +148,7 @@ const getOffenderEligibilitySpy = jest
 const getSentencesSpy = getSentences as jest.MockedFunction<typeof getSentences>
 const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
 const existsInEMDISpy = existsInEMDI as jest.Mock
+const getThroughcareSpy = getThroughcareRows as jest.MockedFunction<typeof getThroughcareRows>
 const preloadActivitySearchSpy = jest
   .spyOn(MasApiClient.prototype, 'preloadActivitySearch')
   .mockImplementation(() => Promise.resolve(undefined))
@@ -549,6 +554,61 @@ describe('caseController', () => {
     it('should NOT call preloadActivitySearch when enableSemanticSearch is disabled', async () => {
       await controllers.case.getCase(hmppsAuthClient)(req, res)
       expect(preloadActivitySearchSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCase - throughcare', () => {
+    const noms = 'A1234BC'
+    const mockPrisoner: Prisoner = { status: 'ACTIVE IN', inOutStatus: 'IN', prisonName: 'Whatton' }
+    const mockThroughcare: SummaryList = {
+      rows: [
+        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Dove, Rachel' } },
+        { key: { text: 'Current prison' }, value: { text: 'Whatton' } },
+        { key: { text: 'Responsible officer expected handover date' }, value: { text: '2026-11-06' } },
+        { key: { text: 'Release date' }, value: { text: '2027-03-16' } },
+      ],
+    }
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: { ...mockPersonalDetails, overview: { ...overview, noms } },
+          },
+        },
+      },
+    })
+
+    it('should request and render the throughcare information when enableNewOverview is enabled', async () => {
+      getThroughcareSpy.mockResolvedValueOnce(mockThroughcare)
+      const throughcareRes = mockAppResponse({
+        flags: { enableNewOverview: true },
+        tierCalculation: mockTierCalculation,
+        prisoner: mockPrisoner,
+      })
+      const throughcareRenderSpy = jest.spyOn(throughcareRes, 'render')
+      await controllers.case.getCase(hmppsAuthClient)(req, throughcareRes)
+      expect(getThroughcareSpy).toHaveBeenCalledWith('token-1', noms, mockPrisoner)
+      expect(throughcareRenderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({ throughcare: mockThroughcare }),
+      )
+    })
+
+    it('should NOT request the throughcare information when enableNewOverview is disabled', async () => {
+      const throughcareRes = mockAppResponse({
+        flags: { enableNewOverview: false },
+        tierCalculation: mockTierCalculation,
+        prisoner: mockPrisoner,
+      })
+      const throughcareRenderSpy = jest.spyOn(throughcareRes, 'render')
+      await controllers.case.getCase(hmppsAuthClient)(req, throughcareRes)
+      expect(getThroughcareSpy).not.toHaveBeenCalled()
+      expect(throughcareRenderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({ throughcare: undefined }),
+      )
     })
   })
 })

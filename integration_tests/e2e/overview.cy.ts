@@ -9,6 +9,20 @@ context('Overview', () => {
       cy.task('stubSupervisionPackageFrontendContext', { crn: 'X000001' })
     }
   }
+  // The prisoner details behind the throughcare card are only requested with the person header
+  const enableThroughcare = () => {
+    cy.task('stubFeatureFlags', [
+      { key: 'enableNewOverview', enabled: true },
+      { key: 'enablePersonHeader', enabled: true },
+    ])
+  }
+  const verifyThroughcareRows = (rows: Array<[label: string, value: string]>) => {
+    cy.get('[data-qa="throughcareCard"] .govuk-summary-list__row').should('have.length', rows.length)
+    rows.forEach(([label, value], index) => {
+      cy.get('[data-qa="throughcareCard"] .govuk-summary-list__key').eq(index).should('contain.text', label)
+      cy.get('[data-qa="throughcareCard"] .govuk-summary-list__value').eq(index).should('contain.text', value)
+    })
+  }
   const expectNoEMDILinks = (page: OverviewPage) => {
     page.getElementData('licencesEMDILink').should('not.exist')
     page.getElementData('requirementsEMDILink').should('not.exist')
@@ -275,6 +289,54 @@ context('Overview', () => {
             const [recentCase] = JSON.parse(result)
             expect(recentCase).to.include(expected)
           })
+      },
+    },
+    {
+      title: 'Throughcare information card is rendered for a person in custody when enableNewOverview is true',
+      setup: enableThroughcare,
+      url: '/case/X000001',
+      assertions: page => {
+        page
+          .getCardHeader('throughcare')
+          .should('contain.text', 'Throughcare information')
+          .find('a')
+          .should('contain.text', 'View staff contacts')
+          .and('have.attr', 'href', '/case/X000001/activity-log')
+        verifyThroughcareRows([
+          ['Prison offender manager (POM)', 'Dove, Rachel'],
+          ['Current prison', 'Whatton'],
+          ['Responsible officer expected handover date', '2026-11-06'],
+          ['Release date', '2025-03-16'],
+        ])
+      },
+    },
+    {
+      title: 'Throughcare information card is rendered for a released person when enableNewOverview is true',
+      setup: () => {
+        enableThroughcare()
+        cy.task('stubPrisonerReleased')
+      },
+      url: '/case/X000001',
+      assertions: page => {
+        page
+          .getCardHeader('throughcare')
+          .should('contain.text', 'Throughcare information')
+          .find('a')
+          .should('contain.text', 'View staff contacts')
+          .and('have.attr', 'href', '/case/X000001/activity-log')
+        verifyThroughcareRows([
+          ['Prison offender manager (POM)', 'Dove, Rachel'],
+          ['Last prison', 'Moorland (HMP & YOI)'],
+          ['Release date', '2025-03-16'],
+        ])
+      },
+    },
+    {
+      title: 'Throughcare information card is not rendered when there are no prisoner details',
+      setup: () => cy.task('stubFeatureFlag', { key: 'enableNewOverview', enabled: true }),
+      url: '/case/X000001',
+      assertions: () => {
+        cy.get('[data-qa="throughcareCard"]').should('not.exist')
       },
     },
     {

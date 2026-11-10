@@ -1,0 +1,18 @@
+{% from "_components/summary-card/macro.njk" import appSummaryCard %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{{ appSummaryCard({
+  titleText: 'Throughcare information',
+  headingLevel: 3,
+  attributes: {'data-qa': 'throughcareCard'},
+  classes: cardClasses,
+  html: govukSummaryList(throughcare),
+  actions: {
+    items: [
+      {
+        text: 'View staff contacts',
+        href: '/case/' + crn + '/activity-log'
+      }
+    ]
+  }
+}) }}
