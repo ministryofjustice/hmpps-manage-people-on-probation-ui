@@ -2,8 +2,6 @@ import httpMocks from 'node-mocks-http'
 import { getAppointment } from './getAppointment'
 import { AppResponse } from '../models/Locals'
 import HmppsAuthClient from '../data/hmppsAuthClient'
-import MasApiClient from '../data/masApiClient'
-import { Overview } from '../data/model/overview'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
 import { mockAppResponse } from '../controllers/mocks'
@@ -31,7 +29,6 @@ const mockAppt: AppointmentSession = {
 const username = 'user-1'
 
 jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/masApiClient')
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -39,16 +36,6 @@ jest.mock('../utils', () => {
     ...actualUtils,
   }
 })
-
-const mockOverview = {
-  personalDetails: {
-    name: {
-      forename: 'Joe',
-      surname: 'Bloggs',
-    },
-  },
-  registrations: ['Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
-} as unknown as Overview
 
 const nextSpy = jest.fn()
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -83,7 +70,17 @@ const mockSentences = [
   },
 ] as unknown as Sentence[]
 
-const mockResponse = ({ allowSms = true } = {}): AppResponse => {
+const mockRiskFlags = [
+  { description: 'Restraining Order' },
+  { description: 'Domestic Abuse Perpetrator' },
+  { description: 'Risk to Known Adult' },
+]
+
+const mockResponse = (
+  options: { allowSms?: boolean; mobileNumber?: string; personRisks?: unknown } = {},
+): AppResponse => {
+  const { allowSms = true, mobileNumber } = options
+  const personRisks = 'personRisks' in options ? options.personRisks : { riskFlags: mockRiskFlags }
   const locals = {
     user: {
       username,
@@ -98,8 +95,11 @@ const mockResponse = ({ allowSms = true } = {}): AppResponse => {
       enableAllowSms: true,
     },
     case: {
+      name: { forename: 'Joe', surname: 'Bloggs' },
+      mobileNumber,
       allowSms,
     },
+    personRisks,
   }
   return mockAppResponse(locals)
 }
@@ -109,10 +109,6 @@ describe('/middleware/getAppointment', () => {
     jest.clearAllMocks()
   })
   it('should assign appointment to locals var if found in session', async () => {
-    const getOverviewSpy = jest
-      .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview))
-
     const req = httpMocks.createRequest({
       params: {
         crn,
@@ -181,14 +177,10 @@ describe('/middleware/getAppointment', () => {
       isReschedule: false,
       allowSms: true,
     })
-    expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
   })
 
   it('should assign appointment to locals var if reschedule appointment journey and allow sms is false', async () => {
-    const getOverviewSpy = jest
-      .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview))
     const res = mockResponse({ allowSms: false })
     const req = httpMocks.createRequest({
       params: {
@@ -257,16 +249,10 @@ describe('/middleware/getAppointment', () => {
       isReschedule: true,
       allowSms: false,
     })
-    expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
   })
 
-  it('should set the meta data correctly if visor in registrations', async () => {
-    const overview: Overview = {
-      ...mockOverview,
-      registrations: ['visor'],
-    }
-    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
+  it('should set the meta data correctly if visor in risk flags', async () => {
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',
@@ -282,7 +268,7 @@ describe('/middleware/getAppointment', () => {
         },
       },
     })
-    const res = mockResponse()
+    const res = mockResponse({ personRisks: { riskFlags: [{ description: 'VISOR' }] } })
 
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
@@ -296,12 +282,30 @@ describe('/middleware/getAppointment', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
 
+  it('should set isVisor to false if risk flags is an empty array', async () => {
+    const req = httpMocks.createRequest({ params: { crn, id: '100' }, session: { data: {} } })
+    const res = mockResponse({ personRisks: { riskFlags: [] } })
+
+    await getAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.appointment.meta.isVisor).toBe(false)
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it.each([
+    ['personRisks is undefined', undefined],
+    ['riskFlags is undefined', {}],
+    ['personRisks is an error response', { status: 500, message: 'Internal Server Error' }],
+  ])('should throw and not call next if %s', async (_, personRisks) => {
+    const req = httpMocks.createRequest({ params: { crn, id: '100' }, session: { data: {} } })
+    const res = mockResponse({ personRisks })
+
+    await expect(getAppointment(hmppsAuthClient)(req, res, nextSpy)).rejects.toThrow(
+      `Unable to get risk flags for CRN ${crn}`,
+    )
+    expect(nextSpy).not.toHaveBeenCalled()
+  })
+
   it('should set the meta data correctly if change in query params', async () => {
-    const overview: Overview = {
-      ...mockOverview,
-      registrations: ['visor'],
-    }
-    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',
@@ -321,7 +325,7 @@ describe('/middleware/getAppointment', () => {
       },
     })
 
-    const res = mockResponse()
+    const res = mockResponse({ personRisks: { riskFlags: [{ description: 'VISOR' }] } })
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.appointment).toStrictEqual({
       meta: {
@@ -335,7 +339,6 @@ describe('/middleware/getAppointment', () => {
   })
 
   it('should not set the locals var if appointment not found in session', async () => {
-    jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(mockOverview))
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',
@@ -366,16 +369,6 @@ describe('/middleware/getAppointment', () => {
   })
 
   it('should populate appointment details using the selected sentence, requirement, licence condition and NSI', async () => {
-    const overview: Overview = {
-      ...mockOverview,
-      personalDetails: {
-        ...mockOverview.personalDetails,
-        mobileNumber: '07123456789',
-      },
-    }
-
-    jest.spyOn(MasApiClient.prototype, 'getOverview').mockResolvedValue(overview)
-
     const req = httpMocks.createRequest({
       params: {
         crn,
@@ -442,7 +435,7 @@ describe('/middleware/getAppointment', () => {
       },
     })
 
-    const res = mockResponse()
+    const res = mockResponse({ mobileNumber: '07123456789' })
 
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
 

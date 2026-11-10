@@ -29,7 +29,7 @@ describe('Arrange an appointment', () => {
     })
     // const expectedUser = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
     it('should render the page', () => {
-      cy.task('stubOverviewVisorRegistration')
+      cy.task('stubRiskFlagsVisor')
       loadPage()
       typePage = new AppointmentTypePage()
       typePage.checkOnPage()

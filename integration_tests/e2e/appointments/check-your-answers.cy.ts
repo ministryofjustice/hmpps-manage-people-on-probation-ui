@@ -96,7 +96,7 @@ describe('Check your answers then confirm the appointment', () => {
 
     it('should render the page with VISOR report', () => {
       it('should display the visor report answer', () => {
-        cy.task('stubOverviewVisorRegistration')
+        cy.task('stubRiskFlagsVisor')
         loadPage({ hasVisor: true })
         const cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'VISOR report')
