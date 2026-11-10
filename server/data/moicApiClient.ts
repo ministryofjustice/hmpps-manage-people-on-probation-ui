@@ -33,7 +33,7 @@ export default class MoicApiClient extends RestClient {
     })
   }
 
-  async getPomName(nomsNumber: string): Promise<PrisonOffenderManagerData> {
+  async getPomDetails(nomsNumber: string): Promise<PrisonOffenderManagerData> {
     return this.get({
       path: `/api/allocation/${nomsNumber}`,
       handle404: true,

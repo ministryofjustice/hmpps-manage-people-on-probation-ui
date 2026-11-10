@@ -6,13 +6,31 @@
       },
       "response": {
         "status": 200,
-        "jsonBody":{
+        "jsonBody": {
           "prisonId": "MDI",
           "prisonName": "Moorland HMP",
           "prisonNameInWelsh": "Carchar Brynbuga",
           "active": true,
           "male": true,
           "female": true,
+          "contracted": true
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      },
+      "request": {
+        "urlPattern": "/prison-register/prisons/id//WTI"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "prisonId": "WTI",
+          "prisonName": "Whatton HMP",
+          "prisonNameInWelsh": "Carchar Brynbuga",
+          "active": true,
+          "male": true,
+          "female": false,
           "contracted": true
         },
         "headers": {

@@ -67,7 +67,7 @@ describe('MOICApiClient', () => {
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
-      const output = await handoverApiClient.getPomName(nomsNumber)
+      const output = await handoverApiClient.getPomDetails(nomsNumber)
 
       expect(output).toEqual(response)
     })
