@@ -21,6 +21,19 @@
   </div>
 {% endblock %}
 
+{% set caseloadInfo %}
+  <a class="govuk-link govuk-!-margin-left-2" href="/case" data-qa="formAnchorLink">
+    55 Cases</a></br>
+  <a class="govuk-link govuk-!-margin-left-2" href="/case" data-qa="formAnchorLink">
+    15 Shared Cases</a></br>
+  <a class="govuk-link govuk-!-margin-left-2" href="/case" data-qa="formAnchorLink">
+    8 Cases with recent activity</a></br>
+  <a class="govuk-link govuk-!-margin-left-2" href="/team/case" data-qa="formAnchorLink">
+    10 Cases that you follow</a></br>
+  <a class="govuk-link govuk-!-margin-left-2" href="/team/case" data-qa="formAnchorLink">
+    120 Team cases</a></br>
+{% endset %}
+
 {% set appointmentsTable %}
   {% include './_appointments.njk' %}
 {% endset %}
@@ -34,6 +47,28 @@
 {% endset %}
 
 {% block content %}
+  {{ probationAccordion({
+    id: "accordion-default",
+    attributes: {
+      'data-qa': 'homepage-appointments'
+    },
+    rememberExpanded: false,
+    items: [
+      {
+        heading: {
+        html: 'My caseload' + (' (' + totalOutcomes + ')' if outcomes.length else '')
+      },
+        afterHeading: {
+        html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">My upcoming appointments</span><a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/case">View all cases</a>'  if appointments.length else ''
+      },
+        content: {
+        html: caseloadInfo
+      },
+        expanded: true if appointments.length == 0 else false
+      }
+    ]
+  }) }}
+
   {{ probationAccordion({
     id: "accordion-default",
     attributes: {

@@ -26,6 +26,10 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
 
   post('/team/case', controllers.caseload.postTeamCase(hmppsAuthClient))
 
+  get('/caseload-search', controllers.caseload.getSearchCaseload(hmppsAuthClient))
+
+  post('/caseload-search', controllers.caseload.postSearchCaseload(hmppsAuthClient))
+
   get('/recent-cases', controllers.caseload.getRecentCases(hmppsAuthClient))
 
   post('/check-access', controllers.caseload.checkAccess(hmppsAuthClient))

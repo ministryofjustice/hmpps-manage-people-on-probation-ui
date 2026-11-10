@@ -77,6 +77,10 @@
                         open: note
                     }) }}
                 {% endif %}
+
+                {% if alert.requiresAction %}
+                    {{ govukTag({ text: "Requires action", classes: 'app-compliance-tag govuk-tag--yellow govuk-!-margin-left-2' }) }}
+                {% endif %}
             {% endset %}
 
             {% if alert.type.editable %}
@@ -95,7 +99,10 @@
                 data-qa="updateInNDelius-{{ alert.id }}">
                 {{ deliusLinkView }}
                 <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
-            </a>
+            </a></br>
+            {{ govukButton({
+                text: "Flag as important"
+            }) }}
             {% endset %}
 
             {% set alertRows = (alertRows.push([
@@ -140,6 +147,93 @@
                     dismissible: false
                 }) }}
             {% endif %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <nav class="moj-sub-navigation" aria-label="Sub navigation" data-qa="caseloadNavigation">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item" data-qa="overviewTab">
+          <a class="moj-sub-navigation__link govuk-link--no-visited-state"
+            {% if currentNavSection == 'yourCases' %}
+            aria-current="page"
+            {% endif %}
+            href="/case">My cases</a>
+        </li>
+        <li class="moj-sub-navigation__item" data-qa="scheduleTab">
+          <a class="moj-sub-navigation__link govuk-link--no-visited-state"
+            {% if currentNavSection == 'teamCases' %}
+            aria-current="page"
+            {% endif %}
+            href="/teams">Following</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<div class="govuk-filter-background govuk-!-margin-bottom-3">
+        <div class="moj-filter__selected-heading">
+          <div class="moj-filter__heading-title">
+            <h2 class="govuk-heading-m">Filter alerts</h2>
+          </div>
+        </div>
+
+        <form name="case-filter" action="/case" method="post" novalidate>
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <div class="govuk-form-group govuk-!-margin-bottom-2">
+            {{ govukInput({
+                    label: {
+                      classes: "govuk-label",
+                      text: "Name or CRN"
+                    },
+                    formGroup: {
+                      classes: "govuk-select--inline govuk-!-margin-bottom-0"
+                    },
+                    id: 'nameOrCrn',
+                    name: 'nameOrCrn',
+                    classes: 'govuk-input govuk-input--width-10'
+                  } | defaultFormInputValues(filter, 'nameOrCrn'))
+                  }}
+
+            {{ govukSelect({
+                    label: {
+                      text: "Risk level",
+                      classes: "govuk-label"
+                    },
+                    classes: "govuk-select--width-20",
+                    formGroup: {
+                    classes: "govuk-select--inline govuk-!-margin-bottom-0"
+                    },
+                    id: 'nextContactCode',
+                    name: 'nextContactCode',
+                    items: [{
+                      text: 'All risk levels',
+                      value: null
+                    },{
+                      text: 'Very High',
+                      value: 'very_high'
+                    },{
+                      text: 'High',
+                      value: 'high'
+                    },{
+                      text: 'Medium',
+                      value: 'medium'
+                    },{
+                      text: 'Low',
+                      value: 'low'
+                    }]
+                    } | defaultFormSelectValues(filter, 'nextContactCode'))
+                  }}
+          </div>
+          <div class="govuk-button-group">
+            <button class="govuk-button" data-module="govuk-button">
+                    Filter alerts
+                  </button>
+            <a class="govuk-link" href="/case?clear=true">Clear</a>
+          </div>
+        </form>
+      </div>
+
             {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
                 {% if not note %}
                 <p class="govuk-body" data-qa="alertsCount">

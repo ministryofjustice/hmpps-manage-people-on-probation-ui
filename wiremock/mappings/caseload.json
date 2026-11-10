@@ -32,7 +32,7 @@
               "dob": "1975-09-25",
               "nextAppointment": {
                 "id": 6,
-                "date": "2024-10-22T09:00:00+01:00",
+                "date": "2026-11-01T09:00:00+01:00",
                 "description": "AP PA - Accommodation"
               },
               "previousAppointment": {
@@ -41,7 +41,8 @@
                 "description": "AP PA - Accommodation"
               },
               "latestSentence": "CJA - Std Determinate Custody",
-              "numberOfAdditionalSentences": 0
+              "numberOfAdditionalSentences": 0,
+              "newCase": true
             },
             {
               "caseName": {
@@ -57,7 +58,9 @@
                 "description": "Post Disclosure Session"
               },
               "latestSentence": "Adult Custody < 12m",
-              "numberOfAdditionalSentences": 1
+              "numberOfAdditionalSentences": 1,
+              "sharedCase": true,
+              "recentActivity": true
             },
             {
               "caseName": {
@@ -250,7 +253,8 @@
                 "middleName": "AutoTestSecondName -umaixqis AutoTestThirdName -ftmjnetw",
                 "surname": "AutoTestSurname -cpjtgqxm"
               },
-              "crn": "X410375"
+              "crn": "X410375",
+              "followed": true
             },
             {
               "staff": {
@@ -265,7 +269,8 @@
                 "middleName": "ZZ ZZ",
                 "surname": "MerRedHH"
               },
-              "crn": "X268435"
+              "crn": "X268435",
+              "followed": false
             },
             {
               "staff": {
@@ -280,7 +285,8 @@
                 "middleName": "hi hi",
                 "surname": "Testing-ufctdent"
               },
-              "crn": "X348116"
+              "crn": "X348116",
+              "followed": false
             },
             {
               "staff": {
@@ -295,7 +301,8 @@
                 "middleName": "hi hi",
                 "surname": "Testing-yamnfrnh"
               },
-              "crn": "X339840"
+              "crn": "X339840",
+              "followed": false
             },
             {
               "staff": {
@@ -310,7 +317,8 @@
                 "middleName": "",
                 "surname": "new-off-event-two"
               },
-              "crn": "X307444"
+              "crn": "X307444",
+              "followed": false
             },
             {
               "staff": {
@@ -325,7 +333,8 @@
                 "middleName": "hi hi",
                 "surname": "Testing-iuiwkktb"
               },
-              "crn": "X343266"
+              "crn": "X343266",
+              "followed": true
             },
             {
               "staff": {
@@ -340,7 +349,8 @@
                 "middleName": "AutoTestSecondName -latatipt AutoTestThirdName -nvagefbh",
                 "surname": "AutoTestSurname -mkswpqsf"
               },
-              "crn": "X412403"
+              "crn": "X412403",
+              "followed": true
             },
             {
               "staff": {
@@ -355,7 +365,8 @@
                 "middleName": "ZZ ZZ",
                 "surname": "CamTanWW"
               },
-              "crn": "X288542"
+              "crn": "X288542",
+              "followed": false
             },
             {
               "staff": {
@@ -370,7 +381,8 @@
                 "middleName": "",
                 "surname": "untermreqone"
               },
-              "crn": "X421012"
+              "crn": "X421012",
+              "followed": false
             },
 
             {
@@ -386,7 +398,8 @@
                 "middleName": "SecondNameA -rrpuhpbd ThirdNameA -acctgibp",
                 "surname": "SurnameA -abdqdynj"
               },
-              "crn": "X667023"
+              "crn": "X667023",
+              "followed": false
             },
             {
               "staff": {
@@ -401,7 +414,8 @@
                 "middleName": "SecondNameA -cgqehgcr ThirdNameA -vcrieglc",
                 "surname": "SurnameA -ckaaxavx"
               },
-              "crn": "X667143"
+              "crn": "X667143",
+              "followed": false
             },
             {
               "staff": {
@@ -416,7 +430,8 @@
                 "middleName": "SecondNameA -ardsqqvw ThirdNameA -mxtncnuv",
                 "surname": "SurnameA -qrtbwaxi"
               },
-              "crn": "X667727"
+              "crn": "X667727",
+              "followed": false
             },
             {
               "staff": {
@@ -431,7 +446,8 @@
                 "middleName": "SecondNameA -geiatdms ThirdNameA -lmncocge",
                 "surname": "SurnameA -hrlosloy"
               },
-              "crn": "X667821"
+              "crn": "X667821",
+              "followed": false
             },
             {
               "staff": {
@@ -446,7 +462,8 @@
                 "middleName": "SecondNameA -hhwnmfvv ThirdNameA -pnjrfvki",
                 "surname": "SurnameA -kbbaslqs"
               },
-              "crn": "X668531"
+              "crn": "X668531",
+              "followed": false
             },
             {
               "staff": {
@@ -461,7 +478,8 @@
                 "middleName": "SecondNameA -ielltgvw ThirdNameA -uweqmlho",
                 "surname": "SurnameA -npnniqpk"
               },
-              "crn": "X668547"
+              "crn": "X668547",
+              "followed": false
             },
             {
               "staff": {
@@ -476,7 +494,8 @@
                 "middleName": "SecondNameA -bbjwisdf ThirdNameA -pedtrqof",
                 "surname": "SurnameA -asgogvbn"
               },
-              "crn": "X668625"
+              "crn": "X668625",
+              "followed": false
             },
             {
               "staff": {
@@ -491,7 +510,8 @@
                 "middleName": "SecondNameA -jdephipd ThirdNameA -ikoinvhu",
                 "surname": "SurnameA -ddxbwuyj"
               },
-              "crn": "X669734"
+              "crn": "X669734",
+              "followed": false
             },
             {
               "staff": {
@@ -506,7 +526,8 @@
                 "middleName": "",
                 "surname": "enforce"
               },
-              "crn": "X042926"
+              "crn": "X042926",
+              "followed": false
             },
             {
               "staff": {
@@ -521,7 +542,8 @@
                 "middleName": "SecondNameA -yddgypcm ThirdNameA -vjrucwat",
                 "surname": "SurnameA -bvushpvi"
               },
-              "crn": "X578048"
+              "crn": "X578048",
+              "followed": false
             },
             {
               "staff": {
@@ -536,7 +558,8 @@
                 "middleName": "SecondNameA -urmjfaac ThirdNameA -yxylmlrk",
                 "surname": "SurnameA -eihejthm"
               },
-              "crn": "X573047"
+              "crn": "X573047",
+              "followed": false
             },
             {
               "staff": {
@@ -551,7 +574,8 @@
                 "middleName": "",
                 "surname": "AutoTestSurname -plpaojpe"
               },
-              "crn": "X358531"
+              "crn": "X358531",
+              "followed": false
             },
             {
               "staff": {
@@ -566,7 +590,8 @@
                 "middleName": "AutoTestSecondName -gpccmolb AutoTestThirdName -qwymjnkx",
                 "surname": "AutoTestSurname -kctawbeb"
               },
-              "crn": "X362745"
+              "crn": "X362745",
+              "followed": false
             },
             {
               "staff": {
@@ -581,7 +606,8 @@
                 "middleName": "SecondNameA -ggarhvak ThirdNameA -guvetshu",
                 "surname": "SurnameA -piqjujve"
               },
-              "crn": "X613664"
+              "crn": "X613664",
+              "followed": false
             },
             {
               "staff": {
@@ -596,7 +622,8 @@
                 "middleName": "SecondNameA -xpaecafm ThirdNameA -ssrefppm",
                 "surname": "SurnameA -aabmpvma"
               },
-              "crn": "X613670"
+              "crn": "X613670",
+              "followed": false
             }
           ]
         },

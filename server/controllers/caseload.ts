@@ -39,6 +39,8 @@ const caseloadController: Controller<
     'getChangeTeam',
     'getTeamCase',
     'postTeamCase',
+    'getSearchCaseload',
+    'postSearchCaseload',
     'getRecentCases',
     'checkAccess',
     'postOutcomesAppointmentsFilter',
@@ -321,6 +323,53 @@ const caseloadController: Controller<
           hasStaffRecord,
         })
       }
+    }
+  },
+  getSearchCaseload: hmppsAuthClient => {
+    return async function getTeamCase(req, res) {
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      if (req.session.mas === undefined || (req.session.mas.teamCount > 0 && req.session.mas.team === undefined)) {
+        res.redirect('/teams')
+      } else {
+        const teamCode = req.session.mas.team
+        const { teamCount, hasStaffRecord } = req.session.mas
+        await auditService.sendAuditMessage({
+          action: 'VIEW_MAS_CASELOAD_TEAM',
+          who: res.locals.user.username,
+          subjectId: teamCode,
+          subjectType: 'TEAM',
+          correlationId: v4(),
+          service: 'hmpps-manage-people-on-probation-ui',
+        })
+        const pageNum: number = req.query.page
+          ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize)
+          : 1
+        const currentNavSection = 'teamCases'
+        const caseload =
+          teamCount > 0
+            ? await masClient.getTeamCaseload(teamCode, (pageNum - 1).toString())
+            : { totalPages: 0, totalElements: 0, pageSize: 0 }
+        const pagination: Pagination = getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize) : 1,
+          caseload?.totalPages || 0,
+          caseload?.totalElements || 0,
+          page => addParameters(req, { page: page.toString() }),
+          caseload?.pageSize || config.apis.masApi.pageSize,
+        )
+        res.render('pages/caseload/minimal-cases', {
+          pagination,
+          caseload,
+          currentNavSection,
+          teamCount,
+          hasStaffRecord,
+        })
+      }
+    }
+  },
+  postSearchCaseload: _hmppsAuthClient => {
+    return async function postSearchCaseload(_req, res) {
+      res.redirect('')
     }
   },
   postTeamCase: hmppsAuthClient => {

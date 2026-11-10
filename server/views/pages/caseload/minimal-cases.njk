@@ -93,6 +93,36 @@
                     items: contactTypeSelectItems
                     } | defaultFormSelectValues(filter, 'nextContactCode'))
                   }}
+
+            {{ govukSelect({
+                    label: {
+                      text: "Risk level",
+                      classes: "govuk-label"
+                    },
+                    classes: "govuk-select--width-20",
+                    formGroup: {
+                    classes: "govuk-select--inline govuk-!-margin-bottom-0"
+                    },
+                    id: 'nextContactCode',
+                    name: 'nextContactCode',
+                    items: [{
+                      text: 'All risk levels',
+                      value: null
+                    },{
+                      text: 'Very High',
+                      value: 'very_high'
+                    },{
+                      text: 'High',
+                      value: 'high'
+                    },{
+                      text: 'Medium',
+                      value: 'medium'
+                    },{
+                      text: 'Low',
+                      value: 'low'
+                    }]
+                    } | defaultFormSelectValues(filter, 'nextContactCode'))
+                  }}
           </div>
           <div class="govuk-button-group">
             <button class="govuk-button" data-module="govuk-button">
@@ -142,6 +172,16 @@
         {% endif %}
         {% endset %}
 
+        {% if flags.enableNDeliusRoshAlertsPage %}
+            {% set roshScore = "VERY_HIGH" if riskRoshScoreMap[alert.crn] == "VERY HIGH" else riskRoshScoreMap[alert.crn] %}
+        {% else %}
+            {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
+        {% endif %}
+
+        {% set riskHtml %}
+        {{ predictorTimelineItem({ type: "ROSH", level: roshScore if flags.enableNDeliusRoshAlertsPage else risksWidget.overallRisk }) }}
+        {% endset %}
+
         {% set nextContactHtml %}
         {% if case.limitedAccess === true %}
                         Restricted
@@ -160,9 +200,15 @@
           {% else %}
             {{ case.caseName.surname }}, {{ case.caseName.forename }}
           {% endif %}
-          </a>
+          </a></br>
           {% if case.newCase %}
-            {{ govukTag({ text: "New case", classes: 'app-compliance-tag govuk-tag--yellow govuk-!-margin-left-2' }) }}
+            {{ govukTag({ text: "New case", classes: 'app-compliance-tag govuk-tag--yellow govuk-!-margin-right-2' }) }}
+          {% endif %}
+          {% if case.sharedCase %}
+            {{ govukTag({ text: "Shared case", classes: 'app-compliance-tag govuk-tag--blue govuk-!-margin-right-2' }) }}
+          {% endif %}
+          {% if case.recentActivity %}
+            {{ govukTag({ text: "Recent activity", classes: 'app-compliance-tag govuk-tag--red govuk-!-margin-right-2' }) }}
           {% endif %}
           <br/>
           <span class="govuk-!-font-weight-bold secondary-text">{{ crn }}</span><br/>
@@ -182,6 +228,8 @@
         {% set rows = (rows.push(
                  [
                    { html: caseHtml,
+                     attributes: { 'data-qa': 'nameOrCrnValue' + loop.index} },
+                   { html: riskHtml,
                      attributes: { 'data-qa': 'nameOrCrnValue' + loop.index} },
                    { html: sentenceHtml,
                      attributes: { 'data-qa': 'sentenceValue' + loop.index }
@@ -210,6 +258,10 @@
                      html: "Cases",
                      attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'data-sort-name': 'nameOrCrn', 'data-sort-action': 'case'}
                  },
+                {
+                     html: "Risk",
+                     attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'data-sort-name': 'nameOrCrn', 'data-sort-action': 'case'}
+                 },
                  {
                      text: "Main sentence",
                      attributes: {'aria-sort': setSortOrder('sentence', caseload.sortedBy) , 'col-name': 'sentence', 'data-sort-name': 'sentence', 'data-sort-action': 'case'}
@@ -236,6 +288,7 @@
             <th class="govuk-table__header">Name</th>
             {% if currentNavSection == 'teamCases' and caseload.team %}
               <th class="govuk-table__header">Probation practitioner</th>
+              <th class="govuk-table__header">Following</th>
             {% endif %}
           </tr>
         </thead>
@@ -249,6 +302,15 @@
               {% if currentNavSection == 'teamCases' and caseload.team %}
                 <td class="govuk-table__cell">
                   {{ case.staff.name | fullName }}</a><br/>
+              </td>
+              <td class="govuk-table__cell">
+              <div class="govuk-button-group">
+                  <p>{{ 'following ' if case.followed }}</p>
+                  {{ govukButton({
+                      text: 'unfollow' if case.followed else 'follow',
+                      classes: "govuk-button--secondary" if case.followed
+                  }) }}
+              </div>
               </td>
             {% endif %}
           </tr>

@@ -27,6 +27,7 @@
                   "hasNoteBeenTruncated": false
                 }
               ],
+              "requiresAction": true,
               "name": {
                 "forename": "Caroline",
                 "middleName": "",

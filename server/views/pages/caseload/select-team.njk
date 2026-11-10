@@ -2,6 +2,7 @@
 {% set title = "Select a team" %}
 {% set action = '/team/case' %}
 {% set backLink = '/case' %}
+{% set hidePoPHeader = true %}
 {% block form %}
     {% set errorList = [{ text: errorMessages.team.text, href: "#team-code" } if errorMessages.team else None ] | reject("undefined") %}
         {% if errorList | length > 0 %}
