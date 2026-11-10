@@ -47,7 +47,7 @@ describe('MOICApiClient', () => {
     })
   })
 
-  describe('fetch pom name', () => {
+  describe('fetch pom details', () => {
     it('should return pom details from api', async () => {
       const nomsNumber = 'A1234BC'
 
@@ -67,7 +67,7 @@ describe('MOICApiClient', () => {
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
-      const output = await handoverApiClient.getPomName(nomsNumber)
+      const output = await handoverApiClient.getPomDetails(nomsNumber)
 
       expect(output).toEqual(response)
     })
