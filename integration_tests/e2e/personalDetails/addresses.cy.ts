@@ -9,8 +9,7 @@ context('Addresses', () => {
     const url =
       'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=AddressandAccommodation&CRN=X000001'
 
-    page.assertAnchorElementAtIndex('p', 2, url)
-    page.assertTextElementAtIndex('p', 2, 'Edit all other addresses on NDelius (opens in new tab)')
+    page.ar addresses on NDelius(opens in new tab)')
 
     page.getTableHeader('mainAddress').should('contain.text', 'Main address – Since 14 Mar 2023')
     cy.get('[data-qa="changeMainAddressLink"]')
@@ -27,16 +26,7 @@ context('Addresses', () => {
       .getRowData('mainAddress', 'addressType', 'Value')
       .should('contain.text', 'Householder (Owner - freehold or leasehold) (verified)')
     page.getRowData('mainAddress', 'addressStartDate', 'Value').should('contain.text', '14 March 2023')
-    page.assertPageElementAtIndexWithin('section', 0, 'dd', 5, 'No notes')
-    page
-      .getRowData('mainAddress', 'addressLastUpdatedBy', 'Value')
-      .should('contain.text', 'Last updated by Paul Smith on 20 Mar 2023')
-
-    page.getRowData('otherAddress1', 'otherAddressStatus', 'Value1').should('contain.text', 'Postal address')
-    page.getRowData('otherAddress1', 'otherAddress', 'Value1').should('contain.text', '32 Other Street')
-    page
-      .getRowData('otherAddress1', 'otherAddressType', 'Value1')
-      .should('contain.text', 'Householder (Owner - freehold or leasehold) (not verified)')
+    page.assertPageElementA
     page.getRowData('otherAddress1', 'otherAddressStartDate', 'Value1').should('contain.text', '14 March 2023')
     page.assertPageElementAtIndexWithin('section', 1, 'dd', 4, 'Other Address')
     page
