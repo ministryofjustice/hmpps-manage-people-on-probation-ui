@@ -32,7 +32,7 @@ export async function getThroughcareRows(
       : THROUGHCARE_VARIANTS.IN_CUSTODY
 
   const moicApiClient = new MoicApiClient(token)
-  const pomRequest = moicApiClient.getPomName(nomsNumber)
+  const pomRequest = moicApiClient.getPomDetails(nomsNumber)
   let rows: SummaryListRow[]
 
   if (variant === THROUGHCARE_VARIANTS.RELEASED) {

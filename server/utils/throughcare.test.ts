@@ -38,13 +38,13 @@ const mockPrison: Prison = {
   contracted: false,
 }
 
-const getPomNameSpy = jest.spyOn(MoicApiClient.prototype, 'getPomName')
+const getPomDetailsSpy = jest.spyOn(MoicApiClient.prototype, 'getPomDetails')
 const getPomToRoHandoverDetailsSpy = jest.spyOn(MoicApiClient.prototype, 'getPomToRoHandoverDetails')
 const getPrisonSpy = jest.spyOn(PrisonRegisterApiClient.prototype, 'getPrison')
 
 describe('utils/throughcare', () => {
   beforeEach(() => {
-    getPomNameSpy.mockResolvedValue({ primary_pom: { staff_id: 1, name: 'Dove, Rachel' } })
+    getPomDetailsSpy.mockResolvedValue({ primary_pom: { staff_id: 1, name: 'Dove, Rachel' } })
     getPomToRoHandoverDetailsSpy.mockResolvedValue({
       nomsNumber,
       handoverDate: '2026-11-20',
@@ -72,7 +72,7 @@ describe('utils/throughcare', () => {
       })
 
       expect(MoicApiClient).toHaveBeenCalledWith(token)
-      expect(getPomNameSpy).toHaveBeenCalledWith(nomsNumber)
+      expect(getPomDetailsSpy).toHaveBeenCalledWith(nomsNumber)
       expect(getPomToRoHandoverDetailsSpy).toHaveBeenCalledWith(nomsNumber)
       expect(getPrisonSpy).not.toHaveBeenCalled()
     })
@@ -87,7 +87,7 @@ describe('utils/throughcare', () => {
       })
 
       expect(PrisonRegisterApiClient).toHaveBeenCalledWith(token)
-      expect(getPomNameSpy).toHaveBeenCalledWith(nomsNumber)
+      expect(getPomDetailsSpy).toHaveBeenCalledWith(nomsNumber)
       expect(getPrisonSpy).toHaveBeenCalledWith('MDI')
       expect(getPomToRoHandoverDetailsSpy).not.toHaveBeenCalled()
     })
@@ -131,7 +131,7 @@ describe('utils/throughcare', () => {
     })
 
     it('removes values when the lookups find nothing', async () => {
-      getPomNameSpy.mockResolvedValue(null)
+      getPomDetailsSpy.mockResolvedValue(null)
       getPomToRoHandoverDetailsSpy.mockResolvedValue(null)
       getPrisonSpy.mockResolvedValue(null)
 
@@ -147,7 +147,7 @@ describe('utils/throughcare', () => {
 
     it('removes the values when the apis respond with a handled 500', async () => {
       const errorResponse = { status: 500, errors: [{ text: 'Currently unavailable.' }] }
-      getPomNameSpy.mockResolvedValue(errorResponse as never)
+      getPomDetailsSpy.mockResolvedValue(errorResponse as never)
       getPomToRoHandoverDetailsSpy.mockResolvedValue(errorResponse as never)
       getPrisonSpy.mockResolvedValue(errorResponse as never)
 
@@ -162,7 +162,7 @@ describe('utils/throughcare', () => {
     it('returns undefined without calling the apis when there is no NOMS number', async () => {
       await expect(getThroughcareRows(token, undefined, prisonerInCustody)).resolves.toBeUndefined()
 
-      expect(getPomNameSpy).not.toHaveBeenCalled()
+      expect(getPomDetailsSpy).not.toHaveBeenCalled()
       expect(getPomToRoHandoverDetailsSpy).not.toHaveBeenCalled()
       expect(getPrisonSpy).not.toHaveBeenCalled()
     })
