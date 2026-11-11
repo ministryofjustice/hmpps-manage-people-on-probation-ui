@@ -110,6 +110,17 @@ describe('getStatusTag', () => {
     )
   })
 
+  it('returns recalled Unlawfully at large when the last movement reason is UAL and recalled is true', async () => {
+    const prisoner: Prisoner = {
+      lastMovementReasonCode: 'UAL',
+      recall: true,
+    }
+
+    await expect(getStatusTag(personalDetails, createSupervisionPackage(), prisoner)).resolves.toBe(
+      PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE,
+    )
+  })
+
   it('returns Recalled - Unlawfully at large when the prisoner is recalled and UAL', async () => {
     const prisoner: Prisoner = {
       lastMovementReasonCode: 'UAL',
@@ -464,8 +475,31 @@ describe('getStatusTagForPersonInCustody', () => {
       PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE,
     )
   })
+  it('prioritises Unlawfully at large over restricted custody status', async () => {
+    const supervisionPackage = createSupervisionPackage({
+      context: {
+        sentences: [
+          createSentence({
+            custody: {
+              location: {
+                code: 'UATLRG',
+              },
+              status: {
+                code: 'D',
+                description: 'Detained',
+              },
+            },
+          }),
+        ],
+      },
+    })
 
-  it('prioritises Unlawfully at large over community sentence breach', async () => {
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(
+      PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE,
+    )
+  })
+
+  it('returns recalled Unlawfully at large when sentence has UATLRG and recall', async () => {
     const supervisionPackage = createSupervisionPackage({
       context: {
         sentences: [
@@ -475,13 +509,18 @@ describe('getStatusTagForPersonInCustody', () => {
               location: {
                 code: 'UATLRG',
               },
+              status: {
+                code: 'C',
+              },
             },
           }),
         ],
       },
     })
 
-    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe('Unlawfully at large')
+    await expect(getStatusTag(createPersonalDetails(), supervisionPackage)).resolves.toBe(
+      PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE,
+    )
   })
 
   it('returns In custody when a person is in restricted custody', async () => {
@@ -557,6 +596,17 @@ describe('getPrisonerDetails', () => {
     mockedPrisonerSearchApiClient.mockImplementation(() => prisonerSearchApiClient)
   })
 
+  it('should log an error and return undefined when getting prisoner details fails', async () => {
+    const error = new Error('API request failed')
+    const nomisNumber = 'A1234BC'
+    const crn = 'X123456'
+
+    prisonerSearchApiClient.getPrisonerDetails.mockRejectedValue(error)
+
+    const result = await getPrisonerDetails('token', nomisNumber, crn)
+
+    expect(result).toBeUndefined()
+  })
   it('returns prisoner details from the Prisoner Search API', async () => {
     const prisoner: Prisoner = {
       prisonerNumber: 'A1234BC',

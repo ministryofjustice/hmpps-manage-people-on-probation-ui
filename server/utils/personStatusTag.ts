@@ -3,6 +3,7 @@ import {
   isRecalled,
   isUnlawfullyAtLarge,
 } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { FrontendSentence } from '@ministryofjustice/hmpps-mpop-frontend-components-lib/dist/types/SupervisionPackage'
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
@@ -36,26 +37,33 @@ export async function getStatusTag(
   if (supervisionPackage?.outcome === 'success') {
     // There will always be one active primary sentence
     const activePrimarySentence = supervisionPackage?.context?.sentences?.find(sentence => sentence.isPrimarySentence)
+    return extractStatusFromPrimarySentence(activePrimarySentence)
+  }
+  return undefined
+}
 
-    if (!activePrimarySentence) {
-      return undefined
-    }
+function extractStatusFromPrimarySentence(activePrimarySentence: FrontendSentence): string | undefined {
+  if (!activePrimarySentence) {
+    return undefined
+  }
 
-    if (isUnlawfullyAtLarge(activePrimarySentence)) {
-      return PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
-    }
-
-    if (activePrimarySentence.inBreach) {
-      return PERSON_STATUS_TAGS.IN_BREACH
-    }
-
+  if (isUnlawfullyAtLarge(activePrimarySentence)) {
     if (isRecalled(activePrimarySentence)) {
-      return PERSON_STATUS_TAGS.RECALLED
+      return PERSON_STATUS_TAGS.RECALLED_UNLAWFULLY_AT_LARGE
     }
+    return PERSON_STATUS_TAGS.UNLAWFULLY_AT_LARGE
+  }
 
-    if (hasRestrictedCustodyStatus(activePrimarySentence)) {
-      return PERSON_STATUS_TAGS.IN_CUSTODY
-    }
+  if (activePrimarySentence.inBreach) {
+    return PERSON_STATUS_TAGS.IN_BREACH
+  }
+
+  if (isRecalled(activePrimarySentence)) {
+    return PERSON_STATUS_TAGS.RECALLED
+  }
+
+  if (hasRestrictedCustodyStatus(activePrimarySentence)) {
+    return PERSON_STATUS_TAGS.IN_CUSTODY
   }
   return undefined
 }
