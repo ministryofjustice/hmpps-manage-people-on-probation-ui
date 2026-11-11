@@ -126,67 +126,36 @@ describe('utils/throughcare', () => {
     it('does not look up the last prison when the released prisoner has no last prison id', async () => {
       const throughcare = await getThroughcareRows(token, nomsNumber, { ...prisonerReleased, lastPrisonId: undefined })
 
-      expect(throughcare.rows[1]).toEqual(summaryListRow('Last prison', undefined))
+      expect(throughcare.rows.find(row => row.key.text === 'Last prison')).toBeUndefined()
       expect(getPrisonSpy).not.toHaveBeenCalled()
     })
 
-    it('leaves the values empty when the lookups find nothing', async () => {
+    it('removes values when the lookups find nothing', async () => {
       getPomNameSpy.mockResolvedValue(null)
       getPomToRoHandoverDetailsSpy.mockResolvedValue(null)
       getPrisonSpy.mockResolvedValue(null)
 
-      await expect(getThroughcareRows(token, nomsNumber, prisonerInCustody)).resolves.toEqual({
-        rows: [
-          summaryListRow('Prison offender manager (POM)', ''),
-          summaryListRow('Current prison', 'HMP Whatton'),
-          summaryListRow('Responsible officer expected handover date', ''),
-          summaryListRow('Release date', '16 March 2027'),
-        ],
+      await expect(
+        getThroughcareRows(token, nomsNumber, { ...prisonerInCustody, releaseDate: undefined }),
+      ).resolves.toEqual({
+        rows: [summaryListRow('Current prison', 'HMP Whatton')],
       })
-      await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual({
-        rows: [
-          summaryListRow('Prison offender manager (POM)', undefined),
-          summaryListRow('Last prison', undefined),
-          summaryListRow('Release date', '16 March 2025'),
-        ],
-      })
+      await expect(
+        getThroughcareRows(token, nomsNumber, { ...prisonerReleased, releaseDate: undefined }),
+      ).resolves.toEqual(undefined)
     })
 
-    it('leaves the handover date empty when no handover start date is recorded', async () => {
-      getPomToRoHandoverDetailsSpy.mockResolvedValue({
-        nomsNumber,
-        handoverDate: '2026-11-20',
-        handoverStartDate: null,
-        responsibility: 'POM',
-        responsibleComName: 'Com Name',
-        responsiblePomName: 'Pom Name',
-      })
-
-      const throughcare = await getThroughcareRows(token, nomsNumber, prisonerInCustody)
-
-      expect(throughcare.rows[2]).toEqual(summaryListRow('Responsible officer expected handover date', ''))
-    })
-
-    it('leaves the values empty when the apis respond with a handled 500', async () => {
+    it('removes the values when the apis respond with a handled 500', async () => {
       const errorResponse = { status: 500, errors: [{ text: 'Currently unavailable.' }] }
       getPomNameSpy.mockResolvedValue(errorResponse as never)
       getPomToRoHandoverDetailsSpy.mockResolvedValue(errorResponse as never)
       getPrisonSpy.mockResolvedValue(errorResponse as never)
 
       await expect(getThroughcareRows(token, nomsNumber, prisonerInCustody)).resolves.toEqual({
-        rows: [
-          summaryListRow('Prison offender manager (POM)', ''),
-          summaryListRow('Current prison', 'HMP Whatton'),
-          summaryListRow('Responsible officer expected handover date', ''),
-          summaryListRow('Release date', '16 March 2027'),
-        ],
+        rows: [summaryListRow('Current prison', 'HMP Whatton'), summaryListRow('Release date', '16 March 2027')],
       })
       await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual({
-        rows: [
-          summaryListRow('Prison offender manager (POM)', ''),
-          summaryListRow('Last prison', ''),
-          summaryListRow('Release date', '16 March 2025'),
-        ],
+        rows: [summaryListRow('Release date', '16 March 2025')],
       })
     })
 
