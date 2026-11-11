@@ -2,13 +2,15 @@ import MoicApiClient from '../data/moicApiClient'
 import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
 import { Prisoner } from '../data/prisonerSearchApiClient'
 import { SummaryList, SummaryListRow } from '../@types'
-import { filterEmptyValues, summaryListRow } from './govukComponents/summaryList'
+import { replaceEmptyValues, summaryListRow } from './govukComponents/summaryList'
 import { dateWithYear } from './dateWithYear'
 
 export const THROUGHCARE_VARIANTS = {
   IN_CUSTODY: 'IN_CUSTODY',
   RELEASED: 'RELEASED',
 } as const
+
+const NO_DATA_AVAILABLE = 'No data available'
 
 const swapNameOrder = (name: string = '') =>
   name
@@ -41,22 +43,28 @@ export async function getThroughcareRows(
       prisoner?.lastPrisonId ? new PrisonRegisterApiClient(token).getPrison(prisoner.lastPrisonId) : undefined,
     ])
 
-    rows = filterEmptyValues([
-      summaryListRow('Prison offender manager (POM)', swapNameOrder(pom?.primary_pom?.name)),
-      summaryListRow('Last prison', lastPrison?.prisonName),
-      summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)),
-    ])
+    rows = replaceEmptyValues(
+      [
+        summaryListRow('Prison offender manager (POM)', swapNameOrder(pom?.primary_pom?.name)),
+        summaryListRow('Last prison', lastPrison?.prisonName),
+        summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)),
+      ],
+      NO_DATA_AVAILABLE,
+    )
   }
 
   if (variant === THROUGHCARE_VARIANTS.IN_CUSTODY) {
     const [pom, handover] = await Promise.all([pomRequest, moicApiClient.getPomToRoHandoverDetails(nomsNumber)])
 
-    rows = filterEmptyValues([
-      summaryListRow('Prison offender manager (POM)', swapNameOrder(pom?.primary_pom?.name)),
-      summaryListRow('Current prison', prisoner?.prisonName),
-      summaryListRow('Responsible officer expected handover date', dateWithYear(handover?.handoverStartDate)),
-      summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)),
-    ])
+    rows = replaceEmptyValues(
+      [
+        summaryListRow('Prison offender manager (POM)', swapNameOrder(pom?.primary_pom?.name)),
+        summaryListRow('Current prison', prisoner?.prisonName),
+        summaryListRow('Responsible officer expected handover date', dateWithYear(handover?.handoverStartDate)),
+        summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)),
+      ],
+      NO_DATA_AVAILABLE,
+    )
   }
 
   if (rows.length) {

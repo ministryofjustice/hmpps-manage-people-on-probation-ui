@@ -1,4 +1,4 @@
-import { filterEmptyValues, summaryListRow } from './summaryList'
+import { filterEmptyValues, replaceEmptyValues, summaryListRow } from './summaryList'
 
 describe('SummaryList helpers', () => {
   describe('summaryListRows', () => {
@@ -27,6 +27,16 @@ describe('SummaryList helpers', () => {
       it('renders nothing if ignoreEmpty option is true', () => {
         expect(summaryListRow('Label', '', { ignoreEmpty: true })).toBeUndefined()
       })
+
+      it.each(['text', 'html'] as const)(
+        'renders the provided default if defaultText option is set for the %s format',
+        valueFormat => {
+          expect(summaryListRow('Label', '', { valueFormat, defaultText: 'Default' })).toEqual({
+            key: { text: 'Label' },
+            value: { text: 'Default' },
+          })
+        },
+      )
     })
   })
 
@@ -39,7 +49,32 @@ describe('SummaryList helpers', () => {
         summaryListRow('Four', '  '),
       ])
 
-      expect(result).toEqual([summaryListRow('Two', 'Content')])
+      expect(result).toEqual([
+        {
+          key: { text: 'Two' },
+          value: { text: 'Content' },
+        },
+      ])
+    })
+  })
+
+  describe('replaceEmptyValues', () => {
+    it('replaces empty values with the provided default', () => {
+      const result = replaceEmptyValues(
+        [summaryListRow('One', ''), summaryListRow('Two', undefined, { valueFormat: 'html' })],
+        'Default value',
+      )
+
+      expect(result).toEqual([
+        {
+          key: { text: 'One' },
+          value: { text: 'Default value' },
+        },
+        {
+          key: { text: 'Two' },
+          value: { text: 'Default value' },
+        },
+      ])
     })
   })
 })
