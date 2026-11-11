@@ -516,9 +516,6 @@ const stubPersonalDetailsWelshPostcode = (): SuperAgentRequest =>
     },
   })
 
-const stubPersonalDetailsDateOfDeathManage = (): SuperAgentRequest =>
-  stubPersonalDetailsX778160({ crn: 'X000001', dateOfDeath: '2025-10-21' })
-
 const stubAllowSmsFalse = (): SuperAgentRequest => stubPersonalDetailsX778160({ allowSms: false })
 
 const stubNoCircumstanceNotes = (): SuperAgentRequest =>
@@ -628,49 +625,15 @@ const stubPersonalDetails500Response = (): SuperAgentRequest =>
     },
   })
 
-const stubUpdatePersonalContact500Response = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/mas/personal-details/X000001/contact',
-      method: 'POST',
-    },
-    response: {
-      status: 500,
-      jsonBody: { message: '500 Error message' },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubUpdatePersonalContact404Response = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/mas/personal-details/X000001/contact',
-      method: 'POST',
-    },
-    response: {
-      status: 404,
-      jsonBody: { message: '404 Error message' },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
 export default {
   stubPersonalDetails,
-  stubPersonalDetailsX778160,
   stubPersonalDetailsNoMobileNumber,
   stubPersonalDetailsNoNoms,
   stubPersonalDetailsNoTelephoneNumbers,
   stubPersonalDetailsDateOfDeath,
-  stubPersonalDetailsDateOfDeathManage,
   stubPersonalDetailsWelshPostcode,
   stubNoCircumstanceNotes,
   stubNullCircumstanceNote,
   stubPersonalDetails500Response,
-  stubUpdatePersonalContact500Response,
-  stubUpdatePersonalContact404Response,
   stubAllowSmsFalse,
 }
