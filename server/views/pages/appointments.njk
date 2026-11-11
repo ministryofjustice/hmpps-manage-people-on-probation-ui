@@ -6,6 +6,7 @@
 {% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
 {% from "mpop/components/supervision-package-summary/macro.njk" import supervisionPackageSummary %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "_components/note/macro.njk" import appNote %}
 {% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
 {% set currentNavSection = 'appointments' %}
@@ -221,9 +222,14 @@
         <div class="moj-button-group moj-button-group--inline govuk-!-margin-bottom-3">
             <div class="moj-button-group__item">
               <form method="POST" action="" class="govuk-!-display-inline-block">
-                <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
-                            Arrange an appointment
-                        </button>
+                {{ govukButton({
+                  text: "Arrange an appointment",
+                  type: "submit",
+                  preventDoubleClick: true,
+                  attributes: {
+                    "data-qa": "arrange-appointment-btn"
+                  }
+                }) }}
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}">
               </form>
             </div>

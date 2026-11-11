@@ -158,6 +158,14 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 describe('caseController', () => {
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-10-11'))
+  })
+
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
   })
