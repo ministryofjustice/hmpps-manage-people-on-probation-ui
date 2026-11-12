@@ -64,7 +64,7 @@ context('Overview', () => {
       .should('contain.text', 'Throughcare information')
       .find('a')
       .should('contain.text', 'View staff contacts')
-      .and('have.attr', 'href', '/case/X000001/activity-log')
+      .and('have.attr', 'href', '/case/X000001/personal-details/staff-contacts')
 
     if (variant === 'In custody') {
       page.getCardElement('throughcare', '.govuk-summary-list').should('contain.text', 'Current prison')
