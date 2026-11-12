@@ -19,6 +19,18 @@ describe('contactDisplayNames', () => {
     )
   })
 
+  it('if ET flag is set then request for early termination name is mapped', () => {
+    expect(
+      getApprovedContactDisplayName('Request for early termination', { enableEarlyTermination20261103Squad3: true }),
+    ).toBe('Early termination request')
+  })
+
+  it('if ET flag is not set then request for early termination name is not mapped', () => {
+    expect(
+      getApprovedContactDisplayName('Request for early termination', { enableEarlyTermination20261103Squad3: false }),
+    ).toBe(undefined)
+  })
+
   it('maps activity log entries from action or type and falls back to type when unmatched', () => {
     const personActivity = {
       activities: [
