@@ -33,7 +33,7 @@ describe('partials/_overview-throughcare-card.njk', () => {
     const link = card.find('.app-summary-card__actions a')
 
     expect(link.text().trim()).toBe('View staff contacts')
-    expect(link.attr('href')).toBe('/case/X000001/activity-log')
+    expect(link.attr('href')).toBe('/case/X000001/personal-details/staff-contacts')
   })
 
   it('renders the throughcare rows as a summary list', () => {
