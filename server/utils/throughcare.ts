@@ -1,7 +1,7 @@
 import MoicApiClient from '../data/moicApiClient'
 import PrisonRegisterApiClient from '../data/prisonRegisterApiClient'
 import { Prisoner } from '../data/prisonerSearchApiClient'
-import { SummaryList, SummaryListRow } from '../@types'
+import { SummaryListRow } from '../@types'
 import { replaceEmptyValues, summaryListRow } from './govukComponents/summaryList'
 import { dateWithYear } from './dateWithYear'
 
@@ -23,7 +23,7 @@ export async function getThroughcareRows(
   token: string,
   nomsNumber?: string,
   prisoner?: Prisoner,
-): Promise<SummaryList | undefined> {
+): Promise<SummaryListRow[] | undefined> {
   if (!nomsNumber) {
     return undefined
   }
@@ -33,9 +33,10 @@ export async function getThroughcareRows(
       ? THROUGHCARE_VARIANTS.RELEASED
       : THROUGHCARE_VARIANTS.IN_CUSTODY
 
+  let rows: SummaryListRow[]
+
   const moicApiClient = new MoicApiClient(token)
   const pomRequest = moicApiClient.getPomDetails(nomsNumber)
-  let rows: SummaryListRow[]
 
   if (variant === THROUGHCARE_VARIANTS.RELEASED) {
     const [pom, lastPrison] = await Promise.all([
@@ -67,9 +68,5 @@ export async function getThroughcareRows(
     )
   }
 
-  if (rows.length) {
-    return { rows }
-  }
-
-  return undefined
+  return rows.length ? rows : undefined
 }

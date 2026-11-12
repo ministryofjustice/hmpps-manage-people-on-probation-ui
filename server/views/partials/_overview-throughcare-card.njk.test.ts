@@ -2,13 +2,11 @@ import * as cheerio from 'cheerio'
 import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
 
 const context = {
-  throughcare: {
-    rows: [
-      { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Jones' } },
-      { key: { text: 'Last prison' }, value: { text: 'Moorland (HMP & YOI)' } },
-      { key: { text: 'Release date' }, value: { text: '16 March 2026' } },
-    ],
-  },
+  throughcareRows: [
+    { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Jones' } },
+    { key: { text: 'Last prison' }, value: { text: 'Moorland (HMP & YOI)' } },
+    { key: { text: 'Release date' }, value: { text: '16 March 2026' } },
+  ],
   crn: 'X000001',
   cardClasses: 'app-summary-card--light',
 }

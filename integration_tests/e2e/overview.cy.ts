@@ -319,7 +319,7 @@ context('Overview', () => {
       },
     },
     {
-      title: 'Throughcare information card is not rendered when there are no prisoner details',
+      title: 'Throughcare information card is not rendered for a community sentence',
       setup: () => {
         enableThroughcare()
         cy.task('stubPersonalDetailsNoNoms')

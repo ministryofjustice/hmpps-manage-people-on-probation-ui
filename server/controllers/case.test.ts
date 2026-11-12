@@ -36,7 +36,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { OffenderEligibility } from '../data/model/esupervision'
 import { getThroughcareRows } from '../utils/throughcare'
-import { SummaryList } from '../@types'
+import { SummaryListRow } from '../@types'
 import { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/masApiClient')
@@ -560,14 +560,12 @@ describe('caseController', () => {
   describe('getCase - throughcare', () => {
     const noms = 'A1234BC'
     const mockPrisoner: Prisoner = { status: 'ACTIVE IN', inOutStatus: 'IN', prisonName: 'Whatton' }
-    const mockThroughcare: SummaryList = {
-      rows: [
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Dove, Rachel' } },
-        { key: { text: 'Current prison' }, value: { text: 'Whatton' } },
-        { key: { text: 'Responsible officer expected handover date' }, value: { text: '2026-11-06' } },
-        { key: { text: 'Release date' }, value: { text: '2027-03-16' } },
-      ],
-    }
+    const mockThroughcareRows: SummaryListRow[] = [
+      { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Dove, Rachel' } },
+      { key: { text: 'Current prison' }, value: { text: 'Whatton' } },
+      { key: { text: 'Responsible officer expected handover date' }, value: { text: '2026-11-06' } },
+      { key: { text: 'Release date' }, value: { text: '2027-03-16' } },
+    ]
     const req = httpMocks.createRequest({
       params: { crn },
       url: '/caseload/appointments/upcoming',
@@ -581,7 +579,7 @@ describe('caseController', () => {
     })
 
     it('should request and render the throughcare information when enableNewOverview is enabled', async () => {
-      getThroughcareSpy.mockResolvedValueOnce(mockThroughcare)
+      getThroughcareSpy.mockResolvedValueOnce(mockThroughcareRows)
       const throughcareRes = mockAppResponse({
         flags: { enableNewOverview: true },
         tierCalculation: mockTierCalculation,
@@ -592,7 +590,7 @@ describe('caseController', () => {
       expect(getThroughcareSpy).toHaveBeenCalledWith('token-1', noms, mockPrisoner)
       expect(throughcareRenderSpy).toHaveBeenCalledWith(
         'pages/overview',
-        expect.objectContaining({ throughcare: mockThroughcare }),
+        expect.objectContaining({ throughcareRows: mockThroughcareRows }),
       )
     })
 
@@ -607,7 +605,7 @@ describe('caseController', () => {
       expect(getThroughcareSpy).not.toHaveBeenCalled()
       expect(throughcareRenderSpy).toHaveBeenCalledWith(
         'pages/overview',
-        expect.objectContaining({ throughcare: undefined }),
+        expect.objectContaining({ throughcareRows: undefined }),
       )
     })
   })

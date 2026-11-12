@@ -43,6 +43,7 @@ $badge-color: #0b0c0c;
 @import './components/risk-alert';
 @import './components/responsive-table';
 @import './components/details-column-span';
+@import './components/summary-list';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */

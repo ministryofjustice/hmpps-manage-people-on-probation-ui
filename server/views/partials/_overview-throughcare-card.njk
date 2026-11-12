@@ -6,7 +6,10 @@
   headingLevel: 3,
   attributes: {'data-qa': 'throughcareCard'},
   classes: cardClasses,
-  html: govukSummaryList(throughcare),
+  html: govukSummaryList({
+    classes: 'app-summary-list--auto-width',
+    rows: throughcareRows
+  }),
   actions: {
     items: [
       {
