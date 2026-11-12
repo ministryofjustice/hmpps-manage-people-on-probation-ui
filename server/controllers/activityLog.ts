@@ -7,6 +7,7 @@ import { getPersonActivity, overrideDeliusManagedFlag, groupActivitiesByDate } f
 import { ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 import { checkIsUpdatableContact } from '../data/model/mpopUpdatableContacts'
 import { mapPersonActivityWithApprovedContactDisplayNames } from '../utils/contactDisplayNames'
+import { isCancelledCheckIn } from '../utils/cancelledCheckIn'
 
 export const getQueryString = (params: ParsedQs): string[] => {
   const queryParams: string[] = []
@@ -78,6 +79,7 @@ const activityLogController: Controller<
       personActivity.activities = personActivity.activities.map(activity => ({
         ...activity,
         isUpdatableContact: checkIsUpdatableContact(activity.type),
+        isCancelledCheckIn: isCancelledCheckIn(activity),
       }))
 
       await auditService.sendAuditMessage({
@@ -145,7 +147,12 @@ const activityLogController: Controller<
       } else {
         personAppointment.appointment.isUpdatableContact = false
       }
-      if (personAppointment.appointment.isAppointment && !personAppointment.appointment.deliusManaged) {
+      personAppointment.appointment.isCancelledCheckIn = isCancelledCheckIn(personAppointment.appointment)
+      if (
+        personAppointment.appointment.isAppointment &&
+        !personAppointment.appointment.deliusManaged &&
+        !personAppointment.appointment.isCancelledCheckIn
+      ) {
         if (back) {
           return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage?back=${back}`)
         }

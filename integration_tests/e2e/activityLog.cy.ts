@@ -609,6 +609,24 @@ context('Contacts', () => {
     page.getElementByDataQA('esup-manage-link').should('contain.text', 'Manage')
   })
 
+  it('should render a cancelled online check in with a View link to the contact', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.contains('.govuk-table__row', 'Online check in cancelled').within(() => {
+      cy.get('.govuk-details__summary-text').should('contain.text', 'Online check in cancelled')
+      cy.get('.govuk-details__summary-text').click()
+      cy.get('.govuk-details__text').should('contain.text', 'Reason: The person on probation is in hospital')
+      cy.get('[data-qa="esup-manage-link"]').should('not.exist')
+      cy.get('[data-qa="view-link"]').should('contain.text', 'View')
+      cy.get('[data-qa="view-link"]').click()
+    })
+    cy.url().should('include', '/case/X000001/activity/33')
+    cy.get('[data-qa="appointmentType"]').should('contain.text', 'System generated')
+    cy.get('[data-qa="appointmentTitle"]').should('contain.text', 'Online check in cancelled')
+    cy.get('[data-qa="appointmentDetailsCard"]').should('contain.text', 'Contact details')
+    cy.get('[data-qa="notesValue"]').should('contain.text', 'Reason: The person on probation is in hospital')
+  })
+
   it('should render contacts when hide contact NDelius system generated contacts is checked', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)

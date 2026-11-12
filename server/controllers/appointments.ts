@@ -27,6 +27,7 @@ import { AppointmentSessionSelection } from '../models/Appointments'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
 import ESupervisionClient from '../data/eSupervisionClient'
+import { isCancelledCheckIn } from '../utils/cancelledCheckIn'
 
 const appointmentsController: Controller<
   readonly [
@@ -392,6 +393,9 @@ const appointmentsController: Controller<
               }
             : note,
         )
+      }
+      if (appointmentResponse?.appointment) {
+        appointmentResponse.appointment.isCancelledCheckIn = isCancelledCheckIn(appointmentResponse.appointment)
       }
       const { back } = req.query
       const url = encodeURIComponent(req.url)

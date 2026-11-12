@@ -12,9 +12,17 @@
   {% endif %}
 {% endmacro %}
 
+{% macro summaryLabel(activity) -%}
+  {%- if activity.isCancelledCheckIn -%}
+    {{ activity.description | toSentenceCase }}
+  {%- else -%}
+    {{ ((activity.description + ' - ' + (activity.displayName or activity.type)) if activity.description else (activity.displayName or activity.type)) | toSentenceCase }}
+  {%- endif -%}
+{%- endmacro %}
+
 {% macro rendersummaryText(activity) %}
   <span>
-    {{ ((activity.description + ' - ' + (activity.displayName or activity.type)) if activity.description else (activity.displayName or activity.type)) | toSentenceCase }}
+    {{ summaryLabel(activity) }}
   </span>
 {% endmacro %}
 
@@ -38,7 +46,9 @@
         {% endif %}
         <td class="govuk-table__cell govuk-!-width-one-half govuk-!-padding-bottom-0 contact-log-compact-row {% if loop.last %} contact-log-compact-row--last{% endif %}" data-qa="timeline{{ groupIndex }}activity{{ loop.index }}Card">
           {% set notes = '' %}{% set link = '/case/' + crn + '/activity/' + activity.id + '?back=' + url %}
-          {% if activity.isAppointment %}
+          {% if activity.isCancelledCheckIn %}
+            {# A cancelled check in can no longer be managed, so view the contact in this service #}
+          {% elif activity.isAppointment %}
             {% set link = '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage?back=' + url %}
           {% elif activity.esupervisionId %}
             {% set link = '/case/' + crn + '/appointments/' + activity.esupervisionId + '/check-in/update?back=' + url %}
@@ -48,6 +58,7 @@
             <div class="contact-log-compact__contact-content">
               {% if hasNotes %}
                 {% set appointmentNote = activity.appointmentNotes[0] %}
+                {% set noteHref = link if activity.isCancelledCheckIn else '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url %}
                   {% set notes = appNote({
                     note: appointmentNote.note,
                     hasNoteBeenTruncated: appointmentNote.hasNoteBeenTruncated,
@@ -55,7 +66,7 @@
                     createdByDate: appointmentNote.createdByDate,
                     lastUpdatedBy: activity.lastUpdatedBy,
                     lastUpdated: activity.lastUpdated
-                  }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact', 'Latest update: ') %}
+                  }, noteHref, 'View full contact', 'Latest update: ') %}
                   {% if activity.outcome %}
                     {% set outcomeHtml = '<p class="govuk-body govuk-!-margin-bottom-3"><span class="govuk-!-font-weight-bold">Outcome:</span> ' + activity.outcome + '</p>' %}
                     {% set notes = outcomeHtml + notes %}
@@ -67,7 +78,7 @@
                 }) }}
               {% else %}
                 <div class="govuk-!-margin-bottom-6 contact-activity--noNotes">
-                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ ((activity.description + ' - ' + (activity.displayName or activity.type)) if activity.description else (activity.displayName or activity.type)) | toSentenceCase }}</a>
+                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ summaryLabel(activity) }}</a>
                 </div>
               {% endif %}
             </div>

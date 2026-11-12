@@ -30,6 +30,7 @@ export const mockActivities = {
       isCommunication: true,
       isPhoneCallFromPop: true,
       isUpdatableContact: false,
+      isCancelledCheckIn: false,
     },
   ],
 } as unknown as PersonActivity

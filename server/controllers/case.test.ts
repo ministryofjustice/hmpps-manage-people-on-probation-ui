@@ -1,4 +1,5 @@
 import httpMocks from 'node-mocks-http'
+import { DateTime } from 'luxon'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import { eligibilityCheckDisabled } from '../utils'
@@ -116,8 +117,10 @@ const mockPersonalDetails: PersonalDetailsSession = {
   predictors: mockPredictors,
   riskData: mockRiskData,
 }
+// Dates are relative to today so the 3 month outcomes filter keeps the last two regardless of when the tests run
+const daysAgo = (days: number) => DateTime.now().minus({ days }).toISODate()
 const mockOverdueOutcomesResponse = {
-  content: [{ date: '2025-01-03' }, { date: '2026-08-10' }, { date: '2026-09-10' }],
+  content: [{ date: '2025-01-03' }, { date: daysAgo(30) }, { date: daysAgo(10) }],
 }
 
 const mockOffenderEligibilityResponse: OffenderEligibility = {

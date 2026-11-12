@@ -23,6 +23,50 @@ const appointment: Partial<Activity> = {
 }
 
 describe('Appointment detail page', () => {
+  it('should display a cancelled online check in as a system generated contact', () => {
+    const env = createNunjucksTestEnv()
+    env.addFilter('toYesNo', toYesNo)
+    const cancelledCheckIn: Partial<Activity> = {
+      ...appointment,
+      id: '33',
+      type: 'Online probation check in',
+      description: 'Online check in cancelled',
+      esupervisionId: '7fa85f64-5717-4562-b3fc-2c963f66afa6',
+      isCancelledCheckIn: true,
+      isAppointment: true,
+      hasOutcome: false,
+      appointmentNotes: [{ id: 0, note: 'Reason: The person on probation is in hospital' }],
+    }
+    const $ = cheerio.load(
+      env.render('pages/appointments/appointment.njk', {
+        crn,
+        id: cancelledCheckIn.id,
+        url: '',
+        queryParams: [],
+        hidePageHeader: true,
+        personAppointment: {
+          personSummary: { name: { forename: 'Eula', surname: 'Schmeler' } },
+          appointment: cancelledCheckIn,
+          documents: [],
+        },
+        drugHistoryContactTypes,
+        enforcementContactTypes,
+        isInThePast,
+        lastUpdatedBy,
+      }),
+    )
+
+    expect($('[data-qa="appointmentType"]').text().trim()).toBe('System generated')
+    expect($('[data-qa="appointmentTitle"]').text().trim()).toBe('Online check in cancelled')
+    expect($('[data-qa="appointmentDetailsCard"] .app-summary-card__title').text().trim()).toBe('Contact details')
+    expect($('[data-qa="typeLabel"]').text()).toBe('Type')
+    expect($('[data-qa="typeValue"]').text()).toBe('Online probation check in')
+    expect($('[data-qa="descriptionLabel"]')).toHaveLength(0)
+    expect($('[data-qa="rarActivityLabel"]')).toHaveLength(0)
+    expect($('[data-qa="notesLabel"]').text()).toBe('Notes')
+    expect($('[data-qa="notesValue"]').text()).toContain('Reason: The person on probation is in hospital')
+  })
+
   it('should display the NDelius drug history deep link when an outcome is recorded', () => {
     const env = createNunjucksTestEnv()
     env.addFilter('toYesNo', toYesNo)

@@ -867,6 +867,51 @@ describe('controllers/appointments', () => {
         }),
       )
     })
+    it('should not mark a contact that is not a cancelled online check in', () => {
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({ isCancelledCheckIn: false }),
+          }),
+        }),
+      )
+    })
+    it('should mark a cancelled online check in so the full note keeps the cancelled contact presentation', async () => {
+      getPersonAppointmentSpy.mockResolvedValue({
+        ...mockPersonAppointment,
+        appointment: {
+          ...mockPersonAppointment.appointment,
+          description: 'Online check in cancelled',
+          esupervisionId: '7fa85f64-5717-4562-b3fc-2c963f66afa6',
+          appointmentNotes: [
+            {
+              id: Number(noteId),
+              note: 'Reason: The person on probation is in hospital...',
+              hasNoteBeenTruncated: true,
+            },
+          ],
+        },
+      })
+      await controllers.appointments.getAppointmentNote(hmppsAuthClient)(req, res)
+      expect(renderSpy).toHaveBeenLastCalledWith(
+        'pages/appointments/appointment',
+        expect.objectContaining({
+          personAppointment: expect.objectContaining({
+            appointment: expect.objectContaining({
+              isCancelledCheckIn: true,
+              appointmentNotes: [
+                expect.objectContaining({
+                  id: Number(noteId),
+                  note: 'This is the full, untruncated note text',
+                  hasNoteBeenTruncated: false,
+                }),
+              ],
+            }),
+          }),
+        }),
+      )
+    })
   })
 
   describe('isSuccessfulUpload', () => {

@@ -1,17 +1,22 @@
 {% import './_ndelius-deep-link.njk' as ndeliusDeepLink %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = not entry.isUpdatableContact and entry.hasOutcome === false and hasAppointmentStartTimePassed and (not flags.enableUserEditableActions or entry.editable) %}
-{% set isMpopManageableAppointment = entry.isAppointment and not entry.deliusManaged %}
+{% set isMpopManageableAppointment = entry.isAppointment and not entry.deliusManaged and not entry.isCancelledCheckIn %}
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if isMpopManageableAppointment %}
   {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
-{% elif entry.esupervisionId %}
+{% elif entry.esupervisionId and not entry.isCancelledCheckIn %}
   {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
 {% endif %}
 
 {% set titleHtml %}
 <ul class="govuk-list contact-activity__actions govuk-!-margin-bottom-0">
-  {% if entry.esupervisionId %}
+  {% if entry.isCancelledCheckIn %}
+    <li>
+      <a href="{{ link }}" class="govuk-!-margin-right-6" data-qa="view-link">View<span class="govuk-visually-hidden">
+          {{ entry.description }}</span></a>
+    </li>
+  {% elif entry.esupervisionId %}
     <li>
       <a href="{{ link }}" data-qa="esup-manage-link">Manage<span class="govuk-visually-hidden">
           {{ entry.displayName or entry.type }}</span></a>
