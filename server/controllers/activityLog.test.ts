@@ -122,7 +122,7 @@ describe('/controllers/activityLogController', () => {
         includeSystemGenerated: false,
         typeCodes: [] as string[],
       }
-      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25', false)
+      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25', {})
       expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
     })
 
@@ -259,7 +259,7 @@ describe('/controllers/activityLogController', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
     it('should request the person appointment note', () => {
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id, {})
     })
 
     it('should render the activity page', () => {

@@ -138,6 +138,7 @@ const alertsController: Controller<readonly ['getAlerts', 'getAlertNote', 'clear
         pageNum - 1,
         sortName.toUpperCase(),
         sortDirection as 'asc' | 'desc',
+        res.locals.flags,
       )
 
       const pagination: Pagination = getPaginationLinks(

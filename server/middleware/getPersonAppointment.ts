@@ -24,7 +24,7 @@ export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Pr
     if (contactId && crn) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const response = await masClient.getPersonAppointment(crn, contactId)
+      const response = await masClient.getPersonAppointment(crn, contactId, res.locals.flags)
       const personAppointment = {
         ...response,
         appointment:

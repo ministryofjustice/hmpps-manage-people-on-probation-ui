@@ -28,7 +28,7 @@ describe('middleware/getPersonAppointment', () => {
       await getPersonAppointment(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should request the person appointment from the api', async () => {
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId, undefined)
     })
     it('should assign the response to res.locals.personAppointment', () => {
       expect(res.locals.personAppointment).toEqual(mockPersonAppointment)
@@ -43,7 +43,7 @@ describe('middleware/getPersonAppointment', () => {
       await getPersonAppointment(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should request the person appointment from the api', async () => {
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId, undefined)
     })
     it('should assign the response to res.locals.personAppointment', () => {
       expect(res.locals.personAppointment).toEqual(mockPersonAppointment)
