@@ -9,10 +9,26 @@ context('Overview', () => {
       cy.task('stubSupervisionPackageFrontendContext', { crn: 'X000001' })
     }
   }
+  const enableThroughcare = () => {
+    cy.task('stubFeatureFlags', [
+      { key: 'enableNewOverview', enabled: true },
+      { key: 'enablePersonHeader', enabled: true },
+    ])
+  }
   const expectNoEMDILinks = (page: OverviewPage) => {
     page.getElementData('licencesEMDILink').should('not.exist')
     page.getElementData('requirementsEMDILink').should('not.exist')
   }
+
+  const verifyPersonHeader = () => {
+    cy.get('.person-header').within(() => {
+      cy.get('[data-qa=personName]').should('contain.text', 'Caroline Wolff')
+      cy.get('[data-qa=crn]').should('contain.text', 'X000001')
+      cy.get('[data-qa=dob]').should('contain.text', '18 August 1979')
+      cy.get('[data-qa=tier]').should('contain.text', 'Tier: B2').and('have.attr', 'href')
+    })
+  }
+
   const verifyTabs = (page: OverviewPage) => {
     page.getTab('overview').should('contain.text', 'Overview')
     page.getTab('personalDetails').should('contain.text', 'Personal details')
@@ -40,6 +56,22 @@ context('Overview', () => {
     cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('not.exist')
     cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('not.exist')
     page.getRowData('personalDetails', 'contactNumber', 'Value').should('contain.text', '07989654824')
+  }
+
+  const verifyThroughcare = (page: OverviewPage, variant?: 'In custody' | 'Released') => {
+    page
+      .getCardHeader('throughcare')
+      .should('contain.text', 'Throughcare information')
+      .find('a')
+      .should('contain.text', 'View staff contacts')
+      .and('have.attr', 'href', '/case/X000001/activity-log')
+
+    if (variant === 'In custody') {
+      page.getCardElement('throughcare', '.govuk-summary-list').should('contain.text', 'Current prison')
+    }
+    if (variant === 'Released') {
+      page.getCardElement('throughcare', '.govuk-summary-list').should('contain.text', 'Last prison')
+    }
   }
 
   const verifySentences = (page: OverviewPage) => {
@@ -240,21 +272,19 @@ context('Overview', () => {
     {
       title: 'Overview page is rendered when enableNewOverview is true',
       setup: () => {
-        cy.task('stubFeatureFlag', { key: 'enableNewOverview', enabled: true })
+        enableThroughcare()
         stubSupervisionPackage(true)
       },
       url: '/case/X000001',
       assertions: page => {
-        page.headerCrn().should('contain.text', 'X000001')
-        page.headerName().should('contain.text', 'Caroline Wolff')
-        page.pageHeading().should('contain.text', 'Overview')
-        page.headerTier().should('contain.text', 'Tier: B2').and('have.attr', 'href')
+        verifyPersonHeader()
         verifyTabs(page)
-        checkPopHeader()
+        page.pageHeading().should('contain.text', 'Overview')
         verifyRiskAlerts(page)
         cy.get('.supervision-package').should('exist')
         page.getCardHeader('schedule').should('not.exist')
         verifyPersonalDetails(page)
+        verifyThroughcare(page, 'In custody')
         verifySentences(page)
         verifyPersonalCircumstances(page)
         verifyRisks(page)
@@ -275,6 +305,28 @@ context('Overview', () => {
             const [recentCase] = JSON.parse(result)
             expect(recentCase).to.include(expected)
           })
+      },
+    },
+    {
+      title: 'Throughcare information card is rendered for a released person when enableNewOverview is true',
+      setup: () => {
+        enableThroughcare()
+        cy.task('stubPrisonerReleased')
+      },
+      url: '/case/X000001',
+      assertions: page => {
+        verifyThroughcare(page, 'Released')
+      },
+    },
+    {
+      title: 'Throughcare information card is not rendered for a community sentence',
+      setup: () => {
+        enableThroughcare()
+        cy.task('stubPersonalDetailsNoNoms')
+      },
+      url: '/case/X000001',
+      assertions: () => {
+        cy.get('[data-qa="throughcareCard"]').should('not.exist')
       },
     },
     {

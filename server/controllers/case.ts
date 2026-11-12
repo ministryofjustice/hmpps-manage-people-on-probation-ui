@@ -13,6 +13,7 @@ import { PersonExistsResponse } from '../data/emdiClient'
 import logger from '../../logger'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { eligibilityCheckDisabled, fullName, resolveCheckinEligibility } from '../utils'
+import { getThroughcareRows } from '../utils/throughcare'
 
 const caseController: Controller<readonly ['getCase'], void> = {
   getCase: hmppsAuthClient => {
@@ -46,13 +47,18 @@ const caseController: Controller<readonly ['getCase'], void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [overview, needs, sanIndicatorResponse, contactResponse, practitioner] = await Promise.all([
-        masClient.getOverview(crn, sentenceNumber),
-        arnsClient.getNeeds(crn),
-        arnsClient.getSanIndicator(crn),
-        masClient.getOverdueOutcomes(crn),
-        masClient.getProbationPractitioner(crn),
-      ])
+      const [overview, needs, sanIndicatorResponse, contactResponse, practitioner, throughcareRows] = await Promise.all(
+        [
+          masClient.getOverview(crn, sentenceNumber),
+          arnsClient.getNeeds(crn),
+          arnsClient.getSanIndicator(crn),
+          masClient.getOverdueOutcomes(crn),
+          masClient.getProbationPractitioner(crn),
+          res.locals.flags.enableNewOverview
+            ? getThroughcareRows(token, req.session.data.personalDetails?.[crn]?.overview?.noms, res.locals.prisoner)
+            : undefined,
+        ],
+      )
       const outcomes = res.locals.flags.enable3MonthsOutcomes
         ? filterContactsMonths(contactResponse?.content)
         : filterContacts(contactResponse?.content)
@@ -93,6 +99,7 @@ const caseController: Controller<readonly ['getCase'], void> = {
         canAccessCheckins,
         locationMonitoringUri: personExistsResponse?.uri,
         checkinEligibility,
+        throughcareRows,
       })
     }
   },

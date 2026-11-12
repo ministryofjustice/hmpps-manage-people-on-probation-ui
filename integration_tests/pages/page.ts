@@ -58,8 +58,8 @@ export default abstract class Page {
   openAccordion = (cardName: string): PageElement =>
     this.getAccordionHeader(cardName).find('.govuk-accordion__section-toggle').click()
 
-  getCardElement = (cardName: string, element: string, index: number): PageElement =>
-    this.getCardHeader(cardName).within(() => cy.get(element).eq(index))
+  getCardElement = (cardName: string, element: string, index = 0): PageElement =>
+    this.getCardHeader(cardName).find(element).eq(index)
 
   getRowData = (cardName: string, rowName: string, type: string, index = 0): PageElement => {
     return cy.get(`[data-qa=${cardName}Card]`).find(`[data-qa=${rowName}${type}]`).eq(index)
