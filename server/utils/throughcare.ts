@@ -4,6 +4,7 @@ import { Prisoner } from '../data/prisonerSearchApiClient'
 import { SummaryListRow } from '../@types'
 import { replaceEmptyValues, summaryListRow } from './govukComponents/summaryList'
 import { dateWithYear } from './dateWithYear'
+import { swapNameOrder } from './name'
 
 export const THROUGHCARE_VARIANTS = {
   IN_CUSTODY: 'IN_CUSTODY',
@@ -11,13 +12,6 @@ export const THROUGHCARE_VARIANTS = {
 } as const
 
 const NO_DATA_AVAILABLE = 'No data available'
-
-const swapNameOrder = (name: string = '') =>
-  name
-    .split(',')
-    .map(n => n.trim())
-    .reverse()
-    .join(' ')
 
 export async function getThroughcareRows(
   token: string,
