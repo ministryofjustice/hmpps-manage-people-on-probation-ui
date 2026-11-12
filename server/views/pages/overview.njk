@@ -570,13 +570,21 @@
             {{ sentence.rarDescription }} <br />
             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}"
                                    data-qa="requirementsEMDILink">View GPS location monitoring data</a>
-            {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+          {% elif sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
             {{ sentence.rarDescription }}
-            {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
+          {% elif not sentence.rarDescription and hasLocationMonitoring.hasRequirementsLMData %}
             Location Monitoring <a class="govuk-link" href="{{ locationMonitoringUri }}"
                                    data-qa="requirementsEMDILink">View GPS location monitoring data</a>
-            {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
-            Details not available
+          {% elif not sentence.rarDescription and not hasLocationMonitoring.hasRequirementsLMData %}
+            {% if flags.enableNewOverview %}
+              No data available
+            {% else %}
+              Details not available
+            {% endif %}
+          {% endif %}
+          {% if flags.enableNewOverview %}
+            <br/>
+            <a href="/case/{{ crn }}/sentence?number={{ sentence.eventNumber }}#sentence">View more requirements details</a>
           {% endif %}
         {% endset %}
         {% set licences %}
