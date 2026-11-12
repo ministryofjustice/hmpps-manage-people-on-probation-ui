@@ -166,6 +166,43 @@ describe('middleware/getSmsPreview', () => {
     }
   }
 
+  describe('recipient email fallback', () => {
+    let appointment: AppointmentSession
+    let res: AppResponse
+
+    beforeEach(() => {
+      appointment = constructMockAppointmentSession()
+      delete appointment.user.email
+      delete appointment.smsPreview
+      res = buildResponse()
+      res.locals.user.email = 'practitioner-user@example.com'
+    })
+
+    it('should use the logged-in user email when appointment email is missing and practitioner first name exists', async () => {
+      const req = buildRequest({ appointment })
+
+      await getSmsPreview(hmppsAuthClient, false)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith({
+        ...getRequestBody(),
+        recipientEmail: 'practitioner-user@example.com',
+        practitionerFirstName: 'Sam',
+      })
+    })
+
+    it('should not populate email when practitioner name is missing', async () => {
+      delete appointment.user.name
+      const req = buildRequest({ appointment })
+
+      await getSmsPreview(hmppsAuthClient, false)(req, res, nextSpy)
+
+      expect(postSmsPreviewSpy).toHaveBeenCalledTimes(1)
+      const [requestBody] = postSmsPreviewSpy.mock.calls[0]
+      expect(requestBody).not.toHaveProperty('recipientEmail')
+      expect(requestBody).not.toHaveProperty('practitionerFirstName')
+    })
+  })
+
   describe('enableAllowSms feature flag is enabled and middleware is inline', () => {
     it('should only return next()', async () => {
       const req = buildRequest()
