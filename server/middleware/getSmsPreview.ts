@@ -46,8 +46,12 @@ export const getSmsPreview = (
       appointmentTypeCode,
       includeWelshPreview,
     }
-    if (recipientEmail) body.recipientEmail = recipientEmail
-    if (practitionerName?.forename) body.practitionerFirstName = convertToTitleCase(practitionerName.forename)
+
+    if (practitionerName?.forename) {
+      const previewRecipientEmail = recipientEmail || res.locals.user.email
+      if (previewRecipientEmail) body.recipientEmail = previewRecipientEmail
+      body.practitionerFirstName = convertToTitleCase(practitionerName.forename)
+    }
 
     // we should not be sending location when its telephone or video contact
     if (!appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
