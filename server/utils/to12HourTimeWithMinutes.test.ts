@@ -2,6 +2,22 @@ import { DateTime } from 'luxon'
 import { to12HourTimeWithMinutes, toIso12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
 
 describe('to12HourTimeWithMinutes', () => {
+  it('returns an empty string for an empty string', () => {
+    expect(to12HourTimeWithMinutes('')).toBe('')
+  })
+
+  it('returns an empty string for undefined', () => {
+    expect(to12HourTimeWithMinutes(undefined)).toBe('')
+  })
+
+  it('returns an empty string for null', () => {
+    expect(to12HourTimeWithMinutes(null)).toBe('')
+  })
+
+  it('returns an empty string when there is no colon separator', () => {
+    expect(to12HourTimeWithMinutes('0900')).toBe('')
+  })
+
   it('formats midnight correctly', () => {
     expect(to12HourTimeWithMinutes('00:00')).toBe('12:00am')
   })
