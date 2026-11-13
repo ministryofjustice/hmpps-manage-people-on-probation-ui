@@ -1,4 +1,5 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import type { RiskBadgeData } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 import { PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
 import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
@@ -13,7 +14,6 @@ import { ProbationPractitioner } from './CaseDetail'
 import { NextAppointmentResponse, SupervisionPackageResponse } from './SupervisionPackage'
 import { AppointmentOutcomeProps } from './Locals'
 import { Activity } from '../data/model/schedule'
-import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
