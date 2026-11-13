@@ -716,7 +716,7 @@ describe('utils/getRiskBadges', () => {
 
     const expectedBadgeData = {
       id: 1,
-      text: 'DORIS (disruption of recorded internal secretors)',
+      text: 'DORIS (Disruption of recorded internal secretors)',
       level: 'MEDIUM',
       badgeClass: 'risk-badge--medium',
     }

@@ -269,7 +269,7 @@ function getRiskDisplayDescription(flag: RiskFlag): string {
     'suicide/self harm': 'Suicide/Self Harm',
     'cppc registered case': 'CPPC registered case',
     mappa: 'MAPPA',
-    'doris (disruption of recorded internal secretors)': 'DORIS (disruption of recorded internal secretors)',
+    'doris (disruption of recorded internal secretors)': 'DORIS (Disruption of recorded internal secretors)',
   }
 
   let text = displayOverrides[normalisedDescription] ?? displayDescription
