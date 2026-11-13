@@ -52,6 +52,15 @@ type TestModel = {
   appointment: AppointmentLocals
   isInPast: boolean | null
   nextAppointmentId?: string
+  appointmentOutcome?: {
+    baseOutcomeUrl: string
+    summary: {
+      outcome?: string
+      enforcementAction?: string
+      enforcementActionChangeLink?: string
+      evidenceDueDate?: string
+    }
+  }
 }
 
 const render = ({ nextAppointmentId, ...model }: Partial<TestModel> = {}) => {
@@ -120,6 +129,77 @@ describe('Arrange another appointment page', () => {
       expect(value($, 6).text()).toContain('Not entered')
       expect(row($, 7).find('.govuk-summary-list__key').text()).toContain('Sensitivity')
       expect(value($, 7).text()).toContain('Not entered')
+    })
+
+    it('should link each row to the relevant change page', () => {
+      const $ = render()
+      const base = `/case/${crn}/arrange-appointment/${id}`
+      expect(action($, 1).attr('href')).toBe(`${base}/sentence?change=`)
+      expect(action($, 2).attr('href')).toBe(`${base}/type-attendance?change=`)
+      expect(action($, 3).attr('href')).toBe(`${base}/attendance?change=`)
+      expect(action($, 4).attr('href')).toBe(`${base}/location-date-time?change=`)
+      expect(action($, 5).attr('href')).toBe(`${base}/location-date-time?change=`)
+      expect(action($, 6).attr('href')).toBe(`${base}/supporting-information?change=`)
+      expect(action($, 7).attr('href')).toBe(`${base}/supporting-information?change=`)
+      expect(action($, 5).text()).toContain('Choose date and time')
+      expect(action($, 7).text()).toContain('Choose sensitivity')
+    })
+
+    it('should display updated date, time, notes and sensitivity', () => {
+      const $ = render({
+        appointment: appointment({
+          date: '2030-03-05',
+          start: '09:30',
+          end: '10:30',
+          notes: 'Some updated notes',
+          sensitivity: 'No',
+        }),
+      })
+      expect(value($, 5).text()).toContain('5 March 2030')
+      expect(value($, 5).text()).toContain('9:30am to 10:30am')
+      expect(action($, 5).text()).toContain('Change')
+      expect(value($, 6).text()).toContain('Some updated notes')
+      expect(value($, 7).text()).toContain('No')
+      expect(action($, 7).text()).toContain('Change')
+    })
+
+    describe('appointment in the past', () => {
+      const $ = render({
+        isInPast: true,
+        appointment: appointment({
+          date: '2020-03-05',
+          start: '09:30',
+          end: '10:30',
+          notes: 'Some updated notes',
+          sensitivity: 'No',
+        }),
+        appointmentOutcome: {
+          baseOutcomeUrl: '/outcome-base',
+          summary: {
+            outcome: 'Attended - failed to comply',
+            enforcementAction: 'No further action',
+            enforcementActionChangeLink: '/enforcement-change',
+            evidenceDueDate: '11 March 2020',
+          },
+        },
+      })
+
+      it('should display the outcome, enforcement action and evidence due date', () => {
+        expect(row($, 6).find('.govuk-summary-list__key').text()).toContain('What was the outcome of this appointment?')
+        expect(value($, 6).text()).toContain('Attended - failed to comply')
+        expect(action($, 6).attr('href')).toBe('/outcome-base?change=')
+        expect(row($, 7).find('.govuk-summary-list__key').text()).toContain('Enforcement action')
+        expect(value($, 7).text()).toContain('No further action')
+        expect(row($, 8).find('.govuk-summary-list__key').text()).toContain('Evidence due date')
+        expect(value($, 8).text()).toContain('11 March 2020')
+      })
+      it('should label the notes row "Notes" and link to the add note page', () => {
+        expect(row($, 9).find('.govuk-summary-list__key').text()).toContain('Notes')
+        expect(value($, 9).text()).toContain('Some updated notes')
+        expect(action($, 9).attr('href')).toBe('/outcome-base/add-note?change=')
+        expect(row($, 10).find('.govuk-summary-list__key').text()).toContain('Sensitivity')
+        expect(action($, 10).attr('href')).toBe('/outcome-base/add-note?change=')
+      })
     })
 
     describe('sentence appointment with no eventId', () => {
