@@ -39,14 +39,15 @@ describe('Arrange another appointment', () => {
     cy.task('stubNextAppointment')
     loadPage()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    const dateTimePage = new AppointmentdateTimePage()
 
     step('Given I have not entered a date and time, when I submit, then I am sent to the date/time page', () => {
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
-      dateTimePage.checkOnPage()
+      // the constructor asserts the page heading, so only create it once the submit has happened
+      new AppointmentdateTimePage().checkOnPage()
     })
 
     step('And the error summary and field errors are displayed', () => {
+      const dateTimePage = new AppointmentdateTimePage()
       dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Enter a start time', 'Enter an end time'])
       getUuid().then(uuid => {
         checkFieldError(dateTimePage, `#appointments-${crn}-${uuid}-date-error`, 'Enter or select a date')
@@ -71,15 +72,35 @@ describe('Arrange another appointment', () => {
       )
     })
 
-    step('And validation errors on change pages do not reset the back link', () => {
-      checkUpdateBackLinkRefresh(arrangeAnotherAppointmentPage)
+    step('Then I submit and the appointment is arranged', () => {
+      arrangeAnotherAppointmentPage.getSubmitBtn().click()
+      new AppointmentConfirmationPage().checkPageTitle('Appointment arranged')
     })
+  })
 
+  // the change helpers expect fresh, incomplete SMS/supporting-information pages, so each runs in its own journey
+  it('does not reset the back link when validation errors occur on change pages', () => {
+    cy.task('stubNextAppointment')
+    loadPage()
+    step('Given a fresh journey, when validation errors occur on change pages, then the back link still works', () => {
+      checkUpdateBackLinkRefresh(new ArrangeAnotherAppointmentPage())
+    })
+  })
+
+  it('changes the location', () => {
+    cy.task('stubNextAppointment')
+    loadPage()
     step('When I change the location, then the summary shows the new location', () => {
-      checkUpdateLocation(arrangeAnotherAppointmentPage)
+      checkUpdateLocation(new ArrangeAnotherAppointmentPage())
     })
+  })
 
-    step('And I change the date, then the summary shows the new date', () => {
+  it('changes the date and submits the appointment', () => {
+    cy.task('stubNextAppointment')
+    loadPage()
+    const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+
+    step('When I change the date, then the summary shows the new date', () => {
       checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
     })
 
@@ -114,14 +135,14 @@ describe('Arrange another appointment', () => {
   it('shows location validation errors when no location is selected', () => {
     cy.task('stubAppointmentNoLocation')
     loadPage({ _crn: 'X000001' })
-    const locationPage = new AppointmentdateTimePage()
 
     step('Given no location is selected, when I submit, then I am sent to the location page', () => {
       new ArrangeAnotherAppointmentPage().getSubmitBtn().click()
-      locationPage.checkOnPage()
+      new AppointmentdateTimePage().checkOnPage()
     })
 
     step('And the error summary is displayed', () => {
+      const locationPage = new AppointmentdateTimePage()
       locationPage.checkErrorSummaryBox([
         'Enter or select a date',
         'Enter a start time',
@@ -131,6 +152,7 @@ describe('Arrange another appointment', () => {
     })
 
     step('And the field errors are displayed', () => {
+      const locationPage = new AppointmentdateTimePage()
       getUuid().then(uuid => {
         checkFieldError(locationPage, `#appointments-X000001-${uuid}-date-error`, 'Enter or select a date')
         checkFieldError(locationPage, `#appointments-X000001-${uuid}-start-error`, 'Enter a start time')
