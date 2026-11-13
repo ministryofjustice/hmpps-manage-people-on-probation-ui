@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { getManagedByDetails } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import PersonRecordApiClient from '../data/personRecordApiClient'
@@ -16,7 +17,6 @@ import { ErrorSummary } from '../data/model/common'
 import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
-import { getManagedByDetails } from '../utils/getManagedByDetails'
 import { getPrisonerDetails, getStatusTag } from '../utils/personStatusTag'
 
 export const getPersonalDetails = (
