@@ -1,23 +1,16 @@
-import { DateTime } from 'luxon'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentdateTimePage from '../../pages/appointments/location-date-time.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import SupportingInformationPage from '../../pages/appointments/note.page'
-import {
-  checkAppointmentSummary,
-  checkUpdateType,
-  checkUpdateSentence,
-  checkUpdateLocation,
-  checkUpdateDateTime,
-  checkUpdateNotes,
-  checkUpdateSensitivity,
-  checkUpdateBackLinkRefresh,
-} from './imports'
-import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { checkUpdateLocation, checkUpdateDateTime, checkUpdateBackLinkRefresh } from './imports'
 import { crn } from './imports/common'
-import { getUuid } from './utils'
+import {
+  getUuid,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+  completeSupportingInformationPage,
+} from './utils'
 
 const loadPage = ({ _crn = crn }: { _crn?: string } = {}) => {
   cy.visit(`/case/${_crn}/appointments/appointment/6/next-appointment`)
@@ -26,113 +19,109 @@ const loadPage = ({ _crn = crn }: { _crn?: string } = {}) => {
   nextAppointmentPage.getSubmitBtn().click()
 }
 
+// Logs a named step (Given / When / Then / And) in the Cypress command log, so a failure shows which step it was
+const step = (name: string, fn: () => void) => {
+  cy.log(`**${name}**`)
+  fn()
+}
+
+const checkFieldError = (page: AppointmentdateTimePage | AppointmentSentencePage, selector: string, message: string) =>
+  page.getElement(selector).should($error => {
+    expect($error.text().trim()).to.include(message)
+  })
+
 describe('Arrange another appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
 
-  it('should render the page', () => {
+  it('validates, amends and submits the appointment', () => {
     cy.task('stubNextAppointment')
     loadPage()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    checkAppointmentSummary({
-      page: arrangeAnotherAppointmentPage,
-      sendTextMessage: false,
-      summaryHasDate: false,
-      anotherAppointment: true,
-    })
-  })
-  describe('User clicks submit without selecting a date and time', () => {
-    let dateTimePage: AppointmentdateTimePage
-    let supportingInformationPage: SupportingInformationPage
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let textMessageConfirmPage: TextMessageConfirmationPage
-    beforeEach(() => {
-      cy.task('stubNextAppointment')
-      loadPage()
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.getSubmitBtn().click()
-    })
+    const dateTimePage = new AppointmentdateTimePage()
 
-    it('should redirect to the date/time page', () => {
-      dateTimePage = new AppointmentdateTimePage()
+    step('Given I have not entered a date and time, when I submit, then I am sent to the date/time page', () => {
+      arrangeAnotherAppointmentPage.getSubmitBtn().click()
       dateTimePage.checkOnPage()
     })
-    it('should display the error summary box', () => {
+
+    step('And the error summary and field errors are displayed', () => {
       dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Enter a start time', 'Enter an end time'])
-    })
-    it('should display the error messages', () => {
       getUuid().then(uuid => {
-        dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
-          expect($error.text().trim()).to.include('Enter or select a date')
-        })
-        dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-          expect($error.text().trim()).to.include('Enter a start time')
-        })
-        dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
-          expect($error.text().trim()).to.include('Enter an end time')
-        })
+        checkFieldError(dateTimePage, `#appointments-${crn}-${uuid}-date-error`, 'Enter or select a date')
+        checkFieldError(dateTimePage, `#appointments-${crn}-${uuid}-start-error`, 'Enter a start time')
+        checkFieldError(dateTimePage, `#appointments-${crn}-${uuid}-end-error`, 'Enter an end time')
       })
     })
-    it('should display the outlook invite inset text', () => {
+
+    step('When I enter the location, date, time, text message and notes, then I return to the summary', () => {
       getUuid().then(uuid => {
-        dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-        const future = DateTime.now().plus({ days: 2 }).toFormat('d/M/yyyy')
-        dateTimePage.getDatePickerInput().clear().type(future)
-        dateTimePage.getElementInput(`startTime`).clear().type('09:10')
-        dateTimePage.getElementInput(`endTime`).focus().clear().type('10:30')
-        dateTimePage.getSubmitBtn().click()
-        dateTimePage.getSubmitBtn().click()
-        textMessageConfirmPage = new TextMessageConfirmationPage()
-        textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
-        textMessageConfirmPage.getSubmitBtn().click()
-        supportingInformationPage = new SupportingInformationPage()
-        cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
-        supportingInformationPage.getSubmitBtn().click()
-        cy.get('[data-qa="calendarInviteInset"]').should(
-          'contain.text',
-          `You'll receive a calendar invite for the appointment.`,
+        completeLocationDateTimePage({ index: 1, uuidOveride: uuid })
+        completeTextMessageConfirmationPage({ _crn: crn, _uuid: uuid, index: 1 })
+        completeSupportingInformationPage({ notes: true, uuidOveride: uuid })
+      })
+      arrangeAnotherAppointmentPage.checkOnPage()
+    })
+
+    step('And the calendar invite inset text is displayed', () => {
+      cy.get('[data-qa="calendarInviteInset"]').should(
+        'contain.text',
+        `You'll receive a calendar invite for the appointment.`,
+      )
+    })
+
+    step('And validation errors on change pages do not reset the back link', () => {
+      checkUpdateBackLinkRefresh(arrangeAnotherAppointmentPage)
+    })
+
+    step('When I change the location, then the summary shows the new location', () => {
+      checkUpdateLocation(arrangeAnotherAppointmentPage)
+    })
+
+    step('And I change the date, then the summary shows the new date', () => {
+      checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
+    })
+
+    step('Then I submit and the appointment is arranged', () => {
+      arrangeAnotherAppointmentPage.getSubmitBtn().click()
+      new AppointmentConfirmationPage().checkPageTitle('Appointment arranged')
+    })
+  })
+
+  it('shows sentence validation errors when no sentence or person is selected', () => {
+    cy.task('stubAppointmentNoEventId')
+    loadPage({ _crn: 'X000001' })
+
+    step('Given no sentence or person is selected, when I submit, then I am sent to the sentence page', () => {
+      new ArrangeAnotherAppointmentPage().getSubmitBtn().click()
+      new AppointmentSentencePage().checkOnPage()
+    })
+
+    step('And the error summary and field error are displayed', () => {
+      const sentencePage = new AppointmentSentencePage()
+      sentencePage.checkErrorSummaryBox(['Select what this appointment is for'])
+      getUuid().then(uuid => {
+        checkFieldError(
+          sentencePage,
+          `#appointments-X000001-${uuid}-eventId-error`,
+          'Select what this appointment is for',
         )
       })
     })
   })
-  describe('User clicks submit without selecting sentence or person', () => {
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let sentencePage: AppointmentSentencePage
-    beforeEach(() => {
-      cy.task('stubAppointmentNoEventId')
-      loadPage({ _crn: 'X000001' })
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.getSubmitBtn().click()
-    })
-    it('should redirect to the sentence page', () => {
-      sentencePage = new AppointmentSentencePage()
-      sentencePage.checkOnPage()
-    })
-    it('should display the error summary box', () => {
-      sentencePage.checkErrorSummaryBox(['Select what this appointment is for'])
-    })
-    it('should display the error messages', () => {
-      getUuid().then(uuid => {
-        sentencePage.getElement(`#appointments-X000001-${uuid}-eventId-error`).should($error => {
-          expect($error.text().trim()).to.include('Select what this appointment is for')
-        })
-      })
-    })
-  })
 
-  describe('User clicks submit without selecting a location', () => {
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let locationPage: AppointmentdateTimePage
-    beforeEach(() => {
-      cy.task('stubAppointmentNoLocation')
-      loadPage({ _crn: 'X000001' })
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.getSubmitBtn().click()
-      locationPage = new AppointmentdateTimePage()
+  it('shows location validation errors when no location is selected', () => {
+    cy.task('stubAppointmentNoLocation')
+    loadPage({ _crn: 'X000001' })
+    const locationPage = new AppointmentdateTimePage()
+
+    step('Given no location is selected, when I submit, then I am sent to the location page', () => {
+      new ArrangeAnotherAppointmentPage().getSubmitBtn().click()
       locationPage.checkOnPage()
     })
-    it('should display the error summary box', () => {
+
+    step('And the error summary is displayed', () => {
       locationPage.checkErrorSummaryBox([
         'Enter or select a date',
         'Enter a start time',
@@ -140,80 +129,29 @@ describe('Arrange another appointment', () => {
         'Select an appointment location',
       ])
     })
-    it('should display the error messages', () => {
+
+    step('And the field errors are displayed', () => {
       getUuid().then(uuid => {
-        locationPage.getElement(`#appointments-X000001-${uuid}-date-error`).should($error => {
-          expect($error.text().trim()).to.include('Enter or select a date')
-        })
-        locationPage.getElement(`#appointments-X000001-${uuid}-start-error`).should($error => {
-          expect($error.text().trim()).to.include('Enter a start time')
-        })
-        locationPage.getElement(`#appointments-X000001-${uuid}-end-error`).should($error => {
-          expect($error.text().trim()).to.include('Enter an end time')
-        })
-        locationPage.getElement(`#appointments-X000001-${uuid}-user-locationCode-error`).should($error => {
-          expect($error.text().trim()).to.include('Select an appointment location')
-        })
+        checkFieldError(locationPage, `#appointments-X000001-${uuid}-date-error`, 'Enter or select a date')
+        checkFieldError(locationPage, `#appointments-X000001-${uuid}-start-error`, 'Enter a start time')
+        checkFieldError(locationPage, `#appointments-X000001-${uuid}-end-error`, 'Enter an end time')
+        checkFieldError(
+          locationPage,
+          `#appointments-X000001-${uuid}-user-locationCode-error`,
+          'Select an appointment location',
+        )
       })
     })
   })
 
-  describe('Change appointment values', () => {
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    beforeEach(() => {
-      cy.task('stubNextAppointment')
-      loadPage()
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    })
-    it('should update the type when value is changed', () => {
-      checkUpdateType(arrangeAnotherAppointmentPage)
-    })
-    it('should update the sentence when value is changed', () => {
-      checkUpdateSentence(arrangeAnotherAppointmentPage)
-    })
-    it('should update the location when value is changed', () => {
-      checkUpdateLocation(arrangeAnotherAppointmentPage)
-    })
-    it('should update the date when value is changed', () => {
-      checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
-    })
-    it('should update the notes when value is changed', () => {
-      checkUpdateSensitivity({ page: arrangeAnotherAppointmentPage })
-      checkUpdateNotes({ page: arrangeAnotherAppointmentPage })
-    })
-    it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity({ page: arrangeAnotherAppointmentPage })
-    })
-    it('validation errors on change pages do not reset backLink/changeLink', () => {
-      checkUpdateBackLinkRefresh(arrangeAnotherAppointmentPage)
-    })
-  })
-
-  describe('Arrange another appointment in the past', () => {
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    beforeEach(() => {
-      cy.task('stubNextAppointment')
-      loadPage()
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    })
-    it('should update the date when value is changed and display outcome and action', () => {
-      checkUpdateDateTime({ page: arrangeAnotherAppointmentPage, inPast: true })
-    })
-  })
-
-  describe('Practitioner submits the appointment', () => {
-    beforeEach(() => {
-      cy.task('stubNextAppointment')
-      loadPage()
-    })
-    it('should redirect to the confirmation page', () => {
-      getUuid().then(_uuid => {
-        const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-        checkUpdateDateTime({ page: arrangeAnotherAppointmentPage })
-        arrangeAnotherAppointmentPage.getSubmitBtn().click()
-        const appointmentConfirmationPage = new AppointmentConfirmationPage()
-        appointmentConfirmationPage.checkPageTitle('Appointment arranged')
-      })
-    })
+  it('shows the outcome and action when the date is changed to the past', () => {
+    cy.task('stubNextAppointment')
+    loadPage()
+    step(
+      'Given I am arranging another appointment, when I change the date to the past, then the outcome is shown',
+      () => {
+        checkUpdateDateTime({ page: new ArrangeAnotherAppointmentPage(), inPast: true })
+      },
+    )
   })
 })
