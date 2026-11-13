@@ -1,10 +1,10 @@
 import * as cheerio from 'cheerio'
 import httpMocks from 'node-mocks-http'
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import type { RiskBadgeData } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { RoshRiskWidgetDto } from '../../data/model/risk'
 import { AppResponse } from '../../models/Locals'
 import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
-import { RiskBadgeData } from '../../utils/personRiskFlagSorter'
 import { Name } from '../../data/model/personalDetails'
 import { TierCalculation } from '../../data/tierApiClient'
 
