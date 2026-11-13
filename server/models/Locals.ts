@@ -1,9 +1,9 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
+import type { RiskBadgeData, ManagedByDetails } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { Document, PersonalDetails } from '../data/model/personalDetails'
 import { ProbationPractitioner } from './CaseDetail'
 import { FeatureFlags } from '../data/model/featureFlags'
-import { ManagedByDetails } from '../utils/getManagedByDetails'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
@@ -50,7 +50,6 @@ import {
 } from '../data/model/esupervision'
 import { PersonExistsResponse } from '../data/emdiClient'
 import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
-import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 import { Prisoner } from '../data/prisonerSearchApiClient'
 
 export interface AppointmentLocals {

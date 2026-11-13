@@ -1,9 +1,9 @@
+import { getRiskBadges, RiskBadgeData } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
 import { setDataValue, findReplace, getStaffRisk, getProbationRisk, getRiskRoshScore } from '../utils'
-import { getRiskBadges, RiskBadgeData } from '../utils/personRiskFlagSorter'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async function getPersonRiskFlagsInner(req, res, next) {
