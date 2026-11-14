@@ -70,6 +70,9 @@ const enforcementContactsController: Controller<readonly ['getAllEnforcementCont
         '25',
         name,
         ascending,
+        undefined,
+        undefined,
+        res.locals.flags,
       )
 
       const pagination: Pagination = getPaginationLinks(

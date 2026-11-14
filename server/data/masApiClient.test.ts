@@ -177,17 +177,17 @@ describe('masApiClient', () => {
       [
         'getPersonAppointment',
         '/schedule/X000001/appointment/1',
-        () => masApiClient.getPersonAppointment('X000001', '1'),
+        () => masApiClient.getPersonAppointment('X000001', '1', {}),
       ],
       [
         'getPersonAppointmentNote',
         '/schedule/X000001/appointment/1/note/2',
-        () => masApiClient.getPersonAppointmentNote('X000001', '1', '2'),
+        () => masApiClient.getPersonAppointmentNote('X000001', '1', '2', {}),
       ],
       [
         'getPersonAppointmentNote',
         '/schedule/X000001/appointment/1/note/2',
-        () => masApiClient.getPersonAppointmentNote('X000001', '1', '2'),
+        () => masApiClient.getPersonAppointmentNote('X000001', '1', '2', {}),
       ],
       [
         'postPersonActivityLog',
@@ -221,7 +221,7 @@ describe('masApiClient', () => {
             { keywords: '', dateFrom: '', dateTo: '', filters: [], typeCodes: [] },
             '1',
             '10',
-            true,
+            { enableSemanticSearch: true },
           ),
         'post',
       ],

@@ -1,4 +1,5 @@
 import { getApprovedContactDisplayName } from '../../utils/contactDisplayNames'
+import { FeatureFlags } from './featureFlags'
 
 export type UpdateContactType = {
   code: string
@@ -128,11 +129,16 @@ export const MpopUpdatableContacts: UpdateContactType[] = [
 
 const normaliseContactType = (value?: string): string => (value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '')
 
-export const checkIsUpdatableContact = (value?: string): boolean => {
-  const approvedDisplayName = getApprovedContactDisplayName(value)
+export const checkIsUpdatableContact = (value?: string, flags: FeatureFlags = {}): boolean => {
+  const approvedDisplayName = getApprovedContactDisplayName(value, flags)
   const valueToCheck = approvedDisplayName || value
 
-  return MpopUpdatableContacts.some(
+  let updatableContacts = MpopUpdatableContacts
+  if (flags?.enableEarlyTermination20261103Squad3) {
+    updatableContacts = MpopUpdatableContacts.concat([{ code: 'ETRP', description: 'Early termination request' }])
+  }
+
+  return updatableContacts.some(
     contact => normaliseContactType(contact.description) === normaliseContactType(valueToCheck),
   )
 }

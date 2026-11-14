@@ -75,11 +75,11 @@ const activityLogController: Controller<
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
-      personActivity = mapPersonActivityWithApprovedContactDisplayNames(personActivity)
+      personActivity = mapPersonActivityWithApprovedContactDisplayNames(personActivity, res.locals.flags)
       personActivity.activities = personActivity.activities.map(activity => ({
         ...activity,
-        isUpdatableContact: checkIsUpdatableContact(activity.type),
         isCancelledCheckIn: isCancelledCheckIn(activity),
+        isUpdatableContact: checkIsUpdatableContact(activity.type, res.locals.flags),
       }))
 
       await auditService.sendAuditMessage({
@@ -131,7 +131,7 @@ const activityLogController: Controller<
       url = encodeURIComponent(url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const response = await masClient.getPersonAppointment(crn, id)
+      const response = await masClient.getPersonAppointment(crn, id, res.locals.flags)
       const personAppointment = {
         ...response,
         appointment:
@@ -140,7 +140,7 @@ const activityLogController: Controller<
             : response?.appointment,
       }
 
-      const isUpdatableContact = checkIsUpdatableContact(personAppointment?.appointment?.type)
+      const isUpdatableContact = checkIsUpdatableContact(personAppointment?.appointment?.type, res.locals.flags)
 
       if (isUpdatableContact) {
         personAppointment.appointment.isUpdatableContact = true

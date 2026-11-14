@@ -1,4 +1,5 @@
 import { PersonActivity } from '../data/model/activityLog'
+import { FeatureFlags } from '../data/model/featureFlags'
 import { PersonAppointment, Schedule, Activity, EnforcementContactsResponse } from '../data/model/schedule'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 
@@ -158,27 +159,37 @@ export function normalizeContactDisplayNameKey(value: string): string {
   return result.trimEnd().toLowerCase()
 }
 
-const normalizedApprovedContactDisplayNames = Object.fromEntries(
-  Object.entries(approvedContactDisplayNames).map(([legacyName, displayName]) => [
-    normalizeContactDisplayNameKey(legacyName),
-    displayName,
-  ]),
-)
+const flaggedContactDisplayNames = (flags?: FeatureFlags) =>
+  flags?.enableEarlyTermination20261103Squad3
+    ? {
+        ...approvedContactDisplayNames,
+        'Request for early termination': 'Early termination request',
+      }
+    : approvedContactDisplayNames
 
-export function getApprovedContactDisplayName(value?: string): string | undefined {
+const normalizedApprovedContactDisplayNames = (flags?: FeatureFlags) =>
+  Object.fromEntries(
+    Object.entries(flaggedContactDisplayNames(flags)).map(([legacyName, displayName]) => [
+      normalizeContactDisplayNameKey(legacyName),
+      displayName,
+    ]),
+  )
+
+export function getApprovedContactDisplayName(value?: string, flags?: FeatureFlags): string | undefined {
   if (!value) {
     return undefined
   }
 
-  return normalizedApprovedContactDisplayNames[normalizeContactDisplayNameKey(value)]
+  return normalizedApprovedContactDisplayNames(flags)[normalizeContactDisplayNameKey(value)]
 }
 
-export function withApprovedContactDisplayName<T extends Activity>(activity: T): T {
+export function withApprovedContactDisplayName<T extends Activity>(activity: T, flags?: FeatureFlags): T {
   if (!activity?.type) {
     return activity
   }
 
-  const displayName = getApprovedContactDisplayName(activity.action) ?? getApprovedContactDisplayName(activity.type)
+  const displayName =
+    getApprovedContactDisplayName(activity.action, flags) ?? getApprovedContactDisplayName(activity.type, flags)
 
   if (!displayName) {
     return activity
@@ -187,24 +198,27 @@ export function withApprovedContactDisplayName<T extends Activity>(activity: T):
   return { ...activity, displayName }
 }
 
-export function mapAlertWithApprovedContactDisplayNames(alert: UserAlertsContent): UserAlertsContent {
+export function mapAlertWithApprovedContactDisplayNames(
+  alert: UserAlertsContent,
+  flags?: FeatureFlags,
+): UserAlertsContent {
   return {
     ...alert,
     type: {
       ...alert.type,
-      description: getApprovedContactDisplayName(alert.type.description) ?? alert.type.description,
+      description: getApprovedContactDisplayName(alert.type.description, flags) ?? alert.type.description,
     },
   }
 }
 
-export function mapAlertsWithApprovedContactDisplayNames(alerts: UserAlerts): UserAlerts {
+export function mapAlertsWithApprovedContactDisplayNames(alerts: UserAlerts, flags?: FeatureFlags): UserAlerts {
   return {
     ...alerts,
-    content: alerts?.content?.map(mapAlertWithApprovedContactDisplayNames),
+    content: alerts?.content?.map(alert => mapAlertWithApprovedContactDisplayNames(alert, flags)),
   }
 }
 
-export function mapScheduleWithApprovedContactDisplayNames(schedule: Schedule): Schedule {
+export function mapScheduleWithApprovedContactDisplayNames(schedule: Schedule, flags?: FeatureFlags): Schedule {
   if (!schedule?.personSchedule?.appointments) {
     return schedule
   }
@@ -213,24 +227,30 @@ export function mapScheduleWithApprovedContactDisplayNames(schedule: Schedule): 
     ...schedule,
     personSchedule: {
       ...schedule.personSchedule,
-      appointments: schedule.personSchedule.appointments.map(withApprovedContactDisplayName),
+      appointments: schedule.personSchedule.appointments.map(appointment =>
+        withApprovedContactDisplayName(appointment, flags),
+      ),
     },
   }
 }
 
-export function mapPersonActivityWithApprovedContactDisplayNames(personActivity: PersonActivity): PersonActivity {
+export function mapPersonActivityWithApprovedContactDisplayNames(
+  personActivity: PersonActivity,
+  flags?: FeatureFlags,
+): PersonActivity {
   if (!personActivity?.activities) {
     return personActivity
   }
 
   return {
     ...personActivity,
-    activities: personActivity.activities.map(withApprovedContactDisplayName),
+    activities: personActivity.activities.map(activity => withApprovedContactDisplayName(activity, flags)),
   }
 }
 
 export function mapPersonAppointmentWithApprovedContactDisplayNames(
   personAppointment: PersonAppointment,
+  flags?: FeatureFlags,
 ): PersonAppointment {
   if (!personAppointment?.appointment) {
     return personAppointment
@@ -238,12 +258,13 @@ export function mapPersonAppointmentWithApprovedContactDisplayNames(
 
   return {
     ...personAppointment,
-    appointment: withApprovedContactDisplayName(personAppointment.appointment),
+    appointment: withApprovedContactDisplayName(personAppointment.appointment, flags),
   }
 }
 
 export function mapEnforcementContactsWithApprovedContactDisplayNames(
   enforcementContacts: EnforcementContactsResponse,
+  flags?: FeatureFlags,
 ): EnforcementContactsResponse {
   if (!enforcementContacts?.enforcementContacts) {
     return enforcementContacts
@@ -252,7 +273,7 @@ export function mapEnforcementContactsWithApprovedContactDisplayNames(
   return {
     ...enforcementContacts,
     enforcementContacts: enforcementContacts.enforcementContacts.map(contact => {
-      const displayName = getApprovedContactDisplayName(contact.appointmentType)
+      const displayName = getApprovedContactDisplayName(contact.appointmentType, flags)
       return {
         ...contact,
         displayName: displayName || contact.appointmentType,

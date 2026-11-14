@@ -59,8 +59,8 @@ const appointmentsController: Controller<
       })
 
       const [upcomingAppointmentsResponse, pastAppointmentsResponse, practitioner] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming', '0'),
-        masClient.getPersonSchedule(crn, 'previous', '0'),
+        masClient.getPersonSchedule(crn, 'upcoming', '0', undefined, res.locals.flags),
+        masClient.getPersonSchedule(crn, 'previous', '0', undefined, res.locals.flags),
         masClient.getProbationPractitioner(crn),
       ])
 
@@ -139,6 +139,7 @@ const appointmentsController: Controller<
         'upcoming',
         (pageNum - 1).toString(),
         sortQuery,
+        res.locals.flags,
       )
 
       const pagination: Pagination = getPaginationLinks(
@@ -340,7 +341,7 @@ const appointmentsController: Controller<
       })
       deleteOutcomeVars(crn)(req, res)
       const outcomeJourney = req.url.includes('outcome/next-appointment')
-      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      const personAppointment = await masClient.getPersonAppointment(crn, contactId, res.locals.flags)
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
@@ -377,8 +378,8 @@ const appointmentsController: Controller<
       const { crn, contactId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const noteResponse = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
-      const appointmentResponse = await masClient.getPersonAppointment(crn, contactId)
+      const noteResponse = await masClient.getPersonAppointmentNote(crn, contactId, noteId, res.locals.flags)
+      const appointmentResponse = await masClient.getPersonAppointment(crn, contactId, res.locals.flags)
 
       const selectedNote = noteResponse?.appointment?.appointmentNote
       const notes = appointmentResponse?.appointment?.appointmentNotes || []
