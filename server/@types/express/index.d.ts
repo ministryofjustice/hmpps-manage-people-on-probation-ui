@@ -47,7 +47,7 @@ declare module 'express-session' {
       uploadedFiles?: FileCache[]
       alertsCount?: AlertsCountCache
     }
-    body?: Record<string, any>
+    body?: Record<string, unknown>
     probationSearch?: ProbationSearch
   }
 

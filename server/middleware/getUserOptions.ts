@@ -40,7 +40,7 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       (!providerCodeQuery ? getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) || '' : '')
     const usernameSession =
       !providerCodeQuery && !teamCodeQuery
-        ? getDataValue(data, ['appointments', crn, id, 'user', 'username']) || ''
+        ? (getDataValue(data, ['appointments', crn, id, 'user', 'username']) as string) || ''
         : ''
 
     const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(

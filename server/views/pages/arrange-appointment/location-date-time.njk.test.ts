@@ -42,7 +42,7 @@ const baseModel: TestModel = {
     enableAllowSms: true,
   },
   url: '/page/url',
-  warningMessages: {} as any,
+  warningMessages: {},
   crn,
   id,
 }

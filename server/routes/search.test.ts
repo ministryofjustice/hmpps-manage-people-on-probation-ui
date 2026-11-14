@@ -1,13 +1,14 @@
 import { Router } from 'express'
 import httpMocks from 'node-mocks-http'
+import SearchService from '@ministryofjustice/probation-search-frontend/service/searchService'
 import searchRoutes from './search'
 import { Services } from '../services'
 
 describe('Search Routes', () => {
   let router: Router
   let services: Services
-  let searchService: any
-  let typedSearchService: any
+  let searchService: SearchService
+  let typedSearchService: SearchService
 
   beforeEach(() => {
     router = Router()
@@ -37,8 +38,9 @@ describe('Search Routes', () => {
       const res = httpMocks.createResponse()
       const next = jest.fn()
 
-      const handler = (router as any).stack.find((s: any) => s.route.path === '/search' && s.route.methods.post).route
-        .stack[0].handle
+      const handler = router.stack.find(
+        s => s.route.path === '/search' && (s.route as unknown as { methods: Record<string, boolean> }).methods.post,
+      ).route.stack[0].handle
 
       handler(req, res, next)
 
@@ -56,8 +58,9 @@ describe('Search Routes', () => {
       })
       const next = jest.fn()
 
-      const handler = (router as any).stack.find((s: any) => s.route.path === '/search' && s.route.methods.post).route
-        .stack[0].handle
+      const handler = router.stack.find(
+        s => s.route.path === '/search' && (s.route as unknown as { methods: Record<string, boolean> }).methods.post,
+      ).route.stack[0].handle
 
       handler(req, res, next)
 
@@ -71,8 +74,9 @@ describe('Search Routes', () => {
       const res = httpMocks.createResponse()
       const next = jest.fn()
 
-      const handler = (router as any).stack.find((s: any) => s.route.path === '/search' && s.route.methods.get).route
-        .stack[0].handle
+      const handler = router.stack.find(
+        s => s.route.path === '/search' && (s.route as unknown as { methods: Record<string, boolean> }).methods.get,
+      ).route.stack[0].handle
 
       handler(req, res, next)
 
@@ -90,8 +94,9 @@ describe('Search Routes', () => {
       })
       const next = jest.fn()
 
-      const handler = (router as any).stack.find((s: any) => s.route.path === '/search' && s.route.methods.get).route
-        .stack[0].handle
+      const handler = router.stack.find(
+        s => s.route.path === '/search' && (s.route as unknown as { methods: Record<string, boolean> }).methods.get,
+      ).route.stack[0].handle
 
       handler(req, res, next)
 

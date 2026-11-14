@@ -201,6 +201,11 @@ export interface AppointmentSession {
   }
   outcome?: AppointmentSessionOutcome
   sensitivityLocked?: boolean
+  previousValues?: {
+    date?: string
+    startTime?: string
+    endTime?: string
+  }
 }
 
 export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'

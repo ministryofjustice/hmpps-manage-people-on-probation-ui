@@ -1,5 +1,13 @@
-export const parseQuestionTemplate = (availableTemplates: any[], questionId: string | number) => {
-  const selectedTemplate = availableTemplates?.find((q: any) => String(q.id) === String(questionId))
+export const parseQuestionTemplate = (
+  availableTemplates: {
+    template: string
+    responseSpec: { placeholders: string[] }
+    questionExamples: string[]
+    id: string
+  }[],
+  questionId: string | number,
+) => {
+  const selectedTemplate = availableTemplates?.find(q => String(q.id) === String(questionId))
 
   if (!selectedTemplate) return null
 
