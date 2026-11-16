@@ -4,6 +4,7 @@ import httpMocks from 'node-mocks-http'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import { AuthOptions } from '@ministryofjustice/hmpps-rest-client'
+import { getStatusTag, MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -44,14 +45,12 @@ import {
 import config from '../config'
 import logger from '../../logger'
 
-import * as personStatusTag from '../utils/personStatusTag'
-
-jest.mock('../utils/personStatusTag', () => ({
-  ...jest.requireActual('../utils/personStatusTag'),
+jest.mock('@ministryofjustice/hmpps-mpop-frontend-components-lib', () => ({
+  ...jest.requireActual('@ministryofjustice/hmpps-mpop-frontend-components-lib'),
   getStatusTag: jest.fn(),
 }))
 
-const mockedGetStatusTag = jest.mocked(personStatusTag.getStatusTag)
+const mockedGetStatusTag = jest.mocked(getStatusTag)
 enum TokenType {
   USER_TOKEN = 'USER_TOKEN',
   SYSTEM_TOKEN = 'SYSTEM_TOKEN',
@@ -108,9 +107,13 @@ const searchUserCaseloadSpy = jest
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(probationPractitioner))
-const getContactsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getContacts')
-  .mockImplementation(() => Promise.resolve(mockContacts))
+const mpopComponents = {
+  getContacts: jest.fn(),
+  getPrisonerDetails: jest.fn(),
+} as unknown as jest.Mocked<MPoPComponents>
+mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
+mpopComponents.getPrisonerDetails.mockResolvedValue({ prisoner: null, httpStatus: 404 })
+const getContactsSpy = mpopComponents.getContacts
 let getPersonalDetailsSpy: jest.SpyInstance
 let getSentencePlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
@@ -220,7 +223,7 @@ describe('/middleware/getPersonalDetails', () => {
         },
         redirect: jest.fn().mockReturnThis(),
       } as unknown as AppResponse
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       const expected = {
         personalDetails: {
           X000001: mock(),
@@ -235,7 +238,7 @@ describe('/middleware/getPersonalDetails', () => {
         nameOrCrn: req.params.crn,
       })
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(getContactsSpy).toHaveBeenCalledWith(req.params.crn)
+      expect(getContactsSpy.mock.calls[0][1]).toBe(req.params.crn)
       expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
       expect(predictorsSpy).not.toHaveBeenCalled()
       expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
@@ -289,7 +292,7 @@ describe('/middleware/getPersonalDetails', () => {
           },
           redirect: jest.fn().mockReturnThis(),
         } as unknown as AppResponse
-        await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
         expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
         expect(tierCalculationSpy).not.toHaveBeenCalled()
         expect(searchUserCaseloadSpy).not.toHaveBeenCalled()
@@ -327,7 +330,7 @@ describe('/middleware/getPersonalDetails', () => {
         },
         redirect: jest.fn().mockReturnThis(),
       } as unknown as AppResponse
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(getPersonalDetailsSpy).not.toHaveBeenCalled()
       expect(risksSpy).not.toHaveBeenCalled()
       expect(tierCalculationSpy).not.toHaveBeenCalled()
@@ -359,7 +362,7 @@ describe('/middleware/getPersonalDetails', () => {
         session: { data: { personalDetails: { X000002: { nextAppointmentResponse: {} } } } },
       })
       res = getRes()
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(masGetPersonalDetailsSpy).toHaveBeenCalledWith('X000002')
       expect(res.locals.case).toEqual(overview('X000002'))
       expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
@@ -376,7 +379,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
     })
 
@@ -388,7 +391,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
     })
@@ -401,7 +404,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
@@ -414,7 +417,7 @@ describe('/middleware/getPersonalDetails', () => {
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
       req = getReq()
       res = getRes()
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
@@ -429,7 +432,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: false }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
@@ -460,7 +463,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(req.session.data.personalDetails.X000002.overview).toEqual({ ...overview('X000002'), noms: 'A1234BC' })
       expect('personPhotoSrc' in req.session.data.personalDetails.X000002).toBe(false)
       expect(res.locals.prisonsUnavailable).toBe(true)
@@ -472,7 +475,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = cachedReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(masSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
       expect(req.session.data.personalDetails.X000002.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
@@ -483,7 +486,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = cachedReq({ personPhotoSrc: null })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
     })
@@ -496,13 +499,13 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       const savedSession = JSON.parse(JSON.stringify(req.session.data))
       req = httpMocks.createRequest({ params: { crn: 'X000002' }, session: { data: savedSession } })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(getImageDataSpy).toHaveBeenCalledTimes(1)
       expect(savedSession.personalDetails.X000002.personPhotoSrc).toBeNull()
@@ -513,7 +516,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = cachedReq({ personPhotoSrc: '/search/prisoner-image/A1234BC' })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: false }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
     })
@@ -531,7 +534,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(getImageDataSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
@@ -541,7 +544,7 @@ describe('/middleware/getPersonalDetails', () => {
   describe('arns', () => {
     beforeEach(() => {
       // The middleware expects these methods to return Promises.
-      jest.spyOn(MasApiClient.prototype, 'getContacts').mockResolvedValue(mockContacts)
+      mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
 
       jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
 
@@ -556,7 +559,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
@@ -570,7 +573,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
@@ -586,7 +589,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(res.locals.risksWidget.overallRisk).toBe('NOT_FOUND')
@@ -601,7 +604,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(res.locals.riskData).toBeNull()
@@ -616,7 +619,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(false)
     })
@@ -627,7 +630,7 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(false)
     })
@@ -639,7 +642,9 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
 
-      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+      await expect(
+        getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy),
+      ).rejects.toThrow('500')
 
       expect(nextSpy).not.toHaveBeenCalled()
     })
@@ -651,7 +656,9 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
 
-      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+      await expect(
+        getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy),
+      ).rejects.toThrow('500')
 
       expect(nextSpy).not.toHaveBeenCalled()
     })
@@ -664,7 +671,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(req.session.data.personalDetails.X000002).toBeUndefined()
@@ -678,7 +685,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(res.locals.arnsUnavailable).toBe(true)
       expect(req.session.data).toBeDefined()
@@ -692,7 +699,9 @@ describe('/middleware/getPersonalDetails', () => {
       req = getReq()
       res = getRes()
 
-      await expect(getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)).rejects.toThrow('500')
+      await expect(
+        getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy),
+      ).rejects.toThrow('500')
 
       expect(nextSpy).not.toHaveBeenCalled()
       expect(res.locals.headerCRN).toBeUndefined()
@@ -709,7 +718,7 @@ describe('/middleware/getPersonalDetails', () => {
         dateOfDeath,
       } as PersonalDetails),
     )
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.dateOfDeath).toEqual(dateOfDeath)
   })
 
@@ -728,7 +737,7 @@ describe('/middleware/getPersonalDetails', () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(getSentencePlanByCrnSpy).not.toHaveBeenCalled()
   })
 
@@ -748,7 +757,7 @@ describe('/middleware/getPersonalDetails', () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
@@ -768,7 +777,7 @@ describe('/middleware/getPersonalDetails', () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: false,
@@ -798,7 +807,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {},
     })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: true,
       showText: false,
@@ -828,7 +837,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: { enableDraftSentencePlanAccess: true },
     })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: true,
       showText: false,
@@ -862,7 +871,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: { enableDraftSentencePlanAccess: true },
     })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
@@ -892,7 +901,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {},
     })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: false,
@@ -926,7 +935,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {},
     })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
@@ -949,7 +958,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {},
     })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+    await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: false,
@@ -961,7 +970,7 @@ describe('/middleware/getPersonalDetails', () => {
       jest.clearAllMocks()
       mockedGetStatusTag.mockReset()
 
-      jest.spyOn(MasApiClient.prototype, 'getContacts').mockResolvedValue(mockContacts)
+      mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
 
       jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
 
@@ -980,7 +989,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
 
@@ -993,6 +1002,38 @@ describe('/middleware/getPersonalDetails', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
 
+    it('gets the prisoner details from the lib and sets res.locals.prisoner', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+      const prisoner = { prisonerNumber: 'A1234BC', status: 'ACTIVE IN', inOutStatus: 'IN' }
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+      mpopComponents.getPrisonerDetails.mockResolvedValueOnce({ prisoner, httpStatus: 200 } as never)
+      res.locals.flags = { enablePersonHeader: true }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+      expect(mpopComponents.getPrisonerDetails).toHaveBeenCalledWith('token', 'A1234BC')
+      expect(res.locals.prisoner).toEqual(prisoner)
+      expect(mockedGetStatusTag).toHaveBeenCalledWith(personOverview, res.locals.supervisionPackageDetails, prisoner)
+    })
+
+    it('logs an error and leaves res.locals.prisoner undefined when getting prisoner details fails', async () => {
+      const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
+      const error = new Error('API request failed')
+      jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce(personOverview)
+      mpopComponents.getPrisonerDetails.mockResolvedValueOnce({ prisoner: null, httpStatus: 500, error })
+      const loggerSpy = jest.spyOn(logger, 'error').mockImplementation()
+      res.locals.flags = { enablePersonHeader: true }
+
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Failed to get prisoner details for NOMS number: A1234BC CRN: X000002',
+        error,
+      )
+      expect(res.locals.prisoner).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
     it('does not call getStatusTag when the feature flag is disabled', async () => {
       const personOverview = { ...overview('X000002'), noms: 'A1234BC' }
 
@@ -1000,7 +1041,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       res.locals.flags = { enablePersonHeader: false }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(mockedGetStatusTag).not.toHaveBeenCalled()
       expect(res.locals.personStatusTag).toBeUndefined()
@@ -1016,7 +1057,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       res.locals.flags = { enablePersonHeader: true }
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(mockedGetStatusTag).toHaveBeenCalledWith(
         personOverview,
@@ -1060,7 +1101,7 @@ describe('/middleware/getPersonalDetails', () => {
       getSystemClientTokenSpy.mockClear()
       getSystemClientTokenSpy.mockResolvedValue('token')
 
-      await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
+      await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
       expect(getSystemClientTokenSpy).toHaveBeenCalledTimes(1)
       expect(getSystemClientTokenSpy).toHaveBeenCalledWith('user-1')

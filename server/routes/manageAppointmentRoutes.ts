@@ -23,7 +23,10 @@ import validate from '../middleware/validation/index'
 import config from '../config'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
-export default function manageAppointmentRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function manageAppointmentRoutes(
+  router: Router,
+  { hmppsAuthClient, arnsComponents, mpopComponents }: Services,
+) {
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -37,7 +40,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     getAppointmentTypes(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     getOutcomeProps,
     getBackLink,
     getOutcomeSentence(hmppsAuthClient),
