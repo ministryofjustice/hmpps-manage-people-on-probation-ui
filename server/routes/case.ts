@@ -18,7 +18,7 @@ export default function caseRoutes(router: Router, { hmppsAuthClient, arnsCompon
     getOasysLink(),
     getSupervisionPackage(hmppsAuthClient, mpopComponents),
     getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getPersonRiskFlags(hmppsAuthClient),
+    getPersonRiskFlags(hmppsAuthClient, mpopComponents),
     getTierDetails(hmppsAuthClient, mpopComponents),
     getNextAppointment(hmppsAuthClient, mpopComponents),
   )
