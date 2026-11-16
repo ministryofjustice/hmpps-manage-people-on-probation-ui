@@ -49,6 +49,7 @@ export const dataAccess = () => ({
       ...config.apis.tierApi,
       masApiConfig: config.apis.masApi,
       supervisionPackageApiConfig: config.apis.supervisionPackageApi,
+      prisonerSearchApiConfig: config.apis.prisonerSearchApi,
     },
     logger,
   ),

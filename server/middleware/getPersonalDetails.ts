@@ -1,7 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { getManagedByDetails } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import {
+  getManagedByDetails,
+  getStatusTag,
+  MPoPComponents,
+} from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import PersonRecordApiClient from '../data/personRecordApiClient'
@@ -17,11 +21,11 @@ import { ErrorSummary } from '../data/model/common'
 import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
-import { getPrisonerDetails, getStatusTag } from '../utils/personStatusTag'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
   arnsComponents: ArnsComponents,
+  mpopComponents: MPoPComponents,
 ): Route<Promise<void>> => {
   return async function getPersonalDetailsInner(req, res, next) {
     const { url, params } = req
@@ -99,7 +103,7 @@ export const getPersonalDetails = (
               })
             : riskDataPromise,
           masClient.getProbationPractitioner(crn),
-          masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
+          mpopComponents.getContacts(token, crn).then(response => response.professionalContact as ProfessionalContact),
         ])
       if (isolateApiFailures) {
         if (risks && (risks as unknown as ErrorSummary).errors !== undefined) {
@@ -177,7 +181,11 @@ export const getPersonalDetails = (
     if (res.locals.flags?.enablePersonHeader) {
       if (overview.noms) {
         token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        res.locals.prisoner = await getPrisonerDetails(token, overview.noms, overview.crn)
+        const { prisoner, error } = await mpopComponents.getPrisonerDetails(token, overview.noms)
+        if (error) {
+          logger.error(`Failed to get prisoner details for NOMS number: ${overview.noms} CRN: ${overview.crn}`, error)
+        }
+        res.locals.prisoner = prisoner ?? undefined
       }
       res.locals.personStatusTag = await getStatusTag(
         overview,
