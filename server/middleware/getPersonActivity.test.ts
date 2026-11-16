@@ -184,7 +184,7 @@ describe('/middleware/getPersonActivity', () => {
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
-    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', String(ACTIVITY_LOG_PAGE_SIZE), false)
+    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0', String(ACTIVITY_LOG_PAGE_SIZE), {})
     expect(tierSpy).toHaveBeenCalledWith(crn)
     expect(personActivity).toEqual(mockPersonActivityResponse)
     expect(tierCalculation).toEqual(mockTierCalculationResponse)
@@ -218,7 +218,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: [], filterBySparksContacts: true, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      res.locals.flags,
     )
     res.locals.flags = {}
   })
@@ -251,7 +251,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: ['complied'], filterBySparksContacts: true, typeCodes: APPOINTMENTS_CODES }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      res.locals.flags,
     )
     res.locals.flags = {}
   })
@@ -284,7 +284,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: ['complied'], filterBySparksContacts: false, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      {},
     )
   })
 
@@ -316,7 +316,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: [], filterBySupervisionPackageContacts: true, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      res.locals.flags,
     )
     res.locals.flags = {}
   })
@@ -353,7 +353,7 @@ describe('/middleware/getPersonActivity', () => {
       }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      res.locals.flags,
     )
     res.locals.flags = {}
   })
@@ -386,7 +386,7 @@ describe('/middleware/getPersonActivity', () => {
       expect.objectContaining({ filters: ['complied'], filterBySupervisionPackageContacts: false, typeCodes: [] }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      {},
     )
   })
 
@@ -424,7 +424,7 @@ describe('/middleware/getPersonActivity', () => {
       }),
       '0',
       String(ACTIVITY_LOG_PAGE_SIZE),
-      false,
+      res.locals.flags,
     )
   })
 
@@ -448,7 +448,13 @@ describe('/middleware/getPersonActivity', () => {
     const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 
     await getPersonActivity(req, res, hmppsAuthClient)
-    expect(masSpy).toHaveBeenCalledWith(crn, expect.objectContaining({}), '0', String(ACTIVITY_LOG_PAGE_SIZE), true)
+    expect(masSpy).toHaveBeenCalledWith(
+      crn,
+      expect.objectContaining({}),
+      '0',
+      String(ACTIVITY_LOG_PAGE_SIZE),
+      res.locals.flags,
+    )
     res.locals.flags = {}
   })
 })

@@ -67,6 +67,7 @@ import {
 } from '../utils/contactDisplayNames'
 import { sanitizeFilename } from '../utils/sanitizeFilename'
 import { LastSmsResponse } from '../models/LastSmsResponse'
+import { FeatureFlags } from './model/featureFlags'
 
 interface GetUserScheduleProps {
   username: string
@@ -292,7 +293,13 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/personal-details/${crn}/document/${documentId}`, raw: true, responseType: 'arrayBuffer' })
   }
 
-  async getPersonSchedule(crn: string, type: string, page: string, sortQuery?: string): Promise<Schedule> {
+  async getPersonSchedule(
+    crn: string,
+    type: string,
+    page: string,
+    sortQuery?: string,
+    flags?: FeatureFlags,
+  ): Promise<Schedule> {
     const queryParameters = `?${new URLSearchParams({ size: '10', page }).toString()}${sortQuery ?? ''}`
 
     const schedule = (await this.get({
@@ -300,7 +307,7 @@ export default class MasApiClient extends RestClient {
       handle404: false,
     })) as Schedule
 
-    return mapScheduleWithApprovedContactDisplayNames(schedule)
+    return mapScheduleWithApprovedContactDisplayNames(schedule, flags)
   }
 
   async getEnforcementContacts(
@@ -312,6 +319,7 @@ export default class MasApiClient extends RestClient {
     months: string = '12',
     sortBy: string = 'lastModifiedDate',
     direction: string = 'DESC',
+    flags?: FeatureFlags,
   ): Promise<EnforcementContactsResponse> {
     const queryParameters = new URLSearchParams({
       page,
@@ -336,16 +344,20 @@ export default class MasApiClient extends RestClient {
     if ('errors' in enforcementContacts) {
       return enforcementContacts
     }
-    return mapEnforcementContactsWithApprovedContactDisplayNames(enforcementContacts)
+    return mapEnforcementContactsWithApprovedContactDisplayNames(enforcementContacts, flags)
   }
 
-  async getPersonAppointment(crn: string, appointmentId: string): Promise<PersonAppointment | null> {
+  async getPersonAppointment(
+    crn: string,
+    appointmentId: string,
+    flags?: FeatureFlags,
+  ): Promise<PersonAppointment | null> {
     const personAppointment = (await this.get({
       path: `/schedule/${crn}/appointment/${appointmentId}`,
       handle404: false,
     })) as PersonAppointment | null
     return personAppointment
-      ? mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment)
+      ? mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment, flags)
       : personAppointment
   }
 
@@ -353,13 +365,14 @@ export default class MasApiClient extends RestClient {
     crn: string,
     appointmentId: string,
     noteId: string,
+    flags?: FeatureFlags,
   ): Promise<PersonAppointment | null> {
     const personAppointment = (await this.get({
       path: `/schedule/${crn}/appointment/${appointmentId}/note/${noteId}`,
       handle404: false,
     })) as PersonAppointment | null
     return personAppointment
-      ? mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment)
+      ? mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment, flags)
       : personAppointment
   }
 
@@ -368,17 +381,17 @@ export default class MasApiClient extends RestClient {
     body: ActivityLogRequestBody,
     page: string,
     size = '10',
-    useSemanticSearch = false,
+    flags?: FeatureFlags,
   ): Promise<PersonActivity | null> {
     const pageQuery = `?${new URLSearchParams({ size, page }).toString()}`
-    const path = useSemanticSearch ? `/activity/${crn}/v2${pageQuery}` : `/activity/${crn}${pageQuery}`
+    const path = flags?.enableSemanticSearch ? `/activity/${crn}/v2${pageQuery}` : `/activity/${crn}${pageQuery}`
     const personActivity = (await this.post({
       data: body,
       path,
       handle404: false,
       handle500: false,
     })) as PersonActivity | null
-    return personActivity ? mapPersonActivityWithApprovedContactDisplayNames(personActivity) : personActivity
+    return personActivity ? mapPersonActivityWithApprovedContactDisplayNames(personActivity, flags) : personActivity
   }
 
   async preloadActivitySearch(crn: string): Promise<unknown> {
@@ -640,7 +653,12 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}`, handle404: true })
   }
 
-  async getUserAlerts(page?: number, sortBy?: string, sortOrder?: 'asc' | 'desc'): Promise<UserAlerts> {
+  async getUserAlerts(
+    page?: number,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc',
+    flags?: FeatureFlags,
+  ): Promise<UserAlerts> {
     let pageQuery = '?size=10'
     if (page !== undefined) {
       pageQuery = `${pageQuery}&page=${page}`
@@ -649,7 +667,7 @@ export default class MasApiClient extends RestClient {
       pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
     }
     const alerts: UserAlerts = await this.get({ path: `/alerts${pageQuery}`, handle404: true })
-    return mapAlertsWithApprovedContactDisplayNames(alerts)
+    return mapAlertsWithApprovedContactDisplayNames(alerts, flags)
   }
 
   async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {

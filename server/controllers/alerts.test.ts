@@ -212,7 +212,7 @@ describe('alertsController', () => {
 
         await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-        expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
+        expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc', { enableRiskOnAlertsDashboard: true })
         expect(getRisksSpy).toHaveBeenCalledWith('X123456')
         expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
 
@@ -250,7 +250,7 @@ describe('alertsController', () => {
 
         await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-        expect(getUserAlertsSpy).toHaveBeenCalledWith(4, 'SURNAME', 'desc')
+        expect(getUserAlertsSpy).toHaveBeenCalledWith(4, 'SURNAME', 'desc', { enableRiskOnAlertsDashboard: true })
         expect(getRisksSpy).toHaveBeenCalledWith('X123456')
         expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
 

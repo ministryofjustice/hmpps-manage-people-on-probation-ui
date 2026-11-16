@@ -24,7 +24,17 @@ const homeController: Controller<readonly ['getHome', 'getHomeOld'], void> = {
       let enforcementActions: EnforcementContact[] = []
       const enforcementContactResponse: EnforcementContactsResponse = res.locals.flags?.disableEnforcementContacts
         ? { size: 0, page: 0, totalResults: 0, totalPages: 0, enforcementContacts: [], timeoutError: undefined }
-        : await masClient.getEnforcementContacts(res.locals.user.username, (pageNum - 1).toString(), true)
+        : await masClient.getEnforcementContacts(
+            res.locals.user.username,
+            (pageNum - 1).toString(),
+            true,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            res.locals.flags,
+          )
       enforcementActions = enforcementContactResponse.enforcementContacts
 
       const { upcomingAppointments } = homePage
@@ -81,7 +91,17 @@ const homeController: Controller<readonly ['getHome', 'getHomeOld'], void> = {
       let enforcementActions: EnforcementContact[] = []
       const enforcementContactResponse: EnforcementContactsResponse = res.locals.flags?.disableEnforcementContacts
         ? { size: 0, page: 0, totalResults: 0, totalPages: 0, enforcementContacts: [], timeoutError: undefined }
-        : await masClient.getEnforcementContacts(res.locals.user.username, (pageNum - 1).toString(), true)
+        : await masClient.getEnforcementContacts(
+            res.locals.user.username,
+            (pageNum - 1).toString(),
+            true,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            res.locals.flags,
+          )
       enforcementActions = enforcementContactResponse.enforcementContacts
       const appointmentsRequiringOutcome = outcomes
       const url = encodeURIComponent(req.url)

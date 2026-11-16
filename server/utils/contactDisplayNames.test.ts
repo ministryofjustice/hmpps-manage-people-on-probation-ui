@@ -19,6 +19,18 @@ describe('contactDisplayNames', () => {
     )
   })
 
+  it('if ET flag is set then request for early termination name is mapped', () => {
+    expect(
+      getApprovedContactDisplayName('Request for early termination', { enableEarlyTermination20261103Squad3: true }),
+    ).toBe('Early termination request')
+  })
+
+  it('if ET flag is not set then request for early termination name is not mapped', () => {
+    expect(
+      getApprovedContactDisplayName('Request for early termination', { enableEarlyTermination20261103Squad3: false }),
+    ).toBe(undefined)
+  })
+
   it('maps activity log entries from action or type and falls back to type when unmatched', () => {
     const personActivity = {
       activities: [
@@ -28,7 +40,7 @@ describe('contactDisplayNames', () => {
       ],
     } as PersonActivity
 
-    expect(mapPersonActivityWithApprovedContactDisplayNames(personActivity).activities).toEqual([
+    expect(mapPersonActivityWithApprovedContactDisplayNames(personActivity, {}).activities).toEqual([
       { id: '1', type: 'Phone Contact from PoP', displayName: 'Telephone contact from person on probation' },
       { id: '2', type: 'Phone call', action: 'eMail/Text from Other', displayName: 'Email or text from other' },
       { id: '3', type: 'Legacy NDelius name' },
@@ -43,7 +55,7 @@ describe('contactDisplayNames', () => {
       },
     } as PersonAppointment
 
-    expect(mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment).appointment).toEqual({
+    expect(mapPersonAppointmentWithApprovedContactDisplayNames(personAppointment, {}).appointment).toEqual({
       id: '1',
       type: 'Management Oversight - HVRA',
       displayName: 'Management oversight – home visit risk assessment',
@@ -72,7 +84,7 @@ describe('contactDisplayNames', () => {
       ],
     } as unknown as EnforcementContactsResponse
 
-    const result = mapEnforcementContactsWithApprovedContactDisplayNames(response)
+    const result = mapEnforcementContactsWithApprovedContactDisplayNames(response, {})
 
     expect(result.enforcementContacts[0]).toMatchObject({
       displayName: 'Telephone contact from person on probation',
@@ -94,7 +106,7 @@ describe('contactDisplayNames', () => {
       ],
     } as unknown as EnforcementContactsResponse
 
-    mapEnforcementContactsWithApprovedContactDisplayNames(response)
+    mapEnforcementContactsWithApprovedContactDisplayNames(response, {})
     // TODO: Add assertion
   })
 
@@ -107,7 +119,7 @@ describe('contactDisplayNames', () => {
         ],
       },
     } as any
-    const result = mapScheduleWithApprovedContactDisplayNames(schedule)
+    const result = mapScheduleWithApprovedContactDisplayNames(schedule, {})
     expect(result.personSchedule.appointments[0].displayName).toBe('Telephone contact from person on probation')
     expect(result.personSchedule.appointments[1].displayName).toBeUndefined()
   })
@@ -133,7 +145,7 @@ describe('contactDisplayNames', () => {
         },
       ],
     } as UserAlerts
-    const result = mapAlertsWithApprovedContactDisplayNames(alerts)
+    const result = mapAlertsWithApprovedContactDisplayNames(alerts, {})
     expect(result.content[0].type.description).toBe('Telephone contact from person on probation')
     expect(result.content[1].type.description).toBe('Unknown')
   })

@@ -233,8 +233,8 @@ describe('controllers/appointments', () => {
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', undefined, mockRes.locals.flags)
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0', undefined, mockRes.locals.flags)
     })
 
     it('should render the appointments page', async () => {
@@ -401,7 +401,13 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS', uuidv4(), crn, 'CRN')
     it('should request previous and upcoming appointments from the api', () => {
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', '&sortBy=date&ascending=true')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(
+        crn,
+        'upcoming',
+        '0',
+        '&sortBy=date&ascending=true',
+        res.locals.flags,
+      )
     })
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
@@ -683,7 +689,7 @@ describe('controllers/appointments', () => {
     it('should request the person appointment', async () => {
       const mockRes = mockAppResponse({ nextAppointment: nextApptResponse(null) })
       await controllers.appointments.getNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId, undefined)
     })
     it('should render the next appointment page', async () => {
       const mockRes = mockAppResponse({ nextAppointment: nextApptResponse(null) })
@@ -836,11 +842,11 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENT_NOTE', uuidv4(), crn, 'CRN')
     it('should request the person appointment note', () => {
-      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
+      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId, res.locals.flags)
     })
     it('should render the appointment page with merged notes (selected note full, others unchanged)', () => {
-      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId, res.locals.flags)
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id, res.locals.flags)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/appointments/appointment',
         expect.objectContaining({

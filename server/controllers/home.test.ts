@@ -213,7 +213,17 @@ describe('homeController', () => {
 
         await controllers.home.getHome(hmppsAuthClient)(reqWithPage, resWithEnforcementFlag)
 
-        expect(masSpyPagination).toHaveBeenCalledWith(resWithEnforcementFlag.locals.user.username, '1', true)
+        expect(masSpyPagination).toHaveBeenCalledWith(
+          resWithEnforcementFlag.locals.user.username,
+          '1',
+          true,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          { enableDeliusClient: true },
+        )
         expect(renderSpyWithEnforcement).toHaveBeenCalledWith(
           'pages/homepage/homepage',
           expect.objectContaining({
@@ -292,7 +302,17 @@ describe('homeController', () => {
 
         await controllers.home.getHomeOld(hmppsAuthClient)(reqWithPage, resOld)
 
-        expect(masSpyOldPagination).toHaveBeenCalledWith(resOld.locals.user.username, '2', true)
+        expect(masSpyOldPagination).toHaveBeenCalledWith(
+          resOld.locals.user.username,
+          '2',
+          true,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          { enableDeliusClient: false },
+        )
       })
 
       it('should render empty collections and both timeout messages when legacy APIs time out', async () => {
