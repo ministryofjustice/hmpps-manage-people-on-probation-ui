@@ -42,7 +42,7 @@ import { returnOptions } from '../middleware/returnOptions'
 import { routeChangeSmsConsent } from '../middleware/routeChangeSmsConsent'
 import { setCollapsibleRiskFlags } from '../middleware/setCollapsibleRiskFlags'
 
-const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
+const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) => {
   router.all(
     '/case/:crn/arrange-appointment/:id/*path',
     getAppointmentTypes(hmppsAuthClient),
@@ -114,7 +114,7 @@ const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsCompone
     '/case/:crn/arrange-appointment/:id/location-date-time',
     restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getPersonRiskFlags(hmppsAuthClient),
+    getPersonRiskFlags(hmppsAuthClient, mpopComponents),
     forceValidation,
     controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
