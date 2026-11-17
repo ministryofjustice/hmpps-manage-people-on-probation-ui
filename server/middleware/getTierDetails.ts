@@ -1,9 +1,9 @@
-import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { MPoPComponents, tierUrlV3 } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { LatestTierResponse } from '../data/tierApiClient'
 import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
-import { tierUrlV3 } from '../utils'
+import config from '../config'
 
 export const getTierDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -48,7 +48,7 @@ export const getTierDetails = (
 
     const { tierData } = await fetchTierDetails(crn, token)
 
-    res.locals.tierUrlV3 = tierUrlV3(crn)
+    res.locals.tierUrlV3 = tierUrlV3(config.tierUrl.link, crn)
     res.locals.tierDetails = tierData
     return next()
   }

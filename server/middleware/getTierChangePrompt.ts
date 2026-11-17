@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon'
+import { tierUrlV3 } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import TierApiClient from '../data/tierApiClient'
 import { getMostRecentTierChange, isTierChangeInWindow } from '../utils/tierChange'
-import { tierUrlV3 } from '../utils'
 import config from '../config'
 
 export const getTierChangePrompt = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
@@ -22,7 +22,7 @@ export const getTierChangePrompt = (hmppsAuthClient: HmppsAuthClient): Route<Pro
         res.locals.tierChangePrompt = {
           oldTier: change.oldTier,
           newTier: change.newTier,
-          historyHref: tierUrlV3(crn),
+          historyHref: tierUrlV3(config.tierUrl.link, crn),
         }
       }
     } catch (err) {
