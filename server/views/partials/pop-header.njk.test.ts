@@ -6,7 +6,6 @@ import { RoshRiskWidgetDto } from '../../data/model/risk'
 import { AppResponse } from '../../models/Locals'
 import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
 import { Name } from '../../data/model/personalDetails'
-import { TierCalculation } from '../../data/tierApiClient'
 
 const crn = 'X000001'
 
@@ -19,8 +18,8 @@ type TestModel = {
   headerPersonName: Name
   headerCRN: string
   headerDob: string
-  headerTierLink: string
-  tierCalculation: Partial<TierCalculation>
+  tierUrlV3: string
+  tierDetails: { calculation: { tierScore: string } }
 }
 
 const riskBadgeData: RiskBadgeData = {
@@ -124,8 +123,8 @@ const riskData = (assessments = {} as any): RiskData => ({
 const baseModel: TestModel = {
   headerCRN: crn,
   headerDob: '1974-10-19',
-  headerTierLink: 'http://tier/link',
-  tierCalculation: { tierScore: 'C' },
+  tierUrlV3: 'http://tier/v3/case/X000001',
+  tierDetails: { calculation: { tierScore: 'C' } },
   headerPersonName: {
     forename: 'James',
     surname: 'Morrison',
@@ -172,7 +171,7 @@ describe('POP header', () => {
       expect($('.person-header').find('[data-qa=personName]').text().trim()).toBe(`James Morrison`)
       expect($('.person-header').find('[data-qa=crn]').text().trim()).toBe(crn)
       expect($('.person-header').find('[data-qa=dob]').text().trim()).toBe('19 October 1974')
-      expect($('.person-header').find('[data-qa=tier]').attr('href')).toBe(baseModel.headerTierLink)
+      expect($('.person-header').find('[data-qa=tier]').attr('href')).toBe(baseModel.tierUrlV3)
       expect($('.person-header').find('[data-qa=tier]').text().trim()).toBe('Tier: C')
     })
     it('should render the ROSH badge with NDelius data', () => {

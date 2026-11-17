@@ -1,11 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import {
-  getManagedByDetails,
-  getStatusTag,
-  MPoPComponents,
-} from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { getStatusTag, MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import PersonRecordApiClient from '../data/personRecordApiClient'
@@ -201,7 +197,7 @@ export const getPersonalDetails = (
     res.locals.risks = risks
     res.locals.riskData = riskData
     res.locals.probationPractitioner = probationPractitioner
-    res.locals.managedBy = getManagedByDetails(crn, professionalContact)
+    res.locals.professionalContact = professionalContact
     res.locals.personPhotoSrc = personPhotoSrc ?? undefined
     res.locals.arnsUnavailable = arnsUnavailable
     res.locals.prisonsUnavailable = prisonsUnavailable

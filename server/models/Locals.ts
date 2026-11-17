@@ -1,7 +1,7 @@
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
-import type { RiskBadgeData, ManagedByDetails } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
-import { Document, PersonalDetails } from '../data/model/personalDetails'
+import type { RiskBadgeData } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { Document, PersonalDetails, ProfessionalContact } from '../data/model/personalDetails'
 import { ProbationPractitioner } from './CaseDetail'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
@@ -130,7 +130,7 @@ interface Locals {
   headerDob?: string
   headerTierLink?: string
   probationPractitioner?: ProbationPractitioner
-  managedBy?: ManagedByDetails
+  professionalContact?: ProfessionalContact | null
   personPhotoSrc?: string
   arnsUnavailable?: boolean
   prisonsUnavailable?: boolean
