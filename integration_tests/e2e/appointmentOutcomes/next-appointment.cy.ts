@@ -66,16 +66,27 @@ const future = DateTime.now().plus({ days: 2 })
 const expectedPastDate = `${past.toFormat('cccc d LLLL yyyy')} at 9am to 10am`
 const expectedFutureDate = `${future.toFormat('cccc d LLLL yyyy')} at 9am to 10am`
 
+// Logs a named step (Given / When / Then / And) in the Cypress command log, so a failure shows which step it was
+const step = (name: string, fn: () => void) => {
+  cy.log(`**${name}**`)
+  fn()
+}
+
 const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   if (journey === 'MANAGE') {
-    describe('Story: logging an outcome then arranging the same type of appointment in the past', () => {
-      it('should complete the journey and summarise both appointments on the outcome check your answers page', () => {
+    it('summarises both appointments when the practitioner keeps the same type in the past', () => {
+      step('Given I have logged the outcome and reached the next appointment step', () => {
         loadNextAppointmentPage()
         nextAppointmentPage = new NextAppointmentPage()
-        nextAppointmentPage.checkPageTitle('Eula’s next supervision appointment')
+      })
+
+      step('When I choose to keep the same appointment type and complete the new appointment journey', () => {
         cy.get(`.govuk-radios__input[value=KEEP_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
         completeNextAppointmentJourney({ dateInPast: true, isOutcomeJourney: true })
+      })
+
+      step('Then the outcome check your answers page summarises both appointments', () => {
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
         checkYourAnswersOutcomePage.checkPageTitle(
           'Check your answers then confirm the appointment outcome and next appointment',
@@ -93,13 +104,19 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
       })
     })
 
-    describe('Story: logging an outcome then arranging a different type of appointment in the future', () => {
-      it('should complete the journey and offer to confirm the outcome and arrange the appointment', () => {
+    it('offers to confirm the outcome and arrange the appointment when the practitioner changes type in the future', () => {
+      step('Given I have logged the outcome and reached the next appointment step', () => {
         loadNextAppointmentPage()
         nextAppointmentPage = new NextAppointmentPage()
+      })
+
+      step('When I choose a different appointment type and complete the new appointment journey', () => {
         cy.get(`.govuk-radios__input[value=CHANGE_TYPE]`).click()
         nextAppointmentPage.getSubmitBtn().click()
         completeNextAppointmentJourney({ type: 'CHANGE_TYPE', dateInPast: false, isOutcomeJourney: true })
+      })
+
+      step('Then the outcome check your answers page summarises both appointments and offers to arrange it', () => {
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
         checkYourAnswersOutcomePage.checkPageTitle(
           'Check your answers then confirm the appointment outcome and next appointment',
@@ -120,29 +137,45 @@ const checkNextAppointment = ({ journey = 'MANAGE' }: { journey?: Journey } = {}
       })
     })
 
-    describe('Story: logging an outcome with no further appointment', () => {
-      it('should redirect to the outcome check your answers page', () => {
+    it('redirects to the outcome check your answers page when there is no further appointment', () => {
+      step('Given I have logged the outcome and reached the next appointment step', () => {
         loadNextAppointmentPage()
         nextAppointmentPage = new NextAppointmentPage()
+      })
+
+      step('When I choose not to arrange another appointment and submit', () => {
         cy.get(`.govuk-radios__input[value=NO]`).click()
         nextAppointmentPage.getSubmitBtn().click()
+      })
+
+      step('Then I am sent straight to the outcome check your answers page', () => {
         checkYourAnswersOutcomePage = new CheckYourAnswersOutcomePage()
         checkYourAnswersOutcomePage.getSubmitBtn().should('contain.text', 'Confirm this appointment')
       })
     })
   }
   if (journey === 'RESCHEDULE') {
-    it('should not display the next appointment page and redirect to the reschedule cya page', () => {
-      completeRescheduleJourney()
-      checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
-      checkYourAnswersPage.checkPageTitle('Change appointment details and reschedule')
+    it('does not display the next appointment page and redirects to the reschedule cya page', () => {
+      step('When I complete the reschedule journey', () => {
+        completeRescheduleJourney()
+      })
+
+      step('Then I am sent straight to the reschedule check your answers page', () => {
+        checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
+        checkYourAnswersPage.checkPageTitle('Change appointment details and reschedule')
+      })
     })
   }
   if (journey === 'ARRANGE') {
-    it('should not display the next appointment page and redirect to the cya page', () => {
-      completeArrangeAppointmentJourney()
-      checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
-      checkYourAnswersPage.checkPageTitle('Check your answers then confirm the appointment')
+    it('does not display the next appointment page and redirects to the cya page', () => {
+      step('When I complete the arrange appointment journey', () => {
+        completeArrangeAppointmentJourney()
+      })
+
+      step('Then I am sent straight to the check your answers page', () => {
+        checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
+        checkYourAnswersPage.checkPageTitle('Check your answers then confirm the appointment')
+      })
     })
   }
 }
