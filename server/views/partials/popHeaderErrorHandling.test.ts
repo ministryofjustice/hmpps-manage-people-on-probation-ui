@@ -43,7 +43,6 @@ const baseContext = (overrides: Record<string, unknown> = {}) => ({
   headerTierLink: '/case/X000001/tier-history',
   tierUrlV3: '/case/X000001/tier-details',
   tierCalculation: { tierScore: 'B2' },
-  managedBy: { text: 'Jane Smith', href: '/case/X000001/personal-details/staff-contacts' },
   personPhotoSrc: '/search/prisoner-image/G9566GQ',
   arnsUnavailable: false,
   prisonsUnavailable: false,

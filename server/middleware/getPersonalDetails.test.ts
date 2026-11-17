@@ -252,12 +252,7 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.headerCRN).toEqual(req.params.crn)
       expect(res.locals.headerDob).toEqual('1979-08-18')
       expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
-      expect(res.locals.managedBy).toEqual({
-        text: 'Arhsimna Xolfo (All London)',
-        name: 'Arhsimna Xolfo',
-        location: 'All London',
-        href: '/case/X000002/personal-details/staff-contacts',
-      })
+      expect(res.locals.professionalContact).toEqual(mockContacts)
       expect(nextSpy).toHaveBeenCalled()
     })
 
