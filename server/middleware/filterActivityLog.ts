@@ -4,7 +4,6 @@ import { Route } from '../@types'
 import {
   categoryFilterOptions,
   sparksCategoryFilterOption,
-  supervisionPackageCategoryFilterOption,
   filterOptions as complianceFilterOptions,
   hideContactsFilterOptions,
 } from '../properties'
@@ -19,7 +18,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const { clearFilterKey, clearFilterValue } = req.query
   const view = req?.query?.view
   const { crn } = req.params as Record<string, string>
-  const { keywords, dateFrom, dateTo, compliance, category, sparks, supervisionPackage, hideContact } = setSession()
+  const { keywords, dateFrom, dateTo, compliance, category, sparks, hideContact } = setSession()
   const errorMessages = req?.session?.errorMessages
 
   function setSession() {
@@ -30,9 +29,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       const complianceFilters: string[] = req.query.compliance ? ([req.query.compliance].flat() as string[]) : []
       const categoryFilters: string[] = req.query.category ? ([req.query.category].flat() as string[]) : []
       const sparksFilters: string[] = req.query.sparks ? ([req.query.sparks].flat() as string[]) : []
-      const supervisionPackageFilters: string[] = req.query.supervisionPackage
-        ? ([req.query.supervisionPackage].flat() as string[])
-        : []
       const hideContactFilters: string[] = req.query.hideContact ? ([req.query.hideContact].flat() as string[]) : []
 
       req.session.activityLogFilters = {
@@ -42,7 +38,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
         compliance: complianceFilters,
         category: categoryFilters,
         sparks: sparksFilters,
-        supervisionPackage: supervisionPackageFilters,
         hideContact: hideContactFilters,
         crn,
       }
@@ -57,7 +52,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       compliance: req.session?.activityLogFilters?.compliance ?? [],
       category: req.session?.activityLogFilters?.category ?? [],
       sparks: req.session?.activityLogFilters?.sparks ?? [],
-      supervisionPackage: req.session?.activityLogFilters?.supervisionPackage ?? [],
       hideContact: req.session?.activityLogFilters?.hideContact ?? [],
     }
   }
@@ -79,10 +73,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters.sparks = req.session.activityLogFilters.sparks.filter(
         (value: string) => value !== clearFilterValue,
       )
-    } else if (clearFilterKey === 'supervisionPackage') {
-      req.session.activityLogFilters.supervisionPackage = req.session.activityLogFilters.supervisionPackage.filter(
-        (value: string) => value !== clearFilterValue,
-      )
     } else if (clearFilterKey === 'hideContact') {
       req.session.activityLogFilters.hideContact = req.session.activityLogFilters.hideContact.filter(
         (value: string) => value !== clearFilterValue,
@@ -98,9 +88,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     : categoryFilterOptions
   const sparksOptionsSource = sparksEnabled ? [sparksCategoryFilterOption] : []
 
-  const supervisionPackageEnabled = res.locals.flags?.enableSupervisionPackageFilter === true
-  const supervisionPackageOptionsSource = supervisionPackageEnabled ? [supervisionPackageCategoryFilterOption] : []
-
   const baseUrl = `/case/${crn}/activity-log`
   const filters: ActivityLogFilters = {
     keywords,
@@ -109,11 +96,10 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     compliance,
     category,
     sparks,
-    supervisionPackage,
     hideContact,
   }
 
-  const keysWithClearValue = new Set(['compliance', 'category', 'sparks', 'supervisionPackage', 'hideContact'])
+  const keysWithClearValue = new Set(['compliance', 'category', 'sparks', 'hideContact'])
   const filterHref = (key: string, value: string): string => {
     const base = keysWithClearValue.has(key)
       ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
@@ -146,14 +132,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
             if (sparksOption) {
               value.push({
                 text: sparksOption.text,
-                href: filterHref(filterKey, text),
-              })
-            }
-          } else if (filterKey === 'supervisionPackage') {
-            const supervisionPackageOption = supervisionPackageOptionsSource.find(option => option.value === text)
-            if (supervisionPackageOption) {
-              value.push({
-                text: supervisionPackageOption.text,
                 href: filterHref(filterKey, text),
               })
             }
@@ -195,12 +173,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     checked: filters.sparks.includes(value),
   }))
 
-  const supervisionPackageOptions: Option[] = supervisionPackageOptionsSource.map(({ text, value }) => ({
-    text,
-    value,
-    checked: filters.supervisionPackage.includes(value),
-  }))
-
   const hideContactOptions: Option[] = hideContactsFilterOptions.map(({ text, value }) => ({
     text,
     value,
@@ -212,14 +184,12 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     complianceOptions,
     categoryOptions,
     sparksOptions,
-    supervisionPackageOptions,
     hideContactOptions,
     baseUrl,
     keywords: filters.keywords,
     compliance: filters.compliance,
     category: filters.category,
     sparks: filters.sparks,
-    supervisionPackage: filters.supervisionPackage,
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     hideContact: filters.hideContact,

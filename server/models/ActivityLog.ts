@@ -7,7 +7,6 @@ export interface ActivityLogFilters {
   compliance: Array<string> | string
   category: string[]
   sparks?: string[]
-  supervisionPackage?: string[]
   clearFilterKey?: string
   clearFilterValue?: string
   hideContact?: Array<string>
@@ -19,7 +18,6 @@ export interface ActivityLogRequestBody {
   dateTo: string
   filters: string[]
   filterBySparksContacts?: boolean
-  filterBySupervisionPackageContacts?: boolean
   includeSystemGenerated?: boolean
   typeCodes: string[]
 }
@@ -34,7 +32,6 @@ export interface ActivityLogFiltersResponse extends ActivityLogFilters {
   complianceOptions: Option[]
   categoryOptions: Option[]
   sparksOptions: Option[]
-  supervisionPackageOptions: Option[]
   hideContactOptions: Option[]
   baseUrl: string
   query?: ActivityLogFilters

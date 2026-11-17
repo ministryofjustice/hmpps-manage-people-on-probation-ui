@@ -109,26 +109,6 @@
   }) }}
   {% endif %}
 
-  {% if filters.supervisionPackageOptions.length %}
-  {{ govukCheckboxes({
-    idPrefix: 'supervisionPackage',
-    name: 'supervisionPackage',
-    classes: "govuk-checkboxes--small",
-    fieldset: {
-      legend: {
-        text: 'Supervision package appointments filter',
-        classes: 'govuk-fieldset__legend--s'
-      }
-    },
-    formGroup: {
-      attributes: {
-        'data-qa': 'supervisionPackage'
-      }
-    },
-    items: filters.supervisionPackageOptions
-  }) }}
-  {% endif %}
-
   {{ govukCheckboxes({
     idPrefix: 'category',
     name: 'category',
