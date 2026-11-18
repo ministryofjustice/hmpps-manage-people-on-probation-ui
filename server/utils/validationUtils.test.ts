@@ -27,6 +27,7 @@ import {
   contactPrefMobileCheck,
   isValidMobileNumber,
   isFutureDate,
+  isValidRescheduledDateTime,
 } from './validationUtils'
 import {
   activityLogValidation,
@@ -374,6 +375,33 @@ describe('validates appointment location and date time page request with spec', 
   })
 })
 
+describe('validates appointment date is not later than the maximum date with spec', () => {
+  const testRequest = {
+    params: { crn, id },
+    body: {
+      _maxDate: '31/12/2199',
+      appointments: {
+        [crn]: {
+          [id]: {
+            user: {
+              locationCode: 'code',
+            },
+            date: '1/1/2200',
+            start: '09:00',
+            end: '09:30',
+          },
+        },
+      },
+    },
+  } as unknown as Request
+  const spec = appointmentsValidation({ crn, id, page: 'location-date-time' })
+  it('should return the maximum date error', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual({
+      [`appointments-${crn}-${id}-date`]: 'The date must not be later than 31/12/2199',
+    })
+  })
+})
+
 describe('validates contacts filter request with spec', () => {
   const testRequest = {
     params: { crn, id },
@@ -712,5 +740,47 @@ describe('validates appointment enforcement action page', () => {
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
     expect(loggerSpy).toHaveBeenCalledWith('Action for failure to comply not selected')
+  })
+})
+
+describe('isValidRescheduledDateTime', () => {
+  const now = DateTime.now()
+  const previousStart = '2024-02-21T10:15:00'
+  const previousEnd = '2024-02-21T10:30:00'
+  const buildRequest = (body: { date?: string; start?: string; end?: string }, session = true) =>
+    ({
+      params: { crn, id },
+      body: { appointments: { [crn]: { [id]: body } } },
+      session: {
+        data: {
+          appointments: { [crn]: { [id]: session ? { rescheduleAppointment: { previousStart, previousEnd } } : {} } },
+        },
+      },
+    }) as unknown as Request
+
+  it('should be invalid if the date, start and end time are the same as the original appointment', () => {
+    const request = buildRequest({ date: '21/2/2024', start: '10:15', end: '10:30' })
+    expect(isValidRescheduledDateTime([], now, request)).toBe(false)
+  })
+  it('should be valid if only the date is changed', () => {
+    const request = buildRequest({ date: '22/2/2024', start: '10:15', end: '10:30' })
+    expect(isValidRescheduledDateTime([], now, request)).toBe(true)
+  })
+  it('should be valid if only the start time is changed', () => {
+    const request = buildRequest({ date: '21/2/2024', start: '10:20', end: '10:30' })
+    expect(isValidRescheduledDateTime([], now, request)).toBe(true)
+  })
+  it('should be valid if only the end time is changed', () => {
+    const request = buildRequest({ date: '21/2/2024', start: '10:15', end: '10:40' })
+    expect(isValidRescheduledDateTime([], now, request)).toBe(true)
+  })
+  it('should be valid if the appointment is not being rescheduled', () => {
+    const request = buildRequest({ date: '21/2/2024', start: '10:15', end: '10:30' }, false)
+    expect(isValidRescheduledDateTime([], now, request)).toBe(true)
+  })
+  it('should be valid if the date or times have not been entered', () => {
+    expect(isValidRescheduledDateTime([], now, buildRequest({ start: '10:15', end: '10:30' }))).toBe(true)
+    expect(isValidRescheduledDateTime([], now, buildRequest({ date: '21/2/2024', end: '10:30' }))).toBe(true)
+    expect(isValidRescheduledDateTime([], now, buildRequest({ date: '21/2/2024', start: '10:15' }))).toBe(true)
   })
 })
