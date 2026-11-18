@@ -1,4 +1,5 @@
 import config from '../config'
+import logger from '../../logger'
 import RestClient from './restClient'
 
 import {
@@ -155,10 +156,18 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
+  // A 404 means NDelius doesn't know the CRN. Any other failure - typically a 503 because one of the
+  // sources the ESUP API checks was unavailable - must not break the page, and the setup journey
+  // checks eligibility again, so it is reported as UNKNOWN rather than as ineligible.
   async getOffenderEligibility(crn: string): Promise<OffenderEligibility | null> {
-    return this.get({
-      path: `/v2/offenders/crn/${crn}/eligibility`,
-      handle404: true,
-    })
+    try {
+      return await this.get({
+        path: `/v2/offenders/crn/${crn}/eligibility`,
+        handle404: true,
+      })
+    } catch (error) {
+      logger.warn(error, `Could not check online check ins eligibility for crn: ${crn}`)
+      return { outcome: 'UNKNOWN', message: null }
+    }
   }
 }

@@ -452,5 +452,18 @@ describe('ESupervisionClient', () => {
       const output = await client.getOffenderEligibility(crn)
       expect(output).toBeNull()
     })
+
+    it('should return an unknown outcome when the eligibility check fails', async () => {
+      const crn = 'X000001'
+
+      fakeESupervisionApi
+        .get(`/v2/offenders/crn/${crn}/eligibility`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .times(3)
+        .reply(503)
+
+      const output = await client.getOffenderEligibility(crn)
+      expect(output).toEqual({ outcome: 'UNKNOWN', message: null })
+    })
   })
 })

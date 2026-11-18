@@ -281,6 +281,16 @@ describe('Appointments', () => {
     expect($('[data-qa="online-checkin-btn"]')).toHaveLength(1)
     expect($('[data-qa="online-checkin-btn"]').text()).toContain('Set up online check ins')
   })
+  it('should render the page with set up check-ins button when eligibility is unknown', () => {
+    const $ = render({
+      flags: { enableEsupEligibilityCheck: true },
+      canAccessCheckins: true,
+      offenderCheckinsByCRNResponse: null,
+      checkinEligibility: { outcome: 'UNKNOWN', message: 'Joe Bloggs may be eligible for online check ins.' },
+    })
+    expect($('[data-qa="online-checkin-btn"]')).toHaveLength(1)
+    expect($('[data-qa="online-checkin-btn"]').text()).toContain('Set up online check ins')
+  })
   it('should render the page without manage button when ineligible', () => {
     const $ = render({
       flags: { enableEsupEligibilityCheck: true },

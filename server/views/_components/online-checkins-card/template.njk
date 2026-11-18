@@ -24,7 +24,8 @@
 {% endif %}
 
 {% set linkHref = params.manageHref if checkin.status in ['VERIFIED', 'INACTIVE'] else params.setupHref %}
-{% set showActions = params.canAccess and params.eligibility.outcome === 'ELIGIBLE' %}
+{# UNKNOWN still offers setup: the eligibility check asks the practitioner what the API can't know #}
+{% set showActions = params.canAccess and params.eligibility.outcome in ['ELIGIBLE', 'UNKNOWN'] %}
 
 {{ appSummaryCard({
   titleText: 'Online check ins',

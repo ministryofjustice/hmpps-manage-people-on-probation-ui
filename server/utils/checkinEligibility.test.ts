@@ -64,6 +64,14 @@ describe('utils/checkinEligibility', () => {
       expect(resolveCheckinEligibility(eligible, { errors: [] }, 'Steve Jones')).toBe(eligible)
     })
 
+    it('returns an unknown result unchanged when a tier is assigned', () => {
+      const unknown: OffenderEligibility = {
+        outcome: 'UNKNOWN',
+        message: 'Joe Bloggs may be eligible for online check ins.',
+      }
+      expect(resolveCheckinEligibility(unknown, tier, 'Joe Bloggs')).toBe(unknown)
+    })
+
     it('returns an ineligible result unchanged', () => {
       expect(resolveCheckinEligibility(ineligible, tier, 'Steve Jones')).toBe(ineligible)
     })
