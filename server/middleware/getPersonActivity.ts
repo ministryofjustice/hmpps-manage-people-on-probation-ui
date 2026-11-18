@@ -6,12 +6,7 @@ import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
 import { AppResponse } from '../models/Locals'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
-import {
-  categoryFilterOptions,
-  sparksCategoryFilterOption,
-  supervisionPackageCategoryFilterOption,
-  ACTIVITY_LOG_PAGE_SIZE,
-} from '../properties'
+import { categoryFilterOptions, sparksCategoryFilterOption, ACTIVITY_LOG_PAGE_SIZE } from '../properties'
 
 export const getPersonActivity = async (
   req: Request,
@@ -20,7 +15,7 @@ export const getPersonActivity = async (
 ): Promise<[TierCalculation, PersonActivity]> => {
   const { filters } = res.locals
   const { params, query } = req
-  const { keywords, dateFrom, dateTo, compliance, category, sparks, supervisionPackage, hideContact } = filters
+  const { keywords, dateFrom, dateTo, compliance, category, sparks, hideContact } = filters
   const { crn } = params as Record<string, string>
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -38,11 +33,6 @@ export const getPersonActivity = async (
     res.locals.flags?.enableSparksFilter === true &&
     Array.isArray(sparks) &&
     sparks.includes(sparksCategoryFilterOption.value)
-
-  const filterBySupervisionPackageContacts =
-    res.locals.flags?.enableSupervisionPackageFilter === true &&
-    Array.isArray(supervisionPackage) &&
-    supervisionPackage.includes(supervisionPackageCategoryFilterOption.value)
 
   const formatCompliance = (): Array<string> => {
     const complianceArray: string[] = []
@@ -62,7 +52,6 @@ export const getPersonActivity = async (
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
     filters: [...formatCompliance()],
     filterBySparksContacts,
-    filterBySupervisionPackageContacts,
     includeSystemGenerated: hideContact?.length === 0,
     typeCodes: combinedCategoryCodes,
   }
