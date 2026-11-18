@@ -43,7 +43,7 @@ const baseContext = (overrides: Record<string, unknown> = {}) => ({
   headerTierLink: '/case/X000001/tier-history',
   tierUrlV3: '/case/X000001/tier-details',
   tierCalculation: { tierScore: 'B2' },
-  personPhotoSrc: '/search/prisoner-image/G9566GQ',
+  personPhotoSrc: '/person-photo/G9566GQ',
   arnsUnavailable: false,
   prisonsUnavailable: false,
   risksWidget: toRoshWidget(workingRisks),

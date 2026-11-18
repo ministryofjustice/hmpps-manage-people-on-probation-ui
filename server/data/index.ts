@@ -50,6 +50,8 @@ export const dataAccess = () => ({
       masApiConfig: config.apis.masApi,
       supervisionPackageApiConfig: config.apis.supervisionPackageApi,
       prisonerSearchApiConfig: config.apis.prisonerSearchApi,
+      personRecordApiConfig: config.apis.personRecordApi,
+      eSupervisionApiConfig: config.apis.eSupervisionApi,
     },
     logger,
   ),
