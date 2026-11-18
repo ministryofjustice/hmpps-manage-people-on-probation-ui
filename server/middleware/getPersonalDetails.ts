@@ -155,7 +155,7 @@ export const getPersonalDetails = (
       getDataFromCache()
     }
 
-    const photoEnabled = res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto
+    const photoEnabled = Boolean(res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto)
     const cachedDetails = req.session?.data?.personalDetails?.[crn]
     let checkInPhotoUrl: string | null = null
     if (photoEnabled && res.locals.flags?.enableESUPCheckInPhotosForSearch) {
@@ -216,6 +216,7 @@ export const getPersonalDetails = (
     res.locals.probationPractitioner = probationPractitioner
     res.locals.professionalContact = professionalContact
     res.locals.personPhotoSrc = personPhotoSrc ?? undefined
+    res.locals.showPersonHeaderPhoto = photoEnabled
     res.locals.arnsUnavailable = arnsUnavailable
     res.locals.prisonsUnavailable = prisonsUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }

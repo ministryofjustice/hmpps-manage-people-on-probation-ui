@@ -132,6 +132,7 @@ interface Locals {
   probationPractitioner?: ProbationPractitioner
   professionalContact?: ProfessionalContact | null
   personPhotoSrc?: string
+  showPersonHeaderPhoto?: boolean
   arnsUnavailable?: boolean
   prisonsUnavailable?: boolean
   tierUrlV3?: string
