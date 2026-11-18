@@ -1,5 +1,4 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { Readable } from 'stream'
 import httpMocks from 'node-mocks-http'
 import { ArnsComponents } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
@@ -9,7 +8,6 @@ import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import PersonRecordApiClient from '../data/personRecordApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
@@ -61,7 +59,6 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
 jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
-jest.mock('../data/personRecordApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -110,9 +107,13 @@ const getProbationPractitionerSpy = jest
 const mpopComponents = {
   getContacts: jest.fn(),
   getPrisonerDetails: jest.fn(),
+  hasPersonPhoto: jest.fn(),
+  getCheckInPhotoUrl: jest.fn(),
 } as unknown as jest.Mocked<MPoPComponents>
 mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
 mpopComponents.getPrisonerDetails.mockResolvedValue({ prisoner: null, httpStatus: 404 })
+mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: false, httpStatus: 404, error: null })
+mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: null, httpStatus: 404, error: null })
 const getContactsSpy = mpopComponents.getContacts
 let getPersonalDetailsSpy: jest.SpyInstance
 let getSentencePlanByCrnSpy: jest.SpyInstance
@@ -366,23 +367,23 @@ describe('/middleware/getPersonalDetails', () => {
   })
 
   describe('photo', () => {
-    it('sets personPhotoSrc to the prisoner-image route when a photo exists', async () => {
+    it('sets personPhotoSrc to the person photo route when a photo exists', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
+      mpopComponents.hasPersonPhoto.mockResolvedValueOnce({ hasPhoto: true, httpStatus: 200, error: null })
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
-      expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
+      expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
     })
 
     it('leaves personPhotoSrc undefined, and prisonsUnavailable false, when there is no photo (404)', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValueOnce(null)
+      mpopComponents.hasPersonPhoto.mockResolvedValueOnce({ hasPhoto: false, httpStatus: 404, error: null })
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -395,7 +396,11 @@ describe('/middleware/getPersonalDetails', () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      mpopComponents.hasPersonPhoto.mockResolvedValueOnce({
+        hasPhoto: false,
+        httpStatus: 500,
+        error: new Error('500'),
+      })
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -406,21 +411,21 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not request a photo when enablePersonHeader is off', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData')
+      const hasPersonPhotoSpy = mpopComponents.hasPersonPhoto
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
       req = getReq()
       res = getRes()
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
-      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
     })
 
     it('does not request a photo, or show the photos unavailable error, when enablePersonHeaderPhoto is off', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData')
+      const hasPersonPhotoSpy = mpopComponents.hasPersonPhoto
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -428,7 +433,7 @@ describe('/middleware/getPersonalDetails', () => {
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: false }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
-      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
       expect(res.locals.prisonsUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
@@ -454,7 +459,11 @@ describe('/middleware/getPersonalDetails', () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockRejectedValueOnce(new Error('500'))
+      mpopComponents.hasPersonPhoto.mockResolvedValueOnce({
+        hasPhoto: false,
+        httpStatus: 500,
+        error: new Error('500'),
+      })
       req = getReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
@@ -466,28 +475,32 @@ describe('/middleware/getPersonalDetails', () => {
 
     it('requests only the photo when enablePersonHeaderPhoto is turned on for a crn already in the session', async () => {
       const masSpy = jest.spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValueOnce(Readable.from(['image-bytes']))
+      mpopComponents.hasPersonPhoto.mockResolvedValueOnce({ hasPhoto: true, httpStatus: 200, error: null })
       req = cachedReq()
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(masSpy).not.toHaveBeenCalled()
-      expect(res.locals.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
-      expect(req.session.data.personalDetails.X000002.personPhotoSrc).toBe('/search/prisoner-image/A1234BC')
+      expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
+      expect(req.session.data.personalDetails.X000002.personPhotoSrc).toBe('/person-photo/A1234BC')
     })
 
     it('does not look up the photo again when the session has it cached as having no image', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData')
+      const hasPersonPhotoSpy = mpopComponents.hasPersonPhoto
       req = cachedReq({ personPhotoSrc: null })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
-      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
     })
 
     it('does not look up the photo again for a crn with no image after the session is saved and reloaded', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
+      const hasPersonPhotoSpy = mpopComponents.hasPersonPhoto.mockResolvedValue({
+        hasPhoto: false,
+        httpStatus: 404,
+        error: null,
+      })
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -502,13 +515,13 @@ describe('/middleware/getPersonalDetails', () => {
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
-      expect(getImageDataSpy).toHaveBeenCalledTimes(1)
+      expect(hasPersonPhotoSpy).toHaveBeenCalledTimes(1)
       expect(savedSession.personalDetails.X000002.personPhotoSrc).toBeNull()
       expect(res.locals.personPhotoSrc).toBeUndefined()
     })
 
     it('hides a photo in the session when enablePersonHeaderPhoto is turned off', async () => {
-      req = cachedReq({ personPhotoSrc: '/search/prisoner-image/A1234BC' })
+      req = cachedReq({ personPhotoSrc: '/person-photo/A1234BC' })
       res = getRes()
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: false }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
@@ -517,9 +530,13 @@ describe('/middleware/getPersonalDetails', () => {
     })
 
     it('does not request a photo when there is no NOMS number', async () => {
-      const getImageDataSpy = jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
+      const hasPersonPhotoSpy = mpopComponents.hasPersonPhoto.mockResolvedValue({
+        hasPhoto: false,
+        httpStatus: 404,
+        error: null,
+      })
 
-      getImageDataSpy.mockClear()
+      hasPersonPhotoSpy.mockClear()
 
       jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockResolvedValueOnce({
         ...overview('X000002'),
@@ -531,8 +548,96 @@ describe('/middleware/getPersonalDetails', () => {
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
-      expect(getImageDataSpy).not.toHaveBeenCalled()
+      expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
+    })
+
+    describe('online check-in photo', () => {
+      const checkInPhotoUrl = 'https://bucket.s3.eu-west-2.amazonaws.com/X000002.jpg'
+      const checkInFlags = {
+        enablePersonHeader: true,
+        enablePersonHeaderPhoto: true,
+        enableESUPCheckInPhotosForSearch: true,
+      }
+
+      it('uses the online check-in photo first, without checking for a prison photo or caching it', async () => {
+        mpopComponents.getCheckInPhotoUrl.mockResolvedValueOnce({
+          photoUrl: checkInPhotoUrl,
+          httpStatus: 200,
+          error: null,
+        })
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledWith(undefined, 'X000002')
+        expect(mpopComponents.hasPersonPhoto).not.toHaveBeenCalled()
+        expect(res.locals.personPhotoSrc).toBe(checkInPhotoUrl)
+        expect(req.session.data.personalDetails.X000002.personPhotoSrc).toBeUndefined()
+      })
+
+      it('gets the online check-in photo again on the next request', async () => {
+        mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: checkInPhotoUrl, httpStatus: 200, error: null })
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledTimes(2)
+        expect(res.locals.personPhotoSrc).toBe(checkInPhotoUrl)
+        mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: null, httpStatus: 404, error: null })
+      })
+
+      it('uses the prison photo when there is no online check-in photo', async () => {
+        mpopComponents.hasPersonPhoto.mockResolvedValueOnce({ hasPhoto: true, httpStatus: 200, error: null })
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalled()
+        expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
+        expect(req.session.data.personalDetails.X000002.personPhotoSrc).toBe('/person-photo/A1234BC')
+      })
+
+      it('falls back to the prison photo, without the photos unavailable error, when the eSupervision API fails', async () => {
+        mpopComponents.getCheckInPhotoUrl.mockResolvedValueOnce({
+          photoUrl: null,
+          httpStatus: 500,
+          error: new Error('500'),
+        })
+        mpopComponents.hasPersonPhoto.mockResolvedValueOnce({ hasPhoto: true, httpStatus: 200, error: null })
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
+        expect(res.locals.prisonsUnavailable).toBe(false)
+      })
+
+      it('does not get the online check-in photo when enableESUPCheckInPhotosForSearch is off', async () => {
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).not.toHaveBeenCalled()
+      })
+
+      it('does not get the online check-in photo when enablePersonHeaderPhoto is off', async () => {
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = { ...checkInFlags, enablePersonHeaderPhoto: false }
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).not.toHaveBeenCalled()
+        expect(res.locals.personPhotoSrc).toBeUndefined()
+      })
     })
   })
 
@@ -541,7 +646,7 @@ describe('/middleware/getPersonalDetails', () => {
       // The middleware expects these methods to return Promises.
       mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
 
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
+      mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: false, httpStatus: 404, error: null })
 
       jest.mocked(hmppsAuthClient.getSystemClientToken).mockResolvedValue('token')
     })
@@ -967,7 +1072,7 @@ describe('/middleware/getPersonalDetails', () => {
 
       mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
 
-      jest.spyOn(PersonRecordApiClient.prototype, 'getImageData').mockResolvedValue(null)
+      mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: false, httpStatus: 404, error: null })
 
       jest.mocked(hmppsAuthClient.getSystemClientToken).mockResolvedValue('token')
 

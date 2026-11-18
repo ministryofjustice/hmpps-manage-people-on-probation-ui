@@ -1,11 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { getStatusTag, MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { getStatusTag, MPoPComponents, toPersonPhotoSrc } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import PersonRecordApiClient from '../data/personRecordApiClient'
 import { Route } from '../@types'
+import { personPhotoHref } from './getPersonPhoto'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
@@ -157,17 +157,34 @@ export const getPersonalDetails = (
 
     const photoEnabled = res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto
     const cachedDetails = req.session?.data?.personalDetails?.[crn]
-    if (photoEnabled && overview?.noms && cachedDetails?.personPhotoSrc === undefined) {
+    let checkInPhotoUrl: string | null = null
+    if (photoEnabled && res.locals.flags?.enableESUPCheckInPhotosForSearch) {
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const photoData = await new PersonRecordApiClient(token).getImageData(overview.noms).catch((): null => {
+      const { photoUrl, error } = await mpopComponents.getCheckInPhotoUrl(token, crn)
+      if (error) {
+        logger.error(error, `Failed to get the online check-in photo for CRN ${crn}`)
+      }
+      checkInPhotoUrl = photoUrl
+    }
+    if (photoEnabled && !checkInPhotoUrl && overview?.noms && cachedDetails?.personPhotoSrc === undefined) {
+      token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const { hasPhoto, error } = await mpopComponents.hasPersonPhoto(token, overview.noms)
+      if (error) {
         prisonsUnavailable = true
-        return null
-      })
-      personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : null
+      }
+      personPhotoSrc = hasPhoto ? personPhotoHref(overview.noms) : null
 
       if (cachedDetails?.overview && !prisonsUnavailable) {
         cachedDetails.personPhotoSrc = personPhotoSrc
       }
+    }
+    if (photoEnabled) {
+      personPhotoSrc = toPersonPhotoSrc({
+        checkInPhotoUrl,
+        noms: overview?.noms,
+        hasPrisonPhoto: Boolean(personPhotoSrc),
+        prisonPhotoHref: personPhotoHref,
+      })
     }
     if (!photoEnabled) {
       personPhotoSrc = undefined
