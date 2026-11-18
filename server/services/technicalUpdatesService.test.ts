@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import TechnicalUpdatesService from './technicalUpdatesService'
 
 jest.mock('../config', () => ({
@@ -7,7 +7,7 @@ jest.mock('../config', () => ({
   },
 }))
 
-jest.mock('fs', () => {
+jest.mock('node:fs', () => {
   const mockFiles: Record<string, string> = {
     '2025-09-23.md': [
       '---',
