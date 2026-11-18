@@ -1,6 +1,5 @@
 import { Controller } from '../@types'
 import TechnicalUpdatesService from '../services/technicalUpdatesService'
-import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const whatsNewController: Controller<readonly ['getWhatsNew'], void> = {
@@ -12,7 +11,6 @@ const whatsNewController: Controller<readonly ['getWhatsNew'], void> = {
         title: 'New features | Manage people on probation',
         referrer: req.get('Referrer'),
         technicalUpdates: technicalUpdatesService.getTechnicalUpdates(),
-        guidanceUrl: config.guidance.link,
       })
     }
   },

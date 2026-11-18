@@ -1,0 +1,21 @@
+.app-markdown {
+  ul, ol {
+    @extend %govuk-list;
+  }
+
+  ul {
+    @extend %govuk-list--bullet;
+  }
+
+  ol {
+    @extend %govuk-list--number;
+  }
+
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+    @extend %govuk-heading-s;
+    margin-bottom: 0;
+  }
+}

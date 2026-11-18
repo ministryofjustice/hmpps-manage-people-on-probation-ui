@@ -45,7 +45,7 @@
   "jest": {
     "resolver": "<rootDir>/jest-resolver.js",
     "transformIgnorePatterns": [
-      "node_modules/(?!(uuid|@smithy|@aws-sdk|@ministryofjustice/hmpps-audit-client|@ministryofjustice/probation-search-frontend)/)"
+      "node_modules/(?!(uuid|@smithy|@aws-sdk|@ministryofjustice/hmpps-audit-client|@ministryofjustice/probation-search-frontend|marked)/)"
     ],
     "moduleNameMapper": {
       "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
@@ -164,6 +164,7 @@
     "lodash": "^4.18.1",
     "luxon": "^3.7.2",
     "luxon-business-days": "^3.0.1",
+    "marked": "18.2.0",
     "multer": "^2.5.0",
     "nocache": "^4.0.0",
     "node-mocks-http": "^1.18.1",
@@ -183,7 +184,8 @@
     "uuid": "14.0.3",
     "webpack": "^5.112.2",
     "webpack-cli": "^7.3.1",
-    "wiremock": "^3.13.1"
+    "wiremock": "^3.13.1",
+    "yaml-front-matter": "4.1.1"
   },
   "devDependencies": {
     "@cypress/code-coverage": "4.1.3",

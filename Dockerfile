@@ -51,7 +51,8 @@ ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
 
-COPY --from=build --chown=appuser:appgroup /app/package.json /app/package-lock.json /app/technicalUpdates.json ./
+COPY --from=build --chown=appuser:appgroup /app/package.json /app/package-lock.json ./
+COPY --from=build --chown=appuser:appgroup /app/whats-new ./whats-new
 
 COPY --from=build --chown=appuser:appgroup /app/assets ./assets
 COPY --from=build --chown=appuser:appgroup /app/dist ./dist
