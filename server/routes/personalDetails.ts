@@ -5,7 +5,10 @@ import type { Route } from '../@types'
 import controllers from '../controllers'
 import { getPersonalDetails } from '../middleware'
 
-export default function personalDetailRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function personalDetailRoutes(
+  router: Router,
+  { hmppsAuthClient, arnsComponents, mpopComponents }: Services,
+) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], handler: Route<void>) => router.post(path, asyncMiddleware(handler))
 
@@ -30,13 +33,13 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   router.get(
     '/case/:crn/personal-details/staff-contacts',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     controllers.personalDetails.getStaffContacts(hmppsAuthClient),
   )
 
   router.get(
     '/case/:crn/personal-details/personal-contact/:id',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     controllers.personalDetails.getPersonalContact(hmppsAuthClient),
   )
 
@@ -52,7 +55,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   router.get(
     '/case/:crn/personal-details/addresses',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     controllers.personalDetails.getAddresses(hmppsAuthClient),
   )
 
@@ -70,7 +73,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   router.get(
     '/case/:crn/personal-details/disabilities',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     controllers.personalDetails.getDisabilities(hmppsAuthClient),
   )
 
@@ -81,7 +84,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   router.get(
     '/case/:crn/personal-details/adjustments',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     controllers.personalDetails.getAdjustments(hmppsAuthClient),
   )
 
@@ -92,7 +95,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient, 
 
   router.get(
     '/case/:crn/personal-details/circumstances',
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     controllers.personalDetails.getCircumstances(hmppsAuthClient),
   )
 

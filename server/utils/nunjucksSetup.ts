@@ -4,7 +4,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 import nunjucks from 'nunjucks'
 
 import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { mpopNunjucksSetup } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { mpopNunjucksSetup, toPersonHeaderParams } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import express, { Request, NextFunction } from 'express'
 import type { Services } from '../services'
 
@@ -232,6 +232,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('getAppointmentsToAction', getAppointmentsToAction)
   njkEnv.addGlobal('getDistinctRequirements', getDistinctRequirements)
   njkEnv.addGlobal('tierLink', tierLink)
+  njkEnv.addGlobal('toPersonHeaderParams', toPersonHeaderParams)
   njkEnv.addGlobal('sentencePlanLink', sentencePlanLink)
   njkEnv.addGlobal('interventionsLink', interventionsLink)
   njkEnv.addGlobal('supervisionContactsAddLink', supervisionContactsAddLink)

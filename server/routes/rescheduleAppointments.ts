@@ -18,7 +18,7 @@ import {
 } from '../middleware'
 import validate from '../middleware/validation'
 
-const rescheduleAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
+const rescheduleAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get(
@@ -49,7 +49,7 @@ const rescheduleAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComp
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
     getOverdueOutcomes(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     getPersonAppointment(hmppsAuthClient),
     getUserProviders(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
