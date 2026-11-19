@@ -108,6 +108,15 @@ describe('appOnlineCheckinsCard', () => {
       expect($('[data-qa="checkinCard"] a').length).toBe(0)
     })
 
+    it('shows the may be eligible message and the set up link when the outcome is unknown', () => {
+      const $ = render({
+        eligibility: { outcome: 'UNKNOWN', message: 'Joe Bloggs may be eligible for online check ins.' },
+      })
+      expect($('[data-qa="checkinValue"]').text()).toBe('Joe Bloggs may be eligible for online check ins.')
+      expect(visibleLinkText($)).toBe('Set up online check ins')
+      expect($('[data-qa="checkinCard"] a').attr('href')).toBe(setupHref)
+    })
+
     it('hides the link and shows a default status when there is no eligibility result', () => {
       const $ = render({ eligibility: null })
       expect($('[data-qa="checkinValue"]').text()).toBe('Online check ins not set up')

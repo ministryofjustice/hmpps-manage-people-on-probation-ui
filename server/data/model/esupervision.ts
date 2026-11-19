@@ -263,9 +263,15 @@ export interface EsupervisionUpcomingQuestionsResponse {
   }[]
 }
 
+// UNKNOWN: nothing the ESUP API can check rules the person out, but the practitioner's answers are
+// still needed to decide - so setup can start, and the eligibility check gives the final answer.
+export type EligibilityOutcome = 'ELIGIBLE' | 'INELIGIBLE' | 'UNKNOWN'
+
 export interface OffenderEligibility {
-  outcome: 'ELIGIBLE' | 'INELIGIBLE'
+  outcome: EligibilityOutcome
   message: string | null
+  // The eligibility rule that decided the outcome, when the ESUP API sends one
+  ruleCode?: string | null
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
