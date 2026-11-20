@@ -57,7 +57,9 @@ describe('Location not in list nunjucks render tests', () => {
       expect($p.text()).toContain('If you think you’re missing a location, complete the')
       const $a = $p.find('a')
       expect($a.text()).toEqual('NDelius reference data - team/location form on the MoJ Technology Portal')
-      expect($a.attr('href')).toContain('https://mojprod.service-now.com/moj_sp')
+      expect($a.attr('href')).toEqual(
+        'https://mojprod.service-now.com/moj_sp?id=sc_cat_item&table=sc_cat_item&sys_id=6eb2ff221[…]ew.do%3Fv%3D1&sysparm_id=6eb2ff221b2dad10a1e2ddf0b24bcb67',
+      )
       expect($a.attr('target')).toEqual('_blank')
       expect($a.attr('rel')).toEqual('noopener noreferrer')
     })
