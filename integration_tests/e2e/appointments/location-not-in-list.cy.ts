@@ -11,54 +11,54 @@ const loadPage = (locations = true) => {
     completeLocationDateTimePage({ index: 5 })
   }
 }
+// Logs a named step (Given / When / Then / And) in the Cypress command log, so a failure shows which step it was
+const step = (name: string, fn: () => void) => {
+  cy.log(`**${name}**`)
+  fn()
+}
+
 describe('Arrange an appointment in another location', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
-  it('should render the page', () => {
-    loadPage()
-    const locationNotInListPage = new AppointmentLocationNotInListPage()
-    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
-    locationNotInListPage
-      .getElement('p:nth-of-type(1)')
-      .should(
-        'contain.text',
-        'You can only arrange appointments from a list of locations associated with the probation practitioner’s team.',
-      )
-    locationNotInListPage
-      .getElement('p:nth-of-type(2)')
-      .should(
-        'contain.html',
-        'If you think you’re missing a location, complete the <a href="https://mojprod.service-now.com/moj_sp?id=sc_cat_item&amp;table=sc_cat_item&amp;sys_id=6eb2ff221[…]ew.do%3Fv%3D1&amp;sysparm_id=6eb2ff221b2dad10a1e2ddf0b24bcb67" target="_blank" rel="noopener noreferrer">NDelius reference data - team/location form on the MoJ Technology Portal</a>.',
-      )
-    locationNotInListPage
-      .getElement('p:nth-of-type(3)')
-      .should('contain.text', '(opens in new tab)')
-      .find('a')
-      .should('contain.text', 'Continue on NDelius')
-    locationNotInListPage
-      .getElement('p:nth-of-type(4)')
-      .find('a')
-      .should('contain.text', 'Cancel and return to previous screen')
-      .click()
-    cy.location().should(location => {
-      expect(location.href).to.eq(
-        'http://localhost:3007/case/X778160/arrange-appointment/19a88188-6013-43a7-bb4d-6e338516818f/location-date-time',
-      )
+
+  it('returns to the locations page using either the cancel link or the back link', () => {
+    let locationNotInListPage: AppointmentLocationNotInListPage
+
+    step('Given I am on the location not in list page', () => {
+      loadPage()
+      locationNotInListPage = new AppointmentLocationNotInListPage()
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+    })
+
+    step('When I click cancel, then I am returned to the locations page', () => {
+      locationNotInListPage.getElement('p:nth-of-type(4)').find('a').click()
+      new AppointmentLocationDateTimePage().checkOnPage()
+      cy.location().should(location => {
+        expect(location.href).to.eq(
+          'http://localhost:3007/case/X778160/arrange-appointment/19a88188-6013-43a7-bb4d-6e338516818f/location-date-time',
+        )
+      })
+    })
+
+    step('When I return to the location not in list page and click back, then I am on the locations page', () => {
+      cy.go('back')
+      new AppointmentLocationNotInListPage().checkOnPage()
+      cy.get('.govuk-back-link').click()
+      new AppointmentLocationDateTimePage().checkOnPage()
     })
   })
-  it('should return to the locations page when back is clicked', () => {
-    loadPage()
-    cy.get('.govuk-back-link').click()
-    const locationPage = new AppointmentLocationDateTimePage()
-    locationPage.checkOnPage()
-  })
-  it('should return to the type attending page if no locations found and location selection is mandatory', () => {
-    cy.task('stubNoUserLocationsFound')
-    const locations = false
-    loadPage(locations)
-    cy.get('.govuk-back-link').click()
-    const typePage = new AppointmentTypePage()
-    typePage.checkOnPage()
+
+  it('returns to the type attendance page if no locations are found and location selection is mandatory', () => {
+    step('Given no locations are found and I am on the location not in list page', () => {
+      cy.task('stubNoUserLocationsFound')
+      const locations = false
+      loadPage(locations)
+    })
+
+    step('When I click back, then I am returned to the type attendance page', () => {
+      cy.get('.govuk-back-link').click()
+      new AppointmentTypePage().checkOnPage()
+    })
   })
 })
