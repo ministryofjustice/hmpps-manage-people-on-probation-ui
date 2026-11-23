@@ -7,6 +7,7 @@
       },
       "response": {
         "status": 200,
+        "transformers": ["response-template"],
         "jsonBody": {
           "content": [
             {
@@ -22,7 +23,7 @@
                 },
                 "code": "N07P007"
               },
-              "date": "2026-09-21",
+              "date": "{{now offset='-7 days' timezone='Europe/London' format='yyyy-MM-dd'}}",
               "start": "10:15:00",
               "end": "10:30:00"
             },
@@ -39,7 +40,7 @@
                 },
                 "code": "N07P007"
               },
-              "date": "2026-08-21",
+              "date": "{{now offset='-14 days' timezone='Europe/London' format='yyyy-MM-dd'}}",
               "start": "10:15:00",
               "end": "10:30:00"
             },
