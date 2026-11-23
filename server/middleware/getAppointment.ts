@@ -14,9 +14,12 @@ export const getAppointment = (_hmppsAuthClient: HmppsAuthClient): Route<Promise
     const { username: loggedInUsername = '' } = res.locals.user
     const overview = res.locals.case
     const { forename } = res.locals.case.name
-    const mobileNumber = res.locals.case?.mobileNumber ?? ''
-    const allowSms = overview?.allowSms
     const { data } = req.session
+    const mobileNumber =
+      res.locals.case?.mobileNumber ??
+      getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
+      ''
+    const allowSms = overview?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
 
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
@@ -80,7 +83,7 @@ export const getAppointment = (_hmppsAuthClient: HmppsAuthClient): Route<Promise
 
       if (res.locals?.flags?.enableAllowSms) {
         textMessageConfirmation = null
-        if (smsOptIn && allowSms) {
+        if (smsOptIn && allowSms !== false) {
           textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
         }
       } else {
