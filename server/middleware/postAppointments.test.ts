@@ -692,10 +692,10 @@ describe('/middleware/postAppointments', () => {
           },
         })
 
-      it('should resolve and return the created appointment instead of throwing, when a fresh user lookup also has no name', async () => {
+      it('should resolve and return the created appointment instead of throwing, when a fresh user lookup and auth profile also have no name', async () => {
         const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = buildMockReq()
-        const res = buildResponse()
+        const res = buildResponse({ locals: { user: { ...mockUser, name: null as string } } })
 
         const response = await postAppointments(hmppsAuthClient)(mockReq, res)
 
@@ -721,7 +721,7 @@ describe('/middleware/postAppointments', () => {
           expect.stringContaining('missing=['),
         )
       })
-      it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null) and email is already present', async () => {
+      it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null), email is already present, and auth profile has no name', async () => {
         const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = createMockReq({
           appointment: {
@@ -729,7 +729,7 @@ describe('/middleware/postAppointments', () => {
             user: { ...mockAppointment.user, name: { forename: '', surname: '' } },
           },
         })
-        const res = buildResponse()
+        const res = buildResponse({ locals: { user: { ...mockUser, name: null as string } } })
 
         await postAppointments(hmppsAuthClient)(mockReq, res)
 
@@ -748,7 +748,7 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
       })
-      it('should capture a single combined Sentry exception when both name and email are still missing after fallback', async () => {
+      it('should capture a single combined Sentry exception when both name and email are still missing after fallback and auth profile has neither', async () => {
         jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = createMockReq({
           appointment: {
@@ -756,7 +756,9 @@ describe('/middleware/postAppointments', () => {
             user: { ...mockAppointment.user, name: null, email: null },
           },
         })
-        const res = buildResponse()
+        const res = buildResponse({
+          locals: { user: { ...mockUser, name: null as string, email: null as string } },
+        })
 
         await postAppointments(hmppsAuthClient)(mockReq, res)
 
@@ -774,7 +776,7 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
       })
-      it('should treat a fallback lookup with a blank firstName/surname as still missing a name, and still capture a Sentry exception', async () => {
+      it('should treat a fallback lookup with a blank firstName/surname as still missing a name when auth profile has no name, and still capture a Sentry exception', async () => {
         const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
           userId: 123,
           username,
@@ -785,7 +787,7 @@ describe('/middleware/postAppointments', () => {
           roles: [],
         })
         const mockReq = buildMockReq()
-        const res = buildResponse()
+        const res = buildResponse({ locals: { user: { ...mockUser, name: null as string } } })
 
         await postAppointments(hmppsAuthClient)(mockReq, res)
 
@@ -804,6 +806,28 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
       })
+      it('should recover name and email from res.locals.user when logged-in user details are missing from both session and MAS API', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+        const mockReq = createMockReq({
+          appointment: {
+            ...mockAppointment,
+            user: { ...mockAppointment.user, name: null, email: null },
+            smsOptIn: 'YES',
+          },
+        })
+        const res = buildResponse({ flags: { enableAllowSms: true } })
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
+        checkOutlookEventRequest(true, 'James')
+        expect(mockReq.session.data.isOutLookEventFailed).toBeFalsy()
+        expect(Sentry.captureException).not.toHaveBeenCalled()
+      })
+
       it('should recover the name from the fallback user details lookup and still send the calendar invite', async () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')

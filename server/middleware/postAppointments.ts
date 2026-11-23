@@ -131,6 +131,20 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         email = fallbackUserDetails?.email
       }
 
+      const isLoggedInUser = username?.toUpperCase() === res.locals.user.username?.toUpperCase()
+      if (isLoggedInUser) {
+        if (isNameIncomplete(name) && res.locals.user.name) {
+          const nameParts = res.locals.user.name.trim().split(/\s+/)
+          name = {
+            forename: name?.forename || nameParts[0] || '',
+            surname: name?.surname || nameParts.slice(1).join(' ') || '',
+          }
+        }
+        if (!email && res.locals.user.email) {
+          email = res.locals.user.email
+        }
+      }
+
       const stillMissing = [isNameIncomplete(name) && 'name', !email && 'email'].filter(Boolean)
       if (stillMissing.length) {
         const message = `Appointment ${id}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
@@ -156,10 +170,17 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
 
-    const { mobileNumber, allowSms } = res.locals.case
+    const mobileNumber =
+      res.locals.case?.mobileNumber ??
+      getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
+      ''
+    const allowSms =
+      res.locals.case?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
+
     let sendSms = false
     if (res.locals?.flags?.enableAllowSms) {
-      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+      sendSms =
+        smsOptIn?.includes('YES') && allowSms !== false && res.locals?.flags?.enableSmsReminders && !!mobileNumber
     } else {
       sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
     }
@@ -188,7 +209,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
           includeWelshPreview,
           appointmentLocation = null,
           appointmentTypeCode = null,
-        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, id, 'smsPreview', 'request'])
+        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, id, 'smsPreview', 'request']) ?? {}
         isWelshTranslation = includeWelshPreview
         outlookEventRequestBody.smsEventRequest = {
           firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
