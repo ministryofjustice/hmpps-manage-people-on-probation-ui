@@ -533,7 +533,7 @@ describe('middleware/postRescheduleAppointments', () => {
       )
     })
 
-    it('should include smsEventRequest and set failure flags when enableAllowSms is true, smsOptIn is YES, and allowSms consent is null/unset', async () => {
+    it('should include smsEventRequest and set failure flags when enableAllowSms is true, smsOptIn is YES and allowSms consent is null/unset', async () => {
       const [req] = buildRequest({ smsOptIn: 'YES' }, null)
       const res = buildResponse({ flags: { enableSmsReminders: true, enableAllowSms: true } })
       jest.spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent').mockResolvedValueOnce({
@@ -584,10 +584,14 @@ describe('middleware/postRescheduleAppointments', () => {
       )
     })
 
-    it('should reconstruct SMS metadata (including Welsh translation, location, practitioner name, and type) when smsPreview is absent from session', async () => {
+    it('should reconstruct SMS metadata when smsPreview is absent from session', async () => {
       const [req] = buildRequest({
         smsOptIn: 'YES',
         smsPreview: undefined,
+        user: {
+          ...mockAppointment.user,
+          username: mockUser.username,
+        },
       })
       req.session.data.personalDetails[crn].overview.preferredLanguage = 'Welsh'
       req.session.data.locations = {
@@ -619,6 +623,65 @@ describe('middleware/postRescheduleAppointments', () => {
           }),
         }),
       )
+    })
+
+    it('should retrieve attending practitioner firstName via getUserDetails when smsPreview and session name are missing for another staff member', async () => {
+      const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
+        userId: 5678,
+        username: 'colleague-1',
+        firstName: 'Colleague',
+        surname: 'Person',
+        email: 'colleague@justice.gov.uk',
+        enabled: true,
+        roles: [],
+      })
+      const [req] = buildRequest({
+        smsOptIn: 'YES',
+        smsPreview: undefined,
+        user: {
+          locationCode: 'HMP',
+          teamCode: 'TEA',
+          staffCode: 'TEA123',
+          username: 'colleague-1',
+          name: null,
+        },
+      })
+      const res = buildResponse({ flags: { enableSmsReminders: true, enableAllowSms: true } })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(getUserDetailsSpy).toHaveBeenCalledWith('colleague-1')
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.objectContaining({
+            smsEventRequest: expect.objectContaining({
+              practitionerFirstName: 'Colleague',
+            }),
+          }),
+        }),
+      )
+    })
+
+    it('should omit practitionerFirstName rather than falling back to the logged-in user when another staff member has no name in session or user details', async () => {
+      const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
+      const [req] = buildRequest({
+        smsOptIn: 'YES',
+        smsPreview: undefined,
+        user: {
+          locationCode: 'HMP',
+          teamCode: 'TEA',
+          staffCode: 'TEA123',
+          username: 'colleague-1',
+          name: null,
+        },
+      })
+      const res = buildResponse({ flags: { enableSmsReminders: true, enableAllowSms: true } })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(getUserDetailsSpy).toHaveBeenCalledWith('colleague-1')
+      const callArg = postRescheduleAppointmentEventSpy.mock.calls[0][0]
+      expect(callArg.rescheduledEventRequest.smsEventRequest.practitionerFirstName).toBeUndefined()
     })
 
     it('should set isWelshNotificationFailed when welsh sms is missing', async () => {

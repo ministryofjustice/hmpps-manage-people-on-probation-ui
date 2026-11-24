@@ -644,7 +644,7 @@ describe('/middleware/postAppointments', () => {
       })
     })
 
-    describe('Attending user does not have email, and the fallback user details lookup also has no email', () => {
+    describe('Attending user does not have email and the fallback user details lookup also has no email', () => {
       // Reproduces a real scenario found in the dev environment: the fallback getUserDetails(username)
       // call succeeds (no error thrown) but the staff record itself has no email recorded at all
       // (e.g. a system/test account), so email remains blank even after the fallback lookup.
@@ -721,7 +721,7 @@ describe('/middleware/postAppointments', () => {
           expect.stringContaining('missing=['),
         )
       })
-      it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null), email is already present, and auth profile has no name', async () => {
+      it('should attempt the fallback lookup and capture a Sentry exception when the original session name is an incomplete object (not null), email is already present and auth profile has no name', async () => {
         const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce(undefined)
         const mockReq = createMockReq({
           appointment: {
@@ -776,7 +776,7 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
       })
-      it('should treat a fallback lookup with a blank firstName/surname as still missing a name when auth profile has no name, and still capture a Sentry exception', async () => {
+      it('should treat a fallback lookup with a blank firstName/surname as still missing a name when auth profile has no name and still capture a Sentry exception', async () => {
         const getUserDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValueOnce({
           userId: 123,
           username,
@@ -979,7 +979,7 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isEnglishNotificationFailed).toBeUndefined()
       })
 
-      it('should reconstruct SMS metadata (including Welsh translation, location, and type) when smsPreview is absent from session', async () => {
+      it('should reconstruct SMS metadata when smsPreview is absent from session', async () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)

@@ -44,7 +44,13 @@ export const postRescheduleAppointments = (
       rescheduleAppointment,
       smsOptIn,
       outcome,
-      user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode, name: practitionerName },
+      user: {
+        teamCode: selectedTeam,
+        locationCode: selectedLocation,
+        staffCode,
+        username: practitionerUsername,
+        name: practitionerName,
+      },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
     const isInPast = appointmentDateIsInPast(req, res)
@@ -124,11 +130,26 @@ export const postRescheduleAppointments = (
           'smsPreview',
           'request',
         ])
+
         const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
         const includeWelshTranslation = smsPreviewRequest?.includeWelshPreview ?? preferredLanguage === 'Welsh'
         const appointmentTypeCode = smsPreviewRequest?.appointmentTypeCode ?? type
-        const practitionerFirstName =
-          smsPreviewRequest?.practitionerFirstName ?? (practitionerName?.forename || firstName || null)
+
+        let practitionerFirstName = smsPreviewRequest?.practitionerFirstName ?? practitionerName?.forename ?? null
+        if (!practitionerFirstName) {
+          const isLoggedInUser =
+            !practitionerUsername || practitionerUsername.toUpperCase() === res.locals.user.username?.toUpperCase()
+          if (isLoggedInUser) {
+            practitionerFirstName = firstName || null
+          } else {
+            try {
+              const attendingUserDetails = await masClient.getUserDetails(practitionerUsername)
+              practitionerFirstName = attendingUserDetails?.firstName || null
+            } catch (error) {
+              logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${practitionerUsername}`)
+            }
+          }
+        }
 
         let appointmentLocation = smsPreviewRequest?.appointmentLocation ?? null
 
