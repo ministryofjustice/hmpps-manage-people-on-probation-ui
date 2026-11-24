@@ -580,7 +580,12 @@ describe('/middleware/getPersonalDetails', () => {
       })
 
       it('gets the online check-in photo again on the next request', async () => {
-        mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: checkInPhotoUrl, httpStatus: 200, error: null })
+        const checkInPhoto: Awaited<ReturnType<MPoPComponents['getCheckInPhotoUrl']>> = {
+          photoUrl: checkInPhotoUrl,
+          httpStatus: 200,
+          error: null,
+        }
+        mpopComponents.getCheckInPhotoUrl.mockResolvedValueOnce(checkInPhoto).mockResolvedValueOnce(checkInPhoto)
         req = cachedReq()
         res = getRes()
         res.locals.flags = checkInFlags
@@ -591,7 +596,6 @@ describe('/middleware/getPersonalDetails', () => {
 
         expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledTimes(2)
         expect(res.locals.personPhotoSrc).toBe(checkInPhotoUrl)
-        mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: null, httpStatus: 404, error: null })
       })
 
       it('gets the online check-in photo once when the middleware runs more than once in a request', async () => {
