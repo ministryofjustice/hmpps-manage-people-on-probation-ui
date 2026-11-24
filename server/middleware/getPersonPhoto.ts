@@ -14,11 +14,12 @@ export const getPersonPhoto = (
     const { photo } = await mpopComponents.getPersonPhoto(token, req.params.nomsNumber as string)
 
     if (!photo) {
-      return res.redirect('/assets/images/NoPhoto@2x.png')
+      res.sendStatus(404)
+      return
     }
     res.set('Cache-Control', 'private, max-age=86400')
     res.removeHeader('pragma')
     res.type('image/jpeg')
-    return pipeline(photo, res)
+    await pipeline(photo, res)
   }
 }

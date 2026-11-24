@@ -35,14 +35,18 @@ describe('middleware/getPersonPhoto', () => {
     expect(pipeline).toHaveBeenCalledWith(photo, res)
   })
 
-  it('redirects to the no photo image when there is no photo', async () => {
-    mpopComponents.getPersonPhoto.mockResolvedValue({ photo: null, httpStatus: 404, error: null })
+  it.each([
+    ['there is no photo', { photo: null, httpStatus: 404, error: null }],
+    ['the request fails', { photo: null, httpStatus: 500, error: new Error('500') }],
+  ])('returns a 404 without a placeholder when %s', async (_case, response) => {
+    mpopComponents.getPersonPhoto.mockResolvedValue(response)
     const res = mockAppResponse()
     const redirectSpy = jest.spyOn(res, 'redirect')
 
     await getPersonPhoto(hmppsAuthClient, mpopComponents)(req, res)
 
-    expect(redirectSpy).toHaveBeenCalledWith('/assets/images/NoPhoto@2x.png')
+    expect(res.sendStatus).toHaveBeenCalledWith(404)
+    expect(redirectSpy).not.toHaveBeenCalled()
     expect(pipeline).not.toHaveBeenCalled()
   })
 
