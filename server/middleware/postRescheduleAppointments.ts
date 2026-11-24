@@ -18,6 +18,9 @@ import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
 import isTimeoutError from '../utils/isTimeoutError'
+import { Location } from '../data/model/caseload'
+
+const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC', 'CHVS', 'CODC'])
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
@@ -41,7 +44,7 @@ export const postRescheduleAppointments = (
       rescheduleAppointment,
       smsOptIn,
       outcome,
-      user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
+      user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode, name: practitionerName },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
     const isInPast = appointmentDateIsInPast(req, res)
@@ -71,11 +74,17 @@ export const postRescheduleAppointments = (
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
 
-    const { mobileNumber, allowSms } = res.locals.case
+    const mobileNumber =
+      res.locals.case?.mobileNumber ??
+      getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
+      ''
+    const allowSms =
+      res.locals.case?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
 
     let sendSms = false
     if (res.locals?.flags?.enableAllowSms) {
-      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
+      sendSms =
+        smsOptIn?.includes('YES') && allowSms !== false && res.locals?.flags?.enableSmsReminders && !!mobileNumber
     } else {
       sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
     }
@@ -108,19 +117,38 @@ export const postRescheduleAppointments = (
       }
 
       if (sendSms) {
-        const {
-          includeWelshPreview,
-          appointmentLocation = null,
-          appointmentTypeCode = null,
-          practitionerFirstName = null,
-        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
-        isWelshTranslation = includeWelshPreview
+        const smsPreviewRequest = getDataValue<SmsPreviewRequest>(data, [
+          'appointments',
+          crn,
+          uuid,
+          'smsPreview',
+          'request',
+        ])
+        const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
+        const includeWelshTranslation = smsPreviewRequest?.includeWelshPreview ?? preferredLanguage === 'Welsh'
+        const appointmentTypeCode = smsPreviewRequest?.appointmentTypeCode ?? type
+        const practitionerFirstName =
+          smsPreviewRequest?.practitionerFirstName ?? (practitionerName?.forename || firstName || null)
+
+        let appointmentLocation = smsPreviewRequest?.appointmentLocation ?? null
+
+        if (!smsPreviewRequest && !appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
+          const locations = getDataValue<Location[]>(data, ['locations', res.locals.user.username]) ?? []
+          const locationMatch = locations.find(loc => loc.code === selectedLocation)
+          appointmentLocation =
+            locationMatch?.address?.officeName ||
+            locationMatch?.address?.buildingName ||
+            locationMatch?.description ||
+            null
+        }
+
+        isWelshTranslation = includeWelshTranslation
         rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
           firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
           mobileNumber,
           crn,
           smsOptIn: true,
-          includeWelshTranslation: includeWelshPreview,
+          includeWelshTranslation,
         }
         if (practitionerFirstName)
           rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName =

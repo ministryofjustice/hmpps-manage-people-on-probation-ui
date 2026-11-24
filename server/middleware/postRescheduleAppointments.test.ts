@@ -533,6 +533,94 @@ describe('middleware/postRescheduleAppointments', () => {
       )
     })
 
+    it('should include smsEventRequest and set failure flags when enableAllowSms is true, smsOptIn is YES, and allowSms consent is null/unset', async () => {
+      const [req] = buildRequest({ smsOptIn: 'YES' }, null)
+      const res = buildResponse({ flags: { enableSmsReminders: true, enableAllowSms: true } })
+      jest.spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent').mockResolvedValueOnce({
+        ...mockEventResponse,
+        smsResponse: null,
+      })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.objectContaining({
+            smsEventRequest: expect.objectContaining({
+              firstName: 'James',
+              practitionerFirstName: 'User',
+              mobileNumber: '07822567890',
+              crn,
+              smsOptIn: true,
+            }),
+          }),
+        }),
+      )
+      expect(req.session.data.isEnglishNotificationFailed).toEqual(true)
+    })
+
+    it('should fall back to session personalDetails for mobileNumber and allowSms when not present on res.locals.case', async () => {
+      const [req] = buildRequest({ smsOptIn: 'YES' }, true)
+      const res = buildResponse({
+        flags: { enableSmsReminders: true, enableAllowSms: true },
+        locals: {
+          case: {
+            name: { forename: 'James', surname: 'Morrison' },
+          },
+        },
+      })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.objectContaining({
+            smsEventRequest: expect.objectContaining({
+              mobileNumber: '07700900000',
+              smsOptIn: true,
+            }),
+          }),
+        }),
+      )
+    })
+
+    it('should reconstruct SMS metadata (including Welsh translation, location, practitioner name, and type) when smsPreview is absent from session', async () => {
+      const [req] = buildRequest({
+        smsOptIn: 'YES',
+        smsPreview: undefined,
+      })
+      req.session.data.personalDetails[crn].overview.preferredLanguage = 'Welsh'
+      req.session.data.locations = {
+        [mockUser.username]: [
+          {
+            code: 'HMP',
+            description: 'Mock Location',
+            address: { officeName: 'Mock Office' },
+          } as any,
+        ],
+      }
+      const res = buildResponse({ flags: { enableSmsReminders: true, enableAllowSms: true } })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.objectContaining({
+            smsEventRequest: {
+              firstName: 'James',
+              practitionerFirstName: 'Test',
+              mobileNumber: '07822567890',
+              crn,
+              smsOptIn: true,
+              includeWelshTranslation: true,
+              appointmentLocation: 'Mock Office',
+              appointmentTypeCode: 'COAP',
+            },
+          }),
+        }),
+      )
+    })
+
     it('should set isWelshNotificationFailed when welsh sms is missing', async () => {
       const [req] = buildRequest({
         smsOptIn: 'YES', // ✅ REQUIRED
