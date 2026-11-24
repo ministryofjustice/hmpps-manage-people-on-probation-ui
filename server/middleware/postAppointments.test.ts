@@ -979,6 +979,77 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isEnglishNotificationFailed).toBeUndefined()
       })
 
+      it('should reconstruct SMS metadata (including Welsh translation, location, and type) when smsPreview is absent from session', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const mockReq = createMockReq({
+          appointment: {
+            ...mockAppointment,
+            smsOptIn: 'YES',
+            smsPreview: undefined,
+          },
+        })
+        mockReq.session.data.personalDetails[crn].overview.preferredLanguage = 'Welsh'
+        mockReq.session.data.locations[username] = [
+          {
+            code: 'HMP',
+            description: 'HMP Wakefield',
+            address: { officeName: 'Wakefield Office' },
+          } as any,
+        ]
+        const res = buildResponse({ flags: { enableAllowSms: true } })
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(postOutlookCalendarEventSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            smsEventRequest: {
+              firstName: 'James',
+              practitionerFirstName: 'Mock',
+              mobileNumber: '07700900000',
+              crn,
+              smsOptIn: true,
+              includeWelshTranslation: true,
+              appointmentLocation: 'Wakefield Office',
+              appointmentTypeCode: 'COAP',
+            },
+          }),
+        )
+      })
+
+      it('should omit appointmentLocation when reconstructing SMS metadata for appointment types without a location', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce(mockOutlookEventResponse)
+        const mockReq = createMockReq({
+          appointment: {
+            ...mockAppointment,
+            type: 'COPT',
+            smsOptIn: 'YES',
+            smsPreview: undefined,
+          },
+        })
+        mockReq.session.data.personalDetails[crn].overview.preferredLanguage = 'English'
+        const res = buildResponse({ flags: { enableAllowSms: true } })
+
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+
+        expect(postOutlookCalendarEventSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            smsEventRequest: {
+              firstName: 'James',
+              practitionerFirstName: 'Mock',
+              mobileNumber: '07700900000',
+              crn,
+              smsOptIn: true,
+              includeWelshTranslation: false,
+              appointmentTypeCode: 'COPT',
+            },
+          }),
+        )
+      })
+
       it('should set req.session.data.isEnglishNotificationFailed to undefined if request has a englishNotificationId ', async () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
