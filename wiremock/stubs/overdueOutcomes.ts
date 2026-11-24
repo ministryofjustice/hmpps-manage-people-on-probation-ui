@@ -1,4 +1,5 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { DateTime } from 'luxon'
 
 const stubSingleOverdueOutcome = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
@@ -16,7 +17,8 @@ const stubSingleOverdueOutcome = (): SuperAgentRequest =>
               code: 'DGTSLC',
               description: 'Phone call',
             },
-            date: '2026-08-21',
+            // Relative to today so the outcome stays inside the app's rolling outcomes window (filterContactsMonths)
+            date: DateTime.now().setZone('Europe/London').minus({ days: 7 }).toISODate(),
             start: '10:15:00',
             end: '10:30:00',
           },

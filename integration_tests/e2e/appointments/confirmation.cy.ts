@@ -188,9 +188,11 @@ describe('Confirmation page', () => {
     it('should render the page with log outcome for a single appointment link', () => {
       cy.task('stubSingleOverdueOutcome')
       loadPage({ crnOverride: 'X000001' })
+      // stubSingleOverdueOutcome dates its outcome 7 days ago
+      const outcomeDate = DateTime.now().setZone('Europe/London').minus({ days: 7 }).toISODate()
       confirmPage
         .getlogOutcomeLink()
-        .should('contain.text', 'log appointment outcome for Friday 21 August 2026')
+        .should('contain.text', `log appointment outcome for ${dayOfWeek(outcomeDate)} ${dateWithYear(outcomeDate)}`)
         .should('have.attr', 'href', `/case/X000001/appointments/appointment/5/manage`)
     })
 

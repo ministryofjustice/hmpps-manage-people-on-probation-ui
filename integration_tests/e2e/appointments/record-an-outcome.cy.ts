@@ -1,7 +1,15 @@
+import { DateTime } from 'luxon'
+import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import Page from '../../pages/page'
 import OverviewPage from '../../pages/overview'
 import RecordAnOutcomePage from '../../pages/appointments/record-an-outcome.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
+
+// The two recent outcomes in overdueOutcomes_X778160.json are templated 7 and 14 days before today
+const daysAgo = (n: number): string => {
+  const date = DateTime.now().setZone('Europe/London').minus({ days: n }).toISODate()
+  return `${dayOfWeek(date)} ${dateWithYear(date)}`
+}
 
 const loadPage = (actionType = 'outcome', crn = 'X000001') => {
   cy.visit(`/case/${crn}`)
@@ -24,11 +32,11 @@ context('Record an outcome', () => {
       )
       cy.get('label[for="appointment-id"]')
         .should('contain.text', 'Phone call with Archibald Queeny')
-        .should('contain.text', 'Monday 21 September 2026 from 10:15am to 10:30am')
+        .should('contain.text', `${daysAgo(7)} from 10:15am to 10:30am`)
       cy.get('input#appointment-id').should('not.be.checked')
       cy.get('label[for="appointment-id-2"]')
         .should('contain.text', 'Other call with Archibald Queeny')
-        .should('contain.text', 'Friday 21 August 2026 from 10:15am to 10:30am')
+        .should('contain.text', `${daysAgo(14)} from 10:15am to 10:30am`)
       cy.get('input#appointment-id-2').should('not.be.checked')
     })
     it('should display validation if continue is clicked without selecting an appointment', () => {
@@ -64,10 +72,10 @@ context('Record an outcome', () => {
       cy.get('[data-qa="outcomes-form"]').find('.govuk-radios__item').should('have.length', 3)
       cy.get('label[for="appointment-id"]')
         .should('contain.text', 'Phone call')
-        .should('contain.text', 'Monday 21 September 2026 from 10:15am to 10:30am')
+        .should('contain.text', `${daysAgo(7)} from 10:15am to 10:30am`)
       cy.get('label[for="appointment-id-2"]')
         .should('contain.text', 'Other call')
-        .should('contain.text', 'Friday 21 August 2026 from 10:15am to 10:30am')
+        .should('contain.text', `${daysAgo(14)} from 10:15am to 10:30am`)
       cy.get('label[for="appointment-id-3"]')
         .should('contain.text', 'Other call')
         .should('contain.text', 'Tuesday 21 February 2023 from 9:15am to 9:30am')
