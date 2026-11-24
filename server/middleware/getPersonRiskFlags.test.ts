@@ -124,6 +124,51 @@ describe('middleware/getPersonRiskFlags', () => {
     })
   })
 
+  describe('risks session saved by the previous version of the middleware', () => {
+    const legacyRequest = () =>
+      httpMocks.createRequest({
+        params: { crn },
+        session: {
+          data: {
+            risks: {
+              [crn]: mockRisks({
+                riskFlags: [riskFlag({ id: 3, description: 'Risk to Probation Staff', level: undefined })],
+              }),
+            },
+            riskBadgeData: { [crn]: { headerBadges: [], groupedBadges: [], remainingCount: 0 } },
+          },
+        },
+      })
+
+    it('requests the risk flags again and replaces the legacy cache', async () => {
+      const req = legacyRequest()
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, res, nextSpy)
+
+      expect(mpopComponents.getPersonRiskFlags).toHaveBeenCalledWith(undefined, crn)
+      expect(req.session.data.risks[crn]).toEqual(mockRisks())
+      expect(req.session.data.riskBadgeData[crn]).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps the Risk to Probation Staff badge in the header', async () => {
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(legacyRequest(), res, nextSpy)
+
+      expect(res.locals.riskBadgeData.headerBadges.map((badge: { id: number }) => badge.id)).toContain(3)
+    })
+
+    it('uses the refreshed cache on the next request', async () => {
+      const req = legacyRequest()
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, createResponse(), nextSpy)
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, createResponse(), nextSpy)
+
+      expect(mpopComponents.getPersonRiskFlags).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe('risks session exists for current crn', () => {
     it('uses the session value without calling the api', async () => {
       const res = createResponse()

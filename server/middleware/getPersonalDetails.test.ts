@@ -594,6 +594,33 @@ describe('/middleware/getPersonalDetails', () => {
         mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: null, httpStatus: 404, error: null })
       })
 
+      it('gets the online check-in photo once when the middleware runs more than once in a request', async () => {
+        mpopComponents.getCheckInPhotoUrl.mockResolvedValueOnce({
+          photoUrl: checkInPhotoUrl,
+          httpStatus: 200,
+          error: null,
+        })
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledTimes(1)
+        expect(res.locals.personPhotoSrc).toBe(checkInPhotoUrl)
+      })
+
+      it('does not get the online check-in photo again in the same request when there is none', async () => {
+        req = cachedReq()
+        res = getRes()
+        res.locals.flags = checkInFlags
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledTimes(1)
+      })
+
       it('uses the prison photo when there is no online check-in photo', async () => {
         mpopComponents.hasPersonPhoto.mockResolvedValueOnce({ hasPhoto: true, httpStatus: 200, error: null })
         req = cachedReq()

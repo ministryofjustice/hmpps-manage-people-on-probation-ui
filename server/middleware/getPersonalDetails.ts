@@ -159,12 +159,15 @@ export const getPersonalDetails = (
     const cachedDetails = req.session?.data?.personalDetails?.[crn]
     let checkInPhotoUrl: string | null = null
     if (photoEnabled && res.locals.flags?.enableESUPCheckInPhotosForSearch) {
-      token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const { photoUrl, error } = await mpopComponents.getCheckInPhotoUrl(token, crn)
-      if (error) {
-        logger.error(error, `Failed to get the online check-in photo for CRN ${crn}`)
+      if (res.locals.checkInPhoto?.crn !== crn) {
+        token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const { photoUrl, error } = await mpopComponents.getCheckInPhotoUrl(token, crn)
+        if (error) {
+          logger.error(error, `Failed to get the online check-in photo for CRN ${crn}`)
+        }
+        res.locals.checkInPhoto = { crn, photoUrl }
       }
-      checkInPhotoUrl = photoUrl
+      checkInPhotoUrl = res.locals.checkInPhoto.photoUrl
     }
     if (photoEnabled && !checkInPhotoUrl && overview?.noms && cachedDetails?.personPhotoSrc === undefined) {
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

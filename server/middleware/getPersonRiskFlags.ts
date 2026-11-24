@@ -14,7 +14,9 @@ export const getPersonRiskFlags = (
 ): Route<Promise<void>> => {
   return async function getPersonRiskFlagsInner(req, res, next) {
     const { crn } = req.params as Record<string, string>
-    let personRiskFlags = req.session?.data?.risks?.[crn]
+    const legacyRiskBadgeData = req.session?.data?.riskBadgeData
+    const isLegacyCache = Boolean(legacyRiskBadgeData?.[crn])
+    let personRiskFlags = isLegacyCache ? undefined : req.session?.data?.risks?.[crn]
 
     if (!personRiskFlags) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -28,6 +30,9 @@ export const getPersonRiskFlags = (
       }
       personRiskFlags = response.personRiskFlags as PersonRiskFlags
       setDataValue(req.session.data, ['risks', crn], personRiskFlags)
+      if (isLegacyCache) {
+        delete legacyRiskBadgeData[crn]
+      }
     }
 
     const { personRisks, riskBadgeData, riskToStaff, riskToProbationStaff, rosh } = toPersonRiskDetails(personRiskFlags)

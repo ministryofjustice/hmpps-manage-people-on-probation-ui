@@ -133,6 +133,7 @@ interface Locals {
   professionalContact?: ProfessionalContact | null
   personPhotoSrc?: string
   showPersonHeaderPhoto?: boolean
+  checkInPhoto?: { crn: string; photoUrl: string | null }
   arnsUnavailable?: boolean
   prisonsUnavailable?: boolean
   tierUrlV3?: string

@@ -87,4 +87,7 @@ export interface Data {
   risks?: {
     [crn: string]: PersonRiskFlags
   }
+  riskBadgeData?: {
+    [crn: string]: RiskBadgeData
+  }
 }
