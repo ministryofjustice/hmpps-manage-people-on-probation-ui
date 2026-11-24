@@ -377,7 +377,6 @@ describe('/middleware/getPersonalDetails', () => {
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
-      expect(res.locals.showPersonHeaderPhoto).toBe(true)
     })
 
     it('leaves personPhotoSrc undefined, and prisonsUnavailable false, when there is no photo (404)', async () => {
@@ -421,7 +420,6 @@ describe('/middleware/getPersonalDetails', () => {
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
-      expect(res.locals.showPersonHeaderPhoto).toBe(false)
       expect(res.locals.prisonsUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
     })

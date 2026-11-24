@@ -5,7 +5,7 @@ import { getStatusTag, MPoPComponents } from '@ministryofjustice/hmpps-mpop-fron
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { getPersonHeaderPhoto, isPersonHeaderPhotoEnabled } from './getPersonHeaderPhoto'
+import { getPersonHeaderPhoto } from './getPersonHeaderPhoto'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
@@ -193,7 +193,6 @@ export const getPersonalDetails = (
     res.locals.probationPractitioner = probationPractitioner
     res.locals.professionalContact = professionalContact
     res.locals.personPhotoSrc = personPhotoSrc ?? undefined
-    res.locals.showPersonHeaderPhoto = isPersonHeaderPhotoEnabled(res)
     res.locals.arnsUnavailable = arnsUnavailable
     res.locals.prisonsUnavailable = prisonsUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }

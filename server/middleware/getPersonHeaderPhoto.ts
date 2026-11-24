@@ -19,7 +19,7 @@ export interface PersonHeaderPhoto {
   prisonsUnavailable: boolean
 }
 
-export const isPersonHeaderPhotoEnabled = (res: AppResponse): boolean =>
+const isPersonHeaderPhotoEnabled = (res: AppResponse): boolean =>
   Boolean(res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto)
 
 const getCheckInPhotoUrl = async ({

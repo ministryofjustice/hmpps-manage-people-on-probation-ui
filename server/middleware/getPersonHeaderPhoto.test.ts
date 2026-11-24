@@ -1,5 +1,5 @@
 import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
-import { getPersonHeaderPhoto, isPersonHeaderPhotoEnabled } from './getPersonHeaderPhoto'
+import { getPersonHeaderPhoto } from './getPersonHeaderPhoto'
 import { mockAppResponse } from '../controllers/mocks'
 import { AppResponse } from '../models/Locals'
 import { PersonalDetailsSession } from '../models/Data'
@@ -33,15 +33,10 @@ describe('middleware/getPersonHeaderPhoto', () => {
   })
 
   it.each([
-    [{ enablePersonHeader: true, enablePersonHeaderPhoto: true }, true],
-    [{ enablePersonHeader: true, enablePersonHeaderPhoto: false }, false],
-    [{ enablePersonHeader: false, enablePersonHeaderPhoto: true }, false],
-  ])('isPersonHeaderPhotoEnabled with %o is %s', (photoFlags, expected) => {
-    expect(isPersonHeaderPhotoEnabled(mockAppResponse({ flags: photoFlags }))).toBe(expected)
-  })
-
-  it('returns no photo and makes no requests when the photo is switched off', async () => {
-    const res = mockAppResponse({ flags: { ...flags, enablePersonHeaderPhoto: false } })
+    { enablePersonHeader: true, enablePersonHeaderPhoto: false },
+    { enablePersonHeader: false, enablePersonHeaderPhoto: true },
+  ])('returns no photo and makes no requests when the photo is switched off: %o', async photoFlags => {
+    const res = mockAppResponse({ flags: { ...flags, ...photoFlags } })
 
     const result = await run(res, { cachedPhotoSrc: `/person-photo/${noms}` })
 
