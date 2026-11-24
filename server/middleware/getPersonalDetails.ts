@@ -1,11 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { getStatusTag, MPoPComponents, toPersonPhotoSrc } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { getStatusTag, MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { personPhotoHref } from './getPersonPhoto'
+import { getPersonHeaderPhoto, isPersonHeaderPhotoEnabled } from './getPersonHeaderPhoto'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
@@ -155,49 +155,23 @@ export const getPersonalDetails = (
       getDataFromCache()
     }
 
-    const photoEnabled = Boolean(res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto)
-    const cachedDetails = req.session?.data?.personalDetails?.[crn]
-    let checkInPhotoUrl: string | null = null
-    if (photoEnabled && res.locals.flags?.enableESUPCheckInPhotosForSearch) {
-      if (res.locals.checkInPhoto?.crn !== crn) {
-        token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const { photoUrl, error } = await mpopComponents.getCheckInPhotoUrl(token, crn)
-        if (error) {
-          logger.error(error, `Failed to get the online check-in photo for CRN ${crn}`)
-        }
-        res.locals.checkInPhoto = { crn, photoUrl }
-      }
-      checkInPhotoUrl = res.locals.checkInPhoto.photoUrl
-    }
-    if (photoEnabled && !checkInPhotoUrl && overview?.noms && cachedDetails?.personPhotoSrc === undefined) {
+    const getToken = async () => {
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const { hasPhoto, error } = await mpopComponents.hasPersonPhoto(token, overview.noms)
-      if (error) {
-        prisonsUnavailable = true
-      }
-      personPhotoSrc = hasPhoto ? personPhotoHref(overview.noms) : null
-
-      if (cachedDetails?.overview && !prisonsUnavailable) {
-        cachedDetails.personPhotoSrc = personPhotoSrc
-      }
+      return token
     }
-    if (photoEnabled) {
-      personPhotoSrc = toPersonPhotoSrc({
-        checkInPhotoUrl,
-        noms: overview?.noms,
-        hasPrisonPhoto: Boolean(personPhotoSrc),
-        prisonPhotoHref: personPhotoHref,
-      })
-    }
-    if (!photoEnabled) {
-      personPhotoSrc = undefined
-      prisonsUnavailable = false
-    }
+    ;({ personPhotoSrc, prisonsUnavailable } = await getPersonHeaderPhoto({
+      res,
+      mpopComponents,
+      getToken,
+      crn,
+      noms: overview?.noms,
+      cachedPhotoSrc: personPhotoSrc,
+      cachedDetails: req.session?.data?.personalDetails?.[crn],
+    }))
 
     if (res.locals.flags?.enablePersonHeader) {
       if (overview.noms) {
-        token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const { prisoner, error } = await mpopComponents.getPrisonerDetails(token, overview.noms)
+        const { prisoner, error } = await mpopComponents.getPrisonerDetails(await getToken(), overview.noms)
         if (error) {
           logger.error(`Failed to get prisoner details for NOMS number: ${overview.noms} CRN: ${overview.crn}`, error)
         }
@@ -219,7 +193,7 @@ export const getPersonalDetails = (
     res.locals.probationPractitioner = probationPractitioner
     res.locals.professionalContact = professionalContact
     res.locals.personPhotoSrc = personPhotoSrc ?? undefined
-    res.locals.showPersonHeaderPhoto = photoEnabled
+    res.locals.showPersonHeaderPhoto = isPersonHeaderPhotoEnabled(res)
     res.locals.arnsUnavailable = arnsUnavailable
     res.locals.prisonsUnavailable = prisonsUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
