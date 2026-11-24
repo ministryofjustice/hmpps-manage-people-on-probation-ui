@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
-import { convertToTitleCase, firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
+import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -11,16 +11,13 @@ import {
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { EventResponse, RescheduleEventRequest, SmsPreviewRequest } from '../data/model/OutlookEvent'
+import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { buildCaseLink } from './postAppointments'
+import { buildCaseLink, buildSmsEventRequest } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
 import isTimeoutError from '../utils/isTimeoutError'
-import { Location } from '../data/model/caseload'
-
-const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC', 'CHVS', 'CODC'])
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
@@ -123,19 +120,7 @@ export const postRescheduleAppointments = (
       }
 
       if (sendSms) {
-        const smsPreviewRequest = getDataValue<SmsPreviewRequest>(data, [
-          'appointments',
-          crn,
-          uuid,
-          'smsPreview',
-          'request',
-        ])
-
-        const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
-        const includeWelshTranslation = smsPreviewRequest?.includeWelshPreview ?? preferredLanguage === 'Welsh'
-        const appointmentTypeCode = smsPreviewRequest?.appointmentTypeCode ?? type
-
-        let practitionerFirstName = smsPreviewRequest?.practitionerFirstName ?? practitionerName?.forename ?? null
+        let practitionerFirstName = practitionerName?.forename ?? null
         if (!practitionerFirstName) {
           const isLoggedInUser =
             !practitionerUsername || practitionerUsername.toUpperCase() === res.locals.user.username?.toUpperCase()
@@ -151,33 +136,18 @@ export const postRescheduleAppointments = (
           }
         }
 
-        let appointmentLocation = smsPreviewRequest?.appointmentLocation ?? null
-
-        if (!smsPreviewRequest && !appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
-          const locations = getDataValue<Location[]>(data, ['locations', res.locals.user.username]) ?? []
-          const locationMatch = locations.find(loc => loc.code === selectedLocation)
-          appointmentLocation =
-            locationMatch?.address?.officeName ||
-            locationMatch?.address?.buildingName ||
-            locationMatch?.description ||
-            null
-        }
-
-        isWelshTranslation = includeWelshTranslation
-        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
-          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
-          mobileNumber,
+        const smsData = buildSmsEventRequest({
+          data,
           crn,
-          smsOptIn: true,
-          includeWelshTranslation,
-        }
-        if (practitionerFirstName)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName =
-            convertToTitleCase(practitionerFirstName)
-        if (appointmentLocation)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
-        if (appointmentTypeCode)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentTypeCode = appointmentTypeCode
+          appointmentId: uuid,
+          type,
+          locationCode: selectedLocation,
+          username: res.locals.user.username,
+          mobileNumber,
+          practitionerFirstName,
+        })
+        isWelshTranslation = smsData.isWelshTranslation
+        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = smsData.smsEventRequest
       }
 
       try {
