@@ -189,7 +189,7 @@ describe('Confirmation page', () => {
       cy.task('stubSingleOverdueOutcome')
       loadPage({ crnOverride: 'X000001' })
       // stubSingleOverdueOutcome dates its outcome 7 days ago
-      const outcomeDate = DateTime.now().minus({ days: 7 }).toISODate()
+      const outcomeDate = DateTime.now().setZone('Europe/London').minus({ days: 7 }).toISODate()
       confirmPage
         .getlogOutcomeLink()
         .should('contain.text', `log appointment outcome for ${dayOfWeek(outcomeDate)} ${dateWithYear(outcomeDate)}`)
