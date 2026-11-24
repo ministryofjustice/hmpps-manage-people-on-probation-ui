@@ -310,7 +310,7 @@ export const buildSmsEventRequest = ({
   const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
   const includeWelshTranslation = smsPreviewRequest?.includeWelshPreview ?? preferredLanguage === 'Welsh'
   const appointmentTypeCode = smsPreviewRequest?.appointmentTypeCode ?? type
-  const resolvedPractitionerFirstName = smsPreviewRequest?.practitionerFirstName ?? practitionerFirstName ?? null
+  const resolvedPractitionerFirstName = practitionerFirstName ?? smsPreviewRequest?.practitionerFirstName ?? null
 
   let appointmentLocation = smsPreviewRequest?.appointmentLocation ?? null
   if (!smsPreviewRequest && !appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
