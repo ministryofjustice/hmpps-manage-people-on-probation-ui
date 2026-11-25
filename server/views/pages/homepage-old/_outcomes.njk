@@ -30,7 +30,7 @@
                     html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
                 },
                 {
-                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type + '</a>'
+                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type | toSentenceCase + '</a>'
                 },
                 {
                     classes: 'govuk-!-text-align-right',
@@ -47,7 +47,7 @@
                     html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
                 },
                 {
-                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type + '</a>'
+                    html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '">' + outcome.type | toSentenceCase + '</a>'
                 },
                 {
                     classes: 'govuk-!-text-align-right',

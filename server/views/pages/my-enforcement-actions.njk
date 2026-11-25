@@ -64,7 +64,7 @@
                 },
                 {
                     classes: "nowrap",
-                    html: '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '">' + enforcement.appointmentType + '</a>' + "<br><span class='secondary-text'> " + (enforcement.appointmentDate | dateWithYearShortMonth) + "</span>",
+                    html: '<a class="govuk-link" href="/case/' + enforcement.crn + '/appointments/appointment/' + enforcement.id + '/manage?back=' + sortUrl + '">' + enforcement.appointmentType | toSentenceCase + '</a>' + "<br><span class='secondary-text'> " + (enforcement.appointmentDate | dateWithYearShortMonth) + "</span>",
                     attributes: { "data-sort-value": enforcement.appointmentType }
                 },
                 {
@@ -78,7 +78,7 @@
                 {
                     classes: "nowrap",
                     html:
-                    (((enforcement.enforcementAction | lower | capitalize) | escape)
+                    (((enforcement.enforcementAction | toSentenceCase) | escape)
                     if enforcement.enforcementAction
                     else ('Not provided' | escape))
                     + '</a><br>'
