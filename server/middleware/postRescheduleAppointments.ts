@@ -13,7 +13,7 @@ import {
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { buildCaseLink, buildSmsEventRequest } from './postAppointments'
+import { buildCaseLink, buildSmsEventRequest, getSmsSendEligibility } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
@@ -77,20 +77,7 @@ export const postRescheduleAppointments = (
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
 
-    const mobileNumber =
-      res.locals.case?.mobileNumber ??
-      getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
-      ''
-    const allowSms =
-      res.locals.case?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
-
-    let sendSms = false
-    if (res.locals?.flags?.enableAllowSms) {
-      sendSms =
-        smsOptIn?.includes('YES') && allowSms !== false && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    } else {
-      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    }
+    const { sendSms, mobileNumber } = getSmsSendEligibility(data, res, crn, smsOptIn)
 
     if (email) {
       const startTime = DateTime.fromISO(start)

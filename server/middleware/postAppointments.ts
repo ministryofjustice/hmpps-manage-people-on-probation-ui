@@ -178,20 +178,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
 
-    const mobileNumber =
-      res.locals.case?.mobileNumber ??
-      getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
-      ''
-    const allowSms =
-      res.locals.case?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
-
-    let sendSms = false
-    if (res.locals?.flags?.enableAllowSms) {
-      sendSms =
-        smsOptIn?.includes('YES') && allowSms !== false && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    } else {
-      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    }
+    const { sendSms, mobileNumber } = getSmsSendEligibility(data, res, crn, smsOptIn)
 
     if (email && firstName && surname) {
       const appointmentId = response.appointments[0].id
@@ -338,6 +325,26 @@ export const buildSmsEventRequest = ({
   }
 
   return { smsEventRequest, isWelshTranslation: includeWelshTranslation }
+}
+
+export const getSmsSendEligibility = (
+  data: Record<string, any>,
+  res: Record<string, any>,
+  crn: string,
+  smsOptIn?: string,
+): { sendSms: boolean; mobileNumber: string } => {
+  const mobileNumber =
+    res.locals?.case?.mobileNumber ??
+    getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
+    ''
+  const allowSms =
+    res.locals?.case?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
+  const hasConsent = res.locals?.flags?.enableAllowSms ? allowSms !== false : true
+  const sendSms = Boolean(
+    smsOptIn?.includes('YES') && hasConsent && res.locals?.flags?.enableSmsReminders && mobileNumber,
+  )
+
+  return { sendSms, mobileNumber }
 }
 
 export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>
