@@ -19,13 +19,21 @@ import {
   MasUserDetails,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from '../data/model/OutlookEvent'
+import {
+  OutlookEventRequestBody,
+  OutlookEventResponse,
+  SmsEventRequest,
+  SmsPreviewRequest,
+} from '../data/model/OutlookEvent'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 import logger from '../../logger'
 import isTimeoutError from '../utils/isTimeoutError'
 import { logFieldPresence } from '../utils/logSessionCacheChange'
+import { Location } from '../data/model/caseload'
+
+const appointmentTypesWithoutLocation = new Set<string>(['COPT', 'COVC', 'CHVS', 'CODC'])
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async function postAppointmentsInner(req, res) {
@@ -131,6 +139,20 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         email = fallbackUserDetails?.email
       }
 
+      const isLoggedInUser = username?.toUpperCase() === res.locals.user.username?.toUpperCase()
+      if (isLoggedInUser) {
+        if (isNameIncomplete(name) && res.locals.user.name) {
+          const nameParts = res.locals.user.name.trim().split(/\s+/)
+          name = {
+            forename: name?.forename || nameParts[0] || '',
+            surname: name?.surname || nameParts.slice(1).join(' ') || '',
+          }
+        }
+        if (!email && res.locals.user.email) {
+          email = res.locals.user.email
+        }
+      }
+
       const stillMissing = [isNameIncomplete(name) && 'name', !email && 'email'].filter(Boolean)
       if (stillMissing.length) {
         const message = `Appointment ${id}: no ${stillMissing.join(' or ')} found for attending user ${username}, even after fallback lookup - calendar invite will not be sent`
@@ -156,13 +178,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     let outlookEventResponse: OutlookEventResponse
     let isWelshTranslation: boolean = false
 
-    const { mobileNumber, allowSms } = res.locals.case
-    let sendSms = false
-    if (res.locals?.flags?.enableAllowSms) {
-      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    } else {
-      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    }
+    const { sendSms, mobileNumber } = getSmsSendEligibility(data, res, crn, smsOptIn)
 
     if (email && firstName && surname) {
       const appointmentId = response.appointments[0].id
@@ -184,22 +200,18 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
       if (sendSms) {
-        const {
-          includeWelshPreview,
-          appointmentLocation = null,
-          appointmentTypeCode = null,
-        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, id, 'smsPreview', 'request'])
-        isWelshTranslation = includeWelshPreview
-        outlookEventRequestBody.smsEventRequest = {
-          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
-          practitionerFirstName: convertToTitleCase(firstName),
-          mobileNumber,
+        const smsData = buildSmsEventRequest({
+          data,
           crn,
-          smsOptIn: true,
-          includeWelshTranslation: includeWelshPreview,
-        }
-        if (appointmentLocation) outlookEventRequestBody.smsEventRequest.appointmentLocation = appointmentLocation
-        if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
+          appointmentId: id,
+          type,
+          locationCode,
+          username: res.locals.user.username,
+          mobileNumber,
+          practitionerFirstName: firstName,
+        })
+        isWelshTranslation = smsData.isWelshTranslation
+        outlookEventRequestBody.smsEventRequest = smsData.smsEventRequest
       }
 
       try {
@@ -254,6 +266,85 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
     return response
   }
+}
+
+export const buildSmsEventRequest = ({
+  data,
+  crn,
+  appointmentId,
+  type,
+  locationCode,
+  username,
+  mobileNumber,
+  practitionerFirstName,
+}: {
+  data: Record<string, any>
+  crn: string
+  appointmentId: string
+  type: string
+  locationCode: string
+  username: string
+  mobileNumber: string
+  practitionerFirstName?: string | null
+}): { smsEventRequest: SmsEventRequest; isWelshTranslation: boolean } => {
+  const smsPreviewRequest = getDataValue<SmsPreviewRequest>(data, [
+    'appointments',
+    crn,
+    appointmentId,
+    'smsPreview',
+    'request',
+  ])
+  const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
+  const includeWelshTranslation = smsPreviewRequest?.includeWelshPreview ?? preferredLanguage === 'Welsh'
+  const appointmentTypeCode = smsPreviewRequest?.appointmentTypeCode ?? type
+  const resolvedPractitionerFirstName = practitionerFirstName ?? smsPreviewRequest?.practitionerFirstName ?? null
+
+  let appointmentLocation = smsPreviewRequest?.appointmentLocation ?? null
+  if (!smsPreviewRequest && !appointmentTypesWithoutLocation.has(appointmentTypeCode)) {
+    const locations = getDataValue<Location[]>(data, ['locations', username]) ?? []
+    const locationMatch = locations.find(loc => loc.code === locationCode)
+    appointmentLocation =
+      locationMatch?.address?.officeName || locationMatch?.address?.buildingName || locationMatch?.description || null
+  }
+
+  const smsEventRequest: SmsEventRequest = {
+    firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
+    mobileNumber,
+    crn,
+    smsOptIn: true,
+    includeWelshTranslation,
+  }
+  if (resolvedPractitionerFirstName) {
+    smsEventRequest.practitionerFirstName = convertToTitleCase(resolvedPractitionerFirstName)
+  }
+  if (appointmentLocation) {
+    smsEventRequest.appointmentLocation = appointmentLocation
+  }
+  if (appointmentTypeCode) {
+    smsEventRequest.appointmentTypeCode = appointmentTypeCode
+  }
+
+  return { smsEventRequest, isWelshTranslation: includeWelshTranslation }
+}
+
+export const getSmsSendEligibility = (
+  data: Record<string, any>,
+  res: Record<string, any>,
+  crn: string,
+  smsOptIn?: string,
+): { sendSms: boolean; mobileNumber: string } => {
+  const mobileNumber =
+    res.locals?.case?.mobileNumber ??
+    getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) ??
+    ''
+  const allowSms =
+    res.locals?.case?.allowSms ?? getDataValue<boolean>(data, ['personalDetails', crn, 'overview', 'allowSms'])
+  const hasConsent = res.locals?.flags?.enableAllowSms ? allowSms !== false : true
+  const sendSms = Boolean(
+    smsOptIn?.includes('YES') && hasConsent && res.locals?.flags?.enableSmsReminders && mobileNumber,
+  )
+
+  return { sendSms, mobileNumber }
 }
 
 export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>

@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import * as Sentry from '@sentry/node'
 import MasApiClient from '../data/masApiClient'
-import { convertToTitleCase, firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
+import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -11,9 +11,9 @@ import {
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { EventResponse, RescheduleEventRequest, SmsPreviewRequest } from '../data/model/OutlookEvent'
+import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { buildCaseLink } from './postAppointments'
+import { buildCaseLink, buildSmsEventRequest, getSmsSendEligibility } from './postAppointments'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import logger from '../../logger'
@@ -41,7 +41,13 @@ export const postRescheduleAppointments = (
       rescheduleAppointment,
       smsOptIn,
       outcome,
-      user: { teamCode: selectedTeam, locationCode: selectedLocation, staffCode },
+      user: {
+        teamCode: selectedTeam,
+        locationCode: selectedLocation,
+        staffCode,
+        username: practitionerUsername,
+        name: practitionerName,
+      },
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
 
     const isInPast = appointmentDateIsInPast(req, res)
@@ -71,14 +77,7 @@ export const postRescheduleAppointments = (
     let eventResponse: EventResponse
     let isWelshTranslation: boolean = false
 
-    const { mobileNumber, allowSms } = res.locals.case
-
-    let sendSms = false
-    if (res.locals?.flags?.enableAllowSms) {
-      sendSms = smsOptIn?.includes('YES') && allowSms && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    } else {
-      sendSms = smsOptIn?.includes('YES') && res.locals?.flags?.enableSmsReminders && !!mobileNumber
-    }
+    const { sendSms, mobileNumber } = getSmsSendEligibility(data, res, crn, smsOptIn)
 
     if (email) {
       const startTime = DateTime.fromISO(start)
@@ -108,27 +107,34 @@ export const postRescheduleAppointments = (
       }
 
       if (sendSms) {
-        const {
-          includeWelshPreview,
-          appointmentLocation = null,
-          appointmentTypeCode = null,
-          practitionerFirstName = null,
-        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
-        isWelshTranslation = includeWelshPreview
-        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
-          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
-          mobileNumber,
-          crn,
-          smsOptIn: true,
-          includeWelshTranslation: includeWelshPreview,
+        let practitionerFirstName = practitionerName?.forename ?? null
+        if (!practitionerFirstName) {
+          const isLoggedInUser =
+            !practitionerUsername || practitionerUsername.toUpperCase() === res.locals.user.username?.toUpperCase()
+          if (isLoggedInUser) {
+            practitionerFirstName = firstName || null
+          } else {
+            try {
+              const attendingUserDetails = await masClient.getUserDetails(practitionerUsername)
+              practitionerFirstName = attendingUserDetails?.firstName || null
+            } catch (error) {
+              logger.warn(error, `Appointment ${uuid}: failed to retrieve user details for ${practitionerUsername}`)
+            }
+          }
         }
-        if (practitionerFirstName)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.practitionerFirstName =
-            convertToTitleCase(practitionerFirstName)
-        if (appointmentLocation)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentLocation = appointmentLocation
-        if (appointmentTypeCode)
-          rescheduleEventRequest.rescheduledEventRequest.smsEventRequest.appointmentTypeCode = appointmentTypeCode
+
+        const smsData = buildSmsEventRequest({
+          data,
+          crn,
+          appointmentId: uuid,
+          type,
+          locationCode: selectedLocation,
+          username: res.locals.user.username,
+          mobileNumber,
+          practitionerFirstName,
+        })
+        isWelshTranslation = smsData.isWelshTranslation
+        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = smsData.smsEventRequest
       }
 
       try {

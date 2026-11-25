@@ -34,7 +34,7 @@ export const getSmsPreview = (
       type: appointmentTypeCode,
       date,
       start,
-      user: { locationCode, email: recipientEmail, name: practitionerName },
+      user: { locationCode, email: recipientEmail, name: practitionerName, username: practitionerUsername },
       smsPreview,
     } = appointment
     const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
@@ -47,10 +47,14 @@ export const getSmsPreview = (
       includeWelshPreview,
     }
 
-    if (practitionerName?.forename) {
-      const previewRecipientEmail = recipientEmail || res.locals.user.email
+    const isLoggedInUser = !practitionerUsername || practitionerUsername.toUpperCase() === username?.toUpperCase()
+    const rawName = practitionerName || (isLoggedInUser ? res.locals.user.name : null)
+    const practitionerForename = typeof rawName === 'string' ? rawName.trim().split(/\s+/)[0] : rawName?.forename
+
+    if (practitionerForename) {
+      const previewRecipientEmail = recipientEmail || (isLoggedInUser ? res.locals.user.email : undefined)
       if (previewRecipientEmail) body.recipientEmail = previewRecipientEmail
-      body.practitionerFirstName = convertToTitleCase(practitionerName.forename)
+      body.practitionerFirstName = convertToTitleCase(practitionerForename)
     }
 
     // we should not be sending location when its telephone or video contact
