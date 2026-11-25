@@ -5,15 +5,14 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
-import { getCheckinOffenderDetails, getSentences } from '../middleware'
-import { getUpcomingCheckinDetails } from '../middleware/getCheckinUpcomingDetails'
+import { getSentences } from '../middleware'
+import { getUpcomingCheckinDetails } from '../utils/getUpcomingCheckinDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
 import { PersonExistsResponse } from '../data/emdiClient'
 import logger from '../../logger'
-import ESupervisionClient from '../data/eSupervisionClient'
-import { eligibilityCheckDisabled, fullName, resolveCheckinEligibility } from '../utils'
 import { getThroughcareRows } from '../utils/throughcare'
+import { getCheckinEligibility } from '../utils/getCheckinEligibility'
 
 const caseController: Controller<readonly ['getCase'], void> = {
   getCase: hmppsAuthClient => {
@@ -23,7 +22,6 @@ const caseController: Controller<readonly ['getCase'], void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
-      const esupClient = new ESupervisionClient(token)
       // Preloads semantic search data into OpenSearch for this CRN; fire-and-forget, non-blocking.
       if (res.locals.flags.enableSemanticSearch) {
         masClient.preloadActivitySearch(crn).catch(err => {
@@ -47,36 +45,33 @@ const caseController: Controller<readonly ['getCase'], void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [overview, needs, sanIndicatorResponse, contactResponse, practitioner, throughcareRows] = await Promise.all(
-        [
-          masClient.getOverview(crn, sentenceNumber),
-          arnsClient.getNeeds(crn),
-          arnsClient.getSanIndicator(crn),
-          masClient.getOverdueOutcomes(crn),
-          masClient.getProbationPractitioner(crn),
-          res.locals.flags.enableNewOverview
-            ? getThroughcareRows(token, req.session.data.personalDetails?.[crn]?.overview?.noms, res.locals.prisoner)
-            : undefined,
-        ],
-      )
+      const [
+        overview,
+        needs,
+        sanIndicatorResponse,
+        contactResponse,
+        practitioner,
+        throughcareRows,
+        { offenderCheckinsByCRNResponse, checkinEligibility },
+      ] = await Promise.all([
+        masClient.getOverview(crn, sentenceNumber),
+        arnsClient.getNeeds(crn),
+        arnsClient.getSanIndicator(crn),
+        masClient.getOverdueOutcomes(crn),
+        masClient.getProbationPractitioner(crn),
+        res.locals.flags.enableNewOverview
+          ? getThroughcareRows(token, req.session.data.personalDetails?.[crn]?.overview?.noms, res.locals.prisoner)
+          : undefined,
+        getCheckinEligibility(token, crn, res.locals),
+      ])
       const outcomes = res.locals.flags.enable3MonthsOutcomes
         ? filterContactsMonths(contactResponse?.content)
         : filterContacts(contactResponse?.content)
 
-      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
-      const checkinEligibility =
-        res.locals.flags?.enableEsupEligibilityCheck === true
-          ? resolveCheckinEligibility(
-              await esupClient.getOffenderEligibility(crn),
-              res.locals.tierCalculation,
-              fullName(res.locals.headerPersonName),
-              res.locals.offenderCheckinsByCRNResponse?.status,
-            )
-          : eligibilityCheckDisabled
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
-      await getUpcomingCheckinDetails(hmppsAuthClient)(req, res)
+      const upcomingCheckin = await getUpcomingCheckinDetails(token, crn, offenderCheckinsByCRNResponse?.status)
       let personExistsResponse: PersonExistsResponse | undefined
       await getSentences(hmppsAuthClient)(req, res, () => {})
       const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
@@ -99,6 +94,8 @@ const caseController: Controller<readonly ['getCase'], void> = {
         canAccessCheckins,
         locationMonitoringUri: personExistsResponse?.uri,
         checkinEligibility,
+        offenderCheckinsByCRNResponse,
+        upcomingCheckin,
         throughcareRows,
       })
     }

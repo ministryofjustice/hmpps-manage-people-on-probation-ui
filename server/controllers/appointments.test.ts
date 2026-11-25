@@ -3,18 +3,18 @@ import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import { isValidCrn, isNumericString, canRescheduleAppointment, eligibilityCheckDisabled } from '../utils'
+import { isValidCrn, isNumericString, canRescheduleAppointment } from '../utils'
 import { mockAppResponse, mockPersonSchedule, mockPersonAppointment, mockTierCalculation } from './mocks'
 import { checkAuditMessage, checkSendAuditMessage } from './testutils'
 import { cloneAppointmentAndRedirect, renderError, overrideDeliusManagedFlag } from '../middleware'
+import { getCheckinEligibility } from '../utils/getCheckinEligibility'
+import { OffenderCheckinsByCRNResponse, OffenderEligibility } from '../data/model/esupervision'
 import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
 import { Activity, PersonAppointment, Schedule } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { Sentence } from '../data/model/sentenceDetails'
-import ESupervisionClient from '../data/eSupervisionClient'
-import { OffenderEligibility } from '../data/model/esupervision'
 
 const crn = 'X000001'
 const id = '1234'
@@ -65,7 +65,6 @@ jest.mock('../utils', () => {
     isMatchingAddress: jest.fn(() => true),
     setDataValue: jest.fn(),
     canRescheduleAppointment: jest.fn(),
-    eligibilityCheckDisabled: jest.fn(),
   }
 })
 
@@ -86,9 +85,10 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
-  getCheckinOffenderDetails: jest.fn(() => mockMiddlewareFn),
   overrideDeliusManagedFlag: jest.fn(() => jest.fn(() => mockScheduleWithFlag.personSchedule.appointments)),
 }))
+
+jest.mock('../utils/getCheckinEligibility')
 
 jest.mock('./arrangeAppointment', () => ({
   redirectToSentence: jest.fn(() => mockMiddlewareFn),
@@ -96,6 +96,17 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
+const mockOffenderCheckinsByCRNResponse = { status: 'VERIFIED' } as OffenderCheckinsByCRNResponse
+const mockCheckinEligibility: OffenderEligibility = {
+  outcome: 'ELIGIBLE',
+  message: 'This person is eligible for online check ins',
+}
+const mockGetCheckinEligibility = (
+  getCheckinEligibility as jest.MockedFunction<typeof getCheckinEligibility>
+).mockResolvedValue({
+  offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
+  checkinEligibility: mockCheckinEligibility,
+})
 const mockOverrideDeliusManagedFlag = overrideDeliusManagedFlag as jest.MockedFunction<typeof overrideDeliusManagedFlag>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
@@ -155,11 +166,6 @@ const mockAppointment: AttendedCompliedAppointment | Activity = {
   startDateTime: '2025-11-20',
 }
 
-const mockOffenderEligibility: OffenderEligibility = {
-  outcome: 'ELIGIBLE',
-  message: 'This person is eligible for online check ins',
-}
-
 const res = mockAppResponse({
   user: {
     username: 'user-1',
@@ -213,10 +219,6 @@ const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(mockPractitioner))
 
-const getOffenderEligibilitySpy = jest
-  .spyOn(ESupervisionClient.prototype, 'getOffenderEligibility')
-  .mockImplementation(() => Promise.resolve(mockOffenderEligibility))
-
 describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -246,7 +248,6 @@ describe('controllers/appointments', () => {
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
-        checkinEligibility: eligibilityCheckDisabled,
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
@@ -254,6 +255,8 @@ describe('controllers/appointments', () => {
         hasDeceased: false,
         hasPractitioner: true,
         canAccessCheckins: false,
+        checkinEligibility: mockCheckinEligibility,
+        offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
         url: '',
       })
     })
@@ -268,7 +271,6 @@ describe('controllers/appointments', () => {
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(mockOverrideDeliusManagedFlag).toHaveBeenCalledTimes(2)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
-        checkinEligibility: eligibilityCheckDisabled,
         upcomingAppointments: mockScheduleWithFlag,
         pastAppointments: mockScheduleWithFlag,
         crn,
@@ -276,6 +278,8 @@ describe('controllers/appointments', () => {
         hasDeceased: false,
         hasPractitioner: true,
         canAccessCheckins: false,
+        checkinEligibility: mockCheckinEligibility,
+        offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
         url: '',
       })
     })
@@ -292,13 +296,14 @@ describe('controllers/appointments', () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
       expect(spy).toHaveBeenCalledWith('pages/appointments', {
-        checkinEligibility: eligibilityCheckDisabled,
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
         hasDeceased: false,
         hasPractitioner: false,
         canAccessCheckins: false,
+        checkinEligibility: mockCheckinEligibility,
+        offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
         url: '',
       })
     })
@@ -324,73 +329,21 @@ describe('controllers/appointments', () => {
   })
 
   describe('get appointments - checkins eligibility', () => {
-    it('should render the appointments page with checkinEligibility details', async () => {
+    it('should resolve the checkin eligibility', async () => {
       const mockRes = mockAppResponse({
         tierCalculation: mockTierCalculation,
-        flags: {
-          enableESupervisionCheckins: true,
-          enableEsupEligibilityCheck: true,
-          enableSupervisionPackageAppointments: true,
-        },
+        flags: { enableSupervisionPackageAppointments: true },
         supervisionPackageDetails: { context: { sentences: [] } },
       })
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(getOffenderEligibilitySpy).toHaveBeenCalledWith(crn)
+      expect(mockGetCheckinEligibility).toHaveBeenCalledWith('token-1', crn, mockRes.locals)
       expect(spy).toHaveBeenCalledWith(
         'pages/appointments',
         expect.objectContaining({
-          checkinEligibility: { message: 'This person is eligible for online check ins', outcome: 'ELIGIBLE' },
+          checkinEligibility: mockCheckinEligibility,
+          offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
         }),
-      )
-    })
-
-    it('should mark the person as ineligible for check ins when no tier has been assigned', async () => {
-      const mockRes = mockAppResponse({
-        flags: { enableESupervisionCheckins: true, enableEsupEligibilityCheck: true },
-        tierCalculation: null,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(spy).toHaveBeenCalledWith(
-        'pages/appointments',
-        expect.objectContaining({
-          checkinEligibility: {
-            outcome: 'INELIGIBLE',
-            message: 'Alton Berge is not eligible for online check ins because they have not been assigned a tier yet.',
-          },
-        }),
-      )
-    })
-
-    it('should keep the person eligible when no tier has been assigned but they are already set up for check ins', async () => {
-      const mockRes = mockAppResponse({
-        flags: { enableESupervisionCheckins: true, enableEsupEligibilityCheck: true },
-        tierCalculation: null,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-        offenderCheckinsByCRNResponse: { status: 'INACTIVE' },
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(spy).toHaveBeenCalledWith(
-        'pages/appointments',
-        expect.objectContaining({ checkinEligibility: mockOffenderEligibility }),
-      )
-    })
-
-    it('should skip the eligibility check and treat the person as eligible when the flag is off', async () => {
-      const mockRes = mockAppResponse({
-        flags: { enableESupervisionCheckins: true, enableEsupEligibilityCheck: false },
-        tierCalculation: null,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      await controllers.appointments.getAppointments(hmppsAuthClient)(req, mockRes)
-      expect(getOffenderEligibilitySpy).not.toHaveBeenCalled()
-      expect(spy).toHaveBeenCalledWith(
-        'pages/appointments',
-        expect.objectContaining({ checkinEligibility: eligibilityCheckDisabled }),
       )
     })
   })
