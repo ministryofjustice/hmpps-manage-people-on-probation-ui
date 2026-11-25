@@ -63,7 +63,7 @@
 
             {% set alertActivity %}
                 <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
-                        {{ alert.description + ' - ' + alert.type.description if alert.description else alert.type.description }}
+                        {{ (alert.description + ' - ' + alert.type.description if alert.description else alert.type.description) | toSentenceCase }}
                     </a></p>
 
                 {% if alert.alertNotes.length > 0 or alert.alertNote %}

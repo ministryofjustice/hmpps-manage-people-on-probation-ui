@@ -34,7 +34,7 @@
           {
               html:
               '<a class="govuk-link" href="/case/' + enforcementAction.crn + '/appointments/appointment/' + enforcementAction.id + '/manage?back=' + url + '">'
-              + ((enforcementAction.displayName if enforcementAction.displayName else enforcementAction.appointmentType) | escape)
+              + ((enforcementAction.displayName if enforcementAction.displayName else enforcementAction.appointmentType) | toSentenceCase | escape )
               + '</a><br>'
               + '<span class="govuk-body-s">'
               + enforcementAction.appointmentDate | dateWithYearShortMonth
@@ -42,13 +42,13 @@
           },
           {
               text:
-              ((enforcementAction.appointmentOutcome | lower | capitalize)
+              ((enforcementAction.appointmentOutcome | toSentenceCase)
               if enforcementAction.appointmentOutcome
               else 'Not provided')
           },
           {
               html:
-              (((enforcementAction.enforcementAction | lower | capitalize) | escape)
+              (((enforcementAction.enforcementAction | toSentenceCase) | escape)
               if enforcementAction.enforcementAction
               else ('Not provided' | escape))
               + '</a><br>'

@@ -43,7 +43,7 @@ context('Enforcement actions', () => {
     page
       .getTableCell(2, 2)
       .find('a')
-      .should('contain.text', 'Home Visit')
+      .should('contain.text', 'Home visit')
       .should(
         'have.attr',
         'href',

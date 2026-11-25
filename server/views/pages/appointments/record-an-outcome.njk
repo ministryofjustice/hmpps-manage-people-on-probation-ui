@@ -38,7 +38,7 @@
                 {% set appointmentName = (appointment.description + ' - ' + appointment.type.description) if appointment.description else appointment.type.description %}
                 {% set ppFullName = appointment.staff.name.forename + ' ' + appointment.staff.name.surname %}
                 {% set appointmentRadioItems = (appointmentRadioItems.push({
-                    html: '<strong>' + appointmentName + ' with ' + (ppFullName | convertToTitleCase) + '</strong><br />' + appointment.date | dateWithDayAndWithYear + ' from ' + timeFromTo(appointment.start, appointment.end),
+                    html: '<strong>' + appointmentName | toSentenceCase + ' with ' + (ppFullName | convertToTitleCase) + '</strong><br />' + appointment.date | dateWithDayAndWithYear + ' from ' + timeFromTo(appointment.start, appointment.end),
                     value: appointment.id,
                     checked: contactId == appointment.id
                 }), appointmentRadioItems) %}
