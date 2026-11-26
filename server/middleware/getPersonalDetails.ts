@@ -34,9 +34,7 @@ export const getPersonalDetails = (
     let riskData: RiskData
     let probationPractitioner: ProbationPractitioner
     let professionalContact: ProfessionalContact | null
-    let personPhotoSrc: string | null | undefined
     let arnsUnavailable = false
-    let photoUnavailable = false
     let token: string
     let masClient: MasApiClient
     const refreshCache =
@@ -53,7 +51,6 @@ export const getPersonalDetails = (
         riskData,
         probationPractitioner,
         professionalContact,
-        personPhotoSrc,
         arnsUnavailable,
       } = req.session.data.personalDetails[crn])
     }
@@ -159,15 +156,14 @@ export const getPersonalDetails = (
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       return token
     }
-    ;({ personPhotoSrc, photoUnavailable } = await getPersonHeaderPhoto({
+    const { personPhotoSrc, photoUnavailable } = await getPersonHeaderPhoto({
       res,
       mpopComponents,
       getToken,
       crn,
       noms: overview?.noms,
-      cachedPhotoSrc: personPhotoSrc,
       cachedDetails: req.session?.data?.personalDetails?.[crn],
-    }))
+    })
 
     if (res.locals.flags?.enablePersonHeader) {
       if (overview.noms) {
@@ -194,7 +190,7 @@ export const getPersonalDetails = (
     res.locals.riskData = riskData
     res.locals.probationPractitioner = probationPractitioner
     res.locals.professionalContact = professionalContact
-    res.locals.personPhotoSrc = personPhotoSrc ?? undefined
+    res.locals.personPhotoSrc = personPhotoSrc
     res.locals.arnsUnavailable = arnsUnavailable
     res.locals.photoUnavailable = photoUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }

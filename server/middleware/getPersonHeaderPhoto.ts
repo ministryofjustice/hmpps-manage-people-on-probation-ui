@@ -10,7 +10,6 @@ interface PersonHeaderPhotoOptions {
   getToken: () => Promise<string>
   crn: string
   noms?: string
-  cachedPhotoSrc?: string | null
   cachedDetails?: Partial<PersonalDetailsSession>
 }
 
@@ -22,7 +21,7 @@ export interface PersonHeaderPhoto {
 const isPersonHeaderPhotoEnabled = (res: AppResponse): boolean =>
   Boolean(res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto)
 
-const getCheckInPhotoUrl = async ({
+const getCheckInPhoto = async ({
   res,
   mpopComponents,
   getToken,
@@ -45,25 +44,24 @@ export const getPersonHeaderPhoto = async (options: PersonHeaderPhotoOptions): P
   }
 
   const checkInPhoto = res.locals.flags?.enableESUPCheckInPhotosForSearch
-    ? await getCheckInPhotoUrl(options)
+    ? await getCheckInPhoto(options)
     : { photoUrl: null, failed: false }
-  const checkInPhotoUrl = checkInPhoto.photoUrl
 
-  let prisonPhotoSrc = options.cachedPhotoSrc
+  let hasPrisonPhoto = Boolean(cachedDetails?.personPhotoSrc)
   let prisonPhotoFailed = false
-  if (!checkInPhotoUrl && noms && cachedDetails?.personPhotoSrc === undefined) {
+  if (!checkInPhoto.photoUrl && noms && cachedDetails?.personPhotoSrc === undefined) {
     const { hasPhoto, error } = await mpopComponents.hasPersonPhoto(await getToken(), noms)
+    hasPrisonPhoto = hasPhoto
     prisonPhotoFailed = Boolean(error)
-    prisonPhotoSrc = hasPhoto ? personPhotoHref(noms) : null
     if (cachedDetails?.overview && !prisonPhotoFailed) {
-      cachedDetails.personPhotoSrc = prisonPhotoSrc
+      cachedDetails.personPhotoSrc = hasPhoto ? personPhotoHref(noms) : null
     }
   }
 
   const personPhotoSrc = toPersonPhotoSrc({
-    checkInPhotoUrl,
+    checkInPhotoUrl: checkInPhoto.photoUrl,
     noms,
-    hasPrisonPhoto: Boolean(prisonPhotoSrc),
+    hasPrisonPhoto,
     prisonPhotoHref: personPhotoHref,
   })
 

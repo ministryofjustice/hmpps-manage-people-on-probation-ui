@@ -17,13 +17,8 @@ const getToken = jest.fn().mockResolvedValue('token-1')
 
 const flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true, enableESUPCheckInPhotosForSearch: true }
 
-const run = (
-  res: AppResponse,
-  {
-    cachedPhotoSrc,
-    cachedDetails,
-  }: { cachedPhotoSrc?: string | null; cachedDetails?: Partial<PersonalDetailsSession> } = {},
-) => getPersonHeaderPhoto({ res, mpopComponents, getToken, crn, noms, cachedPhotoSrc, cachedDetails })
+const run = (res: AppResponse, cachedDetails?: Partial<PersonalDetailsSession>) =>
+  getPersonHeaderPhoto({ res, mpopComponents, getToken, crn, noms, cachedDetails })
 
 describe('middleware/getPersonHeaderPhoto', () => {
   beforeEach(() => {
@@ -38,7 +33,10 @@ describe('middleware/getPersonHeaderPhoto', () => {
   ])('returns no photo and makes no requests when the photo is switched off: %o', async photoFlags => {
     const res = mockAppResponse({ flags: { ...flags, ...photoFlags } })
 
-    const result = await run(res, { cachedPhotoSrc: `/person-photo/${noms}` })
+    const result = await run(res, {
+      overview: {},
+      personPhotoSrc: `/person-photo/${noms}`,
+    } as Partial<PersonalDetailsSession>)
 
     expect(result).toEqual({ personPhotoSrc: undefined, photoUnavailable: false })
     expect(mpopComponents.getCheckInPhotoUrl).not.toHaveBeenCalled()
@@ -104,10 +102,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
     const res = mockAppResponse({ flags })
 
     await run(res)
-    const result = await run(res, {
-      cachedPhotoSrc: null,
-      cachedDetails: { overview: {}, personPhotoSrc: null } as Partial<PersonalDetailsSession>,
-    })
+    const result = await run(res, { overview: {}, personPhotoSrc: null } as Partial<PersonalDetailsSession>)
 
     expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledTimes(1)
     expect(result.photoUnavailable).toBe(true)
@@ -117,7 +112,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
     mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: true, httpStatus: 200, error: null })
     const cachedDetails = { overview: {} } as Partial<PersonalDetailsSession>
 
-    const result = await run(mockAppResponse({ flags }), { cachedDetails })
+    const result = await run(mockAppResponse({ flags }), cachedDetails)
 
     expect(mpopComponents.hasPersonPhoto).toHaveBeenCalledWith('token-1', noms)
     expect(result).toEqual({ personPhotoSrc: `/person-photo/${noms}`, photoUnavailable: false })
@@ -127,7 +122,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
   it('caches no prison photo as null', async () => {
     const cachedDetails = { overview: {} } as Partial<PersonalDetailsSession>
 
-    const result = await run(mockAppResponse({ flags }), { cachedDetails })
+    const result = await run(mockAppResponse({ flags }), cachedDetails)
 
     expect(result.personPhotoSrc).toBeUndefined()
     expect(cachedDetails.personPhotoSrc).toBeNull()
@@ -136,10 +131,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
   it('uses the cached prison photo without checking again', async () => {
     const cachedDetails = { overview: {}, personPhotoSrc: `/person-photo/${noms}` } as Partial<PersonalDetailsSession>
 
-    const result = await run(mockAppResponse({ flags }), {
-      cachedPhotoSrc: cachedDetails.personPhotoSrc,
-      cachedDetails,
-    })
+    const result = await run(mockAppResponse({ flags }), cachedDetails)
 
     expect(mpopComponents.hasPersonPhoto).not.toHaveBeenCalled()
     expect(result.personPhotoSrc).toBe(`/person-photo/${noms}`)
@@ -149,7 +141,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
     mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: false, httpStatus: 500, error: new Error('500') })
     const cachedDetails = { overview: {} } as Partial<PersonalDetailsSession>
 
-    const result = await run(mockAppResponse({ flags }), { cachedDetails })
+    const result = await run(mockAppResponse({ flags }), cachedDetails)
 
     expect(result).toEqual({ personPhotoSrc: undefined, photoUnavailable: true })
     expect(cachedDetails.personPhotoSrc).toBeUndefined()
