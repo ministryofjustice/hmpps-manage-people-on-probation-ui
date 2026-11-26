@@ -63,6 +63,7 @@ const caseController: Controller<readonly ['getCase'], void> = {
           ? getThroughcareRows(token, req.session.data.personalDetails?.[crn]?.overview?.noms, res.locals.prisoner)
           : undefined,
         getCheckinEligibility(token, crn, res.locals),
+        getSentences(hmppsAuthClient)(req, res, () => {}),
       ])
       const outcomes = res.locals.flags.enable3MonthsOutcomes
         ? filterContactsMonths(contactResponse?.content)
@@ -73,7 +74,6 @@ const caseController: Controller<readonly ['getCase'], void> = {
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       const upcomingCheckin = await getUpcomingCheckinDetails(token, crn, offenderCheckinsByCRNResponse?.status)
       let personExistsResponse: PersonExistsResponse | undefined
-      await getSentences(hmppsAuthClient)(req, res, () => {})
       const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
         hasLocationMonitoring(item?.licenceConditions, item?.requirements),
       )
