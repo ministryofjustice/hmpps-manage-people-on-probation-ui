@@ -121,6 +121,12 @@ describe('sentenceController', () => {
         await controllers.sentence.getSentence(hmppsAuthClient)(req, res)
 
         expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
+        expect(renderSpy).toHaveBeenCalledWith('pages/sentence', {
+          sentenceDetails: mockSentenceDetails,
+          crn,
+          locationMonitoringUri: 'https://emdi-uri',
+          personExistsResponse: { uri: 'https://emdi-uri' },
+        })
       })
 
       it('should call existsInEMDI if location monitoring data is present in requirements', async () => {

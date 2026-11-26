@@ -462,6 +462,13 @@ describe('caseController', () => {
       expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          locationMonitoringUri: 'https://emdi-uri',
+          personExistsResponse: { uri: 'https://emdi-uri' },
+        }),
+      )
     })
 
     it('should call getSentences but NOT existsInEMDI when NO location monitoring is present', async () => {

@@ -9,7 +9,6 @@ import { getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../utils/getUpcomingCheckinDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
-import { PersonExistsResponse } from '../data/emdiClient'
 import logger from '../../logger'
 import { getThroughcareRows } from '../utils/throughcare'
 import { getCheckinEligibility } from '../utils/getCheckinEligibility'
@@ -72,15 +71,13 @@ const caseController: Controller<readonly ['getCase'], void> = {
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
-      const upcomingCheckin = await getUpcomingCheckinDetails(token, crn, offenderCheckinsByCRNResponse?.status)
-      let personExistsResponse: PersonExistsResponse | undefined
       const hasLocationMonitoringData = (res.locals?.sentences || []).some(item =>
         hasLocationMonitoring(item?.licenceConditions, item?.requirements),
       )
-      if (hasLocationMonitoringData) {
-        personExistsResponse = await existsInEMDI(crn, token)
-        res.locals.personExistsResponse = personExistsResponse
-      }
+      const [upcomingCheckin, personExistsResponse] = await Promise.all([
+        getUpcomingCheckinDetails(token, crn, offenderCheckinsByCRNResponse?.status),
+        hasLocationMonitoringData ? existsInEMDI(crn, token) : undefined,
+      ])
       return res.render('pages/overview', {
         overview,
         needs,
@@ -93,6 +90,7 @@ const caseController: Controller<readonly ['getCase'], void> = {
         hasPractitioner,
         canAccessCheckins,
         locationMonitoringUri: personExistsResponse?.uri,
+        personExistsResponse,
         checkinEligibility,
         offenderCheckinsByCRNResponse,
         upcomingCheckin,

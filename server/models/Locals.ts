@@ -44,7 +44,6 @@ import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsOptInOptions, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { ESupervisionCheckIn } from '../data/model/esupervision'
-import { PersonExistsResponse } from '../data/emdiClient'
 import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
 import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 import { Prisoner } from '../data/prisonerSearchApiClient'
@@ -200,7 +199,6 @@ interface Locals {
   feedbackEmail?: string
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
-  personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
   nextAppointmentDetails: Activity | null
   searchResponse?: ProbationSearchResponse
