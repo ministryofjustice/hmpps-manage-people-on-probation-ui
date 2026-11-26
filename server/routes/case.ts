@@ -1,5 +1,6 @@
 import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import parallelMiddleware from '../middleware/parallelMiddleware'
 import type { Services } from '../services'
 import controllers from '../controllers'
 import {
@@ -16,17 +17,18 @@ import {
 export default function caseRoutes(router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) {
   router.all(
     ['/case/:crn', '/case/:crn/*path'],
-    getOasysLink(),
-    getSupervisionPackage(hmppsAuthClient, mpopComponents),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getPersonRiskFlags(hmppsAuthClient),
-    getTierDetails(hmppsAuthClient, mpopComponents),
-    getNextAppointment(hmppsAuthClient, mpopComponents),
+    parallelMiddleware(
+      getOasysLink(),
+      // getPersonalDetails reads res.locals.supervisionPackageDetails, so must run after getSupervisionPackage
+      [getSupervisionPackage(hmppsAuthClient, mpopComponents), getPersonalDetails(hmppsAuthClient, arnsComponents)],
+      getPersonRiskFlags(hmppsAuthClient),
+      getTierDetails(hmppsAuthClient, mpopComponents),
+      getNextAppointment(hmppsAuthClient, mpopComponents),
+    ),
   )
   router.get(
     '/case/:crn',
-    getTierChangePrompt(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
+    parallelMiddleware(getTierChangePrompt(hmppsAuthClient), getSentences(hmppsAuthClient)),
     asyncMiddleware(controllers.case.getCase(hmppsAuthClient)),
   )
 }

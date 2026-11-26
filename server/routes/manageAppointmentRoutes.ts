@@ -20,6 +20,7 @@ import {
   restrictPageAccess,
 } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
+import parallelMiddleware from '../middleware/parallelMiddleware'
 import config from '../config'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
@@ -34,10 +35,12 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.all(
     '/case/:crn/appointments/appointment/:contactId/outcome/add-note',
-    getAppointmentTypes(hmppsAuthClient),
-    getPersonAppointment(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    parallelMiddleware(
+      getAppointmentTypes(hmppsAuthClient),
+      getPersonAppointment(hmppsAuthClient),
+      getSentences(hmppsAuthClient),
+      getPersonalDetails(hmppsAuthClient, arnsComponents),
+    ),
     getOutcomeProps,
     getBackLink,
     getOutcomeSentence(hmppsAuthClient),

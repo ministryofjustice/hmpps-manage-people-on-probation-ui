@@ -20,6 +20,8 @@ import {
   restrictPageAccess,
   getSentenceList,
   checkIsValidUrl,
+  checkAnswers,
+  getUserOptions,
 } from '../middleware'
 import {
   getNotePrepend,
@@ -32,12 +34,11 @@ import {
 } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
+import parallelMiddleware from '../middleware/parallelMiddleware'
 import { getTimeOptions } from '../middleware/getTimeOptions'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
-import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
-import { getUserOptions } from '../middleware/getUserOptions'
 import { returnOptions } from '../middleware/returnOptions'
 import { routeChangeSmsConsent } from '../middleware/routeChangeSmsConsent'
 import { setCollapsibleRiskFlags } from '../middleware/setCollapsibleRiskFlags'
@@ -45,8 +46,7 @@ import { setCollapsibleRiskFlags } from '../middleware/setCollapsibleRiskFlags'
 const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
   router.all(
     '/case/:crn/arrange-appointment/:id/*path',
-    getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    parallelMiddleware(getAppointmentTypes(hmppsAuthClient), getPersonalDetails(hmppsAuthClient, arnsComponents)),
     getAppointment(hmppsAuthClient),
     setCollapsibleRiskFlags,
   )
@@ -113,8 +113,7 @@ const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsCompone
   router.get(
     '/case/:crn/arrange-appointment/:id/location-date-time',
     restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getPersonRiskFlags(hmppsAuthClient),
+    parallelMiddleware(getOfficeLocationsByTeamAndProvider(hmppsAuthClient), getPersonRiskFlags(hmppsAuthClient)),
     forceValidation,
     controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
