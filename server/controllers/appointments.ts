@@ -13,21 +13,13 @@ import {
   getDataValue,
   canRescheduleAppointment,
   addressToList,
-  resolveCheckinEligibility,
-  eligibilityCheckDisabled,
-  fullName,
 } from '../utils'
-import {
-  renderError,
-  cloneAppointmentAndRedirect,
-  getCheckinOffenderDetails,
-  overrideDeliusManagedFlag,
-} from '../middleware'
+import { renderError, cloneAppointmentAndRedirect, overrideDeliusManagedFlag } from '../middleware'
 import { AppointmentSessionSelection } from '../models/Appointments'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
 import { deleteOutcomeVars } from '../middleware/appointment-outcomes'
-import ESupervisionClient from '../data/eSupervisionClient'
 import { isCancelledCheckIn } from '../utils/cancelledCheckIn'
+import { getCheckinEligibility } from '../utils/getCheckinEligibility'
 
 const appointmentsController: Controller<
   readonly [
@@ -48,7 +40,6 @@ const appointmentsController: Controller<
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const esupClient = new ESupervisionClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENTS',
         who: res.locals.user.username,
@@ -58,22 +49,17 @@ const appointmentsController: Controller<
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointmentsResponse, pastAppointmentsResponse, practitioner] = await Promise.all([
+      const [
+        upcomingAppointmentsResponse,
+        pastAppointmentsResponse,
+        practitioner,
+        { offenderCheckinsByCRNResponse, checkinEligibility },
+      ] = await Promise.all([
         masClient.getPersonSchedule(crn, 'upcoming', '0', undefined, res.locals.flags),
         masClient.getPersonSchedule(crn, 'previous', '0', undefined, res.locals.flags),
         masClient.getProbationPractitioner(crn),
+        getCheckinEligibility(token, crn, res.locals),
       ])
-
-      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
-      const checkinEligibility =
-        res.locals.flags?.enableEsupEligibilityCheck === true
-          ? resolveCheckinEligibility(
-              await esupClient.getOffenderEligibility(crn),
-              res.locals.tierCalculation,
-              fullName(res.locals.headerPersonName),
-              res.locals.offenderCheckinsByCRNResponse?.status,
-            )
-          : eligibilityCheckDisabled
 
       let pastAppointments = pastAppointmentsResponse
       let upcomingAppointments = upcomingAppointmentsResponse
@@ -109,6 +95,7 @@ const appointmentsController: Controller<
         hasPractitioner,
         canAccessCheckins,
         checkinEligibility,
+        offenderCheckinsByCRNResponse,
       })
     }
   },

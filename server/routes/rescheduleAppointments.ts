@@ -1,5 +1,6 @@
 import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import parallelMiddleware from '../middleware/parallelMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
@@ -38,8 +39,7 @@ const rescheduleAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComp
     cacheUploadedFiles,
     validate.appointments,
     autoStoreSessionData(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
+    parallelMiddleware(getAppointmentTypes(hmppsAuthClient), getSentences(hmppsAuthClient)),
     createAppointmentSession,
     getUserProviders(hmppsAuthClient),
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
@@ -47,12 +47,15 @@ const rescheduleAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComp
 
   router.get(
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
-    getOverdueOutcomes(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
-    getPersonAppointment(hmppsAuthClient),
-    getUserProviders(hmppsAuthClient),
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    parallelMiddleware(
+      getOverdueOutcomes(hmppsAuthClient),
+      getAppointmentTypes(hmppsAuthClient),
+      getPersonalDetails(hmppsAuthClient, arnsComponents),
+      // getUserProviders reads res.locals.personAppointment
+      [getPersonAppointment(hmppsAuthClient), getUserProviders(hmppsAuthClient)],
+      getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    ),
+    // getAppointment reads the case, appointment types, providers and locations set above
     getAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
   )

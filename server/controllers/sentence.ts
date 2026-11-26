@@ -59,12 +59,12 @@ const sentenceController: Controller<
       } = checkLocationMonitoring(licenceConditions, requirements)
       if (hasLocationMonitoring?.hasLicenceConditionsLMData || hasLocationMonitoring?.hasRequirementsLMData) {
         personExistsResponse = await existsInEMDI(crn, token)
-        res.locals.personExistsResponse = personExistsResponse
       }
       return res.render('pages/sentence', {
         sentenceDetails,
         crn,
         locationMonitoringUri: personExistsResponse?.uri,
+        personExistsResponse,
       })
     }
   },

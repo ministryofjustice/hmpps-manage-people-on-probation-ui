@@ -32,6 +32,7 @@ import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
 import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 import requestLogger from './middleware/requestLogger'
 import instrumentRouter from './middleware/instrumentRouter'
+import parallelMiddleware from './middleware/parallelMiddleware'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -72,12 +73,19 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpAuthentication())
   app.use(setUpSuccessBanner())
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
-  app.use(setUpCurrentUser(services))
-  app.use(setUpFlags(services))
-  app.use(getFrontendComponents(services.probationComponentsApiService))
+
   const { hmppsAuthClient } = services
-  app.use(getUserAlertsCount(hmppsAuthClient))
+
+  app.use(
+    parallelMiddleware(
+      setUpCurrentUser(services),
+      setUpFlags(services),
+      getFrontendComponents(services.probationComponentsApiService),
+      getUserAlertsCount(hmppsAuthClient),
+    ),
+  )
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
+
   // Routes that use multer for multipart upload must be registered before csrf executes
   const router = Router()
   app.use(manageAppointmentRoutes(router, services))

@@ -1,5 +1,6 @@
 import { type RequestHandler, Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import parallelMiddleware from '../middleware/parallelMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
@@ -26,9 +27,11 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopCo
 
   router.get(
     '/case/:crn/appointments',
-    getPersonRiskFlags(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
-    getSupervisionPackage(hmppsAuthClient, mpopComponents),
+    parallelMiddleware(
+      getPersonRiskFlags(hmppsAuthClient),
+      getSentences(hmppsAuthClient),
+      getSupervisionPackage(hmppsAuthClient, mpopComponents),
+    ),
     controllers.appointments.getAppointments(hmppsAuthClient),
   )
 
@@ -47,11 +50,13 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopCo
 
   router.all(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
-    getPersonAppointment(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
-    getNextComAppointment(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
-    getUserProviders(hmppsAuthClient),
+    parallelMiddleware(
+      // getUserProviders reads res.locals.personAppointment
+      [getPersonAppointment(hmppsAuthClient), getUserProviders(hmppsAuthClient)],
+      getSentences(hmppsAuthClient),
+      getNextComAppointment(hmppsAuthClient),
+      getAppointmentTypes(hmppsAuthClient),
+    ),
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
@@ -68,10 +73,12 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient, mpopCo
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/manage',
-    getSentences(hmppsAuthClient),
-    getPersonAppointment(hmppsAuthClient),
-    getNextComAppointment(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
+    parallelMiddleware(
+      getSentences(hmppsAuthClient),
+      getPersonAppointment(hmppsAuthClient),
+      getNextComAppointment(hmppsAuthClient),
+      getAppointmentTypes(hmppsAuthClient),
+    ),
     createAppointmentSession,
     getOutcomeProps,
     getCurrentOutcome,

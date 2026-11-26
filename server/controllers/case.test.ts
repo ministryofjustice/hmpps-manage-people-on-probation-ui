@@ -2,13 +2,18 @@ import httpMocks from 'node-mocks-http'
 import { DateTime } from 'luxon'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { eligibilityCheckDisabled } from '../utils'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { existsInEMDI } from '../middleware/existsInEMDI'
-import { getSentences } from '../middleware'
+import { getCheckinEligibility } from '../utils/getCheckinEligibility'
+import { getUpcomingCheckinDetails } from '../utils/getUpcomingCheckinDetails'
+import {
+  EsupervisionUpcomingQuestionsResponse,
+  OffenderCheckinsByCRNResponse,
+  OffenderEligibility,
+} from '../data/model/esupervision'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import {
   mockAppResponse,
@@ -34,11 +39,10 @@ import {
 } from '../data/model/personalDetails'
 import { PersonalDetailsSession } from '../models/Data'
 import { ProbationPractitioner } from '../models/CaseDetail'
-import ESupervisionClient from '../data/eSupervisionClient'
-import { OffenderEligibility } from '../data/model/esupervision'
 import { getThroughcareRows } from '../utils/throughcare'
 import { SummaryListRow } from '../@types'
 import { Prisoner } from '../data/prisonerSearchApiClient'
+import { Sentence } from '../data/model/sentenceDetails'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -68,6 +72,8 @@ jest.mock('../data/eSupervisionClient')
 jest.mock('../middleware/existsInEMDI')
 jest.mock('../middleware/checkLocationMonitoring')
 jest.mock('../utils/throughcare')
+jest.mock('../utils/getCheckinEligibility')
+jest.mock('../utils/getUpcomingCheckinDetails')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -123,11 +129,6 @@ const mockOverdueOutcomesResponse = {
   content: [{ date: '2025-01-03' }, { date: daysAgo(30) }, { date: daysAgo(10) }],
 }
 
-const mockOffenderEligibilityResponse: OffenderEligibility = {
-  outcome: 'ELIGIBLE',
-  message: 'This person is eligible for online check ins',
-}
-
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
   .mockImplementation(() => Promise.resolve(mockOverview))
@@ -144,11 +145,22 @@ const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
 
-const getOffenderEligibilitySpy = jest
-  .spyOn(ESupervisionClient.prototype, 'getOffenderEligibility')
-  .mockImplementation(() => Promise.resolve(mockOffenderEligibilityResponse))
+const mockOffenderCheckinsByCRNResponse = { status: 'VERIFIED' } as OffenderCheckinsByCRNResponse
+const mockCheckinEligibility: OffenderEligibility = {
+  outcome: 'ELIGIBLE',
+  message: 'This person is eligible for online check ins',
+}
+const mockUpcomingCheckin = { expectedCheckinDate: '2026-12-01' } as EsupervisionUpcomingQuestionsResponse
 
-const getSentencesSpy = getSentences as jest.MockedFunction<typeof getSentences>
+const getCheckinEligibilitySpy = (
+  getCheckinEligibility as jest.MockedFunction<typeof getCheckinEligibility>
+).mockResolvedValue({
+  offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
+  checkinEligibility: mockCheckinEligibility,
+})
+const getUpcomingCheckinDetailsSpy = (
+  getUpcomingCheckinDetails as jest.MockedFunction<typeof getUpcomingCheckinDetails>
+).mockResolvedValue(mockUpcomingCheckin)
 const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
 const existsInEMDISpy = existsInEMDI as jest.Mock
 const getThroughcareSpy = getThroughcareRows as jest.MockedFunction<typeof getThroughcareRows>
@@ -212,11 +224,13 @@ describe('caseController', () => {
         url: encodeURIComponent(req.url),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        checkinEligibility: eligibilityCheckDisabled,
         appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
         canAccessCheckins: false,
+        checkinEligibility: mockCheckinEligibility,
+        offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
+        upcomingCheckin: mockUpcomingCheckin,
       })
     })
   })
@@ -253,11 +267,13 @@ describe('caseController', () => {
         url: encodeURIComponent(req.url),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        checkinEligibility: eligibilityCheckDisabled,
         appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
         canAccessCheckins: false,
+        checkinEligibility: mockCheckinEligibility,
+        offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
+        upcomingCheckin: mockUpcomingCheckin,
       })
     })
   })
@@ -289,7 +305,7 @@ describe('caseController', () => {
       )
     })
   })
-  describe('getCase - checkin eligibility returned', () => {
+  describe('getCase - checkin eligibility', () => {
     const req = httpMocks.createRequest({
       params: { crn },
       url: '/caseload/appointments/upcoming',
@@ -302,99 +318,22 @@ describe('caseController', () => {
       },
     })
     beforeEach(async () => {
-      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
-      res.locals.flags = { enableOutcomesV1: true, enableEsupEligibilityCheck: true }
       await controllers.case.getCase(hmppsAuthClient)(req, res)
     })
-    afterEach(() => {
-      res.locals.flags = { enableOutcomesV1: true }
+
+    it('should resolve the checkin eligibility and upcoming checkin', () => {
+      expect(getCheckinEligibilitySpy).toHaveBeenCalledWith('token-1', crn, res.locals)
+      expect(getUpcomingCheckinDetailsSpy).toHaveBeenCalledWith('token-1', crn, 'VERIFIED')
     })
 
-    it('should render the overview page with canAccessCheckins true', () => {
-      expect(getOffenderEligibilitySpy).toHaveBeenCalledWith(crn)
+    it('should pass the checkin details to the overview page', () => {
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/overview',
         expect.objectContaining({
-          checkinEligibility: { message: 'This person is eligible for online check ins', outcome: 'ELIGIBLE' },
+          checkinEligibility: mockCheckinEligibility,
+          offenderCheckinsByCRNResponse: mockOffenderCheckinsByCRNResponse,
+          upcomingCheckin: mockUpcomingCheckin,
         }),
-      )
-    })
-
-    it('should soften a tier-based eligibility message to may be eligible', async () => {
-      getOffenderEligibilitySpy.mockResolvedValueOnce({
-        outcome: 'ELIGIBLE',
-        message: '    Alton Berge are in Tiers D-G.',
-      })
-      const tierRes = mockAppResponse({
-        flags: { enableOutcomesV1: true, enableEsupEligibilityCheck: true },
-        tierCalculation: mockTierCalculation,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-      })
-      const tierRenderSpy = jest.spyOn(tierRes, 'render')
-      await controllers.case.getCase(hmppsAuthClient)(req, tierRes)
-      expect(tierRenderSpy).toHaveBeenCalledWith(
-        'pages/overview',
-        expect.objectContaining({
-          checkinEligibility: { outcome: 'ELIGIBLE', message: 'Alton Berge may be eligible for online check ins.' },
-        }),
-      )
-    })
-
-    it('should mark the person as ineligible for check ins when no tier has been assigned', async () => {
-      const noTierRes = mockAppResponse({
-        flags: { enableOutcomesV1: true, enableEsupEligibilityCheck: true },
-        tierCalculation: null,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-      })
-      const noTierRenderSpy = jest.spyOn(noTierRes, 'render')
-      await controllers.case.getCase(hmppsAuthClient)(req, noTierRes)
-      expect(noTierRenderSpy).toHaveBeenCalledWith(
-        'pages/overview',
-        expect.objectContaining({
-          checkinEligibility: {
-            outcome: 'INELIGIBLE',
-            message: 'Alton Berge is not eligible for online check ins because they have not been assigned a tier yet.',
-          },
-        }),
-      )
-    })
-
-    it('should keep the person eligible when no tier has been assigned but they are already set up for check ins', async () => {
-      jest.spyOn(ESupervisionClient.prototype, 'getOffenderCheckinsByCRN').mockResolvedValueOnce({
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-        crn,
-        status: 'VERIFIED',
-        firstCheckin: '2025-11-03',
-        checkinInterval: 'WEEKLY',
-        mode: 'SCHEDULED',
-        contactPreference: 'PHONE',
-      })
-      const noTierRes = mockAppResponse({
-        flags: { enableOutcomesV1: true, enableEsupEligibilityCheck: true },
-        tierCalculation: null,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-      })
-      const noTierRenderSpy = jest.spyOn(noTierRes, 'render')
-      await controllers.case.getCase(hmppsAuthClient)(req, noTierRes)
-      expect(noTierRenderSpy).toHaveBeenCalledWith(
-        'pages/overview',
-        expect.objectContaining({ checkinEligibility: mockOffenderEligibilityResponse }),
-      )
-    })
-
-    it('should skip the eligibility check and treat the person as eligible when the flag is off', async () => {
-      const flagOffRes = mockAppResponse({
-        flags: { enableOutcomesV1: true, enableEsupEligibilityCheck: false },
-        tierCalculation: null,
-        headerPersonName: { forename: 'Alton', surname: 'Berge' },
-      })
-      const flagOffRenderSpy = jest.spyOn(flagOffRes, 'render')
-      getOffenderEligibilitySpy.mockClear()
-      await controllers.case.getCase(hmppsAuthClient)(req, flagOffRes)
-      expect(getOffenderEligibilitySpy).not.toHaveBeenCalled()
-      expect(flagOffRenderSpy).toHaveBeenCalledWith(
-        'pages/overview',
-        expect.objectContaining({ checkinEligibility: eligibilityCheckDisabled }),
       )
     })
   })
@@ -503,11 +442,7 @@ describe('caseController', () => {
     beforeEach(() => {
       res.locals.flags = {}
       res.locals.user = { username: 'test-user', authSource: 'nomis', token: 'token-1' }
-      getSentencesSpy.mockImplementation(() => (r: any, s: any, next: any): any => {
-        const { locals } = s
-        locals.sentences = [{ licenceConditions: [], requirements: [] }]
-        next()
-      })
+      res.locals.sentences = [{ licenceConditions: [], requirements: [] } as Sentence]
     })
 
     afterEach(() => {
@@ -515,19 +450,24 @@ describe('caseController', () => {
       delete res.locals.sentences
     })
 
-    it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present', async () => {
+    it('should call existsInEMDI when location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(true)
       existsInEMDISpy.mockResolvedValue({ uri: 'https://emdi-uri' })
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-      expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          locationMonitoringUri: 'https://emdi-uri',
+          personExistsResponse: { uri: 'https://emdi-uri' },
+        }),
+      )
     })
 
-    it('should call getSentences but NOT existsInEMDI when NO location monitoring is present', async () => {
+    it('should not call existsInEMDI when NO location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(false)
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-      expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
     })

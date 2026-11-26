@@ -53,6 +53,7 @@ export const getNextAppointment = (
 
     res.locals.nextAppointmentDetails = null
 
+    req.session.data ??= {}
     req.session.data.personalDetails ??= {}
     req.session.data.personalDetails[crn] ??= {} as any
     if (process.env.NODE_ENV === 'development') {

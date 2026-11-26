@@ -44,6 +44,7 @@ import {
 } from '../middleware/appointment-outcomes'
 
 import validate from '../middleware/validation/index'
+import parallelMiddleware from '../middleware/parallelMiddleware'
 import { handleOutcomePageRedirect } from '../middleware/appointment-outcomes/handleOutcomePageRedirect'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
@@ -61,9 +62,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.all(
     [manageBasePath, `${manageBasePath}/*path`],
-    getPersonAppointment(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
+    parallelMiddleware(
+      getPersonAppointment(hmppsAuthClient),
+      getAppointmentTypes(hmppsAuthClient),
+      getSentences(hmppsAuthClient),
+    ),
   )
 
   /* create appointment session in manage journey 👇 */
@@ -277,9 +280,12 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   router.all(
     `${manageBasePath}/next-appointment`,
-    getNextComAppointment(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
-    getUserProviders(hmppsAuthClient),
+    parallelMiddleware(
+      getNextComAppointment(hmppsAuthClient),
+      getAppointmentTypes(hmppsAuthClient),
+      getUserProviders(hmppsAuthClient),
+    ),
+    // getAppointment reads the appointment types and providers set above
     getAppointment(hmppsAuthClient),
   )
   router.get(`${manageBasePath}/next-appointment`, controllers.appointments.getNextAppointment(hmppsAuthClient))

@@ -43,12 +43,7 @@ import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsOptInOptions, SmsPreviewResponse } from '../data/model/OutlookEvent'
-import {
-  ESupervisionCheckIn,
-  EsupervisionUpcomingQuestionsResponse,
-  OffenderCheckinsByCRNResponse,
-} from '../data/model/esupervision'
-import { PersonExistsResponse } from '../data/emdiClient'
+import { ESupervisionCheckIn } from '../data/model/esupervision'
 import { ProbationSearchRequest, ProbationSearchResponse, ProbationSearchResults } from '../data/model/search'
 import { RiskBadgeData } from '../utils/personRiskFlagSorter'
 import { Prisoner } from '../data/prisonerSearchApiClient'
@@ -193,8 +188,6 @@ interface Locals {
   alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
-  offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
-  upcomingCheckin?: EsupervisionUpcomingQuestionsResponse
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
@@ -206,7 +199,6 @@ interface Locals {
   feedbackEmail?: string
   appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
   action?: string
-  personExistsResponse?: PersonExistsResponse & Partial<ErrorSummary>
   nextAppointmentLocation?: string
   nextAppointmentDetails: Activity | null
   searchResponse?: ProbationSearchResponse
