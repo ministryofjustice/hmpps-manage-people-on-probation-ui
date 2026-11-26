@@ -124,7 +124,7 @@ docker exec mpop-redis redis-cli MONITOR
 docker exec mpop-redis redis-cli DEL "sess:<id>"
 
 # edit a session value, keeping the login (here: remove outcomeCode)
-docker exec mpop-redis redis-cli GET "sess:<id>" | jq -c 'del(.data.appointments.<CRN>["<contactId>"].outcome.outcomeCode)' | docker exec -i mpop-redis redis-cli -x SET "sess:<id>" KEEPTTL
+docker exec mpop-redis redis-cli GET "sess:<id>" | jq -c 'del(.data.appointments.<CRN>["<contactId>"].outcome.outcomeCode)' | docker exec -i mpop-redis redis-cli -X val SET "sess:<id>" val KEEPTTL
 
 # clear everything
 docker exec mpop-redis redis-cli FLUSHALL
