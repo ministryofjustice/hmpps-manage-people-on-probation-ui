@@ -18,9 +18,8 @@ export default function caseRoutes(router: Router, { hmppsAuthClient, arnsCompon
   router.all(
     ['/case/:crn', '/case/:crn/*path'],
     parallelMiddleware(
-      getOasysLink(),
-      // getPersonalDetails reads res.locals.supervisionPackageDetails, so must run after getSupervisionPackage
       [getSupervisionPackage(hmppsAuthClient, mpopComponents), getPersonalDetails(hmppsAuthClient, arnsComponents)],
+      getOasysLink(),
       getPersonRiskFlags(hmppsAuthClient),
       getTierDetails(hmppsAuthClient, mpopComponents),
       getNextAppointment(hmppsAuthClient, mpopComponents),
