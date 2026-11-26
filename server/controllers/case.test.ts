@@ -335,7 +335,7 @@ describe('caseController', () => {
       expect(tierRenderSpy).toHaveBeenCalledWith(
         'pages/overview',
         expect.objectContaining({
-          checkinEligibility: { outcome: 'ELIGIBLE', message: 'Alton Berge may be eligible for online check ins.' },
+          checkinEligibility: { outcome: 'UNKNOWN', message: 'Alton Berge may be eligible for online check ins.' },
         }),
       )
     })

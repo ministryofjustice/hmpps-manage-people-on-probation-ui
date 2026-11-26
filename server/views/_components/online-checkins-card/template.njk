@@ -15,7 +15,8 @@
   {% set label = 'Status' %}
   {% set value = 'Check ins stopped' %}
 {% else %}
-  {% set linkText = 'Set up online check ins' %}
+  {# UNKNOWN is a "may be eligible": the practitioner needs to check eligibility before setting up #}
+  {% set linkText = 'Check eligibility' if params.eligibility.outcome === 'UNKNOWN' else 'Set up online check ins' %}
   {% set label = 'Status' %}
   {% set value = params.eligibility.message or 'Online check ins not set up' %}
 {% endif %}
