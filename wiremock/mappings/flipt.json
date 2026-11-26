@@ -254,6 +254,17 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-11-03T12:00:00.000000Z",
               "updatedAt": "2026-12-03T12:00:00.000000Z"
+            },
+            {
+              "key": "enableContactCardDesign20261126Squad3",
+              "name": "enableContactCardDesign20261126Squad3",
+              "description": "",
+              "enabled": false,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-11-26T12:00:00.000000Z",
+              "updatedAt": "2026-11-26T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }

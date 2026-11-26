@@ -79,7 +79,11 @@
           <div>
             <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
           </div>
-          {% include "./contact-log/_compact-view.njk" %}
+          {% if flags.enableContactCardDesign20261126Squad3 %}
+            <!-- Placeholder for cards -->
+          {% else %}
+            {% include "./contact-log/_compact-view.njk" %}
+          {% endif %}
         {% else %}
           <p class="govuk-!-margin-top-4">{{ emptyText }}</p>
         {% endif %}
