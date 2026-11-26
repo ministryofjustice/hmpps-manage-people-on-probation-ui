@@ -10,6 +10,7 @@ import {
   getSupervisionPackage,
   getNextAppointment,
   getOasysLink,
+  getSentences,
 } from '../middleware'
 
 export default function caseRoutes(router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) {
@@ -25,6 +26,7 @@ export default function caseRoutes(router: Router, { hmppsAuthClient, arnsCompon
   router.get(
     '/case/:crn',
     getTierChangePrompt(hmppsAuthClient),
+    getSentences(hmppsAuthClient),
     asyncMiddleware(controllers.case.getCase(hmppsAuthClient)),
   )
 }

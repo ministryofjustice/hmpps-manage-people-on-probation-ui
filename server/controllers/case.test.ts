@@ -7,7 +7,6 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { existsInEMDI } from '../middleware/existsInEMDI'
-import { getSentences } from '../middleware'
 import { getCheckinEligibility } from '../utils/getCheckinEligibility'
 import { getUpcomingCheckinDetails } from '../utils/getUpcomingCheckinDetails'
 import {
@@ -43,6 +42,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import { getThroughcareRows } from '../utils/throughcare'
 import { SummaryListRow } from '../@types'
 import { Prisoner } from '../data/prisonerSearchApiClient'
+import { Sentence } from '../data/model/sentenceDetails'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -161,7 +161,6 @@ const getCheckinEligibilitySpy = (
 const getUpcomingCheckinDetailsSpy = (
   getUpcomingCheckinDetails as jest.MockedFunction<typeof getUpcomingCheckinDetails>
 ).mockResolvedValue(mockUpcomingCheckin)
-const getSentencesSpy = getSentences as jest.MockedFunction<typeof getSentences>
 const hasLocationMonitoringSpy = hasLocationMonitoring as jest.Mock
 const existsInEMDISpy = existsInEMDI as jest.Mock
 const getThroughcareSpy = getThroughcareRows as jest.MockedFunction<typeof getThroughcareRows>
@@ -443,11 +442,7 @@ describe('caseController', () => {
     beforeEach(() => {
       res.locals.flags = {}
       res.locals.user = { username: 'test-user', authSource: 'nomis', token: 'token-1' }
-      getSentencesSpy.mockImplementation(() => (r: any, s: any, next: any): any => {
-        const { locals } = s
-        locals.sentences = [{ licenceConditions: [], requirements: [] }]
-        next()
-      })
+      res.locals.sentences = [{ licenceConditions: [], requirements: [] } as Sentence]
     })
 
     afterEach(() => {
@@ -455,11 +450,10 @@ describe('caseController', () => {
       delete res.locals.sentences
     })
 
-    it('should call getSentences and existsInEMDI when flag is enabled and location monitoring is present', async () => {
+    it('should call existsInEMDI when location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(true)
       existsInEMDISpy.mockResolvedValue({ uri: 'https://emdi-uri' })
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-      expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).toHaveBeenCalledWith(crn, 'token-1')
       expect(renderSpy).toHaveBeenCalledWith(
@@ -471,10 +465,9 @@ describe('caseController', () => {
       )
     })
 
-    it('should call getSentences but NOT existsInEMDI when NO location monitoring is present', async () => {
+    it('should not call existsInEMDI when NO location monitoring is present', async () => {
       hasLocationMonitoringSpy.mockReturnValue(false)
       await controllers.case.getCase(hmppsAuthClient)(req, res)
-      expect(getSentencesSpy).toHaveBeenCalled()
       expect(hasLocationMonitoringSpy).toHaveBeenCalled()
       expect(existsInEMDISpy).not.toHaveBeenCalled()
     })

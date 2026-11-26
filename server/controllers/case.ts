@@ -5,7 +5,6 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { filterContacts, filterContactsMonths } from '../middleware/filterContacts'
-import { getSentences } from '../middleware'
 import { getUpcomingCheckinDetails } from '../utils/getUpcomingCheckinDetails'
 import { hasLocationMonitoring } from '../middleware/checkLocationMonitoring'
 import { existsInEMDI } from '../middleware/existsInEMDI'
@@ -62,7 +61,6 @@ const caseController: Controller<readonly ['getCase'], void> = {
           ? getThroughcareRows(token, req.session.data.personalDetails?.[crn]?.overview?.noms, res.locals.prisoner)
           : undefined,
         getCheckinEligibility(token, crn, res.locals),
-        getSentences(hmppsAuthClient)(req, res, () => {}),
       ])
       const outcomes = res.locals.flags.enable3MonthsOutcomes
         ? filterContactsMonths(contactResponse?.content)
