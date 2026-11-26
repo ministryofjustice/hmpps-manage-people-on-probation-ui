@@ -40,7 +40,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
 
     const result = await run(res, { cachedPhotoSrc: `/person-photo/${noms}` })
 
-    expect(result).toEqual({ personPhotoSrc: undefined, prisonsUnavailable: false })
+    expect(result).toEqual({ personPhotoSrc: undefined, photoUnavailable: false })
     expect(mpopComponents.getCheckInPhotoUrl).not.toHaveBeenCalled()
     expect(mpopComponents.hasPersonPhoto).not.toHaveBeenCalled()
   })
@@ -53,7 +53,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
 
     expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledWith('token-1', crn)
     expect(mpopComponents.hasPersonPhoto).not.toHaveBeenCalled()
-    expect(result).toEqual({ personPhotoSrc: checkInPhotoUrl, prisonsUnavailable: false })
+    expect(result).toEqual({ personPhotoSrc: checkInPhotoUrl, photoUnavailable: false })
   })
 
   it('gets the online check-in photo once per request', async () => {
@@ -85,7 +85,32 @@ describe('middleware/getPersonHeaderPhoto', () => {
     const result = await run(res)
 
     expect(loggerSpy).toHaveBeenCalledWith(error, `Failed to get the online check-in photo for CRN ${crn}`)
-    expect(result).toEqual({ personPhotoSrc: `/person-photo/${noms}`, prisonsUnavailable: false })
+    expect(result).toEqual({ personPhotoSrc: `/person-photo/${noms}`, photoUnavailable: false })
+  })
+
+  it('flags the photo as unavailable when the check-in request fails and there is no prison photo', async () => {
+    jest.spyOn(logger, 'error').mockImplementation()
+    mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: null, httpStatus: 500, error: new Error('500') })
+    const res = mockAppResponse({ flags })
+
+    const result = await run(res)
+
+    expect(result).toEqual({ personPhotoSrc: undefined, photoUnavailable: true })
+  })
+
+  it('flags the photo as unavailable on later lookups in the same request when the check-in request failed', async () => {
+    jest.spyOn(logger, 'error').mockImplementation()
+    mpopComponents.getCheckInPhotoUrl.mockResolvedValue({ photoUrl: null, httpStatus: 500, error: new Error('500') })
+    const res = mockAppResponse({ flags })
+
+    await run(res)
+    const result = await run(res, {
+      cachedPhotoSrc: null,
+      cachedDetails: { overview: {}, personPhotoSrc: null } as Partial<PersonalDetailsSession>,
+    })
+
+    expect(mpopComponents.getCheckInPhotoUrl).toHaveBeenCalledTimes(1)
+    expect(result.photoUnavailable).toBe(true)
   })
 
   it('checks for a prison photo and caches the result when there is no check-in photo', async () => {
@@ -95,7 +120,7 @@ describe('middleware/getPersonHeaderPhoto', () => {
     const result = await run(mockAppResponse({ flags }), { cachedDetails })
 
     expect(mpopComponents.hasPersonPhoto).toHaveBeenCalledWith('token-1', noms)
-    expect(result).toEqual({ personPhotoSrc: `/person-photo/${noms}`, prisonsUnavailable: false })
+    expect(result).toEqual({ personPhotoSrc: `/person-photo/${noms}`, photoUnavailable: false })
     expect(cachedDetails.personPhotoSrc).toBe(`/person-photo/${noms}`)
   })
 
@@ -120,13 +145,13 @@ describe('middleware/getPersonHeaderPhoto', () => {
     expect(result.personPhotoSrc).toBe(`/person-photo/${noms}`)
   })
 
-  it('flags prisons as unavailable and does not cache the result when the prison photo check fails', async () => {
+  it('flags the photo as unavailable and does not cache the result when the prison photo check fails', async () => {
     mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: false, httpStatus: 500, error: new Error('500') })
     const cachedDetails = { overview: {} } as Partial<PersonalDetailsSession>
 
     const result = await run(mockAppResponse({ flags }), { cachedDetails })
 
-    expect(result).toEqual({ personPhotoSrc: undefined, prisonsUnavailable: true })
+    expect(result).toEqual({ personPhotoSrc: undefined, photoUnavailable: true })
     expect(cachedDetails.personPhotoSrc).toBeUndefined()
   })
 })

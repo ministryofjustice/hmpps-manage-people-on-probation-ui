@@ -78,7 +78,12 @@ export default class ESupervisionClient extends RestClient {
   }
 
   async getOffenderCheckinsByCRN(crn: string): Promise<OffenderCheckinsByCRNResponse | null> {
-    return this.get({ path: `/v2/offenders/crn/${crn}`, handle404: true })
+    try {
+      return await this.get({ path: `/v2/offenders/crn/${crn}`, handle404: true })
+    } catch (error) {
+      logger.warn(error, `Could not get online check ins for crn: ${crn}`)
+      return null
+    }
   }
 
   async postUpdateOffenderDetails(

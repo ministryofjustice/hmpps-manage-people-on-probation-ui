@@ -1,35 +1,17 @@
 {% from "mpop/components/pop-header/macro.njk" import popHeader %}
 {% from "mpop/components/person-header/macro.njk" import personHeader %}
+{% from "mpop/components/person-header-errors/macro.njk" import personHeaderErrors %}
 {%- from "moj/components/badge/macro.njk" import mojBadge -%}
 {% from "arns/components/predictor-badge/macro.njk" import predictorBadge %}
 
 {% set calculation = tierDetails.calculation %}
 
-{% set headerErrors = [] %}
-{% if prisonsUnavailable %}
-    {% set headerErrors = (headerErrors.push({ text: "Photos and throughcare information are currently unavailable." }), headerErrors) %}
-{% endif %}
-{% if arnsUnavailable %}
-    {% set headerErrors = (headerErrors.push({ text: "Risk information from the ARNS service is currently unavailable." }), headerErrors) %}
-{% endif %}
-{% if flags.enablePersonHeader and headerErrors.length %}
-    {% set headerErrorsHtml %}
-        {% if headerErrors.length > 1 %}
-            <ul class="govuk-!-margin-top-0">
-            {% for error in headerErrors %}
-                <li>{{ error.text }}</li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <span>{{ headerErrors[0].text }}</span>
-        {% endif %}
-    {% endset %}
-    {{ mojAlert({
-        variant: "error",
-        title: "There is a problem",
-        showTitleAsHeading: true,
-        attributes: { "data-qa": "headerErrors" },
-        html: headerErrorsHtml
+{% if flags.enablePersonHeader %}
+    {{ personHeaderErrors({
+        statusUnavailable: statusUnavailable,
+        photoUnavailable: photoUnavailable,
+        throughcareUnavailable: throughcareUnavailable,
+        arnsUnavailable: arnsUnavailable
     }) }}
 {% endif %}
 

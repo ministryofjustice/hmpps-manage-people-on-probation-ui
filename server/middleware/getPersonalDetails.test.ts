@@ -379,7 +379,7 @@ describe('/middleware/getPersonalDetails', () => {
       expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
     })
 
-    it('leaves personPhotoSrc undefined, and prisonsUnavailable false, when there is no photo (404)', async () => {
+    it('leaves personPhotoSrc undefined, and photoUnavailable false, when there is no photo (404)', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -389,10 +389,10 @@ describe('/middleware/getPersonalDetails', () => {
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
-      expect(res.locals.prisonsUnavailable).toBe(false)
+      expect(res.locals.photoUnavailable).toBe(false)
     })
 
-    it('leaves personPhotoSrc undefined, sets prisonsUnavailable, and still renders the header, when the Prisons API fails and enablePersonHeader is on', async () => {
+    it('leaves personPhotoSrc undefined, sets photoUnavailable, and still renders the header, when the Prisons API fails and enablePersonHeader is on', async () => {
       jest
         .spyOn(MasApiClient.prototype, 'getPersonalDetails')
         .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
@@ -406,7 +406,7 @@ describe('/middleware/getPersonalDetails', () => {
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: true }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
-      expect(res.locals.prisonsUnavailable).toBe(true)
+      expect(res.locals.photoUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
     })
 
@@ -420,7 +420,7 @@ describe('/middleware/getPersonalDetails', () => {
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
-      expect(res.locals.prisonsUnavailable).toBe(false)
+      expect(res.locals.photoUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
     })
 
@@ -435,7 +435,7 @@ describe('/middleware/getPersonalDetails', () => {
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(hasPersonPhotoSpy).not.toHaveBeenCalled()
       expect(res.locals.personPhotoSrc).toBeUndefined()
-      expect(res.locals.prisonsUnavailable).toBe(false)
+      expect(res.locals.photoUnavailable).toBe(false)
       expect(nextSpy).toHaveBeenCalled()
     })
 
@@ -470,7 +470,7 @@ describe('/middleware/getPersonalDetails', () => {
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(req.session.data.personalDetails.X000002.overview).toEqual({ ...overview('X000002'), noms: 'A1234BC' })
       expect('personPhotoSrc' in req.session.data.personalDetails.X000002).toBe(false)
-      expect(res.locals.prisonsUnavailable).toBe(true)
+      expect(res.locals.photoUnavailable).toBe(true)
     })
 
     it('requests only the photo when enablePersonHeaderPhoto is turned on for a crn already in the session', async () => {
@@ -526,7 +526,7 @@ describe('/middleware/getPersonalDetails', () => {
       res.locals.flags = { enablePersonHeader: true, enablePersonHeaderPhoto: false }
       await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
       expect(res.locals.personPhotoSrc).toBeUndefined()
-      expect(res.locals.prisonsUnavailable).toBe(false)
+      expect(res.locals.photoUnavailable).toBe(false)
     })
 
     it('does not request a photo when there is no NOMS number', async () => {
@@ -648,7 +648,7 @@ describe('/middleware/getPersonalDetails', () => {
         await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
 
         expect(res.locals.personPhotoSrc).toBe('/person-photo/A1234BC')
-        expect(res.locals.prisonsUnavailable).toBe(false)
+        expect(res.locals.photoUnavailable).toBe(false)
       })
 
       it('does not get the online check-in photo when enableESUPCheckInPhotosForSearch is off', async () => {
@@ -1162,8 +1162,29 @@ describe('/middleware/getPersonalDetails', () => {
         error,
       )
       expect(res.locals.prisoner).toBeUndefined()
+      expect(res.locals.prisonerUnavailable).toBe(true)
       expect(nextSpy).toHaveBeenCalled()
     })
+
+    it.each([
+      [undefined, true, true],
+      ['In custody', true, false],
+      [undefined, false, false],
+    ])(
+      'with a status tag of %s and supervisionPackageUnavailable %s, statusUnavailable is %s',
+      async (statusTag, supervisionPackageUnavailable, expected) => {
+        jest
+          .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+          .mockResolvedValueOnce({ ...overview('X000002'), noms: 'A1234BC' })
+        mockedGetStatusTag.mockResolvedValueOnce(statusTag)
+        res.locals.flags = { enablePersonHeader: true }
+        res.locals.supervisionPackageUnavailable = supervisionPackageUnavailable
+
+        await getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents)(req, res, nextSpy)
+
+        expect(res.locals.statusUnavailable).toBe(expected)
+      },
+    )
 
     it('does not call getStatusTag when the feature flag is disabled', async () => {
       const personOverview = { ...overview('X000002'), noms: 'A1234BC' }

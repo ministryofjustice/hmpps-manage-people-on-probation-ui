@@ -132,9 +132,12 @@ interface Locals {
   probationPractitioner?: ProbationPractitioner
   professionalContact?: ProfessionalContact | null
   personPhotoSrc?: string
-  checkInPhoto?: { crn: string; photoUrl: string | null }
+  checkInPhoto?: { crn: string; photoUrl: string | null; failed: boolean }
   arnsUnavailable?: boolean
-  prisonsUnavailable?: boolean
+  photoUnavailable?: boolean
+  statusUnavailable?: boolean
+  prisonerUnavailable?: boolean
+  supervisionPackageUnavailable?: boolean
   tierUrlV3?: string
   dateOfDeath?: string
   personRiskFlags?: PersonRiskFlags

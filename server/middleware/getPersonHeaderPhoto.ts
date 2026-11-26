@@ -16,7 +16,7 @@ interface PersonHeaderPhotoOptions {
 
 export interface PersonHeaderPhoto {
   personPhotoSrc?: string
-  prisonsUnavailable: boolean
+  photoUnavailable: boolean
 }
 
 const isPersonHeaderPhotoEnabled = (res: AppResponse): boolean =>
@@ -27,43 +27,48 @@ const getCheckInPhotoUrl = async ({
   mpopComponents,
   getToken,
   crn,
-}: PersonHeaderPhotoOptions): Promise<string | null> => {
+}: PersonHeaderPhotoOptions): Promise<{ photoUrl: string | null; failed: boolean }> => {
   if (res.locals.checkInPhoto?.crn !== crn) {
     const { photoUrl, error } = await mpopComponents.getCheckInPhotoUrl(await getToken(), crn)
     if (error) {
       logger.error(error, `Failed to get the online check-in photo for CRN ${crn}`)
     }
-    res.locals.checkInPhoto = { crn, photoUrl }
+    res.locals.checkInPhoto = { crn, photoUrl, failed: Boolean(error) }
   }
-  return res.locals.checkInPhoto.photoUrl
+  return res.locals.checkInPhoto
 }
 
 export const getPersonHeaderPhoto = async (options: PersonHeaderPhotoOptions): Promise<PersonHeaderPhoto> => {
   const { res, mpopComponents, getToken, noms, cachedDetails } = options
   if (!isPersonHeaderPhotoEnabled(res)) {
-    return { personPhotoSrc: undefined, prisonsUnavailable: false }
+    return { personPhotoSrc: undefined, photoUnavailable: false }
   }
 
-  const checkInPhotoUrl = res.locals.flags?.enableESUPCheckInPhotosForSearch ? await getCheckInPhotoUrl(options) : null
+  const checkInPhoto = res.locals.flags?.enableESUPCheckInPhotosForSearch
+    ? await getCheckInPhotoUrl(options)
+    : { photoUrl: null, failed: false }
+  const checkInPhotoUrl = checkInPhoto.photoUrl
 
   let prisonPhotoSrc = options.cachedPhotoSrc
-  let prisonsUnavailable = false
+  let prisonPhotoFailed = false
   if (!checkInPhotoUrl && noms && cachedDetails?.personPhotoSrc === undefined) {
     const { hasPhoto, error } = await mpopComponents.hasPersonPhoto(await getToken(), noms)
-    prisonsUnavailable = Boolean(error)
+    prisonPhotoFailed = Boolean(error)
     prisonPhotoSrc = hasPhoto ? personPhotoHref(noms) : null
-    if (cachedDetails?.overview && !prisonsUnavailable) {
+    if (cachedDetails?.overview && !prisonPhotoFailed) {
       cachedDetails.personPhotoSrc = prisonPhotoSrc
     }
   }
 
+  const personPhotoSrc = toPersonPhotoSrc({
+    checkInPhotoUrl,
+    noms,
+    hasPrisonPhoto: Boolean(prisonPhotoSrc),
+    prisonPhotoHref: personPhotoHref,
+  })
+
   return {
-    personPhotoSrc: toPersonPhotoSrc({
-      checkInPhotoUrl,
-      noms,
-      hasPrisonPhoto: Boolean(prisonPhotoSrc),
-      prisonPhotoHref: personPhotoHref,
-    }),
-    prisonsUnavailable,
+    personPhotoSrc,
+    photoUnavailable: !personPhotoSrc && (checkInPhoto.failed || prisonPhotoFailed),
   }
 }

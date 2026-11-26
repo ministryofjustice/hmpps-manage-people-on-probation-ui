@@ -17,10 +17,12 @@ export const getSupervisionPackage = (
     supervisionPackageData: SupervisionPackageResponse
     supervisionPackageDataIsLoading: boolean
     supervisionPackageDataError: Error | undefined
+    supervisionPackageDataFailed: boolean
   }> => {
     let supervisionPackageData: SupervisionPackageResponse = null
     let supervisionPackageDataIsLoading: boolean = false
     let supervisionPackageDataError: Error | undefined
+    let supervisionPackageDataFailed = false
 
     try {
       supervisionPackageDataIsLoading = true
@@ -30,6 +32,7 @@ export const getSupervisionPackage = (
         logger.error(supervisionPackageDataError, 'Failed to fetch supervision package from MPoP Components API.')
       }
     } catch (err) {
+      supervisionPackageDataFailed = true
       supervisionPackageDataError =
         typeof err === 'object' && err !== null && 'message' in err
           ? new Error(String((err as any).message))
@@ -42,6 +45,7 @@ export const getSupervisionPackage = (
       supervisionPackageData,
       supervisionPackageDataIsLoading,
       supervisionPackageDataError,
+      supervisionPackageDataFailed,
     }
   }
 
@@ -54,7 +58,9 @@ export const getSupervisionPackage = (
     const { crn } = req.params as Record<string, string>
 
     const token = await hmppsAuthClient.getSystemClientToken(res.locals?.user?.username)
-    const { supervisionPackageData } = await fetchSupervisionPackage(crn, token)
+    const { supervisionPackageData, supervisionPackageDataFailed } = await fetchSupervisionPackage(crn, token)
+    res.locals.supervisionPackageUnavailable =
+      supervisionPackageDataFailed || supervisionPackageData?.outcome === 'error'
 
     if (supervisionPackageData) {
       res.locals.supervisionPackageDetails = supervisionPackageData

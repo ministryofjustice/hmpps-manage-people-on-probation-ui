@@ -466,4 +466,31 @@ describe('ESupervisionClient', () => {
       expect(output).toEqual({ outcome: 'UNKNOWN', message: null })
     })
   })
+
+  describe('getOffenderCheckinsByCRN', () => {
+    it('should return null when the check ins are not found', async () => {
+      const crn = 'X000001'
+
+      fakeESupervisionApi
+        .get(`/v2/offenders/crn/${crn}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(404)
+
+      const output = await client.getOffenderCheckinsByCRN(crn)
+      expect(output).toBeNull()
+    })
+
+    it('should return null rather than throw when the request fails', async () => {
+      const crn = 'X000001'
+
+      fakeESupervisionApi
+        .get(`/v2/offenders/crn/${crn}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .times(3)
+        .reply(503)
+
+      const output = await client.getOffenderCheckinsByCRN(crn)
+      expect(output).toBeNull()
+    })
+  })
 })

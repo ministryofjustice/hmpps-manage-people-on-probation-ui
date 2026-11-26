@@ -36,7 +36,7 @@ export const getPersonalDetails = (
     let professionalContact: ProfessionalContact | null
     let personPhotoSrc: string | null | undefined
     let arnsUnavailable = false
-    let prisonsUnavailable = false
+    let photoUnavailable = false
     let token: string
     let masClient: MasApiClient
     const refreshCache =
@@ -159,7 +159,7 @@ export const getPersonalDetails = (
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       return token
     }
-    ;({ personPhotoSrc, prisonsUnavailable } = await getPersonHeaderPhoto({
+    ;({ personPhotoSrc, photoUnavailable } = await getPersonHeaderPhoto({
       res,
       mpopComponents,
       getToken,
@@ -176,12 +176,14 @@ export const getPersonalDetails = (
           logger.error(`Failed to get prisoner details for NOMS number: ${overview.noms} CRN: ${overview.crn}`, error)
         }
         res.locals.prisoner = prisoner ?? undefined
+        res.locals.prisonerUnavailable = Boolean(error)
       }
       res.locals.personStatusTag = await getStatusTag(
         overview,
         res.locals.supervisionPackageDetails,
         res.locals.prisoner,
       )
+      res.locals.statusUnavailable = !res.locals.personStatusTag && Boolean(res.locals.supervisionPackageUnavailable)
     }
 
     res.locals.sentencePlan = sentencePlan
@@ -194,7 +196,7 @@ export const getPersonalDetails = (
     res.locals.professionalContact = professionalContact
     res.locals.personPhotoSrc = personPhotoSrc ?? undefined
     res.locals.arnsUnavailable = arnsUnavailable
-    res.locals.prisonsUnavailable = prisonsUnavailable
+    res.locals.photoUnavailable = photoUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth

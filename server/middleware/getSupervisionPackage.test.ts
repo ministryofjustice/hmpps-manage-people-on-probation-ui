@@ -153,7 +153,22 @@ describe('getSupervisionPackage middleware', () => {
     expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
     expect(mpopComponents.getSupervisionPackageFrontendContext).toHaveBeenCalledWith(SYSTEM_TOKEN, CRN)
     expect(res.locals.supervisionPackageDetails).toEqual(packageResponse)
+    expect(res.locals.supervisionPackageUnavailable).toBe(false)
     expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('sets supervisionPackageUnavailable when the API returns an error outcome', async () => {
+    mpopComponents.getSupervisionPackageFrontendContext.mockResolvedValue(
+      makeSupervisionPackageResponse({ outcome: 'error' } as Partial<SupervisionPackageResponse>),
+    )
+    const res = buildRes()
+
+    await getSupervisionPackage(
+      hmppsAuthClient as unknown as HmppsAuthClient,
+      mpopComponents as unknown as MPoPComponents,
+    )(buildReq({ [CRN]: makeSessionEntry() }), res, nextSpy)
+
+    expect(res.locals.supervisionPackageUnavailable).toBe(true)
   })
 
   it('should send error to the logger when the API returns null', async () => {
@@ -174,6 +189,7 @@ describe('getSupervisionPackage middleware', () => {
     )
     expect(res.locals.supervisionPackageDetails).toBeUndefined()
     expect(res.locals.supervisionPackageAttempted).toBe(true)
+    expect(res.locals.supervisionPackageUnavailable).toBe(false)
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -214,6 +230,7 @@ describe('getSupervisionPackage middleware', () => {
       'Failed to connect to MPoP Components API.',
     )
     expect(res.locals.supervisionPackageDetails).toBeUndefined()
+    expect(res.locals.supervisionPackageUnavailable).toBe(true)
     expect(nextSpy).toHaveBeenCalled()
   })
 
