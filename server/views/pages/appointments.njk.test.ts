@@ -291,21 +291,39 @@ describe('Appointments', () => {
     expect($('[data-qa="online-checkin-btn"]')).toHaveLength(1)
     expect($('[data-qa="online-checkin-btn"]').text()).toContain('Set up online check ins')
   })
-  it('should render the page without manage button when ineligible', () => {
+  it.each([
+    ['VERIFIED', { outcome: 'INELIGIBLE' as const, message: 'Not eligible' }],
+    ['INACTIVE', { outcome: 'INELIGIBLE' as const, message: 'Not eligible' }],
+    ['VERIFIED', null],
+  ])('should render the manage button when check ins are %s and eligibility is %o', (status, checkinEligibility) => {
     const $ = render({
       flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
-      checkinEligibility: { outcome: 'INELIGIBLE', message: 'This person is eligible for online check ins' },
+      offenderCheckinsByCRNResponse: { ...baseModel.offenderCheckinsByCRNResponse, status },
+      checkinEligibility,
     })
-    expect($('[data-qa="online-manage-btn"]')).toHaveLength(0)
+    expect($('[data-qa="online-manage-btn"]')).toHaveLength(1)
+    expect($('[data-qa="online-manage-btn"]').text()).toContain('Manage online check ins')
   })
-  it('should render the page without check-ins button when ineligible', () => {
+  it('should render the page without check-ins button when ineligible and not set up', () => {
     const $ = render({
       flags: { enableEsupEligibilityCheck: true },
       canAccessCheckins: true,
-      checkinEligibility: { outcome: 'INELIGIBLE', message: 'This person is eligible for online check ins' },
+      offenderCheckinsByCRNResponse: null,
+      checkinEligibility: { outcome: 'INELIGIBLE', message: 'Not eligible' },
     })
     expect($('[data-qa="online-checkin-btn"]')).toHaveLength(0)
+    expect($('[data-qa="online-manage-btn"]')).toHaveLength(0)
+  })
+  it('should render the page without check-ins button when ineligible and status is INITIAL', () => {
+    const $ = render({
+      flags: { enableEsupEligibilityCheck: true },
+      canAccessCheckins: true,
+      offenderCheckinsByCRNResponse: { ...baseModel.offenderCheckinsByCRNResponse, status: 'INITIAL' },
+      checkinEligibility: { outcome: 'INELIGIBLE', message: 'Not eligible' },
+    })
+    expect($('[data-qa="online-checkin-btn"]')).toHaveLength(0)
+    expect($('[data-qa="online-manage-btn"]')).toHaveLength(0)
   })
   it('should render the page with no buttons', () => {
     const $ = render({ hasDeceased: true })

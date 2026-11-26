@@ -2,6 +2,8 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set checkin = params.checkin %}
+{# People already set up keep their status and manage link whatever the eligibility result, e.g. when they have no tier #}
+{% set isRegistered = checkin.status in ['VERIFIED', 'INACTIVE'] %}
 
 {% if checkin.status === 'VERIFIED' %}
   {% set linkText = 'Manage online check ins' %}
@@ -18,14 +20,14 @@
   {% set value = params.eligibility.message or 'Online check ins not set up' %}
 {% endif %}
 
-{% if params.eligibility.outcome === 'INELIGIBLE' %}
+{% if not isRegistered and params.eligibility.outcome === 'INELIGIBLE' %}
   {% set label = 'Status' %}
   {% set value = params.eligibility.message %}
 {% endif %}
 
-{% set linkHref = params.manageHref if checkin.status in ['VERIFIED', 'INACTIVE'] else params.setupHref %}
+{% set linkHref = params.manageHref if isRegistered else params.setupHref %}
 {# UNKNOWN still offers setup: the eligibility check asks the practitioner what the API can't know #}
-{% set showActions = params.canAccess and params.eligibility.outcome in ['ELIGIBLE', 'UNKNOWN'] %}
+{% set showActions = params.canAccess and (isRegistered or params.eligibility.outcome in ['ELIGIBLE', 'UNKNOWN']) %}
 
 {{ appSummaryCard({
   titleText: 'Online check ins',
