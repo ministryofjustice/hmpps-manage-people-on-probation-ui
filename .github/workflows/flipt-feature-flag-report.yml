@@ -2,6 +2,9 @@
 name: Flipt Feature Flag Report
 
 on:
+  schedule:
+    - cron: "30 8 * * 1"
+      timezone: Europe/London
   workflow_dispatch:
 
 permissions:
