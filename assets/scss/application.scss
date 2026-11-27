@@ -46,6 +46,9 @@ $badge-color: #0b0c0c;
 @import './components/summary-list';
 @import './components/markdown';
 
+// Custom components
+@import '../../server/views/_components/generic-hmpps-card/generic-hmpps-card';
+
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
 }
