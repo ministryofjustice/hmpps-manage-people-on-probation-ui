@@ -109,7 +109,9 @@ const mpopComponents = {
   getPrisonerDetails: jest.fn(),
   hasPersonPhoto: jest.fn(),
   getCheckInPhotoUrl: jest.fn(),
+  logger,
 } as unknown as jest.Mocked<MPoPComponents>
+mpopComponents.getPersonHeaderPhoto = MPoPComponents.prototype.getPersonHeaderPhoto.bind(mpopComponents)
 mpopComponents.getContacts.mockResolvedValue({ professionalContact: mockContacts, httpStatus: 200 })
 mpopComponents.getPrisonerDetails.mockResolvedValue({ prisoner: null, httpStatus: 404 })
 mpopComponents.hasPersonPhoto.mockResolvedValue({ hasPhoto: false, httpStatus: 404, error: null })
