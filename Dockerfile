@@ -39,8 +39,10 @@ RUN CYPRESS_INSTALL_BINARY=0 NPM_CONFIG_AUDIT=false NPM_CONFIG_FUND=false npm ru
 ENV NODE_ENV='production'
 
 COPY . .
+# Set SKIP_SENTRY_UPLOAD=true for local builds to skip the Sentry sourcemap upload
+ARG SKIP_SENTRY_UPLOAD=false
 RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry) \
-    npm run build
+    if [ "$SKIP_SENTRY_UPLOAD" = "true" ]; then node esbuild/esbuild.config.js --build; else npm run build; fi
 
 RUN npm prune --no-audit --omit=dev
 
