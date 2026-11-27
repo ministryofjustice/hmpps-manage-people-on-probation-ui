@@ -1,7 +1,6 @@
-import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { MPoPComponents, personPhotoHref } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { AppResponse } from '../models/Locals'
 import { PersonalDetailsSession } from '../models/Data'
-import { personPhotoHref } from './getPersonPhoto'
 
 interface PersonHeaderPhotoOptions {
   res: AppResponse
@@ -30,7 +29,6 @@ export const getPersonHeaderPhoto = async (options: PersonHeaderPhotoOptions): P
     {
       crn,
       noms,
-      prisonPhotoHref: personPhotoHref,
       includeCheckInPhoto: Boolean(flags.enableESUPCheckInPhotosForSearch),
       checkInPhoto: res.locals.checkInPhoto?.crn === crn ? res.locals.checkInPhoto : undefined,
       hasPrisonPhoto: cachedPhotoSrc === undefined ? undefined : Boolean(cachedPhotoSrc),

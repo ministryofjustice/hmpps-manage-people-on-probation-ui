@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { getStatusTag, MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
@@ -166,20 +166,18 @@ export const getPersonalDetails = (
     })
 
     if (res.locals.flags?.enablePersonHeader) {
+      const { personStatusTag, statusUnavailable, prisoner, prisonerUnavailable } =
+        await mpopComponents.getPersonHeaderStatus(await getToken(), {
+          personalDetails: overview,
+          supervisionPackage: res.locals.supervisionPackageDetails,
+          supervisionPackageUnavailable: res.locals.supervisionPackageUnavailable,
+        })
+      res.locals.personStatusTag = personStatusTag
+      res.locals.statusUnavailable = statusUnavailable
       if (overview.noms) {
-        const { prisoner, error } = await mpopComponents.getPrisonerDetails(await getToken(), overview.noms)
-        if (error) {
-          logger.error(`Failed to get prisoner details for NOMS number: ${overview.noms} CRN: ${overview.crn}`, error)
-        }
-        res.locals.prisoner = prisoner ?? undefined
-        res.locals.prisonerUnavailable = Boolean(error)
+        res.locals.prisoner = prisoner
+        res.locals.prisonerUnavailable = prisonerUnavailable
       }
-      res.locals.personStatusTag = await getStatusTag(
-        overview,
-        res.locals.supervisionPackageDetails,
-        res.locals.prisoner,
-      )
-      res.locals.statusUnavailable = !res.locals.personStatusTag && Boolean(res.locals.supervisionPackageUnavailable)
     }
 
     res.locals.sentencePlan = sentencePlan

@@ -1,4 +1,5 @@
 import { type Router } from 'express'
+import { PERSON_PHOTO_PATH } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import controllers from '../controllers'
@@ -14,7 +15,7 @@ import {
 } from '../middleware'
 
 export default function caseRoutes(router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) {
-  router.get('/person-photo/:nomsNumber', asyncMiddleware(getPersonPhoto(hmppsAuthClient, mpopComponents)))
+  router.get(PERSON_PHOTO_PATH, asyncMiddleware(getPersonPhoto(hmppsAuthClient, mpopComponents)))
   router.all(
     ['/case/:crn', '/case/:crn/*path'],
     getOasysLink(),

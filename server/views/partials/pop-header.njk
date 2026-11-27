@@ -1,19 +1,9 @@
 {% from "mpop/components/pop-header/macro.njk" import popHeader %}
 {% from "mpop/components/person-header/macro.njk" import personHeader %}
-{% from "mpop/components/person-header-errors/macro.njk" import personHeaderErrors %}
 {%- from "moj/components/badge/macro.njk" import mojBadge -%}
 {% from "arns/components/predictor-badge/macro.njk" import predictorBadge %}
 
 {% set calculation = tierDetails.calculation %}
-
-{% if flags.enablePersonHeader %}
-    {{ personHeaderErrors({
-        statusUnavailable: statusUnavailable,
-        photoUnavailable: photoUnavailable,
-        throughcareUnavailable: throughcareUnavailable,
-        arnsUnavailable: arnsUnavailable
-    }) }}
-{% endif %}
 
 {% set overallRisk = rosh.level if flags.enableNDeliusRosh else risksWidget.overallRisk %}
 {% set riskName = 'Risk of serious harm' %}
@@ -86,7 +76,13 @@
         riskData: riskData,
         roshLevel: rosh.level if flags.enableNDeliusRosh else risksWidget.overallRisk,
         useNDeliusRosh: flags.enableNDeliusRosh,
-        collapsibleRiskFlags: collapsibleRiskFlags
+        collapsibleRiskFlags: collapsibleRiskFlags,
+        errors: {
+            statusUnavailable: statusUnavailable,
+            photoUnavailable: photoUnavailable,
+            throughcareUnavailable: throughcareUnavailable,
+            arnsUnavailable: arnsUnavailable
+        }
     })) }}
 {% else %}
     <div class="govuk-flex">

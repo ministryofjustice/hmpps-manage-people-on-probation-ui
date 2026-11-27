@@ -48,12 +48,10 @@ describe('middleware/getPersonHeaderPhoto', () => {
     expect(mpopComponents.getPersonHeaderPhoto).toHaveBeenCalledWith('token-1', {
       crn,
       noms,
-      prisonPhotoHref: expect.any(Function),
       includeCheckInPhoto: true,
       checkInPhoto: undefined,
       hasPrisonPhoto: undefined,
     })
-    expect(libOptions().prisonPhotoHref(noms)).toBe(`/person-photo/${noms}`)
   })
 
   it('does not include the online check-in photo when enableESUPCheckInPhotosForSearch is off', async () => {

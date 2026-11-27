@@ -2,7 +2,7 @@ import nunjucks from 'nunjucks'
 import path from 'node:path'
 import { Request } from 'express-serve-static-core'
 import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
-import { mpopNunjucksSetup, toPersonHeaderParams } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
+import { mpopNunjucksSetup } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import {
   addressToList,
   convertToTitleCase,
@@ -87,7 +87,6 @@ export const createNunjucksTestEnv = (req?: Request, res?: AppResponse) => {
   env.addFilter('dayOfWeek', dayOfWeek)
   env.addFilter('to12HourTimeCompact', to12HourTimeCompact)
   env.addGlobal('makePageTitle', makePageTitle)
-  env.addGlobal('toPersonHeaderParams', toPersonHeaderParams)
   env.addGlobal('setSortOrder', setSortOrder)
 
   arnsNunjucksSetup(env)
