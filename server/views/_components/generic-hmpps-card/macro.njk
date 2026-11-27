@@ -1,0 +1,7 @@
+{% macro genericHMPPSCard(params) %}
+    {%- set params = params | default({}) %}
+    {%- set params = params | merge({
+        classes: (params.classes | default('')) + ' app-hmpps-generic-card'
+    }) -%}
+    {%- include "./template.njk" -%}
+{% endmacro %}

@@ -1,0 +1,22 @@
+@use 'govuk-frontend/dist/govuk/base' as gds;
+
+.app-hmpps-generic-card {
+    border-inline: 0px;
+    border-top: 0px;
+    margin-bottom: 0px;
+}
+
+.app-hmpps-generic-card__actions {
+    align-items: center;
+}
+
+.app-hmpps-generic-card__title-wrapper {
+    background-color: gds.govuk-colour('white');
+    @include gds.govuk-responsive-padding(1, 'left');
+    @include gds.govuk-responsive-padding(1, 'right');
+}
+
+.app-hmpps-heading-caption-s {
+    @include gds.govuk-font($size: 16);
+    color: gds.govuk-colour('black', $variant: 'tint-25');
+}
