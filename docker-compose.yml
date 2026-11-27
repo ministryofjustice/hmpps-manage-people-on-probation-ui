@@ -6,6 +6,7 @@ services:
         BUILD_NUMBER: "1.0.0"
         GIT_REF: "a1b2c3"
         GIT_BRANCH: "main"
+        SKIP_SENTRY_UPLOAD: "${SKIP_SENTRY_UPLOAD:-false}"
       secrets:
         - sentry
     networks:
@@ -28,8 +29,8 @@ services:
       MODSEC_AUDIT_ENGINE: "On"
       MODSEC_AUDIT_LOG: "/var/log/modsecurity/audit.log"
       MODSEC_AUDIT_LOG_TYPE: "Serial"
-      BLOCKING_PARANOIA: "1"
-      DETECTION_PARANOIA: "1"
+      BLOCKING_PARANOIA: "2"
+      DETECTION_PARANOIA: "2"
     volumes:
       - ./waf-conf/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
       - ./waf-logs:/var/log/modsecurity
@@ -42,6 +43,3 @@ networks:
 secrets:
   sentry:
     file: .sentry-token
-
-
-
