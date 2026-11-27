@@ -1,0 +1,21 @@
+{% from "_components/generic-hmpps-card/macro.njk" import genericHMPPSCard %}
+
+{% macro summaryLabel(activity) -%}
+  {%- if activity.isCancelledCheckIn -%}
+    {{ activity.description | toSentenceCase }}
+  {%- else -%}
+    {{ ((activity.description + ' - ' + (activity.displayName or activity.type)) if activity.description else (activity.displayName or activity.type)) | toSentenceCase }}
+  {%- endif -%}
+{%- endmacro %}
+
+
+{# For each grouped day #}
+{% for group in groupedActivities %}
+    {% for activity in group.activities %}
+        {{ genericHMPPSCard({
+            titleCaption: { text: group.date },
+            title: { text: summaryLabel(activity) },
+            actions: { items: [{ href: "/add", text: "Add" }] }
+        }) }}
+    {% endfor %}
+{% endfor %}
