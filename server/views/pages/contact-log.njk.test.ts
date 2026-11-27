@@ -85,7 +85,7 @@ describe('Contact log page', () => {
     it('should render the contact log list in the new design', () => {
       const $ = render({ flags: { enableContactCardDesign20261126Squad3: true } })
 
-      // Add assertions for the new design here
+      expect($('.app-hmpps-generic-card').length).toBeGreaterThanOrEqual(1)
       expect($('.contact-log-compact')).toHaveLength(0)
     })
   })
