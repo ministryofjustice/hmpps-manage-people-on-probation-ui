@@ -5,11 +5,18 @@ import type { Route } from '../@types'
 import controllers from '../controllers'
 import { getPersonalDetails, getPersonRiskFlags } from '../middleware'
 
-export default function risksRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
+export default function risksRoutes(router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all(['/case/:crn/risk', '/case/:crn/risk/*path'], getPersonalDetails(hmppsAuthClient, arnsComponents))
-  router.get('/case/:crn/risk', getPersonRiskFlags(hmppsAuthClient), controllers.risk.getRisk(hmppsAuthClient))
+  router.all(
+    ['/case/:crn/risk', '/case/:crn/risk/*path'],
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
+  )
+  router.get(
+    '/case/:crn/risk',
+    getPersonRiskFlags(hmppsAuthClient, mpopComponents),
+    controllers.risk.getRisk(hmppsAuthClient),
+  )
 
   router.get('/case/:crn/risk/flag/:id', [controllers.risk.getRiskFlag(hmppsAuthClient)])
 
@@ -22,7 +29,7 @@ export default function risksRoutes(router: Router, { hmppsAuthClient, arnsCompo
 
   router.get(
     '/case/:crn/risk/removed-risk-flags',
-    getPersonRiskFlags(hmppsAuthClient),
+    getPersonRiskFlags(hmppsAuthClient, mpopComponents),
     controllers.risk.getRemovedRiskFlags(hmppsAuthClient),
   )
 

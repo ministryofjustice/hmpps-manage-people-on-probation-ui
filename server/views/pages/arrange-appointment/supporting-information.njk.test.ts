@@ -2,7 +2,6 @@ import * as cheerio from 'cheerio'
 import httpMocks from 'node-mocks-http'
 import { Name } from '../../../data/model/personalDetails'
 import { RiskFlag } from '../../../data/model/risk'
-import { TierCalculation } from '../../../data/tierApiClient'
 import { AppointmentSession } from '../../../models/Appointments'
 import { AppResponse } from '../../../models/Locals'
 import { createNunjucksTestEnv } from '../../../testutils/nunjucksTestEnv'
@@ -16,8 +15,8 @@ type TestModel = {
   headerPersonName: Name
   headerCRN: string
   headerDob: string
-  headerTierLink: string
-  tierCalculation: Partial<TierCalculation>
+  tierUrlV3: string
+  tierDetails: { calculation: { tierScore: string } }
   allowSms: boolean
   isInPast: boolean
   isSensitive: boolean
@@ -35,8 +34,8 @@ const baseModel: TestModel = {
   headerPersonName: { forename: 'Caroline', surname: 'Wolff' },
   headerCRN: crn,
   headerDob: '1979-08-18',
-  headerTierLink: 'http://tier/link',
-  tierCalculation: { tierScore: 'A3' },
+  tierUrlV3: 'http://tier/v3/case/X000001',
+  tierDetails: { calculation: { tierScore: 'A3' } },
   allowSms: true,
   isInPast: false,
   isSensitive: false,
@@ -85,7 +84,7 @@ describe('Add supporting information (optional)', () => {
     expect(header.text()).toContain('Caroline Wolff')
     expect(header.text()).toContain(crn)
     expect(header.text()).toContain('18 August 1979')
-    expect(header.find('a[href="http://tier/link"]').text()).toContain('A3')
+    expect(header.find('a[href="http://tier/v3/case/X000001"]').text()).toContain('A3')
     expect($('main').find('[data-qa=riskToStaffAlert]').length).toBe(0)
     expect($('.govuk-error-summary').length).toBe(0)
 

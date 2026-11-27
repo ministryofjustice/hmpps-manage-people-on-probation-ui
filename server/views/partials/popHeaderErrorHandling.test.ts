@@ -43,10 +43,9 @@ const baseContext = (overrides: Record<string, unknown> = {}) => ({
   headerTierLink: '/case/X000001/tier-history',
   tierUrlV3: '/case/X000001/tier-details',
   tierCalculation: { tierScore: 'B2' },
-  managedBy: { text: 'Jane Smith', href: '/case/X000001/personal-details/staff-contacts' },
-  personPhotoSrc: '/search/prisoner-image/G9566GQ',
+  personPhotoSrc: '/person-photo/G9566GQ',
   arnsUnavailable: false,
-  prisonsUnavailable: false,
+  photoUnavailable: false,
   risksWidget: toRoshWidget(workingRisks),
   riskData: workingRiskData,
   headerActions: '',
@@ -83,31 +82,33 @@ describe('pop-header.njk API failure handling', () => {
 
       expect(html).toContain('data-qa="headerErrors"')
       expect(html).toContain('Risk information from the ARNS service is currently unavailable.')
-      expect(html).not.toContain('Photos and throughcare information are currently unavailable.')
+      expect(html).not.toContain('Photo is currently unavailable.')
       expect(html).not.toContain("data-qa='riskBadges'")
       expect(html).toContain("data-qa='personPhoto'")
     })
 
-    it('AC3: Prisons failure hides the photo and shows the Prisons message', () => {
+    it('photo failure hides the photo and shows the photo message', () => {
       const html = render(
         baseContext({
-          prisonsUnavailable: true,
+          photoUnavailable: true,
           personPhotoSrc: undefined,
         }),
       )
 
       expect(html).toContain('data-qa="headerErrors"')
-      expect(html).toContain('Photos and throughcare information are currently unavailable.')
+      expect(html).toContain('Photo is currently unavailable.')
       expect(html).not.toContain('Risk information from the ARNS service is currently unavailable.')
       expect(html).not.toContain("data-qa='personPhoto'")
       expect(html).toContain("data-qa='riskBadges'")
     })
 
-    it('AC4: both ARNS and Prisons failing shows both messages, Photos first then ARNS', () => {
+    it('several failures show every message as a list, in order', () => {
       const html = render(
         baseContext({
+          statusUnavailable: true,
           arnsUnavailable: true,
-          prisonsUnavailable: true,
+          photoUnavailable: true,
+          throughcareUnavailable: 'some',
           riskData: null,
           risksWidget: toRoshWidget(null),
           personPhotoSrc: undefined,
@@ -115,11 +116,34 @@ describe('pop-header.njk API failure handling', () => {
       )
 
       expect(html).toContain('data-qa="headerErrors"')
-      expect(html).toContain('Photos and throughcare information are currently unavailable.')
-      expect(html).toContain('Risk information from the ARNS service is currently unavailable.')
-      expect(html.indexOf('Photos and throughcare')).toBeLessThan(html.indexOf('Risk information from the ARNS'))
+      const messages = [
+        'Risk information from the ARNS service is currently unavailable.',
+        'Photo is currently unavailable.',
+        'Status information is currently unavailable.',
+        'Some throughcare information is currently unavailable.',
+      ]
+      const positions = messages.map(message => html.indexOf(message))
+      expect(positions.every(position => position > -1)).toBe(true)
+      expect([...positions].sort((a, b) => a - b)).toEqual(positions)
+      expect(html).toContain('govuk-list--bullet')
       expect(html).not.toContain("data-qa='personPhoto'")
       expect(html).not.toContain("data-qa='riskBadges'")
+    })
+
+    it('status failure shows the status message', () => {
+      const html = render(baseContext({ statusUnavailable: true }))
+
+      expect(html).toContain('Status information is currently unavailable.')
+      expect(html).not.toContain('govuk-list--bullet')
+    })
+
+    it.each([
+      ['some', 'Some throughcare information is currently unavailable.'],
+      ['all', 'Throughcare information is currently unavailable.'],
+    ])('throughcare %s unavailable shows its message', (throughcareUnavailable, message) => {
+      const html = render(baseContext({ throughcareUnavailable }))
+
+      expect(html).toContain(message)
     })
 
     it('AC5: the error summary appears above the header content', () => {
@@ -148,11 +172,11 @@ describe('pop-header.njk API failure handling', () => {
       expect(html).toContain('govuk-tag')
     })
 
-    it('never shows the error summary, even when arnsUnavailable/prisonsUnavailable are set, because this feature is gated behind enablePersonHeader', () => {
+    it('never shows the error summary, even when arnsUnavailable/photoUnavailable are set, because this feature is gated behind enablePersonHeader', () => {
       const html = render(
         legacyContext({
           arnsUnavailable: true,
-          prisonsUnavailable: true,
+          photoUnavailable: true,
           riskData: null,
           risksWidget: toRoshWidget(null),
         }),
@@ -160,7 +184,7 @@ describe('pop-header.njk API failure handling', () => {
 
       expect(html).not.toContain('data-qa="headerErrors"')
       expect(html).not.toContain('Risk information from the ARNS service is currently unavailable.')
-      expect(html).not.toContain('Photos and throughcare information are currently unavailable.')
+      expect(html).not.toContain('Photo is currently unavailable.')
     })
   })
 })

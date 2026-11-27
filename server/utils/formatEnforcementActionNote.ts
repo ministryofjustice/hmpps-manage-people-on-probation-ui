@@ -1,4 +1,4 @@
-import { toSentenceCase } from './toSentenceCase'
+import { toSentenceCase } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 
 export const formatEnforcementActionNote = (str: string): string => {
   if (!str) return ''

@@ -1,267 +1,247 @@
 import httpMocks from 'node-mocks-http'
+import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { getPersonRiskFlags } from './getPersonRiskFlags'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import MasApiClient from '../data/masApiClient'
-import { findReplace, setDataValue, getStaffRisk } from '../utils'
 import { PersonRiskFlags, RiskFlag } from '../data/model/risk'
 import { mockAppResponse } from '../controllers/mocks'
 
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
-jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    setDataValue: jest.fn(),
-    findReplace: jest.fn(),
-    getStaffRisk: jest.fn(),
-  }
-})
-
-const getStaffRiskMock = getStaffRisk as jest.MockedFunction<typeof getStaffRisk>
-
-getStaffRiskMock.mockReturnValue({ id: 1, description: 'Risk to Staff', levelDescription: 'Medium' } as RiskFlag)
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+const mpopComponents = { getPersonRiskFlags: jest.fn() } as unknown as jest.Mocked<MPoPComponents>
 
 const nextSpy = jest.fn()
 const crn = 'X000001'
 
-const mockRisks: PersonRiskFlags = {
-  personSummary: { name: { forename: '', surname: '' }, crn, dateOfBirth: '' },
+const riskFlag = (overrides: Partial<RiskFlag>): RiskFlag =>
+  ({
+    id: 1,
+    description: 'Risk to Staff',
+    level: 'HIGH',
+    levelDescription: 'High',
+    mostRecentReviewDate: '2026-10-01',
+    removed: false,
+    removalHistory: [],
+    ...overrides,
+  }) as RiskFlag
+
+const mockRisks = (overrides: Partial<PersonRiskFlags> = {}): PersonRiskFlags => ({
+  personSummary: { name: { forename: 'James', surname: 'Morrison' }, crn, dateOfBirth: '' },
   opd: {},
   mappa: {},
-  riskFlags: [],
-  removedRiskFlags: [],
-}
-
-const mockSessionRisks: PersonRiskFlags = {
-  ...mockRisks,
-  personSummary: { ...mockRisks.personSummary, name: { forename: 'James', surname: 'Morrison' } },
-}
-
-const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
-const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
-
-const mockFormattedRisks = {
-  ...mockRisks,
   riskFlags: [
-    { id: 1, description: 'Risk to Staff', levelDescription: 'Medium', mostRecentReviewDate: '2026-10-01' },
-    { id: 2, description: 'High ROSH', levelDescription: 'High', mostRecentReviewDate: '2026-10-01' },
+    riskFlag({ id: 1, description: 'Risk to Staff', levelDescription: 'Medium' }),
+    riskFlag({ id: 2, description: 'High RoSH', levelDescription: 'High' }),
+    riskFlag({ id: 3, description: 'Risk to Probation Staff', level: 'HIGH' }),
   ],
-  removedRiskFlags: [{ id: 2, description: 'Removed ROSH flag' }],
-} as Partial<PersonRiskFlags>
+  removedRiskFlags: [riskFlag({ id: 4, description: 'Removed RoSH flag', removed: true })],
+  ...overrides,
+})
 
-mockFindReplace.mockImplementation(() => mockFormattedRisks)
-
-const getPersonRiskFlagsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
-  .mockImplementation(() => Promise.resolve(mockRisks))
-
-const createResponse = ({ enableNDeliusRosh = false } = {}) =>
-  mockAppResponse({
-    flags: {
-      enableNDeliusRosh,
-    },
+const createRequest = (risks?: PersonRiskFlags) =>
+  httpMocks.createRequest({
+    params: { crn },
+    session: { data: risks ? { risks: { [crn]: risks } } : {} },
   })
 
-const res = createResponse()
+const createResponse = ({ enableNDeliusRosh = false } = {}) => mockAppResponse({ flags: { enableNDeliusRosh } })
 
-const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+const apiResponse = (personRiskFlags: PersonRiskFlags | null, httpStatus = 200, error?: Error) => ({
+  personRiskFlags,
+  httpStatus,
+  error,
+})
+
 describe('middleware/getPersonRiskFlags', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mpopComponents.getPersonRiskFlags.mockResolvedValue(apiResponse(mockRisks()))
   })
 
   describe('risks session does not exist for current crn', () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {},
-      },
-    })
-    beforeEach(async () => {
-      await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should request the risk flags from the api', async () => {
-      expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-    })
-    it(`should find and replace RoSH with ROSH in the api response`, () => {
-      expect(mockFindReplace).toHaveBeenCalledTimes(2)
-      expect(mockFindReplace).toHaveBeenNthCalledWith(1, {
-        data: mockRisks,
-        path: ['riskFlags'],
-        key: 'description',
-        find: 'RoSH',
-        replace: 'ROSH',
-      })
-      expect(mockFindReplace).toHaveBeenNthCalledWith(2, {
-        data: expect.any(Object),
-        path: ['removedRiskFlags'],
-        key: 'description',
-        find: 'RoSH',
-        replace: 'ROSH',
-      })
-      expect(res.locals.personRisks).toEqual(mockFormattedRisks)
-    })
-    it('should add the response to to req.session.data.risks', () => {
-      expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['risks', crn], mockFormattedRisks)
-    })
-    it('should set res.locals.personRisks to the api response', () => {
-      expect(res.locals.personRisks).toEqual(mockFormattedRisks)
-      expect(res.locals.rosh).toBeUndefined()
-    })
-    it('should call next()', () => {
+    it('requests the risk flags from the api and caches the response in the session', async () => {
+      const req = createRequest()
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, res, nextSpy)
+
+      expect(mpopComponents.getPersonRiskFlags).toHaveBeenCalledWith(undefined, crn)
+      expect(req.session.data.risks[crn]).toEqual(mockRisks())
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
-  })
-  describe('risks session exists for current crn', () => {
-    const mockRiskBadgeData = {
-      remainingCount: 0,
-    }
 
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {
-          risks: {
-            [crn]: mockSessionRisks,
-          },
-          riskBadgeData: {
-            [crn]: mockRiskBadgeData,
+    it('renames RoSH to ROSH in the risk flags and removed risk flags', async () => {
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+      expect(res.locals.personRisks.riskFlags[1].description).toBe('High ROSH')
+      expect(res.locals.personRisks.removedRiskFlags[0].description).toBe('Removed ROSH flag')
+    })
+
+    it('clears the level on the Risk to Probation Staff flag', async () => {
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+      expect(res.locals.personRisks.riskFlags[2].level).toBeUndefined()
+      expect(res.locals.riskToProbationStaff).toEqual({ id: 3 })
+    })
+
+    it('sets the risk badge data', async () => {
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+      expect(res.locals.riskBadgeData.headerBadges.length).toBeGreaterThan(0)
+    })
+
+    it('shows the risk flags unavailable error when the api returns a 500', async () => {
+      mpopComponents.getPersonRiskFlags.mockResolvedValue(apiResponse(null, 500, new Error('Server error')))
+      const req = createRequest()
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, res, nextSpy)
+
+      expect(res.locals.personRisks).toEqual({
+        errors: [{ text: 'Risk flag information is currently unavailable. Try again later or use NDelius.' }],
+      })
+      expect(req.session.data.risks).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('throws when the api returns another error', async () => {
+      const error = new Error('Service unavailable')
+      mpopComponents.getPersonRiskFlags.mockResolvedValue(apiResponse(null, 503, error))
+
+      await expect(
+        getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), createResponse(), nextSpy),
+      ).rejects.toBe(error)
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('risks session saved by the previous version of the middleware', () => {
+    const legacyRequest = () =>
+      httpMocks.createRequest({
+        params: { crn },
+        session: {
+          data: {
+            risks: {
+              [crn]: mockRisks({
+                riskFlags: [riskFlag({ id: 3, description: 'Risk to Probation Staff', level: undefined })],
+              }),
+            },
+            riskBadgeData: { [crn]: { headerBadges: [], groupedBadges: [], remainingCount: 0 } },
           },
         },
-      },
-    })
-
-    beforeEach(async () => {
-      jest.clearAllMocks()
-
-      await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
-    })
-
-    it('should not request the risk flags from the api', () => {
-      expect(getPersonRiskFlagsSpy).not.toHaveBeenCalled()
-    })
-
-    it('should not set the risks session', () => {
-      expect(mockSetDataValue).not.toHaveBeenCalled()
-    })
-
-    it('should set res.locals.personRisks to the session value', () => {
-      expect(res.locals.personRisks).toEqual(mockSessionRisks)
-    })
-
-    it('should set res.locals.riskToStaff to the expected value', () => {
-      expect(res.locals.riskToStaff).toStrictEqual({
-        id: 1,
-        level: 'MEDIUM',
       })
+
+    it('requests the risk flags again and replaces the legacy cache', async () => {
+      const req = legacyRequest()
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, res, nextSpy)
+
+      expect(mpopComponents.getPersonRiskFlags).toHaveBeenCalledWith(undefined, crn)
+      expect(req.session.data.risks[crn]).toEqual(mockRisks())
+      expect(req.session.data.riskBadgeData[crn]).toBeUndefined()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
     })
 
-    it('should call next()', () => {
+    it('keeps the Risk to Probation Staff badge in the header', async () => {
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(legacyRequest(), res, nextSpy)
+
+      expect(res.locals.riskBadgeData.headerBadges.map((badge: { id: number }) => badge.id)).toContain(3)
+    })
+
+    it('uses the refreshed cache on the next request', async () => {
+      const req = legacyRequest()
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, createResponse(), nextSpy)
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(req, createResponse(), nextSpy)
+
+      expect(mpopComponents.getPersonRiskFlags).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('risks session exists for current crn', () => {
+    it('uses the session value without calling the api', async () => {
+      const res = createResponse()
+
+      await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(
+        createRequest(
+          mockRisks({ personSummary: { name: { forename: 'Cached', surname: 'Person' }, crn, dateOfBirth: '' } }),
+        ),
+        res,
+        nextSpy,
+      )
+
+      expect(mpopComponents.getPersonRiskFlags).not.toHaveBeenCalled()
+      expect(res.locals.personRisks.personSummary.name.forename).toBe('Cached')
+      expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'MEDIUM' })
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
-  describe('Risk to staff level value is formatted as VERY HIGH', () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {},
-      },
-    })
-    beforeEach(async () => {
-      getStaffRiskMock.mockImplementationOnce(
-        () => ({ id: 1, description: 'Risk to Staff', levelDescription: 'VERY HIGH' }) as RiskFlag,
-      )
-      await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should set res.locals.riskToStaff level to VERY_HIGH', () => {
-      expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'VERY_HIGH' })
-    })
+
+  it('sets the risk to staff level to VERY_HIGH when it is Very High', async () => {
+    mpopComponents.getPersonRiskFlags.mockResolvedValue(
+      apiResponse(mockRisks({ riskFlags: [riskFlag({ id: 1, levelDescription: 'Very High' })] })),
+    )
+    const res = createResponse()
+
+    await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+    expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'VERY_HIGH' })
   })
 
-  it('should not generate risk badge data when risk flags are not present', async () => {
-    getPersonRiskFlagsSpy.mockResolvedValueOnce({
-      ...mockRisks,
-      riskFlags: undefined,
-    } as PersonRiskFlags)
+  it('does not set risk badge data when there are no risk flags', async () => {
+    mpopComponents.getPersonRiskFlags.mockResolvedValue(apiResponse(mockRisks({ riskFlags: undefined })))
+    const res = createResponse()
 
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {},
-      },
-    })
-
-    await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
+    await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
 
     expect(res.locals.riskBadgeData).toBeUndefined()
-
-    expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['riskBadgeData', crn], undefined)
   })
 
-  it('should assign NDelius Rosh values to res.locals.rosh if enableNDeliusRosh feature flag is enabled', async () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {},
-      },
-    })
-    const mockRes = createResponse({ enableNDeliusRosh: true })
-    await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
-    expect(mockRes.locals.rosh).toEqual({ level: 'HIGH', assessedOn: '2026-10-01' })
+  it('does not set res.locals.rosh when enableNDeliusRosh is disabled', async () => {
+    const res = createResponse()
+
+    await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+    expect(res.locals.rosh).toBeUndefined()
   })
 
-  it('should assign a VERY HIGH level to res.locals.rosh when the matching risk flag description is Very High ROSH', async () => {
-    const veryHighRisks = {
-      ...mockFormattedRisks,
-      riskFlags: [
-        { id: 1, description: 'Very High ROSH', levelDescription: 'High', mostRecentReviewDate: '2026-10-01' },
-      ],
-    }
-    mockFindReplace.mockImplementationOnce(() => veryHighRisks).mockImplementationOnce(() => veryHighRisks)
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {},
-      },
-    })
-    const mockRes = createResponse({ enableNDeliusRosh: true })
-    await getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)
-    expect(mockRes.locals.rosh).toEqual({ level: 'VERY HIGH', assessedOn: '2026-10-01' })
+  it('sets the NDelius ROSH level when enableNDeliusRosh is enabled', async () => {
+    const res = createResponse({ enableNDeliusRosh: true })
+
+    await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+    expect(res.locals.rosh).toEqual({ level: 'HIGH', assessedOn: '2026-10-01' })
   })
 
-  it('should not throw and should set res.locals.rosh.level to null when enableNDeliusRosh is enabled and riskFlags is absent', async () => {
-    getPersonRiskFlagsSpy.mockResolvedValueOnce({
-      ...mockRisks,
-      riskFlags: undefined,
-    } as PersonRiskFlags)
-    mockFindReplace.mockImplementation(data => data as Partial<PersonRiskFlags>)
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-      },
-      session: {
-        data: {},
-      },
-    })
-    const mockRes = createResponse({ enableNDeliusRosh: true })
-    await expect(getPersonRiskFlags(hmppsAuthClient)(req, mockRes, nextSpy)).resolves.not.toThrow()
-    expect(mockRes.locals.rosh).toEqual({ level: null, assessedOn: null })
+  it('sets a VERY HIGH ROSH level for a Very High ROSH flag', async () => {
+    mpopComponents.getPersonRiskFlags.mockResolvedValue(
+      apiResponse(mockRisks({ riskFlags: [riskFlag({ id: 1, description: 'Very High RoSH' })] })),
+    )
+    const res = createResponse({ enableNDeliusRosh: true })
+
+    await getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy)
+
+    expect(res.locals.rosh).toEqual({ level: 'VERY HIGH', assessedOn: '2026-10-01' })
+  })
+
+  it('sets the ROSH level to null when there are no risk flags', async () => {
+    mpopComponents.getPersonRiskFlags.mockResolvedValue(apiResponse(mockRisks({ riskFlags: undefined })))
+    const res = createResponse({ enableNDeliusRosh: true })
+
+    await expect(
+      getPersonRiskFlags(hmppsAuthClient, mpopComponents)(createRequest(), res, nextSpy),
+    ).resolves.not.toThrow()
+    expect(res.locals.rosh).toEqual({ level: null, assessedOn: null })
   })
 })

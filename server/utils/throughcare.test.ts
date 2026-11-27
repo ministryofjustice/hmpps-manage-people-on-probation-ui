@@ -61,12 +61,15 @@ describe('utils/throughcare', () => {
 
   describe('getThroughcareRows', () => {
     it('returns the in custody rows', async () => {
-      await expect(getThroughcareRows(token, nomsNumber, prisonerInCustody)).resolves.toEqual([
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Dove' } },
-        { key: { text: 'Current prison' }, value: { text: 'HMP Whatton' } },
-        { key: { text: 'Responsible officer expected handover date' }, value: { text: '6 November 2026' } },
-        { key: { text: 'Release date' }, value: { text: '16 March 2027' } },
-      ])
+      await expect(getThroughcareRows(token, nomsNumber, prisonerInCustody)).resolves.toEqual({
+        rows: [
+          { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Dove' } },
+          { key: { text: 'Current prison' }, value: { text: 'HMP Whatton' } },
+          { key: { text: 'Responsible officer expected handover date' }, value: { text: '6 November 2026' } },
+          { key: { text: 'Release date' }, value: { text: '16 March 2027' } },
+        ],
+        unavailable: undefined,
+      })
 
       expect(MoicApiClient).toHaveBeenCalledWith(token)
       expect(getPomDetailsSpy).toHaveBeenCalledWith(nomsNumber)
@@ -75,11 +78,14 @@ describe('utils/throughcare', () => {
     })
 
     it('returns the released rows', async () => {
-      await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual([
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Dove' } },
-        { key: { text: 'Last prison' }, value: { text: 'Moorland (HMP & YOI)' } },
-        { key: { text: 'Release date' }, value: { text: '16 March 2025' } },
-      ])
+      await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual({
+        rows: [
+          { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Dove' } },
+          { key: { text: 'Last prison' }, value: { text: 'Moorland (HMP & YOI)' } },
+          { key: { text: 'Release date' }, value: { text: '16 March 2025' } },
+        ],
+        unavailable: undefined,
+      })
 
       expect(PrisonRegisterApiClient).toHaveBeenCalledWith(token)
       expect(getPomDetailsSpy).toHaveBeenCalledWith(nomsNumber)
@@ -93,7 +99,7 @@ describe('utils/throughcare', () => {
     ])('returns the released rows when the status is %s and the inOutStatus is %s', async (status, inOutStatus) => {
       const throughcareRows = await getThroughcareRows(token, nomsNumber, { ...prisonerReleased, status, inOutStatus })
 
-      expect(throughcareRows.map(({ key }) => key.text)).toEqual([
+      expect(throughcareRows.rows.map(({ key }) => key.text)).toEqual([
         'Prison offender manager (POM)',
         'Last prison',
         'Release date',
@@ -110,7 +116,7 @@ describe('utils/throughcare', () => {
     ])('returns the in custody rows when the status is %s and the inOutStatus is %s', async (status, inOutStatus) => {
       const throughcareRows = await getThroughcareRows(token, nomsNumber, { ...prisonerInCustody, status, inOutStatus })
 
-      expect(throughcareRows.map(({ key }) => key.text)).toEqual([
+      expect(throughcareRows.rows.map(({ key }) => key.text)).toEqual([
         'Prison offender manager (POM)',
         'Current prison',
         'Responsible officer expected handover date',
@@ -124,7 +130,7 @@ describe('utils/throughcare', () => {
         lastPrisonId: undefined,
       })
 
-      expect(throughcareRows.find(row => row.key.text === 'Last prison').value.text).toEqual('No data available')
+      expect(throughcareRows.rows.find(row => row.key.text === 'Last prison').value.text).toEqual('No data available')
       expect(getPrisonSpy).not.toHaveBeenCalled()
     })
 
@@ -135,38 +141,74 @@ describe('utils/throughcare', () => {
 
       await expect(
         getThroughcareRows(token, nomsNumber, { ...prisonerInCustody, releaseDate: undefined }),
-      ).resolves.toEqual([
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'No data available' } },
-        { key: { text: 'Current prison' }, value: { text: 'HMP Whatton' } },
-        { key: { text: 'Responsible officer expected handover date' }, value: { text: 'No data available' } },
-        { key: { text: 'Release date' }, value: { text: 'No data available' } },
-      ])
+      ).resolves.toEqual({
+        rows: [
+          { key: { text: 'Prison offender manager (POM)' }, value: { text: 'No data available' } },
+          { key: { text: 'Current prison' }, value: { text: 'HMP Whatton' } },
+          { key: { text: 'Responsible officer expected handover date' }, value: { text: 'No data available' } },
+          { key: { text: 'Release date' }, value: { text: 'No data available' } },
+        ],
+        unavailable: undefined,
+      })
       await expect(
         getThroughcareRows(token, nomsNumber, { ...prisonerReleased, releaseDate: undefined }),
-      ).resolves.toEqual([
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'No data available' } },
-        { key: { text: 'Last prison' }, value: { text: 'No data available' } },
-        { key: { text: 'Release date' }, value: { text: 'No data available' } },
-      ])
+      ).resolves.toEqual({
+        rows: [
+          { key: { text: 'Prison offender manager (POM)' }, value: { text: 'No data available' } },
+          { key: { text: 'Last prison' }, value: { text: 'No data available' } },
+          { key: { text: 'Release date' }, value: { text: 'No data available' } },
+        ],
+        unavailable: undefined,
+      })
     })
 
-    it('renders a default value when the apis respond with a handled 500', async () => {
+    it('leaves out the rows from apis that respond with a handled 500', async () => {
       const errorResponse = { status: 500, errors: [{ text: 'Currently unavailable.' }] }
       getPomDetailsSpy.mockResolvedValue(errorResponse as never)
       getPomToRoHandoverDetailsSpy.mockResolvedValue(errorResponse as never)
       getPrisonSpy.mockResolvedValue(errorResponse as never)
 
-      await expect(getThroughcareRows(token, nomsNumber, prisonerInCustody)).resolves.toEqual([
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'No data available' } },
-        { key: { text: 'Current prison' }, value: { text: 'HMP Whatton' } },
-        { key: { text: 'Responsible officer expected handover date' }, value: { text: 'No data available' } },
-        { key: { text: 'Release date' }, value: { text: '16 March 2027' } },
-      ])
-      await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual([
-        { key: { text: 'Prison offender manager (POM)' }, value: { text: 'No data available' } },
-        { key: { text: 'Last prison' }, value: { text: 'No data available' } },
-        { key: { text: 'Release date' }, value: { text: '16 March 2025' } },
-      ])
+      await expect(getThroughcareRows(token, nomsNumber, prisonerInCustody)).resolves.toEqual({
+        rows: [
+          { key: { text: 'Current prison' }, value: { text: 'HMP Whatton' } },
+          { key: { text: 'Release date' }, value: { text: '16 March 2027' } },
+        ],
+        unavailable: 'some',
+      })
+      await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual({
+        rows: [{ key: { text: 'Release date' }, value: { text: '16 March 2025' } }],
+        unavailable: 'some',
+      })
+    })
+
+    it('leaves out the rows from apis that throw, without failing', async () => {
+      getPomDetailsSpy.mockRejectedValue(new Error('503'))
+      getPrisonSpy.mockRejectedValue(new Error('timeout'))
+
+      await expect(getThroughcareRows(token, nomsNumber, prisonerReleased)).resolves.toEqual({
+        rows: [{ key: { text: 'Release date' }, value: { text: '16 March 2025' } }],
+        unavailable: 'some',
+      })
+    })
+
+    it('leaves out the prisoner rows when Prisoner Search failed', async () => {
+      await expect(getThroughcareRows(token, nomsNumber, undefined, true)).resolves.toEqual({
+        rows: [
+          { key: { text: 'Prison offender manager (POM)' }, value: { text: 'Rachel Dove' } },
+          { key: { text: 'Responsible officer expected handover date' }, value: { text: '6 November 2026' } },
+        ],
+        unavailable: 'some',
+      })
+    })
+
+    it('returns no rows and all unavailable when every source fails', async () => {
+      getPomDetailsSpy.mockRejectedValue(new Error('503'))
+      getPomToRoHandoverDetailsSpy.mockRejectedValue(new Error('503'))
+
+      await expect(getThroughcareRows(token, nomsNumber, undefined, true)).resolves.toEqual({
+        rows: undefined,
+        unavailable: 'all',
+      })
     })
 
     it('returns undefined without calling the apis when there is no NOMS number', async () => {

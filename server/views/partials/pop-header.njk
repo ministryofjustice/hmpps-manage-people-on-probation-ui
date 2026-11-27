@@ -5,34 +5,6 @@
 
 {% set calculation = tierDetails.calculation %}
 
-{% set headerErrors = [] %}
-{% if prisonsUnavailable %}
-    {% set headerErrors = (headerErrors.push({ text: "Photos and throughcare information are currently unavailable." }), headerErrors) %}
-{% endif %}
-{% if arnsUnavailable %}
-    {% set headerErrors = (headerErrors.push({ text: "Risk information from the ARNS service is currently unavailable." }), headerErrors) %}
-{% endif %}
-{% if flags.enablePersonHeader and headerErrors.length %}
-    {% set headerErrorsHtml %}
-        {% if headerErrors.length > 1 %}
-            <ul class="govuk-!-margin-top-0">
-            {% for error in headerErrors %}
-                <li>{{ error.text }}</li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <span>{{ headerErrors[0].text }}</span>
-        {% endif %}
-    {% endset %}
-    {{ mojAlert({
-        variant: "error",
-        title: "There is a problem",
-        showTitleAsHeading: true,
-        attributes: { "data-qa": "headerErrors" },
-        html: headerErrorsHtml
-    }) }}
-{% endif %}
-
 {% set overallRisk = rosh.level if flags.enableNDeliusRosh else risksWidget.overallRisk %}
 {% set riskName = 'Risk of serious harm' %}
 {% if not flags.enableNDeliusRosh %}
@@ -52,30 +24,6 @@
     ]
 } %}
 {% set riskBadges %}
-{% if flags.enablePersonHeader %}
-{% set showPredictorBadges = riskData.assessments[0].combinedSeriousReoffendingPredictor.band != "NOT APPLICABLE" %}
-{% if (flags.enableNDeliusRosh or showPredictorBadges) and overallRisk and overallRisk !== 'NOT_FOUND' %}
-{{ predictorBadge({
-    data: riskDataRosh,
-    predictor: 'rosh',
-    showScore: false
- })}}
-{% endif %}
-{% if showPredictorBadges %}
-{{ predictorBadge({
-            data: riskData,
-            predictor: 'combinedSeriousReoffendingPredictor',
-            showScore: true
-        })}}
-{% if riskData.assessments[0].rsr.band %}
-{{ predictorBadge({
-                data: riskData,
-                predictor: 'rsr',
-                showScore: true
-            })}}
-{% endif %}
-{% endif %}
-{% else %}
 {% if riskData
         .assessments[0]
         .combinedSeriousReoffendingPredictor
@@ -112,35 +60,30 @@
     showScore: false
  })}}
 {% endif %}
-{% endif %}
-{% endset %}
-
-{% set combinedRiskBadges %}
-    {% if riskBadges and (riskBadges | trim) %}
-        <div class="pop-header-risk-badges">
-            {{ riskBadges | safe }}
-        </div>
-    {% endif %}
 {% endset %}
 
 {% if flags.enablePersonHeader %}
-    {{ personHeader({
-        name: headerPersonName.forename + ' ' + headerPersonName.surname,
+    {{ personHeader(toPersonHeaderParams({
         crn: headerCRN,
-        dob: headerDob | dateWithYear,
-        tier: (calculation.tierScore if flags.enablePersonHeaderTierV3 else tierCalculation.tierScore) | convertToTitleCase,
-        historyHref: tierUrlV3 if flags.enablePersonHeaderTierV3 else headerTierLink,
-        provisional: calculation.provisional if flags.enablePersonHeaderTierV3 else false,
-        managedBy: managedBy.text,
-        managedByName: managedBy.name,
-        managedByLocation: managedBy.location,
-        managedByHref: managedBy.href,
+        name: headerPersonName or {},
+        dateOfBirth: headerDob,
+        tier: calculation,
+        historyHref: tierUrlV3,
+        professionalContact: professionalContact,
+        riskBadgeData: riskBadgeData,
+        personStatusTag: personStatusTag,
         photo: personPhotoSrc,
-        riskBadges: combinedRiskBadges,
-        personRiskFlags: riskBadgeData,
+        riskData: riskData,
+        roshLevel: rosh.level if flags.enableNDeliusRosh else risksWidget.overallRisk,
+        useNDeliusRosh: flags.enableNDeliusRosh,
         collapsibleRiskFlags: collapsibleRiskFlags,
-        personStatusTag: personStatusTag
-    }) }}
+        errors: {
+            statusUnavailable: statusUnavailable,
+            photoUnavailable: photoUnavailable,
+            throughcareUnavailable: throughcareUnavailable,
+            arnsUnavailable: arnsUnavailable
+        }
+    })) }}
 {% else %}
     <div class="govuk-flex">
         <div>

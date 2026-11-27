@@ -1,10 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { asUser } from '@ministryofjustice/hmpps-rest-client'
 import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { MPoPComponents } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import PersonRecordApiClient from '../data/personRecordApiClient'
 import { Route } from '../@types'
+import { getPersonHeaderPhoto } from './getPersonHeaderPhoto'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
@@ -16,12 +17,11 @@ import { ErrorSummary } from '../data/model/common'
 import { RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ProbationPractitioner } from '../models/CaseDetail'
-import { getManagedByDetails } from '../utils/getManagedByDetails'
-import { getPrisonerDetails, getStatusTag } from '../utils/personStatusTag'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
   arnsComponents: ArnsComponents,
+  mpopComponents: MPoPComponents,
 ): Route<Promise<void>> => {
   return async function getPersonalDetailsInner(req, res, next) {
     const { url, params } = req
@@ -34,9 +34,7 @@ export const getPersonalDetails = (
     let riskData: RiskData
     let probationPractitioner: ProbationPractitioner
     let professionalContact: ProfessionalContact | null
-    let personPhotoSrc: string | null | undefined
     let arnsUnavailable = false
-    let prisonsUnavailable = false
     let token: string
     let masClient: MasApiClient
     const refreshCache =
@@ -53,7 +51,6 @@ export const getPersonalDetails = (
         riskData,
         probationPractitioner,
         professionalContact,
-        personPhotoSrc,
         arnsUnavailable,
       } = req.session.data.personalDetails[crn])
     }
@@ -99,7 +96,7 @@ export const getPersonalDetails = (
               })
             : riskDataPromise,
           masClient.getProbationPractitioner(crn),
-          masClient.getContacts(crn).catch((): ProfessionalContact | null => null),
+          mpopComponents.getContacts(token, crn).then(response => response.professionalContact as ProfessionalContact),
         ])
       if (isolateApiFailures) {
         if (risks && (risks as unknown as ErrorSummary).errors !== undefined) {
@@ -155,35 +152,32 @@ export const getPersonalDetails = (
       getDataFromCache()
     }
 
-    const photoEnabled = res.locals.flags?.enablePersonHeader && res.locals.flags?.enablePersonHeaderPhoto
-    const cachedDetails = req.session?.data?.personalDetails?.[crn]
-    if (photoEnabled && overview?.noms && cachedDetails?.personPhotoSrc === undefined) {
+    const getToken = async () => {
       token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const photoData = await new PersonRecordApiClient(token).getImageData(overview.noms).catch((): null => {
-        prisonsUnavailable = true
-        return null
-      })
-      personPhotoSrc = photoData ? `/search/prisoner-image/${encodeURIComponent(overview.noms)}` : null
-
-      if (cachedDetails?.overview && !prisonsUnavailable) {
-        cachedDetails.personPhotoSrc = personPhotoSrc
-      }
+      return token
     }
-    if (!photoEnabled) {
-      personPhotoSrc = undefined
-      prisonsUnavailable = false
-    }
+    const { personPhotoSrc, photoUnavailable } = await getPersonHeaderPhoto({
+      res,
+      mpopComponents,
+      getToken,
+      crn,
+      noms: overview?.noms,
+      cachedDetails: req.session?.data?.personalDetails?.[crn],
+    })
 
     if (res.locals.flags?.enablePersonHeader) {
+      const { personStatusTag, statusUnavailable, prisoner, prisonerUnavailable } =
+        await mpopComponents.getPersonHeaderStatus(await getToken(), {
+          personalDetails: overview,
+          supervisionPackage: res.locals.supervisionPackageDetails,
+          supervisionPackageUnavailable: res.locals.supervisionPackageUnavailable,
+        })
+      res.locals.personStatusTag = personStatusTag
+      res.locals.statusUnavailable = statusUnavailable
       if (overview.noms) {
-        token ??= await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        res.locals.prisoner = await getPrisonerDetails(token, overview.noms, overview.crn)
+        res.locals.prisoner = prisoner
+        res.locals.prisonerUnavailable = prisonerUnavailable
       }
-      res.locals.personStatusTag = await getStatusTag(
-        overview,
-        res.locals.supervisionPackageDetails,
-        res.locals.prisoner,
-      )
     }
 
     res.locals.sentencePlan = sentencePlan
@@ -193,10 +187,10 @@ export const getPersonalDetails = (
     res.locals.risks = risks
     res.locals.riskData = riskData
     res.locals.probationPractitioner = probationPractitioner
-    res.locals.managedBy = getManagedByDetails(crn, professionalContact)
-    res.locals.personPhotoSrc = personPhotoSrc ?? undefined
+    res.locals.professionalContact = professionalContact
+    res.locals.personPhotoSrc = personPhotoSrc
     res.locals.arnsUnavailable = arnsUnavailable
-    res.locals.prisonsUnavailable = prisonsUnavailable
+    res.locals.photoUnavailable = photoUnavailable
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth

@@ -42,11 +42,11 @@ import { returnOptions } from '../middleware/returnOptions'
 import { routeChangeSmsConsent } from '../middleware/routeChangeSmsConsent'
 import { setCollapsibleRiskFlags } from '../middleware/setCollapsibleRiskFlags'
 
-const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents }: Services) => {
+const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsComponents, mpopComponents }: Services) => {
   router.all(
     '/case/:crn/arrange-appointment/:id/*path',
     getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     getAppointment(hmppsAuthClient),
     setCollapsibleRiskFlags,
   )
@@ -78,7 +78,7 @@ const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsCompone
     '/case/:crn/arrange-appointment/:id/type-attendance',
     restrictPageAccess({ requiredValues: ['eventId'] }),
     getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     getDefaultUser(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     forceValidation,
@@ -114,7 +114,7 @@ const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsCompone
     '/case/:crn/arrange-appointment/:id/location-date-time',
     restrictPageAccess({ requiredValues: ['eventId', 'type'] }),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getPersonRiskFlags(hmppsAuthClient),
+    getPersonRiskFlags(hmppsAuthClient, mpopComponents),
     forceValidation,
     controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
@@ -153,7 +153,7 @@ const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsCompone
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
     restrictPageAccess(),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
   )
 
   router.all(
@@ -224,7 +224,7 @@ const arrangeAppointmentRoutes = (router: Router, { hmppsAuthClient, arnsCompone
   router.all(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
     restrictPageAccess({ requiredValues: ['eventId', 'type', 'date', 'start', ['user', 'locationCode']] }),
-    getPersonalDetails(hmppsAuthClient, arnsComponents),
+    getPersonalDetails(hmppsAuthClient, arnsComponents, mpopComponents),
     getSmsPreview(hmppsAuthClient),
     getSmsConfirmationOptions(),
     getSmsConfirmation(hmppsAuthClient),

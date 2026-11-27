@@ -582,7 +582,7 @@ describe('caseController', () => {
     })
 
     it('should request and render the throughcare information when enableNewOverview is enabled', async () => {
-      getThroughcareSpy.mockResolvedValueOnce(mockThroughcareRows)
+      getThroughcareSpy.mockResolvedValueOnce({ rows: mockThroughcareRows, unavailable: 'some' })
       const throughcareRes = mockAppResponse({
         flags: { enableNewOverview: true },
         tierCalculation: mockTierCalculation,
@@ -590,10 +590,10 @@ describe('caseController', () => {
       })
       const throughcareRenderSpy = jest.spyOn(throughcareRes, 'render')
       await controllers.case.getCase(hmppsAuthClient)(req, throughcareRes)
-      expect(getThroughcareSpy).toHaveBeenCalledWith('token-1', noms, mockPrisoner)
+      expect(getThroughcareSpy).toHaveBeenCalledWith('token-1', noms, mockPrisoner, undefined)
       expect(throughcareRenderSpy).toHaveBeenCalledWith(
         'pages/overview',
-        expect.objectContaining({ throughcareRows: mockThroughcareRows }),
+        expect.objectContaining({ throughcareRows: mockThroughcareRows, throughcareUnavailable: 'some' }),
       )
     })
 

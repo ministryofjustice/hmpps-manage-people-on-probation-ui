@@ -1,71 +1,48 @@
+import { MPoPComponents, toPersonRiskDetails } from '@ministryofjustice/hmpps-mpop-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
-import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
-import { setDataValue, findReplace, getStaffRisk, getProbationRisk, getRiskRoshScore } from '../utils'
-import { getRiskBadges, RiskBadgeData } from '../utils/personRiskFlagSorter'
+import { PersonRiskFlags } from '../data/model/risk'
+import { setDataValue } from '../utils'
 
-export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+const riskFlagsUnavailable = {
+  errors: [{ text: 'Risk flag information is currently unavailable. Try again later or use NDelius.' }],
+} as unknown as PersonRiskFlags
+
+export const getPersonRiskFlags = (
+  hmppsAuthClient: HmppsAuthClient,
+  mpopComponents: MPoPComponents,
+): Route<Promise<void>> => {
   return async function getPersonRiskFlagsInner(req, res, next) {
     const { crn } = req.params as Record<string, string>
-    let personRisks: PersonRiskFlags
-    let riskBadgeData: RiskBadgeData
-    if (!req.session?.data?.risks?.[crn]) {
+    const legacyRiskBadgeData = req.session?.data?.riskBadgeData
+    const isLegacyCache = Boolean(legacyRiskBadgeData?.[crn])
+    let personRiskFlags = isLegacyCache ? undefined : req.session?.data?.risks?.[crn]
+
+    if (!personRiskFlags) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      personRisks = (await masClient.getPersonRiskFlags(crn)) as PersonRiskFlags
-
-      if (personRisks?.riskFlags) {
-        riskBadgeData = getRiskBadges(personRisks.riskFlags)
-      }
-
-      const term = 'RoSH'
-      ;['riskFlags', 'removedRiskFlags'].forEach(path => {
-        personRisks = findReplace<PersonRiskFlags, RiskFlag>({
-          data: personRisks,
-          path: [path],
-          key: 'description',
-          find: term,
-          replace: term.toUpperCase(),
-        })
-      })
-      const { data } = req.session
-      setDataValue(data, ['risks', crn], personRisks)
-      setDataValue(data, ['riskBadgeData', crn], riskBadgeData)
-    } else {
-      personRisks = req.session.data.risks[crn]
-      riskBadgeData = req.session.data.riskBadgeData?.[crn] ?? getRiskBadges(personRisks.riskFlags ?? [])
-    }
-    const riskToStaff = getStaffRisk(personRisks.riskFlags)
-    const riskToProbationStaff = getProbationRisk(personRisks.riskFlags)
-    let riskToStaffLevel = riskToStaff?.levelDescription ?? riskToStaff?.level
-    if (riskToStaffLevel?.toUpperCase() === 'VERY HIGH') {
-      riskToStaffLevel = 'VERY_HIGH'
-    }
-    const level =
-      riskToStaffLevel && ['VERY_HIGH', 'HIGH', 'MEDIUM'].includes(riskToStaffLevel.toUpperCase())
-        ? (riskToStaffLevel.toUpperCase() as RiskScore)
-        : null
-    res.locals.riskToProbationStaff = riskToProbationStaff ? { id: riskToProbationStaff?.id } : undefined
-    res.locals.riskToStaff = riskToStaff ? { id: riskToStaff?.id, level } : undefined
-    personRisks.riskFlags = personRisks?.riskFlags?.map(item => {
-      if (item.description === 'Risk to Probation Staff') {
-        return {
-          ...item,
-          level: undefined,
+      const response = await mpopComponents.getPersonRiskFlags(token, crn)
+      if (response.error) {
+        if (response.httpStatus !== 500) {
+          throw response.error
         }
+        res.locals.personRisks = riskFlagsUnavailable
+        return next()
       }
-      return item
-    })
-
-    if (res.locals?.flags?.enableNDeliusRosh) {
-      const { score, assessedOn } = getRiskRoshScore(personRisks.riskFlags)
-      res.locals.rosh = {
-        level: score,
-        assessedOn,
+      personRiskFlags = response.personRiskFlags as PersonRiskFlags
+      setDataValue(req.session.data, ['risks', crn], personRiskFlags)
+      if (isLegacyCache) {
+        delete legacyRiskBadgeData[crn]
       }
     }
-    res.locals.personRisks = personRisks
+
+    const { personRisks, riskBadgeData, riskToStaff, riskToProbationStaff, rosh } = toPersonRiskDetails(personRiskFlags)
+
+    res.locals.riskToProbationStaff = riskToProbationStaff
+    res.locals.riskToStaff = riskToStaff
+    if (res.locals?.flags?.enableNDeliusRosh) {
+      res.locals.rosh = rosh
+    }
+    res.locals.personRisks = personRisks as PersonRiskFlags
     res.locals.riskBadgeData = riskBadgeData
 
     return next()

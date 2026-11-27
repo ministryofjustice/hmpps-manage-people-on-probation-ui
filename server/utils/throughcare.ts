@@ -13,11 +13,32 @@ export const THROUGHCARE_VARIANTS = {
 
 const NO_DATA_AVAILABLE = 'No data available'
 
+export interface Throughcare {
+  rows?: SummaryListRow[]
+  unavailable?: 'some' | 'all'
+}
+
+interface ThroughcareRow {
+  row: SummaryListRow
+  failed: boolean
+}
+
+const settle = async <T>(request: Promise<T> | undefined): Promise<{ value: T | null; failed: boolean }> => {
+  try {
+    const value = await request
+    const failed = Boolean(value && typeof value === 'object' && 'errors' in value)
+    return { value: failed ? null : (value ?? null), failed }
+  } catch {
+    return { value: null, failed: true }
+  }
+}
+
 export async function getThroughcareRows(
   token: string,
   nomsNumber?: string,
   prisoner?: Prisoner,
-): Promise<SummaryListRow[] | undefined> {
+  prisonerUnavailable = false,
+): Promise<Throughcare | undefined> {
   if (!nomsNumber) {
     return undefined
   }
@@ -27,40 +48,55 @@ export async function getThroughcareRows(
       ? THROUGHCARE_VARIANTS.RELEASED
       : THROUGHCARE_VARIANTS.IN_CUSTODY
 
-  let rows: SummaryListRow[]
+  let rows: ThroughcareRow[]
 
   const moicApiClient = new MoicApiClient(token)
-  const pomRequest = moicApiClient.getPomDetails(nomsNumber)
+  const pomRequest = settle(moicApiClient.getPomDetails(nomsNumber))
 
   if (variant === THROUGHCARE_VARIANTS.RELEASED) {
     const [pom, lastPrison] = await Promise.all([
       pomRequest,
-      prisoner?.lastPrisonId ? new PrisonRegisterApiClient(token).getPrison(prisoner.lastPrisonId) : undefined,
+      settle(prisoner?.lastPrisonId ? new PrisonRegisterApiClient(token).getPrison(prisoner.lastPrisonId) : undefined),
     ])
 
-    rows = replaceEmptyValues(
-      [
-        summaryListRow('Prison offender manager (POM)', swapNameOrder(pom?.primary_pom?.name)),
-        summaryListRow('Last prison', lastPrison?.prisonName),
-        summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)),
-      ],
-      NO_DATA_AVAILABLE,
-    )
+    rows = [
+      {
+        row: summaryListRow('Prison offender manager (POM)', swapNameOrder(pom.value?.primary_pom?.name)),
+        failed: pom.failed,
+      },
+      { row: summaryListRow('Last prison', lastPrison.value?.prisonName), failed: lastPrison.failed },
+      { row: summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)), failed: prisonerUnavailable },
+    ]
   }
 
   if (variant === THROUGHCARE_VARIANTS.IN_CUSTODY) {
-    const [pom, handover] = await Promise.all([pomRequest, moicApiClient.getPomToRoHandoverDetails(nomsNumber)])
+    const [pom, handover] = await Promise.all([pomRequest, settle(moicApiClient.getPomToRoHandoverDetails(nomsNumber))])
 
-    rows = replaceEmptyValues(
-      [
-        summaryListRow('Prison offender manager (POM)', swapNameOrder(pom?.primary_pom?.name)),
-        summaryListRow('Current prison', prisoner?.prisonName),
-        summaryListRow('Responsible officer expected handover date', dateWithYear(handover?.handoverStartDate)),
-        summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)),
-      ],
-      NO_DATA_AVAILABLE,
-    )
+    rows = [
+      {
+        row: summaryListRow('Prison offender manager (POM)', swapNameOrder(pom.value?.primary_pom?.name)),
+        failed: pom.failed,
+      },
+      { row: summaryListRow('Current prison', prisoner?.prisonName), failed: prisonerUnavailable },
+      {
+        row: summaryListRow(
+          'Responsible officer expected handover date',
+          dateWithYear(handover.value?.handoverStartDate),
+        ),
+        failed: handover.failed,
+      },
+      { row: summaryListRow('Release date', dateWithYear(prisoner?.releaseDate)), failed: prisonerUnavailable },
+    ]
   }
 
-  return rows.length ? rows : undefined
+  const availableRows = replaceEmptyValues(
+    rows.filter(({ failed }) => !failed).map(({ row }) => row),
+    NO_DATA_AVAILABLE,
+  )
+  let unavailable: Throughcare['unavailable']
+  if (availableRows.length < rows.length) {
+    unavailable = availableRows.length ? 'some' : 'all'
+  }
+
+  return { rows: availableRows.length ? availableRows : undefined, unavailable }
 }
