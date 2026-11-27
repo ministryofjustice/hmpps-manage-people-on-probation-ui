@@ -1,7 +1,18 @@
 import * as cheerio from 'cheerio'
 import { createNunjucksTestEnv } from '../../testutils/nunjucksTestEnv'
+import { isInThePast } from '../../utils'
 
 const crn = 'X000001'
+
+const activity = {
+  id: '33',
+  type: 'Appointment',
+  startDateTime: '2023-02-09T09:00:00.000Z',
+  endDateTime: '2023-02-09T09:30:00.000Z',
+  hasOutcome: false,
+  isSensitive: false,
+  appointmentNotes: [] as unknown[],
+}
 
 const render = (model: Record<string, unknown> = {}) => {
   const env = createNunjucksTestEnv()
@@ -14,11 +25,17 @@ const render = (model: Record<string, unknown> = {}) => {
       headerPersonName: { forename: 'Terry', surname: 'Jones' },
       personActivity: {
         personSummary: { crn, dateOfBirth: '1980-01-01', gender: 'Male' },
-        activities: [],
-        totalResults: 0,
-        totalPages: 0,
+        activities: [activity],
+        totalResults: 1,
+        totalPages: 1,
       },
+      entries: [activity],
+      groupedActivities: [{ date: 'Thursday 9 February 2023', activities: [activity] }],
+      resultsStart: 1,
+      resultsEnd: 1,
       filters: {},
+      isInThePast,
+      url: encodeURIComponent(`/case/${crn}/activity-log`),
       query: {},
       queryParams: [],
       page: '',
@@ -51,6 +68,25 @@ describe('Contact log page', () => {
         'Contacts created since Friday 18 September 2026 are currently unavailable.',
       )
       expect($('.moj-alert').text()).toContain('You can view them on NDelius.')
+    })
+  })
+
+  describe('Contact log list', () => {
+    describe('when feature flag enableContactCardDesign20261126Squad3 is disabled', () => {
+      it('should render the contact log list in the default design', () => {
+        const $ = render({ flags: { enableContactCardDesign20261126Squad3: false } })
+
+        // Add assertions for the default design here
+        expect($('table.contact-log-compact')).toHaveLength(1)
+      })
+    })
+  })
+  describe('when feature flag enableContactCardDesign20261126Squad3 is enabled', () => {
+    it('should render the contact log list in the new design', () => {
+      const $ = render({ flags: { enableContactCardDesign20261126Squad3: true } })
+
+      // Add assertions for the new design here
+      expect($('.contact-log-compact')).toHaveLength(0)
     })
   })
 })
