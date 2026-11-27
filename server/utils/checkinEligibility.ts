@@ -35,8 +35,9 @@ export const resolveCheckinEligibility = (
   if (isTierMissing(tierCalculation) && !isRegisteredForCheckins(checkinStatus)) {
     return { outcome: 'INELIGIBLE', message: noTierEligibilityMessage(name) }
   }
+  // A tier on its own doesn't make someone eligible, so treat it like the API's UNKNOWN: a maybe
   if (isTierBasedEligibility(eligibility)) {
-    return { ...eligibility, message: mayBeEligibleMessage(name) }
+    return { ...eligibility, outcome: 'UNKNOWN', message: mayBeEligibleMessage(name) }
   }
   return eligibility
 }

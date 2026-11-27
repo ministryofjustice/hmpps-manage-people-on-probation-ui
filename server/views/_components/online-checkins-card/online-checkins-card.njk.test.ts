@@ -96,6 +96,34 @@ describe('appOnlineCheckinsCard', () => {
     expect($('[data-qa="checkinCard"] a').attr('href')).toBe(manageHref)
   })
 
+  describe('when check ins are already set up and the person is not eligible', () => {
+    it.each([
+      ['ineligible', ineligible],
+      ['missing', null],
+    ])('keeps the next check in date and the manage link when eligibility is %s', (_, eligibility) => {
+      const $ = render({ checkin: verifiedCheckin, upcomingCheckinDate: '2025-11-10', eligibility })
+      expect($('[data-qa="checkinLabel"]').text()).toBe('Next online check in')
+      expect($('[data-qa="checkinValue"]').text()).toBe('10 November 2025')
+      expect(visibleLinkText($)).toBe('Manage online check ins')
+      expect($('[data-qa="checkinCard"] a').attr('href')).toBe(manageHref)
+    })
+
+    it.each([
+      ['ineligible', ineligible],
+      ['missing', null],
+    ])('keeps check ins stopped and the view details link when eligibility is %s', (_, eligibility) => {
+      const $ = render({ checkin: { status: 'INACTIVE' }, eligibility })
+      expect($('[data-qa="checkinValue"]').text()).toBe('Check ins stopped')
+      expect(visibleLinkText($)).toBe('View all online check in details')
+      expect($('[data-qa="checkinCard"] a').attr('href')).toBe(manageHref)
+    })
+
+    it('still hides the link when the user cannot access check ins', () => {
+      const $ = render({ checkin: verifiedCheckin, eligibility: ineligible, canAccess: false })
+      expect($('[data-qa="checkinCard"] a').length).toBe(0)
+    })
+  })
+
   describe('action link visibility', () => {
     it('hides the link when the user cannot access check ins', () => {
       const $ = render({ canAccess: false })
@@ -108,12 +136,12 @@ describe('appOnlineCheckinsCard', () => {
       expect($('[data-qa="checkinCard"] a').length).toBe(0)
     })
 
-    it('shows the may be eligible message and the set up link when the outcome is unknown', () => {
+    it('shows the may be eligible message and the check eligibility link when the outcome is unknown', () => {
       const $ = render({
         eligibility: { outcome: 'UNKNOWN', message: 'Joe Bloggs may be eligible for online check ins.' },
       })
       expect($('[data-qa="checkinValue"]').text()).toBe('Joe Bloggs may be eligible for online check ins.')
-      expect(visibleLinkText($)).toBe('Set up online check ins')
+      expect(visibleLinkText($)).toBe('Check eligibility')
       expect($('[data-qa="checkinCard"] a').attr('href')).toBe(setupHref)
     })
 

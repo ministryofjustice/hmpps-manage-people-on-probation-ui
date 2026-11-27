@@ -18,7 +18,7 @@ const noTier: OffenderEligibility = {
   message: 'Steve Jones is not eligible for online check ins because they have not been assigned a tier yet.',
 }
 const mayBeEligible: OffenderEligibility = {
-  outcome: 'ELIGIBLE',
+  outcome: 'UNKNOWN',
   message: 'Steve Jones may be eligible for online check ins.',
 }
 
