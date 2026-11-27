@@ -12,8 +12,11 @@ export const getMappedOutcome = <T>({
   description?: string
 } = {}): MappedOutcome<T> | null => {
   if (!code && !description) return null
+  // Delius descriptions differ from ours in spacing (e.g. "Court/Legal"), so ignore whitespace and case.
+  // Stopgap until the API returns the outcome code.
+  const normalise = (value: string) => value.replace(/\s+/g, '').toLowerCase()
   const isMatch = (item: OutcomeProps) =>
-    code ? item.code === code : item.description.toLowerCase() === description.toLowerCase()
+    code ? item.code === code : normalise(item.description) === normalise(description)
   const mappedOutcome: MappedOutcome<T> | null =
     (Object.entries(outcomeMap).find(([_key, item]) => isMatch(item)) as MappedOutcome<T>) || null
   return mappedOutcome

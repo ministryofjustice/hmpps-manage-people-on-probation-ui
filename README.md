@@ -78,6 +78,61 @@ with no function name (common with factory-pattern middleware/controllers,
 e.g. `(dep) => (req, res, next) => {...}`) show as `unnamed#<position>`
 instead - name the inner function to get a real name in the log.
 
+### Inspecting the session locally (Redis)
+
+To see what is stored in the session without adding `console.log` to the code,
+run the app with a local Redis session store and read it with Docker.
+
+1. Start Redis and RedisInsight:
+
+   ```bash
+   docker compose -f docker-compose-redis.yml up -d
+   ```
+
+2. Set `REDIS_ENABLED=true` in `.env` and restart the app. Set it back to `false` when finished.
+3. Sign in and use the app. Session keys are named `sess:<sessionId>`.
+
+Useful commands (container name is `mpop-redis`; `systemToken:*` keys are cached system tokens):
+
+```bash
+# interactive shell
+docker exec -it mpop-redis redis-cli
+
+# list session keys / count all keys
+docker exec mpop-redis redis-cli --scan --pattern "sess:*"
+docker exec mpop-redis redis-cli DBSIZE
+
+# whole session, pretty printed
+docker exec mpop-redis redis-cli GET "sess:<id>" | jq .
+
+# seconds left before the session expires
+docker exec mpop-redis redis-cli TTL "sess:<id>"
+
+# only the appointments and temp data
+docker exec mpop-redis redis-cli GET "sess:<id>" | jq '.data | {appointments, temp}'
+
+# appointment outcome for a CRN and contact, without the large contactOutcomes list
+docker exec mpop-redis redis-cli GET "sess:<id>" | jq '.data.appointments.<CRN>["<contactId>"].outcome | del(.contactOutcomes)'
+
+# find every outcomeCode in the session
+docker exec mpop-redis redis-cli GET "sess:<id>" | jq '.. | .outcomeCode? // empty'
+
+# watch every Redis command as the app runs (Ctrl+C to stop)
+docker exec mpop-redis redis-cli MONITOR
+
+# delete a session (forces a new sign-in)
+docker exec mpop-redis redis-cli DEL "sess:<id>"
+
+# edit a session value, keeping the login (here: remove outcomeCode)
+docker exec mpop-redis redis-cli GET "sess:<id>" | jq -c 'del(.data.appointments.<CRN>["<contactId>"].outcome.outcomeCode)' | docker exec -i mpop-redis redis-cli -X val SET "sess:<id>" val KEEPTTL
+
+# clear everything
+docker exec mpop-redis redis-cli FLUSHALL
+```
+
+RedisInsight is at http://localhost:5540 (connection `redis://default@redis:6379`)
+if you prefer a UI.
+
 ## Formatting
 
 ### Check formatting
